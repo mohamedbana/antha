@@ -1,0 +1,34 @@
+// Simple do nothing protocol for hello world example
+protocol Example
+
+import (
+	"time"
+)
+
+Parameters {
+	var Color string
+	var SleepTime time.Duration
+}
+
+Data {
+	var WellColor string
+}
+
+// no physical inputs
+Inputs {
+
+}
+
+// no physical outputs
+Outputs {
+
+}
+
+Setup {
+	// None
+}
+
+Steps {
+	time.Sleep(SleepTime)
+	OutColor = Color
+}

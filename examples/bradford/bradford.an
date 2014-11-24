@@ -1,0 +1,109 @@
+// Example bradford protocol.
+// Computes the standard curve from a linear regression
+// TODO: implement replicates from parameters
+protocol bradford
+import (
+	"PlateReader"
+	"github.com/sajari/regression"
+)
+
+// Input parameters for this protocol (data)
+Parameters {
+    var SampleVolume Volume = 15.(uL)
+    var BradfordVolume Volume = 5.(uL)
+    var Wavelength Wavelength = 595.(nm)
+    var ControlCurvePoints uint32 = 7
+    var ControlCurveDilutionFactor uint32 = 2
+    var ReplicateCount uint32 = 1 // Note: 1 replicate means experiment is in duplicate, etc.
+}
+
+// Data which is returned from this protocol, and data types
+Data {
+    var SampleAbsorbance Absorbance
+    var ProteinConc Concentration
+    var RSquared float32    
+    var control_absorbance [control_curve_points+1]Absorbance
+    var control_concentrations [control_curve_points+1]float64
+}
+
+
+// Physical Inputs to this protocol with types
+Inputs {
+    var Sample WaterSolution
+    var BradfordReagent WaterSolution
+    var ControlProtein WaterSolution
+    var DistilledWater WaterSolution
+}
+
+// Physical outputs from this protocol with types
+Outputs {
+    // None
+}
+
+// No special requirements on inputs
+Requirements {
+    // None
+}
+
+// Condititions run on startup
+// Including configuring an controls required, and the blocking level needed
+// for them (in this case, per plate of samples processed)
+Setup {
+    control.Config(config.per_plate)    
+
+    var control_curve[ControlCurvePoints + 1]WaterSolution
+
+    for i:= 0; i < control_curve_points; i++ {
+        go func(i) {
+            if (i == control_curve_points) {
+                    control_curve[i] = mix(distilled_water(sample_volume) + bradford_reagent(bradford_volume)) 
+                } else {
+                    control_curve[i] = serial_dilute(control_protein(sample_volume), control_curve_points, control_curve_dilution_factor, i)
+                }
+                control_absorbance[i] = plate_reader.read(control_curve[i], wavelength)
+            }
+        }
+    } 
+}
+
+// The core process for this protocol, with the steps to be performed
+// for every input
+Steps {
+    var product = mix(Sample(SampleVolume) + BradfordReagent(BradfordVolume))
+    SampleAbsorbance = PlateReader.ReadAbsorbance(product, Wavelength)
+}
+
+// Run after controls and a steps block are completed to
+// post process any data and provide downstream results
+Analysis {
+    // need the control samples to be completed before doing the analysis
+    control.WaitForCompletion()
+    // Need to compute the linear curve y = m * x + c 
+    var r regression.Regression
+    r.SetObservedName("Absorbance")
+    r.SetVarName(0, "Concentration")
+    r.AddDataPoint(regression.DataPoint{Observed : ControlCurvePoints+1, Variables : ControlAbsorbance})
+    r.AddDataPoint(regression.DataPoint{Observed : ControlCurvePoints+1, Variables : ControlConcentrations})
+    r.RunLinearRegression()
+    m := r.GetRegCoeff(0)
+    c := r.GetRegCoeff(1)
+    RSquared = r.Rsquared   
+
+    ProteinConc = (sample_absorbance - c) / m
+}
+
+// A block of tests to perform to validate that the sample was processed correctly
+// Optionally, destructive tests can be performed to validate results on a
+// dipstick basis
+Validation {
+    if SampleAbsorbance > 1 {
+        panic("Sample likely needs further dilution")
+    }
+    if (RSquared < 0.9) {
+        warn("Low r_squared on standard curve")
+    }
+    if (RSquared < 0.7) {
+        panic("Bad r_squared on standard curve")
+    }
+    // TODO: add test of replicate variance
+}
