@@ -36,9 +36,9 @@ import (
 	"net/http"
 	"text/template"
 
-	"antha-tools/anthadoc"
-	"antha-tools/anthadoc/redirect"
-	"antha-tools/anthadoc/vfs"
+	"github.com/antha-lang/antha-tools/anthadoc"
+	"github.com/antha-lang/antha-tools/anthadoc/redirect"
+	"github.com/antha-lang/antha-tools/anthadoc/vfs"
 )
 
 var (

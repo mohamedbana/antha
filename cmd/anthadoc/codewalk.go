@@ -48,8 +48,8 @@ import (
 	"text/template"
 	"unicode/utf8"
 
-	"antha-tools/anthadoc"
-	"antha-tools/anthadoc/vfs"
+	"github.com/antha-lang/antha-tools/anthadoc"
+	"github.com/antha-lang/antha-tools/anthadoc/vfs"
 )
 
 var codewalkHTML, codewalkdirHTML *template.Template

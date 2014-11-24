@@ -165,7 +165,7 @@ func processFile(filename string, in io.Reader, out io.Writer, stdin bool) error
 }
 
 func visitFile(path string, f os.FileInfo, err error) error {
-	if err == nil && isGoFile(f) {
+	if err == nil && isAnthaFile(f) {
 		err = processFile(path, nil, os.Stdout, false)
 	}
 	if err != nil {

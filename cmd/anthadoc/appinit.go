@@ -33,11 +33,11 @@ import (
 	"log"
 	"path"
 
-	"antha-tools/anthadoc"
-	"antha-tools/anthadoc/mapfs"
-	"antha-tools/anthadoc/static"
-	"antha-tools/anthadoc/vfs"
-	"antha-tools/anthadoc/vfs/zipfs"
+	"github.com/antha-lang/antha-tools/anthadoc"
+	"github.com/antha-lang/antha-tools/anthadoc/mapfs"
+	"github.com/antha-lang/antha-tools/anthadoc/static"
+	"github.com/antha-lang/antha-tools/anthadoc/vfs"
+	"github.com/antha-lang/antha-tools/anthadoc/vfs/zipfs"
 )
 
 func init() {

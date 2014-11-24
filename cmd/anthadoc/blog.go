@@ -34,8 +34,8 @@ import (
 	"strings"
 	"sync"
 
-	"antha-tools/anthadoc/redirect"
-	"antha-tools/blog"
+	"github.com/antha-lang/antha-tools/anthadoc/redirect"
+	"github.com/antha-lang/antha-tools/blog"
 )
 
 const (

@@ -31,7 +31,7 @@ import (
 
 	// This package registers "/compile" and "/share" handlers
 	// that redirect to the golang.org playground.
-	_ "antha-tools/playground"
+	_ "github.com/antha-lang/antha-tools/playground"
 )
 
 func init() {

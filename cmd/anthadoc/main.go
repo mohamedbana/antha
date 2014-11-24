@@ -63,13 +63,12 @@ import (
 	"runtime"
 	"strings"
 
-	"antha-tools/anthadoc"
-	"antha-tools/anthadoc/analysis"
-	"antha-tools/anthadoc/static"
-	"antha-tools/anthadoc/vfs"
-	"antha-tools/anthadoc/vfs/gatefs"
-	"antha-tools/anthadoc/vfs/mapfs"
-	"antha-tools/anthadoc/vfs/zipfs"
+	"github.com/antha-lang/antha-tools/anthadoc/analysis"
+	"github.com/antha-lang/antha-tools/anthadoc/static"
+	"github.com/antha-lang/antha-tools/anthadoc/vfs"
+	"github.com/antha-lang/antha-tools/anthadoc/vfs/gatefs"
+	"github.com/antha-lang/antha-tools/anthadoc/vfs/mapfs"
+	"github.com/antha-lang/antha-tools/anthadoc/vfs/zipfs"
 )
 
 const (
