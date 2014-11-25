@@ -78,10 +78,10 @@ var xTemplate = template.Must(template.New("x").Parse(`<!DOCTYPE html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <meta name="go-import" content="golang.org{{.Prefix}}{{.Head}} hg {{.Repo}}">
-<meta http-equiv="refresh" content="0; url=https://godoc.org/golang.org{{.Prefix}}{{.Head}}{{.Tail}}">
+<meta http-equiv="refresh" content="0; url=https://anthadoc.org/golang.org{{.Prefix}}{{.Head}}{{.Tail}}">
 </head>
 <body>
-Nothing to see here; <a href="https://godoc.org/golang.org{{.Prefix}}{{.Head}}{{.Tail}}">move along</a>.
+Nothing to see here; <a href="https://anthadoc.org/golang.org{{.Prefix}}{{.Head}}{{.Tail}}">move along</a>.
 </body>
 </html>
 `))

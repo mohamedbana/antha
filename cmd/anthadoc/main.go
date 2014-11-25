@@ -63,6 +63,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/antha-lang/antha-tools/anthadoc"
 	"github.com/antha-lang/antha-tools/anthadoc/analysis"
 	"github.com/antha-lang/antha-tools/anthadoc/static"
 	"github.com/antha-lang/antha-tools/anthadoc/vfs"

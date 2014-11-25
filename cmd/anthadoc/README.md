@@ -1,4 +1,4 @@
 anthadoc
 ========
 
-Antha Documentation Generator (forked from godoc)
+Antha Documentation Generator (forked from anthadoc)

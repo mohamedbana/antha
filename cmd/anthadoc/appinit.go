@@ -26,7 +26,7 @@
 package main
 
 // This file replaces main.go when running anthadoc under app-engine.
-// See README.godoc-app for details.
+// See README.anthadoc-app for details.
 
 import (
 	"archive/zip"

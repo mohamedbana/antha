@@ -1,4 +1,4 @@
-godoc on appengine
+anthadoc on appengine
 ------------------
 
 Prerequisites
@@ -10,27 +10,27 @@ Prerequisites
 * Go sources at tip under $GOROOT
 
 * Godoc sources at tip inside $GOPATH
-  (go get -d code.google.com/p/go.tools/cmd/godoc)
+  (go get -d code.google.com/p/go.tools/cmd/anthadoc)
 
 
 Directory structure
 -------------------
 
 * Let $APPDIR be the directory containing the app engine files.
-  (e.g., $APPDIR=$HOME/godoc-app)
+  (e.g., $APPDIR=$HOME/anthadoc-app)
 
 * $APPDIR contains the following entries (this may change depending on
-  app-engine release and version of godoc):
+  app-engine release and version of anthadoc):
 
 	app.yaml
-	code.google.com/p/go.tools/cmd/godoc
-	godoc.zip
+	code.google.com/p/go.tools/cmd/anthadoc
+	anthadoc.zip
 	index.split.*
 
 * The app.yaml file is set up per app engine documentation.
   For instance:
 
-	application: godoc-app
+	application: anthadoc-app
 	version: 1
 	runtime: go
 	api_version: go1
@@ -40,17 +40,17 @@ Directory structure
 	  script: _go_app
 
 
-Configuring and running godoc
+Configuring and running anthadoc
 -----------------------------
 
-To configure godoc, run
+To configure anthadoc, run
 
-	bash setup-godoc-app.bash
+	bash setup-anthadoc-app.bash
 
 to prepare an $APPDIR as described above. See the script for details on usage.
 
-To run godoc locally, using the App Engine development server, run
+To run anthadoc locally, using the App Engine development server, run
 
 	<path to go_appengine>/dev_appserver.py $APPDIR
 
-godoc should come up at http://localhost:8080 .
+anthadoc should come up at http://localhost:8080 .

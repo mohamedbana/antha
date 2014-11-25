@@ -94,7 +94,7 @@ func codewalk(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pres.ServePage(w, godoc.Page{
+	pres.ServePage(w, anthadoc.Page{
 		Title:    "Codewalk: " + cw.Title,
 		Tabtitle: cw.Title,
 		Body:     applyTemplate(codewalkHTML, "codewalk", cw),
@@ -250,7 +250,7 @@ func codewalkDir(w http.ResponseWriter, r *http.Request, relpath, abspath string
 		}
 	}
 
-	pres.ServePage(w, godoc.Page{
+	pres.ServePage(w, anthadoc.Page{
 		Title: "Codewalks",
 		Body:  applyTemplate(codewalkdirHTML, "codewalkdir", v),
 	})
@@ -261,7 +261,7 @@ func codewalkDir(w http.ResponseWriter, r *http.Request, relpath, abspath string
 // Lo and hi are the numbers of the first and last line to highlight
 // in the response.  This format is used for the middle window pane
 // of the codewalk pages.  It is a separate iframe and does not get
-// the usual godoc HTML wrapper.
+// the usual anthadoc HTML wrapper.
 func codewalkFileprint(w http.ResponseWriter, r *http.Request, f string) {
 	abspath := f
 	data, err := vfs.ReadFile(fs, abspath)

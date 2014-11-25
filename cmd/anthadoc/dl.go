@@ -26,7 +26,7 @@ package main
 import "net/http"
 
 // Register a redirect handler for /dl/ to the golang.org download page.
-// This file will not be included when deploying godoc to golang.org.
+// This file will not be included when deploying anthadoc to golang.org.
 
 func init() {
 	http.Handle("/dl/", http.RedirectHandler("http://golang.org/dl/", http.StatusFound))

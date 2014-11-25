@@ -42,11 +42,11 @@ import (
 )
 
 var (
-	pres *godoc.Presentation
+	pres *anthadoc.Presentation
 	fs   = vfs.NameSpace{}
 )
 
-func registerHandlers(pres *godoc.Presentation) {
+func registerHandlers(pres *anthadoc.Presentation) {
 	if pres == nil {
 		panic("nil Presentation")
 	}
@@ -89,7 +89,7 @@ func readTemplates(p *anthadoc.Presentation, html bool) {
 		p.DirlistHTML = readTemplate("dirlist.html")
 		p.ErrorHTML = readTemplate("error.html")
 		p.ExampleHTML = readTemplate("example.html")
-		p.AnthadocHTML = readTemplate("anthadoc.html")
+		p.GodocHTML = readTemplate("anthadoc.html")
 		p.ImplementsHTML = readTemplate("implements.html")
 		p.MethodSetHTML = readTemplate("methodset.html")
 		p.PackageHTML = readTemplate("package.html")

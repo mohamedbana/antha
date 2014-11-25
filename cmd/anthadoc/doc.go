@@ -105,7 +105,7 @@ The flags are:
 			'implements', and static callees
 		"pointer" display channel peers, callers and dynamic callees
 			(significantly slower)
-		See http://golang.org/lib/godoc/analysis/help.html for details.
+		See http://golang.org/lib/anthadoc/analysis/help.html for details.
 	-templates=""
 		directory containing alternate template files; if set,
 		the directory may provide alternative template files

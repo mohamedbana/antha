@@ -19,7 +19,7 @@ Without the -http flag, it runs in command-line mode and prints plain text
 documentation to standard output and exits. If both a library package and a
 command with the same name exists, using the prefix cmd/ will force
 documentation on the command rather than the library package. If the -src flag
-is specified, godoc prints the exported interface of a package in Go source
+is specified, anthadoc prints the exported interface of a package in Go source
 form, or the implementation of a specific exported language entity:
 
     anthadoc fmt                # documentation for package fmt
@@ -28,7 +28,7 @@ form, or the implementation of a specific exported language entity:
     anthadoc -src fmt           # fmt package interface in Go source form
     anthadoc -src fmt Printf    # implementation of fmt.Printf
 
-In command-line mode, the -q flag enables search queries against a godoc running
+In command-line mode, the -q flag enables search queries against a anthadoc running
 as a webserver. If no explicit server address is specified with the -server
 flag, anthadoc first tries localhost:6060 and then http://golang.org.
 
@@ -95,22 +95,22 @@ The flags are:
     			'implements', and static callees
     		"pointer" display channel peers, callers and dynamic callees
     			(significantly slower)
-    		See http://golang.org/lib/godoc/analysis/help.html for details.
+    		See http://golang.org/lib/anthadoc/analysis/help.html for details.
     	-templates=""
     		directory containing alternate template files; if set,
     		the directory may provide alternative template files
-    		for the files in $GOROOT/lib/godoc
+    		for the files in $GOROOT/lib/anthadoc
     	-url=path
     		print to standard output the data that would be served by
     		an HTTP request for path
     	-zip=""
     		zip file providing the file system to serve; disabled if empty
 
-By default, godoc looks at the packages it finds via $GOROOT and $GOPATH (if
+By default, anthadoc looks at the packages it finds via $GOROOT and $GOPATH (if
 set). This behavior can be altered by providing an alternative $GOROOT with the
 -goroot flag.
 
-When godoc runs as a web server and -index is set, a search index is maintained.
+When anthadoc runs as a web server and -index is set, a search index is maintained.
 The index is created at startup.
 
 The index contains both identifier and full text search information (searchable
@@ -118,7 +118,7 @@ via regular expressions). The maximum number of full text search results shown
 can be set with the -maxresults flag; if set to 0, no full text results are
 shown, and only an identifier index but no full text search index is created.
 
-The presentation mode of web pages served by godoc can be controlled with the
+The presentation mode of web pages served by anthadoc can be controlled with the
 "m" URL parameter; it accepts a comma-separated list of flag names as value:
 
     all	show documentation for all declarations, not just the exported ones
@@ -129,10 +129,10 @@ The presentation mode of web pages served by godoc can be controlled with the
 
 For instance, http://golang.org/pkg/math/big/?m=all,text shows the documentation
 for all (not just the exported) declarations of package big, in textual form (as
-it would appear when using godoc from the command line: "godoc -src math/big
+it would appear when using anthadoc from the command line: "anthadoc -src math/big
 .*").
 
-By default, godoc serves files from the file system of the underlying OS.
+By default, anthadoc serves files from the file system of the underlying OS.
 Instead, a .zip file may be provided via the -zip flag, which contains the file
 system to serve. The file paths stored in the .zip file must use slash ('/') as
 path separator; and they must be unrooted. $GOROOT (or -goroot) must be set to
@@ -141,11 +141,11 @@ a .zip file created by the command:
 
     zip go.zip $HOME/go
 
-one may run godoc as follows:
+one may run anthadoc as follows:
 
     anthadoc -http=:6060 -zip=go.zip -goroot=$HOME/go
 
 Anthadoc documentation is converted to HTML or to text using the go/doc package;
 see http://golang.org/pkg/go/doc/#ToHTML for the exact rules. See "Godoc:
-documenting Go code" for how to write good comments for godoc:
-http://golang.org/doc/articles/godoc_documenting_go_code.html
+documenting Go code" for how to write good comments for anthadoc:
+http://golang.org/doc/articles/anthadoc_documenting_go_code.html
