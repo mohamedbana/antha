@@ -22,8 +22,6 @@
 
 package wutil
 
-// I'm getting sick of all this bs
-
 func GetFloat64FromMap(m map[string]interface{}, k string)float64{
 	var f float64
 

@@ -22,7 +22,7 @@
 
 package wutil
 
-func WndsWith(s,sfx string)bool{
+func EndsWith(s,sfx string)bool{
 	if len(s) < len(sfx) {
 		return false
 	}
