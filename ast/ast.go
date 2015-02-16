@@ -628,7 +628,7 @@ type (
 		Rhs    []Expr
 	}
 
-	// A GoStmt node represents a antha statement.
+	// A GoStmt node represents a go statement.
 	GoStmt struct {
 		Go   token.Pos // position of "go" keyword
 		Call *CallExpr
@@ -922,12 +922,19 @@ type (
 	// constant, type or variable declaration. A valid Lparen position
 	// (Lparen.Line > 0) indicates a parenthesized declaration.
 	//
+	// Antha: Parameters, Data, Inputs or Outputs declarations
+	// Are also parsed as GenDecls
+	//
 	// Relationship between Tok value and Specs element type:
 	//
-	//	token.IMPORT  *ImportSpec
-	//	token.CONST   *ValueSpec
-	//	token.TYPE    *TypeSpec
-	//	token.VAR     *ValueSpec
+	//	token.IMPORT      *ImportSpec
+	//	token.CONST       *ValueSpec
+	//	token.TYPE        *TypeSpec
+	//	token.VAR         *ValueSpec
+	//  token.PARAMETERS  *ValueSpec
+	//  token.DATA		 *ValueSpec
+	//  token.INPUTS      *ValueSpec
+	//  token.OUTPUTS	 *ValueSpec
 	//
 	GenDecl struct {
 		Doc    *CommentGroup // associated documentation; or nil
@@ -938,17 +945,15 @@ type (
 		Rparen token.Pos // position of ')', if any
 	}
 
-	// An AnthaDecl node represents a new block declaration.
-	// Currently parsing all as generic function bodies,
-	// TODO: GenDcl specific parsing
-	// and allow function declarations in specific blocks?
+	// An AnthaDecl node represents an Antha function declaration.
+	// Go code located within this declaration may be modified for syntax sugaring
 	//
 	AnthaDecl struct {
 		Doc    *CommentGroup // associated documentation; or nil
 		TokPos token.Pos     // position of Tok
-		Tok    token.Token   // Type of Antha block (Parameters, Data, Inputs, Outputs, Requirements, Controls, Analysis, Validation, Steps
+		Tok    token.Token   // Type of Antha block (Requirements, Controls, Analysis, Validation, Steps )
 		Name   *Ident        // block name
-		Body   *BlockStmt    // function body; or nil (forward declaration)
+		Body   *BlockStmt    // function body;
 	}
 
 	// A FuncDecl node represents a function declaration.

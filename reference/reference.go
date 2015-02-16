@@ -1,22 +1,22 @@
 // antha/reference/reference.go: Part of the Antha language
 // Copyright (C) 2014 The Antha authors. All rights reserved.
-// 
+//
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-// 
+//
 // For more information relating to the software or licensing issues please
-// contact license@antha-lang.org or write to the Antha team c/o 
+// contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 1 Royal College St, London NW1 0NH UK
 
@@ -25,106 +25,85 @@
 package reference
 
 import (
-	"github.com/Synthace/goflow"
+	"bytes"
+	"encoding/json"
+	"github.com/antha-lang/antha/execute"
+	"github.com/antha-lang/goflow"
+	"io"
+	"log"
 	"sync"
 	"time"
 )
-
-// support function to fire when a full bag of values has arrived
-type AsyncCompleter interface {
-	Complete(interface{})
-}
-
-// support function to map into a concrete struct
-type AsyncMapper interface {
-	Map(map[string]interface{}) interface{}
-}
-
-// Simple structure to coordinate the asynchronous aggregation of multiple
-// values that have to be fired together
-type AsyncBag struct {
-	bag       map[string]interface{}
-	keys      int
-	completer AsyncCompleter
-	mapper    AsyncMapper
-	lock      sync.Mutex
-}
-
-// makes a new AsyncBag which requires keys to fire f
-func (a *AsyncBag) init(keys int, completer AsyncCompleter, mapper AsyncMapper) {
-	a.keys = keys
-	a.completer = completer
-	a.mapper = mapper
-	a.bag = make(map[string]interface{})
-}
-
-// adds value and returns true if the bag was fired
-// TODO: Should the competion be wrapped in a sync.Once in case
-// there are duplicate params flowing through the network with the
-// same threadID?
-func (a *AsyncBag) AddValue(key string, value interface{}) bool {
-	a.lock.Lock()
-	defer a.lock.Unlock()
-	a.bag[key] = value
-
-	// if we completed our bag, fire competion
-	if len(a.bag) == a.keys {
-		// should we unlock mutex during this?
-		go func() {
-			values := a.mapper.Map(a.bag)
-			a.completer.Complete(values)
-		}()
-		return true
-	}
-	return false
-}
 
 var params = [...]string{
 	"Color",
 	"SleepTime"}
 
-type ThreadID string
-
-type ThreadParam struct {
-	Value interface{}
-	ID    ThreadID
+type WellColorParam struct {
+	WellColor string
 }
 
 // channel interfaces
 // with threadID grouped types
 type Example struct {
-	flow.Component                    // component "superclass" embedded
-	Color          <-chan ThreadParam // color to make this well
-	SleepTime      <-chan ThreadParam // amount of time to randomly wait
-	WellColor      chan<- ThreadParam // output color
+	flow.Component                            // component "superclass" embedded
+	Color          <-chan execute.ThreadParam // color to make this well
+	SleepTime      <-chan execute.ThreadParam // amount of time to randomly wait
+	WellColor      chan<- execute.ThreadParam // output color
 	lock           sync.Mutex
-	params         map[ThreadID]*AsyncBag
+	params         map[execute.ThreadID]*execute.AsyncBag
 }
 
 // single execution thread variables
 // with concrete types
-type paramBlock struct {
+type ParamBlock struct {
 	Color     string
 	SleepTime time.Duration
 	WellColor string
-	ID        ThreadID
+	ID        execute.ThreadID
+}
+
+type JSONBlock struct {
+	Color     *string
+	SleepTime *time.Duration
+	WellColor *string
+	ID        *execute.ThreadID
+}
+
+// support function for wire format
+func (p *ParamBlock) ToJSON() (b bytes.Buffer) {
+	enc := json.NewEncoder(&b)
+	if err := enc.Encode(p); err != nil {
+		log.Fatalln(err) // currently fatal error
+	}
+	return
+}
+
+// helper generator function
+func ParamsFromJSON(r io.Reader) (p *ParamBlock) {
+	p = new(ParamBlock)
+	dec := json.NewDecoder(r)
+	if err := dec.Decode(p); err != nil {
+		log.Fatalln(err)
+	}
+	return
 }
 
 // could handle mapping in the threadID better...
 func (e *Example) Map(m map[string]interface{}) interface{} {
-	var res paramBlock
-	res.Color = m["Color"].(ThreadParam).Value.(string)
-	res.SleepTime = m["SleepTime"].(ThreadParam).Value.(time.Duration)
-	res.ID = m["Color"].(ThreadParam).ID
+	var res ParamBlock
+	res.Color = m["Color"].(execute.ThreadParam).Value.(string)
+	res.SleepTime = m["SleepTime"].(execute.ThreadParam).Value.(time.Duration)
+	res.ID = m["Color"].(execute.ThreadParam).ID
 	return res
 }
 
-func (e *Example) OnColor(param ThreadParam) {
+func (e *Example) OnColor(param execute.ThreadParam) {
 	e.lock.Lock()
-	var bag *AsyncBag = e.params[param.ID]
+	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
-		bag = new(AsyncBag)
-		bag.init(2, e, e)
+		bag = new(execute.AsyncBag)
+		bag.Init(2, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -137,12 +116,12 @@ func (e *Example) OnColor(param ThreadParam) {
 	}
 }
 
-func (e *Example) OnSleepTime(param ThreadParam) {
+func (e *Example) OnSleepTime(param execute.ThreadParam) {
 	e.lock.Lock()
-	var bag *AsyncBag = e.params[param.ID]
+	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
-		bag = new(AsyncBag)
-		bag.init(2, e, e)
+		bag = new(execute.AsyncBag)
+		bag.Init(2, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -155,10 +134,10 @@ func (e *Example) OnSleepTime(param ThreadParam) {
 	}
 }
 
-// AsyncBag functions
+// execute.AsyncBag functions
 func (e *Example) Complete(params interface{}) {
-	p := params.(paramBlock)
-	go e.steps(p)
+	p := params.(ParamBlock)
+	e.steps(p)
 }
 
 // generic typing for interface support
@@ -166,7 +145,7 @@ func (e *Example) anthaElement() {}
 
 // init function, read characterization info from seperate file to validate ranges?
 func (e *Example) init() {
-	e.params = make(map[ThreadID]*AsyncBag)
+	e.params = make(map[execute.ThreadID]*execute.AsyncBag)
 }
 
 func NewExample() *Example {
@@ -176,7 +155,7 @@ func NewExample() *Example {
 }
 
 // main function for use in goroutines
-func (e *Example) steps(p paramBlock) {
+func (e *Example) steps(p ParamBlock) {
 	time.Sleep(p.SleepTime)
-	e.WellColor <- ThreadParam{p.Color, p.ID}
+	e.WellColor <- execute.ThreadParam{p.Color, p.ID}
 }

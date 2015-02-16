@@ -1,37 +1,37 @@
 // antha/cmd/antha/antha.go: Part of the Antha language
 // Copyright (C) 2014 The Antha authors. All rights reserved.
-// 
+//
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-// 
+//
 // For more information relating to the software or licensing issues please
-// contact license@antha-lang.org or write to the Antha team c/o 
+// contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 1 Royal College St, London NW1 0NH UK
 
 package main
 
 import (
-	"github.com/antha-lang/antha/ast"
-	"github.com/antha-lang/antha/parser"
-	"github.com/antha-lang/antha/printer"
-	"github.com/antha-lang/antha/scanner"
-	"github.com/antha-lang/antha/token"
 	"bytes"
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/antha-lang/antha/ast"
+	"github.com/antha-lang/antha/compile"
+	"github.com/antha-lang/antha/parser"
+	"github.com/antha-lang/antha/scanner"
+	"github.com/antha-lang/antha/token"
 	"io"
 	"io/ioutil"
 	"os"
@@ -49,7 +49,7 @@ var (
 // parameters to control code formatting
 const (
 	tabWidth    = 8
-	printerMode = printer.UseSpaces | printer.TabIndent
+	printerMode = compile.UseSpaces | compile.TabIndent
 )
 
 // command line parameters
@@ -169,13 +169,9 @@ func processFile(filename string, in io.Reader, out io.Writer, stdin bool) error
 
 	ast.SortImports(fileSet, file)
 
-	err = translateAST(fileSet, file)
-	if err != nil {
-		return err
-	}
-
 	var buf bytes.Buffer
-	err = (&printer.Config{Mode: printerMode, Tabwidth: tabWidth}).Fprint(&buf, fileSet, file)
+	compiler := &compile.Config{Mode: printerMode, Tabwidth: tabWidth}
+	err = compiler.Fprint(&buf, fileSet, file)
 	if err != nil {
 		return err
 	}
@@ -190,7 +186,7 @@ func processFile(filename string, in io.Reader, out io.Writer, stdin bool) error
 		return err
 	}
 
-	_, err = out.Write(res)
+	//_, err = out.Write(res)
 
 	return err
 }
@@ -214,13 +210,13 @@ func parse(fset *token.FileSet, filename string, src []byte, stdin bool) (*ast.F
 	// by inserting a package clause.
 	// Insert using a ;, not a newline, so that the line numbers
 	// in psrc match the ones in src.
-	psrc := append([]byte("package p;"), src...)
+	psrc := append([]byte("protocol p;"), src...)
 	file, err = parser.ParseFile(fset, filename, psrc, parserMode)
 	if err == nil {
 		adjust := func(orig, src []byte) []byte {
 			// Remove the package clause.
 			// Anthafmt has turned the ; into a \n.
-			src = src[len("package p\n"):]
+			src = src[len("protocol p\n"):]
 			return matchSpace(orig, src)
 		}
 		return file, adjust, nil
@@ -237,13 +233,13 @@ func parse(fset *token.FileSet, filename string, src []byte, stdin bool) (*ast.F
 	// into a function body.  This handles expressions too.
 	// Insert using a ;, not a newline, so that the line numbers
 	// in fsrc match the ones in src.
-	fsrc := append(append([]byte("package p; func _() {"), src...), '}')
+	fsrc := append(append([]byte("protocol p; func _() {"), src...), '}')
 	file, err = parser.ParseFile(fset, filename, fsrc, parserMode)
 	if err == nil {
 		adjust := func(orig, src []byte) []byte {
 			// Remove the wrapping.
 			// Anthafmt has turned the ; into a \n\n.
-			src = src[len("package p\n\nfunc _() {"):]
+			src = src[len("protocol p\n\nfunc _() {"):]
 			src = src[:len(src)-len("}\n")]
 			// Anthafmt has also indented the function body one level.
 			// Remove that indent.
@@ -302,16 +298,4 @@ func matchSpace(orig []byte, src []byte) []byte {
 	}
 	b.Write(after)
 	return b.Bytes()
-}
-
-// convert antha AST to go AST
-func translateAST(fset *token.FileSet, f *ast.File) error {
-	// Create an ast.CommentMap from the ast.File's comments.
-	// This helps keeping the association between comments
-	// and AST nodes.
-	//cmap := ast.NewCommentMap(fset, f, f.Comments)
-
-	//fmt.Println(len(cmap))
-
-	return nil
 }

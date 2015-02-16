@@ -1,0 +1,73 @@
+// example sequence similarity search protocol 
+protocol sequencesearch //import "github.com/antha-lang/antha/examples/sequencesearch"
+
+import (
+	"os"
+	"os/exec"
+	"fmt"
+	"log"
+	"bufio"
+	"strings"
+	"regexp"
+	"code.google.com/p/biogo/io/seqio/fasta"
+	"code.google.com/p/biogo/seq/linear"
+	"code.google.com/p/biogo/seq"
+	"github.com/antha-lang/antha/anthalib/wtype"	// should be there anyway
+	"github.com/antha-lang/antha/anthalib/bioinformatics"
+)
+
+// Input parameters for this protocol (data)
+Parameters (
+	Inputseq BioSequence
+	Databasename string
+	Params BLASTSearchParameters
+)
+
+// Data which is returned from this protocol, and data types
+Data (
+	Results BlastResults
+)
+
+// Physical Inputs to this protocol with types
+Inputs (
+	// None
+)
+
+// Physical outputs from this protocol with types
+Outputs (
+    // None
+)
+
+Requirements {
+    // None
+}
+
+// Conditions run on startup
+Setup {
+}
+
+Steps {
+	// TODO wrap these as environment requests for blast services
+	// what we need is a service which wraps local vs. nonlocal 
+	blast:="/Users/msadowski/software/blast-2.2.26_mac/bin/blastall"
+
+	seqname:=wutil.makeseq("/tmp", Inputseq)
+
+	// object lesson in using os.exec
+	cmd:=exec.Command(blast, fmt.Sprintf("-d%s", Databasename), "-pblastn", fmt.Sprintf("-i%s", seqname))
+
+	out,err:=cmd.CombinedOutput()
+	// TODO improve error handling
+	if err!=nil{
+		log.Fatal(err)
+	}
+}
+
+// Run after controls and a steps block are completed to
+// post process any data and provide downstream results
+Analysis {
+}
+
+// A block of tests to perform to validate that the sample was processed correctly
+Validation {
+}

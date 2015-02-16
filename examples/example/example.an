@@ -1,28 +1,28 @@
 // Simple do nothing protocol for hello world example
-protocol Example
+protocol Example //import "github.com/antha-lang/antha/examples/example"
 
 import (
 	"time"
 )
 
-Parameters {
-	var Color string
-	var SleepTime time.Duration
-}
+Parameters (
+	Color string
+	SleepTime time.Duration
+)
 
-Data {
-	var WellColor string
-}
+Data (
+	WellColor string
+)
 
 // no physical inputs
-Inputs {
-	
-}
+Inputs (
+	// none	
+)
 
 // no physical outputs
-Outputs {
-	
-}
+Outputs (
+	// none	
+)
 
 Setup {
 	// None

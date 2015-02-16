@@ -1,119 +1,204 @@
-// antha/examples/bradford/bradford.go: Part of the Antha language
-// Copyright (C) 2014 The Antha authors. All rights reserved.
-// 
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
-// 
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-// 
-// For more information relating to the software or licensing issues please
-// contact license@antha-lang.org or write to the Antha team c/o 
-// Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
-
 // Example bradford protocol.
 // Computes the standard curve from a linear regression
 // TODO: implement replicates from parameters
-protocol bradford
+package bradford
+	
+import "github.com/antha-lang/antha/execute"
+import "github.com/antha-lang/goflow"
+import "sync"
+import "log"
+import "bytes"
+import "encoding/json"
+import "io"
 
+
+//import "github.com/antha-lang/antha/examples/bradford"
+
+// import the antha PlateReader device, and a third party go library from github
 import (
+	"PlateReader"
 	"github.com/sajari/regression"
-	"plate_reader"
-	"standard_labware"
 )
 
 // Input parameters for this protocol (data)
-Parameters {
-	var sample_volume Volume = uL(15)
-	var bradford_volume Volume = uL(5)
-	var wavelength Wavelength = nm(595)
-	var control_curve_points uint32 = 7
-	var control_curve_dilution_factor uint32 = 2
-	var replicate_count uint32 = 1 // Note: 1 replicate means experiment is in duplicate, etc.
-}
+
+// Note: 1 replicate means experiment is in duplicate, etc.
 
 // Data which is returned from this protocol, and data types
-Data {
-	var sample_absorbance Absorbance
-	var protein_conc Concentration
-	var r_squared float32
-	var control_absorbance [control_curve_points + 1]Absorbance
-	var control_concentrations [control_curve_points + 1]float64
-}
 
 // Physical Inputs to this protocol with types
-Inputs {
-	var sample WaterSolution
-	var bradford_reagent WaterSolution
-	var control_protein WaterSolution
-	var distilled_water WaterSolution
-}
 
 // Physical outputs from this protocol with types
-Outputs {
+
+// None
+
+// No special requirements on inputs
+func (e *Bradford) requirements() {
 	// None
 }
 
-Requirements {
-	// None
-}
-
-Setup {
+// Condititions run on startup
+// Including configuring an controls required, and the blocking level needed
+// for them (in this case, per plate of samples processed)
+func (e *Bradford) setup(p ParamBlock) {
 	control.Config(config.per_plate)
 
-	var control_curve [control_curve_points + 1]WaterSolution
+	var control_curve [p.ControlCurvePoints + 1]WaterSolution
 
-	/*	for i:= 0; i < control_curve_points; i++ {
+	for i := 0; i < p.ControlCurvePoints; i++ {
 		go func(i) {
-			if (i == control_curve_points) {
-					control_curve[i] = mix(distilled_water(sample_volume) + bradford_reagent(bradford_volume))
-				} else {
-					control_curve[i] = serial_dilute(control_protein(sample_volume), control_curve_points, control_curve_dilution_factor, i)
-				}
-				control_absorbance[i] = plate_reader.read(control_curve[i], wavelength)
+			if i == p.ControlCurvePoints {
+				control_curve[i] = mix(distilled_water(p.SampleVolume), bradford_reagent(p.BradfordVolume))
+			} else {
+				control_curve[i] = serial_dilute(control_protein(p.SampleVolume), p.ControlCurvePoints, p.ControlCurveDilutionFactor, i)
 			}
-		}
-	} */
+			control_absorbance[i] = plate_reader.read(control_curve[i], p.ReadFrequency)
+		}()
+	}
 }
 
-Steps {
-	var product = mix(sample(sample_volume) + bradford_reagent(bradford_volume))
-	sample_absorbance = plate_reader.read(product, wavelength)
+// The core process for this protocol, with the steps to be performed
+// for every input
+func (e *Bradford) steps(p ParamBlock) {
+	var product = mix(p.Sample(p.SampleVolume) + p.BradfordReagent(p.BradfordVolume))
+	e.SampleAbsorbance <- execute.ThreadParam{PlateReader.ReadAbsorbance(product, Wavelength), p.ID}
 }
 
-Analysis {
+// Run after controls and a steps block are completed to
+// post process any data and provide downstream results
+func (e *Bradford) analysis(p ParamBlock, r ResultBlock) {
+	// need the control samples to be completed before doing the analysis
+	control.WaitForCompletion()
 	// Need to compute the linear curve y = m * x + c
 	var r regression.Regression
 	r.SetObservedName("Absorbance")
 	r.SetVarName(0, "Concentration")
-	r.AddDataPoint(regression.DataPoint{Observed: control_curve_points + 1, Variables: control_absorbance})
-	r.AddDataPoint(regression.DataPOint{Observed: Control_curve_points + 1, Variables: data.Control_concentrations})
+	r.AddDataPoint(regression.DataPoint{Observed: p.ControlCurvePoints + 1, Variables: ControlAbsorbance})
+	r.AddDataPoint(regression.DataPoint{Observed: p.ControlCurvePoints + 1, Variables: ControlConcentrations})
 	r.RunLinearRegression()
 	m := r.GetRegCoeff(0)
 	c := r.GetRegCoeff(1)
-	r_squared = r.Rsquared
+	e.RSquared <- execute.ThreadParam{r.Rsquared, p.ID}
 
-	protein_conc = (sample_absorbance - c) / m
+	e.ProteinConc <- execute.ThreadParam{(e.SampleAbsorbance - c) / m, p.ID}
 }
 
-Validation {
-	if sample_absorbance > 1 {
+// A block of tests to perform to validate that the sample was processed correctly
+// Optionally, destructive tests can be performed to validate results on a
+// dipstick basis
+func (e *Bradford) validation(p ParamBlock, r ResultBlock) {
+	if e.SampleAbsorbance > 1 {
 		panic("Sample likely needs further dilution")
 	}
-	if r_squared < 0.9 {
+	if e.RSquared < 0.9 {
 		warn("Low r_squared on standard curve")
 	}
-	if r_squared < 0.7 {
+	if e.RSquared < 0.7 {
 		panic("Bad r_squared on standard curve")
 	}
 	// TODO: add test of replicate variance
 }
+// AsyncBag functions
+func (e *Bradford) Complete(params interface{}) {
+	p := params.(ParamBlock)
+	e.startup.Do(func() { e.setup(p) })
+	e.steps(p)
+	
+}
+
+// empty function for interface support
+func (e *Bradford) anthaElement() {}
+
+// init function, read characterization info from seperate file to validate ranges?
+func (e *Bradford) init() {
+	e.params = make(map[execute.ThreadID]*execute.AsyncBag)
+}
+
+func New() *Bradford {
+	e := new(Bradford)
+	e.init()
+	return e
+}
+
+// Mapper function
+func (e *Bradford) Map(m map[string]interface{}) interface{} {
+	var res ParamBlock
+
+	res.SampleVolume = m["SampleVolume"].(execute.ThreadParam).Value.(Volume)	
+
+	res.BradfordVolume = m["BradfordVolume"].(execute.ThreadParam).Value.(Volume)	
+
+	res.ReadFrequency = m["ReadFrequency"].(execute.ThreadParam).Value.(Wavelength)	
+
+	res.ControlCurvePoints = m["ControlCurvePoints"].(execute.ThreadParam).Value.(uint32)	
+
+	res.ControlCurveDilutionFactor = m["ControlCurveDilutionFactor"].(execute.ThreadParam).Value.(uint32)	
+
+	res.ReplicateCount = m["ReplicateCount"].(execute.ThreadParam).Value.(uint32)	
+
+	res.Sample = m["Sample"].(execute.ThreadParam).Value.(WaterSolution)	
+
+	res.BradfordReagent = m["BradfordReagent"].(execute.ThreadParam).Value.(WaterSolution)	
+
+	res.ControlProtein = m["ControlProtein"].(execute.ThreadParam).Value.(WaterSolution)	
+
+	res.DistilledWater = m["DistilledWater"].(execute.ThreadParam).Value.(WaterSolution)	
+
+	return res
+}
+
+
+type Bradford struct {
+	flow.Component                    // component "superclass" embedded
+	lock           sync.Mutex
+	startup        sync.Once	
+	params         map[execute.ThreadID]*execute.AsyncBag
+	SampleVolume          <-chan execute.ThreadParam
+	BradfordVolume          <-chan execute.ThreadParam
+	ReadFrequency          <-chan execute.ThreadParam
+	ControlCurvePoints          <-chan execute.ThreadParam
+	ControlCurveDilutionFactor          <-chan execute.ThreadParam
+	ReplicateCount          <-chan execute.ThreadParam
+	Sample          <-chan execute.ThreadParam
+	BradfordReagent          <-chan execute.ThreadParam
+	ControlProtein          <-chan execute.ThreadParam
+	DistilledWater          <-chan execute.ThreadParam
+	SampleAbsorbance      chan<- execute.ThreadParam
+	ProteinConc      chan<- execute.ThreadParam
+	RSquared      chan<- execute.ThreadParam
+	control_absorbance      chan<- execute.ThreadParam
+	control_concentrations      chan<- execute.ThreadParam
+}
+
+type ParamBlock struct {
+	ID        execute.ThreadID
+	SampleVolume Volume
+	BradfordVolume Volume
+	ReadFrequency Wavelength
+	ControlCurvePoints uint32
+	ControlCurveDilutionFactor uint32
+	ReplicateCount uint32
+	Sample WaterSolution
+	BradfordReagent WaterSolution
+	ControlProtein WaterSolution
+	DistilledWater WaterSolution
+}
+
+type ResultBlock struct {
+	ID        execute.ThreadID
+	SampleAbsorbance Absorbance
+	ProteinConc Concentration
+	RSquared float32
+	control_absorbance []Absorbance
+	control_concentrations []float64
+}
+
+type JSONBlock struct {
+	ID        *execute.ThreadID
+	SampleAbsorbance *Absorbance
+	ProteinConc *Concentration
+	RSquared *float32
+	control_absorbance *[]Absorbance
+	control_concentrations *[]float64
+}
+

@@ -2403,8 +2403,8 @@ func (p *parser) parseAnthaDecl() *ast.AnthaDecl {
 	}
 	tok := p.tok
 
-	pos := p.expectList(token.PARAMETERS, token.DATA, token.INPUTS, token.OUTPUTS,
-		token.REQUIREMENTS, token.STEPS, token.SETUP, token.ANALYSIS, token.VALIDATION)
+	pos := p.expectList(token.REQUIREMENTS, token.STEPS, token.SETUP, token.ANALYSIS,
+		token.VALIDATION)
 
 	scope := ast.NewScope(p.topScope) // parameter scope
 
@@ -2484,12 +2484,11 @@ func (p *parser) parseDecl(sync func(*parser)) ast.Decl {
 
 	var f parseSpecFunction
 	switch p.tok {
-	case token.CONST, token.VAR:
+	case token.CONST, token.VAR, token.INPUTS, token.PARAMETERS, token.DATA, token.OUTPUTS:
 		f = p.parseValueSpec
 
 	// Antha extension
-	case token.PARAMETERS, token.DATA, token.INPUTS, token.OUTPUTS, token.REQUIREMENTS,
-		token.STEPS, token.SETUP, token.ANALYSIS, token.VALIDATION:
+	case token.REQUIREMENTS, token.STEPS, token.SETUP, token.ANALYSIS, token.VALIDATION:
 		return p.parseAnthaDecl()
 
 	case token.TYPE:

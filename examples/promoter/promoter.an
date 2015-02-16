@@ -1,28 +1,30 @@
-// Example smart promotor protocol.
-// Parametizes access to the Anderson promotor library.
-protocol promoter
+// Example smart promoter protocol.
+// Parametizes access to the Anderson promoter library.
+protocol promoter //import "github.com/antha-lang/antha/examples/promoter"
 import (
 	"sort"
 )
 
 // Input parameters for this protocol (data)
-Parameters {
-	var PromoterStrength  = 0.50
-}
+Parameters (
+	PromoterStrength float64 = 0.50
+)
 
 // Data which is returned from this protocol, and data types
-Data {
-	var PromoterSequence DNASequence
-	var PredictedStrength float64
-}
+Data (
+	PromoterSequence string // TODO: Update to wtype.DNASequence again
+	PredictedStrength float64
+)
 
 // Requires the collection of sequences to be sorted
 Setup {
 	sort.Sort(collection)
 }
 
+// Simply map to the best characterized sequence
 Steps {
-	seq := collection.GetClosest(PromotorStrength)
+	seq := collection.GetClosest(PromoterStrength)
+
 	PromoterSequence = seq.Seq
 	PredictedStrength = seq.Str
 }
