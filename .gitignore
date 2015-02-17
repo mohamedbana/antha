@@ -42,3 +42,5 @@ cmd/anthadoc/anthadoc
 examples/promoter/promoter.go
 
 cmd/anthafmt/anthafmt
+
+*~
