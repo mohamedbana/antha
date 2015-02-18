@@ -22,8 +22,9 @@
 
 package wtype
 
-import "github.com/antha-lang/antha/anthalib/wunit"
-
+import (
+	"github.com/antha-lang/antha/anthalib/wunit"
+)
 // base type for defining materials
 type Matter interface{
 	MatterType() string
@@ -56,13 +57,13 @@ type Physical interface{
 type Entity interface{
 	// Entities must be solid objects
 	Solid
-	// dummy method since there is no obvious set of methods to define this
-	IsEntity()
+	// since it can be moved independently, an Entity must have a location 
+	Location() Location
 }
 
 
 // solid state
-type Solid interface{	
+type Solid interface{
 	Physical
 	Shape() Shape
 }

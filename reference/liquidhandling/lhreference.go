@@ -3,16 +3,16 @@ package lhreference
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/Synthace/antha/execute"
-	"github.com/Synthace/goflow"
+	"github.com/antha-lang/antha/execute"
+	"github.com/antha-lang/goflow"
 	"io"
 	"log"
 	"sync"
 	"time"
-	"github.com/Synthace/antha/anthalib/wtype"
-	"github.com/Synthace/antha/anthalib/wunit"
-	"github.com/Synthace/antha/anthalib/liquidhandling"
-	"github.com/Synthace/antha/anthalib/mixer"
+	"github.com/antha-lang/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/anthalib/liquidhandling"
+	"github.com/antha-lang/antha/anthalib/mixer"
 )
 
 var params = [...]string{
@@ -159,7 +159,11 @@ func (e *LHExample) setup(p ParamBlock){
 
 // main function for use in goroutines
 func (e *LHExample) steps(p ParamBlock) {
-	//time.Sleep(p.SleepTime)
-	//e.WellColor <- execute.ThreadParam{p.Color, p.ID}
+	// get the execution context
+
+	ctx:=execution.GetContext()
+
+	sample_a:=Sample(A,p.A_vol)
+	sample_b:=Sample(B,p.B_vol)
 
 }

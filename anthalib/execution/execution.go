@@ -39,6 +39,7 @@ type ExecutionService struct{
 // globally accessible execution context variable
 var executionContext ExecutionService
 var servicesStarted bool = false
+var mutex sync.Mutex
 
 // not a true function: has the side-effect of starting runtime services
 func StartRuntime(){
@@ -54,6 +55,9 @@ func StartRuntime(){
 // accessor for above to enforce singleton status
 
 func GetContext()*ExecutionService{
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	if(!servicesStarted){
 		StartRuntime()
 		servicesStarted=true
