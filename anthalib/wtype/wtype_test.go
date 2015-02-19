@@ -46,9 +46,9 @@ func ExampleOne() {
 func TestLocations(*testing.T) {
 	nl := NewLocation("liquidhandler", 9, 0)
 	nl2 := NewLocation("anotherliquidhandler", 9, 0)
-	fmt.Println("Location ", nl.Name, " ", nl.ID, " and location ", nl2.Name, " ", nl2.ID, " are the same? ", SameLocation(nl, nl2, 0))
+	fmt.Println("Location ", nl.Location_Name(), " ", nl.Location_ID(), " and location ", nl2.Location_Name(), " ", nl2.Location_ID(), " are the same? ", SameLocation(nl, nl2, 0))
 
-	fmt.Println("Location ", nl.Positions[0].Name, " and location ", nl.Positions[1].Name, " are the same? ", SameLocation(nl.Positions[0], nl.Positions[1], 0), " share a parent? ", SameLocation(nl.Positions[0], nl.Positions[1], 1))
+	fmt.Println("Location ", nl.Positions()[0].Location_Name(), " and location ", nl.Positions()[1].Location_Name(), " are the same? ", SameLocation(nl.Positions()[0], nl.Positions()[1], 0), " share a parent? ", SameLocation(nl.Positions()[0], nl.Positions()[1], 1))
 
-	fmt.Println("Locations ", nl.Name, " and ", nl.Positions[0].Name, " share a parent? ", SameLocation(nl, nl.Positions[0], 1))
+	fmt.Println("Locations ", nl.Location_Name(), " and ", nl.Positions()[0].Location_Name(), " share a parent? ", SameLocation(nl, nl.Positions()[0], 1))
 }
