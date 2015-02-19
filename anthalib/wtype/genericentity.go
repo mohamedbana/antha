@@ -23,17 +23,20 @@
 package wtype
 
 // a simple structure to allow a generic entity class to be defined
-type GenericEntity struct{
-	GenericSolid
+type GenericEntity struct {
+	//	GenericSolid
+	AnthaObject
 	Loc Location
 }
 
 // entities are defined by having locations
 
-func (ge *GenericEntity)Location()Location{
+func (ge *GenericEntity) Location() Location {
 	return ge.Loc
 }
 
-
-
-
+func NewGenericEntity(name string, location Location) *GenericEntity {
+	ao := NewAnthaObject(name)
+	ge := GenericEntity{ao, location}
+	return &ge
+}

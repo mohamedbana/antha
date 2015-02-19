@@ -57,7 +57,8 @@ type Physical interface {
 // The Entity interface declares that this object is an independently movable thing
 type Entity interface {
 	// Entities must be solid objects
-	Solid
+	// well, they should be anyway
+	//	Solid
 	// since it can be moved independently, an Entity must have a location
 	Location() Location
 }
