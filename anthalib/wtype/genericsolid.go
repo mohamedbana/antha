@@ -32,6 +32,9 @@ func (gs *GenericSolid) Shape() Shape {
 	return gs.shape
 }
 
+// function for returning a blank generic solid - it has the basic type info
+// but no mass, dimensions etc. etc.
+// this will eventually be taken from database entries
 func NewGenericSolid(mattertype string, shapetype string) *GenericSolid {
 	gp := NewGenericPhysical(mattertype)
 	shape := NewShape(shapetype)

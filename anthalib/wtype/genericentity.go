@@ -24,7 +24,7 @@ package wtype
 
 // a simple structure to allow a generic entity class to be defined
 type GenericEntity struct {
-	GenericSolid
+	*GenericSolid
 	Loc Location
 }
 
@@ -35,7 +35,7 @@ func (ge *GenericEntity) Location() Location {
 }
 
 func NewGenericEntity(name string, location Location) *GenericEntity {
-	gs := GenericSolid{}
+	gs := NewGenericSolid("", "")
 	ge := GenericEntity{gs, location}
 	return &ge
 }
