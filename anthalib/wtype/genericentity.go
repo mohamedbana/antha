@@ -24,8 +24,7 @@ package wtype
 
 // a simple structure to allow a generic entity class to be defined
 type GenericEntity struct {
-	//	GenericSolid
-	AnthaObject
+	GenericSolid
 	Loc Location
 }
 
@@ -36,7 +35,7 @@ func (ge *GenericEntity) Location() Location {
 }
 
 func NewGenericEntity(name string, location Location) *GenericEntity {
-	ao := NewAnthaObject(name)
-	ge := GenericEntity{ao, location}
+	gs := GenericSolid{}
+	ge := GenericEntity{gs, location}
 	return &ge
 }
