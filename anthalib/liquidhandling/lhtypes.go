@@ -237,16 +237,17 @@ func NewLHSetup() LHSetup {
 // structure describing a microplate
 // this needs to be harmonised with the wtype version
 type LHPlate struct {
+	*wtype.GenericEntity
 	ID         string
 	Inst       string
 	Loc        string
 	PlateName  string
 	Type       string
 	Mnfr       string
-	WellsX     int
-	WellsY     int
+	WlsX       int
+	WlsY       int
 	Nwells     int
-	Wells      map[string]*LHWell
+	HWells     map[string]*LHWell
 	Height     float64
 	Hunit      string
 	Rows       [][]*LHWell
@@ -255,13 +256,31 @@ type LHPlate struct {
 	Wellcoords map[string]*LHWell
 }
 
+// @implement wtype.Labware
+func (lhp *LHPlate) Wells() [][]wtype.Well {
+	return lhp.Rows
+}
+
+func (lhp *LHPlate) WellAt(crds wtype.WellCoords) wtype.Well {
+	return lhp.Cols[crds.X][crds.Y]
+}
+
+func (lhp *LHPlate) WellsX() int {
+	return lhp.WlsX
+}
+
+func (lhp *LHPlate) WellsY() int {
+	return lhp.WlsY
+
+}
+
 func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell) *LHPlate {
 	var lhp LHPlate
 	lhp.Type = platetype
 	lhp.ID = wtype.GetUUID()
 	lhp.Mnfr = mfr
-	lhp.WellsX = ncols
-	lhp.WellsY = nrows
+	lhp.WlsX = ncols
+	lhp.WlsY = nrows
 	lhp.Nwells = ncols * nrows
 	lhp.Height = height
 	lhp.Hunit = hunit
@@ -294,7 +313,7 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit s
 	}
 
 	lhp.Wellcoords = wellcoords
-	lhp.Wells = wellmap
+	lhp.HWells = wellmap
 	lhp.Cols = colarr
 	lhp.Rows = rowarr
 
@@ -321,6 +340,19 @@ type LHWell struct {
 	Zdim      float64
 	Bottomh   float64
 	Dunit     string
+}
+
+// @implement wtype.Well
+func (w *LHWell) WellTypeName() string {
+	return w.Platetype
+}
+
+func (w *LHWell) ResidualVolume() wunit.Volume {
+	return wunit.Volume{wunit.NewMeasurement(w.Rvol, "", w.Vunit)}
+}
+
+func (w *LHWell) Coords() wtype.WellCoords {
+
 }
 
 func NewLHWellCopy(template *LHWell) *LHWell {
@@ -373,8 +405,8 @@ func get_next_well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 		ncol = wutil.ParseInt(tx[1])
 	}
 
-	wellsx := plate.WellsX
-	wellsy := plate.WellsY
+	wellsx := plate.WlsX
+	wellsy := plate.WlsY
 
 	var new_well *LHWell
 
@@ -463,14 +495,14 @@ func new_solution() *LHSolution {
 }
 
 func new_plate(platetype *LHPlate) *LHPlate {
-	new_plate := NewLHPlate(platetype.Type, platetype.Mnfr, platetype.WellsY, platetype.WellsX, platetype.Height, platetype.Hunit, platetype.Welltype)
+	new_plate := NewLHPlate(platetype.Type, platetype.Mnfr, platetype.WlsY, platetype.WlsX, platetype.Height, platetype.Hunit, platetype.Welltype)
 	initialize_wells(new_plate)
 	return new_plate
 }
 
 func initialize_wells(plate *LHPlate) {
 	id := (*plate).ID
-	wells := (*plate).Wells
+	wells := (*plate).HWells
 	newwells := make(map[string]*LHWell, len(wells))
 	wellcrds := (*plate).Wellcoords
 	for _, well := range wells {
@@ -480,7 +512,7 @@ func initialize_wells(plate *LHPlate) {
 		newwells[well.ID] = well
 		wellcrds[well.Coords] = well
 	}
-	(*plate).Wells = newwells
+	(*plate).HWells = newwells
 	(*plate).Wellcoords = wellcrds
 }
 

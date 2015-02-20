@@ -59,8 +59,8 @@ func (slhp SLHPlate) FillPlate(plate *LHPlate) {
 	plate.PlateName = slhp.Name
 	plate.Type = slhp.Type
 	plate.Mnfr = slhp.Mnfr
-	plate.WellsX = slhp.WellsX
-	plate.WellsY = slhp.WellsY
+	plate.WlsX = slhp.WellsX
+	plate.WlsY = slhp.WellsY
 	plate.Nwells = slhp.Nwells
 	plate.Height = slhp.Height
 	plate.Hunit = slhp.Hunit
@@ -103,7 +103,7 @@ func (plate *LHPlate) Welldimensions() *LHWellType {
 }
 
 func (plate *LHPlate) MarshalJSON() ([]byte, error) {
-	slp := SLHPlate{plate.ID, plate.Inst, plate.Loc, plate.PlateName, plate.Type, plate.Mnfr, plate.WellsX, plate.WellsY, plate.Nwells, plate.Height, plate.Hunit, plate.Welltype, plate.Wellcoords, plate.Welldimensions()}
+	slp := SLHPlate{plate.ID, plate.Inst, plate.Loc, plate.PlateName, plate.Type, plate.Mnfr, plate.WlsX, plate.WlsY, plate.Nwells, plate.Height, plate.Hunit, plate.Welltype, plate.Wellcoords, plate.Welldimensions()}
 
 	return json.Marshal(slp)
 }
@@ -123,14 +123,14 @@ func (plate *LHPlate) UnmarshalJSON(b []byte) error {
 
 	// allocate and fill the other structures
 
-	plate.Wells = make(map[string]*LHWell, len(plate.Wellcoords))
-	plate.Rows = make([][]*LHWell, plate.WellsY)
-	plate.Cols = make([][]*LHWell, plate.WellsX)
+	plate.HWells = make(map[string]*LHWell, len(plate.Wellcoords))
+	plate.Rows = make([][]*LHWell, plate.WlsY)
+	plate.Cols = make([][]*LHWell, plate.WlsX)
 
 	wt := slp.Welldimensions
 
 	for s, w := range plate.Wellcoords {
-		plate.Wells[w.ID] = w
+		plate.HWells[w.ID] = w
 
 		// give w its properties back
 
@@ -138,12 +138,12 @@ func (plate *LHPlate) UnmarshalJSON(b []byte) error {
 		x, y := wutil.DecodeCoords(s)
 
 		if len(plate.Rows[x]) == 0 {
-			plate.Rows[x] = make([]*LHWell, plate.WellsX)
+			plate.Rows[x] = make([]*LHWell, plate.WlsX)
 		}
 		plate.Rows[x][y] = w
 
 		if len(plate.Cols[y]) == 0 {
-			plate.Cols[y] = make([]*LHWell, plate.WellsY)
+			plate.Cols[y] = make([]*LHWell, plate.WlsY)
 		}
 		plate.Cols[y][x] = w
 	}
