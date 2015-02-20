@@ -23,7 +23,10 @@
 package wtype
 
 import (
+	"fmt"
 	"github.com/antha-lang/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/anthalib/wutil"
+	"math/rand"
 )
 
 // the following are all physical things; we need a way to separate
@@ -158,7 +161,7 @@ func makeABunchaRandomSeqs(n_seq_sets, seqs_per_set, min_len, len_var int) [][]D
 	for i := 0; i < n_seq_sets; i++ {
 		seqs[i] = make([]DNASequence, seqs_per_set)
 		for j := 0; j < seqs_per_set; j++ {
-			seqs[i][j] = DNASequence{fmt.Sprintf("SEQ%04d", i*seqs_per_set+j+1), random_dna_seq(rand.Intn(len_var) + min_len)}
+			seqs[i][j] = DNASequence{fmt.Sprintf("SEQ%04d", i*seqs_per_set+j+1), wutil.Random_dna_seq(rand.Intn(len_var) + min_len)}
 		}
 	}
 	return seqs

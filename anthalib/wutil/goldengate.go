@@ -23,8 +23,6 @@
 package wutil
 
 import (
-	"fmt"
-	"github.com/antha-lang/antha/anthalib/wtype"
 	"math/rand"
 )
 
@@ -81,20 +79,20 @@ func RevComp(s string) string {
 	return Comp(Rev(s))
 }
 
-func random_dna_seq(leng int) string {
+func Random_dna_seq(leng int) string {
 	s := ""
 	for i := 0; i < leng; i++ {
-		s += random_char("ACTG")
+		s += Random_char("ACTG")
 	}
 	return s
 }
 
-func all_dna_seqs_with_length(l int) []string {
+func All_dna_seqs_with_length(l int) []string {
 	if l == 0 {
 		return []string{""}
 	}
 
-	s := all_dna_seqs_with_length(l - 1)
+	s := All_dna_seqs_with_length(l - 1)
 
 	r := make([]string, 0, 4*len(s))
 
@@ -106,6 +104,6 @@ func all_dna_seqs_with_length(l int) []string {
 	return r
 }
 
-func random_char(chars string) string {
+func Random_char(chars string) string {
 	return string(chars[rand.Intn(len(chars))])
 }
