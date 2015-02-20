@@ -55,7 +55,7 @@ type WellCoords struct {
 // make well coordinates in the "1A" convention
 func MakeWellCoordsA1(a1 string) WellCoords {
 	// only handles 96 well plates
-	return WellCoords{wutil.ParseInt(a1[1:len(a1)]), AlphaToNum(a1[0])}
+	return WellCoords{wutil.ParseInt(a1[1:len(a1)]), AlphaToNum(string(a1[0]))}
 }
 
 // make well coordinates in a manner compatble with "X1,Y1" etc.
