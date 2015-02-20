@@ -330,7 +330,7 @@ type LHWell struct {
 	Coords    string
 	Vol       float64
 	Vunit     string
-	Contents  []*LHComponent
+	WContents []*LHComponent
 	Rvol      float64
 	Currvol   float64
 	Shape     int
@@ -340,6 +340,13 @@ type LHWell struct {
 	Zdim      float64
 	Bottomh   float64
 	Dunit     string
+}
+
+func (w *LHWell) updateVolume() {
+	w.Vol = 0.0
+	for _, val := range w.WContents {
+		w.Vol += val.Vol
+	}
 }
 
 // @implement wtype.Well
@@ -353,6 +360,37 @@ func (w *LHWell) ResidualVolume() wunit.Volume {
 
 func (w *LHWell) Coords() wtype.WellCoords {
 	return wunit.MakeWellCoordsXY(w.Coords)
+}
+
+func (w *LHWell) ContainerVolume() wunit.Volume {
+	return wunit.Volume{wunit.NewMeasurement(w.Vol, "", w.Vunit)}
+}
+
+func (w *LHWell) Contents() []Physical {
+	return w.WContents
+}
+
+func (w *LHWell) Add(p Physical) {
+	// type switch?
+
+	w.Contents = append(w.Contents, p.(LHComponent))
+}
+
+// this is pretty dodgy... we will have to be quite careful here
+func (w *LHWell) Remove(v wunit.Volume) Physical {
+	ret := w.Contents[0]
+
+	if ret.Vol > v {
+		ret.Vol = v
+		w.Contents[0].Vol -= v
+	} else {
+		w.Contents = w.Contents[1:len(w.Contents)]
+	}
+	return ret
+}
+
+func (w *LHWell) ContainerType() string {
+	return w.PlateType
 }
 
 func NewLHWellCopy(template *LHWell) *LHWell {

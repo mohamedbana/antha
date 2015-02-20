@@ -54,6 +54,7 @@ func TestLocations(*testing.T) {
 }
 
 func TestWellCoords(*testing.T) {
+	fmt.Println("Testing Well Coords")
 	wc := MakeWellCoordsA1("A1")
 	fmt.Println(wc.FormatA1())
 	fmt.Println(wc.Format1A())
@@ -69,4 +70,5 @@ func TestWellCoords(*testing.T) {
 	fmt.Println(wc.Format1A())
 	fmt.Println(wc.FormatXY())
 	fmt.Println(wc.X, " ", wc.Y)
+	fmt.Println("Finished Testing Well Coords")
 }
