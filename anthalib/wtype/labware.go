@@ -44,7 +44,7 @@ type Plate interface {
 
 // A generic to define an SBS format plate
 type GenericSBSFormatPlate struct {
-	GenericEntity
+	*GenericEntity
 	Manufr  string
 	LType   string
 	WellArr [][]Well
