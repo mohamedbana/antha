@@ -170,13 +170,13 @@ func (slw SLHWell) FillWell(lw *LHWell) {
 	lw.Inst = slw.Inst
 	lw.Plateinst = slw.Plateinst
 	lw.Plateid = slw.Plateid
-	lw.Coords = slw.Coords
-	lw.Contents = slw.Contents
+	lw.Crds = slw.Coords
+	lw.WContents = slw.Contents
 	lw.Currvol = slw.Currvol
 }
 
 func (well *LHWell) MarshalJSON() ([]byte, error) {
-	slw := SLHWell{well.ID, well.Inst, well.Plateinst, well.Plateid, well.Coords, well.Contents, well.Currvol}
+	slw := SLHWell{well.ID, well.Inst, well.Plateinst, well.Plateid, well.Crds, well.WContents, well.Currvol}
 	return json.Marshal(slw)
 }
 

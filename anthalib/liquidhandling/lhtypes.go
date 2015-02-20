@@ -25,6 +25,7 @@ package liquidhandling
 
 import (
 	"github.com/antha-lang/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/anthalib/wutil"
 	"strconv"
 	"strings"
@@ -258,7 +259,13 @@ type LHPlate struct {
 
 // @implement wtype.Labware
 func (lhp *LHPlate) Wells() [][]wtype.Well {
-	return lhp.Rows
+	ret := make([][]wtype.Well, len(lhp.Rows))
+	for i := 0; i < len(lhp.Rows); i++ {
+		for j := 0; j < len(lhp.Rows[i]); j++ {
+			ret[i][j] = lhp.Rows[i][j]
+		}
+	}
+	return ret
 }
 
 func (lhp *LHPlate) WellAt(crds wtype.WellCoords) wtype.Well {
@@ -305,7 +312,7 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit s
 
 			crds := wutil.NumToAlpha(j+1) + ":" + strconv.Itoa(i+1)
 			wellcoords[crds] = arr[i][j]
-			arr[i][j].Coords = crds
+			arr[i][j].Crds = crds
 			colarr[i][j] = arr[i][j]
 			rowarr[j][i] = arr[i][j]
 			wellmap[arr[i][j].ID] = arr[i][j]
@@ -327,7 +334,7 @@ type LHWell struct {
 	Plateinst string
 	Plateid   string
 	Platetype string
-	Coords    string
+	Crds      string
 	Vol       float64
 	Vunit     string
 	WContents []*LHComponent
@@ -340,6 +347,7 @@ type LHWell struct {
 	Zdim      float64
 	Bottomh   float64
 	Dunit     string
+	Plate     *LHPlate
 }
 
 func (w *LHWell) updateVolume() {
@@ -359,42 +367,57 @@ func (w *LHWell) ResidualVolume() wunit.Volume {
 }
 
 func (w *LHWell) Coords() wtype.WellCoords {
-	return wunit.MakeWellCoordsXY(w.Coords)
+	return wtype.MakeWellCoordsXY(w.Crds)
 }
 
 func (w *LHWell) ContainerVolume() wunit.Volume {
 	return wunit.Volume{wunit.NewMeasurement(w.Vol, "", w.Vunit)}
 }
 
-func (w *LHWell) Contents() []Physical {
+func (w *LHWell) Contents() []wtype.Physical {
 	return w.WContents
 }
 
-func (w *LHWell) Add(p Physical) {
+func (w *LHWell) Add(p wtype.Physical) {
 	// type switch?
 
-	w.Contents = append(w.Contents, p.(LHComponent))
+	w.WContents = append(w.WContents, p.(LHComponent))
 }
 
 // this is pretty dodgy... we will have to be quite careful here
-func (w *LHWell) Remove(v wunit.Volume) Physical {
-	ret := w.Contents[0]
+// the core problem is how to maintain a list of components and volumes
+// but respect the physical fact that we can't actually unmix things
+func (w *LHWell) Remove(v wunit.Volume) wtype.Physical {
+	defer w.updateVolume()
+	ret := w.WContents[0]
 
-	if ret.Vol > v {
-		ret.Vol = v
-		w.Contents[0].Vol -= v
+	if ret.Vol > v.SIValue() {
+		ret.Vol = v.SIValue()
+		w.WContents[0].Vol -= v.SIValue()
 	} else {
-		w.Contents = w.Contents[1:len(w.Contents)]
+		w.WContents = w.WContents[1:len(w.WContents)]
 	}
 	return ret
 }
 
 func (w *LHWell) ContainerType() string {
-	return w.PlateType
+	return w.Platetype
+}
+
+func (w *LHWell) PartOf() wtype.Entity {
+	return w.Plate
+}
+
+func (w *LHWell) Empty() bool {
+	if w.Vol <= 0.000001 {
+		return true
+	} else {
+		return false
+	}
 }
 
 func NewLHWellCopy(template *LHWell) *LHWell {
-	cp := NewLHWell(template.Platetype, template.Plateid, template.Coords, template.Vol, template.Rvol, template.Shape, template.Bottom, template.Xdim, template.Ydim, template.Zdim, template.Bottomh, template.Dunit)
+	cp := NewLHWell(template.Platetype, template.Plateid, template.Crds, template.Vol, template.Rvol, template.Shape, template.Bottom, template.Xdim, template.Ydim, template.Zdim, template.Bottomh, template.Dunit)
 
 	return cp
 }
@@ -405,7 +428,7 @@ func NewLHWell(platetype, plateid, crds string, vol, rvol float64, shape, bott i
 	well.ID = wtype.GetUUID()
 	well.Platetype = platetype
 	well.Plateid = plateid
-	well.Coords = crds
+	well.Crds = crds
 	well.Vol = vol
 	well.Rvol = rvol
 	well.Currvol = 0.0
@@ -435,7 +458,7 @@ func get_next_well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 
 		// we need a defined traversal of the wells
 
-		crds := curwell.Coords
+		crds := curwell.Crds
 
 		tx := strings.Split(crds, ":")
 
@@ -458,7 +481,7 @@ func get_next_well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 
 		new_well = plate.Wellcoords[crds]
 
-		cnts := new_well.Contents
+		cnts := new_well.WContents
 
 		if len(cnts) == 0 {
 			break
@@ -479,7 +502,7 @@ func get_next_well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 }
 
 func get_vol_left(well *LHWell) float64 {
-	cnts := well.Contents
+	cnts := well.WContents
 
 	// in the first instance we have a fixed constant times the number of
 	// transfers... volumes are in microlitres as always
@@ -548,7 +571,7 @@ func initialize_wells(plate *LHPlate) {
 		well.Plateid = id
 		well.Currvol = 0.0
 		newwells[well.ID] = well
-		wellcrds[well.Coords] = well
+		wellcrds[well.Crds] = well
 	}
 	(*plate).HWells = newwells
 	(*plate).Wellcoords = wellcrds
