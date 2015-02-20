@@ -352,7 +352,7 @@ func (w *LHWell) ResidualVolume() wunit.Volume {
 }
 
 func (w *LHWell) Coords() wtype.WellCoords {
-
+	return wunit.MakeWellCoordsXY(w.Coords)
 }
 
 func NewLHWellCopy(template *LHWell) *LHWell {

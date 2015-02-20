@@ -27,6 +27,7 @@ import (
 	"github.com/antha-lang/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/anthalib/wutil"
 	"strconv"
+	"strings"
 )
 
 // alias coordinate structure to spate's vectormath
@@ -65,8 +66,15 @@ func MakeWellCoords1A(a1 string) WellCoords {
 }
 
 // make well coordinates in a manner compatble with "X1,Y1" etc.
-func MakeWellCoordsXY(x, y string) WellCoords {
+func MakeWellCoordsXYsep(x, y string) WellCoords {
 	return WellCoords{wutil.ParseInt(y[1:len(y)]) - 1, wutil.ParseInt(x[1:len(x)]) - 1}
+}
+
+func MakeWellCoordsXY(xy string) WellCoords {
+	tx := strings.Split(xy, "Y")
+	x := wutil.ParseInt(tx[0][1:len(tx[0])]) - 1
+	y := wutil.ParseInt(tx[1]) - 1
+	return WellCoords{x, y}
 }
 
 // return well coordinates in "X1Y1" format
