@@ -52,3 +52,16 @@ func TestLocations(*testing.T) {
 
 	fmt.Println("Locations ", nl.Location_Name(), " and ", nl.Positions()[0].Location_Name(), " share a parent? ", SameLocation(nl, nl.Positions()[0], 1))
 }
+
+func TestWellCoords(*testing.T) {
+	wc := MakeWellCoordsA1("A1")
+	fmt.Println(wc.FormatA1())
+	fmt.Println(wc.Format1A())
+	fmt.Println(wc.FormatXY())
+	fmt.Println(wc.X, " ", wc.Y)
+	wc = MakeWellCoordsXY("X1", "Y1")
+	fmt.Println(wc.FormatA1())
+	fmt.Println(wc.Format1A())
+	fmt.Println(wc.FormatXY())
+	fmt.Println(wc.X, " ", wc.Y)
+}

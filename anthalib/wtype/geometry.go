@@ -52,21 +52,30 @@ type WellCoords struct {
 	Y int
 }
 
-// make well coordinates in the "1A" convention
+// make well coordinates in the "A1" convention
 func MakeWellCoordsA1(a1 string) WellCoords {
 	// only handles 96 well plates
-	return WellCoords{wutil.ParseInt(a1[1:len(a1)]), AlphaToNum(string(a1[0]))}
+	return WellCoords{wutil.ParseInt(a1[1:len(a1)]) - 1, AlphaToNum(string(a1[0])) - 1}
+}
+
+// make well coordinates in the "1A" convention
+func MakeWellCoords1A(a1 string) WellCoords {
+	// only handles 96 well plates
+	return WellCoords{AlphaToNum(string(a1[0])) - 1, wutil.ParseInt(a1[1:len(a1)]) - 1}
 }
 
 // make well coordinates in a manner compatble with "X1,Y1" etc.
 func MakeWellCoordsXY(x, y string) WellCoords {
-	return WellCoords{wutil.ParseInt(y[1:len(y)]), wutil.ParseInt(x[1:len(x)])}
+	return WellCoords{wutil.ParseInt(y[1:len(y)]) - 1, wutil.ParseInt(x[1:len(x)]) - 1}
 }
 
 // return well coordinates in "X1Y1" format
 func (wc *WellCoords) FormatXY() string {
-	return "X" + strconv.Itoa(wc.X) + "Y" + strconv.Itoa(wc.Y)
+	return "X" + strconv.Itoa(wc.X+1) + "Y" + strconv.Itoa(wc.Y+1)
 }
-func (wc *WellCoords) FormatAH() string {
-	return strconv.Itoa(wc.X) + NumToAlpha(wc.Y)
+func (wc *WellCoords) FormatA1() string {
+	return strconv.Itoa(wc.X+1) + NumToAlpha(wc.Y+1)
+}
+func (wc *WellCoords) Format1A() string {
+	return NumToAlpha(wc.Y+1) + strconv.Itoa(wc.X+1)
 }
