@@ -204,8 +204,11 @@ func (sol LHSolution) GetComponentVolume(key string) float64 {
 	return vol
 }
 
+// @implement wtype.LHSolution
+
 // structure describing a liquid component and its desired properties
 type LHComponent struct {
+	*wtype.GenericPhysical
 	ID          string
 	Inst        string
 	Order       int
@@ -218,13 +221,29 @@ type LHComponent struct {
 	Tvol        float64
 	Loc         string
 	Smax        float64
+	Visc        float64
 	Destination string
+}
+
+// @implement wtype.Liquid
+
+func (lhc *LHComponent) Viscosity() float64 {
+	return lhc.Visc
+}
+
+func (lhc *LHComponent) Sample(v wunit.Volume) wtype.Liquid {
+
 }
 
 func NewLHComponent() *LHComponent {
 	var lhc LHComponent
+	var gp wtype.GenericPhysical
+	lhc.GenericPhysical = &gp
 	lhc.ID = wtype.GetUUID()
 	return &lhc
+}
+
+func CopyLHComponent(lhc *LHComponent) *LHComponent {
 }
 
 // structure defining a liquid handler setup
