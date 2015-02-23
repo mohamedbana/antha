@@ -61,7 +61,7 @@ func NewLHProperties(num_positions int, model, manufacturer, lhtype, tptype stri
 
 	for i := 0; i < num_positions; i++ {
 		// not overriding these defaults seems like a
-		// bad idea
+		// bad idea --- TODO: Fix, e.g., MAXH here
 		positions[i] = NewLHPosition(i+1, "position_"+strconv.Itoa(i+1), 50.0)
 	}
 
@@ -232,7 +232,22 @@ func (lhc *LHComponent) Viscosity() float64 {
 }
 
 func (lhc *LHComponent) Sample(v wunit.Volume) wtype.Liquid {
+	// need to jig around with units a bit here
+	// Should probably just make Vunit, Cunit etc. wunits anyway
+	meas := wunit.ConcreteMeasurement{lhc.Vol, wunit.ParsePrefixedUnit(lhc.Vunit)}
 
+	// we need some logic potentially
+
+	if v.SIValue() > meas.SIValue() {
+		wutil.Error("LHComponent ID: ", lhc.ID, " Not enough volume for sample")
+	} else if v.SIValue() == meas.SIValue() {
+		return lhc
+	} else {
+		smp := CopyLHComponent(lhc)
+		// need a convention here
+
+		smp.Vol=v.
+	}
 }
 
 func NewLHComponent() *LHComponent {

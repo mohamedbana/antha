@@ -48,16 +48,20 @@ func TestSIParsing(*testing.T) {
 	ExampleSeven()
 }
 
+func TestUnitConversion(*testing.T) {
+	ExampleEight()
+}
+
 func ExampleBasic() {
 	degreeC := GenericPrefixedUnit{GenericUnit{"DegreeC", "C", 1.0, "C"}, SIPrefix{"m", 1e-03}}
-	TdegreeC := Temperature{ConcreteMeasurement{NewWFloat(1.0), &degreeC}}
+	TdegreeC := Temperature{ConcreteMeasurement{1.0, &degreeC}}
 	fmt.Println(TdegreeC.SIValue())
 	// Output:
 	// 0.001
 }
 func ExampleTwo() {
 	Joule := GenericPrefixedUnit{GenericUnit{"Joule", "J", 1.0, "J"}, SIPrefix{"k", 1e3}}
-	NJoule := Energy{ConcreteMeasurement{NewWFloat(23.4), &Joule}}
+	NJoule := Energy{ConcreteMeasurement{23.4, &Joule}}
 	fmt.Println(NJoule.SIValue())
 	// Output:
 	// 23400
@@ -107,4 +111,18 @@ func ExampleSeven() {
 	// 1e+09
 	// uM
 	// 1e-06
+}
+
+func ExampleEight() {
+	// testing the new conversion methods
+	pu := ParsePrefixedUnit("GHz")
+	pu2 := ParsePrefixedUnit("MHz")
+
+	meas := ConcreteMeasurement{10, pu}
+	meas2 := ConcreteMeasurement{50, pu2}
+
+	fmt.Println(meas.ToString(), " is ", meas.ConvertTo(meas.Unit()), " ", pu.PrefixedSymbol())
+	fmt.Println(meas2.ToString(), " is ", meas2.ConvertTo(meas.Unit()), " ", pu.PrefixedSymbol())
+	fmt.Println(meas2.ToString(), " is ", meas2.ConvertTo(meas2.Unit()), " ", pu2.PrefixedSymbol())
+	fmt.Println(meas.ToString(), " is ", meas.ConvertTo(meas2.Unit()), " ", pu2.PrefixedSymbol())
 }
