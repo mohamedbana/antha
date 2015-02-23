@@ -125,4 +125,9 @@ func ExampleEight() {
 	fmt.Println(meas2.ToString(), " is ", meas2.ConvertTo(meas.Unit()), " ", pu.PrefixedSymbol())
 	fmt.Println(meas2.ToString(), " is ", meas2.ConvertTo(meas2.Unit()), " ", pu2.PrefixedSymbol())
 	fmt.Println(meas.ToString(), " is ", meas.ConvertTo(meas2.Unit()), " ", pu2.PrefixedSymbol())
+	// Output:
+	// 10.000GHz  is  10   GHz
+	// 50.000MHz  is  0.05   GHz
+	// 50.000MHz  is  50   MHz
+	// 10.000GHz  is  10000   MHz
 }
