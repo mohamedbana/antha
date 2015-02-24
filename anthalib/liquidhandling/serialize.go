@@ -25,6 +25,7 @@ package liquidhandling
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/antha-lang/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/anthalib/wutil"
 	"strconv"
 )
@@ -74,7 +75,7 @@ type LHWellType struct {
 	Vol     float64
 	Vunit   string
 	Rvol    float64
-	Shape   int
+	Shape   wtype.Shape
 	Bottom  int
 	Xdim    float64
 	Ydim    float64

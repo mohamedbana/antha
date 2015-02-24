@@ -440,7 +440,7 @@ type LHWell struct {
 	WContents []*LHComponent
 	Rvol      float64
 	Currvol   float64
-	WShape    int
+	WShape    wtype.Shape
 	Bottom    int
 	Xdim      float64
 	Ydim      float64
@@ -475,7 +475,7 @@ func (lhw *LHWell) Container() wtype.Location {
 	return lhw.Plate
 }
 
-func (lhw *LHWell) Shape() int {
+func (lhw *LHWell) Shape() wtype.Shape {
 	return lhw.WShape
 }
 
@@ -555,7 +555,7 @@ func NewLHWellCopy(template *LHWell) *LHWell {
 }
 
 // make a new well structure
-func NewLHWell(platetype, plateid, crds string, vol, rvol float64, shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
+func NewLHWell(platetype, plateid, crds string, vol, rvol float64, shape wtype.Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
 	var well LHWell
 	well.ID = wtype.GetUUID()
 	well.Platetype = platetype

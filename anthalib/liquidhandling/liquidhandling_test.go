@@ -26,6 +26,7 @@ import (
 	"fmt"
 	//"strings"
 	"encoding/json"
+	"github.com/antha-lang/antha/anthalib/wtype"
 	"math/rand"
 	"testing"
 )
@@ -45,7 +46,7 @@ func ExampleOne() {
 
 	sarr := make(map[string]*LHSolution, 1)
 
-	welltype := NewLHWell("ACMEMicroPlatesDW96ConicalBottom", "", "", 2000, 25, 2, 3, 8.2, 8.2, 41.3, 4.7, "mm")
+	welltype := NewLHWell("ACMEMicroPlatesDW96ConicalBottom", "", "", 2000, 25, wtype.NewShape("box"), 3, 8.2, 8.2, 41.3, 4.7, "mm")
 	plate := NewLHPlate("ACMEMicroPlatesDW96ConicalBottom", "ACMEMicroPlates", 8, 12, 44.1, "mm", welltype)
 
 	lhr.Output_platetype = plate
@@ -145,7 +146,7 @@ func TestThree(*testing.T) {
 	var lhr LHRequest
 	sarr := make(map[string]*LHSolution, 1)
 
-	welltype := NewLHWell("ACMEMicroPlatesDW96ConicalBottom", "", "", 2000, 25, 2, 3, 8.2, 8.2, 41.3, 4.7, "mm")
+	welltype := NewLHWell("ACMEMicroPlatesDW96ConicalBottom", "", "", 2000, 25, wtype.NewShape("box"), 3, 8.2, 8.2, 41.3, 4.7, "mm")
 	plate := NewLHPlate("ACMEMicroPlatesDW96ConicalBottom", "ACMEMicroPlates", 8, 12, 44.1, "mm", welltype)
 
 	m, _ := json.Marshal(plate)

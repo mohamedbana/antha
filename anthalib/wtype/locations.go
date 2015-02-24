@@ -14,14 +14,14 @@ type Location interface {
 	Location_Name() string
 	Positions() []Location
 	Container() Location
-	Shape() int
+	Shape() Shape
 }
 
 type ConcreteLocation struct {
 	AnthaObject
 	Psns []*ConcreteLocation
 	Cntr *ConcreteLocation
-	Shap int
+	Shap Shape
 }
 
 func (cl *ConcreteLocation) Location_ID() string {
@@ -40,11 +40,11 @@ func (cl *ConcreteLocation) Positions() []Location {
 func (cl *ConcreteLocation) Container() Location {
 	return cl.Cntr
 }
-func (cl *ConcreteLocation) Shape() int {
+func (cl *ConcreteLocation) Shape() Shape {
 	return cl.Shap
 }
 
-func NewLocation(name string, nPositions int, shape int) Location {
+func NewLocation(name string, nPositions int, shape Shape) Location {
 	nao := NewAnthaObject(name)
 	positions := make([]*ConcreteLocation, nPositions)
 	l := ConcreteLocation{nao, positions, nil, shape}

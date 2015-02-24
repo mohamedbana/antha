@@ -44,8 +44,8 @@ func ExampleOne() {
 }
 
 func TestLocations(*testing.T) {
-	nl := NewLocation("liquidhandler", 9, 0)
-	nl2 := NewLocation("anotherliquidhandler", 9, 0)
+	nl := NewLocation("liquidhandler", 9, NewShape("box"))
+	nl2 := NewLocation("anotherliquidhandler", 9, NewShape("box"))
 	fmt.Println("Location ", nl.Location_Name(), " ", nl.Location_ID(), " and location ", nl2.Location_Name(), " ", nl2.Location_ID(), " are the same? ", SameLocation(nl, nl2, 0))
 
 	fmt.Println("Location ", nl.Positions()[0].Location_Name(), " and location ", nl.Positions()[1].Location_Name(), " are the same? ", SameLocation(nl.Positions()[0], nl.Positions()[1], 0), " share a parent? ", SameLocation(nl.Positions()[0], nl.Positions()[1], 1))
