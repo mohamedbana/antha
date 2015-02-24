@@ -781,7 +781,13 @@ type LHTipholder struct {
 // @implement SolidContainer
 
 func (lht *LHTipholder) Contents() []wtype.Solid {
-	return lht.Contents
+	ret := make([]wtype.Solid, len(lht.Cnts))
+
+	for i, t := range lht.Cnts {
+		ret[i] = wtype.Solid(t)
+	}
+
+	return ret
 }
 
 func (lht *LHTipholder) ContainerType() string {
@@ -810,15 +816,15 @@ func (lht *LHTipholder) Location_Name() string {
 	return "LHTipHolder"
 }
 
-func (lht *LHTipholder) Positions() []Location {
+func (lht *LHTipholder) Positions() []wtype.Location {
 	return nil
 }
 
-func (lht *LHTipholder) Container() Location {
+func (lht *LHTipholder) Container() wtype.Location {
 	return lht.Parent
 }
 
-func (lht *LHTipholder) Shape() Shape {
+func (lht *LHTipholder) Shape() wtype.Shape {
 	// TODO this should return the right answer
 	return nil
 }
@@ -827,7 +833,7 @@ func NewLHTipholder(parentid string) *LHTipholder {
 	var holder LHTipholder
 	holder.ID = wtype.GetUUID()
 	holder.ParentID = parentid
-	holder.Contents = make([]*LHTip, 1, 1)
+	holder.Cnts = make([]*LHTip, 1, 1)
 	return &holder
 }
 
@@ -844,9 +850,9 @@ func initialize_tips(tipbox *LHTipbox, tiptype *LHTip) *LHTipbox {
 			col := strconv.Itoa(j + 1)
 			coords := row + ":" + col
 			holder := NewLHTipholder(id)
-			cnts := holder.Contents
+			cnts := holder.Cnts
 			cnts[0] = new_tip_copy(tiptype)
-			holder.Contents = cnts
+			holder.Cnts = cnts
 			wells[holder.ID] = holder
 			wellcoords[holder.ID] = coords
 		}
@@ -856,6 +862,7 @@ func initialize_tips(tipbox *LHTipbox, tiptype *LHTip) *LHTipbox {
 }
 
 type LHTip struct {
+	*wtype.GenericSolid
 	ID       string
 	Mnfr     string
 	Type     string
@@ -864,6 +871,22 @@ type LHTip struct {
 	Curvol   float64
 	Contents string
 	Dirty    bool
+	Loc      wtype.Location
+}
+
+// @implement wtype.Labware
+
+func (lht *LHTip) Manufacturer() string {
+	return lht.Mnfr
+}
+
+func (lht *LHTip) LabwareType() string {
+	return lht.Type
+}
+
+// @implement wtype.Entity
+func (lht *LHTip) Location() wtype.Location {
+	return lht.Loc
 }
 
 func NewLHTip(manufacturer, tiptype string, minvol, maxvol float64) *LHTip {
