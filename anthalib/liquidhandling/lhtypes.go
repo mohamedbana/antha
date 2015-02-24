@@ -24,6 +24,9 @@
 package liquidhandling
 
 import (
+	"encoding/json"
+	"errors"
+	"fmt"
 	"github.com/antha-lang/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/anthalib/wutil"
@@ -170,9 +173,10 @@ func NewLHRequest() *LHRequest {
 
 // structure describing a solution: a combination of liquid components
 type LHSolution struct {
+	*wtype.GenericPhysical
 	ID               string
 	Inst             string
-	Name             string
+	SName            string
 	Order            int
 	Components       []*LHComponent
 	ContainerType    string
@@ -189,6 +193,8 @@ type LHSolution struct {
 func NewLHSolution() *LHSolution {
 	var lhs LHSolution
 	lhs.ID = wtype.GetUUID()
+	var gp wtype.GenericPhysical
+	lhs.GenericPhysical = &gp
 	return &lhs
 }
 
@@ -196,7 +202,7 @@ func (sol LHSolution) GetComponentVolume(key string) float64 {
 	vol := 0.0
 
 	for _, v := range sol.Components {
-		if v.Name == key {
+		if v.CName == key {
 			vol += v.Vol
 		}
 	}
@@ -212,7 +218,7 @@ type LHComponent struct {
 	ID          string
 	Inst        string
 	Order       int
-	Name        string
+	CName       string
 	Type        string
 	Vol         float64
 	Conc        float64
@@ -231,6 +237,10 @@ func (lhc *LHComponent) Viscosity() float64 {
 	return lhc.Visc
 }
 
+func (lhc *LHComponent) Name() string {
+	return lhc.CName
+}
+
 func (lhc *LHComponent) Sample(v wunit.Volume) wtype.Liquid {
 	// need to jig around with units a bit here
 	// Should probably just make Vunit, Cunit etc. wunits anyway
@@ -239,15 +249,18 @@ func (lhc *LHComponent) Sample(v wunit.Volume) wtype.Liquid {
 	// we need some logic potentially
 
 	if v.SIValue() > meas.SIValue() {
-		wutil.Error("LHComponent ID: ", lhc.ID, " Not enough volume for sample")
+		wutil.Error(errors.New(fmt.Sprintf("LHComponent ID: %s Not enough volume for sample", lhc.ID)))
 	} else if v.SIValue() == meas.SIValue() {
 		return lhc
-	} else {
-		smp := CopyLHComponent(lhc)
-		// need a convention here
-
-		smp.Vol=v.
 	}
+	smp := CopyLHComponent(lhc)
+	// need a convention here
+
+	smp.Vol = v.RawValue()
+	smp.Vunit = v.Unit().PrefixedSymbol()
+	meas.Subtract(&v.ConcreteMeasurement)
+	lhc.Vol = meas.RawValue()
+	return smp
 }
 
 func NewLHComponent() *LHComponent {
@@ -259,6 +272,15 @@ func NewLHComponent() *LHComponent {
 }
 
 func CopyLHComponent(lhc *LHComponent) *LHComponent {
+	tmp, _ := json.Marshal(lhc)
+	var lhc2 LHComponent
+	json.Unmarshal(tmp, &lhc2)
+	lhc2.ID = wtype.GetUUID()
+	if lhc2.Inst != "" {
+		lhc2.Inst = wtype.GetUUID()
+		// this needs some thought
+	}
+	return &lhc2
 }
 
 // structure defining a liquid handler setup
@@ -409,13 +431,23 @@ func (w *LHWell) ContainerVolume() wunit.Volume {
 }
 
 func (w *LHWell) Contents() []wtype.Physical {
-	return w.WContents
+	ret := make([]wtype.Physical, len(w.WContents))
+	for i := 0; i < len(w.WContents); i++ {
+		ret[i] = wtype.Physical(w.WContents[i])
+	}
+	return ret
 }
 
 func (w *LHWell) Add(p wtype.Physical) {
-	// type switch?
+	switch t := p.(type) {
+	default:
+		wutil.Error(errors.New(fmt.Sprintf("LHWell: Cannot add type %T", t)))
+	case *LHSolution:
+		// do something
+	case *LHComponent:
+		w.WContents = append(w.WContents, p.(*LHComponent))
+	}
 
-	w.WContents = append(w.WContents, p.(LHComponent))
 }
 
 // this is pretty dodgy... we will have to be quite careful here
@@ -521,8 +553,8 @@ func get_next_well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 			break
 		}
 
-		cont := cnts[0].Name
-		if cont != component.Name {
+		cont := cnts[0].Name()
+		if cont != component.Name() {
 			continue
 		}
 
@@ -576,7 +608,7 @@ func next_well_to_try(row, col, nrows, ncols int) (int, int) {
 func new_component(name, ctype string, vol float64) *LHComponent {
 	var component LHComponent
 	component.ID = wtype.GetUUID()
-	component.Name = name
+	component.CName = name
 	component.Type = ctype
 	component.Vol = vol
 	return &component

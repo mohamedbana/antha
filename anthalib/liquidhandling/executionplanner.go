@@ -141,12 +141,12 @@ func get_aggregate_component(sol *LHSolution, name string) *LHComponent {
 
 	ret := NewLHComponent()
 
-	ret.Name = name
+	ret.CName = name
 
 	vol := 0.0
 
 	for _, component := range components {
-		nm := component.Name
+		nm := component.CName
 
 		if nm == name {
 			ret.Type = component.Type

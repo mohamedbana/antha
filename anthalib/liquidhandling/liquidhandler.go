@@ -189,13 +189,13 @@ func (this *liquidhandler) GetInputs(request *LHRequest) map[string][]*LHCompone
 		for _, component := range components {
 			component.Destination = solution.ID
 
-			cmps, ok := inputs[component.Name]
+			cmps, ok := inputs[component.CName]
 			if !ok {
 				cmps = make([]*LHComponent, 0, 3)
 			}
 
 			cmps = append(cmps, component)
-			inputs[component.Name] = cmps
+			inputs[component.CName] = cmps
 		}
 	}
 
