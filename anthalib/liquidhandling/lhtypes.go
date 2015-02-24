@@ -138,6 +138,22 @@ func NewLHPosition(position_number int, name string, maxh float64) *LHPosition {
 	return &lhp
 }
 
+/*
+// question over whether this is necessary
+//@implement wtype.SolidContainer
+func (lhp *LHPosition) Contents() []Solid {
+	return nil
+}
+func (lhp *LHPosition) ContainerType() string {
+	return lhp.Name
+}
+func Empty() bool {
+
+}
+func PartOf() Entity {
+
+}
+*/
 // structure for defining a request to the liquid handler
 type LHRequest struct {
 	ID                         string
@@ -313,6 +329,34 @@ type LHPlate struct {
 	Wellcoords map[string]*LHWell
 }
 
+// @implement wtype.Location
+
+func (lhp *LHPlate) Location_ID() string {
+	return lhp.ID
+}
+
+func (lhp *LHPlate) Location_Name() string {
+	return lhp.PlateName
+}
+
+func (lhp *LHPlate) Positions() []wtype.Location {
+	ret := make([]wtype.Location, lhp.Nwells)
+	x := 0
+	for _, v := range lhp.Cols {
+		for _, w := range v {
+			ret[x] = wtype.Location(w)
+			x += 1
+		}
+	}
+	return ret
+}
+
+func (lhp *LHPlate) Container() wtype.Location {
+	return lhp
+}
+
+// Shape() deferred to GenericPhysical
+
 // @implement wtype.Labware
 func (lhp *LHPlate) Wells() [][]wtype.Well {
 	ret := make([][]wtype.Well, len(lhp.Rows))
@@ -396,7 +440,7 @@ type LHWell struct {
 	WContents []*LHComponent
 	Rvol      float64
 	Currvol   float64
-	Shape     int
+	WShape    int
 	Bottom    int
 	Xdim      float64
 	Ydim      float64
@@ -411,6 +455,28 @@ func (w *LHWell) updateVolume() {
 	for _, val := range w.WContents {
 		w.Vol += val.Vol
 	}
+}
+
+//@implement wtype.Location
+
+func (lhw *LHWell) Location_ID() string {
+	return lhw.ID
+}
+
+func (lhw *LHWell) Location_Name() string {
+	return lhw.Platetype
+}
+
+func (lhw *LHWell) Positions() []wtype.Location {
+	return nil
+}
+
+func (lhw *LHWell) Container() wtype.Location {
+	return lhw.Plate
+}
+
+func (lhw *LHWell) Shape() int {
+	return lhw.WShape
 }
 
 // @implement wtype.Well
@@ -483,7 +549,7 @@ func (w *LHWell) Empty() bool {
 }
 
 func NewLHWellCopy(template *LHWell) *LHWell {
-	cp := NewLHWell(template.Platetype, template.Plateid, template.Crds, template.Vol, template.Rvol, template.Shape, template.Bottom, template.Xdim, template.Ydim, template.Zdim, template.Bottomh, template.Dunit)
+	cp := NewLHWell(template.Platetype, template.Plateid, template.Crds, template.Vol, template.Rvol, template.WShape, template.Bottom, template.Xdim, template.Ydim, template.Zdim, template.Bottomh, template.Dunit)
 
 	return cp
 }
@@ -498,7 +564,7 @@ func NewLHWell(platetype, plateid, crds string, vol, rvol float64, shape, bott i
 	well.Vol = vol
 	well.Rvol = rvol
 	well.Currvol = 0.0
-	well.Shape = shape
+	well.WShape = shape
 	well.Bottom = bott
 	well.Xdim = xdim
 	well.Ydim = ydim
