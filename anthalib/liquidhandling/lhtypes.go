@@ -712,13 +712,55 @@ func initialize_wells(plate *LHPlate) {
 /* tip box */
 
 type LHTipbox struct {
+	*wtype.GenericSolid
 	ID    string
 	Type  string
 	Mnfr  string
 	Nrows int
 	Ncols int
 	Tips  map[string]*LHTipholder
+	Loc   wtype.Location
 }
+
+// @implement wtype.Labware
+// most methods deferred to GenericSolid
+func (lhtb *LHTipbox) Location() wtype.Location {
+	return lhtb.Loc
+}
+
+func (lhtb *LHTipbox) Manufacturer() string {
+	return lhtb.Mnfr
+}
+
+func (lhtb *LHTipbox) LabwareType() string {
+	return lhtb.Type
+}
+
+// @implement wtype.Location
+func (lhtb *LHTipbox) Location_ID() string {
+	return lhtb.ID
+}
+
+func (lhtb *LHTipbox) Location_Name() string {
+	return lhtb.Name()
+}
+
+func (lhtb *LHTipbox) Positions() []wtype.Location {
+	ret := make([]wtype.Location, len(lhtb.Tips))
+	i := 0
+	for _, t := range lhtb.Tips {
+		ret[i] = wtype.Location(t)
+		i += 1
+	}
+
+	return ret
+}
+
+func (lhtb *LHTipbox) Container() wtype.Location {
+	return lhtb.Loc
+}
+
+// Shape() deferred to wtype.GenericPhysical
 
 func NewLHTipbox(nrows, ncols int, manufacturer string, tiptype *LHTip) *LHTipbox {
 	var tipbox LHTipbox
@@ -732,7 +774,53 @@ func NewLHTipbox(nrows, ncols int, manufacturer string, tiptype *LHTip) *LHTipbo
 type LHTipholder struct {
 	ID       string
 	ParentID string
-	Contents []*LHTip
+	Cnts     []*LHTip
+	Parent   *LHTipbox
+}
+
+// @implement SolidContainer
+
+func (lht *LHTipholder) Contents() []wtype.Solid {
+	return lht.Contents
+}
+
+func (lht *LHTipholder) ContainerType() string {
+	return "TipHolder"
+}
+
+func (lht *LHTipholder) Empty() bool {
+	if lht.Cnts[0] != nil {
+		return false
+	}
+	return true
+}
+
+func (lht *LHTipholder) PartOf() wtype.Entity {
+	return lht.Parent
+}
+
+// @implement Location
+
+func (lht *LHTipholder) Location_ID() string {
+	return lht.ID
+}
+
+func (lht *LHTipholder) Location_Name() string {
+	// TODO -- add the proper location name here
+	return "LHTipHolder"
+}
+
+func (lht *LHTipholder) Positions() []Location {
+	return nil
+}
+
+func (lht *LHTipholder) Container() Location {
+	return lht.Parent
+}
+
+func (lht *LHTipholder) Shape() Shape {
+	// TODO this should return the right answer
+	return nil
 }
 
 func NewLHTipholder(parentid string) *LHTipholder {
