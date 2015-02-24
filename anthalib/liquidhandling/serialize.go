@@ -72,23 +72,23 @@ func (slhp SLHPlate) FillPlate(plate *LHPlate) {
 // this is for keeping track of the well type
 
 type LHWellType struct {
-	Vol     float64
-	Vunit   string
-	Rvol    float64
-	Shape   wtype.Shape
-	Bottom  int
-	Xdim    float64
-	Ydim    float64
-	Zdim    float64
-	Bottomh float64
-	Dunit   string
+	Vol       float64
+	Vunit     string
+	Rvol      float64
+	ShapeName string
+	Bottom    int
+	Xdim      float64
+	Ydim      float64
+	Zdim      float64
+	Bottomh   float64
+	Dunit     string
 }
 
 func (w *LHWell) AddDimensions(lhwt *LHWellType) {
 	w.Vol = lhwt.Vol
 	w.Vunit = lhwt.Vunit
 	w.Rvol = lhwt.Rvol
-	w.WShape = lhwt.Shape
+	w.WShape = wtype.NewShape(lhwt.ShapeName)
 	w.Bottom = lhwt.Bottom
 	w.Xdim = lhwt.Xdim
 	w.Ydim = lhwt.Ydim
@@ -99,7 +99,7 @@ func (w *LHWell) AddDimensions(lhwt *LHWellType) {
 
 func (plate *LHPlate) Welldimensions() *LHWellType {
 	t := plate.Welltype
-	lhwt := LHWellType{t.Vol, t.Vunit, t.Rvol, t.WShape, t.Bottom, t.Xdim, t.Ydim, t.Zdim, t.Bottomh, t.Dunit}
+	lhwt := LHWellType{t.Vol, t.Vunit, t.Rvol, t.WShape.ShapeName(), t.Bottom, t.Xdim, t.Ydim, t.Zdim, t.Bottomh, t.Dunit}
 	return &lhwt
 }
 
