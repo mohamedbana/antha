@@ -24,7 +24,6 @@ package liquidhandling
 
 import (
 	"fmt"
-	//"github.com/antha-lang/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/anthalib/execution"
 )
 
