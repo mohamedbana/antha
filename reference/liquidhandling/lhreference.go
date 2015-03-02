@@ -31,22 +31,36 @@ type LHExample struct {
 	Mixture        chan<- execute.ThreadParam // output solution
 	lock           sync.Mutex
 	params         map[execute.ThreadID]*execute.AsyncBag
+	inputs         map[execute.ThreadID]*execute.AsyncBag
+	outputs        map[execute.ThreadID]*execute.AsyncBag
+}
+
+// make LHExample implement AsyncBag
+
+type BlockSet struct {
+	Params ParamBlock
+	Inputs InputBlock
+}
+
+func (e *LHExample) Map(m map[string]interface{}) interface{} {
+	var b BlockSet
+	b.Params = m["params"].(ParamBlock)
+	b.Inputs = m["inputs"].(InputBlock)
+	return b
 }
 
 // single execution thread variables
 // with concrete types
 type ParamBlock struct {
-	A_vol   wunit.Volume
-	B_vol   wunit.Volume
-	Mixture wtype.Solution
-	ID      execute.ThreadID
+	A_vol wunit.Volume
+	B_vol wunit.Volume
+	ID    execute.ThreadID
 }
 
-type JSONBlock struct {
-	A_vol   *wunit.Volume
-	B_vol   *wunit.Volume
-	Mixture *wtype.Solution
-	ID      *execute.ThreadID
+type JSONParamBlock struct {
+	A_vol *wunit.Volume
+	B_vol *wunit.Volume
+	ID    *execute.ThreadID
 }
 
 // support function for wire format
@@ -67,57 +81,71 @@ func ParamsFromJSON(r io.Reader) (p *ParamBlock) {
 	}
 	return
 }
-
-// could handle mapping in the threadID better...
-func (e *LHExample) Map(m map[string]interface{}) interface{} {
-	var res ParamBlock
-	res.A_vol = m["A_vol"].(execute.ThreadParam).Value.(wunit.Volume)
-	res.B_vol = m["B_vol"].(execute.ThreadParam).Value.(wunit.Volume)
-	res.Dest = m["Dest"].(execute.ThreadParam).Value.(wtype.LiquidContainer)
-	m["ID"] = m["A_vol"].(execute.ThreadParam).Value.(execute.ThreadID)
-	return res
+func InputsFromJSON(r io.Reader) (p *InputBlock) {
+	p = new(InputBlock)
+	dec := json.NewDecoder(r)
+	if err := dec.Decode(p); err != nil {
+		log.Fatalln(err)
+	}
+	return
 }
 
-func (e *LHExample) OnA_vol(param execute.ThreadParam) {
-	e.lock.Lock()
+// could handle mapping in the threadID better...
+func (p *ParamBlock) Map(m map[string]interface{}) interface{} {
+	p.A_vol = m["A_vol"].(execute.ThreadParam).Value.(wunit.Volume)
+	p.B_vol = m["B_vol"].(execute.ThreadParam).Value.(wunit.Volume)
+	m["ID"] = m["A_vol"].(execute.ThreadParam).Value.(execute.ThreadID)
+	p.ID = m["ID"]
+	return p
+}
+
+func (p *ParamBlock) Complete(interface{}) {
+
+}
+
+func (p *ParamBlock) OnA_vol(param execute.ThreadParam) {
+	p.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(2, e, e)
-		e.params[param.ID] = bag
+		bag.Init(2, p, p)
+		p.params[param.ID] = bag
 	}
-	e.lock.Unlock()
+	p.lock.Unlock()
 
 	fired := bag.AddValue("A_vol", param)
 	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
+		p.lock.Lock()
+		delete(p.params, param.ID)
+		p.lock.Unlock()
 	}
 }
 
-func (e *LHExample) OnB_vol(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
+func (p *ParamBlock) OnB_vol(param execute.ThreadParam) {
+	p.lock.Lock()
+	var bag *execute.AsyncBag = p.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(2, e, e)
-		e.params[param.ID] = bag
+		bag.Init(2, p, p)
+		p.params[param.ID] = bag
 	}
-	e.lock.Unlock()
+	p.lock.Unlock()
 
 	fired := bag.AddValue("B_vol", param)
 	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
+		p.lock.Lock()
+		delete(p.params, param.ID)
+		p.lock.Unlock()
 	}
 }
 
 // execute.AsyncBag functions
-func (e *LHExample) Complete(params interface{}) {
-	p := params.(ParamBlock)
-	e.steps(p)
+func (e *LHExample) Complete(blocks interface{}) {
+	blx := blocks.(BlockSet)
+	p := blx.ParamBlock
+	i := blx.InputBlock
+	e.setup(p, i)
+	e.steps(p, i)
 }
 
 // generic typing for interface support
@@ -139,44 +167,102 @@ func NewLHExample() *LHExample {
 // we use separate input and output structures
 // to allow each to have its own AsyncBag
 type InputBlock struct {
+	A    wtype.Liquid
+	B    wtype.Liquid
+	Dest wtype.Labware
 }
 
-type OutputBlock struct {
+type JSONInputBlock struct {
+	A    *wtype.Liquid
+	B    *wtype.Liquid
+	Dest *wtype.Labware
 }
 
-func (e *LHExample) OnDest(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
+// InputBlock needs to implement AsyncBag
+
+func (ib *InputBlock) Complete() {
+
+}
+
+func (ib *InputBlock) Map(m map[string]interface{}) interface{} {
+}
+
+func (ib *InputBlock) OnDest(param execute.ThreadParam) {
+	ib.lock.Lock()
+	var bag *execute.AsyncBag = ib.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(2, e, e)
-		e.params[param.ID] = bag
+		bag.Init(2, ib, ib)
+		ib.params[param.ID] = bag
 	}
-	e.lock.Unlock()
+	ib.lock.Unlock()
 
 	fired := bag.AddValue("Dest", param)
 	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
+		ib.lock.Lock()
+		delete(ib.params, param.ID)
+		ib.lock.Unlock()
 	}
+}
+
+func (ib *InputBlock) OnA(param execute.ThreadParam) {
+	ib.lock.Lock()
+	var bag *execute.AsyncBag = ib.params[param.ID]
+	if bag == nil {
+		bag = new(execute.AsyncBag)
+		bag.Init(2, ib, ib)
+		ib.params[param.ID] = bag
+	}
+	ib.lock.Unlock()
+
+	fired := bag.AddValue("A", param)
+	if fired {
+		ib.lock.Lock()
+		delete(ib.params, param.ID)
+		ib.lock.Unlock()
+	}
+
+}
+
+func (ib *InputBlock) OnB(param execute.ThreadParam) {
+	ib.lock.Lock()
+	var bag *execute.AsyncBag = ib.params[param.ID]
+	if bag == nil {
+		bag = new(execute.AsyncBag)
+		bag.Init(2, ib, ib)
+		ib.params[param.ID] = bag
+	}
+	ib.lock.Unlock()
+
+	fired := bag.AddValue("B", param)
+	if fired {
+		ib.lock.Lock()
+		delete(ib.params, param.ID)
+		ib.lock.Unlock()
+	}
+
+}
+
+type OutputBlock struct {
+	SolOut wtype.Solution
 }
 
 // setup function
 
-func (e *LHExample) setup(p ParamBlock) {
+func (e *LHExample) setup(pb ParamBlock, ib InputBlock) {
 
 }
 
 // main function for use in goroutines
-func (e *LHExample) steps(p ParamBlock) {
+func (e *LHExample) steps(pb ParamBlock, ib InputBlock) {
 	// get the execution context
 
 	ctx := execution.GetContext()
 
-	sample_a := mixer.Sample(A, p.A_vol)
-	sample_b := mixer.Sample(B, p.B_vol)
+	sample_a := mixer.Sample(ib.A, p.A_vol)
+	sample_b := mixer.Sample(ib.B, p.B_vol)
 
-	ret := MixInto(p.Dest, sample_a, sample_b)
+	ret := MixInto(ib.Dest, sample_a, sample_b)
 
+	ob.SolOut = ret
 }

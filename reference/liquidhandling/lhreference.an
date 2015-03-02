@@ -21,7 +21,7 @@ Inputs (
 
 Outputs (
 	// mixed liquids
-	S Solution
+	SolOut Solution
 )
 
 Setup {
