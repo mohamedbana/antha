@@ -5,11 +5,11 @@ import (
 	// goflow most likely
 	"bytes"
 	"encoding/json"
-	"github.com/Synthace/Goflow"
 	"github.com/antha-lang/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/execute"
+	"github.com/antha-lang/goflow"
 	"io"
 	"log"
 	"sync"
@@ -24,18 +24,18 @@ type LHReference struct {
 	// it holds channels for receipt of data
 
 	// these are data items
-	A_vol <-chan wunit.Volume
-	B_vol <-chan wunit.Volume
+	A_vol <-chan execute.ThreadParam
+	B_vol <-chan execute.ThreadParam
 
 	// these are materials
 
-	A    <-chan wtype.Liquid
-	B    <-chan wtype.Liquid
-	Dest <-chan wtype.LiquidContainer
+	A    <-chan execute.ThreadParam
+	B    <-chan execute.ThreadParam
+	Dest <-chan execute.ThreadParam
 
 	// this is the output
 
-	Mixture chan<- wtype.Solution
+	Mixture chan<- execute.ThreadParam
 
 	// holders for the blocks
 
@@ -46,6 +46,20 @@ type LHReference struct {
 	// sync structure
 
 	lock sync.Mutex
+}
+
+// constructor
+
+func (lhr *LHReference) init() {
+	lhr.ParamBlocks = make(map[execute.ThreadID]*execute.AsyncBag)
+	lhr.InputBlocks = make(map[execute.ThreadID]*execute.AsyncBag)
+	lhr.PIBlocks = make(map[execute.ThreadID]*execute.AsyncBag)
+}
+
+func NewLHReference() *LHReference {
+	lhr := new(LHReference)
+	lhr.init()
+	return lhr
 }
 
 // complete function for LHReference
@@ -148,18 +162,13 @@ type InputBlock struct {
 
 // JSON blocks are also required... not quite sure why though
 // I'm sure we can serialize the paramblock OK anyway
-
-type JSONPBlock struct {
+type JSONBlock struct {
 	A_vol *wunit.Volume
 	B_vol *wunit.Volume
+	A     *wtype.Liquid
+	B     *wtype.Liquid
+	Dest  *wtype.LiquidContainer
 	ID    *execute.ThreadID
-}
-
-type JSONIBlock struct {
-	A    *wtype.Liquid
-	B    *wtype.Liquid
-	Dest *wtype.LiquidContainer
-	ID   *execute.ThreadID
 }
 
 func (p *ParamBlock) ToJSON() (b bytes.Buffer) {
