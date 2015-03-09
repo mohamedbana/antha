@@ -4,7 +4,9 @@ import (
 	// some things
 	// goflow most likely
 	"github.com/Synthace/Goflow"
+	"github.com/antha-lang/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/execute"
 )
 
