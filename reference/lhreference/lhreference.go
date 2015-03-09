@@ -3,11 +3,16 @@ package lhreference
 import (
 	// some things
 	// goflow most likely
+	"bytes"
+	"encoding/json"
 	"github.com/Synthace/Goflow"
 	"github.com/antha-lang/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/execute"
+	"io"
+	"log"
+	"sync"
 )
 
 // struct defining the antha element as a flow component
@@ -26,7 +31,7 @@ type LHReference struct {
 
 	A    <-chan wtype.Liquid
 	B    <-chan wtype.Liquid
-	Dest <-chan wtype.Labware
+	Dest <-chan wtype.LiquidContainer
 
 	// this is the output
 
@@ -40,7 +45,7 @@ type LHReference struct {
 
 	// sync structure
 
-	lock sync.Lock
+	lock sync.Mutex
 }
 
 // complete function for LHReference
@@ -49,61 +54,70 @@ func (lh *LHReference) Complete(val interface{}) {
 	switch val.(type) {
 	case ParamBlock:
 		v := val.(ParamBlock)
-		tp := ThreadParam{v, v.ID}
-		AddFeature("Params", tp, v, lh, lh.PIBlocks, 2)
+		tp := execute.ThreadParam{v, v.ID}
+		lh.lock.Lock()
+		AddFeature("Params", tp, &v, lh, &lh.PIBlocks, 2)
+		lh.lock.Unlock()
 	case InputBlock:
 		v := val.(InputBlock)
-		tp := ThreadParam{v, v.ID}
-		AddFeature("Params", tp, v, lh, lh.PIBlocks, 2)
+		tp := execute.ThreadParam{v, v.ID}
+		lh.lock.Lock()
+		AddFeature("Params", tp, &v, lh, &lh.PIBlocks, 2)
+		lh.lock.Unlock()
 	case PIBlock:
 		// we have everything we need so just do the steps
-		pib := v.(PIBLock)
+		pib := val.(PIBlock)
 		lh.Setup(pib)
 		lh.Steps(pib)
 	}
 }
 
 // candidate for refactoring out into execute
-func AddFeature(name string, param execute.ThreadParam, mapper execute.AsyncMapper, completer execute.AsyncCompleter, blocks *map[execute.ThreadParam]*execute.AsyncBag, nkeys int) {
-	lh.lock.Lock()
-	var bag *execute.AsyncBag = blocks[param.ID]
+func AddFeature(name string, param execute.ThreadParam, mapper execute.AsyncMapper, completer execute.AsyncCompleter, blocks *map[execute.ThreadID]*execute.AsyncBag, nkeys int) {
+	var bag *execute.AsyncBag = (*blocks)[param.ID]
 
 	if bag == nil {
 		bag = new(execute.AsyncBag)
 		bag.Init(nkeys, completer, mapper)
 	}
 
-	lh.lock.Unlock()
-
-	fired := bag.AddValue(name, param.Value())
+	fired := bag.AddValue(name, param)
 
 	if fired {
-		lh.lock.Lock()
-		delete(blocks, param.ID)
-		lh.lock.Unlock()
+		delete(*blocks, param.ID)
 	}
 }
 
 // ports for wiring into the network
 func (lh *LHReference) OnA_vol(param execute.ThreadParam) {
-	var p ParamBlock
-	AddFeature("A_vol", param, p, lh, lh.ParamBlocks, 2)
+	var p *ParamBlock
+	lh.lock.Lock()
+	AddFeature("A_vol", param, p, lh, &(lh.ParamBlocks), 2)
+	lh.lock.Unlock()
 }
 func (lh *LHReference) OnB_vol(param execute.ThreadParam) {
-	var p ParamBlock
-	AddFeature("B_vol", param, p, lh.ParamBlocks, 2)
+	var p *ParamBlock
+	lh.lock.Lock()
+	AddFeature("B_vol", param, p, lh, &(lh.ParamBlocks), 2)
+	lh.lock.Unlock()
 }
 func (lh *LHReference) OnA(param execute.ThreadParam) {
-	var i InputBlock
-	AddFeature("A", param, lh, i, lh.InputBlocks, 3)
+	var i *InputBlock
+	lh.lock.Lock()
+	AddFeature("A", param, i, lh, &(lh.InputBlocks), 3)
+	lh.lock.Unlock()
 }
 func (lh *LHReference) OnB(param execute.ThreadParam) {
-	var i InputBlock
-	AddFeature("B", param, lh, i, lh.InputBlocks, 3)
+	var i *InputBlock
+	lh.lock.Lock()
+	AddFeature("B", param, i, lh, &(lh.InputBlocks), 3)
+	lh.lock.Unlock()
 }
 func (lh *LHReference) OnDest(param execute.ThreadParam) {
-	var i InputBlock
-	AddFeature("Dest", param, i, lh, lh.InputBlocks, 3)
+	var i *InputBlock
+	lh.lock.Lock()
+	AddFeature("Dest", param, i, lh, &(lh.InputBlocks), 3)
+	lh.lock.Unlock()
 }
 
 // we need a two-level asyncbag structure
@@ -112,9 +126,9 @@ func (lh *LHReference) OnDest(param execute.ThreadParam) {
 
 type PIBlock struct {
 	flow.Component
-	Params Paramblock
-	Inputs Inputblock
-	ID     *execute.ThreadID
+	Params ParamBlock
+	Inputs InputBlock
+	ID     execute.ThreadID
 }
 
 // the next levels down are the paramblock and input block structs
@@ -122,14 +136,14 @@ type PIBlock struct {
 type ParamBlock struct {
 	A_vol wunit.Volume
 	B_vol wunit.Volume
-	ID    *execute.ThreadID
+	ID    execute.ThreadID
 }
 
 type InputBlock struct {
 	A    wtype.Liquid
 	B    wtype.Liquid
-	Dest wtype.Labware
-	ID   *execute.ThreadID
+	Dest wtype.LiquidContainer
+	ID   execute.ThreadID
 }
 
 // JSON blocks are also required... not quite sure why though
@@ -142,10 +156,10 @@ type JSONPBlock struct {
 }
 
 type JSONIBlock struct {
-	A    *wunit.Liquid
-	B    *wunit.Liquid
-	Dest *wunit.Labware
-	ID   *exeute.ThreadID
+	A    *wtype.Liquid
+	B    *wtype.Liquid
+	Dest *wtype.LiquidContainer
+	ID   *execute.ThreadID
 }
 
 func (p *ParamBlock) ToJSON() (b bytes.Buffer) {
@@ -157,7 +171,7 @@ func (p *ParamBlock) ToJSON() (b bytes.Buffer) {
 }
 
 func (i *InputBlock) ToJSON(b bytes.Buffer) {
-	end := json.NewEncoder(&b)
+	enc := json.NewEncoder(&b)
 	if err := enc.Encode(i); err != nil {
 		log.Fatalln(err)
 	}
@@ -176,7 +190,7 @@ func ParamsFromJSON(r io.Reader) (p *ParamBlock) {
 func InputsFromJSON(r io.Reader) (i *InputBlock) {
 	i = new(InputBlock)
 	dec := json.NewDecoder(r)
-	if err := dec.Decode(p); err != nil {
+	if err := dec.Decode(i); err != nil {
 		log.Fatalln(err)
 	}
 	return
@@ -194,28 +208,28 @@ func (p *ParamBlock) Map(m map[string]interface{}) interface{} {
 func (i *InputBlock) Map(m map[string]interface{}) interface{} {
 	i.A = m["A"].(execute.ThreadParam).Value.(wtype.Liquid)
 	i.B = m["B"].(execute.ThreadParam).Value.(wtype.Liquid)
-	i.Dest = m["Dest"].(execute.ThreadParam).Value.(wtype.Labware)
+	i.Dest = m["Dest"].(execute.ThreadParam).Value.(wtype.LiquidContainer)
 	i.ID = m["A"].(execute.ThreadParam).ID
 	return i
 }
 
 func (pi *PIBlock) Map(m map[string]interface{}) interface{} {
-	pi.ParamBlock = m["ParamBlock"].(execute.ThreadParam).Value.(ParamBlock)
-	pi.InputBlock = m["InputBlock"].(execute.ThreadParam).Value.(InputBlock)
+	pi.Params = m["Params"].(execute.ThreadParam).Value.(ParamBlock)
+	pi.Inputs = m["Inputs"].(execute.ThreadParam).Value.(InputBlock)
 	pi.ID = m["ParamBlock"].(execute.ThreadParam).ID
 	return pi
 }
 
 // and definitions of the setup and steps methods
 
-func (lh *LHExample) Setup(v interface{}) {
+func (lh *LHReference) Setup(v interface{}) {
 	// Only needed where there are controls
 }
 
-func (lh *LHExample) Steps(v interface{}) {
+func (lh *LHReference) Steps(v interface{}) {
 	pib := v.(PIBlock)
-	params := pib.ParamBlock
-	inputs := pib.InputBlock
+	params := pib.Params
+	inputs := pib.Inputs
 	// I'm not so keen on this mechanism at the moment
 	// it probably needs redoing to make it easier to auto-generate
 	s := mixer.Sample(inputs.A, params.A_vol)
