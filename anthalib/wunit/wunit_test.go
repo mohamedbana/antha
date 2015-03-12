@@ -23,6 +23,7 @@
 package wunit
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 )
@@ -50,6 +51,10 @@ func TestSIParsing(*testing.T) {
 
 func TestUnitConversion(*testing.T) {
 	ExampleEight()
+}
+
+func TestJSON(*testing.T) {
+	ExampleNine()
 }
 
 func ExampleBasic() {
@@ -117,7 +122,6 @@ func ExampleEight() {
 	// testing the new conversion methods
 	pu := ParsePrefixedUnit("GHz")
 	pu2 := ParsePrefixedUnit("MHz")
-
 	meas := ConcreteMeasurement{10, pu}
 	meas2 := ConcreteMeasurement{50, pu2}
 
@@ -130,4 +134,26 @@ func ExampleEight() {
 	// 50.000MHz  is  0.05   GHz
 	// 50.000MHz  is  50   MHz
 	// 10.000GHz  is  10000   MHz
+}
+
+func ExampleNine() {
+	// testing JSON functions
+
+	pu := ParsePrefixedUnit("GHz")
+	//meas := ConcreteMeasurement{10, pu}
+
+	x := PrefixedUnit(pu)
+
+	b, err := json.Marshal(x)
+
+	fmt.Println(string(b))
+	fmt.Println(err)
+
+	var pu2 PrefixedUnit
+
+	er2 := json.Unmarshal(b, &pu2)
+
+	fmt.Println(pu2)
+	fmt.Println(er2)
+
 }

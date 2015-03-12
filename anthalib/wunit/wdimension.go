@@ -69,10 +69,7 @@ type Volume struct {
 
 // make a volume
 func NewVolume(v float64, unit string) Volume {
-	if unit != "L" && unit != "l" && unit != "M^3" {
-		panic("Can't make volumes which aren't Litres or cubic metres")
-	}
-	o := Volume{NewMeasurement(v, "", unit)}
+	o := Volume{NewPMeasurement(v, unit)}
 	return o
 }
 

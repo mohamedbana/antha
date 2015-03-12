@@ -95,7 +95,16 @@ func ParsePrefixedUnit(unit string) PrefixedUnit {
 
 	parser.Execute()
 
-	return NewPrefixedUnit(parser.TreeTop.Children[0].Value.(string), parser.TreeTop.Children[1].Value.(string))
+	prefix := ""
+	un := ""
+
+	if len(parser.TreeTop.Children) == 1 {
+		un = parser.TreeTop.Children[0].Value.(string)
+	} else {
+		prefix = parser.TreeTop.Children[0].Value.(string)
+		un = parser.TreeTop.Children[1].Value.(string)
+	}
+	return NewPrefixedUnit(prefix, un)
 }
 
 // look up unit by symbol

@@ -5,6 +5,7 @@ import (
 	// goflow most likely
 	"bytes"
 	"encoding/json"
+	"github.com/antha-lang/antha/anthalib/liquidhandling"
 	"github.com/antha-lang/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/anthalib/wunit"
@@ -165,9 +166,9 @@ type InputBlock struct {
 type JSONBlock struct {
 	A_vol *wunit.Volume
 	B_vol *wunit.Volume
-	A     *wtype.Liquid
-	B     *wtype.Liquid
-	Dest  *wtype.LiquidContainer
+	A     *liquidhandling.LHComponent
+	B     *liquidhandling.LHComponent
+	Dest  *liquidhandling.LHWell
 	ID    *execute.ThreadID
 }
 
