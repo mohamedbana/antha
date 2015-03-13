@@ -161,7 +161,7 @@ func (t TOL) Find_string(name string) *TOL{
 }
 
 
-func IndexOfString (query string, pa *[]string) int{
+func IndexOfString(query string, pa *[]string) int{
 	for i:=0;i<len(*pa);i++{
 		if (*pa)[i]==query{
 			return i
