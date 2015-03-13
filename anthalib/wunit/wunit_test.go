@@ -149,11 +149,11 @@ func ExampleNine() {
 	fmt.Println(string(b))
 	fmt.Println(err)
 
-	var pu2 PrefixedUnit
+	var pu2 GenericPrefixedUnit
 
 	er2 := json.Unmarshal(b, &pu2)
 
-	fmt.Println(pu2)
+	fmt.Println("Unmarshalled: ", pu2)
 	fmt.Println(er2)
 
 }

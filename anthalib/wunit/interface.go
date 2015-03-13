@@ -66,7 +66,7 @@ func GetUnitLib(fn string) (*(map[string]GenericUnit), error) {
 
 // helper function to make it easier to
 // make a new unit with prefix directly
-func NewPrefixedUnit(prefix string, unit string) PrefixedUnit {
+func NewPrefixedUnit(prefix string, unit string) *GenericPrefixedUnit {
 	u := UnitBySymbol(unit)
 	p := SIPrefixBySymbol(prefix)
 
@@ -84,7 +84,7 @@ func NewPrefixedUnit(prefix string, unit string) PrefixedUnit {
 
 // get a unit from a string
 
-func ParsePrefixedUnit(unit string) PrefixedUnit {
+func ParsePrefixedUnit(unit string) *GenericPrefixedUnit {
 	parser := &SIPrefixedUnitGrammar{Buffer: unit}
 	parser.Init()
 	parser.SIPrefixedUnit.Init([]byte(unit))

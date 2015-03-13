@@ -83,7 +83,7 @@ type ConcreteMeasurement struct {
 	// the raw value
 	Mvalue float64
 	// the relevant units
-	Munit PrefixedUnit
+	Munit *GenericPrefixedUnit
 }
 
 // value when converted to SI units
