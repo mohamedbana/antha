@@ -1,4 +1,4 @@
-// execution/garbagecollectorservice.go: Part of the Antha language
+// execution/equipmentmanagerservice.go: Part of the Antha language
 // Copyright (C) 2014 the Antha authors. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
@@ -22,34 +22,84 @@
 
 package execution
 
-// map data structure defining a request for an object
-// to enter the waste stream
+import "github.com/antha-lang/antha/anthalib/liquidhandling"
+
+// map data structure defining a request to find a piece of equipment
 type EquipmentManagerRequest map[string]interface{}
 
-// the garbage collector holds channels for communicating
-// with the garbage collection service provider
+// holds channels for communicating with the equipment manager
 type EquipmentManagerService struct {
-	RequestsIn  chan EquipmentManagerRequest
-	RequestsOut chan EquipmentManagerRequest
+	RequestsIn       chan EquipmentManagerRequest
+	RequestsOut      chan EquipmentManagerRequest
+	devicelist       map[string][]string
+	deviceproperties map[string]*liquidhandling.LHProperties
 }
 
-// Initialize the garbage collection service
-// the channels are given a default capacity for 5 items before
-// blocking
+// get properties for a device
+func (ems *EquipmentManagerService) GetEquipmentProperties(deviceclass string) interface{} {
+
+}
+
+// bit of a short-term fix
+
+//returns a list of devices known to the system
+func (ems *EquipmentManagerService) GetDeviceListByClass(class string) []string {
+	return ems.devicelist[class]
+}
+
+// get properties files describing the handlers themselves
+func GetLiquidHandlerProperties(devname string) *liquidhandling.LHProperties {
+	return ems.deviceproperties[devname]
+}
+
+// ask for some equipment
+func (ems *EquipmentManagerService) RequestEquipment(rin EquipmentManagerRequest) EquipmentManagerRequest {
+	ems.RequestsIn <- rin
+	rout := <-gcs.RequestsOut
+	return rout
+}
+
+// initialize the equipment manager
+// needs to read config from somewhere
 func (ems *EquipmentManagerService) Init() {
 	ems.RequestsIn = make(chan EquipmentManagerRequest, 5)
 	ems.RequestsOut = make(chan EquipmentManagerRequest, 5)
+
+	ems.devicelist = make(map[string][]string)
+
+	ems.devicelist["liquidhandler"] = make([]string, 1)
+	ems.devicelist["liquidhandler"][0] = "ALiquidHandler"
+
+	ems.deviceproperties = make(map[string]*liquidhandling.LHProperties)
+
+	ems.deviceproperties["ALiquidHandler"] = makepropertiesbodge()
 
 	go func() {
 		garbageDaemon(ems)
 	}()
 }
 
-// send an item to the waste stream
-func (ems *EquipmentManagerService) RequestGarbageCollection(rin GarbageCollectionRequest) GarbageCollectionRequest {
-	ems.RequestsIn <- rin
-	rout := <-ems.RequestsOut
-	return rout
+func makepropertiesbodge() *liquidhandling.LHProperties {
+	// make a liquid handling structure
+
+	lhp := liquidhandling.NewLHProperties(12, "ALiquidHandler", "ACMEliquidhandlers", "discrete", "disposable", []string{"plate"})
+
+	// I suspect this might need to be in the constructor
+	// or at least wrapped into a factory method
+
+	lhp.Tip_preferences = []int{1, 5, 3}
+	lhp.Input_preferences = []int{10, 11, 12}
+	lhp.Output_preferences = []int{7, 8, 9, 2, 4}
+
+	// need to add some configs
+
+	hvconfig := liquidhandling.NewLHParameter("HVconfig", 10, 250, "ul")
+
+	cnfvol := lhp.Cnfvol
+	cnfvol[0] = hvconfig
+	lhp.Cnfvol = cnfvol
+
+	return &lhp
 }
 
 // Daemon for passing requests through to the service

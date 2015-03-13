@@ -236,10 +236,17 @@ func (lh *LHReference) Steps(v interface{}) {
 	pib := v.(*PIBlock)
 	params := pib.Params
 	inputs := pib.Inputs
+
+	execution := execution.GetContext()
+
+	// we will need to populate these calls at runtime
+	lhp := execution.EquipmentManager.GetEquipmentProperties("liquidhandler").(*liquidhandling.LHProperties)
+
 	// needs an overhaul
 	s := mixer.Sample(inputs.A, params.A_vol)
 	s2 := mixer.Sample(inputs.B, params.B_vol)
 	lhr := mixer.MixInto(inputs.Dest, s, s2)
+	// this should probably take place via the execution environment
 	liquidhandler := liquidhandling.Init(lhp)
 	liquidhandler.MakeSolutions(&lhr)
 }
