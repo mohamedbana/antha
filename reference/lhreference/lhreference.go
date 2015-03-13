@@ -236,9 +236,10 @@ func (lh *LHReference) Steps(v interface{}) {
 	pib := v.(*PIBlock)
 	params := pib.Params
 	inputs := pib.Inputs
-	// I'm not so keen on this mechanism at the moment
-	// it probably needs redoing to make it easier to auto-generate
+	// needs an overhaul
 	s := mixer.Sample(inputs.A, params.A_vol)
 	s2 := mixer.Sample(inputs.B, params.B_vol)
-	mixer.MixInto(inputs.Dest, s, s2)
+	lhr := mixer.MixInto(inputs.Dest, s, s2)
+	liquidhandler := liquidhandling.Init(lhp)
+	liquidhandler.MakeSolutions(&lhr)
 }

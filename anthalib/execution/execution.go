@@ -33,6 +33,7 @@ type ExecutionService struct {
 	Logger           *LogService
 	Scheduler        *ScheduleService
 	GarbageCollector *GarbageCollectionService
+	EquipmentManager *EquipmentManagerService
 	// and also to the config
 	Config *AnthaConfig
 }
@@ -49,8 +50,9 @@ func StartRuntime() {
 	l := NewLogService()
 	s := NewScheduleService()
 	gc := NewGarbageCollectionService()
+	em := NewEquipmentManagerService()
 	ac := NewAnthaConfig()
-	executionContext = ExecutionService{sm, st, l, s, gc, ac}
+	executionContext = ExecutionService{sm, st, l, s, gc, em, ac}
 }
 
 // accessor for above to enforce singleton status
