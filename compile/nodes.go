@@ -33,8 +33,8 @@ package compile
 import (
 	"bytes"
 	//"fmt"
-	"github.com/Synthace/antha/ast"
-	"github.com/Synthace/antha/token"
+	"github.com/antha-lang/antha/ast"
+	"github.com/antha-lang/antha/token"
 	"strings"
 	"unicode/utf8"
 )
