@@ -29,12 +29,12 @@ import (
 // A structure which defines the execution context
 // - holds pointers to the services
 type ExecutionService struct {
-	StockMgr         *stockmanager.StockService
-	SampleTracker    *sampletracker.SampleTrackerService
-	Logger           *logger.LogService
-	Scheduler        *scheduler.ScheduleService
-	GarbageCollector *garbagecollector.GarbageCollectionService
-	EquipmentManager *equipmentmanager.EquipmentManagerService
+	StockMgr         *StockService
+	SampleTracker    *SampleTrackerService
+	Logger           *LogService
+	Scheduler        *ScheduleService
+	GarbageCollector *GarbageCollectionService
+	EquipmentManager *EquipmentManagerService
 	// and also to the config
 	Config *AnthaConfig
 }

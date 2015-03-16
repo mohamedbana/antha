@@ -1,4 +1,4 @@
-// anthalib//execution/interface.go: Part of the Antha language
+// anthalib//liquidhandling/make_layout.go: Part of the Antha language
 // Copyright (C) 2015 The Antha authors. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
@@ -20,45 +20,21 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 1 Royal College St, London NW1 0NH UK
 
-package execution
+package liquidhandling
 
-func NewStockService() *StockService {
-	var ss StockService
-	ss.Init()
-	return &ss
-}
+// how are layouts represented by the system?
 
-func NewSampleTrackerService() *SampleTrackerService {
-	var sts SampleTrackerService
-	sts.Init()
-	return &sts
-}
+// initial idea:
 
-func NewLogService() *LogService {
-	var ls LogService
-	ls.Init()
-	return &ls
-}
+// two levels of group, major and minor
+// minors must be assigned to majors
 
-func NewGarbageCollectionService() *GarbageCollectionService {
-	var gcs GarbageCollectionService
-	gcs.Init()
-	return &gcs
-}
+// in the first case major groups equate to plates
+// minor groups equate to groupings within plates
 
-func NewScheduleService() *ScheduleService {
-	var ss ScheduleService
-	ss.Init()
-	return &ss
-}
+// we need an idea of how a pattern can be represented
+// I think it's probably just a group of wells
 
-func NewAnthaConfig() *AnthaConfig {
-	ac := make(AnthaConfig)
-	return &ac
-}
+func Make_layout() {
 
-func NewEquipmentManagerService() *EquipmentManagerService {
-	var em EquipmentManagerService
-	em.Init()
-	return &em
 }

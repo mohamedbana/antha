@@ -25,16 +25,16 @@ package execution
 // the garbage collector holds channels for communicating
 // with the garbage collection service provider
 type GarbageCollectionService struct {
-	RequestsIn  chan execution.GarbageCollectionRequest
-	RequestsOut chan execution.GarbageCollectionRequest
+	RequestsIn  chan GarbageCollectionRequest
+	RequestsOut chan GarbageCollectionRequest
 }
 
 // Initialize the garbage collection service
 // the channels are given a default capacity for 5 items before
 // blocking
 func (gcs *GarbageCollectionService) Init() {
-	gcs.RequestsIn = make(chan execution.GarbageCollectionRequest, 5)
-	gcs.RequestsOut = make(chan execution.GarbageCollectionRequest, 5)
+	gcs.RequestsIn = make(chan GarbageCollectionRequest, 5)
+	gcs.RequestsOut = make(chan GarbageCollectionRequest, 5)
 
 	go func() {
 		garbageDaemon(gcs)
@@ -42,7 +42,7 @@ func (gcs *GarbageCollectionService) Init() {
 }
 
 // send an item to the waste stream
-func (gcs *GarbageCollectionService) RequestGarbageCollection(rin execution.GarbageCollectionRequest) execution.GarbageCollectionRequest {
+func (gcs *GarbageCollectionService) RequestGarbageCollection(rin GarbageCollectionRequest) GarbageCollectionRequest {
 	gcs.RequestsIn <- rin
 	rout := <-gcs.RequestsOut
 	return rout
