@@ -906,3 +906,8 @@ func new_tip_copy(parent *LHTip) *LHTip {
 	tip := NewLHTip(parent.Mnfr, parent.Type, parent.Minvol, parent.Maxvol)
 	return tip
 }
+
+type RobotInstruction interface {
+	InstructionType() int
+	GetParameter(name string) interface{}
+}
