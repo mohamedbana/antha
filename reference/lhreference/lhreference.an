@@ -1,0 +1,43 @@
+// Simple do nothing protocol for hello world example
+protocol LHReference //import "github.com/antha-lang/antha/reference/lhreference"
+
+import (
+)
+
+Parameters (
+	A_vol  Volume
+	B_vol  Volume
+)
+
+Data (
+	// no data comes out
+)
+
+Inputs (
+	A Liquid
+	B Liquid
+	Dest LiquidContainer
+)
+
+Outputs (
+	// mixed liquids
+	SolOut Solution
+)
+
+Setup {
+	// None
+}
+
+Steps {
+	// these samples are implicitly created
+	// during the liquid handling setp
+	sample_a:=Sample(A, A_vol)
+	sample_b:=Sample(B, B_vol)
+
+	// mix then creates the request for the liquid handler, sends it through
+	// and gets the result
+	// the more concise way would be
+	// S=Mix(Sample(A,A_vol), Sample(B,B_vol)) 
+	// but this is made explicit for clarity
+	S=MixInto(Dest, sample_a,sample_b)
+}

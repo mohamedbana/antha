@@ -1,4 +1,4 @@
-// wtype/genericentity.go: Part of the Antha language
+// locations/genericentity.go: Part of the Antha language
 // Copyright (C) 2014 the Antha authors. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
@@ -23,15 +23,19 @@
 package wtype
 
 // a simple structure to allow a generic entity class to be defined
-type GenericEntity struct{
-	GenericSolid
+type GenericEntity struct {
+	*GenericSolid
+	Loc Location
 }
 
-// dummy method required so that GenericEntity implements Entity
-func (ge *GenericEntity)IsEntity(){
+// entities are defined by having locations
+
+func (ge *GenericEntity) Location() Location {
+	return ge.Loc
 }
 
-
-
-
-
+func NewGenericEntity(name string, location Location) *GenericEntity {
+	gs := NewGenericSolid("", "")
+	ge := GenericEntity{gs, location}
+	return &ge
+}

@@ -45,8 +45,8 @@ type Pipetter interface {
 // something which can move Entities about
 // should be defined as generally as possible
 type Mover interface {
-	Grab(e Entity)
-	Drop() Entity
+	Grab(e Entity) bool
+	Drop(s *Slot) Entity
 	MoveTo(c coordinates)
 	MaxWeight() wunit.Mass
 	Gripper() VariableSlot
@@ -78,6 +78,7 @@ type DeSealer interface {
 type Slot interface {
 	SolidContainer
 	Dimensions() Geometry
+	CanHold(e Entity) bool
 }
 
 // a slot which can change size

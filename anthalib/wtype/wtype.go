@@ -1,31 +1,33 @@
 // wtype/wtype.go: Part of the Antha language
 // Copyright (C) 2014 the Antha authors. All rights reserved.
-// 
+//
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-// 
+//
 // For more information relating to the software or licensing issues please
-// contact license@antha-lang.org or write to the Antha team c/o 
+// contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 1 Royal College St, London NW1 0NH UK
 
 package wtype
 
-import "github.com/antha-lang/antha/anthalib/wunit"
+import (
+	"github.com/antha-lang/antha/anthalib/wunit"
+)
 
 // base type for defining materials
-type Matter interface{
+type Matter interface {
 	MatterType() string
 	MeltingPoint() wunit.Temperature
 	BoilingPoint() wunit.Temperature
@@ -33,18 +35,18 @@ type Matter interface{
 }
 
 // a sample of matter
-type Physical interface{
+type Physical interface {
 	// embedded class for dealing with type of material
 	Matter
 	// identifier of sample
-	Name()string
+	Name() string
 	SetName(string) string
 	// mass of sample
 	Mass() wunit.Mass
 	SetMass(wunit.Mass) wunit.Mass
 	// volume occupied by sample
 	Volume() wunit.Volume
-	SetVolume(wunit.Volume) wunit.Volume 
+	SetVolume(wunit.Volume) wunit.Volume
 	// temperature of object
 	Temperature() wunit.Temperature
 	SetTemperature(t wunit.Temperature)
@@ -53,22 +55,21 @@ type Physical interface{
 }
 
 // The Entity interface declares that this object is an independently movable thing
-type Entity interface{
+type Entity interface {
 	// Entities must be solid objects
 	Solid
-	// dummy method since there is no obvious set of methods to define this
-	IsEntity()
+	// since it can be moved independently, an Entity must have a location
+	Location() Location
 }
 
-
 // solid state
-type Solid interface{	
+type Solid interface {
 	Physical
 	Shape() Shape
 }
 
 // liquid state
-type Liquid interface{
+type Liquid interface {
 	Physical
 	Viscosity() float64
 	// take some of this liquid
@@ -76,17 +77,26 @@ type Liquid interface{
 }
 
 // so far the best definition of this is not-solid-or-liquid...
-type Gas interface{
+type Gas interface {
 	Physical
 	Gas()
 }
 
 // to be composed with an X to make a SealedX
-type Sealed interface{
+type Sealed interface {
 	IsSealed()
 }
 
+type AnthaObject struct {
+	ID   string
+	Inst string
+	Name string
+}
+
+func NewAnthaObject(name string) AnthaObject {
+	id := GetUUID()
+	ao := AnthaObject{id, "", name}
+	return ao
+}
 
 /*************************/
-
-

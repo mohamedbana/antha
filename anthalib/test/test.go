@@ -35,6 +35,7 @@ func main(){
 	// make two liquids
 	w:=wtype.NewGenericLiquid("water", "water", wunit.NewVolume(0.001,"L"))
 	t:=wtype.NewGenericLiquid("tartrazine", "water", wunit.NewVolume(0.0001,"L"))
+	p:=wtype.GenericSBSFormatPlate()
 
 	// define a volume and a concentration
 	v:=wunit.NewVolume(0.0001, "L")
