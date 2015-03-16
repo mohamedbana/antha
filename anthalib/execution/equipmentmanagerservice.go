@@ -34,7 +34,7 @@ type EquipmentManagerService struct {
 
 // get properties for a device
 func (ems *EquipmentManagerService) GetEquipmentProperties(deviceclass string) interface{} {
-	return nil
+	return ems.deviceproperties[ems.devicelist[deviceclass][0]]
 }
 
 // bit of a short-term fix
@@ -94,6 +94,8 @@ func makepropertiesbodge() *liquidhandling.LHProperties {
 	cnfvol := lhp.Cnfvol
 	cnfvol[0] = hvconfig
 	lhp.Cnfvol = cnfvol
+
+	lhp.CurrConf = hvconfig
 
 	return lhp
 }

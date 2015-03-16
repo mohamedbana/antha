@@ -249,6 +249,8 @@ func (lh *LHReference) Steps(v interface{}) {
 
 	var lhr liquidhandling.LHRequest
 
+	lhr.Input_platetype = inputs.Dest.Plate
+	lhr.Output_platetype = inputs.Dest.Plate
 	lhr.Output_solutions = solutions
 
 	// make tips
