@@ -71,7 +71,7 @@ func BasicSetupAgent(request *LHRequest, params *LHProperties) *LHRequest {
 		// get the first available position from the preferences
 		pos := get_first_available_preference(tip_preferences, setup)
 		if pos == -1 {
-			raiseError("No positions left for tipbox")
+			RaiseError("No positions left for tipbox")
 		}
 
 		position := "position_" + strconv.Itoa(pos)
@@ -91,7 +91,7 @@ func BasicSetupAgent(request *LHRequest, params *LHProperties) *LHRequest {
 	for _, p := range output_plates {
 		pos := get_first_available_preference(output_preferences, setup)
 		if pos == -1 {
-			raiseError("No positions left for output")
+			RaiseError("No positions left for output")
 		}
 		position := "position_" + strconv.Itoa(pos)
 		setup[position] = p
@@ -103,7 +103,7 @@ func BasicSetupAgent(request *LHRequest, params *LHProperties) *LHRequest {
 	for _, p := range input_plates {
 		pos := get_first_available_preference(input_preferences, setup)
 		if pos == -1 {
-			raiseError("No positions left for input")
+			RaiseError("No positions left for input")
 		}
 		position := "position_" + strconv.Itoa(pos)
 		setup[position] = p

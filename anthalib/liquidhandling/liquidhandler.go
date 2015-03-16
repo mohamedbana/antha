@@ -24,7 +24,6 @@ package liquidhandling
 
 import (
 	"fmt"
-	"github.com/antha-lang/antha/anthalib/execution"
 )
 
 // the liquid handler structure defines the interface to a particular liquid handling
@@ -88,7 +87,7 @@ func RunLiquidHandler(*chan *LHRequest) {
 func (this *liquidhandler) MakeSolutions(request *LHRequest) *LHRequest {
 	// the minimal request which is possible defines what solutions are to be made
 	if request.Output_solutions == nil {
-		raiseError("No solutions defined")
+		RaiseError("No solutions defined")
 	}
 	this.Plan(request)
 	this.Execute(request)
@@ -106,7 +105,7 @@ func (this *liquidhandler) Execute(request *LHRequest) {
 	instructions := (*request).Instructions
 
 	if len(instructions) == 0 {
-		raiseError("Cannot execute request: no instructions")
+		RaiseError("Cannot execute request: no instructions")
 	}
 
 	for _, ins := range instructions {
@@ -206,10 +205,11 @@ func (this *liquidhandler) GetInputs(request *LHRequest) map[string][]*LHCompone
 		}
 	}
 
-	requestinputs = this.MakeStockRequest(requestinputs)
+	//	requestinputs = this.MakeStockRequest(requestinputs)
 	return requestinputs
 }
 
+/*
 func makeStockRequest(sample *LHComponent) execution.StockRequest {
 	stockrequest := make(execution.StockRequest, 3)
 	stockrequest["Name"] = sample.Name
@@ -244,6 +244,7 @@ func makePlateStockRequest(plate *LHPlate) execution.StockRequest {
 
 	return ret
 }
+*/
 
 // define which labware to use
 // and request specific instances
@@ -261,8 +262,8 @@ func (this *liquidhandler) GetPlates(plates map[string]*LHPlate, major_layouts m
 	// we should know how many plates we need
 	for k, plate := range plates {
 		if plate.Inst == "" {
-			stockrequest := execution.GetContext().StockMgr.RequestStock(makePlateStockRequest(plate))
-			plate.Inst = stockrequest["inst"].(string)
+			//stockrequest := execution.GetContext().StockMgr.RequestStock(makePlateStockRequest(plate))
+			//plate.Inst = stockrequest["inst"].(string)
 		}
 
 		plates[k] = plate

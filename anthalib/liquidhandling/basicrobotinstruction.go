@@ -1,4 +1,4 @@
-// anthalib//liquidhandling/basicrobotinstruction.go: Part of the Antha language
+// anthalib//basicrobotinstruction.go: Part of the Antha language
 // Copyright (C) 2015 The Antha authors. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
@@ -24,7 +24,6 @@ package liquidhandling
 
 import (
 	"fmt"
-	"github.com/antha-lang/antha/anthalib/liquidhandling"
 )
 
 const (
@@ -61,7 +60,7 @@ func (ins AspirateInstruction) GetParameter(s string) interface{} {
 	case "CTYPE":
 		return ins.ComponentType
 	default:
-		liquidhandling.RaiseError(fmt.Sprintf("Aspirate: illegal parameter: %s", s))
+		RaiseError(fmt.Sprintf("Aspirate: illegal parameter: %s", s))
 	}
 	return nil
 }
@@ -91,7 +90,7 @@ func (ins DispenseInstruction) GetParameter(s string) interface{} {
 	case "CTYPE":
 		return ins.ComponentType
 	default:
-		liquidhandling.RaiseError(fmt.Sprintf("Dispense: illegal parameter: %s", s))
+		RaiseError(fmt.Sprintf("Dispense: illegal parameter: %s", s))
 	}
 	return nil
 }
@@ -126,7 +125,7 @@ func (ins MoveInstruction) GetParameter(s string) interface{} {
 	case "OFFSETZ":
 		return ins.OffsetZ
 	default:
-		liquidhandling.RaiseError(fmt.Sprintf("Move: illegal parameter: %s", s))
+		RaiseError(fmt.Sprintf("Move: illegal parameter: %s", s))
 	}
 	return nil
 }
@@ -140,7 +139,7 @@ func (li LoadInstruction) InstructionType() int {
 }
 
 func (ins LoadInstruction) GetParameter(s string) interface{} {
-	liquidhandling.RaiseError(fmt.Sprintf("Load: illegal parameter: %s", s))
+	RaiseError(fmt.Sprintf("Load: illegal parameter: %s", s))
 	// props to the Go compiler for forcing me to put in unreachable statements!
 	// </snark>
 	return nil
@@ -155,7 +154,7 @@ func (ui UnloadInstruction) InstructionType() int {
 }
 
 func (ins UnloadInstruction) GetParameter(s string) interface{} {
-	liquidhandling.RaiseError(fmt.Sprintf("Unload: illegal parameter: %s", s))
+	RaiseError(fmt.Sprintf("Unload: illegal parameter: %s", s))
 	return nil
 }
 

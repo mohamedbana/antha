@@ -244,6 +244,7 @@ type LHComponent struct {
 	Loc         string
 	Smax        float64
 	Visc        float64
+	Container   *LHWell
 	Destination string
 }
 

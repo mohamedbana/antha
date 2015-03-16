@@ -1,4 +1,4 @@
-// anthalib//liquidhandling/compositerobotinstruction.go: Part of the Antha language
+// anthalib//compositerobotinstruction.go: Part of the Antha language
 // Copyright (C) 2015 The Antha authors. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
@@ -24,14 +24,13 @@ package liquidhandling
 
 import (
 	"fmt"
-	"github.com/antha-lang/antha/anthalib/liquidhandling"
 	"github.com/antha-lang/antha/anthalib/wutil"
 )
 
 // a set of instructions which are higher-level than the
 // basic kind, along with some default implementations
 
-type TransferOutputFunc func(TransferInstruction) []liquidhandling.RobotInstruction
+type TransferOutputFunc func(TransferInstruction) []RobotInstruction
 
 type TransferInstruction struct {
 	Type       int
@@ -42,7 +41,7 @@ type TransferInstruction struct {
 	WellTo     []string
 	Volume     []float64 // this could be a Measurement
 	VolumeUnit []string
-	Prms       *liquidhandling.LHParameter
+	Prms       *LHParameter
 }
 
 func (ti TransferInstruction) InstructionType() int {
@@ -68,31 +67,31 @@ func (ins TransferInstruction) GetParameter(s string) interface{} {
 	case "PARAMS":
 		return ins.Prms
 	default:
-		liquidhandling.RaiseError(fmt.Sprintf("Illegal parameter: %s", s))
+		RaiseError(fmt.Sprintf("Illegal parameter: %s", s))
 	}
 	return nil
 }
 
-func Transfer(what []string, pfrom, pto []string, wfrom, wto []string, v []float64, vu []string, prms *liquidhandling.LHParameter) TransferInstruction {
+func Transfer(what []string, pfrom, pto []string, wfrom, wto []string, v []float64, vu []string, prms *LHParameter) TransferInstruction {
 	ti := TransferInstruction{TFR, what, pfrom, pto, wfrom, wto, v, vu, prms}
 	return ti
 }
 
 // placeholder function: the intention is to have flexible rewriting of transfers
-func SimpleOutput(ti TransferInstruction, rq liquidhandling.LHRequest) []liquidhandling.RobotInstruction {
+func SimpleOutput(ti TransferInstruction, rq LHRequest) []RobotInstruction {
 	posFrom := make([]int, len(ti.PltFrom))
 	posTo := make([]int, len(ti.PltTo))
 
 	for i, _ := range ti.PltFrom {
-		posFrom[i] = liquidhandling.PlateLookup(rq, ti.PltFrom[i])
-		posTo[i] = liquidhandling.PlateLookup(rq, ti.PltTo[i])
+		posFrom[i] = PlateLookup(rq, ti.PltFrom[i])
+		posTo[i] = PlateLookup(rq, ti.PltTo[i])
 	}
 
 	return (SimpleTransfer(posFrom, posTo, ti.WellFrom, ti.WellTo, ti.Volume, ti.VolumeUnit, ti.What, ti.Prms))
 }
 
-func SimpleTransfer(posfrom, posto []int, wellfrom, wellto []string, amount []float64, unit []string, what []string, prms *liquidhandling.LHParameter) []liquidhandling.RobotInstruction {
-	ret := make([]liquidhandling.RobotInstruction, 0, 4)
+func SimpleTransfer(posfrom, posto []int, wellfrom, wellto []string, amount []float64, unit []string, what []string, prms *LHParameter) []RobotInstruction {
+	ret := make([]RobotInstruction, 0, 4)
 
 	// the usages below are OK but need to account for how we specify null values
 
@@ -129,7 +128,7 @@ func SimpleTransfer(posfrom, posto []int, wellfrom, wellto []string, amount []fl
 	return ret
 }
 
-func transferVolumes(what string, amount float64, prms *liquidhandling.LHParameter) []float64 {
+func transferVolumes(what string, amount float64, prms *LHParameter) []float64 {
 	vols := make([]float64, 2)
 
 	// this needs added flexibility, for the moment we need to just make this work

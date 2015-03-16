@@ -5,7 +5,7 @@ import (
 	// goflow most likely
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"github.com/antha-lang/antha/anthalib/execution"
 	"github.com/antha-lang/antha/anthalib/liquidhandling"
 	"github.com/antha-lang/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/anthalib/wunit"
@@ -68,19 +68,16 @@ func NewLHReference() *LHReference {
 func (lh *LHReference) Complete(val interface{}) {
 	switch val.(type) {
 	case *ParamBlock:
-		fmt.Println("Complete ParamBlock")
 		var pib PIBlock
 		v := val.(*ParamBlock)
 		tp := execute.ThreadParam{v, v.ID}
 		AddFeature("Params", tp, &pib, lh, &lh.PIBlocks, 2, lh.lock)
 	case *InputBlock:
-		fmt.Println("Complete InputBlock")
 		var pib PIBlock
 		v := val.(*InputBlock)
 		tp := execute.ThreadParam{v, v.ID}
 		AddFeature("Inputs", tp, &pib, lh, &lh.PIBlocks, 2, lh.lock)
 	case *PIBlock:
-		fmt.Println("Complete PIBlock")
 		// we have everything we need so just do the steps
 		pib := val.(*PIBlock)
 		lh.Setup(pib)
@@ -245,7 +242,24 @@ func (lh *LHReference) Steps(v interface{}) {
 	// needs an overhaul
 	s := mixer.Sample(inputs.A, params.A_vol)
 	s2 := mixer.Sample(inputs.B, params.B_vol)
-	lhr := mixer.MixInto(inputs.Dest, s, s2)
+	solution := mixer.MixInto(inputs.Dest, s, s2)
+
+	solutions := make(map[string]*liquidhandling.LHSolution)
+	solutions[solution.ID] = solution
+
+	var lhr liquidhandling.LHRequest
+
+	lhr.Output_solutions = solutions
+
+	// make tips
+	tipboxes := make([]*liquidhandling.LHTipbox, 2, 2)
+	tip := liquidhandling.NewLHTip("ACMEliquidhandlers", "ACMEliquidhandlers250", 20.0, 250.0)
+	for i := 0; i < 2; i++ {
+		tb := liquidhandling.NewLHTipbox(8, 12, "ACMEliquidhandlers", tip)
+		tipboxes[i] = tb
+	}
+	lhr.Tips = tipboxes
+
 	// this should probably take place via the execution environment
 	liquidhandler := liquidhandling.Init(lhp)
 	liquidhandler.MakeSolutions(&lhr)
