@@ -1,4 +1,4 @@
-// Simple do nothing protocol for hello world example
+// basic protocol for mixing two liquids together at defined volumes
 protocol LHReference //import "github.com/antha-lang/antha/reference/lhreference"
 
 import (
@@ -16,7 +16,6 @@ Data (
 Inputs (
 	A Liquid
 	B Liquid
-	Dest LiquidContainer
 )
 
 Outputs (
@@ -39,5 +38,5 @@ Steps {
 	// the more concise way would be
 	// S=Mix(Sample(A,A_vol), Sample(B,B_vol)) 
 	// but this is made explicit for clarity
-	S=MixInto(Dest, sample_a,sample_b)
+	SolOut=Mix(sample_a,sample_b)
 }

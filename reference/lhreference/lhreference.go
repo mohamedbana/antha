@@ -30,9 +30,9 @@ type LHReference struct {
 
 	// these are materials
 
-	A    <-chan execute.ThreadParam
-	B    <-chan execute.ThreadParam
-	Dest <-chan execute.ThreadParam
+	A <-chan execute.ThreadParam
+	B <-chan execute.ThreadParam
+	//Dest <-chan execute.ThreadParam
 
 	// this is the output
 
@@ -123,10 +123,13 @@ func (lh *LHReference) OnB(param execute.ThreadParam) {
 	var i InputBlock
 	AddFeature("B", param, &i, lh, &(lh.InputBlocks), 3, lh.lock)
 }
+
+/*
 func (lh *LHReference) OnDest(param execute.ThreadParam) {
 	var i InputBlock
 	AddFeature("Dest", param, &i, lh, &(lh.InputBlocks), 3, lh.lock)
 }
+*/
 
 // we need a two-level asyncbag structure
 
@@ -148,10 +151,10 @@ type ParamBlock struct {
 }
 
 type InputBlock struct {
-	A    *liquidhandling.LHComponent
-	B    *liquidhandling.LHComponent
-	Dest *liquidhandling.LHWell
-	ID   execute.ThreadID
+	A *liquidhandling.LHComponent
+	B *liquidhandling.LHComponent
+	//Dest *liquidhandling.LHPlate
+	ID execute.ThreadID
 }
 
 // JSON blocks are also required... not quite sure why though
@@ -161,8 +164,8 @@ type JSONBlock struct {
 	B_vol *wunit.Volume
 	A     *liquidhandling.LHComponent
 	B     *liquidhandling.LHComponent
-	Dest  *liquidhandling.LHWell
-	ID    *execute.ThreadID
+	//Dest  *liquidhandling.LHPlate
+	ID *execute.ThreadID
 }
 
 func (p *ParamBlock) ToJSON() (b bytes.Buffer) {
@@ -211,7 +214,7 @@ func (p *ParamBlock) Map(m map[string]interface{}) interface{} {
 func (i *InputBlock) Map(m map[string]interface{}) interface{} {
 	i.A = m["A"].(execute.ThreadParam).Value.(*liquidhandling.LHComponent)
 	i.B = m["B"].(execute.ThreadParam).Value.(*liquidhandling.LHComponent)
-	i.Dest = m["Dest"].(execute.ThreadParam).Value.(*liquidhandling.LHWell)
+	//i.Dest = m["Dest"].(execute.ThreadParam).Value.(*liquidhandling.LHPlate)
 	i.ID = m["A"].(execute.ThreadParam).ID
 	return i
 }
@@ -239,28 +242,21 @@ func (lh *LHReference) Steps(v interface{}) {
 	// we will need to populate these calls at runtime
 	lhp := execution.EquipmentManager.GetEquipmentProperties("liquidhandler").(*liquidhandling.LHProperties)
 
+	//dest:=inputs.Dest.
+
 	// needs an overhaul
 	s := mixer.Sample(inputs.A, params.A_vol)
 	s2 := mixer.Sample(inputs.B, params.B_vol)
-	solution := mixer.MixInto(inputs.Dest, s, s2)
+	solution := mixer.Mix(s, s2)
 
 	solutions := make(map[string]*liquidhandling.LHSolution)
 	solutions[solution.ID] = solution
 
+	// this function determines what needs to happen to make sure the
+	// inputs all work out; defines Input_platetype etc.
 	var lhr liquidhandling.LHRequest
-
-	lhr.Input_platetype = inputs.Dest.Plate
-	lhr.Output_platetype = inputs.Dest.Plate
-	lhr.Output_solutions = solutions
-
-	// make tips
-	tipboxes := make([]*liquidhandling.LHTipbox, 2, 2)
-	tip := liquidhandling.NewLHTip("ACMEliquidhandlers", "ACMEliquidhandlers250", 20.0, 250.0)
-	for i := 0; i < 2; i++ {
-		tb := liquidhandling.NewLHTipbox(8, 12, "ACMEliquidhandlers", tip)
-		tipboxes[i] = tb
-	}
-	lhr.Tips = tipboxes
+	lhr = liquidhandling.Rationalise_Inputs(lhr, lhp, s, s2)
+	lhr = liquidhandling.Define_Tipboxes(lhr, lhp)
 
 	// this should probably take place via the execution environment
 	liquidhandler := liquidhandling.Init(lhp)

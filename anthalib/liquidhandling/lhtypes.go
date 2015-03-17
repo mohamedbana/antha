@@ -417,6 +417,13 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit s
 			colarr[i][j] = arr[i][j]
 			rowarr[j][i] = arr[i][j]
 			wellmap[arr[i][j].ID] = arr[i][j]
+			// fill in necessary bits of callback info
+
+			arr[i][j].Plate = &lhp
+			arr[i][j].Plateinst = lhp.Inst
+			arr[i][j].Plateid = lhp.ID
+			arr[i][j].Platetype = lhp.Type
+			arr[i][j].Crds = crds
 		}
 	}
 
