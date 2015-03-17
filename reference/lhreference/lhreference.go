@@ -117,11 +117,11 @@ func (lh *LHReference) OnB_vol(param execute.ThreadParam) {
 }
 func (lh *LHReference) OnA(param execute.ThreadParam) {
 	var i InputBlock
-	AddFeature("A", param, &i, lh, &(lh.InputBlocks), 3, lh.lock)
+	AddFeature("A", param, &i, lh, &(lh.InputBlocks), 2, lh.lock)
 }
 func (lh *LHReference) OnB(param execute.ThreadParam) {
 	var i InputBlock
-	AddFeature("B", param, &i, lh, &(lh.InputBlocks), 3, lh.lock)
+	AddFeature("B", param, &i, lh, &(lh.InputBlocks), 2, lh.lock)
 }
 
 /*
@@ -252,12 +252,12 @@ func (lh *LHReference) Steps(v interface{}) {
 
 	// this function determines what needs to happen to make sure the
 	// inputs all work out; defines Input_platetype etc.
-	var lhr liquidhandling.LHRequest
+	lhr := liquidhandling.NewLHRequest()
 	lhr = liquidhandling.Rationalise_Inputs(lhr, lhp, s, s2)
 	lhr = liquidhandling.Rationalise_Outputs(lhr, lhp, s)
 	lhr = liquidhandling.Define_Tipboxes(lhr, lhp)
 
 	// this should probably take place via the execution environment
 	liquidhandler := liquidhandling.Init(lhp)
-	liquidhandler.MakeSolutions(&lhr)
+	liquidhandler.MakeSolutions(lhr)
 }
