@@ -362,6 +362,7 @@ func (lhp *LHPlate) Container() wtype.Location {
 func (lhp *LHPlate) Wells() [][]wtype.Well {
 	ret := make([][]wtype.Well, len(lhp.Rows))
 	for i := 0; i < len(lhp.Rows); i++ {
+		ret[i] = make([]wtype.Well, len(lhp.Rows[i]))
 		for j := 0; j < len(lhp.Rows[i]); j++ {
 			ret[i][j] = lhp.Rows[i][j]
 		}
