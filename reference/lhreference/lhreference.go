@@ -242,8 +242,6 @@ func (lh *LHReference) Steps(v interface{}) {
 	// we will need to populate these calls at runtime
 	lhp := execution.EquipmentManager.GetEquipmentProperties("liquidhandler").(*liquidhandling.LHProperties)
 
-	//dest:=inputs.Dest.
-
 	// needs an overhaul
 	s := mixer.Sample(inputs.A, params.A_vol)
 	s2 := mixer.Sample(inputs.B, params.B_vol)
@@ -256,6 +254,7 @@ func (lh *LHReference) Steps(v interface{}) {
 	// inputs all work out; defines Input_platetype etc.
 	var lhr liquidhandling.LHRequest
 	lhr = liquidhandling.Rationalise_Inputs(lhr, lhp, s, s2)
+	lhr = liquidhandling.Rationalise_Outputs(lhr, lhp, s)
 	lhr = liquidhandling.Define_Tipboxes(lhr, lhp)
 
 	// this should probably take place via the execution environment
