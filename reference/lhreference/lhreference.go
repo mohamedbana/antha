@@ -1,10 +1,9 @@
 package lhreference
 
 import (
-	// some things
-	// goflow most likely
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/antha-lang/antha/anthalib/execution"
 	"github.com/antha-lang/antha/anthalib/liquidhandling"
 	"github.com/antha-lang/antha/anthalib/mixer"
@@ -124,13 +123,6 @@ func (lh *LHReference) OnB(param execute.ThreadParam) {
 	AddFeature("B", param, &i, lh, &(lh.InputBlocks), 2, lh.lock)
 }
 
-/*
-func (lh *LHReference) OnDest(param execute.ThreadParam) {
-	var i InputBlock
-	AddFeature("Dest", param, &i, lh, &(lh.InputBlocks), 3, lh.lock)
-}
-*/
-
 // we need a two-level asyncbag structure
 
 // the top level is the PIblock
@@ -151,9 +143,8 @@ type ParamBlock struct {
 }
 
 type InputBlock struct {
-	A *liquidhandling.LHComponent
-	B *liquidhandling.LHComponent
-	//Dest *liquidhandling.LHPlate
+	A  *liquidhandling.LHComponent
+	B  *liquidhandling.LHComponent
 	ID execute.ThreadID
 }
 
@@ -164,8 +155,7 @@ type JSONBlock struct {
 	B_vol *wunit.Volume
 	A     *liquidhandling.LHComponent
 	B     *liquidhandling.LHComponent
-	//Dest  *liquidhandling.LHPlate
-	ID *execute.ThreadID
+	ID    *execute.ThreadID
 }
 
 func (p *ParamBlock) ToJSON() (b bytes.Buffer) {
@@ -214,7 +204,6 @@ func (p *ParamBlock) Map(m map[string]interface{}) interface{} {
 func (i *InputBlock) Map(m map[string]interface{}) interface{} {
 	i.A = m["A"].(execute.ThreadParam).Value.(*liquidhandling.LHComponent)
 	i.B = m["B"].(execute.ThreadParam).Value.(*liquidhandling.LHComponent)
-	//i.Dest = m["Dest"].(execute.ThreadParam).Value.(*liquidhandling.LHPlate)
 	i.ID = m["A"].(execute.ThreadParam).ID
 	return i
 }
@@ -241,8 +230,10 @@ func (lh *LHReference) Steps(v interface{}) {
 
 	// we will need to populate these calls at runtime
 	lhp := execution.EquipmentManager.GetEquipmentProperties("liquidhandler").(*liquidhandling.LHProperties)
-
 	// needs an overhaul
+
+	fmt.Println("YOU DOITY ", inputs.A.LContainer.Plate)
+
 	s := mixer.Sample(inputs.A, params.A_vol)
 	s2 := mixer.Sample(inputs.B, params.B_vol)
 	solution := mixer.Mix(s, s2)

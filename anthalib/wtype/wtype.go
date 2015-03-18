@@ -74,6 +74,7 @@ type Liquid interface {
 	Viscosity() float64
 	// take some of this liquid
 	Sample(v wunit.Volume) Liquid
+	Container() LiquidContainer
 }
 
 // so far the best definition of this is not-solid-or-liquid...

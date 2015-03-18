@@ -30,23 +30,28 @@ import (
 type GenericLiquid struct {
 	GenericPhysical
 	viscosity float64
+	container LiquidContainer
 }
 
 // factory method for creating a new generic liquid
-func NewGenericLiquid(name string, mattertype string, volume wunit.Volume) *GenericLiquid {
+func NewGenericLiquid(name string, mattertype string, volume wunit.Volume, container LiquidContainer) *GenericLiquid {
 	gp := NewGenericPhysical(mattertype)
 	gp.SetVolume(volume)
 	gp.SetName(name) // bit of a fudge to allow us to extend the basic types
-	gl := GenericLiquid{gp, 0.000894}
+	gl := GenericLiquid{gp, 0.000894, container}
 	return &gl
 }
 
 func (gl *GenericLiquid) Clone() GenericLiquid {
-	return GenericLiquid{gl.GenericPhysical.Clone(), gl.Viscosity()}
+	return GenericLiquid{gl.GenericPhysical.Clone(), gl.Viscosity(), gl.Container()}
 }
 
 func (gl *GenericLiquid) Viscosity() float64 {
 	return gl.viscosity
+}
+
+func (gl *GenericLiquid) Container() LiquidContainer {
+	return gl.container
 }
 
 // sample method for a generic liquid

@@ -39,6 +39,8 @@ func SampleAll(l wtype.Liquid) *liquidhandling.LHComponent {
 	return Sample(l, l.Volume())
 }
 
+// below need to account for having locations for liquids specified...
+
 // take a sample of volume v from this liquid
 func Sample(l wtype.Liquid, v wunit.Volume) *liquidhandling.LHComponent {
 	ret := liquidhandling.NewLHComponent()
@@ -46,6 +48,7 @@ func Sample(l wtype.Liquid, v wunit.Volume) *liquidhandling.LHComponent {
 	ret.CName = l.Name()
 	ret.Vol = v.RawValue()
 	ret.Vunit = v.Unit().PrefixedSymbol()
+	ret.LContainer = l.Container().(*liquidhandling.LHWell)
 
 	return ret
 }
@@ -56,6 +59,7 @@ func SampleForConcentration(l wtype.Liquid, c wunit.Concentration) *liquidhandli
 	ret.CName = l.Name()
 	ret.Conc = c.RawValue()
 	ret.Cunit = c.Unit().PrefixedSymbol()
+	ret.LContainer = l.Container().(*liquidhandling.LHWell)
 	return ret
 }
 
@@ -66,6 +70,7 @@ func SampleForTotalVolume(l wtype.Liquid, v wunit.Volume) *liquidhandling.LHComp
 	ret.CName = l.Name()
 	ret.Tvol = v.RawValue()
 	ret.Vunit = v.Unit().PrefixedSymbol()
+	ret.LContainer = l.Container().(*liquidhandling.LHWell)
 
 	return ret
 }
@@ -76,8 +81,8 @@ func Mix(components ...*liquidhandling.LHComponent) *liquidhandling.LHSolution {
 	// this needs to be a container of some kind
 	var d wtype.LiquidContainer
 
-	if components[0].Container != nil {
-		d = components[0].Container
+	if components[0].Container() != nil {
+		d = components[0].Container()
 	} else {
 		wutil.Error(errors.New("No container specified for mix"))
 	}

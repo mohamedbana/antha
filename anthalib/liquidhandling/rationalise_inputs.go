@@ -10,12 +10,12 @@ func Rationalise_Inputs(lhr *LHRequest, lhp *LHProperties, inputs ...*LHComponen
 		// need to check that the inputs are in the right format
 		// at the moment it's just a case of figuring out if they're in plates
 		// already... if not we panic
-
-		if reflect.TypeOf(inputs[i].Container).Name() != "*liquidhandling.LHWell" {
-			panic("Cannot use non-microplate formats in liquid handler... yet!")
+		n := reflect.TypeOf(inputs[i].Container())
+		if !((n.Kind() == reflect.Ptr && n.Elem().Name() == "LHWell") || n.Name() == "liquidhandling.LHWell") {
+			panic("Rationalise_inputs: cannot use non-microplate formats in liquid handler... yet!")
 		}
 
-		ip[inputs[i].Container.Plate.ID] = inputs[i].Container.Plate
+		ip[inputs[i].LContainer.Plate.ID] = inputs[i].LContainer.Plate
 
 	}
 

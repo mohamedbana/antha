@@ -244,7 +244,7 @@ type LHComponent struct {
 	Loc         string
 	Smax        float64
 	Visc        float64
-	Container   *LHWell
+	LContainer  *LHWell
 	Destination string
 }
 
@@ -256,6 +256,10 @@ func (lhc *LHComponent) Viscosity() float64 {
 
 func (lhc *LHComponent) Name() string {
 	return lhc.CName
+}
+
+func (lhc *LHComponent) Container() wtype.LiquidContainer {
+	return lhc.LContainer
 }
 
 func (lhc *LHComponent) Sample(v wunit.Volume) wtype.Liquid {

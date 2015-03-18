@@ -10,12 +10,12 @@ func Rationalise_Outputs(lhr *LHRequest, lhp *LHProperties, outputs ...*LHCompon
 		// need to check that the outputs are in the right format
 		// at the moment it's just a case of figuring out if they're in plates
 		// already... if not we panic
-
-		if reflect.TypeOf(outputs[i].Container).Name() != "*liquidhandling.LHWell" {
-			panic("Cannot use non-microplate formats in liquid handler... yet!")
+		n := reflect.TypeOf(outputs[i].Container())
+		if !((n.Kind() == reflect.Ptr && n.Elem().Name() == "LHWell") || n.Name() == "liquidhandling.LHWell") {
+			panic("Rationalise_outputs: cannot use non-microplate formats in liquid handler... yet!")
 		}
 
-		op[outputs[i].Container.Plate.ID] = outputs[i].Container.Plate
+		op[outputs[i].LContainer.Plate.ID] = outputs[i].LContainer.Plate
 
 	}
 
