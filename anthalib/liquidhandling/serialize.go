@@ -35,6 +35,37 @@ import (
 // to include this to allow object structure to be sensibly defined for
 // runtime purposes without making the network traffic too heavy
 
+// serializable version of LHComponent
+type SLHComponent struct {
+	*wtype.GenericPhysical
+	ID          string
+	Inst        string
+	Order       int
+	CName       string
+	Type        string
+	Vol         float64
+	Conc        float64
+	Vunit       string
+	Cunit       string
+	Tvol        float64
+	Loc         string
+	Smax        float64
+	Visc        float64
+	ContainerID string
+	Destination string
+}
+
+func (lhc *LHComponent) MarshalJSON() ([]byte, error) {
+	slhc := SLHComponent{lhc.GenericPhysical, lhc.ID, lhc.Inst, lhc.Order, lhc.CName, lhc.Type, lhc.Vol, lhc.Conc, lhc.Vunit, lhc.Cunit, lhc.Tvol, lhc.Loc, lhc.Smax, lhc.Visc, lhc.LContainer.ID, lhc.Destination}
+	return json.Marshal(slhc)
+}
+
+func (lhc *LHComponent) UnmarshalJSON(b []byte) error {
+	var slhc SLHComponent
+	err := json.Unmarshal(b, &slhc)
+	return err
+}
+
 // serializable, stripped-down version of the LHPlate
 type SLHPlate struct {
 	ID             string
@@ -131,6 +162,12 @@ func (plate *LHPlate) UnmarshalJSON(b []byte) error {
 	wt := slp.Welldimensions
 
 	for s, w := range plate.Wellcoords {
+		// give w's contents their proper references
+
+		for _, contents := range w.WContents {
+			contents.LContainer = w
+		}
+
 		plate.HWells[w.ID] = w
 
 		// give w its properties back
