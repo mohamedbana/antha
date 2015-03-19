@@ -56,7 +56,11 @@ type SLHComponent struct {
 }
 
 func (lhc *LHComponent) MarshalJSON() ([]byte, error) {
-	slhc := SLHComponent{lhc.GenericPhysical, lhc.ID, lhc.Inst, lhc.Order, lhc.CName, lhc.Type, lhc.Vol, lhc.Conc, lhc.Vunit, lhc.Cunit, lhc.Tvol, lhc.Loc, lhc.Smax, lhc.Visc, lhc.LContainer.ID, lhc.Destination}
+	id := ""
+	if lhc.LContainer != nil {
+		id = lhc.LContainer.ID
+	}
+	slhc := SLHComponent{lhc.GenericPhysical, lhc.ID, lhc.Inst, lhc.Order, lhc.CName, lhc.Type, lhc.Vol, lhc.Conc, lhc.Vunit, lhc.Cunit, lhc.Tvol, lhc.Loc, lhc.Smax, lhc.Visc, id, lhc.Destination}
 	return json.Marshal(slhc)
 }
 
