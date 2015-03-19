@@ -26,13 +26,12 @@ import "github.com/antha-lang/antha/anthalib/liquidhandling"
 
 // holds channels for communicating with the equipment manager
 type EquipmentManagerService struct {
-	RequestsIn       chan *EquipmentManagerRequest
-	RequestsOut      chan *EquipmentManagerRequest
+	RequestsIn       chan EquipmentManagerRequest
+	RequestsOut      chan EquipmentManagerRequest
 	devicelist       map[string][]string
 	deviceproperties map[string]*liquidhandling.LHProperties
+	devicequeues     map[string][]*DeviceManager
 }
-
-type EquipmentManagerRequest map[string]interface{}
 
 // get properties for a device
 func (ems *EquipmentManagerService) GetEquipmentProperties(deviceclass string) interface{} {
@@ -113,8 +112,19 @@ func equipmentmanagerDaemon(ems *EquipmentManagerService) {
 	}
 }
 
-func handleRequest(emr *EquipmentManagerRequest) *EquipmentManagerRequest {
+func MakeDeviceRequest(devicetype string) EquipmentManagerRequest {
+	emr := NewEquipmentManagerRequest()
+
+	emr["requestType"] = "DeviceRequest"
+	emr["deviceType"] = devicetype
+
+	return emr
+}
+
+func handleRequest(emr EquipmentManagerRequest) EquipmentManagerRequest {
 	switch emr["requestType"] {
+	case "DeviceRequest":
 
 	}
+	return emr
 }

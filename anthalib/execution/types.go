@@ -1,5 +1,9 @@
 package execution
 
+import (
+	"github.com/antha-lang/antha/anthalib/wtype"
+)
+
 // holds types - concrete and interface
 
 // antha config type
@@ -24,3 +28,11 @@ type LogRequest map[string]interface{}
 
 // data structure defining sample requests
 type SampleRequest map[string]interface{}
+
+/////////constructors etc.
+
+func NewEquipmentManagerRequest() EquipmentManagerRequest {
+	emr := EquipmentManagerRequest{}
+	emr["ID"] = wtype.GetUUID()
+	return emr
+}

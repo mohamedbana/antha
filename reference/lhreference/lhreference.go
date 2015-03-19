@@ -3,7 +3,6 @@ package lhreference
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/antha-lang/antha/anthalib/execution"
 	"github.com/antha-lang/antha/anthalib/liquidhandling"
 	"github.com/antha-lang/antha/anthalib/mixer"
@@ -123,6 +122,14 @@ func (lh *LHReference) OnB(param execute.ThreadParam) {
 	AddFeature("B", param, &i, lh, &(lh.InputBlocks), 2, lh.lock)
 }
 
+// output structure
+
+type OutputBlock struct {
+	flow.Component
+	SolOut *liquidhandling.LHSolution
+	ID     execute.ThreadID
+}
+
 // we need a two-level asyncbag structure
 
 // the top level is the PIblock
@@ -225,14 +232,38 @@ func (lh *LHReference) Steps(v interface{}) {
 	pib := v.(*PIBlock)
 	params := pib.Params
 	inputs := pib.Inputs
-
-	execution := execution.GetContext()
-
-	// we will need to populate these calls at runtime
-	lhp := execution.EquipmentManager.GetEquipmentProperties("liquidhandler").(*liquidhandling.LHProperties)
+	output := OutputBlock{}
+	output.ID = params.ID
 
 	s := mixer.Sample(inputs.A, params.A_vol)
 	s2 := mixer.Sample(inputs.B, params.B_vol)
 	solution := mixer.Mix(s, s2)
+	output.SolOut = solution
 
+	ctx := execution.GetContext()
+	em := ctx.EquipmentManager
+
+	rq := em.MakeDeviceRequest("liquidhandler")
+
+	em.RequestsIn <- rq
+	response := <-em.RequestsOut
+
+	// handle response problems
+
+	if response["status"] == "FAIL" {
+		log.Fatal("Error requesting liquid handler service")
+	}
+
+	liquidhandler := response["devicequeue"]
+
+	rq2 = liquidhandler.MakeMixRequest(solution)
+
+	liquidhandler.Requestsin <- rq2
+	rsp2 := <-liquidhandler.Requestsout
+
+	if response["status"] == "FAIL" {
+		log.Fatal("Error running liquid handling request")
+	}
+
+	// finished
 }

@@ -22,6 +22,10 @@
 
 package execution
 
+import (
+	"github.com/antha-lang/antha/anthalib/liquidhandling"
+)
+
 // the liquid handler holds channels for communicating
 // with the liquid handling service provider
 type LiquidHandlingService struct {
