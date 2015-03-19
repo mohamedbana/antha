@@ -230,25 +230,9 @@ func (lh *LHReference) Steps(v interface{}) {
 
 	// we will need to populate these calls at runtime
 	lhp := execution.EquipmentManager.GetEquipmentProperties("liquidhandler").(*liquidhandling.LHProperties)
-	// needs an overhaul
-
-	fmt.Println("YOU DOITY ", inputs.A.LContainer.Plate)
 
 	s := mixer.Sample(inputs.A, params.A_vol)
 	s2 := mixer.Sample(inputs.B, params.B_vol)
 	solution := mixer.Mix(s, s2)
 
-	solutions := make(map[string]*liquidhandling.LHSolution)
-	solutions[solution.ID] = solution
-
-	// this function determines what needs to happen to make sure the
-	// inputs all work out; defines Input_platetype etc.
-	lhr := liquidhandling.NewLHRequest()
-	lhr = liquidhandling.Rationalise_Inputs(lhr, lhp, s, s2)
-	lhr = liquidhandling.Rationalise_Outputs(lhr, lhp, s)
-	lhr = liquidhandling.Define_Tipboxes(lhr, lhp)
-
-	// this should probably take place via the execution environment
-	liquidhandler := liquidhandling.Init(lhp)
-	liquidhandler.MakeSolutions(lhr)
 }
