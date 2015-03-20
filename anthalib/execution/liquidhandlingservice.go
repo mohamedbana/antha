@@ -29,8 +29,9 @@ import (
 // the liquid handler holds channels for communicating
 // with the liquid handling service provider
 type LiquidHandlingService struct {
-	RequestsIn  chan liquidhandling.LHRequest
-	RequestsOut chan liquidhandling.LHRequest
+	RequestsIn   chan liquidhandling.LHRequest
+	RequestsOut  chan liquidhandling.LHRequest
+	RequestQueue map[execute.ThreadID]*liquidhandling.LHRequest
 }
 
 // Initialize the liquid handling service
@@ -45,11 +46,15 @@ func (lhs *LiquidHandlingService) Init() {
 	}()
 }
 
-// send an item to the waste stream
-func (lhs *LiquidHandlingService) RequestLiquidHandling(rin liquidhandling.LHRequest) liquidhandling.LHRequest {
-	lhs.RequestsIn <- rin
-	rout := <-lhs.RequestsOut
-	return rout
+func (lhs *LiquidHandlingService) MakeMixRequest(liquidhandling.LHSolution) liquidhandling.LHRequest {
+
+	rq, ok := lhs.RequestQueue[lhs.ID.(execute.ThreadID)]
+
+	if !ok {
+		// if we don't have a request with this ID, make a new one
+		rq = liquidhandling.NewLHRequest()
+	}
+
 }
 
 // Daemon for passing requests through to the service

@@ -184,6 +184,21 @@ type LHRequest struct {
 func NewLHRequest() *LHRequest {
 	var lhr LHRequest
 	lhr.ID = wtype.GetUUID()
+	lhr.Output_solutions = make(map[string]*LHSolution)
+	lhr.Input_solutions = make(map[string][]*LHComponent)
+	lhr.Plates = make(map[string]*LHPlate)
+	lhr.Tips = make([]*LHTipbox)
+	lhr.Locats = make([]string)
+	lhr.Instructions = make([]RobotInstruction)
+	lhr.Input_plates = make(map[string]*LHPlate)
+	lhr.Output_plates = make(map[string]*LHPlate)
+	lhr.Input_major_group_layouts = make(map[int][]string)
+	lhr.Input_minor_group_layouts = make([][]string)
+	lhr.Output_major_group_layouts = make(map[int][]string)
+	lhr.Output_minor_group_layouts = make([][]string)
+	lhr.Output_plate_layout = make(map[int]string)
+	lhr.Plate_lookup = make(map[string]int)
+	lhr.Stockconcs = make(map[string]float64)
 	return &lhr
 }
 
