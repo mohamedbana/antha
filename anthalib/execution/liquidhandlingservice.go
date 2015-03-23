@@ -24,6 +24,8 @@ package execution
 
 import (
 	"github.com/antha-lang/antha/anthalib/liquidhandling"
+	"github.com/antha-lang/antha/execute"
+	"sync"
 )
 
 // the liquid handler holds channels for communicating
@@ -32,6 +34,7 @@ type LiquidHandlingService struct {
 	RequestsIn   chan liquidhandling.LHRequest
 	RequestsOut  chan liquidhandling.LHRequest
 	RequestQueue map[execute.ThreadID]*liquidhandling.LHRequest
+	lock         sync.Mutex
 }
 
 // Initialize the liquid handling service
@@ -40,14 +43,16 @@ type LiquidHandlingService struct {
 func (lhs *LiquidHandlingService) Init() {
 	lhs.RequestsIn = make(chan liquidhandling.LHRequest, 5)
 	lhs.RequestsOut = make(chan liquidhandling.LHRequest, 5)
-
+	lhs.RequestQueue = make(map[execute.ThreadID]*liquidhandling.LHRequest)
+	lhs.lock = new(sync.Mutex)
 	go func() {
 		liquidhandlingDaemon(lhs)
 	}()
 }
 
-func (lhs *LiquidHandlingService) MakeMixRequest(liquidhandling.LHSolution) liquidhandling.LHRequest {
-
+func (lhs *LiquidHandlingService) MakeMixRequest(solution liquidhandling.LHSolution) liquidhandling.LHRequest {
+	lhs.lock.Lock()
+	defer lhs.lock.Unlock()
 	rq, ok := lhs.RequestQueue[lhs.ID.(execute.ThreadID)]
 
 	if !ok {
@@ -55,6 +60,10 @@ func (lhs *LiquidHandlingService) MakeMixRequest(liquidhandling.LHSolution) liqu
 		rq = liquidhandling.NewLHRequest()
 	}
 
+	rq.Output_solutions[lhs.ID] = solution
+	lhs.RequestQueue[lhs.ID.(execute.ThreadID)] = rq
+
+	return rq
 }
 
 // Daemon for passing requests through to the service
