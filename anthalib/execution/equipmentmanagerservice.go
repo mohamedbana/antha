@@ -27,7 +27,7 @@ import "github.com/antha-lang/antha/anthalib/liquidhandling"
 // holds channels for communicating with the equipment manager
 type EquipmentManagerService struct {
 	RequestsIn       chan EquipmentManagerRequest
-	RequestsOut      chan EquipmentManagerRequest
+	RequestsOut      map[string]chan EquipmentManagerRequest
 	devicelist       map[string][]string
 	deviceproperties map[string]*liquidhandling.LHProperties
 	devicequeues     map[string][]*DeviceManager
@@ -51,17 +51,18 @@ func (ems *EquipmentManagerService) GetLiquidHandlerProperties(devname string) *
 }
 
 // ask for some equipment
-func (ems *EquipmentManagerService) RequestEquipment(rin EquipmentManagerRequest) EquipmentManagerRequest {
+func (ems *EquipmentManagerService) RequestEquipment(rin EquipmentManagerRequest) chan EquipmentManagerRequest {
 	ems.RequestsIn <- rin
-	rout := <-ems.RequestsOut
-	return rout
+	ch := make(chan EquipmentManagerRequest)
+	ems.RequestsOut[rin["ID"].(string)] = ch
+	return ch
 }
 
 // initialize the equipment manager
 // needs to read config from somewhere
 func (ems *EquipmentManagerService) Init() {
 	ems.RequestsIn = make(chan EquipmentManagerRequest, 5)
-	ems.RequestsOut = make(chan EquipmentManagerRequest, 5)
+	ems.RequestsOut = make(map[string]chan EquipmentManagerRequest, 100)
 
 	ems.devicelist = make(map[string][]string)
 
@@ -102,13 +103,23 @@ func makepropertiesbodge() *liquidhandling.LHProperties {
 }
 
 // Daemon for passing requests through to the service
+// the new pattern is:
+// request comes in, channel comes out. manager stores channel
+// when request is serviced the output channel is retrieved and
+// fed the output
 func equipmentmanagerDaemon(ems *EquipmentManagerService) {
 	for {
 		rin := <-ems.RequestsIn
-
 		rin = handleRequest(rin)
 
-		ems.RequestsOut <- rin
+		id := rin["ID"].(string)
+
+		rout, ok := ems.RequestsOut[id]
+
+		if !ok {
+			panic("No corresponding output channel for request")
+		}
+		rout <- rin
 	}
 }
 

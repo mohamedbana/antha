@@ -31,8 +31,8 @@ import (
 // the liquid handler holds channels for communicating
 // with the liquid handling service provider
 type LiquidHandlingService struct {
-	RequestsIn   chan liquidhandling.LHRequest
-	RequestsOut  chan liquidhandling.LHRequest
+	RequestsIn   chan *liquidhandling.LHRequest
+	RequestsOut  map[string]chan *liquidhandling.LHRequest
 	RequestQueue map[execute.ThreadID]*liquidhandling.LHRequest
 	lock         *sync.Mutex
 }
@@ -41,8 +41,8 @@ type LiquidHandlingService struct {
 // the channels are given a default capacity for 5 items before
 // blocking
 func (lhs *LiquidHandlingService) Init() {
-	lhs.RequestsIn = make(chan liquidhandling.LHRequest, 5)
-	lhs.RequestsOut = make(chan liquidhandling.LHRequest, 5)
+	lhs.RequestsIn = make(chan *liquidhandling.LHRequest, 5)
+	lhs.RequestsOut = make(map[string]chan *liquidhandling.LHRequest, 10)
 	lhs.RequestQueue = make(map[execute.ThreadID]*liquidhandling.LHRequest)
 	lhs.lock = new(sync.Mutex)
 	go func() {
@@ -67,10 +67,23 @@ func (lhs *LiquidHandlingService) MakeMixRequest(solution *liquidhandling.LHSolu
 }
 
 // Daemon for passing requests through to the service
+// when do these output channels get destroyed? Now I guess
 func liquidhandlingDaemon(lhs *LiquidHandlingService) {
 	for {
 		rin := <-lhs.RequestsIn
-		// do something
-		lhs.RequestsOut <- rin
+
+		// handle request
+		// what do we do?
+		//
+
+		rout, ok := lhs.RequestsOut[rin.ID]
+
+		if !ok {
+			panic("Liquidhandlingdaemon: No channel for request output")
+		}
+
+		delete(lhs.RequestsOut, rin.ID)
+
+		rout <- rin
 	}
 }

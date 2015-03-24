@@ -243,10 +243,9 @@ func (lh *LHReference) Steps(v interface{}) {
 	ctx := execution.GetContext()
 	em := ctx.EquipmentManager
 
-	rq := em.MakeDeviceRequest("liquidhandler")
-
-	em.RequestsIn <- rq
-	response := <-em.RequestsOut
+	rq := execution.MakeDeviceRequest("liquidhandler")
+	rqout := em.RequestEquipment(rq)
+	response := <-rqout
 
 	// handle response problems
 
@@ -254,14 +253,10 @@ func (lh *LHReference) Steps(v interface{}) {
 		log.Fatal("Error requesting liquid handler service")
 	}
 
-	liquidhandler := response["devicequeue"]
+	liquidhandler := response["devicequeue"].(*execution.LiquidHandlingService)
 
-	rq2 = liquidhandler.MakeMixRequest(solution)
-
-	liquidhandler.Requestsin <- rq2
-	rsp2 := <-liquidhandler.Requestsout
-
-	if response["status"] == "FAIL" {
+	rq2 := liquidhandler.MakeMixRequest(solution)
+	if rq2 == nil {
 		log.Fatal("Error running liquid handling request")
 	}
 
