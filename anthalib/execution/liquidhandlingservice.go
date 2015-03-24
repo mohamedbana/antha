@@ -34,7 +34,7 @@ type LiquidHandlingService struct {
 	RequestsIn   chan liquidhandling.LHRequest
 	RequestsOut  chan liquidhandling.LHRequest
 	RequestQueue map[execute.ThreadID]*liquidhandling.LHRequest
-	lock         sync.Mutex
+	lock         *sync.Mutex
 }
 
 // Initialize the liquid handling service
@@ -50,18 +50,18 @@ func (lhs *LiquidHandlingService) Init() {
 	}()
 }
 
-func (lhs *LiquidHandlingService) MakeMixRequest(solution liquidhandling.LHSolution) liquidhandling.LHRequest {
+func (lhs *LiquidHandlingService) MakeMixRequest(solution *liquidhandling.LHSolution) *liquidhandling.LHRequest {
 	lhs.lock.Lock()
 	defer lhs.lock.Unlock()
-	rq, ok := lhs.RequestQueue[lhs.ID.(execute.ThreadID)]
+	rq, ok := lhs.RequestQueue[execute.ThreadID(solution.ID)]
 
 	if !ok {
 		// if we don't have a request with this ID, make a new one
 		rq = liquidhandling.NewLHRequest()
 	}
 
-	rq.Output_solutions[lhs.ID] = solution
-	lhs.RequestQueue[lhs.ID.(execute.ThreadID)] = rq
+	rq.Output_solutions[solution.ID] = solution
+	lhs.RequestQueue[execute.ThreadID(solution.ID)] = rq
 
 	return rq
 }
