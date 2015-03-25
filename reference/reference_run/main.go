@@ -31,9 +31,9 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/Synthace/goflow"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/reference"
-	"github.com/antha-lang/goflow"
 	"log"
 	"os"
 )
@@ -49,6 +49,11 @@ type ExampleApp struct {
 func NewExampleApp() *ExampleApp {
 	n := new(ExampleApp)
 	n.InitGraphState()
+
+	flow.Register("Example", reference.NewExample)
+	flow.Annotate("Example", flow.ComponentInfo{
+		Description: "Example Element",
+	})
 
 	n.Add(reference.NewExample(), "example")
 

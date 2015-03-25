@@ -44,3 +44,5 @@ examples/promoter/promoter.go
 cmd/anthafmt/anthafmt
 
 *~
+
+reference/reference_run/main

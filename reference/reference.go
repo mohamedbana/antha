@@ -27,8 +27,8 @@ package reference
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/Synthace/goflow"
 	"github.com/antha-lang/antha/execute"
-	"github.com/antha-lang/goflow"
 	"io"
 	"log"
 	"sync"
@@ -148,7 +148,7 @@ func (e *Example) init() {
 	e.params = make(map[execute.ThreadID]*execute.AsyncBag)
 }
 
-func NewExample() *Example {
+func NewExample() interface{} {
 	e := new(Example)
 	e.init()
 	return e
