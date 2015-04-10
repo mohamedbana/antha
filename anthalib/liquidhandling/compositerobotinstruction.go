@@ -78,6 +78,7 @@ func Transfer(what []string, pfrom, pto []string, wfrom, wto []string, v []float
 }
 
 // placeholder function: the intention is to have flexible rewriting of transfers
+// this should happen in the device driver with input from other policies, liquid classes etc.
 func SimpleOutput(ti TransferInstruction, rq LHRequest) []RobotInstruction {
 	posFrom := make([]int, len(ti.PltFrom))
 	posTo := make([]int, len(ti.PltTo))

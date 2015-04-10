@@ -87,3 +87,6 @@ func (wc *WellCoords) FormatA1() string {
 func (wc *WellCoords) Format1A() string {
 	return NumToAlpha(wc.Y+1) + strconv.Itoa(wc.X+1)
 }
+func (wc *WellCoords) WellNumber() int {
+	return (8*(wc.X-1) + wc.Y)
+}

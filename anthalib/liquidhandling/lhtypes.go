@@ -939,3 +939,20 @@ type RobotInstruction interface {
 	InstructionType() int
 	GetParameter(name string) interface{}
 }
+
+// need an errcode lookup
+
+const (
+	ERR int = iota
+	OK
+	NIM
+)
+
+type LHCommandStatus struct {
+	OK        bool
+	Errorcode int
+	Msg       string
+}
+
+type LHStatus map[string]interface{}
+type LHPositionState map[string]interface{}

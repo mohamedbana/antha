@@ -96,10 +96,6 @@ func (this *liquidhandler) MakeSolutions(request *LHRequest) *LHRequest {
 
 // run the request - this blocks for inputs then runs
 func (this *liquidhandler) Execute(request *LHRequest) {
-	// wait for inputs to be available
-	// well now... this can actually do things now.
-	// need to think about the
-
 	output := NewOutputInterface("not used yet")
 
 	instructions := (*request).Instructions
@@ -107,6 +103,8 @@ func (this *liquidhandler) Execute(request *LHRequest) {
 	if len(instructions) == 0 {
 		RaiseError("Cannot execute request: no instructions")
 	}
+
+	// this needs to be changed
 
 	for _, ins := range instructions {
 		// these should all be transfers at the top level
@@ -130,6 +128,26 @@ func (this *liquidhandler) Execute(request *LHRequest) {
 // as described above, steps only have an effect if the required inputs are
 // not defined beforehand
 //
+// so essentially the idea is to parameterise all requests to liquid handlers
+// using a Command structure called LHRequest
+//
+// Depending on its state of completeness, the request structure may be executable
+// immediately or may need some additional definition. The purpose of the liquid
+// handling service is to provide methods to invoke when parts of the request need
+// further definition.
+//
+// when running a request we should be able to provide mechanisms for pushing requests
+// back into the queue to allow them to be cached
+//
+// this should be OK since the LHRequest parameterises all state including instructions
+// for asynchronous drivers we have to determine how far the program got before it was
+// paused, which should be tricky but possible.
+//
+// need to find a good way to codify the rules of the system:
+// essentially the question is what happens to inputs pre-defined.
+// I will define this asap
+//
+
 func (this *liquidhandler) Plan(request *LHRequest) {
 	// convert requests to volumes and determine required stock concentrations
 	solutions, stockconcs := solution_setup(request, this.Properties)
