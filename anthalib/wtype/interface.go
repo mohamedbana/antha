@@ -31,13 +31,6 @@ import (
 // map of matter types
 var MatterLib map[string]GenericMatter
 
-// Functions for dealing with physical things
-
-func NewLiquid(liquidtype string, amount float64) {
-	// we have to use the usual idea of default amounts
-
-}
-
 // Functions for dealing with matter
 func MatterByName(name string) GenericMatter {
 	if MatterLib == nil {
