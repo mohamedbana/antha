@@ -48,7 +48,24 @@ type Suspension interface {
 // a solution with water as the solvent
 type WaterSolution struct {
 	GenericLiquid
-	Sltes []Physical
+	Sltes []GenericPhysical
+}
+
+// constructor
+
+func NewWaterSolution(v wunit.Volume, solutenames []string, solutetypes []string, soluteamounts []wunit.Mass) *WaterSolution {
+	l := NewGenericLiquid("water", "water", v, nil)
+	as := make([]GenericPhysical, len(solutenames))
+
+	for i := 0; i < len(solutenames); i++ {
+		s := NewGenericPhysical(solutetypes[i])
+		s.SetName(solutenames[i])
+		s.SetMass(soluteamounts[i])
+		as = append(as, s)
+	}
+	w := WaterSolution{l, as}
+
+	return &w
 }
 
 func (as *WaterSolution) Solvent() Liquid {
@@ -85,7 +102,7 @@ func (as *WaterSolution) ConcentrationOf(s string) wunit.Concentration {
 // a structure defining a non water solution
 type NonWaterSolution struct {
 	GenericLiquid
-	Sltes []Physical
+	Sltes []GenericPhysical
 }
 
 func (nas *NonWaterSolution) Solvent() Liquid {
