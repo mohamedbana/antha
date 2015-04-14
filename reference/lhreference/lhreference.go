@@ -125,7 +125,6 @@ func (lh *LHReference) OnB(param execute.ThreadParam) {
 // output structure
 
 type OutputBlock struct {
-	flow.Component
 	SolOut *liquidhandling.LHSolution
 	ID     execute.ThreadID
 }
@@ -135,7 +134,6 @@ type OutputBlock struct {
 // the top level is the PIblock
 
 type PIBlock struct {
-	flow.Component
 	Params *ParamBlock
 	Inputs *InputBlock
 	ID     execute.ThreadID
