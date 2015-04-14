@@ -28,9 +28,9 @@ type LHReference struct {
 
 	// these are materials
 
-	A <-chan execute.ThreadParam
-	B <-chan execute.ThreadParam
-	//Dest <-chan execute.ThreadParam
+	A    <-chan execute.ThreadParam
+	B    <-chan execute.ThreadParam
+	Dest <-chan execute.ThreadParam
 
 	// this is the output
 
@@ -121,10 +121,15 @@ func (lh *LHReference) OnB(param execute.ThreadParam) {
 	var i InputBlock
 	AddFeature("B", param, &i, lh, &(lh.InputBlocks), 2, lh.lock)
 }
+func (lh *LHReference) OnDest(param execute.ThreadParam) {
+	var i InputBlock
+	AddFeature("Dest", param, &i, lh, &(lh.InputBlocks), 2, lh.lock)
+}
 
 // output structure
 
 type OutputBlock struct {
+	// interestingly, Dest here comes out as part of SolOut
 	SolOut *liquidhandling.LHSolution
 	ID     execute.ThreadID
 }
@@ -148,9 +153,10 @@ type ParamBlock struct {
 }
 
 type InputBlock struct {
-	A  *liquidhandling.LHComponent
-	B  *liquidhandling.LHComponent
-	ID execute.ThreadID
+	A    *liquidhandling.LHComponent
+	B    *liquidhandling.LHComponent
+	Dest *liquidhandling.LHWell
+	ID   execute.ThreadID
 }
 
 // JSON blocks are also required... not quite sure why though
@@ -160,6 +166,7 @@ type JSONBlock struct {
 	B_vol *wunit.Volume
 	A     *liquidhandling.LHComponent
 	B     *liquidhandling.LHComponent
+	Dest  *liquidhandling.LHWell
 	ID    *execute.ThreadID
 }
 
@@ -209,6 +216,7 @@ func (p *ParamBlock) Map(m map[string]interface{}) interface{} {
 func (i *InputBlock) Map(m map[string]interface{}) interface{} {
 	i.A = m["A"].(execute.ThreadParam).Value.(*liquidhandling.LHComponent)
 	i.B = m["B"].(execute.ThreadParam).Value.(*liquidhandling.LHComponent)
+	i.Dest = m["Dest"].(execute.ThreadParam).Value.(*liquidhandling.LHWell)
 	i.ID = m["A"].(execute.ThreadParam).ID
 	return i
 }
@@ -235,7 +243,7 @@ func (lh *LHReference) Steps(v interface{}) {
 
 	s := mixer.Sample(inputs.A, params.A_vol)
 	s2 := mixer.Sample(inputs.B, params.B_vol)
-	solution := mixer.Mix(s, s2)
+	solution := mixer.MixInto(inputs.Dest, s, s2)
 	output.SolOut = solution
 
 	ctx := execution.GetContext()
