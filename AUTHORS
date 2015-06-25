@@ -1,4 +1,5 @@
-# This is the list of copyright holders for the Antha codebase
+# Except where other licenses apply as specified in relevant
+# files in vendored packages, this is the list of copyright holders for the Antha codebase
 # Since Antha is forked from Google's golang the relevant parts
 # of the code remain copyright the Go authors as per the list below
 #

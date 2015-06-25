@@ -1,0 +1,14 @@
+{
+    "properties": {
+        "name": "main"
+    },
+    "processes": {
+        "ConstructAssembly": {
+            "component": "TypeIISConstructAssembly",
+            "metadata": {
+                "label": "CS"
+            }
+        }
+    },
+    "connections": [ ]
+}

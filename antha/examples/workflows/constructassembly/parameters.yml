@@ -1,0 +1,31 @@
+Parameters:
+  ConstructAssembly:
+    Parts:
+      - component:dna_part
+      - component:dna_part
+      - component:dna_part
+      - component:dna_part
+    Vector: component:standard_cloning_vector_mark_1
+    RestrictionEnzyme: component:SapI
+    Buffer: component:CutsmartBuffer
+    Ligase: component:T4Ligase
+    Atp: component:ATP
+    Outplate: plate:pcrplate
+    TipType: tipbox:Gilson50
+    ReactionVolume: 20ul
+    PartConc: 0.0001g/l
+    VectorConc: 0.001g/l
+    AtpVol: 1ul
+    ReVol: 1ul
+    LigVol: 1ul
+    ReactionTemp: 25C
+    ReactionTime: 1800s
+    InactivationTemp: 40C
+    InactivationTime: 60s
+
+Config:
+  MAX_N_PLATES: 1.5
+  MAX_N_WELLS: 12.0
+  RESIDUAL_VOLUME_WEIGHT: 1.0
+  SQLITE_FILE_IN: default.sqlite
+  SQLITE_FILE_OUT: outfile_file.sqlite

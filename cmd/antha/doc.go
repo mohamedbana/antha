@@ -20,7 +20,6 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 1 Royal College St, London NW1 0NH UK
 
-
 /*
 Antha is the primary cross-compiler for antha.
 It parses Antha Element definitions to create the underyling Go source
@@ -39,4 +38,3 @@ The flags are:
 		Print all (including spurious) errors.
 */
 package main
-

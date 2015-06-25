@@ -5,6 +5,9 @@
 # from the appropriate golang version, however only the Antha-specific list
 # is able to contribute to the Antha version of the code. 
 #
+# Contributors to vendored subpackages are listed inside those particular packages
+# and are not superceded by the list below
+#
 # The AUTHORS file lists the copyright holders; this file
 # lists people.  For example, Google employees are listed here
 # but not in AUTHORS, because Google holds the copyright. Similarly
@@ -34,13 +37,15 @@
 # Antha-specific contributors
 #
 
+Carmen Alia <c.alia@synthace.com>
 Sarah Bryan <s.bryan@synthace.com>
 Markus Gershater <m.gershater@synthace.com>
 Chris Grant <c.grant@synthace.com>
 Josi Lemke <j.lemke@synthace.com>
+Jesus Manzanares <j.manzanares@synthace.com>
+Donald Nguyen <d.nguyen@synthace.com>
 Michael Sadowski <m.sadowski@synthace.com>
 Sean Ward <sward@synthace.com>
-
 
 #
 # Golang contributors

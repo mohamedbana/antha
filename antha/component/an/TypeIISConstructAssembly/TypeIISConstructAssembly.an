@@ -1,0 +1,94 @@
+protocol TypeIISConstructAssembly
+
+import (
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/mixer"
+)
+
+// Input parameters for this protocol (data)
+Parameters (
+	ReactionVolume wunit.Volume
+	PartConc wunit.Concentration
+	VectorConc wunit.Concentration
+	AtpVol wunit.Volume
+	ReVol wunit.Volume
+	LigVol wunit.Volume
+	ReactionTemp wunit.Temperature
+	ReactionTime wunit.Time
+	InactivationTemp wunit.Temperature
+	InactivationTime wunit.Time
+)
+
+// Data which is returned from this protocol, and data types
+Data (
+)
+
+
+// Physical Inputs to this protocol with types
+Inputs (
+	Parts []*wtype.LHComponent
+	Vector *wtype.LHComponent
+	RestrictionEnzyme *wtype.LHComponent
+	Buffer *wtype.LHComponent
+	Ligase *wtype.LHComponent
+	Atp *wtype.LHComponent
+	OutPlate *wtype.LHPlate
+)
+
+// Physical outputs from this protocol with types
+Outputs (
+	Reaction *wtype.LHSolution
+)
+
+Requirements {
+}
+
+// Conditions to run on startup
+Setup {
+}
+
+// The core process for this protocol, with the steps to be performed
+// for every input
+Steps {
+	samples := make([]*wtype.LHComponent, 0)
+	bufferSample := mixer.SampleForTotalVolume(Buffer, ReactionVolume)
+	samples = append(samples, bufferSample)
+	atpSample := mixer.Sample(Atp, AtpVol)
+	samples = append(samples, atpSample)
+	vectorSample := mixer.SampleForConcentration(Vector, VectorConc)
+	samples = append(samples, vectorSample)
+
+	for _, part := range Parts {
+		partSample := mixer.SampleForConcentration(part, PartConc)
+		samples = append(samples, partSample)
+	}
+
+	reSample := mixer.Sample(RestrictionEnzyme, ReVol)
+	samples = append(samples, reSample)
+	ligSample := mixer.Sample(Ligase, LigVol)
+	samples = append(samples, ligSample)
+	reaction := MixInto(OutPlate, samples...)
+
+	// incubate the reaction mixture
+
+	Incubate(reaction, ReactionTemp, ReactionTime, false)
+
+	// inactivate
+
+	Incubate(reaction, InactivationTemp, InactivationTime, false)
+
+	// all done
+	Reaction = reaction
+}
+
+// Run after controls and a steps block are completed to
+// post process any data and provide downstream results
+Analysis {
+}
+
+// A block of tests to perform to validate that the sample was processed correctly
+// Optionally, destructive tests can be performed to validate results on a
+// dipstick basis
+Validation {
+}

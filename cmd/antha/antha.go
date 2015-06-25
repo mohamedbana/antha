@@ -27,16 +27,18 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/antha-lang/antha/ast"
-	"github.com/antha-lang/antha/compile"
-	"github.com/antha-lang/antha/parser"
-	"github.com/antha-lang/antha/scanner"
-	"github.com/antha-lang/antha/token"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/antha-lang/antha/antha/ast"
+	"github.com/antha-lang/antha/antha/compile"
+	"github.com/antha-lang/antha/antha/execute"
+	"github.com/antha-lang/antha/antha/parser"
+	"github.com/antha-lang/antha/antha/scanner"
+	"github.com/antha-lang/antha/antha/token"
 )
 
 // execution variables
@@ -44,6 +46,8 @@ var (
 	exitCode   = 0
 	fileSet    = token.NewFileSet() // per process FileSet
 	parserMode parser.Mode
+
+	componentLibrary = make([]execute.ComponentInfo, 0)
 )
 
 // parameters to control code formatting
@@ -55,8 +59,10 @@ const (
 // command line parameters
 var (
 	// main operation modes
-	trace     = flag.Bool("trace", false, "show AST trace")
-	allErrors = flag.Bool("errors", false, "report all errors (not just the first 10 on different lines)")
+	trace                  = flag.Bool("trace", false, "show AST trace")
+	allErrors              = flag.Bool("errors", false, "report all errors (not just the first 10 on different lines)")
+	genComponentLib        = flag.Bool("componentLib", false, "generate component lib (instead of standalone runner)")
+	genComponentLibPackage = flag.String("componentLibPackage", "componentlib", "name of package to use when componentLib is true")
 )
 
 func usage() {
@@ -85,7 +91,7 @@ func initParserMode() {
 	}
 }
 
-// Utility function to check file extesion
+// Utility function to check file extension
 func isAnthaFile(f os.FileInfo) bool {
 	// ignore non-Antha or Go files
 	name := f.Name()
@@ -108,7 +114,7 @@ func anthaMain() {
 
 	// try to parse standard input if no files or directories were passed in
 	if flag.NArg() == 0 {
-		if err := processFile("<standard input>", os.Stdin, os.Stdout, true); err != nil {
+		if err := processFile("<standard input>", os.Stdin, os.Stdout, true, false); err != nil {
 			report(err)
 		}
 		return
@@ -123,9 +129,32 @@ func anthaMain() {
 		case dir.IsDir():
 			walkDir(path)
 		default:
-			if err := processFile(path, nil, os.Stdout, false); err != nil {
+			if err := processFile(path, nil, os.Stdout, false, flag.NArg() > 1); err != nil {
 				report(err)
 			}
+		}
+	}
+
+	if len(componentLibrary) > 1 {
+		ret, err := getPackageRoute(nil)
+		if err != nil {
+			report(err)
+		}
+		packagePath := *ret
+
+		var binBuf bytes.Buffer
+		var outName string
+		if *genComponentLib {
+			compile.GenerateComponentLib(&binBuf, componentLibrary, packagePath, *genComponentLibPackage)
+			outName = *genComponentLibPackage + ".go"
+		} else {
+			compile.GenerateGraphRunner(&binBuf, componentLibrary, packagePath)
+			outName = "main.go"
+		}
+		res := binBuf.Bytes()
+		err = ioutil.WriteFile(outName, res, 0777)
+		if err != nil {
+			report(err)
 		}
 	}
 }
@@ -133,7 +162,7 @@ func anthaMain() {
 // recursive support function for walkpath
 func visitFile(path string, f os.FileInfo, err error) error {
 	if err == nil && isAnthaFile(f) {
-		err = processFile(path, nil, os.Stdout, false)
+		err = processFile(path, nil, os.Stdout, false, false) // TODO this might be an issue since we have to analise the contents in order to establish wether more than one component exist
 	}
 	if err != nil {
 		report(err)
@@ -142,7 +171,8 @@ func visitFile(path string, f os.FileInfo, err error) error {
 }
 
 // If in == nil, the source is the contents of the file with the given filename.
-func processFile(filename string, in io.Reader, out io.Writer, stdin bool) error {
+// @argument graph bool wether we want the output for a single component or a graph binary
+func processFile(filename string, in io.Reader, out io.Writer, stdin bool, graph bool) error {
 	if in == nil {
 		f, err := os.Open(filename)
 		if err != nil {
@@ -171,6 +201,7 @@ func processFile(filename string, in io.Reader, out io.Writer, stdin bool) error
 
 	var buf bytes.Buffer
 	compiler := &compile.Config{Mode: printerMode, Tabwidth: tabWidth}
+	//TODO probably here is a good fit for a one compiler.init execution
 	err = compiler.Fprint(&buf, fileSet, file)
 	if err != nil {
 		return err
@@ -179,16 +210,107 @@ func processFile(filename string, in io.Reader, out io.Writer, stdin bool) error
 	if adjust != nil {
 		res = adjust(src, res)
 	}
+	comp := compiler.GetFileComponentInfo(fileSet, file)
+	componentLibrary = append(componentLibrary, comp)
 
+	var filename2 string
+	if graph {
+		st, _ := os.Stat(filename) //we already checked it existed...
+		//we need to create a folder too
+		dirName := strings.TrimSuffix(comp.Name, ".an") //TODO this is wrong, could have a different componentName
+		fi, err := os.Stat(dirName)
+		if err != nil { //does not exist
+			err = os.Mkdir(dirName, 0777)
+			if err != nil {
+				panic(err)
+				return err
+			}
+			fi, err = os.Stat(dirName)
+			if err != nil {
+				return err
+			}
+		}
+		if !fi.IsDir() {
+			return errors.New(dirName + " is not a Directory")
+		}
+		filename2 = dirName + string(os.PathSeparator) + strings.TrimSuffix(st.Name(), ".an") + ".go"
+
+	} else {
+		filename2 = strings.TrimSuffix(filename, ".an") + ".go"
+	}
 	// save the output as a translated .go file in same location as .an
-	err = ioutil.WriteFile(strings.TrimSuffix(filename, ".an")+".go", res, 0777)
+	err = ioutil.WriteFile(filename2, res, 0777)
 	if err != nil {
 		return err
 	}
 
-	//_, err = out.Write(res)
+	if !graph { //get the normal main
+		//dirName is the new directory where we will store the main file
+		dirName := fmt.Sprintf("%s_run", comp.Name)
+		newdir, _ := getPackageRoute(&filename)
+		//packagePath is the route used to import the go generated file
+		packagePath := *newdir
 
+		var mainBuf bytes.Buffer
+		err = compiler.MainFprint(&mainBuf, fileSet, file, packagePath)
+		if err != nil {
+			return err
+		}
+		res = mainBuf.Bytes()
+		fi, err := os.Stat(dirName)
+		if err != nil { //does not exist
+			err = os.Mkdir(dirName, 0777)
+			if err != nil {
+				fmt.Println(err)
+				return err
+			}
+			fi, err = os.Stat(dirName)
+			if err != nil {
+				return err
+			}
+		}
+		if !fi.IsDir() {
+			return errors.New(dirName + " is not a Directory")
+		}
+		err = ioutil.WriteFile(dirName+"/main.go", res, 0777)
+		if err != nil {
+			return err
+		}
+	}
 	return err
+}
+
+//getPackageRoute returns for a given file the route relative to the GOPATH configured that should be included when
+//importing it. If file is nil, then the route is calculated relatively to the working directory
+func getPackageRoute(file *string) (*string, error) {
+	goPath := os.Getenv("GOPATH")
+	if goPath == "" {
+		return nil, errors.New("GOPATH is not configured")
+	}
+	if file == nil {
+		workingDirectory, err := os.Getwd()
+		if err != nil {
+			return nil, err
+		}
+		if !strings.HasPrefix(workingDirectory, goPath) {
+			return nil, errors.New("antha must be called from a valid go src folder")
+		}
+		ret := workingDirectory[len(goPath)+5:]
+		return &ret, nil //5 is for /src/
+	} else {
+		//This will give me the real directory for a file
+		filedirectory := filepath.Dir(*file)
+		path, err := filepath.Abs(filedirectory)
+		if err != nil {
+			return nil, err
+		}
+		if !strings.HasPrefix(path, goPath) {
+			return nil, errors.New("protocl must be located in a valid go src folder")
+		}
+		ret := path[len(goPath)+5:]
+		return &ret, nil //5 is for /src/
+	}
+	return nil, nil
 }
 
 // parse parses src, which was read from filename,
