@@ -1,7 +1,6 @@
 # antha
 Antha v0.0.2
 
-Initial release of the Antha language parser and cross-compiler. Note: this release is focused on the language parser, and as such does not cross compile to functional Elements.
 =======
 ## Getting Started
 v 0.0.2 release
@@ -10,11 +9,6 @@ Some videos coming soon...
 
 ## Detailed Installation Instructions
 
-<<<<<<< HEAD
-antha parser is located under cmd/antha
-anthadoc is located under cmd/anthadoc
-anthafmt is located under cmd/anthafmt
-=======
 ### OSX
 
 If you have [Homebrew](http://brew.sh/), you can follow these steps to setup
