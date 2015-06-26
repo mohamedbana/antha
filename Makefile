@@ -13,7 +13,7 @@ go_from_antha:
 		gofmt -w -s .
 
 clean:
-	find "$(LIBDIR)" -type d -depth 1 -print0 | xargs -0 rm -r
+	find "$(LIBDIR)" -mindepth 1 -maxdepth 1 -type d -print0 | xargs -0 rm -r
 	rm -f "$(LIBDIR)/$(LIBPACKAGE).go"
 
 .PHONY: all go_from_antha clean

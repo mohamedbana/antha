@@ -11,14 +11,20 @@ Some videos coming soon...
 
 ### OSX
 
-If you have [Homebrew](http://brew.sh/), you can follow these steps to setup
-a working antha development environment:
+If you don't have [Homebrew](http://brew.sh/), please install it first. Then,
+follow these steps to setup a working antha development environment:
 ```sh
 # Install go
 brew install go
-# You probably want to add these lines to your .profile too
+
+# Setup environment variables
+cat<<EOF>>$HOME/.bash_profile
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
+EOF
+
+# Reload your profile
+. $HOME/.bash_profile
 
 # Install some external dependencies
 brew install glpk sqlite3
@@ -31,20 +37,33 @@ go get github.com/antha-lang/antha/cmd/...
 
 Depending on your Linux distribution, you may not have the most recent version
 of go available from your distribution's package repository. We recommend you
-[download](https://golang.org/) go directly. For Debian-based distributions like
-Ubuntu, the installation instructions are as follows:
+[download](https://golang.org/) go directly. 
+
+For Debian-based distributions like Ubuntu on x86_64 machines, the installation
+instructions are as follows.  If you do not use a Debian based system or if you
+are not using an x86_64 machine, you will have to modify these instructions by
+replacing the go binary with one that corresponds to your platform and replacing
+``apt-get`` with your package manager.
 ```sh
+# Install go
 curl -O https://storage.googleapis.com/golang/go1.4.2.linux-amd64.tar.gz
-tar -C /usr/local -xzf go1.4.2.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.4.2.linux-amd64.tar.gz
+
+# Setup environment variables
+cat<<EOF>>$HOME/.bash_profile
 export PATH=$PATH:/usr/local/go/bin
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
+EOF
+
+# Reload your profile
+. $HOME/.bash_profile
 
 # Install antha external dependencies
-apt-get install -y libglpk-dev libsqlite3-dev
+sudo apt-get install -y libglpk-dev libsqlite3-dev git
 
 # Now, we are ready to get antha
-go get github.com/antha-lang/cmd/...
+go get github.com/antha-lang/antha/cmd/...
 ```
 
 ### Windows
