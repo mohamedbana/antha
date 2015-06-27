@@ -36,10 +36,10 @@ of go available from your distribution's package repository. We recommend you
 [download](https://golang.org/) go directly. 
 
 For Debian-based distributions like Ubuntu on x86_64 machines, the installation
-instructions are as follows.  If you do not use a Debian based system or if you
-are not using an x86_64 machine, you will have to modify these instructions by
-replacing the go binary with one that corresponds to your platform and replacing
-``apt-get`` with your package manager.
+instructions follow.  If you do not use a Debian based system or if you are not
+using an x86_64 machine, you will have to modify these instructions by
+replacing the go binary with one that corresponds to your platform and
+replacing ``apt-get`` with your package manager.
 ```sh
 # Install go
 curl -O https://storage.googleapis.com/golang/go1.4.2.linux-amd64.tar.gz
