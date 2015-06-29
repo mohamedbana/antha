@@ -1,25 +1,27 @@
 // /equipment/equipment.go: Part of the Antha language
 // Copyright (C) 2015 The Antha authors. All rights reserved.
-// 
+//
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-// 
+//
 // For more information relating to the software or licensing issues please
-// contact license@antha-lang.org or write to the Antha team c/o 
+// contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 1 Royal College St, London NW1 0NH UK
 
+//package equipment defines the data representation of a piece of equipment and every necessary bits to communicate
+// with them.
 package equipment
 
 import (
@@ -71,6 +73,7 @@ func (b *Behaviour) Matches(ac ActionDescription) bool {
 //Equipment is something capable of performing different actions under different restrictions and explaining what its
 // capabilities and the restrictions on them are
 type Equipment interface {
+	//GetID returns the string that identifies a piece of equipment. Ideally uuids v4 should be used.
 	GetID() string
 	//GetEquipmentDefinition returns a description of the equipment device in terms of
 	// operations it can handle, restrictions, configuration options ...
