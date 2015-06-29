@@ -1,33 +1,29 @@
 # antha
 Antha v0.0.2
 
-=======
-## Getting Started
-v 0.0.2 release
-
-Some videos coming soon... 
-
-## Detailed Installation Instructions
+## Installation Instructions
 
 ### OSX
 
-If you don't have [Homebrew](http://brew.sh/), please install it first. Then,
-follow these steps to setup a working antha development environment:
-```sh
-# Install go
-brew install go
+First step is to install go. Follow the instructions at the
+[Golang](http://golang.org/doc/install) site.
 
+After you install go, if you don't have [Homebrew](http://brew.sh/), please
+install it. Then, follow these steps to setup a working antha development
+environment:
+```sh
 # Setup environment variables
 cat<<EOF>>$HOME/.bash_profile
 export GOPATH=$HOME/go
-export PATH=$PATH:$GOPATH/bin
+export PATH=\$PATH:$HOME/go/bin
 EOF
 
 # Reload your profile
 . $HOME/.bash_profile
 
 # Install some external dependencies
-brew install glpk sqlite3
+brew update
+brew install homebrew/science/glpk sqlite3
 
 # Install antha
 go get github.com/antha-lang/antha/cmd/...
@@ -51,9 +47,8 @@ sudo tar -C /usr/local -xzf go1.4.2.linux-amd64.tar.gz
 
 # Setup environment variables
 cat<<EOF>>$HOME/.bash_profile
-export PATH=$PATH:/usr/local/go/bin
 export GOPATH=$HOME/go
-export PATH=$PATH:$GOPATH/bin
+export PATH=\$PATH:/usr/local/go/bin:$HOME/go/bin
 EOF
 
 # Reload your profile
@@ -92,7 +87,7 @@ procedure with the default options. Caveat emptor.
 After following the installation instructions for your machine. You can check
 if Antha is working properly by running a test protocol
 ```sh
-cd $GOPATH/src/github.com/antha-lang/antha/examples/workflows/constructassembly
+cd $GOPATH/src/github.com/antha-lang/antha/antha/examples/workflows/constructassembly
 antharun --workflow workflow.json --parameters parameters.yml
 ```
 
@@ -108,3 +103,8 @@ make clean && make
 go get github.com/antha-lang/antha/cmd/...
 antharun --workflow myworkflowdefinition.json --parameters myparameters.yml
 ```
+
+## Demo 
+
+[![asciicast](https://asciinema.org/a/12zsgt153sffmfnu2ym7vq9d2.png)](https://asciinema.org/a/12zsgt153sffmfnu2ym7vq9d2)
+
