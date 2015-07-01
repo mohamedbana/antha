@@ -1,4 +1,6 @@
 # antha
+[![Build Status](https://travis-ci.org/antha-lang/antha.svg?branch=master)](https://travis-ci.org/antha-lang/antha)
+
 Antha v0.0.2
 
 ## Installation Instructions
