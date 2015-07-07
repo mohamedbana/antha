@@ -24,6 +24,12 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
+	"log"
+	"os"
+
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/internal/github.com/nu7hatch/gouuid"
 	"github.com/antha-lang/antha/microArch/equipment"
 	"github.com/antha-lang/antha/microArch/equipment/manual"
@@ -31,10 +37,6 @@ import (
 	"github.com/antha-lang/antha/microArch/equipmentManager"
 	"github.com/antha-lang/antha/microArch/logger"
 	"github.com/antha-lang/antha/microArch/logger/middleware"
-	"io"
-	"io/ioutil"
-	"log"
-	"os"
 )
 
 type Frontend struct {
@@ -99,8 +101,22 @@ func (fe *Frontend) Shutdown() {
 }
 
 func (fe *Frontend) SendAlert(msg interface{}) error {
-	mesC := make([]cli.MultiLevelMessage,0)
-	mesC = append(mesC, *cli.NewMultiLevelMessage(fmt.Sprintf("%s", msg), nil))
+	var mml cli.MultiLevelMessage
+	switch typedMessage := msg.(type) {
+	case *wtype.LHSolution:
+		mesc := make([]cli.MultiLevelMessage, 0)
+		for _, c := range typedMessage.Components {
+			mesc = append(mesc, *cli.NewMultiLevelMessage(fmt.Sprintf("%s, %g", c.CName, c.Conc),nil))
+		}
+		mesC := *cli.NewMultiLevelMessage("Reagents", mesc)
+		mesc1 := make([]cli.MultiLevelMessage, 0)
+		mesc1 = append(mesc1, mesC)
+		mml = *cli.NewMultiLevelMessage(fmt.Sprintf("%s @ %s", typedMessage.SName, typedMessage.Welladdress), mesc1)
+	default:
+		mml = *cli.NewMultiLevelMessage(fmt.Sprintf("%v", typedMessage), nil)
+	}
+	mesC := make([]cli.MultiLevelMessage, 0)
+	mesC = append(mesC, mml)
 	req := cli.NewCUICommandRequest("Alert", *cli.NewMultiLevelMessage(
 		"Output",
 		mesC,

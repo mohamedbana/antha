@@ -77,7 +77,7 @@ func run() error {
 	}
 
 	for _, m := range msgs {
-		fe.SendAlert(fmt.Sprintf("Output: %v\n", m))
+		fe.SendAlert(m)
 	}
 
 	return nil
