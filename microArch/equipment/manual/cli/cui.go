@@ -583,7 +583,18 @@ func (c *CUI) newLog(log interface{}) error {
 	case string:
 		shortDesc = l
 	case logger.LogEntry:
-		shortDesc = fmt.Sprintf("[%s] %s", l.Level.String(), l.Message)
+		logview, err := c.G.View("LogView")
+		if err != nil {
+			return err
+		}
+		lx, _ := logview.Size()
+		var mess string
+		if len(l.Message) > lx-9 {
+			mess = l.Message[:lx-9]
+		} else {
+			mess = l.Message
+		}
+		shortDesc = fmt.Sprintf("[%s] %s...", l.Level.String()[:1], mess)
 	default:
 		//ignore by default
 		return nil
