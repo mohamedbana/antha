@@ -74,6 +74,9 @@ func NewFrontend() (*Frontend, error) {
 
 	fe.logger = logger.NewAnthaFileLogger(logId.String())
 	fe.logger.RegisterMiddleware(cmw)
+	var logRef logger.Logger
+	logRef = fe.logger
+	logger.SetLogger(&logRef)
 
 	var writer io.Writer
 	if len(logFile) > 0 {
@@ -95,10 +98,12 @@ func (fe *Frontend) Shutdown() {
 	fe.equipmentManager.Shutdown()
 }
 
-func (fe *Frontend) SendAlert(msg string) error {
+func (fe *Frontend) SendAlert(msg interface{}) error {
+	mesC := make([]cli.MultiLevelMessage,0)
+	mesC = append(mesC, *cli.NewMultiLevelMessage(fmt.Sprintf("%s", msg), nil))
 	req := cli.NewCUICommandRequest("Alert", *cli.NewMultiLevelMessage(
-		fmt.Sprintf("%s", msg),
-		nil,
+		"Output",
+		mesC,
 	))
 
 	fe.cui.CmdIn <- *req

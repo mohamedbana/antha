@@ -137,7 +137,7 @@ func NewWorkflowRun(id uuid.UUID, wf *Workflow, cf *Config) (*WorkflowRun, error
 }
 
 // Runs a workflow for one sample
-func (w *Workflow) Run(cf *Config) ([]string, error) {
+func (w *Workflow) Run(cf *Config) ([]interface{}, error) {
 	id, err := uuid.NewV4()
 	if err != nil {
 		return nil, err
@@ -161,10 +161,11 @@ func (w *Workflow) Run(cf *Config) ([]string, error) {
 		}
 	}()
 
-	var messages []string
+	var messages []interface{}
 	go func() {
 		for v := range wr.Messages {
-			messages = append(messages, fmt.Sprintf("%v", v.Value))
+//			messages = append(messages, fmt.Sprintf("%v", v.Value))
+			messages = append(messages, v.Value)
 		}
 	}()
 
