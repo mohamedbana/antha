@@ -208,6 +208,32 @@ func (sol LHSolution) GetComponentVolume(key string) float64 {
 	return vol
 }
 
+func (sol LHSolution) String() string {
+	one := fmt.Sprintf(
+		"%s, %s, %s, %s, %d",
+		sol.ID,
+		sol.BlockID,
+		sol.Inst,
+		sol.SName,
+		sol.Order,
+	)
+	for _, c := range sol.Components {
+		one = one + fmt.Sprintf("[%s], ", c.CName)
+	}
+	two := fmt.Sprintf("%s, %s, %s, %g, %s, %g, %g, %d, %d",
+		sol.ContainerType,
+		sol.Welladdress,
+		sol.Platetype,
+		sol.Vol,
+		sol.Type,
+		sol.Conc,
+		sol.Tvol,
+		sol.Majorlayoutgroup,
+		sol.Minorlayoutgroup,
+	)
+	return one + two
+}
+
 // structure describing a liquid component and its desired properties
 type LHComponent struct {
 	*GenericPhysical
