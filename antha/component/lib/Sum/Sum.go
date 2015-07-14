@@ -1,12 +1,16 @@
 package Sum
 
-import "github.com/antha-lang/antha/antha/anthalib/execution"
-import "github.com/antha-lang/antha/antha/execute"
-import "github.com/antha-lang/antha/flow"
-import "sync"
-import "encoding/json"
+import
 
 // Input parameters for this protocol
+(
+	"encoding/json"
+	"github.com/antha-lang/antha/antha/anthalib/execution"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/antha/execute"
+	"github.com/antha-lang/antha/flow"
+	"sync"
+)
 
 // Data which is returned from this protocol
 
@@ -15,6 +19,7 @@ import "encoding/json"
 // Physical outputs from this protocol
 
 func (e *Sum) requirements() {
+	_ = wunit.Make_units
 
 }
 
@@ -50,18 +55,14 @@ func (e *Sum) validation(p SumParamBlock, r *SumResultBlock) {
 func (e *Sum) Complete(params interface{}) {
 	p := params.(SumParamBlock)
 	if p.Error {
-
 		e.Sum <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-
 		return
 	}
 	r := new(SumResultBlock)
 	e.startup.Do(func() { e.setup(p) })
 	e.steps(p, r)
 	if r.Error {
-
 		e.Sum <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-
 		return
 	}
 
@@ -69,17 +70,13 @@ func (e *Sum) Complete(params interface{}) {
 
 	e.analysis(p, r)
 	if r.Error {
-
 		e.Sum <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-
 		return
 	}
 
 	e.validation(p, r)
 	if r.Error {
-
 		e.Sum <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-
 		return
 	}
 

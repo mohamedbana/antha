@@ -1,15 +1,14 @@
 package TypeIISConstructAssembly
 
-import "github.com/antha-lang/antha/antha/anthalib/execution"
-import "github.com/antha-lang/antha/antha/execute"
-import "github.com/antha-lang/antha/flow"
-import "sync"
-import "encoding/json"
-
 import (
+	"encoding/json"
+	"github.com/antha-lang/antha/antha/anthalib/execution"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/antha/execute"
+	"github.com/antha-lang/antha/flow"
+	"sync"
 )
 
 // Input parameters for this protocol (data)
@@ -21,6 +20,8 @@ import (
 // Physical outputs from this protocol with types
 
 func (e *TypeIISConstructAssembly) requirements() {
+	_ = wunit.Make_units
+
 }
 
 // Conditions to run on startup
@@ -88,18 +89,14 @@ func (e *TypeIISConstructAssembly) validation(p TypeIISConstructAssemblyParamBlo
 func (e *TypeIISConstructAssembly) Complete(params interface{}) {
 	p := params.(TypeIISConstructAssemblyParamBlock)
 	if p.Error {
-
 		e.Reaction <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-
 		return
 	}
 	r := new(TypeIISConstructAssemblyResultBlock)
 	e.startup.Do(func() { e.setup(p) })
 	e.steps(p, r)
 	if r.Error {
-
 		e.Reaction <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-
 		return
 	}
 
@@ -107,17 +104,13 @@ func (e *TypeIISConstructAssembly) Complete(params interface{}) {
 
 	e.analysis(p, r)
 	if r.Error {
-
 		e.Reaction <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-
 		return
 	}
 
 	e.validation(p, r)
 	if r.Error {
-
 		e.Reaction <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-
 		return
 	}
 

@@ -34,7 +34,6 @@ import (
 	"bytes"
 	"github.com/antha-lang/antha/antha/ast"
 	"github.com/antha-lang/antha/antha/token"
-	"strings"
 	"unicode/utf8"
 )
 
@@ -1399,13 +1398,6 @@ func (p *compiler) spec(spec ast.Spec, n int, doIndent bool) {
 }
 
 func (p *compiler) genDecl(d *ast.GenDecl) {
-	// catch the Antha decls and add them to the element struct
-	switch d.Tok {
-	case token.PARAMETERS, token.DATA, token.INPUTS, token.OUTPUTS:
-		p.anthaParamDecl(d)
-		return
-	default:
-	}
 	p.setComment(d.Doc)
 	p.print(d.Pos(), d.Tok, blank)
 
@@ -1618,66 +1610,25 @@ func (p *compiler) declList(list []ast.Decl) {
 			}
 			p.linebreak(p.lineFor(d.Pos()), min, ignore, false)
 		}
-		// skip printing Antha blocks which are fully generated
-		switch tok {
-		case token.PARAMETERS, token.DATA, token.INPUTS, token.OUTPUTS:
-			continue
-		default:
-			p.decl(d)
-		}
+		p.decl(d)
 	}
 }
 
 // output when compiled is always a package
 // so translate protocol etc into package
 func (p *compiler) file(src *ast.File) {
-
-	// build the antha indexes to allow node translation
-	p.indexParams(src.Decls)
+	p.analyze(src)
+	p.transform(src)
 
 	p.setComment(src.Doc)
+
+	// Print package name
 	p.print(src.Pos(), token.PACKAGE, blank)
-	// pkgName is used to title the primary element struct, so must be
-	// uppercased to export properly
-	p.pkgName = strings.Title(src.Name.Name)
-
-	// store the package details for imports generation
-	// and generator function
-	p.anthaImports[p.pkgName] = src
-
 	p.expr(src.Name)
 
-	//p.print(strconv.Itoa(len(p.params)), newline)
-	//p.print(strconv.Itoa(len(p.results)), newline)
-
-	/*
-		for i := range src.Decls {
-			fmt.Println(src.Decls[i])
-		}
-	*/
-
-	// add the antha Imports to the source
-	// TODO: merge imports rather than add them, in case of duplication
-	p.addAnthaImports()
-
-	// sugar the AST
-	p.sugarAST(src.Decls)
-
-	p.addPreamble(src.Decls)
-
-	// print the remaining declarations
+	// print (transformed) declarations
 	p.declList(src.Decls)
 	p.print(newline)
 
-	// add boilerplate code for the element
-	p.genBoilerplate()
-
-	// add the message handler functions
-	p.genHandlers()
-
-	// generate the types for the element
-	p.genStructs()
-
-	//generate extra methods
-	p.genExtraMethods()
+	p.generate()
 }

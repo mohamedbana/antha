@@ -1,23 +1,22 @@
 protocol TypeIISConstructAssembly
 
 import (
-	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 )
 
 // Input parameters for this protocol (data)
 Parameters (
-	ReactionVolume wunit.Volume
-	PartConc wunit.Concentration
-	VectorConc wunit.Concentration
-	AtpVol wunit.Volume
-	ReVol wunit.Volume
-	LigVol wunit.Volume
-	ReactionTemp wunit.Temperature
-	ReactionTime wunit.Time
-	InactivationTemp wunit.Temperature
-	InactivationTime wunit.Time
+	ReactionVolume Volume
+	PartConc Concentration
+	VectorConc Concentration
+	AtpVol Volume
+	ReVol Volume
+	LigVol Volume
+	ReactionTemp Temperature
+	ReactionTime Time
+	InactivationTemp Temperature
+	InactivationTime Time
 )
 
 // Data which is returned from this protocol, and data types

@@ -28,16 +28,14 @@ package compile
 import (
 	"bytes"
 	"fmt"
+	"github.com/antha-lang/antha/antha/ast"
+	"github.com/antha-lang/antha/antha/token"
 	"io"
 	"os"
 	"strconv"
 	"strings"
 	"text/tabwriter"
 	"unicode"
-
-	"github.com/antha-lang/antha/antha/ast"
-	"github.com/antha-lang/antha/antha/execute"
-	"github.com/antha-lang/antha/antha/token"
 )
 
 const (
@@ -113,19 +111,7 @@ type compiler struct {
 	cachedLine int // line corresponding to cachedPos
 
 	// State needed to parse Antha nodes
-	pkgName      string
-	params       []*ast.ValueSpec
-	results      []*ast.ValueSpec
-	paramTypes   map[string]string               // map used to associate params with types
-	paramMap     map[string]string               // map used to sugar antha variables
-	resultMap    map[string]string               // map used to sugar antha variables
-	reuseMap     map[token.Token]map[string]bool // map use of data through execution phases
-	intrinsicMap map[string]string               // map of true name of intrinsics funcs
-
-	// structures to support -standalone
-	anthaImports      map[string]*ast.File
-	mainOutput        []byte // raw compiler main file result
-	descriptionOutput []byte //raw compiler element description result
+	antha
 }
 
 func (p *compiler) init(cfg *Config, fset *token.FileSet, nodeSizes map[ast.Node]int) {
@@ -137,27 +123,7 @@ func (p *compiler) init(cfg *Config, fset *token.FileSet, nodeSizes map[ast.Node
 	p.nodeSizes = nodeSizes
 	p.cachedPos = -1
 
-	p.anthaImports = make(map[string]*ast.File)
-	p.paramMap = make(map[string]string)
-	p.resultMap = make(map[string]string)
-	p.paramTypes = make(map[string]string)
-	p.reuseMap = make(map[token.Token]map[string]bool)
-	//TODO intrinsicMap differentiates not between variables, struct names etc. should be more selective
-	p.intrinsicMap = map[string]string{
-		"MixInto":  "_wrapper.MixInto",
-		"Mix":  "_wrapper.Mix",
-		"Incubate": "_wrapper.Incubate",
-		"Temperature": "wunit.Temperature",
-		"Time": "wunit.Time",
-		"Length": "wunit.Length",
-		"Area": "wunit.Area",
-		"Volume": "wunit.Volume",
-		"Amount": "wunit.Amount",
-		"Mass": "wunit.Mass",
-		"Angle": "wunit.Angle",
-		"Energy": "wunit.Energy",
-		"SubstanceQuantity": "wunit.SubstanceQuantity",
-	}
+	p.anthaInit()
 }
 
 func (p *compiler) internalError(msg ...interface{}) {
@@ -1340,8 +1306,7 @@ func (cfg *Config) mainFprint(output io.Writer, fset *token.FileSet, node interf
 	var p compiler
 	p.init(cfg, fset, nodeSizes)
 	p.printNode(node) // would be cheaper to save it from last execution
-	p.standAlone(node.(*ast.File), packageRoute)
-	_, err = output.Write(p.mainOutput)
+	_, err = output.Write(p.standAlone(node.(*ast.File), packageRoute))
 	if err != nil {
 		panic(err)
 	}
@@ -1375,33 +1340,4 @@ func (cfg *Config) MainFprint(output io.Writer, fset *token.FileSet, node interf
 //
 func Fprint(output io.Writer, fset *token.FileSet, node interface{}) error {
 	return (&Config{Tabwidth: 8}).Fprint(output, fset, node)
-}
-
-func (cfg *Config) GetFileComponentInfo(fset *token.FileSet, node interface{}) execute.ComponentInfo {
-	nodeSizes := make(map[ast.Node]int)
-	var p compiler
-	p.init(cfg, fset, nodeSizes)
-	p.printNode(node)
-
-	var ci execute.ComponentInfo
-	ci.InPorts = make([]execute.PortInfo, 0)
-	ci.OutPorts = make([]execute.PortInfo, 0)
-	ci.Subgraph = false //TODO this might not be the case sometimes
-	ci.Name = p.pkgName
-	for param, paramType := range p.paramMap {
-		ci.InPorts = append(ci.InPorts, execute.PortInfo{
-			Id:   param,
-			Type: paramType,
-		})
-	}
-	for res, resType := range p.resultMap {
-		if string(res[0]) == strings.ToUpper(string(res[0])) {
-			ci.OutPorts = append(ci.OutPorts, execute.PortInfo{
-				Id:   res,
-				Type: resType,
-			})
-		}
-	}
-
-	return ci
 }
