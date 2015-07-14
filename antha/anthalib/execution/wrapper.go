@@ -86,3 +86,30 @@ func (w *Wrapper) MixInto(outplate *wtype.LHPlate, components ...*wtype.LHCompon
 
 	return reaction
 }
+
+func (w *Wrapper) Mix(components ...*wtype.LHComponent) *wtype.LHSolution {
+
+	if !w.usedMix {
+		ctx := GetContext()
+		em := ctx.EquipmentManager
+		rqOut := em.MakeDeviceRequest("liquidhandler", "Manual")
+		response := <-rqOut
+		if response["status"] == "FAIL" {
+			log.Fatal("Error requesting liquid handler service")
+		}
+		w.liquidHandler = response["devicequeue"].(*LiquidHandlingService)
+		w.usedMix = true
+	}
+
+	reaction := mixer.Mix( components...)
+	reaction.BlockID = string(w.threadID)
+
+	req := w.liquidHandler.MakeMixRequest(reaction)
+	if req == nil {
+		log.Fatal("Error running liquid handling request")
+	}
+	req.Tip_Type = w.tipType
+	w.liquidHandler.Run()
+
+	return reaction
+}

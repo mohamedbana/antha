@@ -142,9 +142,21 @@ func (p *compiler) init(cfg *Config, fset *token.FileSet, nodeSizes map[ast.Node
 	p.resultMap = make(map[string]string)
 	p.paramTypes = make(map[string]string)
 	p.reuseMap = make(map[token.Token]map[string]bool)
+	//TODO intrinsicMap differentiates not between variables, struct names etc. should be more selective
 	p.intrinsicMap = map[string]string{
 		"MixInto":  "_wrapper.MixInto",
+		"Mix":  "_wrapper.Mix",
 		"Incubate": "_wrapper.Incubate",
+		"Temperature": "wunit.Temperature",
+		"Time": "wunit.Time",
+		"Length": "wunit.Length",
+		"Area": "wunit.Area",
+		"Volume": "wunit.Volume",
+		"Amount": "wunit.Amount",
+		"Mass": "wunit.Mass",
+		"Angle": "wunit.Angle",
+		"Energy": "wunit.Energy",
+		"SubstanceQuantity": "wunit.SubstanceQuantity",
 	}
 }
 

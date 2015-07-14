@@ -196,6 +196,7 @@ func (c *anthaContext) endBlock() (b bytes.Buffer, empty bool) {
 func (p *compiler) addAnthaImports() {
 	const tpl = `
 
+import "github.com/antha-lang/antha/antha/anthalib/wunit"
 import "github.com/antha-lang/antha/antha/anthalib/execution"
 import "github.com/antha-lang/antha/antha/execute"
 import "github.com/antha-lang/antha/flow"
@@ -285,7 +286,7 @@ func (p *compiler) getOnFunction(name string, paramCount int, b bytes.Buffer) {
 func getTypeString(e ast.Expr) (res string) {
 	switch t := e.(type) {
 	case *ast.Ident:
-		res = t.Name
+		res = getAnthaLibReference(t.Name)
 		return
 	case *ast.SelectorExpr:
 		res = getTypeString(t.X) + "." + t.Sel.Name
@@ -302,10 +303,36 @@ func getTypeString(e ast.Expr) (res string) {
 	return
 }
 
+func getAnthaLibReference(name string) string {
+	switch name{
+	case "Temperature":
+		return "wunit."+name
+	case "Time":
+		return "wunit."+name
+	case "Length":
+		return "wunit."+name
+	case "Area":
+		return "wunit."+name
+	case "Volume":
+		return "wunit."+name
+	case "Amount":
+		return "wunit."+name
+	case "Mass":
+		return "wunit."+name
+	case "Angle":
+		return "wunit."+name
+	case "Energy":
+		return "wunit."+name
+	case "SubstanceQuantity":
+		return "wunit."+name
+	}
+	return name
+}
+
 func getConfigString(e ast.Expr) (res string) {
 	switch t := e.(type) {
 	case *ast.Ident:
-		res = t.Name
+		res = getAnthaLibReference(t.Name)
 		return
 	case *ast.SelectorExpr:
 		res = getConfigString(t.X) + "." + t.Sel.Name
@@ -751,6 +778,17 @@ func (p *compiler) addPreamble(d []ast.Decl) {
 		switch decl := d[i].(type) {
 		case *ast.AnthaDecl:
 			if decl.Tok == token.REQUIREMENTS {
+				//_ = wunit.Make_units
+				s2Lhs, _ := parser.ParseExpr("_")
+				s2Rhs, _ := parser.ParseExpr("wunit.Make_units")
+				s2 := &ast.AssignStmt{
+					Lhs:    []ast.Expr{s2Lhs},
+					Rhs:    []ast.Expr{s2Rhs},
+					TokPos: decl.TokPos,
+					Tok:    token.ASSIGN,
+				}
+				decl.Body.List = append([]ast.Stmt{s2}, decl.Body.List...)
+
 				continue
 			}
 			// `_wrapper := execution.NewWrapper()`
