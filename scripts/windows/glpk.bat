@@ -4,10 +4,11 @@ powershell -Command "(New-Object System.Net.WebClient).DownloadFile('http://down
 )
 
 pushd %TEMP%
-unzip "%TEMP%\winglpk-4.55.zip"
+cmd /c ""%PROGRAMFILES(x86)%\Git\bin\unzip" "%TEMP%\winglpk-4.55.zip" glpk-4.55\w64\glpk_4_55.lib glpk-4.55\src\glpk.h glpk-4.55\w64\glpk_4_55.dll"
 copy glpk-4.55\w64\glpk_4_55.lib C:\MinGW\lib\
 mklink C:\MinGW\lib\glpk.lib C:\MinGW\lib\glpk_4_55.lib
 copy glpk-4.55\src\glpk.h C:\MinGW\include\
-del winglpk-4.55.zip
+copy glpk-4.55\w64\glpk_4_55.dll C:\MinGW\bin
+rem del winglpk-4.55.zip
 rmdir /s /q glpk-4.55
 popd
