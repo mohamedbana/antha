@@ -240,9 +240,9 @@ type ComponentDesc struct {
 func GetComponents() []ComponentDesc {
 	portMap := make(map[string]map[string]bool) //representing component, port name, and true if in
 {{range .Components}}	portMap["{{.Name}}"] = make(map[string]bool){{$componentName := .Name}}
-{{range .InPorts}}	portMap["{{$componentName}}"]["{{$componentName}}"] = true
+{{range .InPorts}}	portMap["{{$componentName}}"]["{{.}}"] = true
 {{end}}
-{{range .OutPorts}}	portMap["{{$componentName}}"]["{{$componentName}}"] = false
+{{range .OutPorts}}	portMap["{{$componentName}}"]["{{.}}"] = false
 {{end}}
 {{end}}
 	c := make([]ComponentDesc, 0)
