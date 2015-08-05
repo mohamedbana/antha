@@ -13,23 +13,23 @@ type ComponentDesc struct {
 func GetComponents() []ComponentDesc {
 	portMap := make(map[string]map[string]bool) //representing component, port name, and true if in
 	portMap["TypeIISConstructAssembly"] = make(map[string]bool)
-	portMap["TypeIISConstructAssembly"]["Parts"] = true
-	portMap["TypeIISConstructAssembly"]["Ligase"] = true
-	portMap["TypeIISConstructAssembly"]["ReactionVolume"] = true
-	portMap["TypeIISConstructAssembly"]["AtpVol"] = true
-	portMap["TypeIISConstructAssembly"]["InactivationTime"] = true
-	portMap["TypeIISConstructAssembly"]["InactivationTemp"] = true
-	portMap["TypeIISConstructAssembly"]["Atp"] = true
 	portMap["TypeIISConstructAssembly"]["ReactionTime"] = true
+	portMap["TypeIISConstructAssembly"]["InactivationTemp"] = true
+	portMap["TypeIISConstructAssembly"]["Ligase"] = true
+	portMap["TypeIISConstructAssembly"]["Atp"] = true
+	portMap["TypeIISConstructAssembly"]["ReactionVolume"] = true
+	portMap["TypeIISConstructAssembly"]["PartConc"] = true
+	portMap["TypeIISConstructAssembly"]["Vector"] = true
 	portMap["TypeIISConstructAssembly"]["RestrictionEnzyme"] = true
 	portMap["TypeIISConstructAssembly"]["Buffer"] = true
+	portMap["TypeIISConstructAssembly"]["OutPlate"] = true
+	portMap["TypeIISConstructAssembly"]["VectorConc"] = true
+	portMap["TypeIISConstructAssembly"]["AtpVol"] = true
 	portMap["TypeIISConstructAssembly"]["ReVol"] = true
 	portMap["TypeIISConstructAssembly"]["LigVol"] = true
+	portMap["TypeIISConstructAssembly"]["Parts"] = true
 	portMap["TypeIISConstructAssembly"]["ReactionTemp"] = true
-	portMap["TypeIISConstructAssembly"]["OutPlate"] = true
-	portMap["TypeIISConstructAssembly"]["PartConc"] = true
-	portMap["TypeIISConstructAssembly"]["VectorConc"] = true
-	portMap["TypeIISConstructAssembly"]["Vector"] = true
+	portMap["TypeIISConstructAssembly"]["InactivationTime"] = true
 
 	portMap["TypeIISConstructAssembly"]["Reaction"] = false
 
