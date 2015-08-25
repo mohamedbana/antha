@@ -24,6 +24,9 @@ EOF
 # Reload your profile
 . $HOME/.bash_profile
 
+# Install the xcode developer tools
+xcode-select --install
+
 # Install some external dependencies
 brew update
 brew install homebrew/science/glpk sqlite3
