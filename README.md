@@ -105,7 +105,7 @@ existing components there. Afterwards, you can compile and use your components
 with the following commands:
 ```sh
 cd $GOPATH/src/github.com/antha-lang/antha
-make clean && make
+make
 go get github.com/antha-lang/antha/cmd/...
 antharun --workflow myworkflowdefinition.json --parameters myparameters.yml
 ```
