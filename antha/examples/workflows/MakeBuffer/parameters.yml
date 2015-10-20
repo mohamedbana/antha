@@ -1,0 +1,20 @@
+{
+    "Parameters": [{
+        "MakeBuffer":{
+            "Diluent": "component:water",
+            "Buffername": "Cutsmart1X",
+            "Bufferstock": "component:CutsmartBuffer",
+            "Bufferstockvolume": "0.2ml",
+            "Bufferstockconc": "5M/l",
+            "FinalConcentration":"2mg/l",
+            "Diluentvolume": "0.3ml",
+            "FinalVolume": "0.5ml",
+            "OutPlate": "plate:pcrplate_with_cooler",
+            "InPlate": "plate:pcrplate_with_cooler",
+            "TipType": "tipbox:Gilson20"
+        }
+    }],
+    "Config": {
+        "OUTPUT_COUNT": 1
+    }
+}

@@ -1,0 +1,16 @@
+{
+  "Parameters": [{
+    "Kla": {
+      "Platetype": "24DSW_pyramid",
+      "Liquid": "water",
+      "RPM": 200,
+      "Shakertype": "Kuhner",
+      "TargetRE": 226659.867,
+      "Fillvolume": "1000ul",
+      "D": 2.1e-9
+    }
+  }],
+  "Config": {
+    "OUTPUT_COUNT": 1
+  }
+}

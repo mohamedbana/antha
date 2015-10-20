@@ -18,7 +18,7 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 // package compile declares the functions required to translate an
 // Antha AST into a go source file
@@ -28,14 +28,15 @@ package compile
 import (
 	"bytes"
 	"fmt"
-	"github.com/antha-lang/antha/antha/ast"
-	"github.com/antha-lang/antha/antha/token"
 	"io"
 	"os"
 	"strconv"
 	"strings"
 	"text/tabwriter"
 	"unicode"
+
+	"github.com/antha-lang/antha/antha/ast"
+	"github.com/antha-lang/antha/antha/token"
 )
 
 const (
@@ -122,7 +123,6 @@ func (p *compiler) init(cfg *Config, fset *token.FileSet, nodeSizes map[ast.Node
 	p.wsbuf = make([]whiteSpace, 0, 16) // whitespace sequences are short
 	p.nodeSizes = nodeSizes
 	p.cachedPos = -1
-
 	p.anthaInit()
 }
 

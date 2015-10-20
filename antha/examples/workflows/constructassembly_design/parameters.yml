@@ -1,0 +1,29 @@
+{
+    "Parameters": [{
+        "TypeIISAssembly_design":{
+            "Constructname": "Moflo2Assemblyproduct", 				
+            "Partsinorder": [
+            "AmpR_promoter",
+            "Rbs",
+            "BBa_E0020",
+            "Term"
+            ],
+            "PartMoClotypesinorder": [
+            "Pro",
+            "5U + NT1",
+            "CDS1",
+            "3U + Ter"
+            ],
+			"RestrictionsitetoAvoid":[
+			"EcoRI",
+			"PvuII"
+			],
+			"Vector":"pAGM1311_R",
+            "AssemblyStandard": "MoClo",
+            "Level": "Level0"
+        }
+    }],
+    "Config": {
+        "OUTPUT_COUNT": 1
+    }
+}

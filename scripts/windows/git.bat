@@ -4,4 +4,4 @@ if not exist "%TEMP%\git-install.exe" (
 
 cmd /c "%TEMP%\git-install.exe" /SILENT
 
-powershell -Command "$p = [Environment]::GetEnvironmentVariable('PATH', 'Machine'); $pa = [Environment]::GetEnvironmentVariable('PROGRAMFILES(x86)', 'Process'); [Environment]::SetEnvironmentVariable('PATH', \"$p;$pa\Git\bin\", 'Machine');"
+%SystemRoot%\System32\setx.exe PATH "%PATH%;%PROGRAMFILES(x86)%\Git\bin" /M

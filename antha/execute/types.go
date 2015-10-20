@@ -18,7 +18,7 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 // support package with wrapper classes for marshalling parameters into
 // elements
@@ -26,6 +26,9 @@ package execute
 
 import (
 	"encoding/json"
+	"fmt"
+	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -35,16 +38,30 @@ type AnthaElement interface {
 }
 
 type ThreadID string
+type BlockID struct {
+	ThreadID    ThreadID
+	OutputCount int
+}
+
+func (b BlockID) String() string {
+	return fmt.Sprintf("%s,%d", string(b.ThreadID), b.OutputCount)
+}
+func StringToBlockID(in string) (*BlockID, error) {
+	//TODO add format checking etc etc
+	s := strings.Split(in, ",")
+	count, _ := strconv.Atoi(s[1])
+	return &BlockID{ThreadID: ThreadID(s[0]), OutputCount: count}, nil
+}
 
 type ThreadParam struct {
 	Value   interface{}
 	ID      ThreadID
-	BlockID ThreadID
+	BlockID BlockID
 	Error   bool
 }
 
 type BlockConfig struct {
-	BlockID ThreadID
+	BlockID BlockID
 	Threads map[string]string
 }
 

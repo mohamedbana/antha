@@ -18,7 +18,7 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 //package liquidHandler defines a liquid handler implementation as an Antha compatible
 // equipment.
@@ -32,9 +32,7 @@ import (
 //AnthaLiquidHandler represents a liquidHandler that can be identified as an antha compatible
 // device, represented by and ID and that responds to a certain set of Behaviours
 type AnthaLiquidHandler struct {
-	//ID represents a liquid handler uniquely
-	ID string
-	//Behaviours is a list of the actions that a specific piece of equipment can carry out
+	ID         string
 	Behaviours []equipment.Behaviour
 }
 
@@ -70,6 +68,9 @@ func NewAnthaLiquidHandler(id string) *AnthaLiquidHandler {
 	be = append(be, *equipment.NewBehaviour(action.LH_RESET_PISTONS, ""))
 	be = append(be, *equipment.NewBehaviour(action.LH_WAIT, ""))
 	be = append(be, *equipment.NewBehaviour(action.LH_MIX, ""))
+	be = append(be, *equipment.NewBehaviour(action.LH_CONFIG, ""))
+	be = append(be, *equipment.NewBehaviour(action.LH_READ, ""))
+	be = append(be, *equipment.NewBehaviour(action.LH_END, ""))
 
 	eq := new(AnthaLiquidHandler)
 	eq.Behaviours = be
@@ -95,9 +96,15 @@ func (e AnthaLiquidHandler) Do(actionDescription equipment.ActionDescription) er
 	return nil
 }
 
-//Can will return true if a certain action description can be carried out by this particular
-// equipment instance
-func (e AnthaLiquidHandler) Can(b equipment.ActionDescription) bool {
+//Status should give a description of the current execution status and any future actions queued to the device
+func (e *AnthaLiquidHandler) Status() string {
+	//TODO implement properly
+	return "OK"
+}
+
+//Can queries a piece of equipment about an action execution. The description of the action must meet the constraints
+// of the piece of equipment.
+func (e *AnthaLiquidHandler) Can(b equipment.ActionDescription) bool {
 	for _, eb := range e.Behaviours {
 		if eb.Matches(b) {
 			return true
@@ -106,8 +113,12 @@ func (e AnthaLiquidHandler) Can(b equipment.ActionDescription) bool {
 	return false
 }
 
-//Status returns a string representing the current Status of a piece of equipment
-func (e AnthaLiquidHandler) Status() string {
-	//TODO implement properly
-	return "OK"
+//Init driver will be initialized when registered
+func (e *AnthaLiquidHandler) Init() error {
+	return nil
+}
+
+//Shutdown disconnect, turn off, signal whatever is necessary for a graceful shutdown
+func (e *AnthaLiquidHandler) Shutdown() error {
+	return nil
 }

@@ -1,0 +1,200 @@
+protocol TypeIISAssembly_design
+
+import (
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/REBASE"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
+	"strings"
+	"strconv"
+)
+
+// Input parameters for this protocol (data)
+Parameters (
+	Constructname 				string
+	Partsinorder					[]string
+	AssemblyStandard				string
+	Level						string
+	Vector						string
+	PartMoClotypesinorder		[]string
+	RestrictionsitetoAvoid		[]string
+)
+
+// Physical Inputs to this protocol with types
+Inputs (
+
+)
+
+// Physical outputs from this protocol with types
+Outputs (
+	
+)
+
+// Data which is returned from this protocol, and data types
+Data (
+	Warnings string
+	Status string
+	Simulationpass bool
+	PartswithOverhangs []wtype.DNASequence
+	NewDNASequence wtype.DNASequence
+	Sitesfound []enzymes.Restrictionsites
+	BackupParts []string
+)
+// Input Requirement specification
+Requirements {
+	
+}
+
+// Conditions to run on startup
+Setup {}
+
+// The core process for this protocol, with the steps to be performed
+// for every input
+Steps {
+	
+	// set warnings reported back to user to none initially
+	warnings := make([]string,1)
+	warnings[0] = "none"
+	
+	/* find sequence data from keyword; looking it up by a given name in an inventory 
+	   or by biobrick ID from iGem parts registry */
+	partsinorder := make([]wtype.DNASequence,0)
+	var partDNA =wtype.DNASequence{"","",false, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, ""}
+	
+	Status = "all parts available"
+	for _, part := range Partsinorder {
+		
+		
+		if strings.Contains(part,"BBa_") ==true{
+			partDNA.Nm = part
+			partDNA.Seq = igem.GetSequence(part)
+			/* We can add logic to check the status of parts too and return a warning if the part 
+			   is not characeterised */
+			if strings.Contains(igem.GetResults(part),"Works") != true{
+				warnings = make([]string,0)
+				warning := fmt.Sprintln("iGem part", part, "results =", igem.GetResults(part), "rating",igem.GetRating(part), "part type",igem.GetType(part), "part decription =", igem.GetDescription(part), "Categories",igem.GetCategories(part))
+				warnings = append(warnings,warning)
+		}
+		} else {
+		partDNA = Inventory.Partslist[part]
+		}
+		
+		if partDNA.Seq == "" || partDNA.Nm == "" {
+		Status = fmt.Sprintln("part not found in Inventory so element aborted!")
+		}
+	partsinorder = append(partsinorder,partDNA)
+	}
+	
+	// or Look up parts from registry according to properties (this will take a couple of minutes the first time)
+	subparts := igem.FilterRegistry([]string{"Fluorescent", "A "})
+
+	partdetails := igem.PartProperties(subparts)
+	//fmt.Println(partdetails)
+	
+	
+	// this can be slow if there are many parts to check (~2 seconds per block of 14 parts)
+	for _, subpart := range subparts {
+		if strings.Contains(igem.GetDescriptionfromSubset(subpart, partdetails), "RED") &&
+			strings.Contains(igem.GetResultsfromSubset(subpart, partdetails), "WORKS") {
+			BackupParts = append(BackupParts, subpart)
+
+		}
+	}
+	
+	
+	
+	// lookup vector sequence
+	vectordata := Inventory.Partslist[Vector]
+	
+	//lookup restriction enzyme
+	restrictionenzyme := enzymes.Enzymelookup[AssemblyStandard][Level]
+	
+
+	// (1) Add standard overhangs using chosen assembly standard
+	//PartswithOverhangs = enzymes.MakeStandardTypeIIsassemblyParts(partsinorder, AssemblyStandard, Level, PartMoClotypesinorder)
+	
+	// OR (2) Add overhangs for scarfree assembly based on part seqeunces only, i.e. no Assembly standard
+	PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
+	
+	// perfrom mock digest to test fragement overhangs (fragments are hidden by using _, )
+	_,stickyends5,stickyends3 := enzymes.TypeIIsdigest(vectordata, restrictionenzyme)
+	
+	
+	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
+	assembly := enzymes.Assemblyparameters{Constructname, restrictionenzyme.Name,vectordata,PartswithOverhangs}
+		status,numberofassemblies,sitesfound,newDNASequence := enzymes.Assemblysimulator(assembly)
+	
+	// The default sitesfound produced from the assembly simulator only checks to SapI and BsaI so we'll repeat with the enzymes declared in parameters
+	// first lookup enzyme properties
+	enzlist := make([]wtype.LogicalRestrictionEnzyme, 0)
+	for _, site := range RestrictionsitetoAvoid {
+		enzsite := rebase.EnzymeLookup(site)
+	enzlist = append(enzlist, enzsite)
+	}
+	othersitesfound := enzymes.Restrictionsitefinder(newDNASequence,enzlist) 
+	
+	for _, site := range sitesfound{
+	othersitesfound = append(othersitesfound,site)
+	}
+	
+	// Now let's find out the size of fragments we would get if digested with a common site cutter
+	tspEI := rebase.EnzymeLookup("TspEI")
+	
+	Testdigestionsizes := enzymes.RestrictionMapper(newDNASequence, tspEI)
+	
+	// allow the data to be exported by capitalising the first letter of the variable
+	Sitesfound = othersitesfound
+	
+	NewDNASequence = newDNASequence
+	if status == "Yay! this should work" && numberofassemblies == 1 {
+		
+		Simulationpass = true
+	}	
+	
+	Warnings = strings.Join(warnings,";")
+	
+	// Export sequences to order into a fasta file
+	
+	partswithOverhangs := make([]*wtype.DNASequence,0)
+	for i, part := range PartswithOverhangs{
+		_ = enzymes.ExportFastaDir(Constructname,strconv.Itoa(i+1),&part)
+		partswithOverhangs=append(partswithOverhangs,&part)
+		
+		
+	}
+	_ = enzymes.Makefastaserial(Constructname,partswithOverhangs)
+	
+	
+	// Print status
+	if Status != "all parts available"{
+		Status = fmt.Sprintln(Status)
+	} else {Status = fmt.Sprintln(
+		"Warnings:", Warnings,
+		"Simulationpass=", Simulationpass,
+		"Back up parts found (which work)", BackupParts,
+		"NewDNASequence",NewDNASequence,
+		//"partonewithoverhangs", partonewithoverhangs,
+		//"Vector",vectordata,
+		"Vector digest:", stickyends5,stickyends3,
+		"PartswithOverhangs",PartswithOverhangs,
+		"Sitesfound",Sitesfound,
+		"Partsinorder=",Partsinorder,partsinorder,
+		"Test digestion sizes with TspEI", Testdigestionsizes,
+		//"Restriction Enzyme=",restrictionenzyme,
+		)
+		}
+	
+}
+
+// Run after controls and a steps block are completed to
+// post process any data and provide downstream results
+Analysis {
+}
+
+// A block of tests to perform to validate that the sample was processed correctly
+// Optionally, destructive tests can be performed to validate results on a
+// dipstick basis
+Validation {
+}

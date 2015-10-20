@@ -1,27 +1,25 @@
-// /equipment/action/types.go: Part of the Antha language
+// microArch/equipment/action/types.go: Part of the Antha language
 // Copyright (C) 2015 The Antha authors. All rights reserved.
-//
+// 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-//
+// 
 // For more information relating to the software or licensing issues please
-// contact license@antha-lang.org or write to the Antha team c/o
+// contact license@antha-lang.org or write to the Antha team c/o 
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
-//package action represents a description of all the possible actions all pieces of
-// equipment that integrate into the Antha ecosystem can implement.
 package action
 
 //Action describes a particular function that an equipment can perform. It is the same concept as an interface, but
@@ -49,61 +47,69 @@ const (
 	LH_ADD_PLATE
 	LH_REMOVE_PLATE
 	LH_REMOVE_ALL_PLATES //?? maybe not necessary
+	LH_CONFIG
+	LH_READ
+	LH_END
 	MLH_CHANGE_TIPS
 	IN_INCUBATE
 	IN_INCUBATE_SHAKE
 )
 
-//String give a textual representation of an action
 func (a Action) String() string {
 	switch a {
 	case NONE:
-		return "None"
+		return "NONE"
 	case LH_SETUP:
-		return "Setup"
+		return "SETUP"
 	case LH_MOVE:
-		return "Move"
+		return "MOVE"
 	case LH_MOVE_EXPLICIT:
-		return "Move Explicit"
+		return "MOVE EXPLICIT"
 	case LH_MOVE_RAW:
-		return "Move Raw"
+		return "MOVE RAW"
 	case LH_ASPIRATE:
-		return "Aspirate"
+		return "ASPIRATE"
 	case LH_DISPENSE:
-		return "Dispense"
+		return "DISPENSE"
 	case LH_LOAD_TIPS:
-		return "Load Tips"
+		return "LOAD TIPS"
 	case LH_UNLOAD_TIPS:
-		return "Unload Tips"
+		return "UNLOAD TIPS"
 	case LH_SET_PIPPETE_SPEED:
-		return "Set Pippete Speed"
+		return "SET PIPPETE SPEED"
 	case LH_SET_DRIVE_SPEED:
-		return "Set Drive Speed"
+		return "SET DRIVE SPEED"
 	case LH_STOP:
-		return "Stop"
+		return "STOP"
 	case LH_SET_POSITION_STATE:
-		return "Set Position State"
+		return "SET POSTION STATE"
 	case LH_RESET_PISTONS:
-		return "Reset Pistons"
+		return "RESET PISTONS"
 	case LH_WAIT:
-		return "Wait"
+		return "WAIT"
 	case LH_MIX:
-		return "Mix"
+		return "MIX"
 	case LH_ADD_PLATE:
-		return "Add Plate"
+		return "ADD PLATE"
 	case LH_REMOVE_PLATE:
-		return "Remove Plate"
+		return "REMOVE PLATE"
 	case LH_REMOVE_ALL_PLATES:
-		return "Remove All Plates"
+		return "REMOVE ALL PLATES"
+	case LH_CONFIG:
+		return "CONFIG"
 	case IN_INCUBATE:
-		return "Incubate"
+		return "INCUBATE"
 	case IN_INCUBATE_SHAKE:
-		return "Incubate Shaking"
+		return "INCUBATE SHAKING"
 	case MLH_CHANGE_TIPS:
-		return "Change Tips"
+		return "CHANGE TIPS"
+	case LH_READ:
+		return "READ"
+	case LH_END:
+		return "END"
 
 	case MESSAGE:
-		return "Message"
+		return "MESSAGE"
 	default:
 		return ""
 	}

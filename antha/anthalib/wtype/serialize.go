@@ -18,13 +18,13 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 package wtype
 
 import (
 	"encoding/json"
-	"github.com/antha-lang/antha/antha/anthalib/wutil"
+//	"github.com/antha-lang/antha/antha/anthalib/wutil"
 )
 
 // functions to deal with how to serialize / deserialize the relevant objects.
@@ -130,7 +130,7 @@ func (w *LHWell) AddDimensions(lhwt *LHWellType) {
 	w.Vol = lhwt.Vol
 	w.Vunit = lhwt.Vunit
 	w.Rvol = lhwt.Rvol
-	w.WShape = NewShape(lhwt.ShapeName)
+	w.WShape = NewShape(lhwt.ShapeName, lhwt.Dunit, lhwt.Xdim, lhwt.Ydim, lhwt.Zdim)
 	w.Bottom = lhwt.Bottom
 	w.Xdim = lhwt.Xdim
 	w.Ydim = lhwt.Ydim
@@ -141,68 +141,68 @@ func (w *LHWell) AddDimensions(lhwt *LHWellType) {
 
 func (plate *LHPlate) Welldimensions() *LHWellType {
 	t := plate.Welltype
-	lhwt := LHWellType{t.Vol, t.Vunit, t.Rvol, t.WShape.ShapeName(), t.Bottom, t.Xdim, t.Ydim, t.Zdim, t.Bottomh, t.Dunit}
+	lhwt := LHWellType{t.Vol, t.Vunit, t.Rvol, t.WShape.ShapeName, t.Bottom, t.Xdim, t.Ydim, t.Zdim, t.Bottomh, t.Dunit}
 	return &lhwt
 }
-
-func (plate *LHPlate) MarshalJSON() ([]byte, error) {
-	slp := SLHPlate{plate.ID, plate.Inst, plate.Loc, plate.PlateName, plate.Type, plate.Mnfr, plate.WlsX, plate.WlsY, plate.Nwells, plate.Height, plate.Hunit, plate.Welltype, plate.Wellcoords, plate.Welldimensions()}
-
-	return json.Marshal(slp)
-}
-
-func (plate *LHPlate) UnmarshalJSON(b []byte) error {
-	var slp SLHPlate
-
-	e := json.Unmarshal(b, &slp)
-
-	if e != nil {
-		return e
-	}
-
-	// push the info into the plate
-
-	slp.FillPlate(plate)
-
-	// allocate and fill the other structures
-
-	plate.HWells = make(map[string]*LHWell, len(plate.Wellcoords))
-	plate.Rows = make([][]*LHWell, plate.WlsY)
-	plate.Cols = make([][]*LHWell, plate.WlsX)
-
-	wt := slp.Welldimensions
-
-	for s, w := range plate.Wellcoords {
-		// give w's contents their proper references
-
-		for _, contents := range w.WContents {
-			contents.LContainer = w
-		}
-
-		plate.HWells[w.ID] = w
-
-		// give w its properties back
-
-		w.AddDimensions(wt)
-		x, y := wutil.DecodeCoords(s)
-
-		if len(plate.Rows[x]) == 0 {
-			plate.Rows[x] = make([]*LHWell, plate.WlsX)
-		}
-		plate.Rows[x][y] = w
-
-		if len(plate.Cols[y]) == 0 {
-			plate.Cols[y] = make([]*LHWell, plate.WlsY)
-		}
-		plate.Cols[y][x] = w
-	}
-
-	// don't forget to add them back to the welltype!
-
-	plate.Welltype.AddDimensions(wt)
-
-	return e
-}
+//
+//func (plate *LHPlate) MarshalJSON() ([]byte, error) {
+//	slp := SLHPlate{plate.ID, plate.Inst, plate.Loc, plate.PlateName, plate.Type, plate.Mnfr, plate.WlsX, plate.WlsY, plate.Nwells, plate.Height, plate.Hunit, plate.Welltype, plate.Wellcoords, plate.Welldimensions()}
+//
+//	return json.Marshal(slp)
+//}
+//
+//func (plate *LHPlate) UnmarshalJSON(b []byte) error {
+//	var slp SLHPlate
+//
+//	e := json.Unmarshal(b, &slp)
+//
+//	if e != nil {
+//		return e
+//	}
+//
+//	// push the info into the plate
+//
+//	slp.FillPlate(plate)
+//
+//	// allocate and fill the other structures
+//
+//	plate.HWells = make(map[string]*LHWell, len(plate.Wellcoords))
+//	plate.Rows = make([][]*LHWell, plate.WlsY)
+//	plate.Cols = make([][]*LHWell, plate.WlsX)
+//
+//	wt := slp.Welldimensions
+//
+//	for s, w := range plate.Wellcoords {
+//		// give w's contents their proper references
+//
+//		for _, contents := range w.WContents {
+//			contents.LContainer = w
+//		}
+//
+//		plate.HWells[w.ID] = w
+//
+//		// give w its properties back
+//
+//		w.AddDimensions(wt)
+//		x, y := wutil.DecodeCoords(s)
+//
+//		if len(plate.Rows[x]) == 0 {
+//			plate.Rows[x] = make([]*LHWell, plate.WlsX)
+//		}
+//		plate.Rows[x][y] = w
+//
+//		if len(plate.Cols[y]) == 0 {
+//			plate.Cols[y] = make([]*LHWell, plate.WlsY)
+//		}
+//		plate.Cols[y][x] = w
+//	}
+//
+//	// don't forget to add them back to the welltype!
+//
+//	plate.Welltype.AddDimensions(wt)
+//
+//	return e
+//}
 
 type SLHWell struct {
 	ID        string
@@ -227,23 +227,23 @@ func (slw SLHWell) FillWell(lw *LHWell) {
 	}
 }
 
-func (well *LHWell) MarshalJSON() ([]byte, error) {
-	// make sure we don't cause an infinite loop
-	for _, c := range well.WContents {
-		c.LContainer = nil
-	}
-	slw := SLHWell{well.ID, well.Inst, well.Plateinst, well.Plateid, well.Crds, well.WContents, well.Currvol}
-	return json.Marshal(slw)
-}
+//func (well LHWell) MarshalJSON() ([]byte, error) {
+//	// make sure we don't cause an infinite loop
+//	for _, c := range well.WContents {
+//		c.LContainer = nil
+//	}
+//	slw := SLHWell{well.ID, well.Inst, well.Plateinst, well.Plateid, well.Crds, well.WContents, well.Currvol}
+//	return json.Marshal(slw)
+//}
 
-func (well *LHWell) UnmarshalJSON(ar []byte) error {
-	var slw SLHWell
-	err := json.Unmarshal(ar, &slw)
-
-	slw.FillWell(well)
-
-	return err
-}
+//func (well *LHWell) UnmarshalJSON(ar []byte) error {
+//	var slw SLHWell
+//	err := json.Unmarshal(ar, &slw)
+//
+//	slw.FillWell(well)
+//
+//	return err
+//}
 
 type FromFactory struct {
 	String string

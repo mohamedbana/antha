@@ -22,6 +22,7 @@ package uuid
  ***************/
 
 import (
+	"bytes"
 	"encoding"
 	"encoding/hex"
 	"errors"
@@ -30,7 +31,6 @@ import (
 	seed "math/rand"
 	"regexp"
 	"strings"
-	"bytes"
 )
 
 const (

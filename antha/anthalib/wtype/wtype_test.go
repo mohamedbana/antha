@@ -18,7 +18,7 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 package wtype
 
@@ -32,20 +32,20 @@ func testBS(bs BioSequence) {
 }
 
 func TestOne(*testing.T) {
-	dna := DNASequence{"test", "ACCACACATAGCTAGCTAGCTAG"}
+	dna := DNASequence{"test", "ACCACACATAGCTAGCTAGCTAG", false, false, Overhang{}, Overhang{}, ""}
 	testBS(&dna)
 }
 
 func ExampleOne() {
-	dna := DNASequence{"test", "ACCACACATAGCTAGCTAGCTAG"}
+	dna := DNASequence{"test", "ACCACACATAGCTAGCTAGCTAG", false, false, Overhang{}, Overhang{}, ""}
 	testBS(&dna)
 	// Output:
 	// ACCACACATAGCTAGCTAGCTAG
 }
 
 func TestLocations(*testing.T) {
-	nl := NewLocation("liquidhandler", 9, NewShape("box"))
-	nl2 := NewLocation("anotherliquidhandler", 9, NewShape("box"))
+	nl := NewLocation("liquidhandler", 9, NewShape("box", "", 0, 0, 0))
+	nl2 := NewLocation("anotherliquidhandler", 9, NewShape("box", "", 0, 0, 0))
 	fmt.Println("Location ", nl.Location_Name(), " ", nl.Location_ID(), " and location ", nl2.Location_Name(), " ", nl2.Location_ID(), " are the same? ", SameLocation(nl, nl2, 0))
 
 	fmt.Println("Location ", nl.Positions()[0].Location_Name(), " and location ", nl.Positions()[1].Location_Name(), " are the same? ", SameLocation(nl.Positions()[0], nl.Positions()[1], 0), " share a parent? ", SameLocation(nl.Positions()[0], nl.Positions()[1], 1))

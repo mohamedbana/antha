@@ -2,8 +2,8 @@
 package flow
 
 import (
-	"github.com/antha-lang/antha/internal/code.google.com/p/go.net/websocket"
 	"fmt"
+	"github.com/antha-lang/antha/internal/code.google.com/p/go.net/websocket"
 	"reflect"
 	"sync"
 )

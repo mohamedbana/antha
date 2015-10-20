@@ -18,7 +18,7 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.Org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 // defines types for dealing with liquid handling requests
 package wtype
@@ -27,10 +27,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"strconv"
 	"strings"
+
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
+	"github.com/antha-lang/antha/antha/execute"
 )
 
 const (
@@ -50,6 +52,32 @@ type LHChannelParameter struct {
 	Independent bool
 	Orientation int
 	Head        int
+}
+
+func (lhcp LHChannelParameter) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		ID          string
+		Name        string
+		Minvol      wunit.Volume
+		Maxvol      wunit.Volume
+		Minspd      wunit.FlowRate
+		Maxspd      wunit.FlowRate
+		Multi       int
+		Independent bool
+		Orientation int
+		Head        int
+	}{
+		lhcp.ID,
+		lhcp.Name,
+		*lhcp.Minvol,
+		*lhcp.Maxvol,
+		*lhcp.Minspd,
+		*lhcp.Maxspd,
+		lhcp.Multi,
+		lhcp.Independent,
+		lhcp.Orientation,
+		lhcp.Head,
+	})
 }
 
 func (lhcp *LHChannelParameter) Dup() *LHChannelParameter {
@@ -147,9 +175,8 @@ func (lhp *LHPosition) Positions() []Location {
 	return nil
 }
 
-func (lhp *LHPosition) Shape() Shape {
-	// HARD CODE SBS format here
-	return EZG3D(0.08548, 0.12776, 0.0)
+func (lhp *LHPosition) Shape() *Shape {
+	return NewShape("box", "mm", 0.08548, 0.12776, 0.0)
 }
 
 /*
@@ -172,13 +199,15 @@ func PartOf() Entity {
 type LHSolution struct {
 	*GenericPhysical
 	ID               string
-	BlockID          string
+	BlockID          execute.BlockID
 	Inst             string
 	SName            string
 	Order            int
 	Components       []*LHComponent
 	ContainerType    string
 	Welladdress      string
+	Plateaddress     string
+	PlateID          string
 	Platetype        string
 	Vol              float64
 	Type             string
@@ -220,7 +249,7 @@ func (sol LHSolution) String() string {
 	for _, c := range sol.Components {
 		one = one + fmt.Sprintf("[%s], ", c.CName)
 	}
-	two := fmt.Sprintf("%s, %s, %s, %g, %s, %g, %g, %d, %d",
+	two := fmt.Sprintf("%s, %s, %s, %g, %s, %g, %d, %d",
 		sol.ContainerType,
 		sol.Welladdress,
 		sol.Platetype,
@@ -232,6 +261,42 @@ func (sol LHSolution) String() string {
 		sol.Minorlayoutgroup,
 	)
 	return one + two
+}
+
+func SolutionToComponent(s *LHSolution) (c *LHComponent) {
+
+	c = New_Component(s.SName, s.Type, s.Vol)
+
+	/*
+		c = NewLHComponent()
+
+		c.ID = s.ID
+		c.Inst = s.Inst
+		//
+
+		c.GenericPhysical = s.GenericPhysical
+		c.Order = s.Order
+		c.CName = s.SName
+		c.Type = s.Type
+		c.Vol = s.Vol
+		c.Conc = s.Conc
+		c.Vunit = s.Vunit
+		c.Tvol = s.TVol
+		c.Loc = s.Loc
+		c.Smax = s.Smax
+		c.Visc = s.Visc
+		c.LContainer = //LHWell.Dup() //NewLHWell(s.Platetype, s.PlateID, crds, vunit string, vol, rvol float64, shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
+		c.Destination = s.Destination
+		c.StockConcentration = s.StockConcentration
+
+	*/
+
+	/*c.Extra = make(map[string]interface{}, len(lhc.Extra))
+	for k, v := range lhc.Extra {
+		c.Extra[k] = v
+	}*/
+	return c
+
 }
 
 // structure describing a liquid component and its desired properties
@@ -251,13 +316,14 @@ type LHComponent struct {
 	Smax               float64
 	Visc               float64
 	StockConcentration float64
-	LContainer         *LHWell
+	LContainer         *LHWell `gotopb:"-" json:"-"`
 	Destination        string
 	Extra              map[string]interface{}
 }
 
 func (lhc *LHComponent) Dup() *LHComponent {
 	c := NewLHComponent()
+	c.GenericPhysical = lhc.GenericPhysical
 	c.Order = lhc.Order
 	c.CName = lhc.CName
 	c.Type = lhc.Type
@@ -352,6 +418,10 @@ func (lhc *LHComponent) GetVunit() string {
 	return lhc.Vunit
 }
 
+func (lhc *LHComponent) GetType() string {
+	return lhc.Type
+}
+
 func NewLHComponent() *LHComponent {
 	var lhc LHComponent
 	var gp GenericPhysical
@@ -407,6 +477,55 @@ type LHPlate struct {
 	WellZStart  float64
 }
 
+func (lhp LHPlate) String() string {
+	return fmt.Sprintf(
+		`LHPlate {
+	ID          : %s,
+	Inst        : %s,
+	Loc         : %s,
+	PlateName   : %s,
+	Type        : %s,
+	Mnfr        : %s,
+	WlsX        : %d,
+	WlsY        : %d,
+	Nwells      : %d,
+	HWells      : %p,
+	Height      : %f,
+	Hunit       : %s,
+	Rows        : %p,
+	Cols        : %p,
+	Welltype    : %p,
+	Wellcoords  : %p,
+	WellXOffset : %f,
+	WellYOffset : %f,
+	WellXStart  : %f,
+	WellYStart  : %f,
+	WellZStart  : %f,
+}`,
+		lhp.ID,
+		lhp.Inst,
+		lhp.Loc,
+		lhp.PlateName,
+		lhp.Type,
+		lhp.Mnfr,
+		lhp.WlsX,
+		lhp.WlsY,
+		lhp.Nwells,
+		lhp.HWells,
+		lhp.Height,
+		lhp.Hunit,
+		lhp.Rows,
+		lhp.Cols,
+		lhp.Welltype,
+		lhp.Wellcoords,
+		lhp.WellXOffset,
+		lhp.WellYOffset,
+		lhp.WellXStart,
+		lhp.WellYStart,
+		lhp.WellZStart,
+	)
+}
+
 // @implement named
 
 func (lhp *LHPlate) GetName() string {
@@ -438,8 +557,6 @@ func (lhp *LHPlate) Positions() []Location {
 func (lhp *LHPlate) Container() Location {
 	return lhp
 }
-
-// Shape() deferred to GenericPhysical
 
 // @implement Labware
 func (lhp *LHPlate) Wells() [][]Well {
@@ -498,7 +615,7 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit s
 			if colarr[j] == nil {
 				colarr[j] = make([]*LHWell, nrows)
 			}
-			arr[i][j] = NewLHWellCopy(*welltype)
+			arr[i][j] = welltype.Dup()
 
 			crds := wutil.NumToAlpha(i+1) + ":" + strconv.Itoa(j+1)
 			wellcoords[crds] = arr[i][j]
@@ -523,7 +640,20 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit s
 }
 
 func (lhp *LHPlate) Dup() *LHPlate {
-	return NewLHPlate(lhp.Type, lhp.Mnfr, lhp.WlsY, lhp.WlsX, lhp.Height, lhp.Hunit, lhp.Welltype, lhp.WellXOffset, lhp.WellYOffset, lhp.WellXStart, lhp.WellYStart, lhp.WellZStart)
+	ret := NewLHPlate(lhp.Type, lhp.Mnfr, lhp.WlsY, lhp.WlsX, lhp.Height, lhp.Hunit, lhp.Welltype, lhp.WellXOffset, lhp.WellYOffset, lhp.WellXStart, lhp.WellYStart, lhp.WellZStart)
+
+	ret.PlateName = lhp.PlateName
+
+	for i, row := range lhp.Rows {
+		for j, well := range row {
+			d := well.Dup()
+			ret.Rows[i][j] = d
+			ret.Cols[j][i] = d
+			ret.Wellcoords[d.Crds] = d
+		}
+	}
+
+	return ret
 }
 
 // structure representing a well on a microplate - description of a destination
@@ -539,7 +669,7 @@ type LHWell struct {
 	WContents []*LHComponent
 	Rvol      float64
 	Currvol   float64
-	WShape    Shape
+	WShape    *Shape
 	Bottom    int
 	Xdim      float64
 	Ydim      float64
@@ -547,7 +677,54 @@ type LHWell struct {
 	Bottomh   float64
 	Dunit     string
 	Extra     map[string]interface{}
-	Plate     *LHPlate
+	Plate     *LHPlate `gotopb:"-" json:"-"`
+}
+
+func (w LHWell) String() string {
+	return fmt.Sprintf(
+`LHWELL{
+ID        : %s,
+Inst      : %s,
+Plateinst : %s,
+Plateid   : %s,
+Platetype : %s,
+Crds      : %s,
+Vol       : %g,
+Vunit     : %s,
+WContents : %v,
+Rvol      : %g,
+Currvol   : %g,
+WShape    : %v,
+Bottom    : %d,
+Xdim      : %g,
+Ydim      : %g,
+Zdim      : %g,
+Bottomh   : %g,
+Dunit     : %s,
+Extra     : %v,
+Plate     : %v,
+}`,
+	w.ID,
+	w.Inst,
+	w.Plateinst,
+	w.Plateid,
+	w.Platetype,
+	w.Crds,
+	w.Vol,
+	w.Vunit,
+	w.WContents,
+	w.Rvol,
+	w.Currvol,
+	w.WShape,
+	w.Bottom,
+	w.Xdim,
+	w.Ydim,
+	w.Zdim,
+	w.Bottomh,
+	w.Dunit,
+	w.Extra,
+	w.Plate,
+	)
 }
 
 func (w *LHWell) WorkingVolume() *wunit.Volume {
@@ -582,7 +759,7 @@ func (lhw *LHWell) Container() Location {
 	return lhw.Plate
 }
 
-func (lhw *LHWell) Shape() Shape {
+func (lhw *LHWell) Shape() *Shape {
 	return lhw.WShape
 }
 
@@ -592,7 +769,7 @@ func (w *LHWell) WellTypeName() string {
 }
 
 func (w *LHWell) ResidualVolume() wunit.Volume {
-	return wunit.Volume{wunit.NewMeasurement(w.Rvol, "", w.Vunit)}
+	return wunit.NewVolume(w.Rvol, w.Vunit)
 }
 
 func (w *LHWell) Coords() WellCoords {
@@ -600,7 +777,7 @@ func (w *LHWell) Coords() WellCoords {
 }
 
 func (w *LHWell) ContainerVolume() wunit.Volume {
-	return wunit.Volume{wunit.NewMeasurement(w.Vol, "", w.Vunit)}
+	return wunit.NewVolume(w.Vol, w.Vunit)
 }
 
 func (w *LHWell) Contents() []Physical {
@@ -619,10 +796,10 @@ func (w *LHWell) Add(p Physical) {
 		// do something
 	case *LHComponent:
 		w.WContents = append(w.WContents, p.(*LHComponent))
+
 		w.Currvol += p.(*LHComponent).Vol
 		p.(*LHComponent).LContainer = w
 	}
-
 }
 
 // this is pretty dodgy... we will have to be quite careful here
@@ -657,15 +834,27 @@ func (w *LHWell) Empty() bool {
 	}
 }
 
-func NewLHWellCopy(template LHWell) *LHWell {
-	//	cp := NewLHWell(template.Platetype, template.Plateid, template.Crds, template.Vol, template.Rvol, template.WShape, template.Bottom, template.Xdim, template.Ydim, template.Zdim, template.Bottomh, template.Dunit)
+func (lhw *LHWell) Dup() *LHWell {
+	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.Vol, lhw.Rvol, lhw.WShape.Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, lhw.Dunit)
 
-	return &template
+	cp.Currvol = lhw.Currvol
+
+	for k, v := range lhw.Extra {
+		cp.Extra[k] = v
+	}
+
+	for _, c := range lhw.WContents {
+		cp.WContents = append(cp.WContents, c.Dup())
+	}
+
+	return cp
 }
 
 // make a new well structure
-func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
+func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
 	var well LHWell
+
+	well.WContents = make([]*LHComponent, 0, 5)
 	well.ID = GetUUID()
 	well.Platetype = platetype
 	well.Plateid = plateid
@@ -674,7 +863,7 @@ func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape,
 	well.Rvol = rvol
 	well.Vunit = vunit
 	well.Currvol = 0.0
-	well.WShape = IntToShape(shape, wunit.NewLength(zdim, dunit), wunit.NewLength(xdim, dunit), wunit.NewLength(ydim, dunit))
+	well.WShape = shape.Dup()
 	well.Bottom = bott
 	well.Xdim = xdim
 	well.Ydim = ydim
@@ -736,6 +925,7 @@ func Get_Next_Well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 		}
 
 		vol_left := get_vol_left(new_well)
+
 		if vol < vol_left {
 			break
 		}
@@ -752,10 +942,10 @@ func get_vol_left(well *LHWell) float64 {
 
 	carry_vol := 10.0 // microlitres
 	total_carry_vol := float64(len(cnts)) * carry_vol
-	currvol := well.Currvol
+	Currvol := well.Currvol
 	rvol := well.Rvol
 	vol := well.Vol
-	return vol - (currvol + total_carry_vol + rvol)
+	return vol - (Currvol + total_carry_vol + rvol)
 }
 
 func next_well_to_try(row, col, nrows, ncols int) (int, int) {
@@ -825,6 +1015,7 @@ func Initialize_Wells(plate *LHPlate) {
 type LHTipbox struct {
 	*GenericSolid
 	ID         string
+	Boxname    string
 	Type       string
 	Mnfr       string
 	Nrows      int
@@ -845,6 +1036,7 @@ func NewLHTipbox(nrows, ncols int, height float64, manufacturer, boxtype string,
 	var tipbox LHTipbox
 	tipbox.ID = GetUUID()
 	tipbox.Type = boxtype
+	tipbox.Boxname = fmt.Sprintf("%s_%s", boxtype, tipbox.ID[1:len(tipbox.ID)-2])
 	tipbox.Mnfr = manufacturer
 	tipbox.Nrows = nrows
 	tipbox.Ncols = ncols
@@ -864,6 +1056,45 @@ func NewLHTipbox(nrows, ncols int, height float64, manufacturer, boxtype string,
 	return initialize_tips(&tipbox, tiptype)
 }
 
+func (tb LHTipbox) String() string {
+	return fmt.Sprintf(
+		`LHTipbox {
+ID        : %s,
+Boxname   : %s,
+Type      : %s,
+Mnfr      : %s,
+Nrows     : %d,
+Ncols     : %d,
+Height    : %f,
+Tiptype   : %p,
+AsWell    : %v,
+NTips     : %d,
+Tips      : %p,
+TipXOffset: %f,
+TipYOffset: %f,
+TipXStart : %f,
+TipYStart : %f,
+TipZStart : %f,
+}`,
+		tb.ID,
+		tb.Boxname,
+		tb.Type,
+		tb.Mnfr,
+		tb.Nrows,
+		tb.Ncols,
+		tb.Height,
+		tb.Tiptype,
+		tb.AsWell,
+		tb.NTips,
+		tb.Tips,
+		tb.TipXOffset,
+		tb.TipYOffset,
+		tb.TipXStart,
+		tb.TipYStart,
+		tb.TipZStart,
+	)
+}
+
 func (tb *LHTipbox) Dup() *LHTipbox {
 	return NewLHTipbox(tb.Nrows, tb.Ncols, tb.Height, tb.Mnfr, tb.Type, tb.Tiptype, tb.AsWell, tb.TipXOffset, tb.TipYOffset, tb.TipXStart, tb.TipYStart, tb.TipZStart)
 }
@@ -871,7 +1102,7 @@ func (tb *LHTipbox) Dup() *LHTipbox {
 // @implement named
 
 func (tb *LHTipbox) GetName() string {
-	return tb.Type
+	return tb.Boxname
 }
 
 // actually useful functions
@@ -883,17 +1114,21 @@ func (tb *LHTipbox) GetTips(mirror bool, multi, orient int) []string {
 	if orient == LHHChannel {
 		for j := 0; j < tb.Nrows; j++ {
 			c := 0
+			s := -1
 			for i := 0; i < tb.Ncols; i++ {
 				if tb.Tips[i][j] != nil && !tb.Tips[i][j].Dirty {
 					c += 1
+					if s == -1 {
+						s = i
+					}
 				}
 			}
 
 			if c >= multi {
 				ret = make([]string, multi)
 				for i := 0; i < multi; i++ {
-					tb.Tips[i][j] = nil
-					wc := WellCoords{j, i}
+					tb.Tips[i+s][j] = nil
+					wc := WellCoords{i + s, j}
 					ret[i] = wc.FormatA1()
 				}
 				break
@@ -903,9 +1138,13 @@ func (tb *LHTipbox) GetTips(mirror bool, multi, orient int) []string {
 	} else if orient == LHVChannel {
 		for i := 0; i < tb.Ncols; i++ {
 			c := 0
+			s := -1
 			for j := 0; j < tb.Nrows; j++ {
 				if tb.Tips[i][j] != nil && !tb.Tips[i][j].Dirty {
 					c += 1
+					if s == -1 {
+						s = j
+					}
 				}
 			}
 
@@ -913,8 +1152,8 @@ func (tb *LHTipbox) GetTips(mirror bool, multi, orient int) []string {
 				ret = make([]string, multi)
 
 				for j := 0; j < multi; j++ {
-					tb.Tips[i][j] = nil
-					wc := WellCoords{j, i}
+					tb.Tips[i][j+s] = nil
+					wc := WellCoords{i, j + s}
 					ret[j] = wc.FormatA1()
 				}
 				break
@@ -983,6 +1222,34 @@ type LHTipwaste struct {
 	WellYStart float64
 	WellZStart float64
 	AsWell     *LHWell
+}
+
+func (te LHTipwaste) String() string {
+	return fmt.Sprintf(
+		`LHTipwaste {
+	ID: %s,
+	Type: %s,
+	Mnfr: %s,
+	Capacity: %d,
+	Contents: %d,
+	Height: %f,
+	WellXStart: %f,
+	WellYStart: %f,
+	WellZStart: %f,
+	AsWell: %p,
+}
+`,
+		te.ID,
+		te.Type,
+		te.Mnfr,
+		te.Capacity,
+		te.Contents,
+		te.Height,
+		te.WellXStart,
+		te.WellYStart,
+		te.WellZStart,
+		te.AsWell, //AsWell is printed as pointer to kepp things short
+	)
 }
 
 func (tw *LHTipwaste) Dup() *LHTipwaste {

@@ -171,7 +171,7 @@ package main
 import (
     "fmt"
 	"log"
-	"github.com/nu7hatch/gouuid"
+	"github.com/twinj/uuid"
     "encoding/json"
     "strings"
     "github.com/parnurzeal/gorequest"
@@ -194,10 +194,7 @@ type Runtime_details struct {
 // Initialize Runtime_details with user-provided parameters.  Runtime ID is automatically
 // generated with uuid.
 func (r *Runtime_details) runtimeInitializeRuntime(runtime_type string , protocol string , user_id string , label string , ip string , port string){
-	uv4, err := uuid.NewV4()
-	if err != nil {
-		log.Println(err.Error())
-	}
+	uv4 := uuid.NewV4()
 	s := []string{ip, port}
     
 	r.Type = runtime_type

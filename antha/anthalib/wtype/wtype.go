@@ -18,7 +18,7 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 package wtype
 
@@ -61,13 +61,13 @@ type Entity interface {
 	// since it can be moved independently, an Entity must have a location
 	Location() Location
 	//SetLocation updates the position of this entity
-	SetLocation(newLocation Location) error
+	SetLocation(newLocation *ConcreteLocation) error
 }
 
 // solid state
 type Solid interface {
 	Physical
-	Shape() Shape
+	Shape() *Shape
 }
 
 // liquid state
@@ -85,6 +85,7 @@ type Liquid interface {
 	GetCunit() string
 	GetVunit() string
 	GetStockConcentration() float64
+	GetType() string
 }
 
 // so far the best definition of this is not-solid-or-liquid...

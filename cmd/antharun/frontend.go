@@ -18,82 +18,63 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 package main
 
 import (
 	"fmt"
-	"io"
-	"io/ioutil"
-	"log"
-	"os"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"github.com/antha-lang/antha/internal/github.com/nu7hatch/gouuid"
+	"github.com/antha-lang/antha/internal/github.com/twinj/uuid"
 	"github.com/antha-lang/antha/microArch/equipment"
 	"github.com/antha-lang/antha/microArch/equipment/manual"
 	"github.com/antha-lang/antha/microArch/equipment/manual/cli"
 	"github.com/antha-lang/antha/microArch/equipmentManager"
 	"github.com/antha-lang/antha/microArch/logger"
-	"github.com/antha-lang/antha/microArch/logger/middleware"
 )
 
 type Frontend struct {
 	equipmentManager *equipmentManager.AnthaEquipmentManager
-	logger           *logger.AnthaFileLogger
-	debugLogger      *log.Logger
-	cui              cli.CUI
+	cui              *cli.CUI
 }
 
-func NewFrontend() (*Frontend, error) {
+func NewCUIFrontend() (*Frontend, error) {
 	fe := &Frontend{}
 
-	eid, err := uuid.NewV4()
-	if err != nil {
-		return nil, err
-	}
+	eid := uuid.NewV4()
 	// TODO need to shudown equipmentmanager here on error
 	fe.equipmentManager = equipmentManager.NewAnthaEquipmentManager(eid.String())
 	fee := equipmentManager.EquipmentManager(fe.equipmentManager)
-	equipmentManager.SetEquipmentManager(&fee)
+	equipmentManager.SetEquipmentManager(fee)
 
-	mid, err := uuid.NewV4()
-	if err != nil {
-		return nil, err
-	}
-	md := manual.NewAnthaManual(mid.String())
+	mid := uuid.NewV4()
+	md := manual.NewAnthaManualCUI(mid.String())
 	mdd := equipment.Equipment(md)
-	fe.equipmentManager.RegisterEquipment(&mdd)
+	fe.equipmentManager.RegisterEquipment(mdd)
 
 	//cui logger middleware
-	fe.cui = md.Cui
-	cmw := middleware.NewLogToCui(&md.Cui)
-	logId, err := uuid.NewV4()
-	if err != nil {
+	logger.RegisterMiddleware(md.Cui)
+
+	return fe, nil
+}
+
+func NewRemoteFrontend(driverAddress string) (*Frontend, error) {
+	fe := &Frontend{}
+
+	eid := uuid.NewV4()
+	// TODO need to shudown equipmentmanager here on error
+	fe.equipmentManager = equipmentManager.NewAnthaEquipmentManager(eid.String())
+	fee := equipmentManager.EquipmentManager(fe.equipmentManager)
+	equipmentManager.SetEquipmentManager(fee)
+
+	remoteManual := manual.NewAnthaManualGrpc(uuid.NewV4().String(), driverAddress)
+	if err := remoteManual.Init(); err != nil {
 		return nil, err
 	}
 
-	fe.logger = logger.NewAnthaFileLogger(logId.String())
-	fe.logger.RegisterMiddleware(cmw)
-	var logRef logger.Logger
-	logRef = fe.logger
-	logger.SetLogger(&logRef)
-
-	var writer io.Writer
-	if len(logFile) > 0 {
-		w, err := os.OpenFile(logFile, os.O_WRONLY|os.O_CREATE, 0600)
-		if err != nil {
-			return nil, err
-		}
-		writer = w
-	} else {
-		writer = ioutil.Discard
-	}
-
-	fe.debugLogger = log.New(writer, "", log.LstdFlags)
-
-	return fe, nil
+	err := fe.equipmentManager.RegisterEquipment(remoteManual)
+	return fe, err
 }
 
 func (fe *Frontend) Shutdown() {
@@ -101,28 +82,33 @@ func (fe *Frontend) Shutdown() {
 }
 
 func (fe *Frontend) SendAlert(msg interface{}) error {
-	var mml cli.MultiLevelMessage
-	switch typedMessage := msg.(type) {
-	case *wtype.LHSolution:
-		mesc := make([]cli.MultiLevelMessage, 0)
-		for _, c := range typedMessage.Components {
-			mesc = append(mesc, *cli.NewMultiLevelMessage(fmt.Sprintf("%s, %g", c.CName, c.Conc),nil))
+	if fe.cui != nil {
+		var mml cli.MultiLevelMessage
+		switch typedMessage := msg.(type) {
+		case *wtype.LHSolution:
+			mesc := make([]cli.MultiLevelMessage, 0)
+			for _, c := range typedMessage.Components {
+				mesc = append(mesc, *cli.NewMultiLevelMessage(fmt.Sprintf("%s, %g", c.CName, c.Conc), nil))
+			}
+			mesC := *cli.NewMultiLevelMessage("Reagents", mesc)
+			mesc1 := make([]cli.MultiLevelMessage, 0)
+			mesc1 = append(mesc1, mesC)
+			mml = *cli.NewMultiLevelMessage(fmt.Sprintf("%s @ %s", typedMessage.SName, typedMessage.Welladdress), mesc1)
+		default:
+			mml = *cli.NewMultiLevelMessage(fmt.Sprintf("%v", typedMessage), nil)
 		}
-		mesC := *cli.NewMultiLevelMessage("Reagents", mesc)
-		mesc1 := make([]cli.MultiLevelMessage, 0)
-		mesc1 = append(mesc1, mesC)
-		mml = *cli.NewMultiLevelMessage(fmt.Sprintf("%s @ %s", typedMessage.SName, typedMessage.Welladdress), mesc1)
-	default:
-		mml = *cli.NewMultiLevelMessage(fmt.Sprintf("%v", typedMessage), nil)
-	}
-	mesC := make([]cli.MultiLevelMessage, 0)
-	mesC = append(mesC, mml)
-	req := cli.NewCUICommandRequest("Alert", *cli.NewMultiLevelMessage(
-		"Output",
-		mesC,
-	))
+		mesC := make([]cli.MultiLevelMessage, 0)
+		mesC = append(mesC, mml)
+		req := cli.NewCUICommandRequest("Alert", *cli.NewMultiLevelMessage(
+			"Output",
+			mesC,
+		))
 
-	fe.cui.CmdIn <- *req
-	res := <-fe.cui.CmdOut
-	return res.Error
+		fe.cui.CmdIn <- *req
+		res := <-fe.cui.CmdOut
+		return res.Error
+	} else {
+		fmt.Println(msg)
+	}
+	return nil
 }

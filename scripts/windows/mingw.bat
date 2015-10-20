@@ -5,18 +5,19 @@ if not exist "%TEMP%\7z920-x64.msi" (
 msiexec /qb /i "%TEMP%\7z920-x64.msi"
 
 pushd "%TEMP%"
-rem Make sure the '%' nd '&' in URL are escaped when copy-and-pasting in
+rem Make sure the '%' in URL are escaped when copy-and-pasting in
 if not exist "%TEMP%\mingw.7z" (
-  rem Use curl because it can follow redirects
-  "%PROGRAMFILES(X86)%\Git\bin\curl.exe" -L "http://downloads.sourceforge.net/project/mingw-w64/Toolchains%%20targetting%%20Win64/Personal%%20Builds/mingw-builds/5.1.0/threads-posix/seh/x86_64-5.1.0-release-posix-seh-rt_v4-rev0.7z?r=http%%3A%%2F%%2Fsourceforge.net%%2Fprojects%%2Fmingw-w64%%2Ffiles%%2FToolchains%%2520targetting%%2520Win64%%2FPersonal%%2520Builds%%2Fmingw-builds%%2F5.1.0%%2Fthreads-posix%%2Fseh%%2F" -o mingw.7z
+  powershell -Command "(New-Object System.Net.WebClient).DownloadFile('http://cznic.dl.sourceforge.net/project/mingw-w64/Toolchains%%20targetting%%20Win64/Personal%%20Builds/mingw-builds/5.1.0/threads-posix/seh/x86_64-5.1.0-release-posix-seh-rt_v4-rev0.7z', 'mingw.7z')" <NUL
 )
-"%PROGRAMFILES%\7-Zip\7z.exe" x mingw.7z -oC:\
-rename C:\mingw64 MinGW
-rem del mingw.7z
+cmd /c ""%PROGRAMFILES%\7-Zip\7z.exe" x mingw.7z"
+mkdir "C:\MinGW"
+xcopy /Y /E mingw64 "C:\MinGW"
+rmdir /s /q mingw64
+del mingw.7z
 popd
 
-rem msiexec /qb /x "%TEMP%\7z920-x64.msi"
+msiexec /qb /x "%TEMP%\7z920-x64.msi"
 
-powershell -Command "$p = [Environment]::SetEnvironmentVariable('C_INCLUDE_PATH', 'C:\MinGW\include', 'Machine');"
-powershell -Command "$p = [Environment]::SetEnvironmentVariable('LIBRARY_PATH', 'C:\MinGW\lib', 'Machine');"
-powershell -Command "$p = [Environment]::GetEnvironmentVariable('PATH', 'Machine'); [Environment]::SetEnvironmentVariable('PATH', \"$p;C:\MinGW\bin\", 'Machine');"
+%SystemRoot%\System32\setx.exe C_INCLUDE_PATH C:\MinGW\include /M
+%SystemRoot%\System32\setx.exe LIBRARY_PATH C:\MinGW\lib /M
+%SystemRoot%\System32\setx.exe PATH "%PATH%;C:\MinGW\bin" /M

@@ -18,14 +18,17 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 package wunit
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
+
+	"github.com/antha-lang/antha/microArch/logger"
 )
 
 // units mapped by string
@@ -54,11 +57,12 @@ func GetUnitLib(fn string) (*(map[string]GenericUnit), error) {
 	e2 := json.Unmarshal(f, &units)
 
 	if e2 != nil {
+		logger.Fatal(e2.Error())
 		panic(e2)
 	}
 
 	for k, v := range units {
-		fmt.Println(k, " ", v)
+		logger.Debug(fmt.Sprintln(k, " ", v))
 	}
 
 	return &units, err
@@ -90,7 +94,9 @@ func ParsePrefixedUnit(unit string) *GenericPrefixedUnit {
 	parser.SIPrefixedUnit.Init([]byte(unit))
 
 	if err := parser.Parse(); err != nil {
-		panic(err)
+		e := errors.New(fmt.Sprintf("cannot parse %s: %s", unit, err.Error()))
+		logger.Fatal(e.Error())
+		panic(e)
 	}
 
 	parser.Execute()
@@ -118,11 +124,11 @@ func UnitBySymbol(sym string) GenericUnit {
 
 // generate an initial unit library
 func Make_units() map[string]GenericUnit {
-	units := []string{"M", "m", "l", "L", "g", "V", "J", "A", "N", "s", "radians", "degrees", "rads", "Hz", "rpm", "˚C", "M/l", "g/l", "J/kg"}
-	unitnames := []string{"mole", "minute", "litre", "litre", "Gramme", "Volt", "Joule", "Ampere", "Newton", "second", "radian", "degree", "radian", "Herz", "revolutions per minute", "Celsius", "Mol/litre", "g/litre", "Joule/kilogram"}
+	units := []string{"M", "m", "l", "L", "g", "V", "J", "A", "N", "s", "radians", "degrees", "rads", "Hz", "rpm", "˚C", "M/l", "g/l", "J/kg", "Pa"}
+	unitnames := []string{"mole", "minute", "litre", "litre", "Gramme", "Volt", "Joule", "Ampere", "Newton", "second", "radian", "degree", "radian", "Herz", "revolutions per minute", "Celsius", "Mol/litre", "g/litre", "Joule/kilogram", "Pascal"}
 	//unitdimensions:=[]string{"amount", "time", "length^3", "length^3", "mass", "mass*length/time^2*charge", "mass*length^2/time^2", "charge/time", "charge", "mass*length/time^2", "time", "angle", "angle", "angle", "time^-1", "angle/time", "temperature"}
 
-	unitbaseconvs := []float64{1, 0.1666666666666666667, 1, 1, 0.001, 1, 1, 1, 1, 1, 1, 0.01745329251994, 1, 1, 1, 1, 1, 1, 1}
+	unitbaseconvs := []float64{1, 0.1666666666666666667, 1, 1, 0.001, 1, 1, 1, 1, 1, 1, 0.01745329251994, 1, 1, 1, 1, 1, 1, 1, 1}
 
 	unit_map := make(map[string]GenericUnit, len(units))
 

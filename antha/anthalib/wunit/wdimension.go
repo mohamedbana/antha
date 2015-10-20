@@ -18,11 +18,15 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 package wunit
 
-import ()
+import (
+	"strings"
+
+	"github.com/antha-lang/antha/microArch/logger"
+)
 
 // length
 type Length struct {
@@ -40,6 +44,7 @@ func NewLength(v float64, unit string) Length {
 	// check
 
 	if l.Unit().RawSymbol() != "m" {
+		logger.Fatal("Base unit for lengths must be meters")
 		panic("Base unit for lengths must be meters")
 	}
 
@@ -54,6 +59,7 @@ type Area struct {
 // make an area unit
 func NewArea(v float64, unit string) Area {
 	if unit != "m^2" {
+		logger.Fatal("Can't make areas which aren't square metres")
 		panic("Can't make areas which aren't square metres")
 	}
 
@@ -68,6 +74,10 @@ type Volume struct {
 
 // make a volume
 func NewVolume(v float64, unit string) Volume {
+	if len(strings.TrimSpace(unit)) == 0 {
+		logger.Fatal("Can't make Volumes without unit")
+		panic("Can't make Volumes without unit")
+	}
 	o := Volume{NewPMeasurement(v, unit)}
 	return o
 }
@@ -85,6 +95,7 @@ type Temperature struct {
 // make a temperature
 func NewTemperature(v float64, unit string) Temperature {
 	if unit != "˚C" && unit != "C" {
+		logger.Fatal("Can't make temperatures which aren't in degrees C")
 		panic("Can't make temperatures which aren't in degrees C")
 	}
 	t := Temperature{NewMeasurement(v, "", unit)}
@@ -99,6 +110,7 @@ type Time struct {
 // make a time unit
 func NewTime(v float64, unit string) Time {
 	if unit != "s" {
+		logger.Fatal("Can't make temperatures which aren't in seconds")
 		panic("Can't make temperatures which aren't in seconds")
 	}
 
@@ -146,6 +158,7 @@ type Amount struct {
 // generate a new Amount in moles
 func NewAmount(v float64, unit string) Amount {
 	if unit != "M" {
+		logger.Fatal("Can't make amounts which aren't in moles")
 		panic("Can't make amounts which aren't in moles")
 	}
 
@@ -166,6 +179,7 @@ type Angle struct {
 // generate a new angle unit
 func NewAngle(v float64, unit string) Angle {
 	if unit != "radians" {
+		logger.Fatal("Can't make angles which aren't in radians")
 		panic("Can't make angles which aren't in radians")
 	}
 
@@ -181,6 +195,7 @@ type Energy struct {
 // make a new energy unit
 func NewEnergy(v float64, unit string) Energy {
 	if unit != "J" {
+		logger.Fatal("Can't make energies which aren't in Joules")
 		panic("Can't make energies which aren't in Joules")
 	}
 
@@ -201,6 +216,7 @@ type Force struct {
 // a new force in Newtons
 func NewForce(v float64, unit string) Force {
 	if unit != "N" {
+		logger.Fatal("Can't make forces which aren't in Newtons")
 		panic("Can't make forces which aren't in Newtons")
 	}
 
@@ -216,6 +232,7 @@ type Pressure struct {
 // make a new pressure in Pascals
 func NewPressure(v float64, unit string) Pressure {
 	if unit != "Pa" {
+		logger.Fatal("Can't make pressures which aren't in Pascals")
 		panic("Can't make pressures which aren't in Pascals")
 	}
 
@@ -233,6 +250,7 @@ type Concentration struct {
 func NewConcentration(v float64, unit string) Concentration {
 	if unit != "g/l" && unit != "M/l" {
 		// this should never be seen by users
+		logger.Fatal("Can't make concentrations which aren't either Mol/l or g/l")
 		panic("Can't make concentrations which aren't either Mol/l or g/l")
 	}
 
@@ -240,6 +258,120 @@ func NewConcentration(v float64, unit string) Concentration {
 	return c
 }
 
+/*
+type Molecule interface {
+	MolecularWeight() wtype.Mass
+}
+/*
+type Protein interface {
+	Molecule
+	AASequence() string
+}
+
+type Enzyme struct {
+	Class    string
+	Synonyms []string
+}
+*/
+/*
+func (p *Molecule) MolecularWeight() wtype.Mass {
+
+}
+
+func (d *DNA) MolecularWeight() wtype.Mass {
+
+}
+
+func (e *Enzyme) AASequence() string {
+
+}
+*/
+
+/* Sid's stuff
+
+type Conc interface {
+	AsMolar(mass Mass) MolarConcentration
+	AsMass(mass Mass) MassConcentration
+}
+
+type MolarConcentration struct {
+	Moles Amount
+	Vol   Volume
+}
+
+func (m MolarConcentration) AsMolar(actualmass Mass) MolarConcentration {
+	return m
+}
+
+// "M" and "g" need to be prefixed units to work!
+func (m MolarConcentration) AsMass(mass Mass) MassConcentration {
+	return MassConcentration{NewMass(m.Moles.ConvertTo(ParsePrefixedUnit("M"))*mass.ConvertTo(ParsePrefixedUnit("g")), "g"), m.Vol}
+}
+
+type MassConcentration struct {
+	Mass Mass
+	Vol  Volume
+}
+
+func (m MassConcentration) AsMolar(mass Mass) MolarConcentration {
+	return MolarConcentration{NewAmount(m.Mass.SIValue()/mass.SIValue(), "M"), m.Vol}
+}
+
+func (m MassConcentration) AsMass(mass Mass) MassConcentration {
+	return m
+}
+*/
+/*
+func ConcinGperL(conc Concentration, molecularweight float64) (conc_g Concentration) {
+	if conc.BaseSISymbol()="g/l"{
+		conc_g = conc
+		}
+	if conc.BaseSISymbol()="M/l"{
+		conc_g = NewConcentration((conc.SIValue()*molecularweight),"M/l")
+		}
+	return conc_g
+}
+
+func ConcinMperL(conc Concentration, molecularweight float64) (conc_M Concentration) {
+	if conc.BaseSISymbol()="g/l"{
+		conc_M = NewConcentration((conc.SIValue()/molecularweight),"g/l")
+		}
+	if conc.BaseSISymbol()="M/l"{
+		conc_M = conc
+		}
+	return conc_M
+}
+*/
+/*
+type Conc interface {
+	AsMolar(gperl Concentration) MoleculeConcentration
+	AsMass(Mperl float64) MoleculeConcentration
+}
+
+type MoleculeConcentration struct {
+	Conc_gperl      Concentration
+	Molecularweight float64 // Really a g/mol
+	//Vol   Volume
+}
+
+const Avogadro = 6.0221417930 * 1E23 // number of molecules in a mol
+
+func (m MoleculeConcentration) AsMolar(gperl Concentration) MoleculeConcentration {
+	return m
+}
+
+func (m MoleculeConcentration) AsMass(mperl Concentration) MoleculeConcentration {
+	return MoleculeConcentration{NewMass(m.Moles.ConvertTo("M")*mass.ConvertTo("g"), "g"), m.Vol}
+}
+
+func (m MassConcentration) AsMolar(mass Mass) MolarConcentration {
+	return MolarConcentration{NewAmount(m.Mass.SIValue()/mass.SIValue(), "M"), m.Vol}
+}
+
+func (m MassConcentration) AsMass(mass Mass) MassConcentration {
+	return m
+}
+*/
 // a structure which defines a specific heat capacity
 type SpecificHeatCapacity struct {
 	ConcreteMeasurement
@@ -248,6 +380,7 @@ type SpecificHeatCapacity struct {
 // make a new specific heat capacity structure in SI units
 func NewSpecificHeatCapacity(v float64, unit string) SpecificHeatCapacity {
 	if unit != "J/kg" {
+		logger.Fatal("Can't make specific heat capacities which aren't in J/kg")
 		panic("Can't make specific heat capacities which aren't in J/kg")
 	}
 
@@ -263,6 +396,7 @@ type Density struct {
 // make a new density structure in SI units
 func NewDensity(v float64, unit string) Density {
 	if unit != "kg/m^3" {
+		logger.Fatal("Can't make densities which aren't in kg/m^3")
 		panic("Can't make densities which aren't in kg/m^3")
 	}
 
@@ -278,6 +412,7 @@ type FlowRate struct {
 
 func NewFlowRate(v float64, unit string) FlowRate {
 	if unit != "ml/min" {
+		logger.Fatal("Can't make densities which aren't in ml/min")
 		panic("Can't make densities which aren't in ml/min")
 	}
 	fr := FlowRate{NewMeasurement(v, "", unit)}

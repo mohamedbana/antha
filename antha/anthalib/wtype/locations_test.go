@@ -1,30 +1,30 @@
 // /anthalib/wtype/locations_test.go: Part of the Antha language
 // Copyright (C) 2015 The Antha authors. All rights reserved.
-// 
+//
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-// 
+//
 // For more information relating to the software or licensing issues please
-// contact license@antha-lang.org or write to the Antha team c/o 
+// contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 package wtype
 
 import (
-	"testing"
 	"errors"
+	"testing"
 )
 
 func TestSameLocation(t *testing.T) {
@@ -32,20 +32,20 @@ func TestSameLocation(t *testing.T) {
 	testSuite := make([][]Location, 3)
 	testLevel := make([]int, 3)
 
-	testSuite[0] = make([]Location,2)
-	testSuite[0][0] = NewLocation("origin", 1, NewShape("Device"))
+	testSuite[0] = make([]Location, 2)
+	testSuite[0][0] = NewLocation("origin", 1, NewShape("Device", "", 0, 0, 0))
 	testSuite[0][1] = testSuite[0][0]
 	testResult[0] = true
 	testLevel[0] = 0
 
-	testSuite[1] = make([]Location,2)
-	testSuite[1][0] = NewLocation("origin", 1, NewShape("Device"))
-	testSuite[1][1] = NewLocation("origin", 1, NewShape("Device"))
+	testSuite[1] = make([]Location, 2)
+	testSuite[1][0] = NewLocation("origin", 1, NewShape("Device", "", 0, 0, 0))
+	testSuite[1][1] = NewLocation("origin", 1, NewShape("Device", "", 0, 0, 0))
 	testResult[1] = false
 	testLevel[1] = 0
 
-	testSuite[2] = make([]Location,2)
-	testSuite[2][0] = NewLocation("origin", 1, NewShape("Device"))
+	testSuite[2] = make([]Location, 2)
+	testSuite[2][0] = NewLocation("origin", 1, NewShape("Device", "", 0, 0, 0))
 	testSuite[2][1] = testSuite[2][0].Positions()[0]
 	testResult[2] = true
 	testLevel[2] = 1

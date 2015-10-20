@@ -18,7 +18,7 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 package main
 
@@ -385,7 +385,7 @@ func getImportPath(dir string) (string, error) {
 }
 
 // parse parses src, which was read from filename,
-// as a Antha source file or statement list.
+// as an Antha source file or statement list.
 func parse(fset *token.FileSet, filename string, src []byte, stdin bool) (*ast.File, func(orig, src []byte) []byte, error) {
 	// Try as whole source file.
 	file, err := parser.ParseFile(fset, filename, src, parserMode)

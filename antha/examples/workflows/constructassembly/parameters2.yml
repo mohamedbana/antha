@@ -1,0 +1,82 @@
+{
+    "Parameters": [
+        {
+            "ConstructAssembly":{
+                "Parts": [
+                    "component:dna_part",
+                    "component:dna_part",
+                    "component:dna_part"
+                ],
+                "ReactionVolume": "20ul",
+                "PartVols": [
+                    "3ul",
+                    "3ul",
+                    "3ul"
+                ],
+                "PartNames" : [
+                    "dna1",
+                    "dna2",
+                    "dna3"
+                ],
+                "Water": "component:water",
+                "Vector": "component:standard_cloning_vector_mark_1",
+                "VectorVol": "3ul",
+                "Buffer": "component:CutsmartBuffer",
+                "BufferVol": "2ul",
+                "Ligase": "component:T4Ligase",
+                "LigVol": "1ul",
+                "Atp": "component:ATP",
+                "AtpVol": "1ul",
+                "RestrictionEnzyme": "component:SapI",
+                "ReVol": "1ul",
+                "OutPlate": "plate:pcrplate_with_cooler",
+                "InPlate": "plate:pcrplate_with_cooler",
+                "TipType": "tipbox:Gilson20",
+                "ReactionTemp": "25C",
+                "ReactionTime": "1800s",
+                "InactivationTemp": "40C",
+                "InactivationTime": "60s"
+            }
+        },{
+            "ConstructAssembly":{
+                "Parts": [
+                    "component:dna_part",
+                    "component:dna_part",
+                    "component:dna_part"
+                ],
+                "ReactionVolume": "20ul",
+                "PartVols": [
+                    "3ul",
+                    "3ul",
+                    "3ul"
+                ],
+                "PartNames" : [
+                    "dna4",
+                    "dna5",
+                    "dna6"
+                ],
+                "Water": "component:water",
+                "Vector": "component:standard_cloning_vector_mark_1",
+                "VectorVol": "3ul",
+                "Buffer": "component:CutsmartBuffer",
+                "BufferVol": "2ul",
+                "Ligase": "component:T4Ligase",
+                "LigVol": "1ul",
+                "Atp": "component:ATP",
+                "AtpVol": "1ul",
+                "RestrictionEnzyme": "component:SapI",
+                "ReVol": "1ul",
+                "OutPlate": "plate:pcrplate_with_cooler",
+                "InPlate": "plate:pcrplate_with_cooler",
+                "TipType": "tipbox:Gilson20",
+                "ReactionTemp": "25C",
+                "ReactionTime": "1800s",
+                "InactivationTemp": "40C",
+                "InactivationTime": "60s"
+            }
+        }
+    ],
+    "Config": {
+        "OUTPUT_COUNT": 2
+    }
+}

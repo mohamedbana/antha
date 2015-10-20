@@ -1,0 +1,16 @@
+{
+  "Parameters": [{
+    "Thawtime": {
+      "Platetype": "PCR_plate",
+      "Liquid": "water",
+      "Airvelocity": 20,
+      "SurfaceTemp": "25˚C",
+      "BulkTemp": "0˚C",
+      "Fillvolume": "200ul",
+      "Fudgefactor": 2
+    }
+  }],
+    "Config": {
+        "OUTPUT_COUNT": 1
+    }
+}

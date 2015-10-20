@@ -18,7 +18,7 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 package wtype
 
@@ -29,20 +29,20 @@ import (
 // GenericPhysical structure: holds data items required to define a physical object
 type GenericPhysical struct {
 	GenericMatter
-	name string
-	mass wunit.Mass
-	vol  wunit.Volume
-	temp wunit.Temperature
+	Myname string
+	Mymass wunit.Mass
+	Myvol  wunit.Volume
+	Mytemp wunit.Temperature
 }
 
 func (gp *GenericPhysical) Name() string {
-	return gp.name
+	return gp.Myname
 }
 
 func (gp *GenericPhysical) SetName(s string) string {
-	oldname := gp.name
-	gp.name = s
-	return oldname
+	oldMyname := gp.Myname
+	gp.Myname = s
+	return oldMyname
 }
 
 func NewGenericPhysical(mattertype string) GenericPhysical {
@@ -51,26 +51,26 @@ func NewGenericPhysical(mattertype string) GenericPhysical {
 }
 
 func (gp *GenericPhysical) Clone() GenericPhysical {
-	return GenericPhysical{gp.GenericMatter.Clone(), gp.Name(), gp.mass, gp.vol, gp.temp}
+	return GenericPhysical{gp.GenericMatter.Clone(), gp.Name(), gp.Mymass, gp.Myvol, gp.Mytemp}
 }
 
 func (gp *GenericPhysical) Mass() wunit.Mass {
-	return gp.mass
+	return gp.Mymass
 }
 
 func (gp *GenericPhysical) SetMass(m wunit.Mass) wunit.Mass {
-	om := gp.mass
-	gp.mass = m
+	om := gp.Mymass
+	gp.Mymass = m
 	return om
 }
 
 func (gp *GenericPhysical) Volume() wunit.Volume {
-	return gp.vol
+	return gp.Myvol
 }
 
 func (gp *GenericPhysical) SetVolume(v wunit.Volume) wunit.Volume {
-	ov := gp.vol
-	gp.vol = v
+	ov := gp.Myvol
+	gp.Myvol = v
 	return ov
 }
 
@@ -85,11 +85,11 @@ func (gp *GenericPhysical)SetLocation(c coordinates){
 */
 
 func (gp *GenericPhysical) Temperature() wunit.Temperature {
-	return gp.temp
+	return gp.Mytemp
 }
 
 func (gp *GenericPhysical) SetTemperature(t wunit.Temperature) {
-	gp.temp = t
+	gp.Mytemp = t
 }
 
 func (gp *GenericPhysical) Density() wunit.Density {

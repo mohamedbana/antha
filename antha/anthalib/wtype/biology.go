@@ -18,7 +18,7 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 package wtype
 
@@ -39,9 +39,16 @@ type Enzyme struct {
 
 type LogicalRestrictionEnzyme struct {
 	// other fields required but for now the main things are...
-	RecognitionSequence string
-	CutDist             int
-	EndLength           int
+	RecognitionSequence               string
+	EndLength                         int
+	Name                              string
+	Prototype                         string
+	Topstrand3primedistancefromend    int
+	Bottomstrand5primedistancefromend int
+	MethylationSite                   string   //"attr, <4>"
+	CommercialSource                  []string //string "attr, <5>"
+	References                        []int
+	Class                             string
 }
 
 // structure which defines an organism. These need specific handling
@@ -76,8 +83,41 @@ type DNA struct {
 
 // DNAsequence is a type of Biosequence
 type DNASequence struct {
-	Nm  string
-	Seq string
+	Nm             string
+	Seq            string
+	Plasmid        bool
+	Singlestranded bool
+	Overhang5prime Overhang
+	Overhang3prime Overhang
+	Methylation    string // add histones etc?
+}
+
+const (
+	FALSE     = 0
+	BLUNT     = 1
+	OVERHANG  = 2
+	UNDERHANG = -1
+)
+
+const (
+	TOP    = 1
+	BOTTOM = 2
+)
+
+/*
+const (
+	5PRIME = 5
+	3PRIME = 3
+	NA = 0
+)
+*/
+type Overhang struct {
+	//Strand          int // i.e. 1 or 2 (top or bottom
+	End             int // i.e. 5 or 3 or 0
+	Type            int //as contants above
+	Length          int
+	Sequence        string
+	Phosphorylation bool
 }
 
 func (dna *DNASequence) Sequence() string {
@@ -172,7 +212,7 @@ func makeABunchaRandomSeqs(n_seq_sets, seqs_per_set, min_len, len_var int) [][]D
 	for i := 0; i < n_seq_sets; i++ {
 		seqs[i] = make([]DNASequence, seqs_per_set)
 		for j := 0; j < seqs_per_set; j++ {
-			seqs[i][j] = DNASequence{fmt.Sprintf("SEQ%04d", i*seqs_per_set+j+1), random_dna_seq(rand.Intn(len_var) + min_len)}
+			seqs[i][j] = DNASequence{fmt.Sprintf("SEQ%04d", i*seqs_per_set+j+1), random_dna_seq(rand.Intn(len_var) + min_len), false, false, Overhang{0, 0, 0, "", false}, Overhang{0, 0, 0, "", false}, ""}
 		}
 	}
 	return seqs

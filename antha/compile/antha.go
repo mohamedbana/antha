@@ -18,7 +18,7 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 // This file implements the generation of go code from the
 // antha blocks. It is primarily used in nodes.go and compile.go
@@ -40,28 +40,31 @@ import (
 
 // Augmentation to compiler state to parse Antha files
 type antha struct {
-	pkgName      string
-	params       []*ast.ValueSpec
-	results      []*ast.ValueSpec
-	paramTypes   map[string]string               // map used to associate params with types
-	paramMap     map[string]string               // map used to sugar antha variables
-	resultMap    map[string]string               // map used to sugar antha variables
-	reuseMap     map[token.Token]map[string]bool // map use of data through execution phases
-	intrinsicMap map[string]string               // replacements for identifiers in expressions in functions
-	typeMap      map[string]string               // replacement for type names in type expressions and type and type lists
+	pkgName     string
+	params      []string                        // canonical order of params to ensure deterministic output
+	paramTypes  map[string]string               // map from params to type names
+	results     []string                        // canonical order of results to ensure deterministic output
+	resultTypes map[string]string               // map from results to type names
+	configTypes map[string]string               // map from params to config type names
+	reuseMap    map[token.Token]map[string]bool // map use of data through execution phases
+	intrinsics  map[string]string               // replacements for identifiers in expressions in functions
+	types       map[string]string               // replacement for type names in type expressions and type and type lists
 }
 
 func (p *compiler) anthaInit() {
-	p.paramMap = make(map[string]string)
-	p.resultMap = make(map[string]string)
 	p.paramTypes = make(map[string]string)
+	p.resultTypes = make(map[string]string)
+	p.configTypes = make(map[string]string)
 	p.reuseMap = make(map[token.Token]map[string]bool)
-	p.intrinsicMap = map[string]string{
+	for _, tok := range []token.Token{token.ANALYSIS, token.VALIDATION, token.STEPS, token.SETUP, token.REQUIREMENTS} {
+		p.reuseMap[tok] = make(map[string]bool)
+	}
+	p.intrinsics = map[string]string{
 		"MixInto":  "_wrapper.MixInto",
 		"Mix":      "_wrapper.Mix",
 		"Incubate": "_wrapper.Incubate",
 	}
-	p.typeMap = map[string]string{
+	p.types = map[string]string{
 		"Temperature":       "wunit.Temperature",
 		"Time":              "wunit.Time",
 		"Length":            "wunit.Length",
@@ -133,27 +136,8 @@ func (p *compiler) addAnthaImports(file *ast.File, paths []string) {
 	//ast.SortImports(token.NewFileSet(), file)
 }
 
-// generate all the On... message handlers for the element
-func (p *compiler) genHandlers() {
-	var b bytes.Buffer
-
-	numParams := len(p.paramMap)
-
-	// Sort
-	sortedParams := make([]string, len(p.paramMap))
-	i := 0
-	for k, _ := range p.paramMap {
-		sortedParams[i] = k
-		i += 1
-	}
-	sort.Strings(sortedParams)
-	for _, param := range sortedParams {
-		p.genOnFunction(param, numParams, b)
-	}
-}
-
 // Generate message handler for parameter
-func (p *compiler) genOnFunction(name string, paramCount int, b bytes.Buffer) {
+func (p *compiler) genOnFunction(name string, paramCount int) {
 	type anthaParam struct {
 		PkgName    string
 		ParamName  string
@@ -183,15 +167,17 @@ func (p *compiler) genOnFunction(name string, paramCount int, b bytes.Buffer) {
 	funcVals.ParamCount = paramCount
 
 	t := template.Must(template.New("On" + name).Parse(tpl))
+
+	var b bytes.Buffer
 	t.Execute(&b, funcVals)
 	p.print(b, newline)
 }
 
-// Return appropriate go type for an antha (type) expr
+// Return appropriate go type string for an antha (type) expr
 func (p *compiler) getTypeString(e ast.Expr) (res string) {
 	switch t := e.(type) {
 	case *ast.Ident:
-		if v, ok := p.typeMap[t.Name]; ok {
+		if v, ok := p.types[t.Name]; ok {
 			res = v
 		} else {
 			res = t.Name
@@ -200,7 +186,8 @@ func (p *compiler) getTypeString(e ast.Expr) (res string) {
 	case *ast.SelectorExpr:
 		res = p.getTypeString(t.X) + "." + t.Sel.Name
 		return
-	case *ast.ArrayType: // note: array types can use a param as the length, so must be allocated and treated as a slice since they can be dynamic
+	case *ast.ArrayType:
+		// note: array types can use a param as the length, so must be allocated and treated as a slice since they can be dynamic
 		res = "[]" + p.getTypeString(t.Elt)
 		return
 	case *ast.StarExpr:
@@ -216,7 +203,7 @@ func (p *compiler) getTypeString(e ast.Expr) (res string) {
 func (p *compiler) getConfigTypeString(e ast.Expr) (res string) {
 	switch t := e.(type) {
 	case *ast.Ident:
-		if v, ok := p.typeMap[t.Name]; ok {
+		if v, ok := p.types[t.Name]; ok {
 			res = v
 		} else {
 			res = t.Name
@@ -242,9 +229,9 @@ func (p *compiler) removeParamDecls(src *ast.File) {
 	var newd []ast.Decl
 	for _, decl := range src.Decls {
 		toadd := true
-		switch decl.(type) {
+		switch decl := decl.(type) {
 		case *ast.GenDecl:
-			switch decl.(*ast.GenDecl).Tok {
+			switch decl.Tok {
 			case token.PARAMETERS, token.DATA, token.INPUTS, token.OUTPUTS:
 				toadd = false
 			}
@@ -260,7 +247,7 @@ func (p *compiler) removeParamDecls(src *ast.File) {
 func (p *compiler) transform(src *ast.File) {
 	p.addAnthaImports(src,
 		[]string{
-			"github.com/antha-lang/antha/antha/anthalib/execution",
+			"github.com/antha-lang/antha/microArch/execution",
 			"github.com/antha-lang/antha/antha/anthalib/wunit",
 			"github.com/antha-lang/antha/antha/execute",
 			"github.com/antha-lang/antha/flow",
@@ -276,75 +263,86 @@ func (p *compiler) transform(src *ast.File) {
 // Print out additional go code for each antha file
 func (p *compiler) generate() {
 	p.genBoilerplate()
-	p.genHandlers()
+
+	for _, param := range p.params {
+		p.genOnFunction(param, len(p.params))
+	}
+
 	p.genStructs()
 	p.genComponentInfo()
 }
 
+func sortKeys(m map[string]string) []string {
+	sorted := make([]string, len(m))
+	i := 0
+	for k, _ := range m {
+		sorted[i] = k
+		i += 1
+	}
+	sort.Strings(sorted)
+	return sorted
+}
+
 // Collect information needed in downstream generation passes
 func (p *compiler) analyze(src *ast.File) {
-	p.indexParams(src.Decls)
+	p.recordParams(src.Decls)
+	p.recordOutputUse(src.Decls)
 	p.pkgName = strings.Title(src.Name.Name)
+
+	p.params = sortKeys(p.paramTypes)
+	p.results = sortKeys(p.resultTypes)
 }
 
 // index all the spec definitions for inputs and outputs to element
-func (p *compiler) indexParams(d []ast.Decl) {
-	for i := range d {
-		switch decl := d[i].(type) {
+func (p *compiler) recordParams(decls []ast.Decl) {
+	for _, decl := range decls {
+		switch decl := decl.(type) {
 		case *ast.GenDecl:
 			switch decl.Tok {
 			case token.PARAMETERS, token.INPUTS:
-				for j := range decl.Specs {
-					tmp := decl.Specs[j].(*ast.ValueSpec)
-					p.params = append(p.params, tmp)
-					for k := range tmp.Names {
-						//param := strings.Title(tmp.Names[k].String()) //TODO check input data cannot be lowercase
-						param := tmp.Names[k].String()
-						p.paramTypes[param] = p.getTypeString(tmp.Type)
-						p.paramMap[param] = "p." + param
+				for _, spec := range decl.Specs {
+					spec := spec.(*ast.ValueSpec)
+					for _, name := range spec.Names {
+						//TODO check input data cannot be lowercase
+						param := name.String()
+						p.paramTypes[param] = p.getTypeString(spec.Type)
+						p.configTypes[param] = p.getConfigTypeString(spec.Type)
 					}
 				}
 			case token.OUTPUTS, token.DATA:
-				for j := range decl.Specs {
-					tmp := decl.Specs[j].(*ast.ValueSpec)
-					p.results = append(p.results, tmp)
-					for k := range tmp.Names {
-						if string(tmp.Names[k].String()[0]) == strings.ToUpper(string(tmp.Names[k].String()[0])) {
-							result := tmp.Names[k].String()
-							p.paramTypes[result] = p.getTypeString(tmp.Type)
-							p.resultMap[result] = "r." + result //assign to resultblock, later staged
-						} else { //lowercase, assign to resultblock
-							result := tmp.Names[k].String()
-							p.paramTypes[result] = p.getTypeString(tmp.Type)
-							p.resultMap[result] = "r." + result
-						}
+				for _, spec := range decl.Specs {
+					spec := spec.(*ast.ValueSpec)
+					for _, name := range spec.Names {
+						param := name.String()
+						p.resultTypes[param] = p.getTypeString(spec.Type)
 					}
 				}
 			}
+		}
+	}
+}
+
+// Track use of output parameters in antha blocks
+func (p *compiler) recordOutputUse(decls []ast.Decl) {
+	for _, decl := range decls {
+		switch decl := decl.(type) {
 		case *ast.AnthaDecl:
-			var ref ast.AnthaDecl
-			ref = *decl
-			tok := ref.Tok
-			ast.Inspect(ref.Body, func(n ast.Node) bool {
-				switch n.(type) {
+			tok := decl.Tok
+			ast.Inspect(decl.Body, func(n ast.Node) bool {
+				switch n := n.(type) {
 				case *ast.Ident:
-					if _, is := p.resultMap[n.(*ast.Ident).Name]; is {
-						varName := n.(*ast.Ident).Name
-						if _, ok := p.reuseMap[tok]; !ok {
-							p.reuseMap[tok] = make(map[string]bool)
-						}
+					if _, is := p.resultTypes[n.Name]; is {
+						varName := n.Name
 						p.reuseMap[tok][varName] = true
 					}
 				}
 				return true
 			})
-		default:
-			continue
 		}
 	}
 }
 
-// function to generate boilerplate antha element code
+// function to generate boilerplate antha element code //TODO insert blockID
 func (p *compiler) genBoilerplate() {
 	var boilerPlateTemplate = `// AsyncBag functions
 func (e *{{.PkgName}}) Complete(params interface{}) {
@@ -354,28 +352,23 @@ func (e *{{.PkgName}}) Complete(params interface{}) {
 {{end}}		return
 	}
 	r := new({{.PkgName}}ResultBlock)
+	defer func() {
+		if res := recover(); res != nil {
+{{range .Results}}		e.{{.OutputVariableName}} <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
+{{end}}		execute.AddError(res)
+			return
+		}
+	}()
 	e.startup.Do(func() { e.setup(p) })
 	e.steps(p, r)
-	if r.Error {
-{{range .Results}}		e.{{.OutputVariableName}} <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-{{end}}		return
-	}
 {{range .StepsOutput}}
 	e.{{.OutputVariableName}} <- execute.ThreadParam{Value: r.{{.ResultVariableName}}, ID: p.ID, Error: false}
 {{end}}
 	e.analysis(p, r)
-		if r.Error {
-{{range .Results}}		e.{{.OutputVariableName}} <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-{{end}}		return
-	}
 {{range .AnalysisOutput}}
 	e.{{.OutputVariableName}} <- execute.ThreadParam{Value: r.{{.ResultVariableName}}, ID: p.ID, Error: false}
 {{end}}
 	e.validation(p, r)
-	if r.Error {
-{{range .Results}}		e.{{.OutputVariableName}} <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-{{end}}		return
-	}
 {{range .ValidationOutput}}	e.{{.OutputVariableName}} <- execute.ThreadParam{Value: r.{{.ResultVariableName}}, ID: p.ID, Error: false}
 {{end}}
 }
@@ -415,6 +408,7 @@ func (e *{{.PkgName}}) Map(m map[string]interface{}) interface{} {
 {{end}}
 {{if .HasIdLine}}
 	res.ID = m["{{.IdVarName}}"].(execute.ThreadParam).ID
+	res.BlockID = m["{{.IdVarName}}"].(execute.ThreadParam).BlockID
 {{end}}
 	return res
 }
@@ -439,25 +433,25 @@ func (e *{{.PkgName}}) Map(m map[string]interface{}) interface{} {
 	}
 
 	bpVars := BoilerPlateVars{PkgName: p.pkgName}
-	for i := range p.params {
-		bpVars.Params = append(bpVars.Params, BoilerPlateParamVars{p.params[i].Names[0].Name, p.getTypeString(p.params[i].Type)})
+	for _, name := range p.params {
+		bpVars.Params = append(bpVars.Params, BoilerPlateParamVars{name, p.paramTypes[name]})
 	}
+	// TODO(ddn): Check if first or alphabetically first param can serve as ID
 	if len(p.params) > 0 {
 		bpVars.HasIdLine = true
-		bpVars.IdVarName = p.params[0].Names[0].Name
+		bpVars.IdVarName = p.params[0]
 	}
-	for i := range p.results {
-		varName := p.results[i].Names[0].Name
-		if string(varName[0]) == strings.ToUpper(string(varName[0])) { // only upper case are external
-			bpVars.Results = append(bpVars.Results, OutputRedirection{varName, varName})
-			_, an := p.reuseMap[token.ANALYSIS][varName]
-			_, va := p.reuseMap[token.VALIDATION][varName]
+	for _, name := range p.results {
+		if name[0:1] == strings.ToUpper(name[0:1]) { // only upper case are external
+			bpVars.Results = append(bpVars.Results, OutputRedirection{name, name})
+			_, an := p.reuseMap[token.ANALYSIS][name]
+			_, va := p.reuseMap[token.VALIDATION][name]
 			if !(an || va) { //steps is the last one it appeared (if it did)
-				bpVars.StepsOutput = append(bpVars.StepsOutput, OutputRedirection{varName, varName})
+				bpVars.StepsOutput = append(bpVars.StepsOutput, OutputRedirection{name, name})
 			} else if !va { //analysis is the last one it appeared (if it did)
-				bpVars.AnalysisOutput = append(bpVars.AnalysisOutput, OutputRedirection{varName, varName})
+				bpVars.AnalysisOutput = append(bpVars.AnalysisOutput, OutputRedirection{name, name})
 			} else { //validation is the last one it appeared (if it did)
-				bpVars.ValidationOutput = append(bpVars.ValidationOutput, OutputRedirection{varName, varName})
+				bpVars.ValidationOutput = append(bpVars.ValidationOutput, OutputRedirection{name, name})
 			}
 		}
 	}
@@ -481,24 +475,28 @@ func (p *compiler) genStructs() {
 
 type {{.ElementName}}ParamBlock struct{
 	ID		execute.ThreadID
+	BlockID	execute.BlockID
 	Error	bool{{range .Params}}
 	{{.Name}}		{{.Type}}{{end}}
 }
 
 type {{.ElementName}}Config struct{
 	ID		execute.ThreadID
+	BlockID	execute.BlockID
 	Error	bool{{range .Configs}}
 	{{.Name}}		{{.Type}}{{end}}
 }
 
 type {{.ElementName}}ResultBlock struct{
 	ID		execute.ThreadID
+	BlockID	execute.BlockID
 	Error	bool{{range .Results}}
 	{{.Name}}		{{.Type}}{{end}}
 }
 
 type {{.ElementName}}JSONBlock struct{
 	ID			*execute.ThreadID
+	BlockID		*execute.BlockID
 	Error		*bool{{range .Params}}
 	{{.Name}}		*{{.Type}}{{end}}{{range .Results}}
 	{{.Name}}		*{{.Type}}{{end}}
@@ -517,18 +515,17 @@ type {{.ElementName}}JSONBlock struct{
 
 	var structSpec StructSpec
 	structSpec.ElementName = p.pkgName
-	for _, i := range p.params {
-		n := i.Names[0].Name
-		ts := p.getTypeString(i.Type)
-		cs := p.getConfigTypeString(i.Type)
-		structSpec.Params = append(structSpec.Params, VarSpec{n, ts})
-		structSpec.Inports = append(structSpec.Inports, VarSpec{n, ts})
-		structSpec.Configs = append(structSpec.Configs, VarSpec{n, cs})
+	for _, name := range p.params {
+		ts := p.paramTypes[name]
+		cs := p.configTypes[name]
+		structSpec.Params = append(structSpec.Params, VarSpec{name, ts})
+		structSpec.Inports = append(structSpec.Inports, VarSpec{name, ts})
+		structSpec.Configs = append(structSpec.Configs, VarSpec{name, cs})
 	}
-	for _, i := range p.results {
-		structSpec.Results = append(structSpec.Results, VarSpec{i.Names[0].Name, p.getTypeString(i.Type)})
-		if string(i.Names[0].Name[0]) == strings.ToUpper(string(i.Names[0].Name[0])) {
-			structSpec.Outports = append(structSpec.Outports, VarSpec{i.Names[0].Name, p.getTypeString(i.Type)})
+	for _, name := range p.results {
+		structSpec.Results = append(structSpec.Results, VarSpec{name, p.resultTypes[name]})
+		if name[0:1] == strings.ToUpper(name[0:1]) {
+			structSpec.Outports = append(structSpec.Outports, VarSpec{name, p.resultTypes[name]})
 		}
 	}
 	var b bytes.Buffer
@@ -561,18 +558,17 @@ func (c *{{.ElementName}}) ComponentInfo() *execute.ComponentInfo {
 
 	var structSpec StructSpec
 	structSpec.ElementName = p.pkgName
-	for _, i := range p.params {
-		structSpec.Inports = append(structSpec.Inports, VarSpec{i.Names[0].Name, p.getTypeString(i.Type)})
+	for _, name := range p.params {
+		structSpec.Inports = append(structSpec.Inports, VarSpec{name, p.paramTypes[name]})
 	}
-	for _, i := range p.results {
-		if string(i.Names[0].Name[0]) == strings.ToUpper(string(i.Names[0].Name[0])) {
-			structSpec.Outports = append(structSpec.Outports, VarSpec{i.Names[0].Name, p.getTypeString(i.Type)})
+	for _, name := range p.results {
+		if name[0:1] == strings.ToUpper(name[0:1]) {
+			structSpec.Outports = append(structSpec.Outports, VarSpec{name, p.resultTypes[name]})
 		}
 	}
 	var b bytes.Buffer
 	t.Execute(&b, structSpec)
 	p.print(b, newline)
-
 }
 
 // Add statements to the beginning of antha decls
@@ -596,7 +592,7 @@ func (p *compiler) addPreamble(decls []ast.Decl) {
 			}
 			// `_wrapper := execution.NewWrapper()`
 			s1Lhs, _ := parser.ParseExpr("_wrapper")
-			s1Rhs, _ := parser.ParseExpr("execution.NewWrapper(p.ID)")
+			s1Rhs, _ := parser.ParseExpr("execution.NewWrapper(p.ID, p.BlockID)")
 			s1 := &ast.AssignStmt{
 				Lhs:    []ast.Expr{s1Lhs},
 				Rhs:    []ast.Expr{s1Rhs},
@@ -612,7 +608,18 @@ func (p *compiler) addPreamble(decls []ast.Decl) {
 				TokPos: d.TokPos,
 				Tok:    token.ASSIGN,
 			}
+
+			s3Lhs, _ := parser.ParseExpr("_")
+			s3Rhs, _ := parser.ParseExpr("_wrapper.WaitToEnd()") //TODO won't handle intermediate waiting
+			s3 := &ast.AssignStmt{
+				Lhs:    []ast.Expr{s3Lhs},
+				Rhs:    []ast.Expr{s3Rhs},
+				TokPos: d.TokPos,
+				Tok:    token.ASSIGN,
+			}
+
 			d.Body.List = append([]ast.Stmt{s1, s2}, d.Body.List...)
+			d.Body.List = append(d.Body.List, s3)
 		default:
 			continue
 		}
@@ -627,14 +634,99 @@ func (p *compiler) sugarAST(d []ast.Decl) {
 		case *ast.AnthaDecl:
 			p.sugarForParams(decl.Body)
 			p.sugarForIntrinsics(decl.Body)
-		default: // ignore all other decls... for now
+			p.sugarForTypes(decl.Body)
+		default:
 			continue
 		}
 	}
 }
 
+// Return appropriate nested SelectorExpr for the replacement for Identifier
+func (p *compiler) sugarForIdent(t *ast.Ident) ast.Expr {
+	if v, ok := p.types[t.Name]; ok {
+		cs := strings.Split(v, ".")
+		var base ast.Expr = &ast.Ident{NamePos: t.NamePos, Name: cs[0]}
+		for _, c := range cs[1:] {
+			base = &ast.SelectorExpr{X: base, Sel: &ast.Ident{NamePos: t.NamePos, Name: c}}
+		}
+		return base
+	} else {
+		return t
+	}
+}
+
+// Return appropriate go type for an antha (type) expr
+func (p *compiler) sugarForType(t ast.Expr) ast.Expr {
+	switch t := t.(type) {
+	case nil:
+	case *ast.Ident:
+		return p.sugarForIdent(t)
+	case *ast.ParenExpr:
+		return &ast.ParenExpr{Lparen: t.Lparen, X: p.sugarForType(t.X), Rparen: t.Rparen}
+	case *ast.SelectorExpr:
+		return t
+	case *ast.StarExpr:
+		return &ast.StarExpr{Star: t.Star, X: p.sugarForType(t.X)}
+	case *ast.ArrayType:
+		return &ast.ArrayType{Lbrack: t.Lbrack, Len: t.Len, Elt: p.sugarForType(t.Elt)}
+	case *ast.StructType:
+		return &ast.StructType{Struct: t.Struct, Fields: p.sugarForFieldList(t.Fields), Incomplete: t.Incomplete}
+	case *ast.FuncType:
+		return &ast.FuncType{Func: t.Func, Params: p.sugarForFieldList(t.Params), Results: p.sugarForFieldList(t.Results)}
+	case *ast.InterfaceType:
+		return &ast.InterfaceType{Interface: t.Interface, Methods: p.sugarForFieldList(t.Methods), Incomplete: t.Incomplete}
+	case *ast.MapType:
+		return &ast.MapType{Map: t.Map, Key: p.sugarForType(t.Key), Value: p.sugarForType(t.Value)}
+	case *ast.ChanType:
+		return &ast.ChanType{Begin: t.Begin, Arrow: t.Arrow, Dir: t.Dir, Value: p.sugarForType(t.Value)}
+	default:
+		log.Panicf("unexpected expression %s of type %s", t, reflect.TypeOf(t))
+	}
+
+	return t
+}
+
+func (p *compiler) sugarForFieldList(t *ast.FieldList) *ast.FieldList {
+	if t == nil {
+		return nil
+	}
+	var fields []*ast.Field
+	for _, f := range t.List {
+		fields = append(fields, &ast.Field{Doc: f.Doc, Names: f.Names, Type: p.sugarForType(f.Type), Tag: f.Tag, Comment: f.Comment})
+	}
+	return &ast.FieldList{Opening: t.Opening, List: fields, Closing: t.Closing}
+}
+
+// Replace bare antha types with go qualified names
+func (p *compiler) sugarForTypes(root ast.Node) ast.Node {
+	ast.Inspect(root, func(n ast.Node) bool {
+		switch n := n.(type) {
+		case nil:
+			return false
+		case *ast.FuncLit:
+			n.Type = p.sugarForType(n.Type).(*ast.FuncType)
+			return false
+		case *ast.CompositeLit:
+			n.Type = p.sugarForType(n.Type)
+			return false
+		case *ast.TypeAssertExpr:
+			n.Type = p.sugarForType(n.Type)
+			return false
+		case *ast.ValueSpec:
+			n.Type = p.sugarForType(n.Type)
+			return false
+		default:
+			return true
+		}
+	})
+	return root
+}
+
 // Replace bare antha identifiers with go qualified names
 func (p *compiler) sugarForParams(body *ast.BlockStmt) {
+	// TODO(ddn): merge with sugarForTypes or clone and adopt a similar strategy to
+	// restrict replacements to unqualified variable use. Right now, the code below
+	// can rewrite field accesses, etc.
 	list := body.List
 
 	for i := range list {
@@ -644,10 +736,10 @@ func (p *compiler) sugarForParams(body *ast.BlockStmt) {
 				return false
 			case *ast.Ident:
 				// sugar the name if it is a known param
-				if sugar, ok := p.paramMap[node.Name]; ok {
-					node.Name = sugar
-				} else if sugar, ok := p.resultMap[node.Name]; ok {
-					node.Name = sugar
+				if _, ok := p.paramTypes[node.Name]; ok {
+					node.Name = "p." + node.Name
+				} else if _, ok := p.resultTypes[node.Name]; ok {
+					node.Name = "r." + node.Name
 				}
 				// test if the left hand side of an assignment is to a results variable
 				// if so, sugar it by replacing the = with a channel operation
@@ -656,10 +748,10 @@ func (p *compiler) sugarForParams(body *ast.BlockStmt) {
 				fix_assign := false
 				for j := range node.Lhs {
 					if ident, ok := node.Lhs[j].(*ast.Ident); ok {
-						isUpper := string(ident.Name[0]) == strings.ToUpper(string(ident.Name[0]))
-						if sugar, fixme := p.resultMap[ident.Name]; fixme && isUpper {
+						isUpper := ident.Name[0:1] == strings.ToUpper(ident.Name[0:1])
+						if _, fixme := p.resultTypes[ident.Name]; fixme && isUpper {
 							//fix_assign = true
-							ident.Name = sugar
+							ident.Name = "r." + ident.Name
 						}
 					}
 				}
@@ -672,7 +764,6 @@ func (p *compiler) sugarForParams(body *ast.BlockStmt) {
 					list[i] = &ast.SendStmt{node.Lhs[0], node.TokPos, p.wrapParamExpr(node.Rhs[0])}
 				}
 			default:
-
 			}
 			return true
 		})
@@ -681,14 +772,17 @@ func (p *compiler) sugarForParams(body *ast.BlockStmt) {
 
 // Replace bare antha function names with go qualified names
 func (p *compiler) sugarForIntrinsics(root ast.Node) {
+	// TODO(ddn): merge with sugarForTypes or clone and adopt a similar strategy to
+	// restrict replacements to unqualified variable use. Right now, the code below
+	// can rewrite field accesses, etc.
 	ast.Inspect(root, func(n ast.Node) bool {
-		switch node := n.(type) {
+		switch n := n.(type) {
 		case nil:
 			return false
 		case *ast.Ident:
 			// sugar the name if it is a known param
-			if sugar, ok := p.intrinsicMap[node.Name]; ok {
-				node.Name = sugar
+			if sugar, ok := p.intrinsics[n.Name]; ok {
+				n.Name = sugar
 			}
 			// test if the left hand side of an assignment is to a results variable
 			// if so, sugar it by replacing the = with a channel operation

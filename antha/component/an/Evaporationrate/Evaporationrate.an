@@ -1,0 +1,118 @@
+/* Evaporation calculator based on 
+http://www.engineeringtoolbox.com/evaporation-water-surface-d_690.html
+
+This engineering function may need to be improved to account for vapour pressure and surface tension
+
+gs = Θ A (xs - x) / 3600         (1)
+
+or
+
+gh = Θ A (xs - x)
+
+where
+
+gs = amount of evaporated water per second (kg/s)
+
+gh = amount of evaporated water per hour (kg/h)
+
+Θ = (25 + 19 v) = evaporation coefficient (kg/m2h)
+
+v = velocity of air above the water surface (m/s)
+
+A = water surface area (m2)
+
+xs = humidity ratio in saturated air at the same temperature as the water surface (kg/kg)  (kg H2O in kg Dry Air)
+
+x = humidity ratio in the air (kg/kg) (kg H2O in kg Dry Air) */
+
+protocol Evaporationrate 
+import (
+	"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Labware"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/eng"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Liquidclasses"	
+)
+Parameters (
+  	
+	Liquid string 
+	Platetype string
+	Volumeperwell Volume // ul
+	
+	// cubesensor streams:
+	Pa float64 //wunit.Pressure // in pascals atmospheric pressure of moist air (Pa) 100mBar = 1 pa
+	Temp Temperature // input in deg C will be converted to Kelvin
+	Relativehumidity float64 // Percentage // density water vapor (kg/m3)
+	
+	Airvelocity float64  // // velocity of air above water in m/s ; could be calculated or measured
+	
+	Executiontime Time// time 
+	
+)
+Data (
+	Status string
+	Evaporationrateestimate float64 // ul/h
+	Evaporatedliquid Volume // ul
+	Estimatedevaporationtime Time
+)
+Inputs (
+)
+Outputs (
+)
+Requirements {
+}
+Setup {
+} 
+Steps {
+	}
+Analysis {
+	
+	tempinKelvin := (Temp.SIValue()+273.15)
+	var PWS float64 = eng.Pws(tempinKelvin)
+	var pw float64 = eng.Pw(Relativehumidity, PWS) // vapour partial pressure in Pascals
+	var	Gh = (eng.Θ(Liquid, Airvelocity) * 
+	(labware.Labwaregeometry[Platetype]["Surfacearea"] * 
+	((eng.Xs(PWS, Pa)) - (eng.X(pw, Pa))))) // Gh is rate of evaporation in kg/h
+	evaporatedliquid := (Gh * (Executiontime.SIValue()/3600)) // in kg
+	evaporatedliquid = (evaporatedliquid * liquidclasses.Liquidclass[Liquid]["ro"])/1000 // converted to litres
+	Evaporatedliquid = wunit.NewVolume((evaporatedliquid*1000000),"ul") // convert to ul
+	
+	Evaporationrateestimate = Gh*1000000 // ul/h if declared in parameters or data it doesn't need declaring again
+
+	estimatedevaporationtime  := Volumeperwell.ConvertTo(wunit.ParsePrefixedUnit("ul")) / Evaporationrateestimate 
+	Estimatedevaporationtime = wunit.NewTime((estimatedevaporationtime*3600),"s") 
+	
+	Status = fmt.Sprintln("Well Surface Area=", 
+				(labware.Labwaregeometry[Platetype]["Surfacearea"])*1000000, "mm2", 
+				"evaporation rate =", Gh*1000000, "ul/h", 
+				"total evaporated liquid =", Evaporatedliquid.ToString(), "after", Executiontime.ToString(),
+				"estimated evaporation time = ", Estimatedevaporationtime.ToString())
+	
+} // works in either analysis or steps sections
+
+Validation {
+	if Evaporatedliquid.SIValue() > Volumeperwell.SIValue() {
+	panic("not enough liquid")
+	}
+}
+
+// Go helper functions:
+
+//Functions for rounding numbers to a specified number of decimal places (places):
+/*func Round(f float64) float64 {
+	return math.Floor(f + .5)
+}
+
+func RoundPlus(f float64, places int) float64 {
+	shift := math.Pow(10, float64(places))
+	return Round(f*shift) / shift
+}
+*/
+/* This function calculates Θ required for the evaporation calculator based on air velocity above the sample; 
+this will be important in a laminar flow cabinet, fume cabinet and when the plates are mixing: 
+*/
+
+
+
+
+/*: 0.62198 * pws / (pa - pws), // humidity ratio in saturated air at the same temperature as the water surface (kg/kg)  (kg H2O in kg Dry Air)
+"x":  0.62198 * pw / (pa - pw), */

@@ -4,6 +4,6 @@ if not exist "%TEMP%\go.msi" (
 
 msiexec /quiet /i "%TEMP%\go.msi
 
-mkdir "%USERPROFILE%\go"
-mkdir "%USERPROFILE%\go\bin"
-powershell -Command "$p = [Environment]::GetEnvironmentVariable('PATH', 'Machine'); $pa = [Environment]::GetEnvironmentVariable('USERPROFILE', 'Process'); [Environment]::SetEnvironmentVariable('GOPATH', \"$pa\go\", 'Machine'); [Environment]::SetEnvironmentVariable('PATH', \"$p;$pa\go\bin\", 'Machine');"
+%SystemRoot%\System32\setx GOPATH "%USERPROFILE%\go"
+mkdir "%GOPATH%"
+%SystemRoot%\System32\setx.exe PATH "%PATH%;C:\Go\bin" /M

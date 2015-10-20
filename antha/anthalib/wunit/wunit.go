@@ -18,7 +18,7 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 package wunit
 
@@ -200,7 +200,7 @@ func (cm *ConcreteMeasurement) EqualToFloat(f float64) bool {
 	return false
 }
 
-func (cm *ConcreteMeasurement) ToString() string {
+func (cm ConcreteMeasurement) ToString() string {
 	return fmt.Sprintf("%-6.3f%s", cm.RawValue(), cm.Unit().PrefixedSymbol())
 }
 

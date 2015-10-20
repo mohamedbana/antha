@@ -18,14 +18,14 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 package wtype
 
 // a simple structure to allow a generic entity class to be defined
 type GenericEntity struct {
 	*GenericSolid
-	Loc Location
+	Loc *ConcreteLocation
 }
 
 // entities are defined by having locations
@@ -34,12 +34,12 @@ func (ge *GenericEntity) Location() Location {
 	return ge.Loc
 }
 
-func (ge GenericEntity) SetLocation(location Location) error {
+func (ge GenericEntity) SetLocation(location *ConcreteLocation) error {
 	ge.Loc = location
 	return nil
 }
 
-func NewGenericEntity(name string, location Location) *GenericEntity {
+func NewGenericEntity(name string, location *ConcreteLocation) *GenericEntity {
 	gs := NewGenericSolid("", "")
 	ge := GenericEntity{gs, location}
 	return &ge

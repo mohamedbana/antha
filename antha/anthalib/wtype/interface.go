@@ -18,14 +18,16 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 package wtype
 
 import (
 	"encoding/json"
-	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"io/ioutil"
+
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/microArch/logger"
 )
 
 // map of matter types
@@ -52,6 +54,7 @@ func GetMatterLib(fn string) (*(map[string]GenericMatter), error) {
 	e2 := json.Unmarshal(f, &matter)
 
 	if e2 != nil {
+		logger.Fatal(e2.Error())
 		panic(e2)
 	}
 	return &matter, err
@@ -60,6 +63,7 @@ func GetMatterLib(fn string) (*(map[string]GenericMatter), error) {
 // check errors
 func check(e error) {
 	if e != nil {
+		logger.Fatal(e.Error())
 		panic(e)
 	}
 }

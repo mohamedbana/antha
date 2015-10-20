@@ -1,3 +1,25 @@
+// antha/component/lib/Sum/Sum.go: Part of the Antha language
+// Copyright (C) 2015 The Antha authors. All rights reserved.
+// 
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+// 
+// For more information relating to the software or licensing issues please
+// contact license@antha-lang.org or write to the Antha team c/o 
+// Synthace Ltd. The London Bioscience Innovation Centre
+// 2 Royal College St, London NW1 0NH UK
+
 package Sum
 
 import
@@ -5,10 +27,10 @@ import
 // Input parameters for this protocol
 (
 	"encoding/json"
-	"github.com/antha-lang/antha/antha/anthalib/execution"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/flow"
+	"github.com/antha-lang/antha/microArch/execution"
 	"sync"
 )
 
@@ -25,29 +47,38 @@ func (e *Sum) requirements() {
 
 // Actions to perform before protocol itself
 func (e *Sum) setup(p SumParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID)
 	_ = _wrapper
+	_ = _wrapper.WaitToEnd()
 
 }
 
 // Core process of the protocol: steps to be performed for each input
 func (e *Sum) steps(p SumParamBlock, r *SumResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID)
 	_ = _wrapper
 
 	r.Sum = p.A + p.B
+	_ = _wrapper.WaitToEnd()
+
 }
 
 // Actions to perform after steps block to analyze data
 func (e *Sum) analysis(p SumParamBlock, r *SumResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID)
 	_ = _wrapper
+	_ = _wrapper.WaitToEnd()
 
 }
 
 func (e *Sum) validation(p SumParamBlock, r *SumResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID)
 	_ = _wrapper
+	_ = _wrapper.WaitToEnd()
 
 }
 
@@ -59,26 +90,21 @@ func (e *Sum) Complete(params interface{}) {
 		return
 	}
 	r := new(SumResultBlock)
+	defer func() {
+		if res := recover(); res != nil {
+			e.Sum <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
+			execute.AddError(res)
+			return
+		}
+	}()
 	e.startup.Do(func() { e.setup(p) })
 	e.steps(p, r)
-	if r.Error {
-		e.Sum <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		return
-	}
 
 	e.Sum <- execute.ThreadParam{Value: r.Sum, ID: p.ID, Error: false}
 
 	e.analysis(p, r)
-	if r.Error {
-		e.Sum <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		return
-	}
 
 	e.validation(p, r)
-	if r.Error {
-		e.Sum <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		return
-	}
 
 }
 
@@ -125,6 +151,7 @@ func (e *Sum) Map(m map[string]interface{}) interface{} {
 	}
 
 	res.ID = m["A"].(execute.ThreadParam).ID
+	res.BlockID = m["A"].(execute.ThreadParam).BlockID
 
 	return res
 }
@@ -175,31 +202,35 @@ type Sum struct {
 }
 
 type SumParamBlock struct {
-	ID    execute.ThreadID
-	Error bool
-	A     int
-	B     int
+	ID      execute.ThreadID
+	BlockID execute.BlockID
+	Error   bool
+	A       int
+	B       int
 }
 
 type SumConfig struct {
-	ID    execute.ThreadID
-	Error bool
-	A     int
-	B     int
+	ID      execute.ThreadID
+	BlockID execute.BlockID
+	Error   bool
+	A       int
+	B       int
 }
 
 type SumResultBlock struct {
-	ID    execute.ThreadID
-	Error bool
-	Sum   int
+	ID      execute.ThreadID
+	BlockID execute.BlockID
+	Error   bool
+	Sum     int
 }
 
 type SumJSONBlock struct {
-	ID    *execute.ThreadID
-	Error *bool
-	A     *int
-	B     *int
-	Sum   *int
+	ID      *execute.ThreadID
+	BlockID *execute.BlockID
+	Error   *bool
+	A       *int
+	B       *int
+	Sum     *int
 }
 
 func (c *Sum) ComponentInfo() *execute.ComponentInfo {

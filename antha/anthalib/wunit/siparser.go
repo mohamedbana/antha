@@ -1,24 +1,24 @@
 // /anthalib/wunit/siparser.go: Part of the Antha language
 // Copyright (C) 2015 The Antha authors. All rights reserved.
-// 
+//
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-// 
+//
 // For more information relating to the software or licensing issues please
-// contact license@antha-lang.org or write to the Antha team c/o 
+// contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 package wunit
 
@@ -60,7 +60,7 @@ func (p *SIPrefixedUnit) AddNodeToStack(node *PNode) {
 	/*
 		for _, n := range p.Stack {
 			fmt.Print(n.Name, ":")
-			fmt.Println()
+			logger.Debug(fmt.Sprintln())
 		}
 	*/
 }
@@ -125,14 +125,14 @@ func NewNode(name string, typ NodeType, cap uint8) *PNode {
 // Functions for building the tree
 
 func (p *SIPrefixedUnit) AddUnit(s string) {
-	//	fmt.Println("Adding Unit", s)
+	//	logger.Debug(fmt.Sprintln("Adding Unit", s))
 	node := NewNode("Unit", LeafNode, 0)
 	node.Value = s
 	p.AddNodeToStack(node)
 }
 
 func (p *SIPrefixedUnit) AddUnitPrefix(s string) {
-	//	fmt.Println("Adding unit prefix", s)
+	//	logger.Debug(fmt.Sprintln("Adding unit prefix", s))
 	node := NewNode("UnitPrefix", LeafNode, 0)
 	node.Value = s
 	p.AddNodeToStack(node)

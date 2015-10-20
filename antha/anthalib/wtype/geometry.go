@@ -18,7 +18,7 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 package wtype
 
@@ -42,28 +42,33 @@ type Geometry interface {
 	Depth() wunit.Length
 }
 
-// defines a shape
-type Shape interface {
-	ShapeName() string
-	IsShape()
-	MinEnclosingBox() Geometry
+type Shape struct {
+	ShapeName  string
+	LengthUnit string
+	H          float64
+	W          float64
+	D          float64
 }
 
-func IntToShape(i int, h, w, d wunit.Length) Shape {
-	var sh Shape = nil
-	switch i {
-	case 0:
-		sh = NewShape("box")
-		sh.(*Box).H = h
-		sh.(*Box).W = w
-		sh.(*Box).D = d
-	case 1:
-		sh = NewShape("cylinder")
-		sh.(*Cylinder).R = w
-		sh.(*Cylinder).H = h
-	}
+// let shape implement geometry
 
-	return sh
+func (sh *Shape) Height() wunit.Length {
+	return wunit.NewLength(sh.H, sh.LengthUnit)
+}
+func (sh *Shape) Width() wunit.Length {
+	return wunit.NewLength(sh.W, sh.LengthUnit)
+}
+func (sh *Shape) Depth() wunit.Length {
+	return wunit.NewLength(sh.D, sh.LengthUnit)
+}
+
+func (sh *Shape) Dup() *Shape {
+	return &(Shape{sh.ShapeName, sh.LengthUnit, sh.H, sh.W, sh.D})
+}
+
+func NewShape(name, lengthunit string, h, w, d float64) *Shape {
+	sh := Shape{name, lengthunit, h, w, d}
+	return &sh
 }
 
 // convenience structure for handling well coordinates

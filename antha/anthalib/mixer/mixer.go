@@ -18,7 +18,7 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 package mixer
 
@@ -43,6 +43,7 @@ func Sample(l wtype.Liquid, v wunit.Volume) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
 
 	ret.CName = l.Name()
+	ret.Type = l.GetType()
 	ret.Vol = v.RawValue()
 	ret.Vunit = v.Unit().PrefixedSymbol()
 	ret.Extra = l.GetExtra()
@@ -59,7 +60,7 @@ func Sample(l wtype.Liquid, v wunit.Volume) *wtype.LHComponent {
 func SampleForConcentration(l wtype.Liquid, c wunit.Concentration) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
 	ret.CName = l.Name()
-	// TODO fill in type here
+	ret.Type = l.GetType()
 	ret.Conc = c.RawValue()
 	ret.Cunit = c.Unit().PrefixedSymbol()
 	ret.CName = l.Name()
@@ -75,6 +76,7 @@ func SampleForConcentration(l wtype.Liquid, c wunit.Concentration) *wtype.LHComp
 func SampleForTotalVolume(l wtype.Liquid, v wunit.Volume) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
 	ret.CName = l.Name()
+	ret.Type = l.GetType()
 	ret.Tvol = v.RawValue()
 	ret.Vunit = v.Unit().PrefixedSymbol()
 	ret.LContainer = l.Container().(*wtype.LHWell)
@@ -82,6 +84,27 @@ func SampleForTotalVolume(l wtype.Liquid, v wunit.Volume) *wtype.LHComponent {
 	ret.Extra = l.GetExtra()
 	ret.Smax = l.GetSmax()
 	ret.Visc = l.GetVisc()
+
+	return ret
+}
+
+// Temp hack to mix solutions
+func MixLiquidstemp(liquids ...*wtype.LHSolution) *wtype.LHSolution {
+	// we must respect the order in which things are mixed.
+	// the convention is that mix(X,Y) corresponds to "Add Y to X"
+
+	ret := wtype.NewLHSolution()
+
+	ret.Components = make([]*wtype.LHComponent, 0)
+	for _, liquid := range liquids {
+		for _, component := range liquid.Components {
+			ret.Components = append(ret.Components, component)
+		}
+	}
+	// this translates to the component ordering in the resulting solution
+	for i, cmp := range liquids {
+		cmp.Order = i
+	}
 
 	return ret
 }

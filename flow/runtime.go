@@ -1,12 +1,13 @@
 package flow
 
 import (
-	"github.com/antha-lang/antha/internal/code.google.com/p/go.net/websocket"
 	"fmt"
-	ms "github.com/antha-lang/antha/internal/github.com/mitchellh/mapstructure"
-	"github.com/antha-lang/antha/internal/github.com/nu7hatch/gouuid"
 	"log"
 	"net/http"
+
+	"github.com/antha-lang/antha/internal/code.google.com/p/go.net/websocket"
+	ms "github.com/antha-lang/antha/internal/github.com/mitchellh/mapstructure"
+	"github.com/antha-lang/antha/internal/github.com/twinj/uuid"
 )
 
 type protocolHandler func(*websocket.Conn, interface{})
@@ -54,10 +55,7 @@ type networkInfo struct {
 
 // Register command handlers
 func (r *Runtime) Init() {
-	uv4, err := uuid.NewV4()
-	if err != nil {
-		log.Println(err.Error())
-	}
+	uv4 := uuid.NewV4()
 	r.id = uv4.String()
 	r.done = make(chan struct{})
 	r.ready = make(chan struct{})

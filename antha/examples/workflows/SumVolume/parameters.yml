@@ -1,0 +1,13 @@
+{
+  "Parameters": [{
+    "SumVolume": {
+      "A": "5ml",
+      "B": "6ul",
+      "C": "25˚C",
+	  "D": "1g/l"
+    }
+  }],
+  "Config": {
+      "OUTPUT_COUNT": 1
+  }
+}

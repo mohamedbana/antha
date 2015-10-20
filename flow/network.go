@@ -1,11 +1,11 @@
 package flow
 
 import (
-	"github.com/antha-lang/antha/internal/code.google.com/p/go.net/websocket"
 	"errors"
-	"fmt"
 	"reflect"
 	"sync"
+
+	"github.com/antha-lang/antha/internal/code.google.com/p/go.net/websocket"
 )
 
 // DefaultBufferSize is the default channel buffer capacity.
@@ -958,6 +958,5 @@ func (r *Runtime) networkGetStatus(ws *websocket.Conn, payload interface{}) {
 }
 */
 func (r *Runtime) networkStart(ws *websocket.Conn, payload interface{}) {
-	fmt.Println("handle network.start")
 	//placeholder
 }

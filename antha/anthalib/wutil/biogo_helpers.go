@@ -18,7 +18,7 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 package wutil
 
@@ -29,6 +29,7 @@ import (
 	"github.com/antha-lang/antha/internal/github.com/biogo/biogo/io/seqio/fasta"
 	"github.com/antha-lang/antha/internal/github.com/biogo/biogo/seq"
 	"github.com/antha-lang/antha/internal/github.com/biogo/biogo/seq/linear"
+	"github.com/antha-lang/antha/microArch/logger"
 )
 
 func SeqToBioseq(s seq.Sequence) string {
@@ -47,6 +48,7 @@ func ReadFastaSeqs(fn string) []seq.Sequence {
 	f, e := os.Open(fn)
 
 	if e != nil {
+		logger.Fatal(e.Error())
 		panic(e)
 	}
 

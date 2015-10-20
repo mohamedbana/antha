@@ -18,7 +18,7 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 //package equipment defines the data representation of a piece of equipment and every necessary bits to communicate
 // with them.
@@ -75,9 +75,6 @@ func (b *Behaviour) Matches(ac ActionDescription) bool {
 type Equipment interface {
 	//GetID returns the string that identifies a piece of equipment. Ideally uuids v4 should be used.
 	GetID() string
-	//GetEquipmentDefinition returns a description of the equipment device in terms of
-	// operations it can handle, restrictions, configuration options ...
-	GetEquipmentDefinition()
 	//Perform an action in the equipment. Actions might be transmitted in blocks to the equipment
 	// The grouping of the actions (as a set, plate or whatever) is not performed at the equipment driver level
 	// or is it?

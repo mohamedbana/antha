@@ -18,7 +18,7 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 package cli
 
@@ -30,8 +30,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/antha-lang/antha/microArch/logger"
 	"github.com/antha-lang/antha/internal/github.com/jroimartin/gocui"
+	"github.com/antha-lang/antha/microArch/logger"
 )
 
 //MultiLevelMessage represents an aggregating struct to hold indentable strings
@@ -116,6 +116,7 @@ type CUI struct {
 	Exit chan interface{}
 	//G reference to the underlying gocui GUI interface
 	G              *gocui.Gui
+	//capturedstdout pointer to saved stdout descriptor so we can reuse it
 	capturedstdout *os.File
 }
 
@@ -582,19 +583,6 @@ func (c *CUI) newLog(log interface{}) error {
 	switch l := log.(type) {
 	case string:
 		shortDesc = l
-	case logger.LogEntry:
-		logview, err := c.G.View("LogView")
-		if err != nil {
-			return err
-		}
-		lx, _ := logview.Size()
-		var mess string
-		if len(l.Message) > lx-9 {
-			mess = l.Message[:lx-9]
-		} else {
-			mess = l.Message
-		}
-		shortDesc = fmt.Sprintf("[%s] %s...", l.Level.String()[:1], mess)
 	default:
 		//ignore by default
 		return nil
@@ -605,4 +593,14 @@ func (c *CUI) newLog(log interface{}) error {
 	}
 	fmt.Fprint(v, shortDesc+"\n")
 	return nil
+}
+
+func (m CUI) Log(level logger.LogLevel, ts int64, source string, message string, extra ...interface{}) {
+	m.LogIn <- fmt.Sprint(level, " ", message, " | ", extra)
+}
+func (m CUI) Measure(ts int64, source string, message string, extra ...interface{}) {
+	m.LogIn <- fmt.Sprint("[Telemetry] ", message, " | ", extra)
+}
+func (m CUI) Sensor(ts int64, source string, message string, extra ...interface{}) {
+	m.LogIn <- fmt.Sprint("[Sensor] ", message, " | ", extra)
 }

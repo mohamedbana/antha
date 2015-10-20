@@ -18,18 +18,18 @@
 // For more information relating to the software or licensing issues please
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
-// 1 Royal College St, London NW1 0NH UK
+// 2 Royal College St, London NW1 0NH UK
 
 package wtype
 
 // defines a generic solid structure
 type GenericSolid struct {
 	GenericPhysical
-	shape Shape
+	Myshape *Shape
 }
 
-func (gs *GenericSolid) Shape() Shape {
-	return gs.shape
+func (gs *GenericSolid) Shape() *Shape {
+	return gs.Myshape
 }
 
 // function for returning a blank generic solid - it has the basic type info
@@ -37,7 +37,7 @@ func (gs *GenericSolid) Shape() Shape {
 // this will eventually be taken from database entries
 func NewGenericSolid(mattertype string, shapetype string) *GenericSolid {
 	gp := NewGenericPhysical(mattertype)
-	shape := NewShape(shapetype)
+	shape := NewShape(shapetype, "m", 0.0, 0.0, 0.0)
 	gs := GenericSolid{gp, shape}
 	return &gs
 }
