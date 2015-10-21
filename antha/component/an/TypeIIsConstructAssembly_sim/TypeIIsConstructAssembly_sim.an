@@ -82,7 +82,7 @@ Steps {
 	
 	vectordata := Inventory.Partslist[Vectordata]
 	assembly := enzymes.Assemblyparameters{Constructname, RestrictionEnzyme.CName,vectordata,partsinorder}
-		status,numberofassemblies,sitesfound,newDNASequence := enzymes.Assemblysimulator(assembly)
+		status,numberofassemblies,sitesfound,newDNASequence,_ := enzymes.Assemblysimulator(assembly)
 	
 	NewDNASequence = newDNASequence
 	Sitesfound = sitesfound
