@@ -81,8 +81,8 @@ func (w *Wrapper) MixInto(outplate *wtype.LHPlate, components ...*wtype.LHCompon
 		// this aggregation layer and that will allow us to run multiple protocols.
 		//prepare the values
 		config := make(map[string]interface{}) //new(wtype.ConfigItem)
-		config["MAX_N_PLATES"] = 1.5
-		config["MAX_N_WELLS"] = 12.0
+		config["MAX_N_PLATES"] = 4.5
+		config["MAX_N_WELLS"] = 278.0
 		config["RESIDUAL_VOLUME_WEIGHT"] = 1.0
 		config["OUTPUT_COUNT"] = w.outputCount
 		config["BLOCKID"] = w.blockID.String()

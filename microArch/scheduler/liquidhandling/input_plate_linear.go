@@ -36,21 +36,37 @@ func choose_plate_assignments(component_volumes map[string]wunit.Volume, plate_t
 	//
 	//		let:
 	//			Xk 	= 	Number of wells of type Y containing component Z (k = 1...YZ)
-	//			Vy	= 	Working volume of well Y
-	//			RVy	= 	Residual volume of well Y
+	//			Vy	= 	Working volume of well type Y
+	//			RVy	= 	Residual volume of well type Y
 	//			TVz	= 	Total volume of component Z required
 	//			WRy	=	Rate of wells of type y in their plate
 	//			PMax	=	Maximum number of plates
 	//			WMax	= 	Maximum number of wells
 	//
 	//	Minimise:
-	//			sum of Xk Wrv RVy
+	//			sum of Xk WRy RVy
 	//
 	//	Subject to:
 	//			sum of Xk Vy 	>= TVz	for each component Z
 	//			sum of WRy Xk 	<= PMax
 	//			sum of Xk	<= WMax
 	//
+
+	// defense
+
+	ppt := make([]*wtype.LHPlate, 0, len(plate_types))
+	h := make(map[string]bool, len(plate_types))
+
+	for _, p := range plate_types {
+		if h[p.Type] {
+			continue
+		}
+
+		ppt = append(ppt, p)
+		h[p.Type] = true
+	}
+
+	plate_types = ppt
 
 	// setup
 
@@ -78,8 +94,11 @@ func choose_plate_assignments(component_volumes map[string]wunit.Volume, plate_t
 
 	// volume constraints
 	for cmp, vol := range component_volumes {
+		//debug
+		//fmt.Println("component ", cmp, " need volume ", vol.ConvertTo(wunit.ParsePrefixedUnit("ul")))
 		component_order[cur-1] = cmp
-		lp.SetRowBnds(cur, glpk.LO, vol.ConvertTo(wunit.ParsePrefixedUnit("ul")), 99999.0)
+		v := vol.ConvertTo(wunit.ParsePrefixedUnit("ul"))
+		lp.SetRowBnds(cur, glpk.LO, v, 9999999.0)
 		cur += 1
 	}
 
@@ -88,11 +107,15 @@ func choose_plate_assignments(component_volumes map[string]wunit.Volume, plate_t
 	// plate number constraints
 
 	max_n_plates := weight_constraint["MAX_N_PLATES"] - 1.0
+	//debug
+	//fmt.Println("Max_n_plates: ", max_n_plates)
 	lp.SetRowBnds(cur, glpk.UP, -99999.0, max_n_plates)
 	cur += 1
 
 	// well number constraints
 	max_n_wells := weight_constraint["MAX_N_WELLS"]
+	//debug
+	//fmt.Println("Max_n_wells: ", max_n_wells)
 	lp.SetRowBnds(cur, glpk.UP, -99999.0, max_n_wells)
 	cur += 1
 
@@ -112,6 +135,8 @@ func choose_plate_assignments(component_volumes map[string]wunit.Volume, plate_t
 			lp.SetColBnds(cur, glpk.LO, 0.0, 0.0)
 			lp.SetColKind(cur, glpk.IV)
 			cur += 1
+			// debug
+			//fmt.Println("\tObjective for ", plate.Type, " coefficient: ", coef)
 		}
 	}
 
@@ -133,6 +158,8 @@ func choose_plate_assignments(component_volumes map[string]wunit.Volume, plate_t
 					rvol := wunit.NewVolume(plate_types[j].Welltype.Rvol, plate_types[j].Welltype.Vunit)
 					vol.Subtract(&rvol)
 					vc = vol.ConvertTo(wunit.ParsePrefixedUnit("ul"))
+					//debug
+					//fmt.Println("\t\trow : ", ind, " col ", col+1, " vc: ", vc)
 				}
 				row[col+1] = vc
 				col += 1
@@ -174,7 +201,8 @@ func choose_plate_assignments(component_volumes map[string]wunit.Volume, plate_t
 
 	iocp := glpk.NewIocp()
 	iocp.SetPresolve(true)
-	iocp.SetMsgLev(0)
+	//debug
+	iocp.SetMsgLev(2)
 	lp.Intopt(iocp)
 
 	// check constraints

@@ -28,7 +28,7 @@ func makeTipwastes() map[string]*wtype.LHTipwaste {
 	ret := make(map[string]*wtype.LHTipwaste, 1)
 
 	ret["Gilsontipwaste"] = makeGilsonTipWaste()
-	ret["Cybiotipwaste"] = makeCyBioTipwaste()
+	ret["CyBiotipwaste"] = makeCyBioTipwaste()
 	return ret
 }
 
