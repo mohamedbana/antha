@@ -1,0 +1,153 @@
+// 
+protocol Phytip_miniprep
+import (
+	"github.com/Synthace/AnthaStandardLibrary/Packages/liquidclasses"
+	"github.com/Synthace/AnthaStandardLibrary/Packages/labware"
+	"github.com/Synthace/AnthaStandardLibrary/Packages/devices"
+	"github.com/Synthace/AnthaStandardLibrary/Packages/unitoperations"
+)
+	
+Parameters (
+    Cellpelletmass Mass
+	
+	Resuspensionstep Pipetstep
+	Lysisstep Pipetstep
+	Precipitationstep Pipetstep
+	Equilibrationstep Chromstep
+	Airstep Chromstep
+	Capturestep Chromstep
+	Washstep [] Chromstep
+	Elutionstep Chromstep
+	
+	Blottime Time
+	Blotcylces int
+	
+	Vacuum bool
+	Vacuumstrength Torr
+	Drytime Time
+	
+	// cubesensor streams:
+	Pa float64 // in pascals atmospheric pressure of moist air (Pa) 100mBar = 1 pa
+	Temp float64 // in Kelvin
+	Relativehumidity float64 // Percentage // density water vapor (kg/m3)
+	
+	Time float64// time 
+	
+	/* RBvolume Volume // 150ul
+	RBflowrate Rate
+	RBpause Time // seconds
+	RBcycles int
+	
+	LBvolume Volume
+	LBflowrate Rate
+	LBpause Time
+	LBcycles int
+	
+	PBvolume Volume
+	PBflowrate Rate
+	PBpause Time
+	PBcycles int
+	
+	Equilibrationvolume Volume
+	Equilibrationflowrate Rate
+	Equilibrationpause Time
+	Equilibrationcycles int
+	
+	Airdispensevolume Volume
+	Airdispenseflowrate Rate
+	Airdispensepause Time
+	Airdispensecycles int
+	
+	
+	
+	Airaspiratevolume Volume
+	Airaspirateflowrate Rate
+	Airaspiratepause Time
+	Airaspiratecylces int
+	
+	Capturevoume Volume
+	Captureflowrate Rate
+	Capturepause Time
+	Capturecycles int
+	
+	Washbuffervolume [] Volume
+	Washbufferflowrate [] Rate
+	Washbufferpause [] Time
+	Washbuffercycles [] int
+	
+	
+	
+	Elutionbuffervolume Volume
+	Elutionflowrate Rate
+	Elutionpause Time
+	Elutioncycles int
+	
+	*/
+	//or 
+	
+
+Data (
+	/* PlasmidConc Concentration
+	Storagelocation Location
+	Storageconditions StorageHistory
+	Plasmidbuffer Composition */ // is this all inferred from a PLasmid solution  type anyway?
+)
+Inputs (
+	Devices.Phytips
+	Devices.Chiller
+	Devices.Vacuum_manifold
+	Devices.Blotting_position
+	
+	Cellpellet Culture // wrong type?
+	
+	RB Watersolution
+	LB Watersolution
+	PB Watersolution
+	Water Watersolution // equilibration buffer
+	Air Gas
+	Washbuffer[] Watersolution
+	Elutionbuffer Watersolution
+)
+Outputs (
+	PlasmidDNAsolution PlasmidSolution
+)
+Requirements {
+}
+Setup {
+} 
+Steps {
+	resuspension := Resuspension(Cellpellet, Resuspensionstep)
+	lysate := Lysis(Lysisstep,resuspension)
+	precipitate := Precipitation(Precipitationstep,lysate)
+	
+	columnready := Equilibration(Water, Equilibrationstep, Phytips)
+	
+	
+	readyforcapture := AirChromatography(Air,Airstep,columnready)
+	capture := Chromatography(precipitate, Capturestep, readyforcapture)
+	Wash[] := Chromatography(capture,Washstep,readyforcapture) ; i++
+	Blot(Blotcylces,Blottime)
+		
+	if Vacuum == true, 
+		drytips = Dry (Drytime,Vacuumstrength, Vacuum_manifold)
+		
+		
+		//parameters required fro evaporation calculator
+		Liquid := Washbuffer Pipetstep.name //ethanol?
+		Platetype := Phytip.tip //.surfacearea? labware.phytip.surfacearea?
+		Volumeperwell := (Washbuffer.Volume / 10) // assume max 10% residual volume for now??
+		
+		drytimerequired := Evaporation.Estimatedevaporationtime(Airvelocity, Liquid, Platetype, Volumeperwell)
+	
+	
+	)
+		else Dry (drytimerequired)
+		
+	PlasmidDNAsolution = Chromatography(Elutionbuffer,Elutionstep, drytips)
+	
+	
+}
+Analysis {
+}
+Validation {
+}
