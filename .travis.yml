@@ -2,7 +2,6 @@ language: go
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y libglpk-dev
-sudo: false
 script: make && make test
 notifications:
   hipchat:
