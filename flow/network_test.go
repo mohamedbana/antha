@@ -631,7 +631,7 @@ func newOneToNNet(t *testing.T) *oneToNNet {
 
 // Tests if 1-to-n connection work as they should in go
 // i.e. we sond to multipe receivers and check if go pseudorandimly chooses receivers
-func TestOneToNConnections(t *testing.T) {
+func xTestOneToNConnections(t *testing.T) {
 	// Make the network of 2 components
 	net := newOneToNNet(t)
 	// in and out serve as network's in and out
