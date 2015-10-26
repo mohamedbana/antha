@@ -1,37 +1,42 @@
 // 
 protocol Phytip_miniprep
 import (
-	"github.com/Synthace/AnthaStandardLibrary/Packages/liquidclasses"
-	"github.com/Synthace/AnthaStandardLibrary/Packages/labware"
-	"github.com/Synthace/AnthaStandardLibrary/Packages/devices"
-	"github.com/Synthace/AnthaStandardLibrary/Packages/unitoperations"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Liquidclasses"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Labware"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/devices"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/unitoperations"
+	//"github.com/antha-lang/antha/antha/anthalib/mixer"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"time"
 )
 	
 Parameters (
     Cellpelletmass Mass
 	
-	Resuspensionstep Pipetstep
-	Lysisstep Pipetstep
-	Precipitationstep Pipetstep
-	Equilibrationstep Chromstep
-	Airstep Chromstep
-	Capturestep Chromstep
-	Washstep [] Chromstep
-	Elutionstep Chromstep
+	Resuspensionstep unitoperations.Chromstep
+	Lysisstep unitoperations.Chromstep
+	Precipitationstep unitoperations.Chromstep
+	Equilibrationstep unitoperations.Chromstep
+	Airstep unitoperations.Chromstep
+	Capturestep unitoperations.Chromstep
+	Washsteps  []unitoperations.Chromstep
+	Elutionstep unitoperations.Chromstep
 	
-	Blottime Time
-	Blotcylces int
+	Blottime time.Duration
+	Blotcycles int
 	
 	Vacuum bool
-	Vacuumstrength Torr
-	Drytime Time
+	Vacuumstrength float64 //Torr
+	Drytime time.Duration
 	
 	// cubesensor streams:
 	Pa float64 // in pascals atmospheric pressure of moist air (Pa) 100mBar = 1 pa
 	Temp float64 // in Kelvin
 	Relativehumidity float64 // Percentage // density water vapor (kg/m3)
 	
-	Time float64// time 
+	Time time.Duration //float64// time 
+	
 	
 	/* RBvolume Volume // 150ul
 	RBflowrate Rate
@@ -85,7 +90,7 @@ Parameters (
 	*/
 	//or 
 	
-
+)
 Data (
 	/* PlasmidConc Concentration
 	Storagelocation Location
@@ -93,57 +98,63 @@ Data (
 	Plasmidbuffer Composition */ // is this all inferred from a PLasmid solution  type anyway?
 )
 Inputs (
-	Devices.Phytips
-	Devices.Chiller
-	Devices.Vacuum_manifold
-	Devices.Blotting_position
+	Phytips unitoperations.Column //
+	Tips unitoperations.Column // wtype.LHTip
+	//Devices.Chiller
+	//Devices.Vacuum_manifold
+	//Devices.Blotting_position
 	
-	Cellpellet Culture // wrong type?
+	Cellpellet *wtype.Physical //unitoperations.Pellet // wrong type?
 	
-	RB Watersolution
-	LB Watersolution
-	PB Watersolution
-	Water Watersolution // equilibration buffer
-	Air Gas
-	Washbuffer[] Watersolution
-	Elutionbuffer Watersolution
+	//RB wtype.LHComponent //Watersolution
+	//LB wtype.LHComponent //Watersolution
+	//PB wtype.LHComponent //Watersolution
+	Water *wtype.LHComponent //Watersolution // equilibration buffer
+	Air *wtype.LHComponent //Gas
+	//Washbuffer []wtype.LHComponent //Watersolution
+	//Elutionbuffer *wtype.LHComponent //Watersolution
 )
 Outputs (
-	PlasmidDNAsolution PlasmidSolution
+	PlasmidDNAsolution *wtype.LHComponent //Solution //PlasmidSolution
 )
 Requirements {
 }
 Setup {
 } 
 Steps {
-	resuspension := Resuspension(Cellpellet, Resuspensionstep)
-	lysate := Lysis(Lysisstep,resuspension)
-	precipitate := Precipitation(Precipitationstep,lysate)
+	resuspension,_ := unitoperations.Resuspend(Cellpellet, Resuspensionstep,Tips)
+	lysate,_ := unitoperations.Chromatography(resuspension,Lysisstep,Tips)
+	precipitate,_ := unitoperations.Chromatography(lysate,Precipitationstep,Tips)
 	
-	columnready := Equilibration(Water, Equilibrationstep, Phytips)
+	_,columnready := unitoperations.Chromatography(Water, Equilibrationstep, Phytips)
 	
 	
-	readyforcapture := AirChromatography(Air,Airstep,columnready)
-	capture := Chromatography(precipitate, Capturestep, readyforcapture)
-	Wash[] := Chromatography(capture,Washstep,readyforcapture) ; i++
-	Blot(Blotcylces,Blottime)
+	_,readyforcapture := unitoperations.Chromatography(Air,Airstep,columnready)
+	capture,readyforcapture := unitoperations.Chromatography(precipitate, Capturestep, readyforcapture)
+	
+	for _, washstep := range Washsteps {
+	_, readyforcapture = unitoperations.Chromatography(capture,washstep,readyforcapture)
+	}
+	readyfordrying := unitoperations.Blot(readyforcapture,Blotcycles,Blottime)
 		
-	if Vacuum == true, 
-		drytips = Dry (Drytime,Vacuumstrength, Vacuum_manifold)
+	/*if Vacuum == true {
+		drytips := unitoperations.Dry(Tips,Drytime,Vacuumstrength)
 		
 		
-		//parameters required fro evaporation calculator
-		Liquid := Washbuffer Pipetstep.name //ethanol?
-		Platetype := Phytip.tip //.surfacearea? labware.phytip.surfacearea?
-		Volumeperwell := (Washbuffer.Volume / 10) // assume max 10% residual volume for now??
+		//parameters required for evaporation calculator
+		Liquid := Washsteps[0].Pipetstep.Name //ethanol?
+		// lookup properties via liquidclasses package to workout evaporation time using Evaporationrate element?
+		
+		
+		//Platetype := Phytips.tip //.surfacearea? labware.phytip.surfacearea?
+		Volumeperwell := (Washsteps[0].Pipetstep.Volume.SIValue() / 10) // assume max 10% residual volume for now??
 		
 		drytimerequired := Evaporation.Estimatedevaporationtime(Airvelocity, Liquid, Platetype, Volumeperwell)
 	
 	
-	)
-		else Dry (drytimerequired)
+	} else {*/drytips := unitoperations.Dry(readyfordrying,Drytime, Vacuumstrength)//}
 		
-	PlasmidDNAsolution = Chromatography(Elutionbuffer,Elutionstep, drytips)
+	PlasmidDNAsolution,_ = unitoperations.Chromatography(Elutionstep.Buffer,Elutionstep, drytips)
 	
 	
 }
