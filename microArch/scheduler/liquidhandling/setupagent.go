@@ -104,6 +104,7 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 	// outputs
 
 	for _, p := range output_plates {
+		logger.Debug(fmt.Sprintf("%v", output_plates))
 		position := get_first_available_preference(output_preferences, setup)
 		if position == "" {
 			RaiseError("No positions left for output")
@@ -136,6 +137,7 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 
 func get_first_available_preference(prefs []string, setup map[string]interface{}) string {
 	for _, pref := range prefs {
+		logger.Debug(fmt.Sprintf("looking for pref %s", pref))
 		_, ok := setup[pref]
 		if !ok {
 			return pref

@@ -25,9 +25,9 @@ package liquidhandling
 import (
 	"fmt"
 
-	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/microArch/factory"
 )
 
 //  TASK: 	Map inputs to input plates
@@ -44,6 +44,7 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 			input_platetypes[i] = factory.GetPlateByType(platetype)
 		}
 		(*request).Input_platetypes = input_platetypes
+		//debug
 	}
 	input_plates := (*request).Input_plates
 

@@ -24,12 +24,14 @@ package liquidhandling
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/rand"
 	"testing"
 
-	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/microArch/factory"
+	"github.com/antha-lang/antha/microArch/logger"
 )
 
 func TestStockConcs(*testing.T) {
@@ -81,7 +83,8 @@ func TestIPLinear(*testing.T) {
 	cmps := make(map[string]wunit.Volume)
 
 	for _, cmpn := range ctypes {
-		vf := rand.Float64() * 10000.0
+		logger.Debug("COMPONENT: ", cmpn)
+		vf := rand.Float64() * 4000.0
 		vol := wunit.NewVolume(vf, "ul")
 		cmps[cmpn] = vol
 	}
@@ -94,7 +97,10 @@ func TestIPLinear(*testing.T) {
 	plates := make([]*wtype.LHPlate, 0)
 
 	for _, p := range plist {
-		plates = append(plates, factory.GetPlateByType(p))
+		logger.Debug(p)
+		if p == "pcrplate_with_cooler" || p == "DSW96" {
+			plates = append(plates, factory.GetPlateByType(p))
+		}
 	}
 
 	// we need a map between components and volumes
@@ -102,18 +108,19 @@ func TestIPLinear(*testing.T) {
 	// and a map of weights and constraints
 
 	wtc := make(map[string]float64, 3)
-	wtc["MAX_N_PLATES"] = 2.0
-	wtc["MAX_N_WELLS"] = 12.0
+	wtc["MAX_N_PLATES"] = 4.0
+	wtc["MAX_N_WELLS"] = 270.0
 	wtc["RESIDUAL_VOLUME_WEIGHT"] = 1.0
 	ass := choose_plate_assignments(cmps, plates, wtc)
 	ass = ass
-	/*
-		for component, cmap := range ass {
-			for plt, nw := range cmap {
-				volreq := cmps[component]
-					logger.Debug(fmt.Sprintln("\t", nw, " wells of ", plt.Type, " total volume ", float64(nw)*(plt.Welltype.Vol-plt.Welltype.Rvol), " residual volume ", float64(nw)*plt.Welltype.Rvol, " volume required: ", volreq.RawValue()))
-			}
-
+	cnt := 0
+	for component, cmap := range ass {
+		for plt, nw := range cmap {
+			volreq := cmps[component]
+			fmt.Printf(fmt.Sprintln("\t", nw, " wells of ", plt.Type, " total volume ", float64(nw)*(plt.Welltype.Vol-plt.Welltype.Rvol), " residual volume ", float64(nw)*plt.Welltype.Rvol, " volume required: ", volreq.RawValue()))
+			cnt += nw
 		}
-	*/
+
+	}
+	logger.Debug(fmt.Sprintf("%d Wells total", cnt))
 }

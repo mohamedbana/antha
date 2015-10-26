@@ -477,6 +477,10 @@ type LHPlate struct {
 	WellZStart  float64
 }
 
+func (lhp LHPlate) Name() string {
+	return lhp.PlateName
+}
+
 func (lhp LHPlate) String() string {
 	return fmt.Sprintf(
 		`LHPlate {
@@ -682,7 +686,7 @@ type LHWell struct {
 
 func (w LHWell) String() string {
 	return fmt.Sprintf(
-`LHWELL{
+		`LHWELL{
 ID        : %s,
 Inst      : %s,
 Plateinst : %s,
@@ -704,26 +708,26 @@ Dunit     : %s,
 Extra     : %v,
 Plate     : %v,
 }`,
-	w.ID,
-	w.Inst,
-	w.Plateinst,
-	w.Plateid,
-	w.Platetype,
-	w.Crds,
-	w.Vol,
-	w.Vunit,
-	w.WContents,
-	w.Rvol,
-	w.Currvol,
-	w.WShape,
-	w.Bottom,
-	w.Xdim,
-	w.Ydim,
-	w.Zdim,
-	w.Bottomh,
-	w.Dunit,
-	w.Extra,
-	w.Plate,
+		w.ID,
+		w.Inst,
+		w.Plateinst,
+		w.Plateid,
+		w.Platetype,
+		w.Crds,
+		w.Vol,
+		w.Vunit,
+		w.WContents,
+		w.Rvol,
+		w.Currvol,
+		w.WShape,
+		w.Bottom,
+		w.Xdim,
+		w.Ydim,
+		w.Zdim,
+		w.Bottomh,
+		w.Dunit,
+		w.Extra,
+		w.Plate,
 	)
 }
 

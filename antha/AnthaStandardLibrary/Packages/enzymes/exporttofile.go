@@ -32,9 +32,8 @@ import (
 
 // function to export a standard report of sequence properties to a txt file
 func Exporttofile(dir string, seq wtype.BioSequence) string {
-	os.Mkdir(dir, 0777)
-	//if error = nil {
-	filename := dir + "/" + dir + "_" + seq.Name() + ".txt"
+	filename := fmt.Sprintf("%s%c%s_%s.txt", os.TempDir(), os.PathSeparator, dir, seq.Name())
+
 	f, e := os.Create(filename)
 	if e != nil {
 		log.Fatal(e)
@@ -83,9 +82,7 @@ func Exporttofile(dir string, seq wtype.BioSequence) string {
 
 // function to export a sequence to a txt file
 func ExportFasta(dir string, seq wtype.BioSequence) string {
-	os.Mkdir(dir, 0777)
-	//if error = nil {
-	filename := dir + "/" + dir + "_" + seq.Name() + ".fasta"
+	filename := fmt.Sprintf("%s%c%s_%s.fasta", os.TempDir(), os.PathSeparator, dir, seq.Name())
 	f, e := os.Create(filename)
 	if e != nil {
 		log.Fatal(e)
@@ -100,9 +97,7 @@ func ExportFasta(dir string, seq wtype.BioSequence) string {
 
 // function to export a sequence to a txt file
 func ExportFastaDir(dir string, file string, seq wtype.BioSequence) string {
-	os.Mkdir(dir, 0777)
-	//if error = nil {
-	filename := dir + "/" + file + "_" + seq.Name() + ".fasta"
+	filename := fmt.Sprintf("%s%c%s_%s.fasta", os.TempDir(), os.PathSeparator, dir, seq.Name())
 	f, e := os.Create(filename)
 	if e != nil {
 		log.Fatal(e)
@@ -116,9 +111,7 @@ func ExportFastaDir(dir string, file string, seq wtype.BioSequence) string {
 }
 
 func ExportReport(dir string, seq wtype.BioSequence) string {
-	os.Mkdir(dir, 0777)
-	//if error = nil {
-	filename := dir + "/" + dir + "_" + seq.Name() + ".txt"
+	filename := fmt.Sprintf("%s%c%s_%s.txt", os.TempDir(), os.PathSeparator, dir, seq.Name())
 	f, e := os.Create(filename)
 	if e != nil {
 		log.Fatal(e)
@@ -133,10 +126,7 @@ func ExportReport(dir string, seq wtype.BioSequence) string {
 
 // function to export multiple sequences in fasta format into a single txt file
 func Makefastaserial(dir string, seqs []*wtype.DNASequence) string {
-	os.Mkdir(dir, 0777)
-	//if error = nil {
-
-	filename := dir + "/" + dir + ".fasta"
+	filename := fmt.Sprintf("%s%c%s.fasta", os.TempDir(), os.PathSeparator, dir)
 	f, e := os.Create(filename)
 	if e != nil {
 		log.Fatal(e)
