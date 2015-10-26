@@ -12,7 +12,7 @@ import (
 )
 	
 Parameters (
-    Cellpelletmass Mass
+    //Cellpelletmass Mass
 	
 	Resuspensionstep unitoperations.Chromstep
 	Lysisstep unitoperations.Chromstep
@@ -31,11 +31,11 @@ Parameters (
 	Drytime time.Duration
 	
 	// cubesensor streams:
-	Pa float64 // in pascals atmospheric pressure of moist air (Pa) 100mBar = 1 pa
+	/*Pa float64 // in pascals atmospheric pressure of moist air (Pa) 100mBar = 1 pa
 	Temp float64 // in Kelvin
 	Relativehumidity float64 // Percentage // density water vapor (kg/m3)
-	
-	Time time.Duration //float64// time 
+	*/
+	//Time time.Duration //float64// time 
 	
 	
 	/* RBvolume Volume // 150ul
@@ -106,12 +106,12 @@ Inputs (
 	
 	Cellpellet *wtype.Physical //unitoperations.Pellet // wrong type?
 	
-	//RB wtype.LHComponent //Watersolution
-	//LB wtype.LHComponent //Watersolution
-	//PB wtype.LHComponent //Watersolution
-	Water *wtype.LHComponent //Watersolution // equilibration buffer
-	Air *wtype.LHComponent //Gas
-	//Washbuffer []wtype.LHComponent //Watersolution
+	//RB *wtype.LHComponent //Watersolution
+	//LB *wtype.LHComponent //Watersolution
+	//PB *wtype.LHComponent //Watersolution
+	//Water *wtype.LHComponent //Watersolution // equilibration buffer
+	//Air *wtype.LHComponent //Gas
+	//Washbuffer []*wtype.LHComponent //Watersolution
 	//Elutionbuffer *wtype.LHComponent //Watersolution
 )
 Outputs (
@@ -126,10 +126,10 @@ Steps {
 	lysate,_ := unitoperations.Chromatography(resuspension,Lysisstep,Tips)
 	precipitate,_ := unitoperations.Chromatography(lysate,Precipitationstep,Tips)
 	
-	_,columnready := unitoperations.Chromatography(Water, Equilibrationstep, Phytips)
+	_,columnready := unitoperations.Chromatography(Equilibrationstep.Buffer, Equilibrationstep, Phytips)
 	
 	
-	_,readyforcapture := unitoperations.Chromatography(Air,Airstep,columnready)
+	_,readyforcapture := unitoperations.Chromatography(Airstep.Buffer,Airstep,columnready)
 	capture,readyforcapture := unitoperations.Chromatography(precipitate, Capturestep, readyforcapture)
 	
 	for _, washstep := range Washsteps {
