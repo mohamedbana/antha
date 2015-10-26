@@ -25,6 +25,7 @@ package enzymes
 import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"strconv"
 	"strings"
 )
 
@@ -115,6 +116,25 @@ func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequen
 	return assembledfragments, plasmidproducts, err
 }
 
+/*func JoinAnnotatedparts(vector wtype.DNASequence, partsinorder []wtype.DNASequence, enzyme TypeIIs) (assembledfragments []Digestedfragment, plasmidproducts []wtype.DNASequence) {
+
+	doublestrandedvector := MakedoublestrandedDNA(vector)
+	digestedvector := DigestionPairs(doublestrandedvector, enzyme)
+
+	doublestrandedpart := MakedoublestrandedDNA(partsinorder[0])
+	digestedpart := DigestionPairs(doublestrandedpart, enzyme)
+	assembledfragments, plasmidproducts = Jointwoparts(digestedvector, digestedpart)
+	//fmt.Println("vector + part1 product = ", assembledfragments, plasmidproducts)
+	for i := 1; i < len(partsinorder); i++ {
+		doublestrandedpart = MakedoublestrandedDNA(partsinorder[i])
+		digestedpart := DigestionPairs(doublestrandedpart, enzyme)
+		//for _, newfragments := range assembledfragments {
+		assembledfragments, plasmidproducts = Jointwoparts(assembledfragments, digestedpart)
+		//}
+	}
+	return assembledfragments, plasmidproducts
+}
+*/
 type Assemblyparameters struct {
 	Constructname string
 	Enzymename    string
@@ -122,6 +142,12 @@ type Assemblyparameters struct {
 	Partsinorder  []wtype.DNASequence
 }
 
+/*type AA_DNA_Assemblyparameters struct {
+	Constructname string
+	Enzymename    string
+	Vector        wtype.DNASequence
+	Partsinorder  []wtype.BioSequence
+}*/
 func Assemblysimulator(assemblyparameters Assemblyparameters) (s string, successfulassemblies int, sites []Restrictionsites, newDNASequence wtype.DNASequence, err error) {
 
 	// fetch enzyme properties from map (this is basically a look up table for those who don't know)
@@ -204,11 +230,43 @@ func MultipleAssemblies(parameters []Assemblyparameters) (s string, successfulas
 	// for each construct
 	for _, construct := range parameters {
 
-		output, _, _, _, err := Assemblysimulator(construct)
+		output, count, _, _, err := Assemblysimulator(construct)
 		if err != nil {
 			allOK = false
-			errorDescription[construct.Constructname] = output
+
+			if output == "Nope! this won't work" {
+				//sitesstring := ""
+				sitesperpart := make([]Restrictionsites, 0)
+				constructsitesstring := make([]string, 0)
+				constructsitesstring = append(constructsitesstring, output)
+				//for i := 0; i < len(plasmidproductsfromXprimaryseq); i++ {
+				//enzyme := TypeIIsEnzymeproperties[strings.ToUpper(construct.Enzymename)]
+				//enzyme := rebase.EnzymeLookup(construct.Enzymename)
+				enzyme := SapI
+				sitesperpart = Restrictionsitefinder(construct.Vector, []wtype.LogicalRestrictionEnzyme{enzyme})
+				if len(sitesperpart) != 2 {
+					// need to loop through sitesperpart
+
+					sitepositions := SitepositionString(sitesperpart[0])
+					sitestring := construct.Vector.Nm + ":" + strconv.Itoa(sitesperpart[0].Numberofsites) + "sites found at positions" + sitepositions
+					constructsitesstring = append(constructsitesstring, sitestring)
+
+					for _, part := range construct.Partsinorder {
+						sitesperpart = Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enzyme})
+						if len(sitesperpart) != 2 {
+							sitepositions := SitepositionString(sitesperpart[0])
+							sitestring = fmt.Sprintf(part.Nm, ":", strconv.Itoa(sitesperpart[0].Numberofsites), "sites found at positions", sitepositions)
+							constructsitesstring = append(constructsitesstring, sitestring)
+						}
+
+					}
+				}
+				message := strings.Join(constructsitesstring, "")
+				errorDescription[construct.Constructname] = message
+			}
 		}
+		fmt.Println(output, count)
+
 		if output == "Yay! this should work" {
 			successfulassemblies = successfulassemblies + 1
 		}
