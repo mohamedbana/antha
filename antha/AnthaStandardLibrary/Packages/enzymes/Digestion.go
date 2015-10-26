@@ -71,7 +71,7 @@ func SitepositionString(sitesperpart Restrictionsites) (sitepositions string) {
 	for _, site := range sitesperpart.Reversepositions {
 		Num = append(Num, strconv.Itoa(site))
 	}
-	sitepositions = strings.Join(Num, ";")
+	sitepositions = strings.Join(Num, ", ")
 	return
 }
 
@@ -81,6 +81,7 @@ func Restrictionsitefinder(sequence wtype.DNASequence, enzymelist []wtype.Logica
 
 	for _, enzyme := range enzymelist {
 		var enzymesite Restrictionsites
+		//var siteafterwobble Restrictionsites
 		enzymesite.Enzyme = enzyme
 		enzymesite.Recognitionsequence = strings.ToUpper(enzyme.RecognitionSequence)
 		sequence.Seq = strings.ToUpper(sequence.Seq)
@@ -89,33 +90,28 @@ func Restrictionsitefinder(sequence wtype.DNASequence, enzymelist []wtype.Logica
 
 		for _, wobbleoption := range wobbleproofrecognitionoptions {
 
-			if strings.Contains(sequence.Seq, wobbleoption) {
-				enzymesite.Sitefound = true
-			}
-
-			options := Findall(sequence.Seq, wobbleoption)
-			for _, option := range options {
-				if option != 0 {
-					enzymesite.Forwardpositions = append(enzymesite.Forwardpositions, option)
-				}
-			}
-			if enzyme.RecognitionSequence == RevComp(wobbleoption) {
-				enzymesite.Reversepositions = enzymesite.Forwardpositions
-				enzymesite.Numberofsites = len(enzymesite.Forwardpositions)
-			} else {
-				options := Findall(sequence.Seq, RevComp(wobbleoption))
+				options := Findall(sequence.Seq, wobbleoption)
 				for _, option := range options {
 					if option != 0 {
-						enzymesite.Reversepositions = append(enzymesite.Forwardpositions, option)
+						enzymesite.Forwardpositions = append(enzymesite.Forwardpositions, option)
 					}
 				}
+				if enzyme.RecognitionSequence != strings.ToUpper(RevComp(wobbleoption)) {
+					revoptions := Findall(sequence.Seq, RevComp(wobbleoption))
+					for _, option := range revoptions {
+						if option != 0 {
+							enzymesite.Reversepositions = append(enzymesite.Reversepositions, option)
+						}
+					}
+
+				}
 				enzymesite.Numberofsites = len(enzymesite.Forwardpositions) + len(enzymesite.Reversepositions)
-			}
-			if enzymesite.Numberofsites > 0 {
-				enzymesite.Sitefound = true
-			}
+				if enzymesite.Numberofsites > 0 {
+					enzymesite.Sitefound = true
+				}
 
 		}
+
 		sites = append(sites, enzymesite)
 	}
 

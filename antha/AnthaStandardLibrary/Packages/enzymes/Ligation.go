@@ -189,7 +189,7 @@ func Assemblysimulator(assemblyparameters Assemblyparameters) (s string, success
 	s = "hmmm I'm confused, this doesn't seem to make any sense"
 
 	if len(plasmidproductsfromXprimaryseq) == 0 && len(failedassemblies) == 0 {
-		s = "Nope! this won't work"
+		s = "Nope! this construct won't work"
 	}
 	if len(plasmidproductsfromXprimaryseq) == 1 {
 		s = "Yay! this should work"
@@ -234,34 +234,36 @@ func MultipleAssemblies(parameters []Assemblyparameters) (s string, successfulas
 		if err != nil {
 			allOK = false
 
-			if output == "Nope! this won't work" {
+			if output == "Nope! this construct won't work" {
 				//sitesstring := ""
 				sitesperpart := make([]Restrictionsites, 0)
 				constructsitesstring := make([]string, 0)
 				constructsitesstring = append(constructsitesstring, output)
+				sitestring := ""
 				//for i := 0; i < len(plasmidproductsfromXprimaryseq); i++ {
 				//enzyme := TypeIIsEnzymeproperties[strings.ToUpper(construct.Enzymename)]
 				//enzyme := rebase.EnzymeLookup(construct.Enzymename)
 				enzyme := SapI
 				sitesperpart = Restrictionsitefinder(construct.Vector, []wtype.LogicalRestrictionEnzyme{enzyme})
-				if len(sitesperpart) != 2 {
+				if sitesperpart[0].Numberofsites != 2 {
 					// need to loop through sitesperpart
 
 					sitepositions := SitepositionString(sitesperpart[0])
-					sitestring := construct.Vector.Nm + ":" + strconv.Itoa(sitesperpart[0].Numberofsites) + "sites found at positions" + sitepositions
+					sitestring = "For " + construct.Vector.Nm + ": " + strconv.Itoa(sitesperpart[0].Numberofsites) + " sites found at positions: " + sitepositions
 					constructsitesstring = append(constructsitesstring, sitestring)
+				}
 
-					for _, part := range construct.Partsinorder {
+				for _, part := range construct.Partsinorder {
 						sitesperpart = Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enzyme})
-						if len(sitesperpart) != 2 {
+						if sitesperpart[0].Numberofsites != 2 {
 							sitepositions := SitepositionString(sitesperpart[0])
-							sitestring = fmt.Sprintf(part.Nm, ":", strconv.Itoa(sitesperpart[0].Numberofsites), "sites found at positions", sitepositions)
+							sitestring = fmt.Sprint("For ", part.Nm, ": ", strconv.Itoa(sitesperpart[0].Numberofsites), " sites were found at positions: ", sitepositions)
 							constructsitesstring = append(constructsitesstring, sitestring)
 						}
 
-					}
 				}
-				message := strings.Join(constructsitesstring, "")
+
+				message := strings.Join(constructsitesstring, "; ")
 				errorDescription[construct.Constructname] = message
 			}
 		}
