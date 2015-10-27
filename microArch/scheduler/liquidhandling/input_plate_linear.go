@@ -202,6 +202,7 @@ func choose_plate_assignments(component_volumes map[string]wunit.Volume, plate_t
 	iocp := glpk.NewIocp()
 	iocp.SetPresolve(true)
 	//debug
+	//iocp.SetMsgLev(2)
 	iocp.SetMsgLev(2)
 	lp.Intopt(iocp)
 
