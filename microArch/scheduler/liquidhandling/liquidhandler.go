@@ -80,22 +80,6 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) *LHRequest {
 	}
 
 	logger.Debug("Make Solutions, before plan")
-
-	/*
-		logger.Debug("TIPS TIPS TIPS:::")
-
-		for _, v := range request.Tips {
-			logger.Debug(fmt.Sprintf("%v", v))
-		}
-
-		logger.Debug("INPUTPLATES INPUTPLATES INPUTPLATES:::")
-		for _, v := range request.Input_platetypes {
-			logger.Debug(fmt.Sprintf("%v", v))
-		}
-		logger.Debug("OUTPUTPLATES OUTPUTPLATES OUTPUTPLATES:::")
-		logger.Debug(fmt.Sprintf("%v", request.Output_platetype))
-	*/
-
 	this.Plan(request)
 	logger.Debug("Plan ready")
 	this.Execute(request)
@@ -181,7 +165,6 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 	// define the input plates
 
 	request = input_plate_setup(request)
-	logger.Debug("YESSSS")
 
 	// set up the mapping of the outputs
 	// this assumes the input plates are set
