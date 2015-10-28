@@ -21,61 +21,64 @@ import (
 
 //Torr
 
-// cubesensor streams:
+// cubesensor streams to work out drying time:
 /*Pa float64 // in pascals atmospheric pressure of moist air (Pa) 100mBar = 1 pa
 Temp float64 // in Kelvin
 Relativehumidity float64 // Percentage // density water vapor (kg/m3)
 */
 //Time time.Duration //float64// time
 
-/* RBvolume Volume // 150ul
-RBflowrate Rate
-RBpause Time // seconds
-RBcycles int
+/*
+	Parameters before refactoring into Chromstep structs
 
-LBvolume Volume
-LBflowrate Rate
-LBpause Time
-LBcycles int
+	RBvolume Volume // 150ul
+	RBflowrate Rate
+	RBpause Time // seconds
+	RBcycles int
 
-PBvolume Volume
-PBflowrate Rate
-PBpause Time
-PBcycles int
+	LBvolume Volume
+	LBflowrate Rate
+	LBpause Time
+	LBcycles int
 
-Equilibrationvolume Volume
-Equilibrationflowrate Rate
-Equilibrationpause Time
-Equilibrationcycles int
+	PBvolume Volume
+	PBflowrate Rate
+	PBpause Time
+	PBcycles int
 
-Airdispensevolume Volume
-Airdispenseflowrate Rate
-Airdispensepause Time
-Airdispensecycles int
+	Equilibrationvolume Volume
+	Equilibrationflowrate Rate
+	Equilibrationpause Time
+	Equilibrationcycles int
 
-
-
-Airaspiratevolume Volume
-Airaspirateflowrate Rate
-Airaspiratepause Time
-Airaspiratecylces int
-
-Capturevoume Volume
-Captureflowrate Rate
-Capturepause Time
-Capturecycles int
-
-Washbuffervolume [] Volume
-Washbufferflowrate [] Rate
-Washbufferpause [] Time
-Washbuffercycles [] int
+	Airdispensevolume Volume
+	Airdispenseflowrate Rate
+	Airdispensepause Time
+	Airdispensecycles int
 
 
 
-Elutionbuffervolume Volume
-Elutionflowrate Rate
-Elutionpause Time
-Elutioncycles int
+	Airaspiratevolume Volume
+	Airaspirateflowrate Rate
+	Airaspiratepause Time
+	Airaspiratecylces int
+
+	Capturevoume Volume
+	Captureflowrate Rate
+	Capturepause Time
+	Capturecycles int
+
+	Washbuffervolume [] Volume
+	Washbufferflowrate [] Rate
+	Washbufferpause [] Time
+	Washbuffercycles [] int
+
+
+
+	Elutionbuffervolume Volume
+	Elutionflowrate Rate
+	Elutionpause Time
+	Elutioncycles int
 
 */
 //or
@@ -87,10 +90,6 @@ Plasmidbuffer Composition */ // is this all inferred from a PLasmid solution  ty
 
 //
 // wtype.LHTip
-//Devices.Chiller
-//Devices.Vacuum_manifold
-//Devices.Blotting_position
-
 //unitoperations.Pellet // wrong type?
 
 //RB *wtype.LHComponent //Watersolution

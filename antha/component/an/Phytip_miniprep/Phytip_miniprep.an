@@ -10,7 +10,6 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"time"
 )
-	
 Parameters (
     //Cellpelletmass Mass
 	
@@ -30,7 +29,7 @@ Parameters (
 	Vacuumstrength float64 //Torr
 	Drytime time.Duration
 	
-	// cubesensor streams:
+	// cubesensor streams to work out drying time:
 	/*Pa float64 // in pascals atmospheric pressure of moist air (Pa) 100mBar = 1 pa
 	Temp float64 // in Kelvin
 	Relativehumidity float64 // Percentage // density water vapor (kg/m3)
@@ -38,7 +37,10 @@ Parameters (
 	//Time time.Duration //float64// time 
 	
 	
-	/* RBvolume Volume // 150ul
+	/*
+	Parameters before refactoring into Chromstep structs
+
+	RBvolume Volume // 150ul
 	RBflowrate Rate
 	RBpause Time // seconds
 	RBcycles int
@@ -100,10 +102,6 @@ Data (
 Inputs (
 	Phytips unitoperations.Column //
 	Tips unitoperations.Column // wtype.LHTip
-	//Devices.Chiller
-	//Devices.Vacuum_manifold
-	//Devices.Blotting_position
-	
 	Cellpellet *wtype.Physical //unitoperations.Pellet // wrong type?
 	
 	//RB *wtype.LHComponent //Watersolution

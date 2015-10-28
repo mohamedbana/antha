@@ -19,10 +19,10 @@ import (
 // Input parameters for this protocol (data)
 
 // or should this be a concentration?
-//DNAgelruntime time
+//DNAgelruntime time.Duration
 //DNAgelwellcapacity Volume
 //DNAgelnumberofwells int32
-//Organism taxonomy //= http://www.ncbi.nlm.nih.gov/nuccore/49175990?report=genbank
+//Organism Taxonomy //= http://www.ncbi.nlm.nih.gov/nuccore/49175990?report=genbank
 //Organismgenome Genome
 //Target_DNA wtype.DNASequence
 //Target_DNAsize float64 //Length
@@ -42,9 +42,11 @@ import (
 
 //WaterSolution
 //WaterSolution //Chemspiderlink // not correct link but similar desirable
+//Gel
+
 //DNAladder *wtype.LHComponent//NucleicacidSolution
 //Water *wtype.LHComponent//WaterSolution
-//Gel
+
 //DNAgelbuffer *wtype.LHComponent//WaterSolution
 //DNAgelNucleicacidintercalator *wtype.LHComponent//ToxicSolution // e.g. ethidium bromide, sybrsafe
 //QC_sample *wtype.LHComponent//QC // this is a control
@@ -111,20 +113,24 @@ func (e *DNA_gel) steps(p DNA_gelParamBlock, r *DNA_gelResultBlock) {
 	_ = _wrapper.WaitToEnd()
 
 	// Then run the gel
-	/*Devices.Gelpowerpack.run (Runvoltage,DNAgelruntime)
+	/* DNAgel := electrophoresis.Run(Loadedgel,Runvoltage,DNAgelruntime)
 
 		// then analyse
-	    Visualise.DNAgel
-		call assemblydesign_validation{
-		if pass? bool
-		{
-		Visualise.Numberofbands int == 1,
-		Visualise.Bandsize == PCR_product_length {
-		crossreference DNAladder for PCR_product_length length
-		if PCR_product_length == expectedDNAcalculatebandsize {
-		pass? bool}
-		if check PCR_product_length != [incorrect_assembly_possibilities]{
-	    pass? bool}
+	   	DNAgel.Visualise()
+		PCR_product_length = call(assemblydesign_validation).PCR_product_length
+		if DNAgel.Numberofbands() == 1
+		&& DNAgel.Bandsize(DNAgel[0]) == PCR_product_length {
+			Pass = true
+			}
+
+		incorrect_assembly_possibilities := assemblydesign_validation.Otherpossibleassemblysizes()
+
+		for _, incorrect := range incorrect_assembly_possibilities {
+			if  PCR_product_length == incorrect {
+	    pass == false
+		S := "matches size of incorrect assembly possibility"
+		}
+
 		//cherrypick(positive_colonies,recoverylocation)*/
 }
 
@@ -155,9 +161,9 @@ func (e *DNA_gel) validation(p DNA_gelParamBlock, r *DNA_gelResultBlock) {
 			stop
 		}
 		if calculatedbandsize != expected {
-		check if calculatedbandsize == incorrect_assembly_possibilities[]{
-			return incorrect_assembly_possibility,
-			call assembly_troubleshoot
+		if S == "matches size of incorrect assembly possibility" {
+			call(assembly_troubleshoot)
+			}
 		} // loop at beginning should be designed to split labware resource optimally in the event of any failures e.g. if 96well capacity and 4 failures check 96/4 = 12 colonies of each to maximise chance of getting a hit
 	    }
 	    if repeat > 2
