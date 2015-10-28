@@ -27,6 +27,56 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 )
 
-func ReadAbsorbance(solution wtype.Solution, pathlength wunit.Length, wavelength float64) float64 {
-	return 0.0
+func ReadAbsorbance(plate wtype.LHPlate, solution wtype.LHSolution, wavelength float64) (abs wtype.Absorbance) {
+	abs.Reading = 0.0 // obviously placeholder
+	abs.Wavelength = wavelength
+	// add calculation to work out pathlength from volume and well geometry abs.Pathlength
+
+	return abs
 }
+
+func Blankcorrect(blank wtype.Absorbance, sample wtype.Absorbance) (blankcorrected wtype.Absorbance) {
+
+	if sample.Wavelength == blank.Wavelength &&
+		sample.Pathlength == blank.Pathlength &&
+		sample.Reader == blank.Reader {
+		blankcorrected.Reading = sample.Reading - blank.Reading
+
+		//currentstatus = make([]string,0)
+
+		for _, status := range sample.Status {
+			blankcorrected.Status = append(blankcorrected.Status, status)
+		}
+		blankcorrected.Status = append(blankcorrected.Status, "Blank Corrected")
+	}
+	return
+}
+
+func PathlengthCorrect(pathlength wunit.Length, reading wtype.Absorbance) (pathlengthcorrected wtype.Absorbance) {
+
+	referencepathlength := wunit.NewLength(0.01, "m")
+
+	pathlengthcorrected.Reading = reading.Reading * referencepathlength.SIValue() / pathlength.SIValue()
+	return
+}
+
+//example
+
+/*
+func OD(Platetype wtype.LHPLate,wellvolume wtype.Volume,reading wtype.Absorbance) (od wtype.Absorbance){
+volumetopathlengthconversionfactor := 0.0533//WellCrosssectionalArea
+OD = (Blankcorrected_absorbance * 10/(total_volume*volumetopathlengthconversionfactor)// 0.0533 could be written as function of labware and liquid volume (or measureed height)
+}
+
+DCW = OD * ODtoDCWconversionfactor
+
+*/
+/*
+type Absorbance struct {
+	Reading    float64
+	Wavelength float64
+	Pathlength *wtype.Length
+	Status     *[]string
+	Reader     *string
+}
+*/
