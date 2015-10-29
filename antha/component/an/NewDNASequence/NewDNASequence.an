@@ -1,0 +1,63 @@
+protocol NewDNASequence
+
+import (
+	//"fmt"
+	//"math"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+)
+// Input parameters for this protocol
+Parameters (
+	DNA_seq string
+	Gene_name string
+	Plasmid bool
+	Linear bool
+	SingleStranded bool
+	
+)
+
+// Data which is returned from this protocol
+Data (
+	DNA wtype.DNASequence
+)
+
+// Physical inputs to this protocol
+Inputs (
+
+)
+
+// Physical outputs from this protocol
+Outputs (
+)
+
+Requirements {
+
+}
+
+// Actions to perform before protocol itself
+Setup {
+
+}
+
+// Core process of the protocol: steps to be performed for each input
+Steps {
+	
+	if Plasmid != Linear && Plasmid != SingleStranded {
+		if Plasmid  {
+			DNA = wtype.MakePlasmidDNASequence(Gene_name,DNA_seq)
+					}else if Linear {
+						DNA = wtype.MakeLinearDNASequence(Gene_name,DNA_seq)
+							} else if SingleStranded {
+									DNA = wtype.MakeSingleStrandedDNASequence(Gene_name,DNA_seq)	
+									} 
+}
+
+}
+// Actions to perform after steps block to analyze data
+Analysis {
+
+}
+
+Validation {
+
+}

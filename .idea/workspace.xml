@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="286ebfac-965b-4ddc-b79c-32f163d7d694" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/antha/component/an/DNA_gel/DNA_gel.an" afterPath="$PROJECT_DIR$/antha/component/an/DNA_gel/DNA_gel.an" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/GOPATH__antha_.xml" afterPath="$PROJECT_DIR$/.idea/libraries/GOPATH__antha_.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/antha/component/lib/lib.go" afterPath="$PROJECT_DIR$/antha/component/lib/lib.go" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="antha.iws" />
@@ -30,7 +29,7 @@
         <entry file="file://$PROJECT_DIR$/antha/AnthaStandardLibrary/Packages/enzymes/Ligation.go">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="255" column="55" selection-start-line="255" selection-start-column="37" selection-end-line="255" selection-end-column="55" />
+              <caret line="251" column="0" selection-start-line="251" selection-start-column="0" selection-end-line="251" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -52,11 +51,9 @@
       <file leaf-file-name="unitoperations.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/antha/AnthaStandardLibrary/Packages/unitoperations/unitoperations.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding>
-                <element signature="e#42#216#0" expanded="true" />
-              </folding>
+            <state vertical-scroll-proportion="0.058517557">
+              <caret line="3" column="8" selection-start-line="3" selection-start-column="8" selection-end-line="3" selection-end-column="8" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -131,16 +128,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="_typeIIsassembly_test.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/antha/AnthaStandardLibrary/Packages/enzymes/_typeIIsassembly_test.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="427" column="53" selection-start-line="427" selection-start-column="53" selection-end-line="427" selection-end-column="62" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
     </leaf>
   </component>
   <component name="Git.Settings">
@@ -160,6 +147,8 @@
         <option value="$PROJECT_DIR$/antha/anthalib/wtype/absorbance.go" />
         <option value="$PROJECT_DIR$/antha/component/an/DNA_gel/DNA_gel.an" />
         <option value="$PROJECT_DIR$/antha/component/an/OD/OD.an" />
+        <option value="$PROJECT_DIR$/antha/AnthaStandardLibrary/Packages/unitoperations/unitoperations.go" />
+        <option value="$PROJECT_DIR$/antha/component/lib/lib.go" />
       </list>
     </option>
   </component>
@@ -1005,12 +994,12 @@
       <workItem from="1445858588534" duration="53000" />
       <workItem from="1445858653652" duration="10000" />
       <workItem from="1445858664913" duration="1603000" />
-      <workItem from="1446043704559" duration="892000" />
+      <workItem from="1446043704559" duration="1452000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3671000" />
+    <option name="totallyTimeSpent" value="4231000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="26" y="30" width="1411" height="866" extended-state="0" />
@@ -1084,9 +1073,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#42#216#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1415,7 +1402,7 @@
     <entry file="file://$PROJECT_DIR$/antha/AnthaStandardLibrary/Packages/enzymes/Ligation.go">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="255" column="55" selection-start-line="255" selection-start-column="37" selection-end-line="255" selection-end-column="55" />
+          <caret line="251" column="0" selection-start-line="251" selection-start-column="0" selection-end-line="251" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1473,13 +1460,19 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/antha/AnthaStandardLibrary/Packages/unitoperations/unitoperations.go">
+    <entry file="file://$PROJECT_DIR$/antha/component/lib/lib.go">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#42#216#0" expanded="true" />
-          </folding>
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/antha/AnthaStandardLibrary/Packages/unitoperations/unitoperations.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.058517557">
+          <caret line="3" column="8" selection-start-line="3" selection-start-column="8" selection-end-line="3" selection-end-column="8" />
+          <folding />
         </state>
       </provider>
     </entry>

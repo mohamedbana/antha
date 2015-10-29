@@ -104,6 +104,7 @@ func DefaultBLASTSearchParameters() BLASTSearchParameters {
 	return BLASTSearchParameters{10.0, "BLOSUM62", true, -1, -1, 250, 250, 1}
 }
 
+// creates a fasta file containing the sequence
 func Makeseq(dir string, seq BioSequence) string {
 	filename := dir + "/" + seq.Name() + ".fasta"
 	f, e := os.Create(filename)
