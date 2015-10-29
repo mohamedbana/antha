@@ -1,5 +1,5 @@
 // Example syntax
-package unitoperations
+package UnitOperations
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
