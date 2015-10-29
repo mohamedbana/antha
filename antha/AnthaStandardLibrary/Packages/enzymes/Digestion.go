@@ -23,10 +23,11 @@
 package enzymes
 
 import (
-	"sort"
-	"strings"
-	"strconv"
+	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"sort"
+	"strconv"
+	"strings"
 )
 
 //should expand to be more general, i.e. 3prime overhangs
@@ -90,25 +91,25 @@ func Restrictionsitefinder(sequence wtype.DNASequence, enzymelist []wtype.Logica
 
 		for _, wobbleoption := range wobbleproofrecognitionoptions {
 
-				options := Findall(sequence.Seq, wobbleoption)
-				for _, option := range options {
+			options := Findall(sequence.Seq, wobbleoption)
+			for _, option := range options {
+				if option != 0 {
+					enzymesite.Forwardpositions = append(enzymesite.Forwardpositions, option)
+				}
+			}
+			if enzyme.RecognitionSequence != strings.ToUpper(RevComp(wobbleoption)) {
+				revoptions := Findall(sequence.Seq, RevComp(wobbleoption))
+				for _, option := range revoptions {
 					if option != 0 {
-						enzymesite.Forwardpositions = append(enzymesite.Forwardpositions, option)
+						enzymesite.Reversepositions = append(enzymesite.Reversepositions, option)
 					}
 				}
-				if enzyme.RecognitionSequence != strings.ToUpper(RevComp(wobbleoption)) {
-					revoptions := Findall(sequence.Seq, RevComp(wobbleoption))
-					for _, option := range revoptions {
-						if option != 0 {
-							enzymesite.Reversepositions = append(enzymesite.Reversepositions, option)
-						}
-					}
 
-				}
-				enzymesite.Numberofsites = len(enzymesite.Forwardpositions) + len(enzymesite.Reversepositions)
-				if enzymesite.Numberofsites > 0 {
-					enzymesite.Sitefound = true
-				}
+			}
+			enzymesite.Numberofsites = len(enzymesite.Forwardpositions) + len(enzymesite.Reversepositions)
+			if enzymesite.Numberofsites > 0 {
+				enzymesite.Sitefound = true
+			}
 
 		}
 

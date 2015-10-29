@@ -11,10 +11,14 @@ import (
 )
 // Input parameters for this protocol (data)
 Parameters (
+	
 	Loadingdyeinsample bool
+	
 	Loadingdyevolume Volume
 	DNAgelrunvolume Volume
+	
 	DNAladder Volume // or should this be a concentration?
+
 	//DNAgelruntime time.Duration
 	//DNAgelwellcapacity Volume
 	//DNAgelnumberofwells int32
@@ -82,6 +86,7 @@ Steps {
 
 	// load gel
 	var DNAgelloadmix *wtype.LHComponent
+		
 		if Loadingdyeinsample == false {
 		DNAgelloadmixsolution := MixInto(
 		DNAgel,

@@ -19,6 +19,7 @@ import (
 // Input parameters for this protocol (data)
 
 // or should this be a concentration?
+
 //DNAgelruntime time.Duration
 //DNAgelwellcapacity Volume
 //DNAgelnumberofwells int32
@@ -93,6 +94,7 @@ func (e *DNA_gel) steps(p DNA_gelParamBlock, r *DNA_gelResultBlock) {
 
 	// load gel
 	var DNAgelloadmix *wtype.LHComponent
+
 	if p.Loadingdyeinsample == false {
 		DNAgelloadmixsolution := _wrapper.MixInto(
 			p.DNAgel,

@@ -24,6 +24,7 @@ package enzymes
 
 import (
 	"fmt"
+	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"strconv"
 	"strings"
@@ -68,10 +69,10 @@ func Jointwoparts(upstreampart []Digestedfragment, downstreampart []Digestedfrag
 			}
 		}
 	}
-	if len(assembledfragments) == 0 && len(plasmidproducts) ==0 {
+	if len(assembledfragments) == 0 && len(plasmidproducts) == 0 {
 		err = fmt.Errorf("fragments aren't compatible, check ends")
 	}
- 	return assembledfragments, plasmidproducts,err
+	return assembledfragments, plasmidproducts, err
 }
 
 func Jointwopartsfromsequence(vector wtype.DNASequence, part1 wtype.DNASequence, enzyme TypeIIs) (assembledfragments []Digestedfragment, plasmidproducts []wtype.DNASequence) {
@@ -86,26 +87,23 @@ func Jointwopartsfromsequence(vector wtype.DNASequence, part1 wtype.DNASequence,
 	return assembledfragments, plasmidproducts
 }
 
-
-
-
 func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequence, enzyme TypeIIs) (assembledfragments []Digestedfragment, plasmidproducts []wtype.DNASequence, err error) {
 
 	if vector.Seq == "" {
 		err = fmt.Errorf("No Vector sequence found")
-		return assembledfragments,plasmidproducts,err
+		return assembledfragments, plasmidproducts, err
 	}
 	doublestrandedvector := MakedoublestrandedDNA(vector)
 	digestedvector := DigestionPairs(doublestrandedvector, enzyme)
 
 	if len(partsinorder) == 0 {
-		return nil,nil,fmt.Errorf("No parts found")
+		return nil, nil, fmt.Errorf("No parts found")
 	}
-	if len(partsinorder[0].Seq) ==0 {
+	if len(partsinorder[0].Seq) == 0 {
 		name := partsinorder[0].Nm
 		errorstring := name + " has no sequence"
 		err = fmt.Errorf(errorstring)
-		return assembledfragments,plasmidproducts,err
+		return assembledfragments, plasmidproducts, err
 	}
 	doublestrandedpart := MakedoublestrandedDNA(partsinorder[0])
 	digestedpart := DigestionPairs(doublestrandedpart, enzyme)
@@ -114,28 +112,28 @@ func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequen
 	if newerr != nil {
 		message := fmt.Sprint(vector.Nm, " and ", partsinorder[0].Nm, ": ", newerr.Error())
 		err = fmt.Errorf(message)
-	return
+		return
 	}
 
 	for i := 1; i < len(partsinorder); i++ {
-		if len(partsinorder[i].Seq) ==0 {
+		if len(partsinorder[i].Seq) == 0 {
 			name := partsinorder[i].Nm
 			errorstring := name + " has no sequence"
 			err = fmt.Errorf(errorstring)
-			return assembledfragments,plasmidproducts,err
+			return assembledfragments, plasmidproducts, err
 		}
 		doublestrandedpart = MakedoublestrandedDNA(partsinorder[i])
 		digestedpart := DigestionPairs(doublestrandedpart, enzyme)
 		//for _, newfragments := range assembledfragments {
 		assembledfragments, plasmidproducts, newerr = Jointwoparts(assembledfragments, digestedpart)
 		if newerr != nil {
-		//	if err != nil {
-				message := fmt.Sprint(partsinorder[i - 1].Nm, " and ", partsinorder[i].Nm, ": ", newerr.Error())
-				err = fmt.Errorf(message)
-		//	} else {
-		//		message := fmt.Sprint(partsinorder[i - 1].Nm, " and ", partsinorder[i].Nm, ": ", newerr.Error())
-		//		err = fmt.Errorf(message)
-		//	}
+			//	if err != nil {
+			message := fmt.Sprint(partsinorder[i-1].Nm, " and ", partsinorder[i].Nm, ": ", newerr.Error())
+			err = fmt.Errorf(message)
+			//	} else {
+			//		message := fmt.Sprint(partsinorder[i - 1].Nm, " and ", partsinorder[i].Nm, ": ", newerr.Error())
+			//		err = fmt.Errorf(message)
+			//	}
 			return
 		}
 		//}
@@ -186,7 +184,7 @@ func Assemblysimulator(assemblyparameters Assemblyparameters) (s string, success
 
 	// need to expand this to include other enzyme possibilities
 	if enzyme.Name != "SapI" && enzyme.Name != "BsaI" && enzyme.Name != "BpiI" {
-		s = fmt.Sprint(enzymename,": Incorrect Enzyme or no enzyme specified")
+		s = fmt.Sprint(enzymename, ": Incorrect Enzyme or no enzyme specified")
 		err = fmt.Errorf(s)
 		return s, successfulassemblies, sites, newDNASequence, err
 	}
@@ -264,12 +262,10 @@ func MultipleAssemblies(parameters []Assemblyparameters) (s string, successfulas
 		output, _, _, _, err := Assemblysimulator(construct)
 		s = "Oh no, not all assemblies seem to work out"
 
-
-
 		if err != nil {
 			allOK = false
 
-			if strings.Contains(err.Error(),"Failure Joining fragments after digestion") == true {
+			if strings.Contains(err.Error(), "Failure Joining fragments after digestion") == true {
 				//sitesstring := ""
 				sitesperpart := make([]Restrictionsites, 0)
 				constructsitesstring := make([]string, 0)
@@ -289,16 +285,16 @@ func MultipleAssemblies(parameters []Assemblyparameters) (s string, successfulas
 				}
 
 				for _, part := range construct.Partsinorder {
-						sitesperpart = Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enzyme})
-						if sitesperpart[0].Numberofsites != 2 {
-							sitepositions := SitepositionString(sitesperpart[0])
-							positions := ""
-							if sitesperpart[0].Numberofsites != 0 {
-								positions = fmt.Sprint("at positions:", sitepositions)
-							}
-							sitestring = fmt.Sprint("For ", part.Nm, ": ", strconv.Itoa(sitesperpart[0].Numberofsites), " sites were found ", positions)
-							constructsitesstring = append(constructsitesstring, sitestring)
+					sitesperpart = Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enzyme})
+					if sitesperpart[0].Numberofsites != 2 {
+						sitepositions := SitepositionString(sitesperpart[0])
+						positions := ""
+						if sitesperpart[0].Numberofsites != 0 {
+							positions = fmt.Sprint("at positions:", sitepositions)
 						}
+						sitestring = fmt.Sprint("For ", part.Nm, ": ", strconv.Itoa(sitesperpart[0].Numberofsites), " sites were found ", positions)
+						constructsitesstring = append(constructsitesstring, sitestring)
+					}
 
 				}
 				if len(constructsitesstring) != 1 {
@@ -308,11 +304,10 @@ func MultipleAssemblies(parameters []Assemblyparameters) (s string, successfulas
 				}
 			}
 
-			s = fmt.Sprint(construct.Constructname,": ",err.Error())
+			s = fmt.Sprint(construct.Constructname, ": ", err.Error())
 
 			errorDescription[construct.Constructname] = s
 		}
-
 
 		if output == "Yay! this should work" {
 			successfulassemblies = successfulassemblies + 1
