@@ -50,9 +50,9 @@ type Config struct {
 // Assumes that params is a nil instance and conf is like type of params but
 // with some values as FromFactory rather than the appropriate interface type
 func (p *Config) transfer(cv reflect.Value, pv reflect.Value) error {
-	fmt.Println(">>> ", cv, " +++ ", pv)
+	//fmt.Println(">>> ", cv, " +++ ", pv)
 	factoryType := reflect.TypeOf(wtype.FromFactory{})
-	fmt.Println("    >> >> >> ", reflect.ValueOf(cv))
+	//fmt.Println("    >> >> >> ", reflect.ValueOf(cv))
 	ct := cv.Type()
 	pt := pv.Type()
 	switch {

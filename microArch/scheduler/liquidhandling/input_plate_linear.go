@@ -205,14 +205,6 @@ func choose_plate_assignments(component_volumes map[string]wunit.Volume, plate_t
 	iocp.SetMsgLev(0)
 	lp.Intopt(iocp)
 
-	// check constraints
-	/*
-		for i := 1; i <= n_rows; i++ {
-			logger.Debug(fmt.Sprintln("ROW : ", i, " VAL : ", lp.MipRowVal(i)))
-		}
-	*/
-	// fill assignments - this is the number of wells in the plate of each type needed
-
 	assignments := make(map[string]map[*wtype.LHPlate]int, len(component_volumes))
 
 	cur = 1
@@ -222,7 +214,6 @@ func choose_plate_assignments(component_volumes map[string]wunit.Volume, plate_t
 		for j := 0; j < len(plate_types); j++ {
 			nwells := lp.MipColVal(cur)
 			if nwells > 0 {
-				//logger.Debug(fmt.Sprintln(component_order[i], " : ", plate_types[j].Type, " N WELLS: ", nwells))
 				cmap[plate_types[j]] = int(nwells)
 			}
 			cur += 1

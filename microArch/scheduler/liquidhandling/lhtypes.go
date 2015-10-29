@@ -51,14 +51,14 @@ type LHRequest struct {
 	Input_plates               map[string]*wtype.LHPlate
 	Output_plates              map[string]*wtype.LHPlate
 	Input_platetypes           []*wtype.LHPlate
-	Input_major_group_layouts  map[int][]string
+	Input_major_group_layouts  [][]string
 	Input_minor_group_layouts  [][]string
-	Input_plate_layout         map[int]string
+	Input_plate_layout         []string
 	Input_Setup_Weights        map[string]float64
 	Output_platetype           *wtype.LHPlate
-	Output_major_group_layouts map[int][]string
+	Output_major_group_layouts [][]string
 	Output_minor_group_layouts [][]string
-	Output_plate_layout        map[int]string
+	Output_plate_layout        []string
 	Plate_lookup               map[string]string
 	Stockconcs                 map[string]float64
 	Policies                   *liquidhandling.LHPolicyRuleSet
@@ -102,11 +102,11 @@ func NewLHRequest() *LHRequest {
 	lhr.Input_platetypes = make([]*wtype.LHPlate, 0, 2)
 	lhr.Input_Setup_Weights = make(map[string]float64)
 	lhr.Output_plates = make(map[string]*wtype.LHPlate)
-	lhr.Input_major_group_layouts = make(map[int][]string)
+	lhr.Input_major_group_layouts = make([][]string, 0, 1)
 	lhr.Input_minor_group_layouts = make([][]string, 0, 1)
-	lhr.Output_major_group_layouts = make(map[int][]string)
+	lhr.Output_major_group_layouts = make([][]string, 0, 1)
 	lhr.Output_minor_group_layouts = make([][]string, 0, 1)
-	lhr.Output_plate_layout = make(map[int]string)
+	lhr.Output_plate_layout = make([]string, 0, 1)
 	lhr.Plate_lookup = make(map[string]string)
 	lhr.Stockconcs = make(map[string]float64)
 	lhr.Input_order = make([]string, 0)

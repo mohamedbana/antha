@@ -443,7 +443,6 @@ func (lhp *LHProperties) GetCleanTips(tiptype string, channel *wtype.LHChannelPa
 	foundit := false
 
 	for _, pos := range lhp.Tip_preferences {
-		//		pos := fmt.Sprintf("position_%d", ipos)
 		bx := lhp.Tipboxes[pos]
 		if bx.Tiptype.Type != tiptype {
 			continue
@@ -453,7 +452,6 @@ func (lhp *LHProperties) GetCleanTips(tiptype string, channel *wtype.LHChannelPa
 			foundit = true
 			for i := 0; i < multi; i++ {
 				positions[i] = pos
-				//boxtypes[i] = bx.Type
 				boxtypes[i] = bx.Boxname
 			}
 			break

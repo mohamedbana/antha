@@ -442,9 +442,8 @@ func (e *AnthaManualGrpc) end(actionDescription equipment.ActionDescription) err
 	if !ok {
 		return nil
 	}
-	ret := planner.MakeSolutions(req)
 
-	logger.Debug("output from makesolutions", ret)
+	planner.MakeSolutions(req)
 
 	e.queue[blockId.ThreadID] = nil
 	e.planner[blockId.ThreadID] = nil

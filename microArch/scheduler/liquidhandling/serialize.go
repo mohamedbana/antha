@@ -27,9 +27,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
+	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/logger"
 )
 
@@ -102,25 +102,25 @@ func (req *LHRequest) UnmarshalJSON(ar []byte) error {
 
 	e = json.Unmarshal(ar, slhr)
 
-	req.Input_major_group_layouts = make(map[int][]string, len(slhr.Input_major_group_layouts))
+	req.Input_major_group_layouts = make([][]string, len(slhr.Input_major_group_layouts))
 
 	for k, v := range slhr.Input_major_group_layouts {
 		req.Input_major_group_layouts[wutil.ParseInt(k)] = v
 	}
 
-	req.Input_plate_layout = make(map[int]string, len(slhr.Input_plate_layout))
+	req.Input_plate_layout = make([]string, len(slhr.Input_plate_layout))
 
 	for k, v := range slhr.Input_plate_layout {
 		req.Input_plate_layout[wutil.ParseInt(k)] = v
 	}
 
-	req.Output_major_group_layouts = make(map[int][]string, len(slhr.Output_major_group_layouts))
+	req.Output_major_group_layouts = make([][]string, len(slhr.Output_major_group_layouts))
 
 	for k, v := range slhr.Output_major_group_layouts {
 		req.Output_major_group_layouts[wutil.ParseInt(k)] = v
 	}
 
-	req.Output_plate_layout = make(map[int]string, len(slhr.Output_plate_layout))
+	req.Output_plate_layout = make([]string, len(slhr.Output_plate_layout))
 
 	for k, v := range slhr.Output_plate_layout {
 		req.Output_plate_layout[wutil.ParseInt(k)] = v

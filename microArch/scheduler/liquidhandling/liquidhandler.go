@@ -25,6 +25,7 @@ package liquidhandling
 import (
 	"fmt"
 	"log"
+	"sync"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
@@ -59,6 +60,7 @@ type Liquidhandler struct {
 	ExecutionPlanner func(*LHRequest, *liquidhandling.LHProperties) *LHRequest
 	PolicyManager    *LHPolicyManager
 	Counter          int
+	Once             sync.Once
 }
 
 // initialize the liquid handling structure
@@ -79,11 +81,13 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) *LHRequest {
 		RaiseError("No solutions defined")
 	}
 
-	logger.Debug("Make Solutions, before plan")
-	this.Plan(request)
-	logger.Debug("Plan ready")
-	this.Execute(request)
-	logger.Debug("Execute done")
+	f := func() {
+		this.Plan(request)
+		this.Execute(request)
+	}
+
+	this.Once.Do(f)
+
 	return request
 }
 
@@ -169,6 +173,8 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 	// set up the mapping of the outputs
 	// this assumes the input plates are set
 
+	// bet this is where we have issues
+
 	request = this.Layout(request)
 
 	// define the output plates
@@ -190,8 +196,13 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 
 	if this.Counter > 0 {
-		logger.Fatal("DOUBLE CALL TO GETINPUTS!")
-		panic("You only GetInputs() once")
+		/*
+			logger.Fatal("DOUBLE CALL TO GETINPUTS!")
+			panic("You only GetInputs() once")
+		*/
+
+		// I don't think we need to be quite so graceless
+		return request
 	}
 	this.Counter += 1
 
@@ -269,6 +280,7 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 
 		// XXX this needs attention: we shouldn't allow this HARD CODE
 		// in future we need to use the validation mechanism to trap this way earlier
+		// MARKED FOR DELETION --- THIS NOW IS HANDLED ELSEWHERE
 		if request.Tip_Type == nil || request.Tip_Type.GenericSolid == nil {
 			logger.Debug(fmt.Sprintf("LiquidHandling model is %q", this.Properties.Model))
 			if this.Properties.Model == "Pipetmax" {
@@ -287,6 +299,7 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 
 	var waste *wtype.LHTipwaste
 	// again we don't want this to happen
+	// MARKED FOR DELETION... SHOULD BE HANDLED ELSEWHERE
 	if this.Properties.Model == "Pipetmax" {
 		waste = factory.GetTipwasteByType("Gilsontipwaste")
 	} else { //if this.Properties.Model == "GeneTheatre" { //TODO handle general case differently

@@ -24,18 +24,18 @@ package wutil
 
 import "sort"
 
-func FMax(floats []float64) float64 {
+func FMax(floats []float64) (float64, bool) {
 	if len(floats) == 0 {
-		return 0
+		return 0, false
 	}
 	sort.Float64s(floats)
-	return floats[len(floats)-1]
+	return floats[len(floats)-1], true
 }
 
-func FMin(floats []float64) float64 {
+func FMin(floats []float64) (float64, bool) {
 	if len(floats) == 0 {
-		return 0
+		return 0, false
 	}
 	sort.Float64s(floats)
-	return floats[0]
+	return floats[0], true
 }
