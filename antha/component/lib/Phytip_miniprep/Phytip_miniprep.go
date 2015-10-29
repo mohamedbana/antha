@@ -90,7 +90,7 @@ Plasmidbuffer Composition */ // is this all inferred from a PLasmid solution  ty
 
 //
 // wtype.LHTip
-//unitoperations.Pellet // wrong type?
+//UnitOperations.Pellet // wrong type?
 
 //RB *wtype.LHComponent //Watersolution
 //LB *wtype.LHComponent //Watersolution
@@ -118,22 +118,22 @@ func (e *Phytip_miniprep) steps(p Phytip_miniprepParamBlock, r *Phytip_miniprepR
 		p.BlockID)
 	_ = _wrapper
 
-	resuspension, _ := unitoperations.Resuspend(p.Cellpellet, p.Resuspensionstep, p.Tips)
-	lysate, _ := unitoperations.Chromatography(resuspension, p.Lysisstep, p.Tips)
-	precipitate, _ := unitoperations.Chromatography(lysate, p.Precipitationstep, p.Tips)
+	resuspension, _ := UnitOperations.Resuspend(p.Cellpellet, p.Resuspensionstep, p.Tips)
+	lysate, _ := UnitOperations.Chromatography(resuspension, p.Lysisstep, p.Tips)
+	precipitate, _ := UnitOperations.Chromatography(lysate, p.Precipitationstep, p.Tips)
 
-	_, columnready := unitoperations.Chromatography(p.Equilibrationstep.Buffer, p.Equilibrationstep, p.Phytips)
+	_, columnready := UnitOperations.Chromatography(p.Equilibrationstep.Buffer, p.Equilibrationstep, p.Phytips)
 
-	_, readyforcapture := unitoperations.Chromatography(p.Airstep.Buffer, p.Airstep, columnready)
-	capture, readyforcapture := unitoperations.Chromatography(precipitate, p.Capturestep, readyforcapture)
+	_, readyforcapture := UnitOperations.Chromatography(p.Airstep.Buffer, p.Airstep, columnready)
+	capture, readyforcapture := UnitOperations.Chromatography(precipitate, p.Capturestep, readyforcapture)
 
 	for _, washstep := range p.Washsteps {
-		_, readyforcapture = unitoperations.Chromatography(capture, washstep, readyforcapture)
+		_, readyforcapture = UnitOperations.Chromatography(capture, washstep, readyforcapture)
 	}
-	readyfordrying := unitoperations.Blot(readyforcapture, p.Blotcycles, p.Blottime)
+	readyfordrying := UnitOperations.Blot(readyforcapture, p.Blotcycles, p.Blottime)
 
 	/*if Vacuum == true {
-		drytips := unitoperations.Dry(Tips,Drytime,Vacuumstrength)
+		drytips := UnitOperations.Dry(Tips,Drytime,Vacuumstrength)
 
 
 		//parameters required for evaporation calculator
@@ -147,9 +147,9 @@ func (e *Phytip_miniprep) steps(p Phytip_miniprepParamBlock, r *Phytip_miniprepR
 		drytimerequired := Evaporation.Estimatedevaporationtime(Airvelocity, Liquid, Platetype, Volumeperwell)
 
 
-	} else {*/drytips := unitoperations.Dry(readyfordrying, p.Drytime, p.Vacuumstrength) //}
+	} else {*/drytips := UnitOperations.Dry(readyfordrying, p.Drytime, p.Vacuumstrength) //}
 
-	r.PlasmidDNAsolution, _ = unitoperations.Chromatography(p.Elutionstep.Buffer, p.Elutionstep, drytips)
+	r.PlasmidDNAsolution, _ = UnitOperations.Chromatography(p.Elutionstep.Buffer, p.Elutionstep, drytips)
 	_ = _wrapper.WaitToEnd()
 
 }
@@ -224,7 +224,7 @@ func (e *Phytip_miniprep) Map(m map[string]interface{}) interface{} {
 		json.Unmarshal([]byte(vAirstep.JSONString), &temp)
 		res.Airstep = *temp.Airstep
 	} else {
-		res.Airstep = m["Airstep"].(execute.ThreadParam).Value.(unitoperations.Chromstep)
+		res.Airstep = m["Airstep"].(execute.ThreadParam).Value.(UnitOperations.Chromstep)
 	}
 
 	vBlotcycles, is := m["Blotcycles"].(execute.ThreadParam).Value.(execute.JSONValue)
@@ -251,7 +251,7 @@ func (e *Phytip_miniprep) Map(m map[string]interface{}) interface{} {
 		json.Unmarshal([]byte(vCapturestep.JSONString), &temp)
 		res.Capturestep = *temp.Capturestep
 	} else {
-		res.Capturestep = m["Capturestep"].(execute.ThreadParam).Value.(unitoperations.Chromstep)
+		res.Capturestep = m["Capturestep"].(execute.ThreadParam).Value.(UnitOperations.Chromstep)
 	}
 
 	vCellpellet, is := m["Cellpellet"].(execute.ThreadParam).Value.(execute.JSONValue)
@@ -278,7 +278,7 @@ func (e *Phytip_miniprep) Map(m map[string]interface{}) interface{} {
 		json.Unmarshal([]byte(vElutionstep.JSONString), &temp)
 		res.Elutionstep = *temp.Elutionstep
 	} else {
-		res.Elutionstep = m["Elutionstep"].(execute.ThreadParam).Value.(unitoperations.Chromstep)
+		res.Elutionstep = m["Elutionstep"].(execute.ThreadParam).Value.(UnitOperations.Chromstep)
 	}
 
 	vEquilibrationstep, is := m["Equilibrationstep"].(execute.ThreadParam).Value.(execute.JSONValue)
@@ -287,7 +287,7 @@ func (e *Phytip_miniprep) Map(m map[string]interface{}) interface{} {
 		json.Unmarshal([]byte(vEquilibrationstep.JSONString), &temp)
 		res.Equilibrationstep = *temp.Equilibrationstep
 	} else {
-		res.Equilibrationstep = m["Equilibrationstep"].(execute.ThreadParam).Value.(unitoperations.Chromstep)
+		res.Equilibrationstep = m["Equilibrationstep"].(execute.ThreadParam).Value.(UnitOperations.Chromstep)
 	}
 
 	vLysisstep, is := m["Lysisstep"].(execute.ThreadParam).Value.(execute.JSONValue)
@@ -296,7 +296,7 @@ func (e *Phytip_miniprep) Map(m map[string]interface{}) interface{} {
 		json.Unmarshal([]byte(vLysisstep.JSONString), &temp)
 		res.Lysisstep = *temp.Lysisstep
 	} else {
-		res.Lysisstep = m["Lysisstep"].(execute.ThreadParam).Value.(unitoperations.Chromstep)
+		res.Lysisstep = m["Lysisstep"].(execute.ThreadParam).Value.(UnitOperations.Chromstep)
 	}
 
 	vPhytips, is := m["Phytips"].(execute.ThreadParam).Value.(execute.JSONValue)
@@ -305,7 +305,7 @@ func (e *Phytip_miniprep) Map(m map[string]interface{}) interface{} {
 		json.Unmarshal([]byte(vPhytips.JSONString), &temp)
 		res.Phytips = *temp.Phytips
 	} else {
-		res.Phytips = m["Phytips"].(execute.ThreadParam).Value.(unitoperations.Column)
+		res.Phytips = m["Phytips"].(execute.ThreadParam).Value.(UnitOperations.Column)
 	}
 
 	vPrecipitationstep, is := m["Precipitationstep"].(execute.ThreadParam).Value.(execute.JSONValue)
@@ -314,7 +314,7 @@ func (e *Phytip_miniprep) Map(m map[string]interface{}) interface{} {
 		json.Unmarshal([]byte(vPrecipitationstep.JSONString), &temp)
 		res.Precipitationstep = *temp.Precipitationstep
 	} else {
-		res.Precipitationstep = m["Precipitationstep"].(execute.ThreadParam).Value.(unitoperations.Chromstep)
+		res.Precipitationstep = m["Precipitationstep"].(execute.ThreadParam).Value.(UnitOperations.Chromstep)
 	}
 
 	vResuspensionstep, is := m["Resuspensionstep"].(execute.ThreadParam).Value.(execute.JSONValue)
@@ -323,7 +323,7 @@ func (e *Phytip_miniprep) Map(m map[string]interface{}) interface{} {
 		json.Unmarshal([]byte(vResuspensionstep.JSONString), &temp)
 		res.Resuspensionstep = *temp.Resuspensionstep
 	} else {
-		res.Resuspensionstep = m["Resuspensionstep"].(execute.ThreadParam).Value.(unitoperations.Chromstep)
+		res.Resuspensionstep = m["Resuspensionstep"].(execute.ThreadParam).Value.(UnitOperations.Chromstep)
 	}
 
 	vTips, is := m["Tips"].(execute.ThreadParam).Value.(execute.JSONValue)
@@ -332,7 +332,7 @@ func (e *Phytip_miniprep) Map(m map[string]interface{}) interface{} {
 		json.Unmarshal([]byte(vTips.JSONString), &temp)
 		res.Tips = *temp.Tips
 	} else {
-		res.Tips = m["Tips"].(execute.ThreadParam).Value.(unitoperations.Column)
+		res.Tips = m["Tips"].(execute.ThreadParam).Value.(UnitOperations.Column)
 	}
 
 	vVacuum, is := m["Vacuum"].(execute.ThreadParam).Value.(execute.JSONValue)
@@ -359,7 +359,7 @@ func (e *Phytip_miniprep) Map(m map[string]interface{}) interface{} {
 		json.Unmarshal([]byte(vWashsteps.JSONString), &temp)
 		res.Washsteps = *temp.Washsteps
 	} else {
-		res.Washsteps = m["Washsteps"].(execute.ThreadParam).Value.([]unitoperations.Chromstep)
+		res.Washsteps = m["Washsteps"].(execute.ThreadParam).Value.([]UnitOperations.Chromstep)
 	}
 
 	res.ID = m["Airstep"].(execute.ThreadParam).ID
@@ -669,44 +669,44 @@ type Phytip_miniprepParamBlock struct {
 	ID                execute.ThreadID
 	BlockID           execute.BlockID
 	Error             bool
-	Airstep           unitoperations.Chromstep
+	Airstep           UnitOperations.Chromstep
 	Blotcycles        int
 	Blottime          time.Duration
-	Capturestep       unitoperations.Chromstep
+	Capturestep       UnitOperations.Chromstep
 	Cellpellet        *wtype.Physical
 	Drytime           time.Duration
-	Elutionstep       unitoperations.Chromstep
-	Equilibrationstep unitoperations.Chromstep
-	Lysisstep         unitoperations.Chromstep
-	Phytips           unitoperations.Column
-	Precipitationstep unitoperations.Chromstep
-	Resuspensionstep  unitoperations.Chromstep
-	Tips              unitoperations.Column
+	Elutionstep       UnitOperations.Chromstep
+	Equilibrationstep UnitOperations.Chromstep
+	Lysisstep         UnitOperations.Chromstep
+	Phytips           UnitOperations.Column
+	Precipitationstep UnitOperations.Chromstep
+	Resuspensionstep  UnitOperations.Chromstep
+	Tips              UnitOperations.Column
 	Vacuum            bool
 	Vacuumstrength    float64
-	Washsteps         []unitoperations.Chromstep
+	Washsteps         []UnitOperations.Chromstep
 }
 
 type Phytip_miniprepConfig struct {
 	ID                execute.ThreadID
 	BlockID           execute.BlockID
 	Error             bool
-	Airstep           unitoperations.Chromstep
+	Airstep           UnitOperations.Chromstep
 	Blotcycles        int
 	Blottime          time.Duration
-	Capturestep       unitoperations.Chromstep
+	Capturestep       UnitOperations.Chromstep
 	Cellpellet        wtype.FromFactory
 	Drytime           time.Duration
-	Elutionstep       unitoperations.Chromstep
-	Equilibrationstep unitoperations.Chromstep
-	Lysisstep         unitoperations.Chromstep
-	Phytips           unitoperations.Column
-	Precipitationstep unitoperations.Chromstep
-	Resuspensionstep  unitoperations.Chromstep
-	Tips              unitoperations.Column
+	Elutionstep       UnitOperations.Chromstep
+	Equilibrationstep UnitOperations.Chromstep
+	Lysisstep         UnitOperations.Chromstep
+	Phytips           UnitOperations.Column
+	Precipitationstep UnitOperations.Chromstep
+	Resuspensionstep  UnitOperations.Chromstep
+	Tips              UnitOperations.Column
 	Vacuum            bool
 	Vacuumstrength    float64
-	Washsteps         []unitoperations.Chromstep
+	Washsteps         []UnitOperations.Chromstep
 }
 
 type Phytip_miniprepResultBlock struct {
@@ -720,44 +720,44 @@ type Phytip_miniprepJSONBlock struct {
 	ID                 *execute.ThreadID
 	BlockID            *execute.BlockID
 	Error              *bool
-	Airstep            *unitoperations.Chromstep
+	Airstep            *UnitOperations.Chromstep
 	Blotcycles         *int
 	Blottime           *time.Duration
-	Capturestep        *unitoperations.Chromstep
+	Capturestep        *UnitOperations.Chromstep
 	Cellpellet         **wtype.Physical
 	Drytime            *time.Duration
-	Elutionstep        *unitoperations.Chromstep
-	Equilibrationstep  *unitoperations.Chromstep
-	Lysisstep          *unitoperations.Chromstep
-	Phytips            *unitoperations.Column
-	Precipitationstep  *unitoperations.Chromstep
-	Resuspensionstep   *unitoperations.Chromstep
-	Tips               *unitoperations.Column
+	Elutionstep        *UnitOperations.Chromstep
+	Equilibrationstep  *UnitOperations.Chromstep
+	Lysisstep          *UnitOperations.Chromstep
+	Phytips            *UnitOperations.Column
+	Precipitationstep  *UnitOperations.Chromstep
+	Resuspensionstep   *UnitOperations.Chromstep
+	Tips               *UnitOperations.Column
 	Vacuum             *bool
 	Vacuumstrength     *float64
-	Washsteps          *[]unitoperations.Chromstep
+	Washsteps          *[]UnitOperations.Chromstep
 	PlasmidDNAsolution **wtype.LHComponent
 }
 
 func (c *Phytip_miniprep) ComponentInfo() *execute.ComponentInfo {
 	inp := make([]execute.PortInfo, 0)
 	outp := make([]execute.PortInfo, 0)
-	inp = append(inp, *execute.NewPortInfo("Airstep", "unitoperations.Chromstep", "Airstep", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Airstep", "UnitOperations.Chromstep", "Airstep", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Blotcycles", "int", "Blotcycles", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Blottime", "time.Duration", "Blottime", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Capturestep", "unitoperations.Chromstep", "Capturestep", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Capturestep", "UnitOperations.Chromstep", "Capturestep", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Cellpellet", "*wtype.Physical", "Cellpellet", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Drytime", "time.Duration", "Drytime", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Elutionstep", "unitoperations.Chromstep", "Elutionstep", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Equilibrationstep", "unitoperations.Chromstep", "Equilibrationstep", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Lysisstep", "unitoperations.Chromstep", "Lysisstep", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Phytips", "unitoperations.Column", "Phytips", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Precipitationstep", "unitoperations.Chromstep", "Precipitationstep", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Resuspensionstep", "unitoperations.Chromstep", "Resuspensionstep", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Tips", "unitoperations.Column", "Tips", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Elutionstep", "UnitOperations.Chromstep", "Elutionstep", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Equilibrationstep", "UnitOperations.Chromstep", "Equilibrationstep", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Lysisstep", "UnitOperations.Chromstep", "Lysisstep", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Phytips", "UnitOperations.Column", "Phytips", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Precipitationstep", "UnitOperations.Chromstep", "Precipitationstep", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Resuspensionstep", "UnitOperations.Chromstep", "Resuspensionstep", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Tips", "UnitOperations.Column", "Tips", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Vacuum", "bool", "Vacuum", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Vacuumstrength", "float64", "Vacuumstrength", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Washsteps", "[]unitoperations.Chromstep", "Washsteps", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Washsteps", "[]UnitOperations.Chromstep", "Washsteps", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("PlasmidDNAsolution", "*wtype.LHComponent", "PlasmidDNAsolution", true, true, nil, nil))
 
 	ci := execute.NewComponentInfo("Phytip_miniprep", "Phytip_miniprep", "", false, inp, outp)

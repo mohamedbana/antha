@@ -4,7 +4,7 @@ import (
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Liquidclasses"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Labware"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/devices"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/unitoperations"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/UnitOperations"
 	//"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -13,14 +13,14 @@ import (
 Parameters (
     //Cellpelletmass Mass
 	
-	Resuspensionstep unitoperations.Chromstep
-	Lysisstep unitoperations.Chromstep
-	Precipitationstep unitoperations.Chromstep
-	Equilibrationstep unitoperations.Chromstep
-	Airstep unitoperations.Chromstep
-	Capturestep unitoperations.Chromstep
-	Washsteps  []unitoperations.Chromstep
-	Elutionstep unitoperations.Chromstep
+	Resuspensionstep UnitOperations.Chromstep
+	Lysisstep UnitOperations.Chromstep
+	Precipitationstep UnitOperations.Chromstep
+	Equilibrationstep UnitOperations.Chromstep
+	Airstep UnitOperations.Chromstep
+	Capturestep UnitOperations.Chromstep
+	Washsteps  []UnitOperations.Chromstep
+	Elutionstep UnitOperations.Chromstep
 	
 	Blottime time.Duration
 	Blotcycles int
@@ -100,9 +100,9 @@ Data (
 	Plasmidbuffer Composition */ // is this all inferred from a PLasmid solution  type anyway?
 )
 Inputs (
-	Phytips unitoperations.Column //
-	Tips unitoperations.Column // wtype.LHTip
-	Cellpellet *wtype.Physical //unitoperations.Pellet // wrong type?
+	Phytips UnitOperations.Column //
+	Tips UnitOperations.Column // wtype.LHTip
+	Cellpellet *wtype.Physical //UnitOperations.Pellet // wrong type?
 	
 	//RB *wtype.LHComponent //Watersolution
 	//LB *wtype.LHComponent //Watersolution
@@ -120,23 +120,23 @@ Requirements {
 Setup {
 } 
 Steps {
-	resuspension,_ := unitoperations.Resuspend(Cellpellet, Resuspensionstep,Tips)
-	lysate,_ := unitoperations.Chromatography(resuspension,Lysisstep,Tips)
-	precipitate,_ := unitoperations.Chromatography(lysate,Precipitationstep,Tips)
+	resuspension,_ := UnitOperations.Resuspend(Cellpellet, Resuspensionstep,Tips)
+	lysate,_ := UnitOperations.Chromatography(resuspension,Lysisstep,Tips)
+	precipitate,_ := UnitOperations.Chromatography(lysate,Precipitationstep,Tips)
 	
-	_,columnready := unitoperations.Chromatography(Equilibrationstep.Buffer, Equilibrationstep, Phytips)
+	_,columnready := UnitOperations.Chromatography(Equilibrationstep.Buffer, Equilibrationstep, Phytips)
 	
 	
-	_,readyforcapture := unitoperations.Chromatography(Airstep.Buffer,Airstep,columnready)
-	capture,readyforcapture := unitoperations.Chromatography(precipitate, Capturestep, readyforcapture)
+	_,readyforcapture := UnitOperations.Chromatography(Airstep.Buffer,Airstep,columnready)
+	capture,readyforcapture := UnitOperations.Chromatography(precipitate, Capturestep, readyforcapture)
 	
 	for _, washstep := range Washsteps {
-	_, readyforcapture = unitoperations.Chromatography(capture,washstep,readyforcapture)
+	_, readyforcapture = UnitOperations.Chromatography(capture,washstep,readyforcapture)
 	}
-	readyfordrying := unitoperations.Blot(readyforcapture,Blotcycles,Blottime)
+	readyfordrying := UnitOperations.Blot(readyforcapture,Blotcycles,Blottime)
 		
 	/*if Vacuum == true {
-		drytips := unitoperations.Dry(Tips,Drytime,Vacuumstrength)
+		drytips := UnitOperations.Dry(Tips,Drytime,Vacuumstrength)
 		
 		
 		//parameters required for evaporation calculator
@@ -150,9 +150,9 @@ Steps {
 		drytimerequired := Evaporation.Estimatedevaporationtime(Airvelocity, Liquid, Platetype, Volumeperwell)
 	
 	
-	} else {*/drytips := unitoperations.Dry(readyfordrying,Drytime, Vacuumstrength)//}
+	} else {*/drytips := UnitOperations.Dry(readyfordrying,Drytime, Vacuumstrength)//}
 		
-	PlasmidDNAsolution,_ = unitoperations.Chromatography(Elutionstep.Buffer,Elutionstep, drytips)
+	PlasmidDNAsolution,_ = UnitOperations.Chromatography(Elutionstep.Buffer,Elutionstep, drytips)
 	
 	
 }
