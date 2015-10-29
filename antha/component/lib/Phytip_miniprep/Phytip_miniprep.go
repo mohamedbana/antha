@@ -5,7 +5,7 @@ import (
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Liquidclasses"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Labware"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/devices"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/unitoperations"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/UnitOperations"
 	//"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"encoding/json"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
