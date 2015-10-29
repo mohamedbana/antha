@@ -222,6 +222,8 @@ func NewLHSolution() *LHSolution {
 	lhs.ID = GetUUID()
 	var gp GenericPhysical
 	lhs.GenericPhysical = &gp
+	lhs.Majorlayoutgroup = -1
+	lhs.Minorlayoutgroup = -1
 	return &lhs
 }
 

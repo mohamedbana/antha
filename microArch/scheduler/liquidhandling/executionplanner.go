@@ -221,6 +221,7 @@ func AdvancedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 				wellto[i] = wutil.NumToAlpha(row) + strconv.Itoa(col)
 
 				outplate := output_plates[output_plate_layout[toplatenum]]
+
 				outwell := outplate.Rows[row-1][col-1]
 				v := wunit.NewVolume(smpl.Vol, smpl.Vunit)
 				tpwx[i] = outplate.WellsX()

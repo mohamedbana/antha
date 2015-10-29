@@ -25,9 +25,9 @@ package liquidhandling
 import (
 	"strconv"
 
-	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
+	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 )
 
 // default layout: requests fill plates in column order
@@ -38,15 +38,21 @@ func BasicLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *
 	solutions := request.Output_solutions
 
 	// get the incoming group IDs
-
+	// the purpose of this check is to determine whether there
+	// already exist assignments...this is quite tricky
 	MajorLayoutGroupIDs, _ := getLayoutGroups(solutions)
 
 	// check we have enough and assign more if necessary
-
-	n_plates_required := wutil.RoundInt(float64(len(solutions)) / float64(plate.Nwells))
+	n_plates_required := wutil.RoundInt(float64(len(solutions))/float64(plate.Nwells)) + 1
 
 	if len(MajorLayoutGroupIDs) < n_plates_required {
-		for i := wutil.Max(MajorLayoutGroupIDs) + 1; i < n_plates_required-len(MajorLayoutGroupIDs); i++ {
+		lmg := len(MajorLayoutGroupIDs)
+		mx, ok := wutil.Max(MajorLayoutGroupIDs)
+		if !ok {
+			mx = -1
+		}
+
+		for i := mx + 1; i < (n_plates_required - lmg); i++ {
 			MajorLayoutGroupIDs = append(MajorLayoutGroupIDs, i)
 		}
 	}
@@ -57,7 +63,7 @@ func BasicLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *
 
 	// now we need to map solutions to groups
 
-	MajorLayoutGroups := make(map[int][]string, len(MajorLayoutGroupIDs))
+	MajorLayoutGroups := make([][]string, len(MajorLayoutGroupIDs))
 
 	// make the receptacles
 
@@ -74,7 +80,8 @@ func BasicLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *
 
 		lg := soln.Majorlayoutgroup
 
-		if lg == 0 {
+		// -1 means unassigned
+		if lg == -1 {
 			lg = choose_major_layout_group(MajorLayoutGroups, max_major_group_size)
 		}
 
@@ -114,13 +121,13 @@ func BasicLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *
 	return request
 }
 
-func assign_minor_layouts(group []string, plate *wtype.LHPlate, plateID string) (mgrps [][]string, masss map[int]string) {
+func assign_minor_layouts(group []string, plate *wtype.LHPlate, plateID string) (mgrps [][]string, masss []string) {
 	mgrps = make([][]string, 0, 10)
-	masss = make(map[int]string, 10)
-
 	// in this version we just use the number of wells in a column
 
 	colsize := plate.WlsY
+	rowsize := plate.WlsX
+	masss = make([]string, rowsize)
 
 	row := 1
 	col := 1
@@ -152,7 +159,7 @@ func assign_minor_layouts(group []string, plate *wtype.LHPlate, plateID string) 
 	return mgrps, masss
 }
 
-func choose_major_layout_group(groups map[int][]string, mx int) int {
+func choose_major_layout_group(groups [][]string, mx int) int {
 	g := 0
 	for x, ar := range groups {
 		if len(ar) < mx {
@@ -163,14 +170,13 @@ func choose_major_layout_group(groups map[int][]string, mx int) int {
 	return g
 }
 
-func do_major_layouts(request *LHRequest, majorlayoutgroups map[int][]string) map[int]string {
+func do_major_layouts(request *LHRequest, majorlayoutgroups [][]string) []string {
 	// we assign layout groups to plates
 	plateLayouts := request.Output_plate_layout
 	// we assign each mlg to a plate... since we don't have any plates yet we just give them numbers
 
 	if len(plateLayouts) == 0 {
-		// ERROR HERE
-		plateLayouts = make(map[int]string, 10)
+		plateLayouts = make([]string, len(majorlayoutgroups))
 
 		platenum := 0
 		for k, _ := range majorlayoutgroups {
@@ -185,17 +191,24 @@ func getLayoutGroups(solutions map[string]*wtype.LHSolution) ([]int, []int) {
 	// determine which groups exist
 	// we define major and minor layout groupings
 
-	MajorLayoutGroupIDs := make([]int, 0, 4)
-	MinorLayoutGroupIDs := make([]int, 0, 4)
+	MajorLayoutGroupIDs := wutil.NewIntSet(4)
+	MinorLayoutGroupIDs := wutil.NewIntSet(4)
 
 	for _, s := range solutions {
-		Mlg := 0
-		Mlg = s.Majorlayoutgroup
-		MajorLayoutGroupIDs = append(MajorLayoutGroupIDs, Mlg)
-		mlg := 0
-		mlg = s.Minorlayoutgroup
-		MinorLayoutGroupIDs = append(MinorLayoutGroupIDs, mlg)
+		Mlg := s.Majorlayoutgroup
+
+		// -1 means 'not assigned'
+
+		if Mlg != -1 {
+			MajorLayoutGroupIDs.Add(Mlg)
+		}
+
+		mlg := s.Minorlayoutgroup
+
+		if mlg != -1 {
+			MinorLayoutGroupIDs.Add(mlg)
+		}
 	}
 
-	return MajorLayoutGroupIDs, MinorLayoutGroupIDs
+	return MajorLayoutGroupIDs.AsSlice(), MinorLayoutGroupIDs.AsSlice()
 }
