@@ -25,6 +25,7 @@ package liquidhandling
 import (
 	"fmt"
 	"log"
+	"sync"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
@@ -59,6 +60,7 @@ type Liquidhandler struct {
 	ExecutionPlanner func(*LHRequest, *liquidhandling.LHProperties) *LHRequest
 	PolicyManager    *LHPolicyManager
 	Counter          int
+	Once             sync.Once
 }
 
 // initialize the liquid handling structure
@@ -79,11 +81,13 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) *LHRequest {
 		RaiseError("No solutions defined")
 	}
 
-	logger.Debug("Make Solutions, before plan")
-	this.Plan(request)
-	logger.Debug("Plan ready")
-	this.Execute(request)
-	logger.Debug("Execute done")
+	f := func() {
+		this.Plan(request)
+		this.Execute(request)
+	}
+
+	this.Once.Do(f)
+
 	return request
 }
 
@@ -171,11 +175,7 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 
 	// bet this is where we have issues
 
-	logger.Debug("THIS WILL PRINT")
-
 	request = this.Layout(request)
-
-	logger.Debug("THIS WILL NOT PRINT")
 
 	// define the output plates
 	request = output_plate_setup(request)

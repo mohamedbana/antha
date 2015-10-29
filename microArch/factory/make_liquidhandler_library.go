@@ -152,9 +152,9 @@ func makeGeneTheatre() *liquidhandling.LHProperties {
 	lhp := liquidhandling.NewLHProperties(12, "GeneTheatre", "CyBio", "discrete", "disposable", layout)
 
 	// crucial constraint info
-	lhp.Tip_preferences = []string{"A1", "A2", "A3"}
+	lhp.Tip_preferences = []string{"A1", "A2", "A3", "B1", "B2", "B3"}
 	lhp.Input_preferences = []string{"D3", "D2", "C3", "C2", "B1", "B2"}
-	lhp.Output_preferences = []string{"B3", "B2", "B1", "C2", "C3", "D2"}
+	lhp.Output_preferences = []string{"C3", "C2", "C1", "D2", "B2", "B1"}
 	lhp.Wash_preferences = []string{"C2"}
 	lhp.Waste_preferences = []string{"C1"}
 	lhp.Tipwaste_preferences = []string{"D1", "C1"}

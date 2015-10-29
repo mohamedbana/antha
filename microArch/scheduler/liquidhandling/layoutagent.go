@@ -103,7 +103,7 @@ func BasicLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *
 	// in this instance this is just mapping everything to columns
 
 	minor_group_layouts := make([][]string, 0, len(solutions))
-	assignments := make([]string, len(solutions))
+	assignments := make([]string, 0, len(solutions))
 
 	for i, grp := range MajorLayoutGroups {
 		dplate := plateLayouts[i]
@@ -111,10 +111,11 @@ func BasicLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *
 		plate_minor_groups, plate_assignments := assign_minor_layouts(grp, plate, dplate)
 
 		minor_group_layouts = append(minor_group_layouts, plate_minor_groups...)
-		for j, as := range plate_assignments {
-			assignments[j] = as
+		for _, as := range plate_assignments {
+			assignments = append(assignments, as)
 		}
 	}
+
 	request.Output_minor_group_layouts = minor_group_layouts
 	request.Output_major_group_layouts = MajorLayoutGroups
 	request.Output_assignments = assignments
@@ -152,6 +153,7 @@ func assign_minor_layouts(group []string, plate *wtype.LHPlate, plateID string) 
 		// get its assignment
 
 		ass := plateID + ":" + wutil.NumToAlpha(row) + ":" + strconv.Itoa(col) + ":" + strconv.Itoa(1) + ":" + strconv.Itoa(0)
+
 		mgrps = append(mgrps, grp)
 		masss[col-1] = ass
 		col += 1

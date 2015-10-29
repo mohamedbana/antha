@@ -76,7 +76,6 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 		if id != "" {
 			p := params.PlateLookup[id]
 			setup[pos] = p
-			//logger.Debug(fmt.Sprintln("SETUP: ", pos, " contains plate with id ", id, " name ", p.(wtype.Named).GetName()))
 		}
 
 	}
@@ -104,7 +103,6 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 	// outputs
 
 	for _, p := range output_plates {
-		logger.Debug(fmt.Sprintf("%v", output_plates))
 		position := get_first_available_preference(output_preferences, setup)
 		if position == "" {
 			RaiseError("No positions left for output")
@@ -114,10 +112,6 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 		params.AddPlate(position, p)
 		logger.Info(fmt.Sprintf("Output plate of type %s in position %s", p.Type, position))
 	}
-
-	// inputs
-
-	logger.Debug(fmt.Sprintln("WE NEED: ", len(input_plates), " PLATES"))
 
 	for _, p := range input_plates {
 		position := get_first_available_preference(input_preferences, setup)
@@ -137,7 +131,6 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 
 func get_first_available_preference(prefs []string, setup map[string]interface{}) string {
 	for _, pref := range prefs {
-		logger.Debug(fmt.Sprintf("looking for pref %s", pref))
 		_, ok := setup[pref]
 		if !ok {
 			return pref
