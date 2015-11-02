@@ -122,6 +122,7 @@ func UpdateRebasefile() (err error) {
 	if err != nil {
 		panic(err)
 	} else {
+		anthapath.CreatedotAnthafolder()
 		f, _ := os.Create(filepath.Join(anthapath.Dirpath(), "REBASETypeII.txt"))
 		fmt.Println("step 2: copying registry")
 		_, err = io.Copy(f, r)

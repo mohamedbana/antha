@@ -67,7 +67,10 @@ func CreatedotAnthafolder() (dpath string, err error) {
 }
 
 func AddFile(filename string) (f *os.File, err error) {
-
+	_, err = CreatedotAnthafolder()
+	if err != nil {
+		log.Panic(err)
+	}
 	if u, err := user.Current(); err != nil {
 		log.Panic(err)
 	} else if dpath := filepath.Join(u.HomeDir, ".antha"); false {
