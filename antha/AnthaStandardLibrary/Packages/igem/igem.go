@@ -309,7 +309,7 @@ func CountPartsinRegistryContaining(keystrings []string) (numberofparts int) {
 		}
 		//allparts := SlurpOutput("http://parts.igem.org/fasta/parts/All_Parts")
 	}
-	allparts, err := ioutil.ReadFile("iGem_registry.txt")
+	allparts, err := ioutil.ReadFile(filepath.Join(anthapath.Dirpath(), "iGem_registry.txt"))
 	if err != nil {
 		fmt.Println("error:", err)
 	}
@@ -364,7 +364,7 @@ func FilterRegistry(keystrings []string) (listofpartIDs []string) {
 		}
 		//allparts := SlurpOutput("http://parts.igem.org/fasta/parts/All_Parts")
 	}
-	allparts, err := ioutil.ReadFile("iGem_registry.txt")
+	allparts, err := ioutil.ReadFile(filepath.Join(anthapath.Dirpath(), "iGem_registry.txt"))
 	if err != nil {
 		fmt.Println("error:", err)
 	}
