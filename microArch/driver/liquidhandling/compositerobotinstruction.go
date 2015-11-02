@@ -102,7 +102,7 @@ func ChooseChannel(vol *wunit.Volume, prms *LHProperties) (*wtype.LHChannelParam
 	}
 
 	if headchosen == nil {
-		logger.Fatal(fmt.Sprintf("Cannot find a head with suitable capacity to handle volume %s", vol.ToString))
+		logger.Fatal(fmt.Sprintf("Cannot find a head with suitable capacity to handle volume %s", vol.ToString()))
 		panic("NO HEAD CHOSEN")
 	}
 
