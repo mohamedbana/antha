@@ -9,6 +9,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 	"strings"
 	"strconv"
+	//"log"
 )
 
 // Input parameters for this protocol (data)
@@ -68,6 +69,10 @@ Steps {
 		
 		
 		if strings.Contains(part,"BBa_") ==true{
+			/*err := igem.UpdateRegistryfile()
+			if err != nil {
+				log.Panic(err)
+			}*/
 			partDNA.Nm = part
 			partDNA.Seq = igem.GetSequence(part)
 			/* We can add logic to check the status of parts too and return a warning if the part 

@@ -12,6 +12,7 @@ import (
 	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/flow"
 	"github.com/antha-lang/antha/microArch/execution"
+	"log"
 	"strconv"
 	"strings"
 	"sync"
@@ -60,6 +61,10 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 	for _, part := range p.Partsinorder {
 
 		if strings.Contains(part, "BBa_") == true {
+			err := igem.UpdateRegistryfile()
+			if err != nil {
+				log.Panic(err)
+			}
 			partDNA.Nm = part
 			partDNA.Seq = igem.GetSequence(part)
 			/* We can add logic to check the status of parts too and return a warning if the part
