@@ -94,8 +94,6 @@ func choose_plate_assignments(component_volumes map[string]wunit.Volume, plate_t
 
 	// volume constraints
 	for cmp, vol := range component_volumes {
-		//debug
-		//fmt.Println("component ", cmp, " need volume ", vol.ConvertTo(wunit.ParsePrefixedUnit("ul")))
 		component_order[cur-1] = cmp
 		v := vol.ConvertTo(wunit.ParsePrefixedUnit("ul"))
 		lp.SetRowBnds(cur, glpk.LO, v, 9999999.0)
@@ -202,7 +200,7 @@ func choose_plate_assignments(component_volumes map[string]wunit.Volume, plate_t
 	iocp := glpk.NewIocp()
 	iocp.SetPresolve(true)
 	//debug
-	iocp.SetMsgLev(0)
+	iocp.SetMsgLev(2)
 	lp.Intopt(iocp)
 
 	assignments := make(map[string]map[*wtype.LHPlate]int, len(component_volumes))
