@@ -23,6 +23,8 @@
 package liquidhandling
 
 import (
+	"fmt"
+	"math"
 	"strconv"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -43,7 +45,7 @@ func BasicLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *
 	MajorLayoutGroupIDs, _ := getLayoutGroups(solutions)
 
 	// check we have enough and assign more if necessary
-	n_plates_required := wutil.RoundInt(float64(len(solutions))/float64(plate.Nwells)) + 1
+	n_plates_required := int(math.Floor(float64(len(solutions))/float64(plate.Nwells))) + 1
 
 	if len(MajorLayoutGroupIDs) < n_plates_required {
 		lmg := len(MajorLayoutGroupIDs)
