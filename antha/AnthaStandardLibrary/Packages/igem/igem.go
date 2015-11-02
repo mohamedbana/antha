@@ -39,6 +39,7 @@ import (
 	"os"
 	"strings"
 	//"time"
+	//"github.com/mgutz/ansi"
 	"path/filepath"
 )
 
@@ -114,7 +115,7 @@ func SlurpOutput(Urlstring string) (output []byte) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("step 1")
+	//fmt.Println("step 1")
 
 	/*reader := bufio.NewReader(res.Body)
 
@@ -140,14 +141,14 @@ func SlurpOutput(Urlstring string) (output []byte) {
 	//f, _ := os.Create("temp.tmp")
 
 	//err := ioutil.WriteFile("temp.tmp", res.Body, 0777)
-	fmt.Println("step 2")
+	//fmt.Println("step 2")
 	//_, _ = io.Copy(f, res.Body)
-	fmt.Println("step 3")
+	//fmt.Println("step 3")
 	//		return
 	//	}
 	//}
 
-	fmt.Println("step 4")
+	//fmt.Println("step 4")
 	//output, err = ioutil.ReadFile("temp.tmp") // this is a very fast step!
 
 	/*body := make([]byte, int64(res.ContentLength))
@@ -157,7 +158,8 @@ func SlurpOutput(Urlstring string) (output []byte) {
 	fmt.Println("step 3")
 	output = b.Bytes()*/
 	output, err = ioutil.ReadAll(res.Body) // this is a slow step!
-	fmt.Println("step 5")
+	//fmt.Println("step 5")
+
 	//res.Body.Close()
 	//if err != nil {
 	//	log.Fatal(err)
@@ -556,7 +558,7 @@ func PartPropertiesChan(parts []string) chan Rsbpml {
 */
 
 func PartProperties(parts []string) (parsedxml Rsbpml) {
-	fmt.Println("len(parts =", len(parts))
+	fmt.Println("number of parts to find in registry", len(parts))
 	if len(parts) > 14 {
 
 		partslice := parts[0:14]
@@ -624,7 +626,6 @@ func GetSequence(partname string) (sequence string) {
 	url := MakeXMLURL(parts)
 	urloutput := SlurpOutput(url)
 	parsedxml := ParseOutput(urloutput)
-
 	sequence = parsedxml.Partlist[0].Parts[0].Sequencelist[0].Seq_data // [0].Seq_data
 
 	sequence = strings.Replace(sequence, "\n", "", -1)

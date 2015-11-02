@@ -9,6 +9,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 	"strings"
 	"strconv"
+	//"github.com/mgutz/ansi"
 )
 
 // Input parameters for this protocol (data)
@@ -53,7 +54,7 @@ Setup {}
 // The core process for this protocol, with the steps to be performed
 // for every input
 Steps {
-	
+	//var msg string
 	// set warnings reported back to user to none initially
 	warnings := make([]string,1)
 	warnings[0] = "none"
@@ -68,17 +69,23 @@ Steps {
 		
 		
 		if strings.Contains(part,"BBa_") ==true{
+			
 			partDNA.Nm = part
 			partDNA.Seq = igem.GetSequence(part)
+		
 			/* We can add logic to check the status of parts too and return a warning if the part 
 			   is not characeterised */
+			
 			if strings.Contains(igem.GetResults(part),"Works") != true{
+					
 				warnings = make([]string,0)
 				warning := fmt.Sprintln("iGem part", part, "results =", igem.GetResults(part), "rating",igem.GetRating(part), "part type",igem.GetType(part), "part decription =", igem.GetDescription(part), "Categories",igem.GetCategories(part))
 				warnings = append(warnings,warning)
+				
 		}
 		} else {
 		partDNA = Inventory.Partslist[part]
+		
 		}
 		
 		if partDNA.Seq == "" || partDNA.Nm == "" {
@@ -86,10 +93,9 @@ Steps {
 		}
 	partsinorder = append(partsinorder,partDNA)
 	}
-	
+
 	// or Look up parts from registry according to properties (this will take a couple of minutes the first time)
 	subparts := igem.FilterRegistry([]string{"Fluorescent", "A "})
-
 	partdetails := igem.PartProperties(subparts)
 	//fmt.Println(partdetails)
 	
@@ -166,6 +172,9 @@ Steps {
 	}
 	_ = enzymes.Makefastaserial(Constructname,partswithOverhangs)
 	
+	//partstoorder := ansi.Color(fmt.Sprintln("PartswithOverhangs", PartswithOverhangs),"red")
+	partstoorder := fmt.Sprintln("PartswithOverhangs", PartswithOverhangs)
+	
 	
 	// Print status
 	if Status != "all parts available"{
@@ -178,7 +187,7 @@ Steps {
 		//"partonewithoverhangs", partonewithoverhangs,
 		//"Vector",vectordata,
 		"Vector digest:", stickyends5,stickyends3,
-		"PartswithOverhangs",PartswithOverhangs,
+		partstoorder,
 		"Sitesfound",Sitesfound,
 		"Partsinorder=",Partsinorder,partsinorder,
 		"Test digestion sizes with TspEI", Testdigestionsizes,

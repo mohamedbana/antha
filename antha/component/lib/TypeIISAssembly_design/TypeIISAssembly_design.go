@@ -17,6 +17,8 @@ import (
 	"sync"
 )
 
+//"github.com/mgutz/ansi"
+
 // Input parameters for this protocol (data)
 
 // Physical Inputs to this protocol with types
@@ -47,6 +49,7 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 		p.BlockID)
 	_ = _wrapper
 
+	//var msg string
 	// set warnings reported back to user to none initially
 	warnings := make([]string, 1)
 	warnings[0] = "none"
@@ -60,17 +63,23 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 	for _, part := range p.Partsinorder {
 
 		if strings.Contains(part, "BBa_") == true {
+
 			partDNA.Nm = part
 			partDNA.Seq = igem.GetSequence(part)
+
 			/* We can add logic to check the status of parts too and return a warning if the part
 			   is not characeterised */
+
 			if strings.Contains(igem.GetResults(part), "Works") != true {
+
 				warnings = make([]string, 0)
 				warning := fmt.Sprintln("iGem part", part, "results =", igem.GetResults(part), "rating", igem.GetRating(part), "part type", igem.GetType(part), "part decription =", igem.GetDescription(part), "Categories", igem.GetCategories(part))
 				warnings = append(warnings, warning)
+
 			}
 		} else {
 			partDNA = Inventory.Partslist[part]
+
 		}
 
 		if partDNA.Seq == "" || partDNA.Nm == "" {
@@ -81,7 +90,6 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 
 	// or Look up parts from registry according to properties (this will take a couple of minutes the first time)
 	subparts := igem.FilterRegistry([]string{"Fluorescent", "A "})
-
 	partdetails := igem.PartProperties(subparts)
 	//fmt.Println(partdetails)
 
@@ -152,6 +160,9 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 	}
 	_ = enzymes.Makefastaserial(p.Constructname, partswithOverhangs)
 
+	//partstoorder := ansi.Color(fmt.Sprintln("PartswithOverhangs", PartswithOverhangs),"red")
+	partstoorder := fmt.Sprintln("PartswithOverhangs", r.PartswithOverhangs)
+
 	// Print status
 	if r.Status != "all parts available" {
 		r.Status = fmt.Sprintln(r.Status)
@@ -164,7 +175,7 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 			//"partonewithoverhangs", partonewithoverhangs,
 			//"Vector",vectordata,
 			"Vector digest:", stickyends5, stickyends3,
-			"PartswithOverhangs", r.PartswithOverhangs,
+			partstoorder,
 			"Sitesfound", r.Sitesfound,
 			"Partsinorder=", p.Partsinorder, partsinorder,
 			"Test digestion sizes with TspEI", Testdigestionsizes,
