@@ -24,8 +24,11 @@ package wtype
 
 import (
 	"fmt"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"math/rand"
+	"strings"
 )
 
 // the following are all physical things; we need a way to separate
@@ -92,6 +95,121 @@ type DNASequence struct {
 	Methylation    string // add histones etc?
 }
 
+func MakeDNASequence(name string, seqstring string, properties []string) (seq DNASequence, err error) {
+	seq.Nm = name
+	seq.Seq = seqstring
+	for _, property := range properties {
+		property = strings.ToUpper(property)
+
+		if strings.Contains(property, "DCM") || strings.Contains(property, "DAM") || strings.Contains(property, "CPG") {
+			seq.Methylation = property
+		}
+
+		if strings.Contains(property, "PLASMID") || strings.Contains(property, "CIRCULAR") || strings.Contains(property, "VECTOR") {
+			seq.Plasmid = true
+			break
+		}
+		if strings.Contains(property, "SS") || strings.Contains(property, "SINGLE STRANDED") {
+			seq.Singlestranded = true
+			break
+		}
+		/*
+		   // deal with overhangs separately
+		   if strings.Contains(property,"5'") {
+		   	seq.Overhang5prime.End = 5
+		   	seq.Overhang5prime.Type =
+		   }
+		*/
+	}
+	return
+}
+func MakeLinearDNASequence(name string, seqstring string) (seq DNASequence) {
+	seq.Nm = name
+	seq.Seq = seqstring
+
+	return
+}
+func MakePlasmidDNASequence(name string, seqstring string) (seq DNASequence) {
+	seq.Nm = name
+	seq.Seq = seqstring
+	seq.Plasmid = true
+	return
+}
+func MakeSingleStrandedDNASequence(name string, seqstring string) (seq DNASequence) {
+	seq.Nm = name
+	seq.Seq = seqstring
+	seq.Singlestranded = true
+	return
+}
+
+func MakeOverhang(sequence DNASequence, end int, toporbottom int, length int, phosphorylated bool) (overhang Overhang, err error) {
+
+	if sequence.Singlestranded {
+		err = fmt.Errorf("Can't have overhang on single stranded dna")
+		return
+	}
+	if sequence.Plasmid {
+		err = fmt.Errorf("Can't have overhang on Plasmid(circular) dna")
+		return
+	}
+	if end == 0 {
+		err = fmt.Errorf("if end = 0, all fields are returned empty")
+		return
+	}
+
+	if end == 5 || end == 3 || end == 0 {
+		overhang.End = end
+	} else {
+		err = fmt.Errorf("invalid entry for end: 5PRIME = 5, 3PRIME = 3, NA = 0")
+		return
+	}
+	if toporbottom == 0 && length == 0 {
+		overhang.Type = 1
+		return
+	}
+	if toporbottom == 0 && length != 0 {
+		err = fmt.Errorf("If length of overhang is not 0, toporbottom must be 0")
+		return
+	}
+	if toporbottom != 0 && length == 0 {
+		err = fmt.Errorf("If length of overhang is not 0, toporbottom must be 0")
+		return
+	}
+	if toporbottom > 2 {
+		err = fmt.Errorf("invalid entry for toporbottom: NEITHER = 0, TOP    = 1, BOTTOM = 2")
+		return
+	}
+	if toporbottom == 1 {
+		overhang.Type = 2
+		overhang.Sequence = sequences.Prefix(sequence.Seq, length)
+	}
+	if toporbottom == 2 {
+		overhang.Type = -1
+		overhang.Sequence = sequences.Suffix(sequences.RevComp(sequence.Seq), length)
+	}
+	overhang.Phosphorylation = phosphorylated
+	return
+}
+
+func Phosphorylate(dnaseq DNASequence) (phosphorylateddna DNASequence, err error) {
+	if dnaseq.Plasmid == true {
+		err = fmt.Errorf("Can't phosphorylate circular dna")
+		phosphorylateddna = dnaseq
+		return
+	}
+	if dnaseq.Overhang5prime.Type != 0 {
+		dnaseq.Overhang5prime.Phosphorylation = true
+	}
+	if dnaseq.Overhang3prime.Type != 0 {
+		dnaseq.Overhang3prime.Phosphorylation = true
+	}
+	if dnaseq.Overhang3prime.Type == 0 && dnaseq.Overhang5prime.Type == 0 {
+		err = fmt.Errorf("No ends available, but not plasmid! This doesn't seem possible!")
+		phosphorylateddna = dnaseq
+	}
+	return
+}
+
 const (
 	FALSE     = 0
 	BLUNT     = 1
@@ -100,17 +218,17 @@ const (
 )
 
 const (
-	TOP    = 1
-	BOTTOM = 2
+	NEITHER = 0
+	TOP     = 1
+	BOTTOM  = 2
 )
 
-/*
-const (
+/*const (
 	5PRIME = 5
 	3PRIME = 3
 	NA = 0
-)
-*/
+)*/
+
 type Overhang struct {
 	//Strand          int // i.e. 1 or 2 (top or bottom
 	End             int // i.e. 5 or 3 or 0

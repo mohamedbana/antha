@@ -1,22 +1,22 @@
 // antha/AnthaStandardLibrary/Packages/igem/igem.go: Part of the Antha language
 // Copyright (C) 2015 The Antha authors. All rights reserved.
-// 
+//
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-// 
+//
 // For more information relating to the software or licensing issues please
-// contact license@antha-lang.org or write to the Antha team c/o 
+// contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
@@ -29,6 +29,7 @@ import (
 	"fmt"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	//"/data"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	//"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"io"
@@ -38,7 +39,7 @@ import (
 	"os"
 	"strings"
 	//"time"
-	//"path/filepath"
+	"path/filepath"
 )
 
 // http://parts.igem.org/Registry_API
@@ -166,7 +167,7 @@ func SlurpOutput(Urlstring string) (output []byte) {
 }
 
 func UpdateRegistryfile() (err error) {
-	fmt.Println("Slurping...", "http://parts.igem.org/fasta/parts/All_Parts")
+	fmt.Println("Getting latest registry database file from ...", "http://parts.igem.org/fasta/parts/All_Parts")
 	res, err := http.Get("http://parts.igem.org/fasta/parts/All_Parts")
 	if err != nil {
 		log.Fatal(err)
@@ -182,8 +183,8 @@ func UpdateRegistryfile() (err error) {
 	//if _, err := os.Stat("Registry.fasta"); err != nil {
 	//	if os.IsNotExist(err) {
 	//		fmt.Printf("downloading registry.fasta")
-	f, _ := os.Create("iGem_registry.txt")
-	fmt.Println("step 2: copying registry... This could take a few minutes so hold tight")
+	f, _ := os.Create(filepath.Join(anthapath.Dirpath(), "iGem_registry.txt"))
+	fmt.Println("step 2: copying registry... This could take a few minutes, don't go anywhere")
 	_, err = io.Copy(f, res.Body) // takes just as long as ioutil.Readall()
 	fmt.Println("step 3")
 	//		return
@@ -299,7 +300,8 @@ func FastaParse(fastaFh io.Reader) chan FastaPart {
 }
 
 func CountPartsinRegistryContaining(keystrings []string) (numberofparts int) {
-	if Exists("iGem_registry.txt") == false {
+
+	if anthapath.Anthafileexists("iGem_registry.txt") == false {
 		err := UpdateRegistryfile()
 		if err != nil {
 			fmt.Println("error:", err)
@@ -354,7 +356,7 @@ func Exists(filename string) bool {
 }
 
 func FilterRegistry(keystrings []string) (listofpartIDs []string) {
-	if Exists("iGem_registry.txt") == false {
+	if anthapath.Anthafileexists("iGem_registry.txt") == false {
 		err := UpdateRegistryfile()
 		if err != nil {
 			fmt.Println("error:", err)

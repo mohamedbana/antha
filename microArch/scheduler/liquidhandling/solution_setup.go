@@ -25,10 +25,10 @@ package liquidhandling
 import (
 	"errors"
 	"fmt"
-	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
+	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 )
 
 // determines how to
@@ -153,8 +153,8 @@ func solution_setup(request *LHRequest, prms *liquidhandling.LHProperties) (map[
 	}
 
 	for cmp, arr := range mconcs {
-		min := wutil.FMin(arr)
-		max := wutil.FMax(arr)
+		min, _ := wutil.FMin(arr)
+		max, _ := wutil.FMax(arr)
 		minrequired[cmp] = min
 		maxrequired[cmp] = max
 		// if smax undefined we need to deal  - we assume infinite solubility!!

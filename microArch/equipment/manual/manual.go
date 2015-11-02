@@ -378,14 +378,19 @@ func (e *AnthaManualGrpc) configRequest(actionDescription equipment.ActionDescri
 		req = r
 	}
 	//@jmanart TODO this down needs to come from the configuration step, need to figure out the correct cast
-	req.Input_Setup_Weights["MAX_N_PLATES"] = 1.5
-	req.Input_Setup_Weights["MAX_N_WELLS"] = 12.0
+	// XXX XXX XXX this can cause big issues
+	req.Input_Setup_Weights["MAX_N_PLATES"] = 4.5
+	req.Input_Setup_Weights["MAX_N_WELLS"] = 278.0
 	req.Input_Setup_Weights["RESIDUAL_VOLUME_WEIGHT"] = 1.0
 
 	// MIS MAJOR TODO XXX XXX XXX here: this HARD CODE needs to be removed or we can only use one type of plate!
 	// this stuff needs to come from the database - have to work out user configurability here also
-	pwc := factory.GetPlateByType("pcrplate_with_cooler")
-	req.Input_platetypes = append(req.Input_platetypes, pwc)
+	// oh dear, this code is wronger than I had realised
+	// MIS fix here - only allow a single plate in here
+	if len(req.Input_platetypes) == 0 {
+		pwc := factory.GetPlateByType("pcrplate_with_cooler")
+		req.Input_platetypes = append(req.Input_platetypes, pwc)
+	}
 
 	return nil
 }
@@ -437,9 +442,8 @@ func (e *AnthaManualGrpc) end(actionDescription equipment.ActionDescription) err
 	if !ok {
 		return nil
 	}
-	ret := planner.MakeSolutions(req)
 
-	logger.Debug("output from makesolutions", ret)
+	planner.MakeSolutions(req)
 
 	e.queue[blockId.ThreadID] = nil
 	e.planner[blockId.ThreadID] = nil
@@ -471,7 +475,8 @@ func (e *AnthaManualGrpc) Shutdown() error {
 
 //Init driver will be initialized when registered
 func (e *AnthaManualGrpc) Init() error {
-	e.properties = factory.GetLiquidhandlerByType("GilsonPipetmax")
+	//e.properties = factory.GetLiquidhandlerByType("GilsonPipetmax")
+	e.properties = factory.GetLiquidhandlerByType("CyBioGeneTheatre")
 	e.properties.Driver = e.driver
 	return nil
 }

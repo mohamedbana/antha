@@ -23,10 +23,11 @@
 package enzymes
 
 import (
-	"sort"
-	"strings"
-
+	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"sort"
+	"strconv"
+	"strings"
 )
 
 //should expand to be more general, i.e. 3prime overhangs
@@ -54,12 +55,25 @@ func MakedoublestrandedDNA(sequence wtype.DNASequence) (Doublestrandedpair []wty
 }
 
 type Restrictionsites struct {
-	enzyme              wtype.LogicalRestrictionEnzyme
-	recognitionsequence string
-	sitefound           bool
-	numberofsites       int
-	forwardpositions    []int
-	reversepositions    []int
+	Enzyme              wtype.LogicalRestrictionEnzyme
+	Recognitionsequence string
+	Sitefound           bool
+	Numberofsites       int
+	Forwardpositions    []int
+	Reversepositions    []int
+}
+
+func SitepositionString(sitesperpart Restrictionsites) (sitepositions string) {
+	Num := make([]string, 0)
+
+	for _, site := range sitesperpart.Forwardpositions {
+		Num = append(Num, strconv.Itoa(site))
+	}
+	for _, site := range sitesperpart.Reversepositions {
+		Num = append(Num, strconv.Itoa(site))
+	}
+	sitepositions = strings.Join(Num, ", ")
+	return
 }
 
 func Restrictionsitefinder(sequence wtype.DNASequence, enzymelist []wtype.LogicalRestrictionEnzyme) (sites []Restrictionsites) {
@@ -68,41 +82,37 @@ func Restrictionsitefinder(sequence wtype.DNASequence, enzymelist []wtype.Logica
 
 	for _, enzyme := range enzymelist {
 		var enzymesite Restrictionsites
-		enzymesite.enzyme = enzyme
-		enzymesite.recognitionsequence = strings.ToUpper(enzyme.RecognitionSequence)
+		//var siteafterwobble Restrictionsites
+		enzymesite.Enzyme = enzyme
+		enzymesite.Recognitionsequence = strings.ToUpper(enzyme.RecognitionSequence)
 		sequence.Seq = strings.ToUpper(sequence.Seq)
 
-		wobbleproofrecognitionoptions := Wobble(enzymesite.recognitionsequence)
+		wobbleproofrecognitionoptions := Wobble(enzymesite.Recognitionsequence)
 
 		for _, wobbleoption := range wobbleproofrecognitionoptions {
-
-			if strings.Contains(sequence.Seq, wobbleoption) {
-				enzymesite.sitefound = true
-			}
 
 			options := Findall(sequence.Seq, wobbleoption)
 			for _, option := range options {
 				if option != 0 {
-					enzymesite.forwardpositions = append(enzymesite.forwardpositions, option)
+					enzymesite.Forwardpositions = append(enzymesite.Forwardpositions, option)
 				}
 			}
-			if enzyme.RecognitionSequence == RevComp(wobbleoption) {
-				enzymesite.reversepositions = enzymesite.forwardpositions
-				enzymesite.numberofsites = len(enzymesite.forwardpositions)
-			} else {
-				options := Findall(sequence.Seq, RevComp(wobbleoption))
-				for _, option := range options {
+			if enzyme.RecognitionSequence != strings.ToUpper(RevComp(wobbleoption)) {
+				revoptions := Findall(sequence.Seq, RevComp(wobbleoption))
+				for _, option := range revoptions {
 					if option != 0 {
-						enzymesite.reversepositions = append(enzymesite.forwardpositions, option)
+						enzymesite.Reversepositions = append(enzymesite.Reversepositions, option)
 					}
 				}
-				enzymesite.numberofsites = len(enzymesite.forwardpositions) + len(enzymesite.reversepositions)
+
 			}
-			if enzymesite.numberofsites > 0 {
-				enzymesite.sitefound = true
+			enzymesite.Numberofsites = len(enzymesite.Forwardpositions) + len(enzymesite.Reversepositions)
+			if enzymesite.Numberofsites > 0 {
+				enzymesite.Sitefound = true
 			}
 
 		}
+
 		sites = append(sites, enzymesite)
 	}
 

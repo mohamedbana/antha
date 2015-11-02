@@ -76,7 +76,6 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 		if id != "" {
 			p := params.PlateLookup[id]
 			setup[pos] = p
-			//logger.Debug(fmt.Sprintln("SETUP: ", pos, " contains plate with id ", id, " name ", p.(wtype.Named).GetName()))
 		}
 
 	}
@@ -113,10 +112,6 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 		params.AddPlate(position, p)
 		logger.Info(fmt.Sprintf("Output plate of type %s in position %s", p.Type, position))
 	}
-
-	// inputs
-
-	logger.Debug(fmt.Sprintln("WE NEED: ", len(input_plates), " PLATES"))
 
 	for _, p := range input_plates {
 		position := get_first_available_preference(input_preferences, setup)

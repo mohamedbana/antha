@@ -24,11 +24,13 @@ package liquidhandling
 
 import (
 	"fmt"
+	"log"
+	"sync"
+
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
-	"log"
 )
 
 // the liquid handler structure defines the interface to a particular liquid handling
@@ -58,6 +60,7 @@ type Liquidhandler struct {
 	ExecutionPlanner func(*LHRequest, *liquidhandling.LHProperties) *LHRequest
 	PolicyManager    *LHPolicyManager
 	Counter          int
+	Once             sync.Once
 }
 
 // initialize the liquid handling structure
@@ -78,8 +81,13 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) *LHRequest {
 		RaiseError("No solutions defined")
 	}
 
-	this.Plan(request)
-	this.Execute(request)
+	f := func() {
+		this.Plan(request)
+		this.Execute(request)
+	}
+
+	this.Once.Do(f)
+
 	return request
 }
 
@@ -165,6 +173,8 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 	// set up the mapping of the outputs
 	// this assumes the input plates are set
 
+	// bet this is where we have issues
+
 	request = this.Layout(request)
 
 	// define the output plates
@@ -186,8 +196,13 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 
 	if this.Counter > 0 {
-		logger.Fatal("DOUBLE CALL TO GETINPUTS!")
-		panic("You only GetInputs() once")
+		/*
+			logger.Fatal("DOUBLE CALL TO GETINPUTS!")
+			panic("You only GetInputs() once")
+		*/
+
+		// I don't think we need to be quite so graceless
+		return request
 	}
 	this.Counter += 1
 
@@ -258,15 +273,23 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 	// fix some tips in place
 	// TODO this has to be sorted out
 	// SERIOUSLY
-	max_n_tipboxes := 5
+	max_n_tipboxes := len(this.Properties.Tip_preferences)
 	for i := 0; i < max_n_tipboxes; i++ {
 		//		this.Properties.AddTipBox(request.Tip_Type.Dup())//TODO get this from where it comes, quick hack now!
 		//		this.Properties.AddTipBox(factory.GetTipboxByType("Gilson20"))
 
 		// XXX this needs attention: we shouldn't allow this HARD CODE
 		// in future we need to use the validation mechanism to trap this way earlier
+		// MARKED FOR DELETION --- THIS NOW IS HANDLED ELSEWHERE
 		if request.Tip_Type == nil || request.Tip_Type.GenericSolid == nil {
-			this.Properties.AddTipBox(factory.GetTipboxByType("Gilson20"))
+			logger.Debug(fmt.Sprintf("LiquidHandling model is %q", this.Properties.Model))
+			if this.Properties.Model == "Pipetmax" {
+				this.Properties.AddTipBox(factory.GetTipboxByType("Gilson20"))
+			} else { //if this.Properties.Model == "GeneTheatre" { //TODO handle general case differently
+				this.Properties.AddTipBox(factory.GetTipboxByType("CyBio50Tipbox"))
+				this.Properties.Tips = make([]*wtype.LHTip, 1)
+				this.Properties.Tips[0] = factory.GetTipboxByType("CyBio50Tipbox").Tiptype
+			}
 		} else {
 			this.Properties.AddTipBox(factory.GetTipboxByType(request.Tip_Type.Name()))
 		}
@@ -274,7 +297,14 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 
 	// finally we have to add a waste
 
-	waste := factory.GetTipwasteByType("Gilsontipwaste")
+	var waste *wtype.LHTipwaste
+	// again we don't want this to happen
+	// MARKED FOR DELETION... SHOULD BE HANDLED ELSEWHERE
+	if this.Properties.Model == "Pipetmax" {
+		waste = factory.GetTipwasteByType("Gilsontipwaste")
+	} else { //if this.Properties.Model == "GeneTheatre" { //TODO handle general case differently
+		waste = factory.GetTipwasteByType("CyBiotipwaste")
+	}
 
 	this.Properties.AddTipWaste(waste)
 

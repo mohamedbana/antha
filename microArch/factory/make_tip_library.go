@@ -35,20 +35,20 @@ func makeTipLibrary() map[string]*wtype.LHTipbox {
 	// create a well representation of the tip holder... sometimes needed
 	// heh, should have kept LHTipholder!
 	shp := wtype.NewShape("cylinder", "mm", 7.3, 7.3, 51.2)
-	w := wtype.NewLHWell("Cybio250Tipbox", "", "A1", "ul", 250.0, 10.0, shp, 0, 7.3, 7.3, 51.2, 0.0, "mm")
+	w := wtype.NewLHWell("CyBio250Tipbox", "", "A1", "ul", 250.0, 10.0, shp, 0, 7.3, 7.3, 51.2, 0.0, "mm")
 	w.Extra["InnerL"] = 5.6
 	w.Extra["InnerW"] = 5.6
 	tip := wtype.NewLHTip("cybio", "CyBio250", 10.0, 250.0, "ul")
-	tb := wtype.NewLHTipbox(8, 12, 60.13, "CyBio", "Tipbox", tip, w, 9.0, 9.0, 0.0, 0.0, 0.0)
+	tb := wtype.NewLHTipbox(8, 12, 60.13, "CyBio", "CyBio250Tipbox", tip, w, 9.0, 9.0, 0.0, 0.0, 0.0)
 	tips[tip.Type] = tb
 	tips[tb.Type] = tb
 
-	w = wtype.NewLHWell("Cybio50Tipbox", "", "A1", "ul", 50.0, 0.5, shp, 0, 7.3, 7.3, 51.2, 0.0, "mm")
+	w = wtype.NewLHWell("CyBio50Tipbox", "", "A1", "ul", 50.0, 0.5, shp, 0, 7.3, 7.3, 51.2, 0.0, "mm")
 	w.Extra["InnerL"] = 5.6
 	w.Extra["InnerW"] = 5.6
 
 	tip = wtype.NewLHTip("cybio", "CyBio50", 0.5, 50.0, "ul")
-	tb = wtype.NewLHTipbox(8, 12, 60.13, "CyBio", "Tipbox", tip, w, 9.0, 9.0, 0.0, 0.0, 0.0)
+	tb = wtype.NewLHTipbox(8, 12, 60.13, "CyBio", "CyBio50Tipbox", tip, w, 9.0, 9.0, 0.0, 0.0, 0.0)
 	tips[tip.Type] = tb
 	tips[tb.Type] = tb
 
@@ -57,7 +57,7 @@ func makeTipLibrary() map[string]*wtype.LHTipbox {
 	w.Extra["InnerL"] = 5.6
 	w.Extra["InnerW"] = 5.6
 	tip = wtype.NewLHTip("cybio", "CyBio1000", 100.0, 1000.0, "ul")
-	tb = wtype.NewLHTipbox(8, 12, 60.13, "CyBio", "Tipbox", tip, w, 9.0, 9.0, 0.0, 0.0, 0.0)
+	tb = wtype.NewLHTipbox(8, 12, 60.13, "CyBio", "CyBio1000Tipbox", tip, w, 9.0, 9.0, 0.0, 0.0, 0.0)
 	tips[tip.Type] = tb
 	tips[tb.Type] = tb
 

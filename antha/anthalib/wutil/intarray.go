@@ -24,18 +24,18 @@ package wutil
 
 import "sort"
 
-func Max(ints []int) int {
+func Max(ints []int) (int, bool) {
 	if len(ints) == 0 {
-		return 0
+		return 0, false
 	}
 	sort.Ints(ints)
-	return ints[len(ints)-1]
+	return ints[len(ints)-1], false
 }
 
-func Min(ints []int) int {
+func Min(ints []int) (int, bool) {
 	if len(ints) == 0 {
-		return 0
+		return 0, false
 	}
 	sort.Ints(ints)
-	return ints[0]
+	return ints[0], false
 }

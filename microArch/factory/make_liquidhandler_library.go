@@ -152,9 +152,9 @@ func makeGeneTheatre() *liquidhandling.LHProperties {
 	lhp := liquidhandling.NewLHProperties(12, "GeneTheatre", "CyBio", "discrete", "disposable", layout)
 
 	// crucial constraint info
-	lhp.Tip_preferences = []string{"A1", "A2", "A3"}
+	lhp.Tip_preferences = []string{"A1", "A2", "A3", "B1", "B2", "B3", "C1"}
 	lhp.Input_preferences = []string{"D3", "D2", "C3", "C2", "B1", "B2"}
-	lhp.Output_preferences = []string{"B3", "B2", "B1", "C2", "C3", "D2"}
+	lhp.Output_preferences = []string{"C3", "C2", "C1", "D2", "B2", "B1"}
 	lhp.Wash_preferences = []string{"C2"}
 	lhp.Waste_preferences = []string{"C1"}
 	lhp.Tipwaste_preferences = []string{"D1", "C1"}
@@ -258,7 +258,8 @@ func makeGilson() *liquidhandling.LHProperties {
 	// get tips permissible from the factory
 	SetUpTipsFor(lhp)
 
-	lhp.Tip_preferences = []string{"position_2", "position_3", "position_6", "position_9", "position_8", "position_5", "position_4", "position_7"}
+	//lhp.Tip_preferences = []string{"position_2", "position_3", "position_6", "position_9", "position_8", "position_5", "position_4", "position_7"}
+	lhp.Tip_preferences = []string{"position_2", "position_3", "position_6", "position_9", "position_8"} //jmanart i cut it down to 5, as it was hardcoded in the liquidhandler getInputs call before
 	lhp.Input_preferences = []string{"position_4", "position_5", "position_6", "position_9", "position_8", "position_3"}
 	lhp.Output_preferences = []string{"position_7", "position_8", "position_9", "position_6", "position_5", "position_3"}
 	lhp.Wash_preferences = []string{"position_8"}

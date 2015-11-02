@@ -24,6 +24,7 @@ package wutil
 
 import (
 	"fmt"
+	"log"
 	"testing"
 )
 
@@ -94,4 +95,23 @@ func ExampleATN() {
 	// B:  2
 	// CV:  100
 	// AA:  27
+}
+
+func TestIntSet(*testing.T) {
+	s := NewIntSet(10)
+
+	for i := 0; i < 100; i++ {
+		s.Add(i % 10)
+	}
+
+	// s now should contain only 0..9
+	// in that order
+
+	t := s.AsSlice()
+
+	for i := 0; i < 10; i++ {
+		if t[i] != i {
+			log.Fatal("TestIntSet: slice contents incorrect")
+		}
+	}
 }

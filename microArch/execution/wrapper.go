@@ -34,7 +34,6 @@ import (
 	"github.com/antha-lang/antha/microArch/equipment"
 	"github.com/antha-lang/antha/microArch/equipment/action"
 	"github.com/antha-lang/antha/microArch/equipmentManager"
-	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
 )
 
@@ -44,7 +43,6 @@ type Wrapper struct {
 	liquidHandler equipment.Equipment
 	threadID      execute.ThreadID
 	blockID       execute.BlockID
-	inplate       *wtype.LHPlate
 	outputCount   int
 }
 
@@ -53,7 +51,6 @@ func NewWrapper(threadID execute.ThreadID, blockID execute.BlockID) *Wrapper {
 	w := &Wrapper{}
 	w.threadID = threadID
 	w.blockID = blockID
-	w.inplate = factory.GetPlateByType("pcrplate_with_cooler")
 	return w
 }
 
@@ -81,12 +78,13 @@ func (w *Wrapper) MixInto(outplate *wtype.LHPlate, components ...*wtype.LHCompon
 		// this aggregation layer and that will allow us to run multiple protocols.
 		//prepare the values
 		config := make(map[string]interface{}) //new(wtype.ConfigItem)
-		config["MAX_N_PLATES"] = 1.5
-		config["MAX_N_WELLS"] = 12.0
+		config["MAX_N_PLATES"] = 4.5
+		config["MAX_N_WELLS"] = 278.0
 		config["RESIDUAL_VOLUME_WEIGHT"] = 1.0
 		config["OUTPUT_COUNT"] = w.outputCount
 		config["BLOCKID"] = w.blockID.String()
-		config["TIPTYPE"] = "Gilson20"
+		config["INPUT_PLATETYPE"] = "pcrplate_with_cooler"
+		config["OUTPUT_PLATETYPE"] = "pcrplate_with_cooler"
 		configString, err := json.Marshal(config)
 		if err != nil {
 			panic(fmt.Sprintf("error configuring liquid handling request: %s", err))

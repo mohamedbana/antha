@@ -138,7 +138,6 @@ func AdvancedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 	}
 
 	for _, name := range order {
-		//logger.Debug(fmt.Sprintln(name))
 		for n, g := range minorlayoutgroups {
 			grp := []string(g)
 
@@ -175,7 +174,6 @@ func AdvancedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 			tpwx := make([]int, len(grp))
 			tpwy := make([]int, len(grp))
 
-			//logger.Debug(fmt.Sprintln("GROUP: ", grp))
 			compingroup := false
 
 			for i, solID := range grp {
@@ -184,7 +182,6 @@ func AdvancedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 				// we need to get the relevant component out
 				smpl := get_aggregate_component(sol, name)
 				if smpl == nil {
-					//logger.Debug(fmt.Sprintln("skipping ", i))
 					row += incrow
 					col += inccol
 					continue
@@ -221,12 +218,11 @@ func AdvancedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 				wellto[i] = wutil.NumToAlpha(row) + strconv.Itoa(col)
 
 				outplate := output_plates[output_plate_layout[toplatenum]]
+
 				outwell := outplate.Rows[row-1][col-1]
 				v := wunit.NewVolume(smpl.Vol, smpl.Vunit)
 				tpwx[i] = outplate.WellsX()
 				tpwy[i] = outplate.WellsY()
-
-				//logger.Debug(fmt.Sprintln("HEY? ", smpl.Vol, smpl.Vunit, v.ToString()))
 
 				vt := wunit.NewVolume(outwell.Currvol, "ul")
 				vf := wunit.NewVolume(wvol, "ul")
@@ -256,8 +252,6 @@ func AdvancedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 			}
 
 			ins := liquidhandling.NewTransferInstruction(whats, pltfrom, pltto, wellfrom, wellto, plttypefrom, plttypeto, vols, fvols, tvols, fpwx, fpwy, tpwx, tpwy)
-
-			//logger.Debug(fmt.Sprintln(liquidhandling.InsToString(ins)))
 
 			instructions.Add(ins)
 		}
