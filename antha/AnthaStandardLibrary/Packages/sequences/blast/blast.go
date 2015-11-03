@@ -2,29 +2,29 @@ package blast
 
 import (
 	"fmt"
-	. "github.com/biogo/ncbi/blast"
-//"github.com/biogo/ncbi/blast_test"
-//"log"
+	. "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
+	//"github.com/biogo/ncbi/blast_test"
+	//"log"
 	"strings"
-	"github.com/mgutz/ansi"
+	"github.com/antha-lang/antha/internal/github.com/mgutz/ansi"
 	"strconv"
 	"time"
 )
 
 var (
-//email = "ucbecrg@ucl.ac.uk"
+	//email = "ucbecrg@ucl.ac.uk"
 	email = "chrisrgrant@gmail.com"
-//tool  = "blast-example"
-	tool = "blast-example1"
-	params Parameters
+	//tool  = "blast-example"
+	tool      = "blast-example1"
+	params    Parameters
 	putparams = PutParameters{Program: "blastn", Megablast: true, Database: "nr"}
 	getparams GetParameters
-	page = ""
-//query     = "X14032.1"
-//query     = "MSFSNYKVIAMPVLVANFVLGAATAWANENYPAKSAGYNQGDWVASFNFSKVYVGEELGDLNVGGGALPNADVSIGNDTTLTFDIAYFVSSNIAVDFFVGVPARAKFQGEKSISSLGRVSEVDYGPAILSLQYHYDSFERLYPYVGVGVGRVLFFDKTDGALSSFDIKDKWAPAFQVGLRYDLGNSWMLNSDVRYIPFKTDVTGTLGPVPVSTKIEVDPFILSLGASYVF"
-//query   = "atgagtttttctaattataaagtaatcgcgatgccggtgttggttgctaattttgttttgggggcggccactgcatgggcgaatgaaaattatccggcgaaatctgctggctataatcagggtgactgggtcgctagcttcaatttttctaaggtctatgtgggtgaggagcttggcgatctaaatgttggagggggggctttgccaaatgctgatgtaagtattggtaatgatacaacacttacgtttgatatcgcctattttgttagctcaaatatagcggtggatttttttgttggggtgccagctagggctaaatttcaaggtgagaaatcaatctcctcgctgggaagagtcagtgaagttgattacggccctgcaattctttcgcttcaatatcattacgatagctttgagcgactttatccatatgttggggttggtgttggtcgggtgctattttttgataaaaccgacggtgctttgagttcgtttgatattaaggataaatgggcgcctgcttttcaggttggccttagatatgaccttggtaactcatggatgctaaattcagatgtgcgttatattcctttcaaaacggacgtcacaggtactcttggcccggttcctgtttctactaaaattgaggttgatcctttcattctcagtcttggtgcgtcatatgttttctaa"
+	page      = ""
+	//query     = "X14032.1"
+	//query     = "MSFSNYKVIAMPVLVANFVLGAATAWANENYPAKSAGYNQGDWVASFNFSKVYVGEELGDLNVGGGALPNADVSIGNDTTLTFDIAYFVSSNIAVDFFVGVPARAKFQGEKSISSLGRVSEVDYGPAILSLQYHYDSFERLYPYVGVGVGRVLFFDKTDGALSSFDIKDKWAPAFQVGLRYDLGNSWMLNSDVRYIPFKTDVTGTLGPVPVSTKIEVDPFILSLGASYVF"
+	//query   = "atgagtttttctaattataaagtaatcgcgatgccggtgttggttgctaattttgttttgggggcggccactgcatgggcgaatgaaaattatccggcgaaatctgctggctataatcagggtgactgggtcgctagcttcaatttttctaaggtctatgtgggtgaggagcttggcgatctaaatgttggagggggggctttgccaaatgctgatgtaagtattggtaatgatacaacacttacgtttgatatcgcctattttgttagctcaaatatagcggtggatttttttgttggggtgccagctagggctaaatttcaaggtgagaaatcaatctcctcgctgggaagagtcagtgaagttgattacggccctgcaattctttcgcttcaatatcattacgatagctttgagcgactttatccatatgttggggttggtgttggtcgggtgctattttttgataaaaccgacggtgctttgagttcgtttgatattaaggataaatgggcgcctgcttttcaggttggccttagatatgaccttggtaactcatggatgctaaattcagatgtgcgttatattcctttcaaaacggacgtcacaggtactcttggcccggttcctgtttctactaaaattgaggttgatcctttcattctcagtcttggtgcgtcatatgttttctaa"
 	retries = 1
-	retry = retries
+	retry   = retries
 )
 
 func RerunRIDstring(rid string) (o *Output, err error) {
@@ -59,7 +59,6 @@ func RerunRIDstring(rid string) (o *Output, err error) {
 }
 
 func RerunRID(r *Rid) (o *Output, err error) {
-
 
 	if r != nil {
 		fmt.Println("RID=", r.String())
@@ -142,8 +141,6 @@ func MegaBlastN(query string) (hits []Hit, err error) {
 	return
 }
 
-
-
 func SimpleBlast(query string) (o *Output, err error) {
 
 	r, err := Put(query, &putparams, tool, email)
@@ -159,27 +156,25 @@ func SimpleBlast(query string) (o *Output, err error) {
 			o, err = r.GetOutput(&getparams, tool, email)
 			continue
 		} else if strings.Contains(s.Status, "WAITING") == true {
-				for {
-					if strings.Contains(s.Status, "WAITING") == true  {
-						fmt.Println("waiting 1 min to rerun RID:", r.String())
-						time.Sleep(1 *time.Minute)
-						s, err = r.SearchInfo(tool, email)
-						o, err = RerunRID(r)
+			for {
+				if strings.Contains(s.Status, "WAITING") == true {
+					fmt.Println("waiting 1 min to rerun RID:", r.String())
+					time.Sleep(1 * time.Minute)
+					s, err = r.SearchInfo(tool, email)
+					o, err = RerunRID(r)
 
-					} else {
-						return
-					}
+				} else {
+					return
 				}
+			}
 
-
-				if err == nil {
-					break
-				}
-
+			if err == nil {
+				break
 			}
 
 		}
 
+	}
 
 	return
 }

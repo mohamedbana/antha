@@ -14,7 +14,7 @@ import (
 	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/flow"
 	"github.com/antha-lang/antha/microArch/execution"
-	biogo "github.com/biogo/ncbi/blast"
+	biogo "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
 	"sync"
 )
 

@@ -3,165 +3,144 @@
 	"ignore": "",
 	"package": [
 		{
-			"canonical": "code.google.com/p/go-sqlite/go1/sqlite3",
-			"comment": "",
-			"local": "code.google.com/p/go-sqlite/go1/sqlite3",
-			"revision": "6e75c20f8fc4",
-			"revisionTime": "2013-09-15T19:25:44-04:00"
-		},
-		{
-			"canonical": "code.google.com/p/go-sqlite/go1/sqlite3/codec",
-			"comment": "",
-			"local": "code.google.com/p/go-sqlite/go1/sqlite3/codec",
-			"revision": "6e75c20f8fc4",
-			"revisionTime": "2013-09-15T19:25:44-04:00"
-		},
-		{
-			"canonical": "",
-			"comment": "",
-			"local": "code.google.com/p/go.net/websocket",
-			"revision": "937a34c9de13",
-			"revisionTime": "2014-12-05T14:04:04+09:00"
-		},
-		{
-			"canonical": "github.com/Synthace/go-glpk/glpk",
-			"comment": "",
-			"local": "github.com/Synthace/go-glpk/glpk",
-			"revision": "57b54016c4e11d470e799cbd75b6617f0c12063a",
-			"revisionTime": "2015-07-02T11:42:44-05:00"
-		},
-		{
-			"canonical": "github.com/kylelemons/godebug/diff",
-			"comment": "",
-			"local": "github.com/antha-lang/antha/internal/github.com/kylelemons/godebug/diff",
-			"revision": "21cb3784d9bda523911b96719efba02b7e983256",
-			"revisionTime": "2015-05-19T08:45:55-07:00"
-		},
-		{
-			"canonical": "github.com/kylelemons/godebug/pretty",
-			"comment": "",
-			"local": "github.com/antha-lang/antha/internal/github.com/kylelemons/godebug/pretty",
-			"revision": "21cb3784d9bda523911b96719efba02b7e983256",
-			"revisionTime": "2015-05-19T08:45:55-07:00"
-		},
-		{
-			"canonical": "github.com/tealeg/xlsx",
-			"comment": "",
-			"local": "github.com/antha-lang/antha/internal/github.com/tealeg/xlsx",
-			"revision": "c2885b3e5cb5fb9b241bdab3430ca6e1c1057079",
-			"revisionTime": "2015-07-24T21:09:55+02:00"
-		},
-		{
-			"canonical": "",
-			"comment": "",
-			"local": "github.com/biogo/biogo/alphabet",
-			"revision": "cad5a317cd03372c35d86059dd99344b5542a072",
-			"revisionTime": "2015-05-06T14:43:48+09:30"
-		},
-		{
-			"canonical": "",
-			"comment": "",
-			"local": "github.com/biogo/biogo/feat",
-			"revision": "cad5a317cd03372c35d86059dd99344b5542a072",
-			"revisionTime": "2015-05-06T14:43:48+09:30"
-		},
-		{
-			"canonical": "",
-			"comment": "",
-			"local": "github.com/biogo/biogo/io/seqio",
-			"revision": "cad5a317cd03372c35d86059dd99344b5542a072",
-			"revisionTime": "2015-05-06T14:43:48+09:30"
-		},
-		{
-			"canonical": "",
-			"comment": "",
-			"local": "github.com/biogo/biogo/io/seqio/fasta",
-			"revision": "cad5a317cd03372c35d86059dd99344b5542a072",
-			"revisionTime": "2015-05-06T14:43:48+09:30"
-		},
-		{
-			"canonical": "",
-			"comment": "",
-			"local": "github.com/biogo/biogo/seq",
-			"revision": "cad5a317cd03372c35d86059dd99344b5542a072",
-			"revisionTime": "2015-05-06T14:43:48+09:30"
-		},
-		{
-			"canonical": "",
-			"comment": "",
-			"local": "github.com/biogo/biogo/seq/linear",
-			"revision": "cad5a317cd03372c35d86059dd99344b5542a072",
-			"revisionTime": "2015-05-06T14:43:48+09:30"
-		},
-		{
-			"canonical": "",
-			"comment": "",
-			"local": "github.com/ghodss/yaml",
-			"revision": "c3eb24aeea63668ebdac08d2e252f20df8b6b1ae",
-			"revisionTime": "2015-03-27T18:25:44-07:00"
-		},
-		{
-			"canonical": "",
-			"comment": "",
-			"local": "github.com/jroimartin/gocui",
+			"path": "",
 			"revision": "e2590f1300bfef8146d50f58377a8e7b93934fa8",
 			"revisionTime": "2015-02-24T13:05:33+01:00"
 		},
 		{
-			"canonical": "github.com/mattn/go-runewidth",
-			"comment": "",
-			"local": "github.com/mattn/go-runewidth",
-			"revision": "5890272cd41c5103531cd7b79e428d99c9e97f76",
-			"revisionTime": "2015-05-27T19:19:16+09:00"
+			"path": "",
+			"revision": "c1cd2254a6dd314c9d73c338c12688c9325d85c6",
+			"revisionTime": "2015-05-19T19:42:33+09:00"
 		},
 		{
-			"canonical": "",
-			"comment": "",
-			"local": "github.com/mitchellh/mapstructure",
-			"revision": "442e588f213303bec7936deba67901f8fc8f18b1",
-			"revisionTime": "2015-01-20T21:22:42-08:00"
+			"path": "",
+			"revision": "937a34c9de13",
+			"revisionTime": "2014-12-05T14:04:04+09:00"
 		},
 		{
-			"canonical": "github.com/montanaflynn/stats",
-			"comment": "",
-			"local": "github.com/montanaflynn/stats",
-			"revision": "44fb56da2a2a67d394dec0e18a82dd316f192529",
-			"revisionTime": "2015-06-13T03:02:36-07:00"
-		},
-		{
-			"canonical": "github.com/nsf/termbox-go",
-			"comment": "",
-			"local": "github.com/nsf/termbox-go",
-			"revision": "675ffd907b7401b8a709a5ef2249978af5616bb2",
-			"revisionTime": "2015-06-17T20:38:20-07:00"
-		},
-		{
-			"canonical": "",
-			"comment": "",
-			"local": "github.com/twinj/uuid",
-			"revision": "69bea132aeedf01f2bb5eaebeef88ce71ac2a477",
-			"revisionTime": "2015-06-21T20:00:22+10:00"
-		},
-		{
-			"canonical": "",
-			"comment": "",
-			"local": "golang.org/x/net/websocket",
-			"revision": "dfe268fd2bb5c793f4c083803609fce9806c6f80",
-			"revisionTime": "2015-06-05T17:53:27+12:00"
-		},
-		{
-			"canonical": "",
-			"comment": "",
-			"local": "gopkg.in/check.v1",
+			"path": "",
 			"revision": "8d49746f13e4c654088c52685541fcf4cbc8fa59",
 			"revisionTime": "2015-06-10T20:30:30-03:00"
 		},
 		{
-			"canonical": "",
-			"comment": "",
-			"local": "gopkg.in/yaml.v2",
-			"revision": "c1cd2254a6dd314c9d73c338c12688c9325d85c6",
-			"revisionTime": "2015-05-19T19:42:33+09:00"
+			"path": "",
+			"revision": "dfe268fd2bb5c793f4c083803609fce9806c6f80",
+			"revisionTime": "2015-06-05T17:53:27+12:00"
+		},
+		{
+			"path": "",
+			"revision": "69bea132aeedf01f2bb5eaebeef88ce71ac2a477",
+			"revisionTime": "2015-06-21T20:00:22+10:00"
+		},
+		{
+			"path": "",
+			"revision": "442e588f213303bec7936deba67901f8fc8f18b1",
+			"revisionTime": "2015-01-20T21:22:42-08:00"
+		},
+		{
+			"path": "",
+			"revision": "cad5a317cd03372c35d86059dd99344b5542a072",
+			"revisionTime": "2015-05-06T14:43:48+09:30"
+		},
+		{
+			"path": "",
+			"revision": "cad5a317cd03372c35d86059dd99344b5542a072",
+			"revisionTime": "2015-05-06T14:43:48+09:30"
+		},
+		{
+			"path": "",
+			"revision": "cad5a317cd03372c35d86059dd99344b5542a072",
+			"revisionTime": "2015-05-06T14:43:48+09:30"
+		},
+		{
+			"path": "",
+			"revision": "cad5a317cd03372c35d86059dd99344b5542a072",
+			"revisionTime": "2015-05-06T14:43:48+09:30"
+		},
+		{
+			"path": "",
+			"revision": "cad5a317cd03372c35d86059dd99344b5542a072",
+			"revisionTime": "2015-05-06T14:43:48+09:30"
+		},
+		{
+			"path": "",
+			"revision": "cad5a317cd03372c35d86059dd99344b5542a072",
+			"revisionTime": "2015-05-06T14:43:48+09:30"
+		},
+		{
+			"path": "",
+			"revision": "c3eb24aeea63668ebdac08d2e252f20df8b6b1ae",
+			"revisionTime": "2015-03-27T18:25:44-07:00"
+		},
+		{
+			"path": "code.google.com/p/go-sqlite/go1/sqlite3",
+			"revision": "6e75c20f8fc4",
+			"revisionTime": "2013-09-15T19:25:44-04:00"
+		},
+		{
+			"path": "code.google.com/p/go-sqlite/go1/sqlite3/codec",
+			"revision": "6e75c20f8fc4",
+			"revisionTime": "2013-09-15T19:25:44-04:00"
+		},
+		{
+			"path": "github.com/Synthace/go-glpk/glpk",
+			"revision": "57b54016c4e11d470e799cbd75b6617f0c12063a",
+			"revisionTime": "2015-07-02T11:42:44-05:00"
+		},
+		{
+			"path": "github.com/biogo/ncbi/blast",
+			"revision": "1f2a04055962f693a4fb3d85adc4e0c156b60685",
+			"revisionTime": "2015-10-27T08:49:08+10:30"
+		},
+		{
+			"path": "github.com/biogo/ncbi/ncbi",
+			"revision": "1f2a04055962f693a4fb3d85adc4e0c156b60685",
+			"revisionTime": "2015-10-27T08:49:08+10:30"
+		},
+		{
+			"path": "github.com/kylelemons/godebug/diff",
+			"revision": "21cb3784d9bda523911b96719efba02b7e983256",
+			"revisionTime": "2015-05-19T08:45:55-07:00"
+		},
+		{
+			"path": "github.com/kylelemons/godebug/pretty",
+			"revision": "21cb3784d9bda523911b96719efba02b7e983256",
+			"revisionTime": "2015-05-19T08:45:55-07:00"
+		},
+		{
+			"path": "github.com/mattn/go-runewidth",
+			"revision": "5890272cd41c5103531cd7b79e428d99c9e97f76",
+			"revisionTime": "2015-05-27T19:19:16+09:00"
+		},
+		{
+			"path": "github.com/mgutz/ansi",
+			"revision": "c286dcecd19ff979eeb73ea444e479b903f2cfcb",
+			"revisionTime": "2015-09-14T09:22:38-07:00"
+		},
+		{
+			"path": "github.com/montanaflynn/stats",
+			"revision": "44fb56da2a2a67d394dec0e18a82dd316f192529",
+			"revisionTime": "2015-06-13T03:02:36-07:00"
+		},
+		{
+			"path": "github.com/nsf/termbox-go",
+			"revision": "675ffd907b7401b8a709a5ef2249978af5616bb2",
+			"revisionTime": "2015-06-17T20:38:20-07:00"
+		},
+		{
+			"path": "github.com/tealeg/xlsx",
+			"revision": "c2885b3e5cb5fb9b241bdab3430ca6e1c1057079",
+			"revisionTime": "2015-07-24T21:09:55+02:00"
+		},
+		{
+			"path": "golang.org/x/net/html",
+			"revision": "b4e17d61b15679caf2335da776c614169a1b4643",
+			"revisionTime": "2015-10-28T13:07:21+01:00"
+		},
+		{
+			"path": "golang.org/x/net/html/atom",
+			"revision": "b4e17d61b15679caf2335da776c614169a1b4643",
+			"revisionTime": "2015-10-28T13:07:21+01:00"
 		}
 	]
 }
