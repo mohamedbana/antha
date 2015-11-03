@@ -31,6 +31,13 @@
 			"revisionTime": "2015-07-02T11:42:44-05:00"
 		},
 		{
+			"canonical": "github.com/fatih/structs",
+			"comment": "",
+			"local": "github.com/antha-lang/antha/internal/github.com/fatih/structs",
+			"revision": "c701457aaa1ff6709d5e35fccb5c129448e0a37b",
+			"revisionTime": "2015-10-14T12:55:59+03:00"
+		},
+		{
 			"canonical": "github.com/kylelemons/godebug/diff",
 			"comment": "",
 			"local": "github.com/antha-lang/antha/internal/github.com/kylelemons/godebug/diff",
