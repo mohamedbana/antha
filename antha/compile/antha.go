@@ -28,14 +28,15 @@ package compile
 import (
 	"bytes"
 	"fmt"
-	"github.com/antha-lang/antha/antha/ast"
-	"github.com/antha-lang/antha/antha/parser"
-	"github.com/antha-lang/antha/antha/token"
 	"log"
 	"reflect"
 	"sort"
 	"strings"
 	"text/template"
+
+	"github.com/antha-lang/antha/antha/ast"
+	"github.com/antha-lang/antha/antha/parser"
+	"github.com/antha-lang/antha/antha/token"
 )
 
 // Augmentation to compiler state to parse Antha files
@@ -592,7 +593,7 @@ func (p *compiler) addPreamble(decls []ast.Decl) {
 			}
 			// `_wrapper := execution.NewWrapper()`
 			s1Lhs, _ := parser.ParseExpr("_wrapper")
-			s1Rhs, _ := parser.ParseExpr("execution.NewWrapper(p.ID, p.BlockID)")
+			s1Rhs, _ := parser.ParseExpr("execution.NewWrapper(p.ID, p.BlockID, p)")
 			s1 := &ast.AssignStmt{
 				Lhs:    []ast.Expr{s1Lhs},
 				Rhs:    []ast.Expr{s1Rhs},
