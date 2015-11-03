@@ -188,7 +188,6 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 
 	// define the tip boxes - this will depend on the execution plan
 	request = this.Tip_box_setup(request)
-
 }
 
 // request the inputs which are needed to run the plan, unless they have already
