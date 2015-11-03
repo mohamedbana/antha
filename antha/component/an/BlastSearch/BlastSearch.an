@@ -1,0 +1,78 @@
+//Some examples functions
+// Calculate rate of reaction, V, of enzyme displaying Micahelis-Menten kinetics with Vmax, Km and [S] declared
+// Calculating [S] and V from g/l concentration and looking up molecular weight of named substrate
+// Calculating [S] and V from g/l concentration of DNA of known sequence
+// Calculating [S] and V from g/l concentration of Protein product of DNA of known sequence
+
+protocol BlastSearch
+
+import (
+	"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/blast"
+	biogo "github.com/biogo/ncbi/blast"
+	
+)
+// Input parameters for this protocol
+Parameters (
+	Query string//Amount
+	Querytype string
+	
+)
+
+// Data which is returned from this protocol
+Data (
+	Hits string
+)
+
+// Physical inputs to this protocol
+Inputs (
+
+)
+
+// Physical outputs from this protocol
+Outputs (
+)
+
+Requirements {
+
+}
+
+// Actions to perform before protocol itself
+Setup {
+
+}
+
+// Core process of the protocol: steps to be performed for each input
+Steps {
+	
+	var err error
+	var hits []biogo.Hit
+	
+	if Querytype == "PROTEIN" {
+	hits, err = blast.MegaBlastP(Query)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	
+	Hits = fmt.Sprintln(blast.HitSummary(hits))
+
+	
+	} else if Querytype == "DNA" {
+	hits, err = blast.MegaBlastN(Query)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	
+	Hits = fmt.Sprintln(blast.HitSummary(hits))
+	} 
+	
+}
+
+// Actions to perform after steps block to analyze data
+Analysis {
+
+}
+
+Validation {
+
+}
