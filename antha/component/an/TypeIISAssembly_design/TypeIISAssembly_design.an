@@ -19,8 +19,8 @@ import (
 // Input parameters for this protocol (data)
 Parameters (
 	Constructname 				string
-	Partsinorder					[]string
-	AssemblyStandard				string
+	Partsinorder				[]string
+	AssemblyStandard			string
 	Level						string
 	Vector						string
 	PartMoClotypesinorder		[]string

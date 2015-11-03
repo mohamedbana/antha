@@ -481,6 +481,7 @@ func LookforSpecificORF(seq string, targetAASeq string) (present bool) {
 	for _, orf := range ORFS.TopstrandORFS {
 		if strings.Contains(orf.Protseq, targetAASeq) {
 			present = true
+			return present
 		}
 	}
 	for _, revorf := range ORFS.BottomstrandORFS {

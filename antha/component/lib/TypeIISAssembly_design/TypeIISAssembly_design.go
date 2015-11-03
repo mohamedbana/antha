@@ -19,6 +19,8 @@ import (
 
 //"github.com/mgutz/ansi"
 
+//"log"
+
 // Input parameters for this protocol (data)
 
 // Physical Inputs to this protocol with types
@@ -63,6 +65,11 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 	for _, part := range p.Partsinorder {
 
 		if strings.Contains(part, "BBa_") == true {
+
+			/*err := igem.UpdateRegistryfile()
+			if err != nil {
+				log.Panic(err)
+			}*/
 
 			partDNA.Nm = part
 			partDNA.Seq = igem.GetSequence(part)
