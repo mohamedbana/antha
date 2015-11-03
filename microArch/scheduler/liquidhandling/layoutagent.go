@@ -23,7 +23,6 @@
 package liquidhandling
 
 import (
-	"fmt"
 	"math"
 	"strconv"
 
