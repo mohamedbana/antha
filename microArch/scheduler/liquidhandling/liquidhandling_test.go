@@ -183,7 +183,7 @@ func checkInputAssignments(r1, r2 *LHRequest) bool {
 	return true
 }
 
-func TestSetupDeterminism(t *testing.T) {
+func _TestSetupDeterminism(t *testing.T) {
 	fmt.Println("Testing setup determinism")
 
 	var lastrq *LHRequest
