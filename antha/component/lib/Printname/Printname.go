@@ -26,7 +26,7 @@ func (e *Printname) requirements() {
 // Actions to perform before protocol itself
 func (e *Printname) setup(p PrintnameParamBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -35,7 +35,7 @@ func (e *Printname) setup(p PrintnameParamBlock) {
 // Core process of the protocol: steps to be performed for each input
 func (e *Printname) steps(p PrintnameParamBlock, r *PrintnameResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 
 	if p.Name == "Michael Jackson" {
@@ -50,7 +50,7 @@ func (e *Printname) steps(p PrintnameParamBlock, r *PrintnameResultBlock) {
 // Actions to perform after steps block to analyze data
 func (e *Printname) analysis(p PrintnameParamBlock, r *PrintnameResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -58,7 +58,7 @@ func (e *Printname) analysis(p PrintnameParamBlock, r *PrintnameResultBlock) {
 
 func (e *Printname) validation(p PrintnameParamBlock, r *PrintnameResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

@@ -108,14 +108,14 @@ func (e *Phytip_miniprep) requirements() {
 }
 func (e *Phytip_miniprep) setup(p Phytip_miniprepParamBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 func (e *Phytip_miniprep) steps(p Phytip_miniprepParamBlock, r *Phytip_miniprepResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 
 	resuspension, _ := UnitOperations.Resuspend(p.Cellpellet, p.Resuspensionstep, p.Tips)
@@ -155,14 +155,14 @@ func (e *Phytip_miniprep) steps(p Phytip_miniprepParamBlock, r *Phytip_miniprepR
 }
 func (e *Phytip_miniprep) analysis(p Phytip_miniprepParamBlock, r *Phytip_miniprepResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 func (e *Phytip_miniprep) validation(p Phytip_miniprepParamBlock, r *Phytip_miniprepResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

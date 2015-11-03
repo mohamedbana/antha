@@ -32,7 +32,7 @@ func (e *MakeBuffer) requirements() {
 // Conditions to run on startup
 func (e *MakeBuffer) setup(p MakeBufferParamBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -42,7 +42,7 @@ func (e *MakeBuffer) setup(p MakeBufferParamBlock) {
 // for every input
 func (e *MakeBuffer) steps(p MakeBufferParamBlock, r *MakeBufferResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 
 	//Bufferstockvolume := wunit.NewVolume((FinalVolume.SIValue() * FinalConcentration.SIValue()/Bufferstockconc.SIValue()),"l")
@@ -63,7 +63,7 @@ func (e *MakeBuffer) steps(p MakeBufferParamBlock, r *MakeBufferResultBlock) {
 // post process any data and provide downstream results
 func (e *MakeBuffer) analysis(p MakeBufferParamBlock, r *MakeBufferResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -74,7 +74,7 @@ func (e *MakeBuffer) analysis(p MakeBufferParamBlock, r *MakeBufferResultBlock) 
 // dipstick basis
 func (e *MakeBuffer) validation(p MakeBufferParamBlock, r *MakeBufferResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

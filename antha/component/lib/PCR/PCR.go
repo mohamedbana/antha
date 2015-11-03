@@ -59,7 +59,7 @@ func (e *PCR) requirements() {
 // Conditions to run on startup
 func (e *PCR) setup(p PCRParamBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -69,7 +69,7 @@ func (e *PCR) setup(p PCRParamBlock) {
 // for every input
 func (e *PCR) steps(p PCRParamBlock, r *PCRResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 
 	samples := make([]*wtype.LHComponent, 0)
@@ -132,7 +132,7 @@ func (e *PCR) steps(p PCRParamBlock, r *PCRResultBlock) {
 // post process any data and provide downstream results
 func (e *PCR) analysis(p PCRParamBlock, r *PCRResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -143,7 +143,7 @@ func (e *PCR) analysis(p PCRParamBlock, r *PCRResultBlock) {
 // dipstick basis
 func (e *PCR) validation(p PCRParamBlock, r *PCRResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

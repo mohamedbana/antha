@@ -74,7 +74,7 @@ func (e *DNA_gel) requirements() {
 // for them (in this case, per plate of samples processed)
 func (e *DNA_gel) setup(p DNA_gelParamBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -89,7 +89,7 @@ func (e *DNA_gel) setup(p DNA_gelParamBlock) {
 // for every input
 func (e *DNA_gel) steps(p DNA_gelParamBlock, r *DNA_gelResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 
 	// load gel
@@ -140,7 +140,7 @@ func (e *DNA_gel) steps(p DNA_gelParamBlock, r *DNA_gelResultBlock) {
 // post process any data and provide downstream results
 func (e *DNA_gel) analysis(p DNA_gelParamBlock, r *DNA_gelResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -155,7 +155,7 @@ func (e *DNA_gel) analysis(p DNA_gelParamBlock, r *DNA_gelResultBlock) {
 // dipstick basis
 func (e *DNA_gel) validation(p DNA_gelParamBlock, r *DNA_gelResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

@@ -29,7 +29,7 @@ func (e *NewDNASequence) requirements() {
 // Actions to perform before protocol itself
 func (e *NewDNASequence) setup(p NewDNASequenceParamBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -38,7 +38,7 @@ func (e *NewDNASequence) setup(p NewDNASequenceParamBlock) {
 // Core process of the protocol: steps to be performed for each input
 func (e *NewDNASequence) steps(p NewDNASequenceParamBlock, r *NewDNASequenceResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 
 	if p.Plasmid != p.Linear && p.Plasmid != p.SingleStranded {
@@ -57,7 +57,7 @@ func (e *NewDNASequence) steps(p NewDNASequenceParamBlock, r *NewDNASequenceResu
 // Actions to perform after steps block to analyze data
 func (e *NewDNASequence) analysis(p NewDNASequenceParamBlock, r *NewDNASequenceResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -65,7 +65,7 @@ func (e *NewDNASequence) analysis(p NewDNASequenceParamBlock, r *NewDNASequenceR
 
 func (e *NewDNASequence) validation(p NewDNASequenceParamBlock, r *NewDNASequenceResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
