@@ -30,6 +30,43 @@ import (
 	"sort"
 )
 
+type InputSorter struct {
+	Ordered []string
+	Values  map[string]wunit.Volume
+}
+
+// @implement sort.Interface
+func (is InputSorter) Len() int {
+	return len(is.Ordered)
+}
+
+func (is InputSorter) Swap(i, j int) {
+	s := is.Ordered[i]
+	is.Ordered[i] = is.Ordered[j]
+	is.Ordered[j] = s
+}
+
+func (is InputSorter) Less(i, j int) bool {
+	vv1 := is.Values[is.Ordered[i]]
+	vv2 := is.Values[is.Ordered[j]]
+
+	v1 := vv1.SIValue()
+	v2 := vv2.SIValue()
+
+	// we want ascending sort here
+	if v1 < v2 {
+		return false
+	} else if v1 > v2 {
+		return true
+	}
+
+	// volumes are equal
+
+	ss := sort.StringSlice(is.Ordered)
+
+	return ss.Less(i, j)
+}
+
 //  TASK: 	Map inputs to input plates
 // INPUT: 	"input_platetype", "inputs"
 //OUTPUT: 	"input_plates"      -- these each have components in wells
@@ -65,10 +102,6 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 		input_order[i] = v
 	}
 
-	// sort to make deterministic
-
-	sort.Strings(input_order)
-
 	input_volumes := make(map[string]wunit.Volume, len(inputs))
 
 	// we add a little bit to account for extra volumes used
@@ -88,6 +121,14 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 		vol.Add(&extravol)
 		input_volumes[k] = *vol
 	}
+	// sort to make deterministic
+	// we sort by a) volume (descending) b) name (alphabetically)
+
+	isrt := InputSorter{input_order, input_volumes}
+
+	sort.Sort(isrt)
+
+	input_order = isrt.Ordered
 
 	weights_constraints := request.Input_Setup_Weights
 
