@@ -24,10 +24,10 @@ package liquidhandling
 
 import (
 	"fmt"
-
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/factory"
+	"sort"
 )
 
 //  TASK: 	Map inputs to input plates
@@ -58,7 +58,17 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 	var curr_plate *wtype.LHPlate
 
 	inputs := (*request).Input_solutions
-	input_order := (*request).Input_order
+	//	input_order := (*request).Input_order
+
+	input_order := make([]string, len((*request).Input_order))
+	for i, v := range (*request).Input_order {
+		input_order[i] = v
+	}
+
+	// sort to make deterministic
+
+	sort.Strings(input_order)
+
 	input_volumes := make(map[string]wunit.Volume, len(inputs))
 
 	// we add a little bit to account for extra volumes used
