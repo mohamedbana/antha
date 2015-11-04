@@ -5,7 +5,7 @@ protocol BlastSearch
 import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/blast"
-	biogo "github.com/biogo/ncbi/blast"
+	biogo "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
 	
 )
 // Input parameters for this protocol

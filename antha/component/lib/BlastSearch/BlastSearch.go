@@ -1,8 +1,4 @@
-//Some examples functions
-// Calculate rate of reaction, V, of enzyme displaying Micahelis-Menten kinetics with Vmax, Km and [S] declared
-// Calculating [S] and V from g/l concentration and looking up molecular weight of named substrate
-// Calculating [S] and V from g/l concentration of DNA of known sequence
-// Calculating [S] and V from g/l concentration of Protein product of DNA of known sequence
+// Example element demonstrating how to perform a BLAST search using the megablast algorithm
 
 package BlastSearch
 
@@ -13,8 +9,8 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/flow"
-	"github.com/antha-lang/antha/microArch/execution"
 	biogo "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
+	"github.com/antha-lang/antha/microArch/execution"
 	"sync"
 )
 
@@ -35,8 +31,7 @@ func (e *BlastSearch) requirements() {
 
 // Actions to perform before protocol itself
 func (e *BlastSearch) setup(p BlastSearchParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -44,8 +39,7 @@ func (e *BlastSearch) setup(p BlastSearchParamBlock) {
 
 // Core process of the protocol: steps to be performed for each input
 func (e *BlastSearch) steps(p BlastSearchParamBlock, r *BlastSearchResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	var err error
@@ -73,16 +67,14 @@ func (e *BlastSearch) steps(p BlastSearchParamBlock, r *BlastSearchResultBlock) 
 
 // Actions to perform after steps block to analyze data
 func (e *BlastSearch) analysis(p BlastSearchParamBlock, r *BlastSearchResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 
 func (e *BlastSearch) validation(p BlastSearchParamBlock, r *BlastSearchResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

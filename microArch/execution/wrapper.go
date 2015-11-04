@@ -31,6 +31,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/execute"
+	"github.com/antha-lang/antha/internal/github.com/fatih/structs"
 	"github.com/antha-lang/antha/microArch/equipment"
 	"github.com/antha-lang/antha/microArch/equipment/action"
 	"github.com/antha-lang/antha/microArch/equipmentManager"
@@ -44,18 +45,29 @@ type Wrapper struct {
 	threadID      execute.ThreadID
 	blockID       execute.BlockID
 	outputCount   int
+	paramBlock    interface{}
 }
 
-func NewWrapper(threadID execute.ThreadID, blockID execute.BlockID) *Wrapper {
+func NewWrapper(threadID execute.ThreadID, blockID execute.BlockID, paramBlock interface{}) *Wrapper {
 	//TODO delete the rest of unneeded configuration parameters
 	w := &Wrapper{}
 	w.threadID = threadID
 	w.blockID = blockID
+	w.paramBlock = paramBlock
 	return w
 }
 
 func (w *Wrapper) Incubate(what *wtype.LHSolution, temp wunit.Temperature, time wunit.Time, shaking bool) {
 	logger.Debug(fmt.Sprintln("INCUBATE: ", temp.ToString(), " ", time.ToString(), " shaking? ", shaking))
+}
+
+func (w *Wrapper) getString(x string) string {
+	m := structs.Map(w.paramBlock)
+	if v, ok := m[x].(string); ok {
+		return v
+	} else {
+		return ""
+	}
 }
 
 func (w *Wrapper) MixInto(outplate *wtype.LHPlate, components ...*wtype.LHComponent) *wtype.LHSolution {
@@ -96,7 +108,7 @@ func (w *Wrapper) MixInto(outplate *wtype.LHPlate, components ...*wtype.LHCompon
 
 	reaction := mixer.MixInto(outplate, components...)
 	reaction.BlockID = w.blockID
-	reaction.SName = "Reaction"
+	reaction.SName = w.getString("OutputReactionName")
 	reqReaction, err := json.Marshal(reaction)
 	if err != nil {
 		panic(fmt.Sprintf("error coding reaction data, %v", err))

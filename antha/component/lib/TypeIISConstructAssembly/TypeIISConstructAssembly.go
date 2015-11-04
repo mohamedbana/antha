@@ -24,8 +24,7 @@ func (e *TypeIISConstructAssembly) requirements() { _ = wunit.Make_units }
 
 // Conditions to run on startup
 func (e *TypeIISConstructAssembly) setup(p TypeIISConstructAssemblyParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -34,8 +33,7 @@ func (e *TypeIISConstructAssembly) setup(p TypeIISConstructAssemblyParamBlock) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *TypeIISConstructAssembly) steps(p TypeIISConstructAssemblyParamBlock, r *TypeIISConstructAssemblyResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	samples := make([]*wtype.LHComponent, 0)
@@ -78,8 +76,7 @@ func (e *TypeIISConstructAssembly) steps(p TypeIISConstructAssemblyParamBlock, r
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *TypeIISConstructAssembly) analysis(p TypeIISConstructAssemblyParamBlock, r *TypeIISConstructAssemblyResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -89,8 +86,7 @@ func (e *TypeIISConstructAssembly) analysis(p TypeIISConstructAssemblyParamBlock
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *TypeIISConstructAssembly) validation(p TypeIISConstructAssemblyParamBlock, r *TypeIISConstructAssemblyResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -144,7 +140,7 @@ func NewTypeIISConstructAssembly() interface{} { //*TypeIISConstructAssembly {
 // Mapper function
 func (e *TypeIISConstructAssembly) Map(m map[string]interface{}) interface{} {
 	var res TypeIISConstructAssemblyParamBlock
-	res.Error = false || m["Atp"].(execute.ThreadParam).Error || m["AtpVol"].(execute.ThreadParam).Error || m["Buffer"].(execute.ThreadParam).Error || m["BufferVol"].(execute.ThreadParam).Error || m["InPlate"].(execute.ThreadParam).Error || m["InactivationTemp"].(execute.ThreadParam).Error || m["InactivationTime"].(execute.ThreadParam).Error || m["LigVol"].(execute.ThreadParam).Error || m["Ligase"].(execute.ThreadParam).Error || m["OutPlate"].(execute.ThreadParam).Error || m["PartNames"].(execute.ThreadParam).Error || m["PartVols"].(execute.ThreadParam).Error || m["Parts"].(execute.ThreadParam).Error || m["ReVol"].(execute.ThreadParam).Error || m["ReactionTemp"].(execute.ThreadParam).Error || m["ReactionTime"].(execute.ThreadParam).Error || m["ReactionVolume"].(execute.ThreadParam).Error || m["RestrictionEnzyme"].(execute.ThreadParam).Error || m["Vector"].(execute.ThreadParam).Error || m["VectorVol"].(execute.ThreadParam).Error || m["Water"].(execute.ThreadParam).Error
+	res.Error = false || m["Atp"].(execute.ThreadParam).Error || m["AtpVol"].(execute.ThreadParam).Error || m["Buffer"].(execute.ThreadParam).Error || m["BufferVol"].(execute.ThreadParam).Error || m["InPlate"].(execute.ThreadParam).Error || m["InactivationTemp"].(execute.ThreadParam).Error || m["InactivationTime"].(execute.ThreadParam).Error || m["LigVol"].(execute.ThreadParam).Error || m["Ligase"].(execute.ThreadParam).Error || m["OutPlate"].(execute.ThreadParam).Error || m["OutputReactionName"].(execute.ThreadParam).Error || m["PartNames"].(execute.ThreadParam).Error || m["PartVols"].(execute.ThreadParam).Error || m["Parts"].(execute.ThreadParam).Error || m["ReVol"].(execute.ThreadParam).Error || m["ReactionTemp"].(execute.ThreadParam).Error || m["ReactionTime"].(execute.ThreadParam).Error || m["ReactionVolume"].(execute.ThreadParam).Error || m["RestrictionEnzyme"].(execute.ThreadParam).Error || m["Vector"].(execute.ThreadParam).Error || m["VectorVol"].(execute.ThreadParam).Error || m["Water"].(execute.ThreadParam).Error
 
 	vAtp, is := m["Atp"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
@@ -234,6 +230,15 @@ func (e *TypeIISConstructAssembly) Map(m map[string]interface{}) interface{} {
 		res.OutPlate = *temp.OutPlate
 	} else {
 		res.OutPlate = m["OutPlate"].(execute.ThreadParam).Value.(*wtype.LHPlate)
+	}
+
+	vOutputReactionName, is := m["OutputReactionName"].(execute.ThreadParam).Value.(execute.JSONValue)
+	if is {
+		var temp TypeIISConstructAssemblyJSONBlock
+		json.Unmarshal([]byte(vOutputReactionName.JSONString), &temp)
+		res.OutputReactionName = *temp.OutputReactionName
+	} else {
+		res.OutputReactionName = m["OutputReactionName"].(execute.ThreadParam).Value.(string)
 	}
 
 	vPartNames, is := m["PartNames"].(execute.ThreadParam).Value.(execute.JSONValue)
@@ -346,7 +351,7 @@ func (e *TypeIISConstructAssembly) OnAtp(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -363,7 +368,7 @@ func (e *TypeIISConstructAssembly) OnAtpVol(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -380,7 +385,7 @@ func (e *TypeIISConstructAssembly) OnBuffer(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -397,7 +402,7 @@ func (e *TypeIISConstructAssembly) OnBufferVol(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -414,7 +419,7 @@ func (e *TypeIISConstructAssembly) OnInPlate(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -431,7 +436,7 @@ func (e *TypeIISConstructAssembly) OnInactivationTemp(param execute.ThreadParam)
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -448,7 +453,7 @@ func (e *TypeIISConstructAssembly) OnInactivationTime(param execute.ThreadParam)
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -465,7 +470,7 @@ func (e *TypeIISConstructAssembly) OnLigVol(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -482,7 +487,7 @@ func (e *TypeIISConstructAssembly) OnLigase(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -499,7 +504,7 @@ func (e *TypeIISConstructAssembly) OnOutPlate(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -511,12 +516,29 @@ func (e *TypeIISConstructAssembly) OnOutPlate(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
+func (e *TypeIISConstructAssembly) OnOutputReactionName(param execute.ThreadParam) {
+	e.lock.Lock()
+	var bag *execute.AsyncBag = e.params[param.ID]
+	if bag == nil {
+		bag = new(execute.AsyncBag)
+		bag.Init(22, e, e)
+		e.params[param.ID] = bag
+	}
+	e.lock.Unlock()
+
+	fired := bag.AddValue("OutputReactionName", param)
+	if fired {
+		e.lock.Lock()
+		delete(e.params, param.ID)
+		e.lock.Unlock()
+	}
+}
 func (e *TypeIISConstructAssembly) OnPartNames(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -533,7 +555,7 @@ func (e *TypeIISConstructAssembly) OnPartVols(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -550,7 +572,7 @@ func (e *TypeIISConstructAssembly) OnParts(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -567,7 +589,7 @@ func (e *TypeIISConstructAssembly) OnReVol(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -584,7 +606,7 @@ func (e *TypeIISConstructAssembly) OnReactionTemp(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -601,7 +623,7 @@ func (e *TypeIISConstructAssembly) OnReactionTime(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -618,7 +640,7 @@ func (e *TypeIISConstructAssembly) OnReactionVolume(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -635,7 +657,7 @@ func (e *TypeIISConstructAssembly) OnRestrictionEnzyme(param execute.ThreadParam
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -652,7 +674,7 @@ func (e *TypeIISConstructAssembly) OnVector(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -669,7 +691,7 @@ func (e *TypeIISConstructAssembly) OnVectorVol(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -686,7 +708,7 @@ func (e *TypeIISConstructAssembly) OnWater(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(21, e, e)
+		bag.Init(22, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -700,86 +722,89 @@ func (e *TypeIISConstructAssembly) OnWater(param execute.ThreadParam) {
 }
 
 type TypeIISConstructAssembly struct {
-	flow.Component    // component "superclass" embedded
-	lock              sync.Mutex
-	startup           sync.Once
-	params            map[execute.ThreadID]*execute.AsyncBag
-	Atp               <-chan execute.ThreadParam
-	AtpVol            <-chan execute.ThreadParam
-	Buffer            <-chan execute.ThreadParam
-	BufferVol         <-chan execute.ThreadParam
-	InPlate           <-chan execute.ThreadParam
-	InactivationTemp  <-chan execute.ThreadParam
-	InactivationTime  <-chan execute.ThreadParam
-	LigVol            <-chan execute.ThreadParam
-	Ligase            <-chan execute.ThreadParam
-	OutPlate          <-chan execute.ThreadParam
-	PartNames         <-chan execute.ThreadParam
-	PartVols          <-chan execute.ThreadParam
-	Parts             <-chan execute.ThreadParam
-	ReVol             <-chan execute.ThreadParam
-	ReactionTemp      <-chan execute.ThreadParam
-	ReactionTime      <-chan execute.ThreadParam
-	ReactionVolume    <-chan execute.ThreadParam
-	RestrictionEnzyme <-chan execute.ThreadParam
-	Vector            <-chan execute.ThreadParam
-	VectorVol         <-chan execute.ThreadParam
-	Water             <-chan execute.ThreadParam
-	Reaction          chan<- execute.ThreadParam
+	flow.Component     // component "superclass" embedded
+	lock               sync.Mutex
+	startup            sync.Once
+	params             map[execute.ThreadID]*execute.AsyncBag
+	Atp                <-chan execute.ThreadParam
+	AtpVol             <-chan execute.ThreadParam
+	Buffer             <-chan execute.ThreadParam
+	BufferVol          <-chan execute.ThreadParam
+	InPlate            <-chan execute.ThreadParam
+	InactivationTemp   <-chan execute.ThreadParam
+	InactivationTime   <-chan execute.ThreadParam
+	LigVol             <-chan execute.ThreadParam
+	Ligase             <-chan execute.ThreadParam
+	OutPlate           <-chan execute.ThreadParam
+	OutputReactionName <-chan execute.ThreadParam
+	PartNames          <-chan execute.ThreadParam
+	PartVols           <-chan execute.ThreadParam
+	Parts              <-chan execute.ThreadParam
+	ReVol              <-chan execute.ThreadParam
+	ReactionTemp       <-chan execute.ThreadParam
+	ReactionTime       <-chan execute.ThreadParam
+	ReactionVolume     <-chan execute.ThreadParam
+	RestrictionEnzyme  <-chan execute.ThreadParam
+	Vector             <-chan execute.ThreadParam
+	VectorVol          <-chan execute.ThreadParam
+	Water              <-chan execute.ThreadParam
+	Reaction           chan<- execute.ThreadParam
 }
 
 type TypeIISConstructAssemblyParamBlock struct {
-	ID                execute.ThreadID
-	BlockID           execute.BlockID
-	Error             bool
-	Atp               *wtype.LHComponent
-	AtpVol            wunit.Volume
-	Buffer            *wtype.LHComponent
-	BufferVol         wunit.Volume
-	InPlate           *wtype.LHPlate
-	InactivationTemp  wunit.Temperature
-	InactivationTime  wunit.Time
-	LigVol            wunit.Volume
-	Ligase            *wtype.LHComponent
-	OutPlate          *wtype.LHPlate
-	PartNames         []string
-	PartVols          []wunit.Volume
-	Parts             []*wtype.LHComponent
-	ReVol             wunit.Volume
-	ReactionTemp      wunit.Temperature
-	ReactionTime      wunit.Time
-	ReactionVolume    wunit.Volume
-	RestrictionEnzyme *wtype.LHComponent
-	Vector            *wtype.LHComponent
-	VectorVol         wunit.Volume
-	Water             *wtype.LHComponent
+	ID                 execute.ThreadID
+	BlockID            execute.BlockID
+	Error              bool
+	Atp                *wtype.LHComponent
+	AtpVol             wunit.Volume
+	Buffer             *wtype.LHComponent
+	BufferVol          wunit.Volume
+	InPlate            *wtype.LHPlate
+	InactivationTemp   wunit.Temperature
+	InactivationTime   wunit.Time
+	LigVol             wunit.Volume
+	Ligase             *wtype.LHComponent
+	OutPlate           *wtype.LHPlate
+	OutputReactionName string
+	PartNames          []string
+	PartVols           []wunit.Volume
+	Parts              []*wtype.LHComponent
+	ReVol              wunit.Volume
+	ReactionTemp       wunit.Temperature
+	ReactionTime       wunit.Time
+	ReactionVolume     wunit.Volume
+	RestrictionEnzyme  *wtype.LHComponent
+	Vector             *wtype.LHComponent
+	VectorVol          wunit.Volume
+	Water              *wtype.LHComponent
 }
 
 type TypeIISConstructAssemblyConfig struct {
-	ID                execute.ThreadID
-	BlockID           execute.BlockID
-	Error             bool
-	Atp               wtype.FromFactory
-	AtpVol            wunit.Volume
-	Buffer            wtype.FromFactory
-	BufferVol         wunit.Volume
-	InPlate           wtype.FromFactory
-	InactivationTemp  wunit.Temperature
-	InactivationTime  wunit.Time
-	LigVol            wunit.Volume
-	Ligase            wtype.FromFactory
-	OutPlate          wtype.FromFactory
-	PartNames         []string
-	PartVols          []wunit.Volume
-	Parts             []wtype.FromFactory
-	ReVol             wunit.Volume
-	ReactionTemp      wunit.Temperature
-	ReactionTime      wunit.Time
-	ReactionVolume    wunit.Volume
-	RestrictionEnzyme wtype.FromFactory
-	Vector            wtype.FromFactory
-	VectorVol         wunit.Volume
-	Water             wtype.FromFactory
+	ID                 execute.ThreadID
+	BlockID            execute.BlockID
+	Error              bool
+	Atp                wtype.FromFactory
+	AtpVol             wunit.Volume
+	Buffer             wtype.FromFactory
+	BufferVol          wunit.Volume
+	InPlate            wtype.FromFactory
+	InactivationTemp   wunit.Temperature
+	InactivationTime   wunit.Time
+	LigVol             wunit.Volume
+	Ligase             wtype.FromFactory
+	OutPlate           wtype.FromFactory
+	OutputReactionName string
+	PartNames          []string
+	PartVols           []wunit.Volume
+	Parts              []wtype.FromFactory
+	ReVol              wunit.Volume
+	ReactionTemp       wunit.Temperature
+	ReactionTime       wunit.Time
+	ReactionVolume     wunit.Volume
+	RestrictionEnzyme  wtype.FromFactory
+	Vector             wtype.FromFactory
+	VectorVol          wunit.Volume
+	Water              wtype.FromFactory
 }
 
 type TypeIISConstructAssemblyResultBlock struct {
@@ -790,31 +815,32 @@ type TypeIISConstructAssemblyResultBlock struct {
 }
 
 type TypeIISConstructAssemblyJSONBlock struct {
-	ID                *execute.ThreadID
-	BlockID           *execute.BlockID
-	Error             *bool
-	Atp               **wtype.LHComponent
-	AtpVol            *wunit.Volume
-	Buffer            **wtype.LHComponent
-	BufferVol         *wunit.Volume
-	InPlate           **wtype.LHPlate
-	InactivationTemp  *wunit.Temperature
-	InactivationTime  *wunit.Time
-	LigVol            *wunit.Volume
-	Ligase            **wtype.LHComponent
-	OutPlate          **wtype.LHPlate
-	PartNames         *[]string
-	PartVols          *[]wunit.Volume
-	Parts             *[]*wtype.LHComponent
-	ReVol             *wunit.Volume
-	ReactionTemp      *wunit.Temperature
-	ReactionTime      *wunit.Time
-	ReactionVolume    *wunit.Volume
-	RestrictionEnzyme **wtype.LHComponent
-	Vector            **wtype.LHComponent
-	VectorVol         *wunit.Volume
-	Water             **wtype.LHComponent
-	Reaction          **wtype.LHSolution
+	ID                 *execute.ThreadID
+	BlockID            *execute.BlockID
+	Error              *bool
+	Atp                **wtype.LHComponent
+	AtpVol             *wunit.Volume
+	Buffer             **wtype.LHComponent
+	BufferVol          *wunit.Volume
+	InPlate            **wtype.LHPlate
+	InactivationTemp   *wunit.Temperature
+	InactivationTime   *wunit.Time
+	LigVol             *wunit.Volume
+	Ligase             **wtype.LHComponent
+	OutPlate           **wtype.LHPlate
+	OutputReactionName *string
+	PartNames          *[]string
+	PartVols           *[]wunit.Volume
+	Parts              *[]*wtype.LHComponent
+	ReVol              *wunit.Volume
+	ReactionTemp       *wunit.Temperature
+	ReactionTime       *wunit.Time
+	ReactionVolume     *wunit.Volume
+	RestrictionEnzyme  **wtype.LHComponent
+	Vector             **wtype.LHComponent
+	VectorVol          *wunit.Volume
+	Water              **wtype.LHComponent
+	Reaction           **wtype.LHSolution
 }
 
 func (c *TypeIISConstructAssembly) ComponentInfo() *execute.ComponentInfo {
@@ -830,6 +856,7 @@ func (c *TypeIISConstructAssembly) ComponentInfo() *execute.ComponentInfo {
 	inp = append(inp, *execute.NewPortInfo("LigVol", "wunit.Volume", "LigVol", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Ligase", "*wtype.LHComponent", "Ligase", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("OutPlate", "*wtype.LHPlate", "OutPlate", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("OutputReactionName", "string", "OutputReactionName", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("PartNames", "[]string", "PartNames", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("PartVols", "[]wunit.Volume", "PartVols", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Parts", "[]*wtype.LHComponent", "Parts", true, true, nil, nil))

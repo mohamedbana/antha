@@ -40,8 +40,7 @@ func (e *Datacrunch) requirements() {
 
 // Actions to perform before protocol itself
 func (e *Datacrunch) setup(p DatacrunchParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -49,8 +48,7 @@ func (e *Datacrunch) setup(p DatacrunchParamBlock) {
 
 // Core process of the protocol: steps to be performed for each input
 func (e *Datacrunch) steps(p DatacrunchParamBlock, r *DatacrunchResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	// Work out rate of reaction, V of enzyme with Michaelis-Menten kinetics and [S], Km and Vmax declared
@@ -130,16 +128,14 @@ func (e *Datacrunch) steps(p DatacrunchParamBlock, r *DatacrunchResultBlock) {
 
 // Actions to perform after steps block to analyze data
 func (e *Datacrunch) analysis(p DatacrunchParamBlock, r *DatacrunchResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 
 func (e *Datacrunch) validation(p DatacrunchParamBlock, r *DatacrunchResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

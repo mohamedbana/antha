@@ -5,17 +5,15 @@ import (
 	. "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
 	//"github.com/biogo/ncbi/blast_test"
 	//"log"
-	"strings"
 	"github.com/antha-lang/antha/internal/github.com/mgutz/ansi"
 	"strconv"
+	"strings"
 	"time"
 )
 
 var (
-	//email = "ucbecrg@ucl.ac.uk"
-	email = "chrisrgrant@gmail.com"
-	//tool  = "blast-example"
-	tool      = "blast-example1"
+	email     = "no-reply@antha-lang.com"
+	tool      = "blast-biogo-antha"
 	params    Parameters
 	putparams = PutParameters{Program: "blastn", Megablast: true, Database: "nr"}
 	getparams GetParameters
