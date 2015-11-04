@@ -26,7 +26,7 @@ func (e *TypeIISConstructAssembly_alt) requirements() { _ = wunit.Make_units }
 // Conditions to run on startup
 func (e *TypeIISConstructAssembly_alt) setup(p TypeIISConstructAssembly_altParamBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -36,7 +36,7 @@ func (e *TypeIISConstructAssembly_alt) setup(p TypeIISConstructAssembly_altParam
 // for every input
 func (e *TypeIISConstructAssembly_alt) steps(p TypeIISConstructAssembly_altParamBlock, r *TypeIISConstructAssembly_altResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 
 	samples := make([]*wtype.LHComponent, 0)
@@ -92,7 +92,7 @@ func (e *TypeIISConstructAssembly_alt) steps(p TypeIISConstructAssembly_altParam
 // post process any data and provide downstream results
 func (e *TypeIISConstructAssembly_alt) analysis(p TypeIISConstructAssembly_altParamBlock, r *TypeIISConstructAssembly_altResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -103,7 +103,7 @@ func (e *TypeIISConstructAssembly_alt) analysis(p TypeIISConstructAssembly_altPa
 // dipstick basis
 func (e *TypeIISConstructAssembly_alt) validation(p TypeIISConstructAssembly_altParamBlock, r *TypeIISConstructAssembly_altResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

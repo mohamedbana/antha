@@ -35,14 +35,14 @@ func (e *Thawtime) requirements() {
 }
 func (e *Thawtime) setup(p ThawtimeParamBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 func (e *Thawtime) steps(p ThawtimeParamBlock, r *ThawtimeResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 
 	/*  Step 1. we need a mass for the following equations so we calculate this by looking up
@@ -97,7 +97,7 @@ func (e *Thawtime) steps(p ThawtimeParamBlock, r *ThawtimeResultBlock) {
 }
 func (e *Thawtime) analysis(p ThawtimeParamBlock, r *ThawtimeResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -105,7 +105,7 @@ func (e *Thawtime) analysis(p ThawtimeParamBlock, r *ThawtimeResultBlock) {
 
 func (e *Thawtime) validation(p ThawtimeParamBlock, r *ThawtimeResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

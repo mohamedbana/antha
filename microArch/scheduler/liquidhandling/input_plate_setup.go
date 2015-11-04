@@ -24,11 +24,48 @@ package liquidhandling
 
 import (
 	"fmt"
-
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/factory"
+	"sort"
 )
+
+type InputSorter struct {
+	Ordered []string
+	Values  map[string]wunit.Volume
+}
+
+// @implement sort.Interface
+func (is InputSorter) Len() int {
+	return len(is.Ordered)
+}
+
+func (is InputSorter) Swap(i, j int) {
+	s := is.Ordered[i]
+	is.Ordered[i] = is.Ordered[j]
+	is.Ordered[j] = s
+}
+
+func (is InputSorter) Less(i, j int) bool {
+	vv1 := is.Values[is.Ordered[i]]
+	vv2 := is.Values[is.Ordered[j]]
+
+	v1 := vv1.SIValue()
+	v2 := vv2.SIValue()
+
+	// we want ascending sort here
+	if v1 < v2 {
+		return false
+	} else if v1 > v2 {
+		return true
+	}
+
+	// volumes are equal
+
+	ss := sort.StringSlice(is.Ordered)
+
+	return ss.Less(i, j)
+}
 
 //  TASK: 	Map inputs to input plates
 // INPUT: 	"input_platetype", "inputs"
@@ -37,6 +74,7 @@ import (
 func input_plate_setup(request *LHRequest) *LHRequest {
 	input_platetypes := (*request).Input_platetypes
 	if input_platetypes == nil || len(input_platetypes) == 0 {
+		// XXX this is dangerous... until input_plate_linear is replaced we will hit big problems here
 		// this configuration needs to happen outside but for now...
 		list := factory.GetPlateList()
 		input_platetypes = make([]*wtype.LHPlate, len(list))
@@ -57,13 +95,20 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 	var curr_plate *wtype.LHPlate
 
 	inputs := (*request).Input_solutions
+	//	input_order := (*request).Input_order
+
+	input_order := make([]string, len((*request).Input_order))
+	for i, v := range (*request).Input_order {
+		input_order[i] = v
+	}
 
 	input_volumes := make(map[string]wunit.Volume, len(inputs))
 
 	// we add a little bit to account for extra volumes used
 
 	// aggregate the volumes for the inputs
-	for k, v := range inputs {
+	for _, k := range input_order {
+		v := inputs[k]
 		v2 := v[0].Volume()
 		vol := &v2
 		for i := 1; i < len(v); i++ {
@@ -76,10 +121,18 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 		vol.Add(&extravol)
 		input_volumes[k] = *vol
 	}
+	// sort to make deterministic
+	// we sort by a) volume (descending) b) name (alphabetically)
+
+	isrt := InputSorter{input_order, input_volumes}
+
+	sort.Sort(isrt)
+
+	input_order = isrt.Ordered
 
 	weights_constraints := request.Input_Setup_Weights
 
-	// get the assignments
+	// get the assignment
 
 	well_count_assignments := choose_plate_assignments(input_volumes, input_platetypes, weights_constraints)
 
@@ -88,7 +141,8 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 	plates_in_play := make(map[string]*wtype.LHPlate)
 
 	curplaten := 1
-	for cname, volume := range input_volumes {
+	for _, cname := range input_order {
+		volume := input_volumes[cname]
 		component := inputs[cname][0]
 		//logger.Debug(fmt.Sprintln("Plate_setup - component", cname, ":"))
 
@@ -140,6 +194,7 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 				input_plates[curr_plate.ID] = curr_plate
 			}
 		}
+
 		input_assignments[cname] = ass
 	}
 

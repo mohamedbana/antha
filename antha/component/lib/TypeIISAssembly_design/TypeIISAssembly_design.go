@@ -36,7 +36,7 @@ func (e *TypeIISAssembly_design) requirements() {
 // Conditions to run on startup
 func (e *TypeIISAssembly_design) setup(p TypeIISAssembly_designParamBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -46,7 +46,7 @@ func (e *TypeIISAssembly_design) setup(p TypeIISAssembly_designParamBlock) {
 // for every input
 func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *TypeIISAssembly_designResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 
 	//var msg string
@@ -190,7 +190,7 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 // post process any data and provide downstream results
 func (e *TypeIISAssembly_design) analysis(p TypeIISAssembly_designParamBlock, r *TypeIISAssembly_designResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -201,7 +201,7 @@ func (e *TypeIISAssembly_design) analysis(p TypeIISAssembly_designParamBlock, r 
 // dipstick basis
 func (e *TypeIISAssembly_design) validation(p TypeIISAssembly_designParamBlock, r *TypeIISAssembly_designResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

@@ -50,14 +50,14 @@ func (e *Kla) requirements() {
 }
 func (e *Kla) setup(p KlaParamBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 func (e *Kla) steps(p KlaParamBlock, r *KlaResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 
 	dv := labware.Labwaregeometry[p.Platetype]["dv"] // microwell vessel diameter, m 0.017 //
@@ -118,7 +118,7 @@ func (e *Kla) steps(p KlaParamBlock, r *KlaResultBlock) {
 }
 func (e *Kla) analysis(p KlaParamBlock, r *KlaResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -126,7 +126,7 @@ func (e *Kla) analysis(p KlaParamBlock, r *KlaResultBlock) {
 
 func (e *Kla) validation(p KlaParamBlock, r *KlaResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

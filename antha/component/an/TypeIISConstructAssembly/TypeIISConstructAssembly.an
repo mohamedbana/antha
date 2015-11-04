@@ -21,6 +21,8 @@ Parameters (
 	ReactionTime 				Time
 	InactivationTemp 			Temperature
 	InactivationTime 			Time
+
+	OutputReactionName			string
 )
 
 // Physical Inputs to this protocol with types

@@ -47,7 +47,7 @@ func (e *Transformation) requirements() {
 // Conditions to run on startup
 func (e *Transformation) setup(p TransformationParamBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -57,7 +57,7 @@ func (e *Transformation) setup(p TransformationParamBlock) {
 // for every input
 func (e *Transformation) steps(p TransformationParamBlock, r *TransformationResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 
 	competentcells := make([]*wtype.LHComponent, 0)
@@ -141,7 +141,7 @@ func (e *Transformation) steps(p TransformationParamBlock, r *TransformationResu
 // post process any data and provide downstream results
 func (e *Transformation) analysis(p TransformationParamBlock, r *TransformationResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -152,7 +152,7 @@ func (e *Transformation) analysis(p TransformationParamBlock, r *TransformationR
 // dipstick basis
 func (e *Transformation) validation(p TransformationParamBlock, r *TransformationResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

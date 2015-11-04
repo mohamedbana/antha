@@ -31,7 +31,7 @@ func (e *TypeIISConstructAssembly_sim) requirements() {
 // Conditions to run on startup
 func (e *TypeIISConstructAssembly_sim) setup(p TypeIISConstructAssembly_simParamBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -41,7 +41,7 @@ func (e *TypeIISConstructAssembly_sim) setup(p TypeIISConstructAssembly_simParam
 // for every input
 func (e *TypeIISConstructAssembly_sim) steps(p TypeIISConstructAssembly_simParamBlock, r *TypeIISConstructAssembly_simResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 
 	// Check that assembly is feasible by simulating assembly of the sequences with the chosen enzyme
@@ -139,7 +139,7 @@ func (e *TypeIISConstructAssembly_sim) steps(p TypeIISConstructAssembly_simParam
 // post process any data and provide downstream results
 func (e *TypeIISConstructAssembly_sim) analysis(p TypeIISConstructAssembly_simParamBlock, r *TypeIISConstructAssembly_simResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -150,7 +150,7 @@ func (e *TypeIISConstructAssembly_sim) analysis(p TypeIISConstructAssembly_simPa
 // dipstick basis
 func (e *TypeIISConstructAssembly_sim) validation(p TypeIISConstructAssembly_simParamBlock, r *TypeIISConstructAssembly_simResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID)
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
