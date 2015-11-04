@@ -26,7 +26,9 @@ import (
 	"fmt"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/blast"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	. "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
 	"math/rand"
 	"strings"
 )
@@ -75,6 +77,7 @@ type BioSequence interface {
 	Sequence() string
 	Append(string)
 	Prepend(string)
+	Blast() ([]Hit, error)
 }
 
 // defines something as physical DNA
@@ -252,6 +255,10 @@ func (dna *DNASequence) Append(s string) {
 func (dna *DNASequence) Prepend(s string) {
 	dna.Seq = s + dna.Seq
 }
+func (seq *DNASequence) Blast() (hits []Hit, err error) {
+	hits, err = blast.MegaBlastN(seq.Seq)
+	return
+}
 
 // RNA sample: physical RNA, has an RNASequence object
 type RNA struct {
@@ -279,6 +286,10 @@ func (rna *RNASequence) Append(s string) {
 
 func (rna *RNASequence) Prepend(s string) {
 	rna.Seq = s + rna.Seq
+}
+func (seq *RNASequence) Blast() (hits []Hit, err error) {
+	hits, err = blast.MegaBlastN(seq.Seq)
+	return
 }
 
 // physical protein sample
@@ -310,6 +321,10 @@ func (prot *ProteinSequence) Prepend(s string) {
 	prot.Seq = s + prot.Seq
 }
 
+func (seq *ProteinSequence) Blast() (hits []Hit, err error) {
+	hits, err = blast.MegaBlastP(seq.Seq)
+	return
+}
 func random_dna_seq(leng int) string {
 	s := ""
 	for i := 0; i < leng; i++ {
