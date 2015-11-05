@@ -42,7 +42,7 @@ Data (
 	Warnings string
 	Status string
 	Simulationpass bool
-	PartswithOverhangs []wtype.DNASequence
+	PartswithOverhangs []wtype.DNASequence // i.e. parts to order
 	NewDNASequence wtype.DNASequence
 	Sitesfound []enzymes.Restrictionsites
 	BackupParts []string

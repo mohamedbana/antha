@@ -29,6 +29,8 @@ import (
 
 // Data which is returned from this protocol, and data types
 
+// i.e. parts to order
+
 // Input Requirement specification
 func (e *TypeIISAssembly_design) requirements() {
 	_ = wunit.Make_units
@@ -114,10 +116,10 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 	restrictionenzyme := enzymes.Enzymelookup[p.AssemblyStandard][p.Level]
 
 	// (1) Add standard overhangs using chosen assembly standard
-	//PartswithOverhangs = enzymes.MakeStandardTypeIIsassemblyParts(partsinorder, AssemblyStandard, Level, PartMoClotypesinorder)
+	r.PartswithOverhangs = enzymes.MakeStandardTypeIIsassemblyParts(partsinorder, p.AssemblyStandard, p.Level, p.PartMoClotypesinorder)
 
 	// OR (2) Add overhangs for scarfree assembly based on part seqeunces only, i.e. no Assembly standard
-	r.PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
+	//PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
 
 	// perfrom mock digest to test fragement overhangs (fragments are hidden by using _, )
 	_, stickyends5, stickyends3 := enzymes.TypeIIsdigest(vectordata, restrictionenzyme)

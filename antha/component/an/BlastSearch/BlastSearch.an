@@ -16,7 +16,7 @@ Parameters (
 	Name string
 )
 
-// Data which is returned from this protocol
+// Data which is returned from this protocol; output data
 Data (
 	Hits string
 	AnthaSeq wtype.DNASequence
@@ -70,6 +70,7 @@ Steps {
 	// Convert the sequence to an anthatype
 	AnthaSeq = wtype.MakeLinearDNASequence(Name, DNA)
 	
+	// look for orfs
 	orf, orftrue := enzymes.FindORF(AnthaSeq.Seq)
 	
 	if orftrue == true {
@@ -88,7 +89,7 @@ Steps {
 		Hits = fmt.Sprintln(blast.HitSummary(hits))
 		
 		// Rename Sequence with ID of top blast hit
-		AnthaSeq.Name = Hits[0].Id
+		AnthaSeq.Nm = hits[0].Id
 	//}
 	
 	

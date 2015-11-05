@@ -18,7 +18,7 @@ import (
 
 // Input parameters for this protocol
 
-// Data which is returned from this protocol
+// Data which is returned from this protocol; output data
 
 // Physical inputs to this protocol
 
@@ -67,6 +67,7 @@ func (e *BlastSearch) steps(p BlastSearchParamBlock, r *BlastSearchResultBlock) 
 	// Convert the sequence to an anthatype
 	r.AnthaSeq = wtype.MakeLinearDNASequence(p.Name, p.DNA)
 
+	// look for orfs
 	orf, orftrue := enzymes.FindORF(r.AnthaSeq.Seq)
 
 	if orftrue == true {
@@ -83,6 +84,9 @@ func (e *BlastSearch) steps(p BlastSearchParamBlock, r *BlastSearchResultBlock) 
 	} //else {
 
 	r.Hits = fmt.Sprintln(blast.HitSummary(hits))
+
+	// Rename Sequence with ID of top blast hit
+	r.AnthaSeq.Nm = hits[0].Id
 	_ = _wrapper.WaitToEnd()
 
 	//}
