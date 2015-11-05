@@ -117,8 +117,8 @@ func run() error {
 }
 
 func main() {
-	flag.StringVar(&parametersFile, "parameters", "", "parameters to workflow")
-	flag.StringVar(&workflowFile, "workflow", "", "workflow definition file")
+	flag.StringVar(&parametersFile, "parameters", "parameters.yml", "parameters to workflow")
+	flag.StringVar(&workflowFile, "workflow", "workflow.json", "workflow definition file")
 	flag.StringVar(&logFile, "log", "", "log file")
 	flag.StringVar(&driverURI, "driver", "", "uri where a grpc driver implementation listens")
 	flag.Parse()
