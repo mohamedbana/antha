@@ -92,8 +92,26 @@ func RevTranslatetoNstring(aa string) (NNN string) {
 
 }
 
-// Translate dna sequence into amino acid sequence
-func Translate(s []string) string {
+/*
+// need to update according to findORF
+func Translatestring (seq string) (aa string,err error) {
+
+	array := make([]string,0)
+
+	if len(seq) != 0 {
+	//character should be every three characters
+	for _, character := range seq {
+		array = append(array,character)
+	}
+	aa = DNAtoAASeq(array)
+	}else {
+		err = fmt.Errorf("No DNA sequence!")
+	}
+	return
+}
+*/
+// Translate dna sequence into amino acid sequence; need to update to deal with wobble
+func DNAtoAASeq(s []string) string {
 	r := make([]string, 0)
 	m := map[string]string{
 
@@ -190,7 +208,7 @@ type ORF struct {
 	StartPosition int
 	EndPosition   int
 	DNASeq        string
-	Protseq       string
+	ProtSeq       string
 	Direction     string
 }
 
@@ -206,7 +224,7 @@ http://www.basic.northwestern.edu/biotools/proteincalc.html
 
 // Estimate molecular weight of protein product
 func Molecularweight(orf ORF) (kDa float64) {
-	aaarray := strings.Split(orf.Protseq, "")
+	aaarray := strings.Split(orf.ProtSeq, "")
 	array := make([]float64, len(aaarray))
 	for i := 0; i < len(aaarray); i++ {
 		array = append(array, (aa_mw[aaarray[i]] - 18.0))
@@ -317,7 +335,7 @@ func FindORF(seq string) (orf ORF, orftrue bool) { // finds an orf in the forwar
 					ORFcodons := aas
 					//	fmt.Println("orfcodons", ORFcodons)
 					orf.DNASeq = strings.Join(ORFcodons, "")
-					orf.Protseq = Translate(ORFcodons)
+					orf.ProtSeq = DNAtoAASeq(ORFcodons)
 					orf.EndPosition = orf.StartPosition + len(orf.DNASeq) - 1
 					//fmt.Println("translated=", translated)
 				}
@@ -325,7 +343,7 @@ func FindORF(seq string) (orf ORF, orftrue bool) { // finds an orf in the forwar
 					ORFcodons := aas
 					//	fmt.Println("orfcodons", ORFcodons)
 					orf.DNASeq = strings.Join(ORFcodons, "")
-					orf.Protseq = Translate(ORFcodons)
+					orf.ProtSeq = DNAtoAASeq(ORFcodons)
 					orf.EndPosition = orf.StartPosition + len(orf.DNASeq) - 1
 					//fmt.Println("translated=", translated)
 				}
@@ -333,7 +351,7 @@ func FindORF(seq string) (orf ORF, orftrue bool) { // finds an orf in the forwar
 					ORFcodons := aas
 					//	fmt.Println("orfcodons", ORFcodons)
 					orf.DNASeq = strings.Join(ORFcodons, "")
-					orf.Protseq = Translate(ORFcodons)
+					orf.ProtSeq = DNAtoAASeq(ORFcodons)
 					orf.EndPosition = orf.StartPosition + len(orf.DNASeq) - 1
 					//fmt.Println("translated=", translated)
 				}
@@ -479,13 +497,13 @@ func LookforSpecificORF(seq string, targetAASeq string) (present bool) {
 	ORFS := DoublestrandedORFS(seq)
 	present = false
 	for _, orf := range ORFS.TopstrandORFS {
-		if strings.Contains(orf.Protseq, targetAASeq) {
+		if strings.Contains(orf.ProtSeq, targetAASeq) {
 			present = true
 			return present
 		}
 	}
 	for _, revorf := range ORFS.BottomstrandORFS {
-		if strings.Contains(revorf.Protseq, targetAASeq) {
+		if strings.Contains(revorf.ProtSeq, targetAASeq) {
 			present = true
 		}
 	}

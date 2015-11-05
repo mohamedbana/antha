@@ -1,0 +1,120 @@
+package seqtools
+
+import (
+	"fmt"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	"io"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
+)
+
+func Npercent(NumberofN int, FullSeq string) float64 {
+	a := float64(NumberofN)
+	b := float64(len(FullSeq))
+	var undet float64 = (a / b * 100)
+
+	return undet
+}
+
+func ReadtoCsvfromcurrentdir(filenametocreate string) {
+
+	//Make an output file
+	//filename := "Sequencing_results.csv"
+
+	file, err := os.Create(filenametocreate)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	//Write headers to output file
+	fmt.Println("Sequence data written to file: " + filenametocreate)
+	var headers string = "Filename,	Sequence length (nts),	Proprotion undetermined (%),	Sequence"
+	n, err1 := io.WriteString(file, headers)
+
+	if err1 != nil {
+		fmt.Println(n, err1)
+	}
+
+	file.Close()
+
+	//Search for files within current directory
+	dirname := "." + string(filepath.Separator)
+
+	d, err := os.Open(dirname)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	defer d.Close()
+
+	files, err := d.Readdir(-1)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	fmt.Println("Reading " + dirname)
+	var skip bool
+	filesdone := make([]string, 0)
+	//Determine if file extension is ".seq"
+	for _, file := range files {
+		if filepath.Ext(file.Name()) == ".seq" {
+			if len(filesdone) != 0 {
+				for _, filedone := range filesdone {
+
+					if file.Name() == filedone {
+						skip = true
+					}
+
+				}
+			}
+			if skip == false {
+				//Read file containing sequencing result
+				bs, err := ioutil.ReadFile(file.Name())
+				if err != nil {
+					return
+				}
+
+				var name1 string = file.Name()
+
+				//Print the filename
+				fmt.Println("Sequence filename:", name1)
+
+				//assign sequence result to a variable
+				seq1 := string(bs)
+				Seq := strings.Replace(seq1, "\n", "", -1)
+
+				//print the sequence result
+				fmt.Println("Sequencing result =", Seq)
+
+				//print the length of the sequencing run
+				fmt.Println("Sequencing run length =", len(Seq))
+
+				//count the number of nucleotides which have been designated "n" (undetermined) and print the amount
+				N := strings.Count(Seq, "N")
+				fmt.Println("Nucleotides not sequenced =", N)
+
+				//print the proportion of undetermined nucleotides in the sequence
+				fmt.Printf("Proportion of sequence not determined = %0.2f %% \n", Npercent(N, Seq))
+
+				//Append sequence data to the file
+				f, err := os.OpenFile("Sequencing_results.csv", os.O_APPEND|os.O_WRONLY, 0600)
+				if err != nil {
+					panic(err)
+				}
+
+				defer f.Close()
+
+				if _, err = f.WriteString(fmt.Sprintf("\n %s, %v, %0.2f, %s", name1, len(Seq), Npercent(N, Seq), Seq)); err != nil {
+					panic(err)
+
+				}
+				filesdone = append(filesdone, file.Name())
+
+			}
+		}
+	}
+}

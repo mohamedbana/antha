@@ -5,21 +5,19 @@ protocol BlastSearch
 import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/blast"
-	//biogo "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	biogo "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	//"log"
 	
 )
 // Input parameters for this protocol
 Parameters (
-	Query string//Amount
-	Querytype string
+	DNA string
 	Name string
 )
 
 // Data which is returned from this protocol
 Data (
-	//Hits string
 	Hits string
 	AnthaSeq wtype.DNASequence
 )
@@ -46,8 +44,8 @@ Setup {
 Steps {
 	
 	
-	//var err error
-	//var hits []biogo.Hit
+	var err error
+	var hits []biogo.Hit
 	/*
 	if Querytype == "PROTEIN" {
 	hits, err = blast.MegaBlastP(Query)
@@ -67,18 +65,32 @@ Steps {
 	Hits = fmt.Sprintln(blast.HitSummary(hits))
 	} 
 	*/
-	if Querytype == "DNA" {
-	AnthaSeq = wtype.MakePlasmidDNASequence(Name, Query)
 	
-	hits, err := AnthaSeq.Blast()
+	
+	// Convert the sequence to an anthatype
+	AnthaSeq = wtype.MakeLinearDNASequence(Name, DNA)
+	
+	orf, orftrue := enzymes.FindORF(AnthaSeq.Seq)
+	
+	if orftrue == true {
+		// if open reading frame is detected, we'll perform a blastP search'
+		fmt.Println("ORF detected:", "full sequence length: ", len(AnthaSeq.Seq), "ORF length: ", len(orf.DNASeq))
+		hits, err = blast.MegaBlastP(orf.ProtSeq)
+	} else {
+	// otherwise we'll blast the nucleotide sequence
+	hits, err = AnthaSeq.Blast()
+	}
 	if err !=nil {
 		fmt.Println(err.Error())
 	
 	} //else {
 	
 		Hits = fmt.Sprintln(blast.HitSummary(hits))
+		
+		// Rename Sequence with ID of top blast hit
+		AnthaSeq.Name = Hits[0].Id
 	//}
-	}
+	
 	
 }
 

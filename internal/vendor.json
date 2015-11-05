@@ -3,14 +3,18 @@
 	"ignore": "",
 	"package": [
 		{
-			"path": "",
-			"revision": "e2590f1300bfef8146d50f58377a8e7b93934fa8",
-			"revisionTime": "2015-02-24T13:05:33+01:00"
+			"canonical": "code.google.com/p/go-sqlite/go1/sqlite3",
+			"comment": "",
+			"local": "code.google.com/p/go-sqlite/go1/sqlite3",
+			"revision": "6e75c20f8fc4",
+			"revisionTime": "2013-09-15T19:25:44-04:00"
 		},
 		{
-			"path": "",
-			"revision": "c1cd2254a6dd314c9d73c338c12688c9325d85c6",
-			"revisionTime": "2015-05-19T19:42:33+09:00"
+			"canonical": "code.google.com/p/go-sqlite/go1/sqlite3/codec",
+			"comment": "",
+			"local": "code.google.com/p/go-sqlite/go1/sqlite3/codec",
+			"revision": "6e75c20f8fc4",
+			"revisionTime": "2013-09-15T19:25:44-04:00"
 		},
 		{
 			"path": "",

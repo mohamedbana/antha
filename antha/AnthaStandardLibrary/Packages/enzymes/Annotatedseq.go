@@ -83,7 +83,7 @@ func MakeFeature(name string, seq string, sequencetype string, class string, rev
 		orf, orftrue := FindORF(seq)
 		if orftrue == true {
 			fmt.Println("orftrue!)")
-			feature.Protseq = orf.Protseq
+			feature.Protseq = orf.ProtSeq
 			feature.StartPosition = orf.StartPosition
 			feature.EndPosition = orf.EndPosition
 		}

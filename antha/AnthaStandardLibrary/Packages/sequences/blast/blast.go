@@ -124,25 +124,25 @@ func HitSummary(hits []Hit) (summary string, err error) {
 		}*/
 		seqlength := hits[0].Len
 
-		identity := strconv.Itoa((*hits[0].Hsps[0].HspIdentity / len(hits[0].Hsps[0].QuerySeq)) * 100)  //+ "%"
-		coverage := strconv.Itoa(len(hits[0].Hsps[0].QuerySeq) / len(hits[0].Hsps[0].SubjectSeq) * 100) // + "%"
+		identity := strconv.Itoa((*hits[0].Hsps[0].HspIdentity/len(hits[0].Hsps[0].QuerySeq))*100) + "%"
+		coverage := strconv.Itoa(len(hits[0].Hsps[0].QuerySeq)/len(hits[0].Hsps[0].SubjectSeq)*100) + "%"
 
 		summary = fmt.Sprintln(ansi.Color("Hits: ", "red"), len(hits),
 			//	Printfield(hits[0].Id),
-			/*	Print("HspIdentity: ", strconv.Itoa(*hits[0].Hsps[0].HspIdentity)),
-				Print("queryLen: ", len(hits[0].Hsps[0].QuerySeq)),
-				Print("subjectLen: ", len(hits[0].Hsps[0].SubjectSeq)),
-				Print("alignLen: ", *hits[0].Hsps[0].AlignLen),
-				Print("Identity: ", identity),
-				Print("coverage: ", coverage),*/
+			Print("HspIdentity: ", strconv.Itoa(*hits[0].Hsps[0].HspIdentity)),
+			Print("queryLen: ", len(hits[0].Hsps[0].QuerySeq)),
+			Print("subjectLen: ", len(hits[0].Hsps[0].SubjectSeq)),
+			Print("alignLen: ", *hits[0].Hsps[0].AlignLen),
+			Print("Identity: ", identity),
+			Print("coverage: ", coverage),
 			//Print("HspIdentity", *hits[0].Hsps[0].HspIdentity),
 			ansi.Color("Sequence length:", "red"), seqlength,
 			ansi.Color("high scoring pairs for top match:", "red"), len(hits[0].Hsps),
 			ansi.Color("Id:", "red"), hits[0].Id,
 			ansi.Color("Definition:", "red"), hits[0].Def,
 			ansi.Color("Accession:", "red"), hits[0].Accession,
-			ansi.Color("Identity: ", "red"), identity, "%",
-			ansi.Color("Coverage: ", "red"), coverage, "%",
+			//ansi.Color("Identity: ", "red"), identity, "%",
+			//ansi.Color("Coverage: ", "red"), coverage, "%",
 			ansi.Color("Bitscore", "red"), hits[0].Hsps[0].BitScore,
 			ansi.Color("Score", "red"), hits[0].Hsps[0].Score,
 			ansi.Color("EValue", "red"), hits[0].Hsps[0].EValue)
@@ -189,6 +189,7 @@ func SimpleBlast(query string) (o *Output, err error) {
 
 	r, err := Put(query, &putparams, tool, email)
 	fmt.Println("RID=", r.String())
+	fmt.Println("Submitting request to BLAST server, please wait")
 	//var o *Output
 	for k := 0; k < retries; k++ {
 		var s *SearchInfo

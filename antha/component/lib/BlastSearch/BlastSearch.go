@@ -3,27 +3,22 @@
 package BlastSearch
 
 import (
-	"fmt"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/blast"
-	//biogo "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
 	"encoding/json"
+	"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/blast"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/flow"
+	biogo "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
 	"github.com/antha-lang/antha/microArch/execution"
 	"sync"
 )
 
-//"log"
-
 // Input parameters for this protocol
 
-//Amount
-
 // Data which is returned from this protocol
-
-//Hits string
 
 // Physical inputs to this protocol
 
@@ -47,8 +42,8 @@ func (e *BlastSearch) steps(p BlastSearchParamBlock, r *BlastSearchResultBlock) 
 	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
-	//var err error
-	//var hits []biogo.Hit
+	var err error
+	var hits []biogo.Hit
 	/*
 		if Querytype == "PROTEIN" {
 		hits, err = blast.MegaBlastP(Query)
@@ -68,19 +63,29 @@ func (e *BlastSearch) steps(p BlastSearchParamBlock, r *BlastSearchResultBlock) 
 		Hits = fmt.Sprintln(blast.HitSummary(hits))
 		}
 	*/
-	if p.Querytype == "DNA" {
-		r.AnthaSeq = wtype.MakePlasmidDNASequence(p.Name, p.Query)
 
-		hits, err := r.AnthaSeq.Blast()
-		if err != nil {
-			fmt.Println(err.Error())
+	// Convert the sequence to an anthatype
+	r.AnthaSeq = wtype.MakeLinearDNASequence(p.Name, p.DNA)
 
-		} //else {
+	orf, orftrue := enzymes.FindORF(r.AnthaSeq.Seq)
 
-		r.Hits = fmt.Sprintln(blast.HitSummary(hits))
-		//}
+	if orftrue == true {
+		// if open reading frame is detected, we'll perform a blastP search'
+		fmt.Println("ORF detected:", "full sequence length: ", len(r.AnthaSeq.Seq), "ORF length: ", len(orf.DNASeq))
+		hits, err = blast.MegaBlastP(orf.ProtSeq)
+	} else {
+		// otherwise we'll blast the nucleotide sequence
+		hits, err = r.AnthaSeq.Blast()
 	}
+	if err != nil {
+		fmt.Println(err.Error())
+
+	} //else {
+
+	r.Hits = fmt.Sprintln(blast.HitSummary(hits))
 	_ = _wrapper.WaitToEnd()
+
+	//}
 
 }
 
@@ -151,7 +156,16 @@ func NewBlastSearch() interface{} { //*BlastSearch {
 // Mapper function
 func (e *BlastSearch) Map(m map[string]interface{}) interface{} {
 	var res BlastSearchParamBlock
-	res.Error = false || m["Name"].(execute.ThreadParam).Error || m["Query"].(execute.ThreadParam).Error || m["Querytype"].(execute.ThreadParam).Error
+	res.Error = false || m["DNA"].(execute.ThreadParam).Error || m["Name"].(execute.ThreadParam).Error
+
+	vDNA, is := m["DNA"].(execute.ThreadParam).Value.(execute.JSONValue)
+	if is {
+		var temp BlastSearchJSONBlock
+		json.Unmarshal([]byte(vDNA.JSONString), &temp)
+		res.DNA = *temp.DNA
+	} else {
+		res.DNA = m["DNA"].(execute.ThreadParam).Value.(string)
+	}
 
 	vName, is := m["Name"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
@@ -162,75 +176,40 @@ func (e *BlastSearch) Map(m map[string]interface{}) interface{} {
 		res.Name = m["Name"].(execute.ThreadParam).Value.(string)
 	}
 
-	vQuery, is := m["Query"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp BlastSearchJSONBlock
-		json.Unmarshal([]byte(vQuery.JSONString), &temp)
-		res.Query = *temp.Query
-	} else {
-		res.Query = m["Query"].(execute.ThreadParam).Value.(string)
-	}
-
-	vQuerytype, is := m["Querytype"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp BlastSearchJSONBlock
-		json.Unmarshal([]byte(vQuerytype.JSONString), &temp)
-		res.Querytype = *temp.Querytype
-	} else {
-		res.Querytype = m["Querytype"].(execute.ThreadParam).Value.(string)
-	}
-
-	res.ID = m["Name"].(execute.ThreadParam).ID
-	res.BlockID = m["Name"].(execute.ThreadParam).BlockID
+	res.ID = m["DNA"].(execute.ThreadParam).ID
+	res.BlockID = m["DNA"].(execute.ThreadParam).BlockID
 
 	return res
 }
 
+func (e *BlastSearch) OnDNA(param execute.ThreadParam) {
+	e.lock.Lock()
+	var bag *execute.AsyncBag = e.params[param.ID]
+	if bag == nil {
+		bag = new(execute.AsyncBag)
+		bag.Init(2, e, e)
+		e.params[param.ID] = bag
+	}
+	e.lock.Unlock()
+
+	fired := bag.AddValue("DNA", param)
+	if fired {
+		e.lock.Lock()
+		delete(e.params, param.ID)
+		e.lock.Unlock()
+	}
+}
 func (e *BlastSearch) OnName(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(3, e, e)
+		bag.Init(2, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
 
 	fired := bag.AddValue("Name", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *BlastSearch) OnQuery(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(3, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Query", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *BlastSearch) OnQuerytype(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(3, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Querytype", param)
 	if fired {
 		e.lock.Lock()
 		delete(e.params, param.ID)
@@ -243,29 +222,26 @@ type BlastSearch struct {
 	lock           sync.Mutex
 	startup        sync.Once
 	params         map[execute.ThreadID]*execute.AsyncBag
+	DNA            <-chan execute.ThreadParam
 	Name           <-chan execute.ThreadParam
-	Query          <-chan execute.ThreadParam
-	Querytype      <-chan execute.ThreadParam
 	AnthaSeq       chan<- execute.ThreadParam
 	Hits           chan<- execute.ThreadParam
 }
 
 type BlastSearchParamBlock struct {
-	ID        execute.ThreadID
-	BlockID   execute.BlockID
-	Error     bool
-	Name      string
-	Query     string
-	Querytype string
+	ID      execute.ThreadID
+	BlockID execute.BlockID
+	Error   bool
+	DNA     string
+	Name    string
 }
 
 type BlastSearchConfig struct {
-	ID        execute.ThreadID
-	BlockID   execute.BlockID
-	Error     bool
-	Name      string
-	Query     string
-	Querytype string
+	ID      execute.ThreadID
+	BlockID execute.BlockID
+	Error   bool
+	DNA     string
+	Name    string
 }
 
 type BlastSearchResultBlock struct {
@@ -277,22 +253,20 @@ type BlastSearchResultBlock struct {
 }
 
 type BlastSearchJSONBlock struct {
-	ID        *execute.ThreadID
-	BlockID   *execute.BlockID
-	Error     *bool
-	Name      *string
-	Query     *string
-	Querytype *string
-	AnthaSeq  *wtype.DNASequence
-	Hits      *string
+	ID       *execute.ThreadID
+	BlockID  *execute.BlockID
+	Error    *bool
+	DNA      *string
+	Name     *string
+	AnthaSeq *wtype.DNASequence
+	Hits     *string
 }
 
 func (c *BlastSearch) ComponentInfo() *execute.ComponentInfo {
 	inp := make([]execute.PortInfo, 0)
 	outp := make([]execute.PortInfo, 0)
+	inp = append(inp, *execute.NewPortInfo("DNA", "string", "DNA", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Name", "string", "Name", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Query", "string", "Query", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Querytype", "string", "Querytype", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("AnthaSeq", "wtype.DNASequence", "AnthaSeq", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("Hits", "string", "Hits", true, true, nil, nil))
 
