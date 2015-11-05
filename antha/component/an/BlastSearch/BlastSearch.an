@@ -5,19 +5,23 @@ protocol BlastSearch
 import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/blast"
-	biogo "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
+	//biogo "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	//"log"
 	
 )
 // Input parameters for this protocol
 Parameters (
 	Query string//Amount
 	Querytype string
-	
+	Name string
 )
 
 // Data which is returned from this protocol
 Data (
+	//Hits string
 	Hits string
+	AnthaSeq wtype.DNASequence
 )
 
 // Physical inputs to this protocol
@@ -41,9 +45,10 @@ Setup {
 // Core process of the protocol: steps to be performed for each input
 Steps {
 	
-	var err error
-	var hits []biogo.Hit
 	
+	//var err error
+	//var hits []biogo.Hit
+	/*
 	if Querytype == "PROTEIN" {
 	hits, err = blast.MegaBlastP(Query)
 	if err != nil {
@@ -61,6 +66,19 @@ Steps {
 	
 	Hits = fmt.Sprintln(blast.HitSummary(hits))
 	} 
+	*/
+	if Querytype == "DNA" {
+	AnthaSeq = wtype.MakePlasmidDNASequence(Name, Query)
+	
+	hits, err := AnthaSeq.Blast()
+	if err !=nil {
+		fmt.Println(err.Error())
+	
+	} //else {
+	
+		Hits = fmt.Sprintln(blast.HitSummary(hits))
+	//}
+	}
 	
 }
 

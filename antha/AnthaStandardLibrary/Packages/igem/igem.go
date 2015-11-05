@@ -629,7 +629,7 @@ func GetSequence(partname string) (sequence string) {
 	parsedxml := ParseOutput(urloutput)
 	sequence = parsedxml.Partlist[0].Parts[0].Sequencelist[0].Seq_data // [0].Seq_data
 
-	sequence = strings.Replace(sequence, "\n", "", -1)
+	sequence = strings.ToUpper(strings.Replace(sequence, "\n", "", -1))
 
 	return sequence
 }

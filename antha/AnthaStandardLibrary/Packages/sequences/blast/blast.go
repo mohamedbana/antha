@@ -6,6 +6,7 @@ import (
 	//"github.com/biogo/ncbi/blast_test"
 	//"log"
 	"github.com/antha-lang/antha/internal/github.com/mgutz/ansi"
+	//"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -85,19 +86,63 @@ func RerunRID(r *Rid) (o *Output, err error) {
 	return
 }
 
+func Print(desc string, value interface{}) (fmtd string) {
+
+	fmtd = fmt.Sprint(ansi.Color(desc, "red"), value)
+	return
+}
+
+/*
+func Printfield( value interface{}) (fmtd string) {
+
+	switch myValue := value.(type){
+		case string:
+		fmt.Println(myValue)
+		case Hit:
+		fmt.Printf("%+v\n", myValue)
+		default:
+		fmt.Println("Type not handled: ", reflect.TypeOf(value))
+	}
+
+	//a := &Hsp{Len: "afoo"}
+	val := reflect.Indirect(reflect.ValueOf(value))
+	desc := fmt.Sprint(val.Type().Field(0).Name)
+
+	fmtd = fmt.Sprint(ansi.Color(desc, "red"), value)
+	return
+}
+*/
 func HitSummary(hits []Hit) (summary string, err error) {
 
 	if len(hits) != 0 {
+
+		/*for _, hit := range hits {
+			for _, hsp := range hit.Hsps {
+				fmt.Printf("%+v", hsp)
+
+			}
+		}*/
 		seqlength := hits[0].Len
-		identity := strconv.Itoa((*hits[0].Hsps[0].HspIdentity / seqlength) * 100)
+
+		identity := strconv.Itoa((*hits[0].Hsps[0].HspIdentity / len(hits[0].Hsps[0].QuerySeq)) * 100)  //+ "%"
+		coverage := strconv.Itoa(len(hits[0].Hsps[0].QuerySeq) / len(hits[0].Hsps[0].SubjectSeq) * 100) // + "%"
 
 		summary = fmt.Sprintln(ansi.Color("Hits: ", "red"), len(hits),
+			//	Printfield(hits[0].Id),
+			/*	Print("HspIdentity: ", strconv.Itoa(*hits[0].Hsps[0].HspIdentity)),
+				Print("queryLen: ", len(hits[0].Hsps[0].QuerySeq)),
+				Print("subjectLen: ", len(hits[0].Hsps[0].SubjectSeq)),
+				Print("alignLen: ", *hits[0].Hsps[0].AlignLen),
+				Print("Identity: ", identity),
+				Print("coverage: ", coverage),*/
+			//Print("HspIdentity", *hits[0].Hsps[0].HspIdentity),
 			ansi.Color("Sequence length:", "red"), seqlength,
 			ansi.Color("high scoring pairs for top match:", "red"), len(hits[0].Hsps),
 			ansi.Color("Id:", "red"), hits[0].Id,
 			ansi.Color("Definition:", "red"), hits[0].Def,
 			ansi.Color("Accession:", "red"), hits[0].Accession,
 			ansi.Color("Identity: ", "red"), identity, "%",
+			ansi.Color("Coverage: ", "red"), coverage, "%",
 			ansi.Color("Bitscore", "red"), hits[0].Hsps[0].BitScore,
 			ansi.Color("Score", "red"), hits[0].Hsps[0].Score,
 			ansi.Color("EValue", "red"), hits[0].Hsps[0].EValue)
@@ -133,6 +178,7 @@ func MegaBlastN(query string) (hits []Hit, err error) {
 		return
 	}
 	hits, err = Hits(o)
+	//fmt.Println(hits)
 	if err != nil {
 		return
 	}
