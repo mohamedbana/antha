@@ -132,10 +132,7 @@ func NewWorkflowRun(id execute.BlockID, wf *Workflow, cf *Config) (*WorkflowRun,
 			sg.Done()
 		}(ch)
 	}
-	go func() {
-		sg.Wait()
-		defer close(messages)
-	}()
+
 	go func() {
 		defer func() {
 			for _, ch := range ins {
@@ -151,11 +148,14 @@ func NewWorkflowRun(id execute.BlockID, wf *Workflow, cf *Config) (*WorkflowRun,
 	}()
 
 	go func() {
+		sg.Wait()
+		defer close(messages)
+		defer close(errors)
+
 		<-wf.Graph.Wait()
 		if err := execute.TakeErrors(); err != nil {
 			errors <- err
 		}
-		close(errors)
 		done <- true
 	}()
 

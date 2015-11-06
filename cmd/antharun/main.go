@@ -28,6 +28,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"sync"
 
 	"github.com/antha-lang/antha/antha/execute/util"
 )
@@ -89,30 +90,35 @@ func run() error {
 		return err
 	}
 
+	sg := sync.WaitGroup{}
+
+	sg.Add(1)
+	sg.Add(1)
 	go func() {
-		//handle messages?
 		for m := range wr.Messages {
 			fe.SendAlert(fmt.Sprintf("%v", m))
 		}
+		sg.Done()
 	}()
+
 	go func() {
-		//handle errors
 		for e := range wr.Errors {
 			fe.SendAlert(fmt.Sprintf("%v", e))
 		}
+		sg.Done()
 	}()
-	//	go func() {
-	//wait til done
+
 	<-wr.Done
+	sg.Wait()
+
 	fe.SendAlert("Execution finished")
-	//	}()
 
 	return nil
 }
 
 func main() {
-	flag.StringVar(&parametersFile, "parameters", "", "parameters to workflow")
-	flag.StringVar(&workflowFile, "workflow", "", "workflow definition file")
+	flag.StringVar(&parametersFile, "parameters", "parameters.yml", "parameters to workflow")
+	flag.StringVar(&workflowFile, "workflow", "workflow.json", "workflow definition file")
 	flag.StringVar(&logFile, "log", "", "log file")
 	flag.StringVar(&driverURI, "driver", "", "uri where a grpc driver implementation listens")
 	flag.Parse()
