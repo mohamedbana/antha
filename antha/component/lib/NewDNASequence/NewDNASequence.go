@@ -1,7 +1,7 @@
 package NewDNASequence
 
 import (
-	//"fmt"
+	"fmt"
 	//"math"
 	"encoding/json"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -39,7 +39,7 @@ func (e *NewDNASequence) steps(p NewDNASequenceParamBlock, r *NewDNASequenceResu
 	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
-	if p.Plasmid != p.Linear && p.Plasmid != p.SingleStranded {
+	if p.Plasmid != p.Linear {
 		if p.Plasmid {
 			r.DNA = wtype.MakePlasmidDNASequence(p.Gene_name, p.DNA_seq)
 		} else if p.Linear {
@@ -47,6 +47,8 @@ func (e *NewDNASequence) steps(p NewDNASequenceParamBlock, r *NewDNASequenceResu
 		} else if p.SingleStranded {
 			r.DNA = wtype.MakeSingleStrandedDNASequence(p.Gene_name, p.DNA_seq)
 		}
+	} else {
+		fmt.Println("correct conditions not met")
 	}
 	_ = _wrapper.WaitToEnd()
 

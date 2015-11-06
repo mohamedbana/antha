@@ -116,10 +116,10 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 	restrictionenzyme := enzymes.Enzymelookup[p.AssemblyStandard][p.Level]
 
 	// (1) Add standard overhangs using chosen assembly standard
-	r.PartswithOverhangs = enzymes.MakeStandardTypeIIsassemblyParts(partsinorder, p.AssemblyStandard, p.Level, p.PartMoClotypesinorder)
+	//PartswithOverhangs = enzymes.MakeStandardTypeIIsassemblyParts(partsinorder, AssemblyStandard, Level, PartMoClotypesinorder)
 
 	// OR (2) Add overhangs for scarfree assembly based on part seqeunces only, i.e. no Assembly standard
-	//PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
+	r.PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
 
 	// perfrom mock digest to test fragement overhangs (fragments are hidden by using _, )
 	_, stickyends5, stickyends3 := enzymes.TypeIIsdigest(vectordata, restrictionenzyme)

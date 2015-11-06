@@ -1,7 +1,7 @@
 protocol NewDNASequence
 
 import (
-	//"fmt"
+	"fmt"
 	//"math"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
@@ -42,7 +42,7 @@ Setup {
 // Core process of the protocol: steps to be performed for each input
 Steps {
 	
-	if Plasmid != Linear && Plasmid != SingleStranded {
+	if Plasmid != Linear {
 		if Plasmid  {
 			DNA = wtype.MakePlasmidDNASequence(Gene_name,DNA_seq)
 					}else if Linear {
@@ -50,7 +50,7 @@ Steps {
 							} else if SingleStranded {
 									DNA = wtype.MakeSingleStrandedDNASequence(Gene_name,DNA_seq)	
 									} 
-}
+}else {fmt.Println("correct conditions not met")}
 
 }
 // Actions to perform after steps block to analyze data

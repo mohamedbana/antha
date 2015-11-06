@@ -12,7 +12,7 @@ import (
 )
 // Input parameters for this protocol
 Parameters (
-	DNA string
+	DNA string //wtype.DNASequence//string
 	Name string
 )
 

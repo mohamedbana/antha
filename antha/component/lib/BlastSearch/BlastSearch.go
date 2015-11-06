@@ -18,6 +18,8 @@ import (
 
 // Input parameters for this protocol
 
+//wtype.DNASequence//string
+
 // Data which is returned from this protocol; output data
 
 // Physical inputs to this protocol
