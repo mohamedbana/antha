@@ -122,10 +122,12 @@ func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequen
 			err = fmt.Errorf(errorstring)
 			return assembledfragments, plasmidproducts, err
 		}
+
 		doublestrandedpart = MakedoublestrandedDNA(partsinorder[i])
 		digestedpart := DigestionPairs(doublestrandedpart, enzyme)
 		//for _, newfragments := range assembledfragments {
 		assembledfragments, plasmidproducts, newerr = Jointwoparts(assembledfragments, digestedpart)
+		//err = newerr
 		if newerr != nil {
 			//	if err != nil {
 			message := fmt.Sprint(partsinorder[i-1].Nm, " and ", partsinorder[i].Nm, ": ", newerr.Error())
@@ -218,7 +220,8 @@ func Assemblysimulator(assemblyparameters Assemblyparameters) (s string, success
 	s = "hmmm I'm confused, this doesn't seem to make any sense"
 
 	if len(plasmidproductsfromXprimaryseq) == 0 && len(failedassemblies) == 0 {
-		s = "Nope! this construct won't work"
+		err = fmt.Errorf("Nope! this construct won't work: ", err)
+		s = err.Error()
 	}
 	if len(plasmidproductsfromXprimaryseq) == 1 {
 		s = "Yay! this should work"
@@ -226,11 +229,18 @@ func Assemblysimulator(assemblyparameters Assemblyparameters) (s string, success
 	}
 
 	if len(plasmidproductsfromXprimaryseq) > 1 {
-		s = "Yay! this should work but there seems to be more than one possible plasmid which could form"
+
+		err = fmt.Errorf("Yay! this should work but there seems to be more than one possible plasmid which could form %s", err)
+		s = err.Error()
 	}
 
 	if len(plasmidproductsfromXprimaryseq) == 0 && len(failedassemblies) != 0 {
-		s = "Ooh, only partial assembly expected"
+
+		s = fmt.Sprint("Ooh, only partial assembly expected: ", assemblyparameters.Partsinorder[(len(assemblyparameters.Partsinorder)-1)].Nm, " and ", assemblyparameters.Vector.Nm, ": ", "Not compatible, check ends")
+
+		err = fmt.Errorf(s)
+		//err = fmt.Errorf(funk, err.Error())
+		//s = err.Error()
 	}
 
 	for _, assemblyproduct := range plasmidproductsfromXprimaryseq {

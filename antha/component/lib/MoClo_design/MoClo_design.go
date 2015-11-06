@@ -5,19 +5,19 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/REBASE"
-	"encoding/json"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
+	"strconv"
+	"strings"
+
+	"encoding/json"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/flow"
 	"github.com/antha-lang/antha/microArch/execution"
-	"strconv"
-	"strings"
 	"sync"
 )
-
-//"github.com/mgutz/ansi"
 
 //"log"
 
@@ -75,13 +75,13 @@ func (e *MoClo_design) steps(p MoClo_designParamBlock, r *MoClo_designResultBloc
 			/* We can add logic to check the status of parts too and return a warning if the part
 			   is not characeterised */
 
-			if strings.Contains(igem.GetResults(part), "Works") != true {
+			/*		if strings.Contains(igem.GetResults(part),"Works") != true{
 
-				warnings = make([]string, 0)
-				warning := fmt.Sprintln("iGem part", part, "results =", igem.GetResults(part), "rating", igem.GetRating(part), "part type", igem.GetType(part), "part decription =", igem.GetDescription(part), "Categories", igem.GetCategories(part))
-				warnings = append(warnings, warning)
+					warnings = make([]string,0)
+					warning := fmt.Sprintln("iGem part", part, "results =", igem.GetResults(part), "rating",igem.GetRating(part), "part type",igem.GetType(part), "part decription =", igem.GetDescription(part), "Categories",igem.GetCategories(part))
+					warnings = append(warnings,warning)
 
-			}
+			}*/
 		} else {
 			partDNA = Inventory.Partslist[part]
 
@@ -107,6 +107,23 @@ func (e *MoClo_design) steps(p MoClo_designParamBlock, r *MoClo_designResultBloc
 	// perfrom mock digest to test fragement overhangs (fragments are hidden by using _, )
 	_, stickyends5, stickyends3 := enzymes.TypeIIsdigest(vectordata, restrictionenzyme)
 
+	allends := make([]string, 0)
+	ends := ""
+
+	ends = text.Print(vectordata.Nm+" 5 Prime end: ", stickyends5)
+	allends = append(allends, ends)
+	ends = text.Print(vectordata.Nm+" 3 Prime end: ", stickyends3)
+	allends = append(allends, ends)
+
+	for _, part := range r.PartswithOverhangs {
+		_, stickyends5, stickyends3 := enzymes.TypeIIsdigest(part, restrictionenzyme)
+		ends = text.Print(part.Nm+" 5 Prime end: ", stickyends5)
+		allends = append(allends, ends)
+		ends = text.Print(part.Nm+" 3 Prime end: ", stickyends3)
+		allends = append(allends, ends)
+	}
+	endreport := strings.Join(allends, " ")
+
 	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
 	assembly := enzymes.Assemblyparameters{p.Constructname, restrictionenzyme.Name, vectordata, r.PartswithOverhangs}
 	status, numberofassemblies, _, newDNASequence, _ := enzymes.Assemblysimulator(assembly)
@@ -130,22 +147,25 @@ func (e *MoClo_design) steps(p MoClo_designParamBlock, r *MoClo_designResultBloc
 	_ = enzymes.Makefastaserial(p.Constructname, partswithOverhangs)
 
 	//partstoorder := ansi.Color(fmt.Sprintln("PartswithOverhangs", PartswithOverhangs),"red")
-	partstoorder := fmt.Sprintln("PartswithOverhangs", r.PartswithOverhangs)
+
+	partsummary := make([]string, 0)
+	for _, part := range r.PartswithOverhangs {
+		partsummary = append(partsummary, text.Print(part.Nm, part.Seq))
+	}
+
+	partstoorder := text.Print("PartswithOverhangs: ", partsummary)
 
 	// Print status
 	if r.Status != "all parts available" {
 		r.Status = fmt.Sprintln(r.Status)
 	} else {
 		r.Status = fmt.Sprintln(
-			"Warnings:", r.Warnings,
-			"Simulationpass=", r.Simulationpass,
-			"NewDNASequence", r.NewDNASequence,
-			//"partonewithoverhangs", partonewithoverhangs,
-			//"Vector",vectordata,
-			"Vector digest:", stickyends5, stickyends3,
+			text.Print("simulator status: ", status),
+			text.Print("Endreport after digestion: ", endreport),
+			text.Print("Warnings:", r.Warnings),
+			text.Print("Simulationpass=", r.Simulationpass),
+			text.Print("NewDNASequence: ", r.NewDNASequence),
 			partstoorder,
-			"Partsinorder=", p.Partsinorder, partsinorder,
-		//"Restriction Enzyme=",restrictionenzyme,
 		)
 	}
 	_ = _wrapper.WaitToEnd()

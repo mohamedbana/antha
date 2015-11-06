@@ -24,6 +24,7 @@ package enzymes
 
 import (
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"sort"
 	"strconv"
@@ -754,4 +755,26 @@ func Digestionsimulator(assemblyparameters Assemblyparameters) (digestedfragemen
 		digestedfragementarray = append(digestedfragementarray, digestedpart)
 	}
 	return digestedfragementarray
+}
+
+func EndReport(restrictionenzyme TypeIIs, vectordata wtype.DNASequence, parts []wtype.DNASequence) (endreport string) {
+	_, stickyends5, stickyends3 := TypeIIsdigest(vectordata, restrictionenzyme)
+
+	allends := make([]string, 0)
+	ends := ""
+
+	ends = text.Print(vectordata.Nm+" 5 Prime end: ", stickyends5)
+	allends = append(allends, ends)
+	ends = text.Print(vectordata.Nm+" 3 Prime end: ", stickyends3)
+	allends = append(allends, ends)
+
+	for _, part := range parts {
+		_, stickyends5, stickyends3 = TypeIIsdigest(part, restrictionenzyme)
+		ends = text.Print(part.Nm+" 5 Prime end: ", stickyends5)
+		allends = append(allends, ends)
+		ends = text.Print(part.Nm+" 3 Prime end: ", stickyends3)
+		allends = append(allends, ends)
+	}
+	endreport = strings.Join(allends, " ")
+	return
 }

@@ -10,7 +10,7 @@ import (
 	"strings"
 	"strconv"
 
-	//"github.com/mgutz/ansi"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 
 	//"log"
 
@@ -84,13 +84,13 @@ Steps {
 			/* We can add logic to check the status of parts too and return a warning if the part 
 			   is not characeterised */
 			
-			if strings.Contains(igem.GetResults(part),"Works") != true{
+	/*		if strings.Contains(igem.GetResults(part),"Works") != true{
 					
 				warnings = make([]string,0)
 				warning := fmt.Sprintln("iGem part", part, "results =", igem.GetResults(part), "rating",igem.GetRating(part), "part type",igem.GetType(part), "part decription =", igem.GetDescription(part), "Categories",igem.GetCategories(part))
 				warnings = append(warnings,warning)
 				
-		}
+		}*/
 		} else {
 		partDNA = Inventory.Partslist[part]
 		
@@ -114,8 +114,28 @@ Steps {
 	// OR (2) Add overhangs for scarfree assembly based on part seqeunces only, i.e. no Assembly standard
 	//PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
 	
+	
+	
 	// perfrom mock digest to test fragement overhangs (fragments are hidden by using _, )
 	_,stickyends5,stickyends3 := enzymes.TypeIIsdigest(vectordata, restrictionenzyme)
+	
+	allends := make([]string,0)
+	ends := ""
+	
+	ends = text.Print(vectordata.Nm + " 5 Prime end: ",stickyends5)
+	allends =append(allends,ends)
+	ends = text.Print(vectordata.Nm + " 3 Prime end: ",stickyends3)
+	allends =append(allends,ends)
+	
+	for _, part := range PartswithOverhangs {
+	_,stickyends5,stickyends3 := enzymes.TypeIIsdigest(part, restrictionenzyme)
+	ends = text.Print(part.Nm + " 5 Prime end: ",stickyends5)
+	allends =append(allends,ends)
+	ends = text.Print(part.Nm + " 3 Prime end: ",stickyends3)
+	allends =append(allends,ends)
+	}
+	endreport := strings.Join(allends," ")
+	
 	
 	
 	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
@@ -143,22 +163,25 @@ Steps {
 	_ = enzymes.Makefastaserial(Constructname,partswithOverhangs)
 	
 	//partstoorder := ansi.Color(fmt.Sprintln("PartswithOverhangs", PartswithOverhangs),"red")
-	partstoorder := fmt.Sprintln("PartswithOverhangs", PartswithOverhangs)
+	
+	partsummary := make([]string,0)
+	for _, part:= range PartswithOverhangs {
+		partsummary =append(partsummary, text.Print(part.Nm,part.Seq))
+	}
+	
+	partstoorder := text.Print("PartswithOverhangs: ", partsummary)
 	
 	
 	// Print status
 	if Status != "all parts available"{
 		Status = fmt.Sprintln(Status)
 	} else {Status = fmt.Sprintln(
-		"Warnings:", Warnings,
-		"Simulationpass=", Simulationpass,
-		"NewDNASequence",NewDNASequence,
-		//"partonewithoverhangs", partonewithoverhangs,
-		//"Vector",vectordata,
-		"Vector digest:", stickyends5,stickyends3,
+		text.Print("simulator status: ", status),
+		text.Print("Endreport after digestion: ",endreport),
+		text.Print("Warnings:", Warnings),
+		text.Print("Simulationpass=", Simulationpass),
+		text.Print("NewDNASequence: ",NewDNASequence),
 		partstoorder,
-		"Partsinorder=",Partsinorder,partsinorder,
-		//"Restriction Enzyme=",restrictionenzyme,
 		)
 		}
 	
