@@ -125,6 +125,7 @@ func ExportReport(dir string, seq wtype.BioSequence) string {
 }
 
 // function to export multiple sequences in fasta format into a single txt file
+// Modify this for the more general case
 func Makefastaserial(dir string, seqs []*wtype.DNASequence) string {
 	filename := fmt.Sprintf("%s%c%s.fasta", os.TempDir(), os.PathSeparator, dir)
 	f, e := os.Create(filename)

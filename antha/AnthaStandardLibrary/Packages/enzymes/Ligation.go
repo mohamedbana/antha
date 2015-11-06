@@ -205,6 +205,7 @@ func Assemblysimulator(assemblyparameters Assemblyparameters) (s string, success
 		sites = Restrictionsitefinder(plasmidproductsfromXprimaryseq[0], []wtype.LogicalRestrictionEnzyme{BsaI, SapI})
 		newDNASequence = plasmidproductsfromXprimaryseq[0]
 	}
+	// returns first plasmid in array! should be changed later!
 	if len(plasmidproductsfromXprimaryseq) > 1 {
 		sites = make([]Restrictionsites, 0)
 		for i := 0; i < len(plasmidproductsfromXprimaryseq); i++ {

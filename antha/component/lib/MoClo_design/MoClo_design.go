@@ -1,27 +1,27 @@
 package MoClo_design
 
 import (
-	"fmt"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/REBASE"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
-	"strconv"
-	"strings"
-
 	"encoding/json"
+	"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/flow"
 	"github.com/antha-lang/antha/microArch/execution"
+	"strings"
 	"sync"
 )
 
-//"log"
-
 // Input parameters for this protocol (data)
+
+//MoClo
+// of assembly standard
+
+// labels e.g. pro = promoter
 
 // Physical Inputs to this protocol with types
 
@@ -29,10 +29,14 @@ import (
 
 // Data which is returned from this protocol, and data types
 
+// parts to order
+// desired sequence to end up with after assembly
+
 // Input Requirement specification
 func (e *MoClo_design) requirements() {
 	_ = wunit.Make_units
 
+	// e.g. are MoClo types valid?
 }
 
 // Conditions to run on startup
@@ -64,24 +68,19 @@ func (e *MoClo_design) steps(p MoClo_designParamBlock, r *MoClo_designResultBloc
 
 		if strings.Contains(part, "BBa_") == true {
 
-			/*err := igem.UpdateRegistryfile()
-			if err != nil {
-				log.Panic(err)
-			}*/
-
 			partDNA.Nm = part
 			partDNA.Seq = igem.GetSequence(part)
 
 			/* We can add logic to check the status of parts too and return a warning if the part
-			   is not characeterised */
+			   is not characterised */
 
-			/*		if strings.Contains(igem.GetResults(part),"Works") != true{
+			if strings.Contains(igem.GetResults(part), "Works") != true {
 
-					warnings = make([]string,0)
-					warning := fmt.Sprintln("iGem part", part, "results =", igem.GetResults(part), "rating",igem.GetRating(part), "part type",igem.GetType(part), "part decription =", igem.GetDescription(part), "Categories",igem.GetCategories(part))
-					warnings = append(warnings,warning)
+				warnings = make([]string, 0)
+				warning := fmt.Sprintln("iGem part", part, "results =", igem.GetResults(part), "rating", igem.GetRating(part), "part type", igem.GetType(part), "part decription =", igem.GetDescription(part), "Categories", igem.GetCategories(part))
+				warnings = append(warnings, warning)
 
-			}*/
+			}
 		} else {
 			partDNA = Inventory.Partslist[part]
 
@@ -104,49 +103,39 @@ func (e *MoClo_design) steps(p MoClo_designParamBlock, r *MoClo_designResultBloc
 	// OR (2) Add overhangs for scarfree assembly based on part seqeunces only, i.e. no Assembly standard
 	//PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
 
-	// perfrom mock digest to test fragement overhangs (fragments are hidden by using _, )
-	_, stickyends5, stickyends3 := enzymes.TypeIIsdigest(vectordata, restrictionenzyme)
-
-	allends := make([]string, 0)
-	ends := ""
-
-	ends = text.Print(vectordata.Nm+" 5 Prime end: ", stickyends5)
-	allends = append(allends, ends)
-	ends = text.Print(vectordata.Nm+" 3 Prime end: ", stickyends3)
-	allends = append(allends, ends)
-
-	for _, part := range r.PartswithOverhangs {
-		_, stickyends5, stickyends3 := enzymes.TypeIIsdigest(part, restrictionenzyme)
-		ends = text.Print(part.Nm+" 5 Prime end: ", stickyends5)
-		allends = append(allends, ends)
-		ends = text.Print(part.Nm+" 3 Prime end: ", stickyends3)
-		allends = append(allends, ends)
-	}
-	endreport := strings.Join(allends, " ")
-
 	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
 	assembly := enzymes.Assemblyparameters{p.Constructname, restrictionenzyme.Name, vectordata, r.PartswithOverhangs}
-	status, numberofassemblies, _, newDNASequence, _ := enzymes.Assemblysimulator(assembly)
+	status, numberofassemblies, _, newDNASequence, err := enzymes.Assemblysimulator(assembly)
 
+	endreport := "Only run in the event of assembly failure"
 	r.NewDNASequence = newDNASequence
-	if status == "Yay! this should work" && numberofassemblies == 1 {
+	if err == nil && numberofassemblies == 1 {
 
 		r.Simulationpass = true
+	} else {
+		warnings = append(warnings, status)
+		// perform mock digest to test fragement overhangs (fragments are hidden by using _, )
+		_, stickyends5, stickyends3 := enzymes.TypeIIsdigest(vectordata, restrictionenzyme)
+
+		allends := make([]string, 0)
+		ends := ""
+
+		ends = text.Print(vectordata.Nm+" 5 Prime end: ", stickyends5)
+		allends = append(allends, ends)
+		ends = text.Print(vectordata.Nm+" 3 Prime end: ", stickyends3)
+		allends = append(allends, ends)
+
+		for _, part := range r.PartswithOverhangs {
+			_, stickyends5, stickyends3 := enzymes.TypeIIsdigest(part, restrictionenzyme)
+			ends = text.Print(part.Nm+" 5 Prime end: ", stickyends5)
+			allends = append(allends, ends)
+			ends = text.Print(part.Nm+" 3 Prime end: ", stickyends3)
+			allends = append(allends, ends)
+		}
+		endreport = strings.Join(allends, " ")
 	}
 
 	r.Warnings = strings.Join(warnings, ";")
-
-	// Export sequences to order into a fasta file
-
-	partswithOverhangs := make([]*wtype.DNASequence, 0)
-	for i, part := range r.PartswithOverhangs {
-		_ = enzymes.ExportFastaDir(p.Constructname, strconv.Itoa(i+1), &part)
-		partswithOverhangs = append(partswithOverhangs, &part)
-
-	}
-	_ = enzymes.Makefastaserial(p.Constructname, partswithOverhangs)
-
-	//partstoorder := ansi.Color(fmt.Sprintln("PartswithOverhangs", PartswithOverhangs),"red")
 
 	partsummary := make([]string, 0)
 	for _, part := range r.PartswithOverhangs {

@@ -4,15 +4,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
-	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/REBASE"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 	"strings"
-	"strconv"
-
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
-
-	//"log"
 
 )
 
@@ -20,11 +15,10 @@ import (
 Parameters (
 	Constructname 				string
 	Partsinorder				[]string
-	AssemblyStandard			string
-	Level						string
+	AssemblyStandard			string //MoClo
+	Level						string // of assembly standard
 	Vector						string
-	PartMoClotypesinorder		[]string
-
+	PartMoClotypesinorder		[]string // labels e.g. pro = promoter
 )
 
 // Physical Inputs to this protocol with types
@@ -42,13 +36,13 @@ Data (
 	Warnings string
 	Status string
 	Simulationpass bool
-	PartswithOverhangs []wtype.DNASequence
-	NewDNASequence wtype.DNASequence
+	PartswithOverhangs []wtype.DNASequence // parts to order
+	NewDNASequence wtype.DNASequence // desired sequence to end up with after assembly
 	
 )
 // Input Requirement specification
 Requirements {
-	
+	// e.g. are MoClo types valid?
 }
 
 // Conditions to run on startup
@@ -73,24 +67,19 @@ Steps {
 		
 		if strings.Contains(part,"BBa_") ==true{
 
-			/*err := igem.UpdateRegistryfile()
-			if err != nil {
-				log.Panic(err)
-			}*/
-
 			partDNA.Nm = part
 			partDNA.Seq = igem.GetSequence(part)
 		
 			/* We can add logic to check the status of parts too and return a warning if the part 
-			   is not characeterised */
+			   is not characterised */
 			
-	/*		if strings.Contains(igem.GetResults(part),"Works") != true{
+		if strings.Contains(igem.GetResults(part),"Works") != true{
 					
 				warnings = make([]string,0)
 				warning := fmt.Sprintln("iGem part", part, "results =", igem.GetResults(part), "rating",igem.GetRating(part), "part type",igem.GetType(part), "part decription =", igem.GetDescription(part), "Categories",igem.GetCategories(part))
 				warnings = append(warnings,warning)
 				
-		}*/
+		}
 		} else {
 		partDNA = Inventory.Partslist[part]
 		
@@ -114,9 +103,18 @@ Steps {
 	// OR (2) Add overhangs for scarfree assembly based on part seqeunces only, i.e. no Assembly standard
 	//PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
 	
+	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
+	assembly := enzymes.Assemblyparameters{Constructname, restrictionenzyme.Name,vectordata,PartswithOverhangs}
+		status,numberofassemblies,_,newDNASequence, err := enzymes.Assemblysimulator(assembly)
 	
-	
-	// perfrom mock digest to test fragement overhangs (fragments are hidden by using _, )
+	endreport := "Only run in the event of assembly failure"
+	NewDNASequence = newDNASequence
+	if err == nil && numberofassemblies == 1 {
+		
+		Simulationpass = true
+	} else {
+		warnings = append(warnings,status)
+		// perform mock digest to test fragement overhangs (fragments are hidden by using _, )
 	_,stickyends5,stickyends3 := enzymes.TypeIIsdigest(vectordata, restrictionenzyme)
 	
 	allends := make([]string,0)
@@ -134,35 +132,10 @@ Steps {
 	ends = text.Print(part.Nm + " 3 Prime end: ",stickyends3)
 	allends =append(allends,ends)
 	}
-	endreport := strings.Join(allends," ")
-	
-	
-	
-	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
-	assembly := enzymes.Assemblyparameters{Constructname, restrictionenzyme.Name,vectordata,PartswithOverhangs}
-		status,numberofassemblies,_,newDNASequence,_ := enzymes.Assemblysimulator(assembly)
-	
-	
-	NewDNASequence = newDNASequence
-	if status == "Yay! this should work" && numberofassemblies == 1 {
-		
-		Simulationpass = true
+	endreport = strings.Join(allends," ")
 	}	
 	
 	Warnings = strings.Join(warnings,";")
-	
-	// Export sequences to order into a fasta file
-	
-	partswithOverhangs := make([]*wtype.DNASequence,0)
-	for i, part := range PartswithOverhangs{
-		_ = enzymes.ExportFastaDir(Constructname,strconv.Itoa(i+1),&part)
-		partswithOverhangs=append(partswithOverhangs,&part)
-		
-		
-	}
-	_ = enzymes.Makefastaserial(Constructname,partswithOverhangs)
-	
-	//partstoorder := ansi.Color(fmt.Sprintln("PartswithOverhangs", PartswithOverhangs),"red")
 	
 	partsummary := make([]string,0)
 	for _, part:= range PartswithOverhangs {
@@ -170,7 +143,6 @@ Steps {
 	}
 	
 	partstoorder := text.Print("PartswithOverhangs: ", partsummary)
-	
 	
 	// Print status
 	if Status != "all parts available"{
@@ -183,7 +155,7 @@ Steps {
 		text.Print("NewDNASequence: ",NewDNASequence),
 		partstoorder,
 		)
-		}
+	}
 	
 }
 

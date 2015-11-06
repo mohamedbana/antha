@@ -673,6 +673,7 @@ func GetResults(partname string) (results string) {
 	return results
 }
 
+// change to object based method call
 func GetResultsfromSubset(partname string, parsedxml Rsbpml) (results string) {
 
 	/*parts := make([]string, 0)
@@ -757,6 +758,10 @@ type Rsbpml struct {
 
 type Part_list struct {
 	Parts []Part `xml:"part"`
+}
+
+type Registryquerier interface {
+	GetParts([]string) []Rsbpml
 }
 
 type Part struct {
