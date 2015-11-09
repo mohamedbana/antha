@@ -1,0 +1,17 @@
+{
+    "Parameters": [{
+        "FindPartsthat":{ 				
+           "Parttypes": [
+            "Terminator",
+            
+            ],
+		 "Partdescriptions": [
+            "Double",
+            ],
+        }
+    }],
+    "Config": {
+        "OUTPUT_COUNT": 1
+    }
+}
+
