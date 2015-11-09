@@ -56,6 +56,30 @@ type LogicalRestrictionEnzyme struct {
 	Class                             string
 }
 
+type TypeIIs struct {
+	LogicalRestrictionEnzyme
+	Name                              string
+	Isoschizomers                     []string
+	Topstrand3primedistancefromend    int
+	Bottomstrand5primedistancefromend int
+}
+
+func ToTypeIIs(typeIIenzyme LogicalRestrictionEnzyme) (typeIIsenz TypeIIs, err error) {
+	if typeIIenzyme.Class == "TypeII" {
+		err = fmt.Errorf("You can't do this, enzyme is not a type IIs")
+	}
+	if typeIIenzyme.Class == "TypeIIs" {
+
+		var isoschizomers = make([]string, 0)
+		/*for _, lookup := range ...
+		add code to lookup isoschizers from rebase
+		*/
+		typeIIsenz = TypeIIs{typeIIenzyme, typeIIenzyme.Name, isoschizomers, typeIIenzyme.Topstrand3primedistancefromend, typeIIenzyme.Bottomstrand5primedistancefromend}
+
+	}
+	return
+}
+
 // structure which defines an organism. These need specific handling
 // -- some detail is derived using the TOL structure
 type Organism struct {
@@ -128,13 +152,13 @@ func MakeDNASequence(name string, seqstring string, properties []string) (seq DN
 }
 func MakeLinearDNASequence(name string, seqstring string) (seq DNASequence) {
 	seq.Nm = name
-	seq.Seq = seqstring
+	seq.Seq = strings.ToUpper(seqstring)
 
 	return
 }
 func MakePlasmidDNASequence(name string, seqstring string) (seq DNASequence) {
 	seq.Nm = name
-	seq.Seq = seqstring
+	seq.Seq = strings.ToUpper(seqstring)
 	seq.Plasmid = true
 	return
 }

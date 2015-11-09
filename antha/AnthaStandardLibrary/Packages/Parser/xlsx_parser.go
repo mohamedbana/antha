@@ -3,12 +3,11 @@ package parser
 import (
 	"errors"
 	"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
 	"io/ioutil"
 	"os"
 	"strings"
-
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
-	"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
 )
 
 var delimiter = ","

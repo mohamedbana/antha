@@ -689,6 +689,7 @@ func (parsedxml *Rsbpml) Description(partname string) (result string) {
 	}
 
 	result = strings.ToUpper(result)
+
 	return
 }
 

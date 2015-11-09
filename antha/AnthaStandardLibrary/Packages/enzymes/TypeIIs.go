@@ -1,22 +1,22 @@
 // antha/AnthaStandardLibrary/Packages/enzymes/TypeIIs.go: Part of the Antha language
 // Copyright (C) 2015 The Antha authors. All rights reserved.
-// 
+//
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-// 
+//
 // For more information relating to the software or licensing issues please
-// contact license@antha-lang.org or write to the Antha team c/o 
+// contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
@@ -24,6 +24,7 @@
 package enzymes
 
 import (
+	//"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	//"time"
@@ -167,14 +168,6 @@ var K = Atom{
 }
 */
 
-type TypeIIs struct {
-	wtype.LogicalRestrictionEnzyme
-	Name                              string
-	Isoschizomers                     []string
-	Topstrand3primedistancefromend    int
-	Bottomstrand5primedistancefromend int
-}
-
 type CutPosition struct {
 	Topstrand3primedistancefromend    int
 	Bottomstrand5primedistancefromend int
@@ -184,21 +177,21 @@ type CutPosition struct {
 
 var SapI = wtype.LogicalRestrictionEnzyme{"GCTCTTC", 3, "SapI", "", 1, 4, "", []string{"N"}, []int{91, 1109, 1919, 1920}, "TypeIIs"}
 var isoschizomers = []string{"BspQI", "LguI", "PciSI", "VpaK32I"}
-var SapIenz = TypeIIs{SapI, "SapI", isoschizomers, 1, 4}
+var SapIenz = wtype.TypeIIs{SapI, "SapI", isoschizomers, 1, 4}
 var BsaI = wtype.LogicalRestrictionEnzyme{"GGTCTC", 4, "BsaI", "Eco31I", 1, 5, "?(5)", []string{"N"}, []int{814, 1109, 1912, 1995, 1996}, "TypeIIs"}
-var BsaIenz = TypeIIs{BsaI, "BsaI", []string{"none"}, 1, 5}
+var BsaIenz = wtype.TypeIIs{BsaI, "BsaI", []string{"none"}, 1, 5}
 
 var BpiI = wtype.LogicalRestrictionEnzyme{"GAAGAC", 4, "BpiI", "BbvII", 2, 6, "", []string{"B"}, []int{718}, "TypeIIs"}
-var BpiIenz = TypeIIs{BpiI, "BpiI", []string{"BbvII", "BbsI", "BpuAI", "BSTV2I"}, 2, 6}
+var BpiIenz = wtype.TypeIIs{BpiI, "BpiI", []string{"BbvII", "BbsI", "BpuAI", "BSTV2I"}, 2, 6}
 
-var TypeIIsEnzymeproperties = map[string]TypeIIs{
+var TypeIIsEnzymeproperties = map[string]wtype.TypeIIs{
 	"SAPI": SapIenz,
 	"BSAI": BsaIenz,
 	"BPII": BpiIenz,
 }
 
 type Enzymeproperties struct {
-	typeIIsenzyme TypeIIs
+	typeIIsenzyme wtype.TypeIIs
 	storageBuffer SimpleBuffer
 	assaybuffer   SimpleBuffer
 	unitsperml    float64

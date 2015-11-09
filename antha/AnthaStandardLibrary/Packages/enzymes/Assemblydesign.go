@@ -148,7 +148,7 @@ func AddStandardStickyEndsfromClass(part wtype.DNASequence, assemblystandard str
 	return Partwithends
 }
 
-func AddCustomEnds(part wtype.DNASequence, enzyme TypeIIs, desiredstickyend5prime string, desiredstickyend3prime string) (Partwithends wtype.DNASequence) {
+func AddCustomEnds(part wtype.DNASequence, enzyme wtype.TypeIIs, desiredstickyend5prime string, desiredstickyend3prime string) (Partwithends wtype.DNASequence) {
 
 	bittoadd := desiredstickyend5prime
 	if strings.HasPrefix(part.Seq, bittoadd) == true {
@@ -196,7 +196,7 @@ func MakeStandardTypeIIsassemblyParts(parts []wtype.DNASequence, assemblystandar
 	return partswithends
 }
 
-func MakeScarfreeCustomTypeIIsassemblyParts(parts []wtype.DNASequence, vector wtype.DNASequence, enzyme TypeIIs) (partswithends []wtype.DNASequence) {
+func MakeScarfreeCustomTypeIIsassemblyParts(parts []wtype.DNASequence, vector wtype.DNASequence, enzyme wtype.TypeIIs) (partswithends []wtype.DNASequence) {
 
 	partswithends = make([]wtype.DNASequence, 0)
 	var partwithends wtype.DNASequence
@@ -338,7 +338,7 @@ func Addnucleotide(s string) (splus1array []string) {
 	return splus1array
 }
 
-func Makeoverhang(enzyme TypeIIs, end string, stickyendseq string, spacer string) (seqwithoverhang string) {
+func Makeoverhang(enzyme wtype.TypeIIs, end string, stickyendseq string, spacer string) (seqwithoverhang string) {
 	if end == "5prime" {
 		if enzyme.Topstrand3primedistancefromend < 0 {
 			panic("Unlikely to work with this enzyme in making a 5'prime spacer")
@@ -456,13 +456,13 @@ var Vectorends = map[string]map[string][]string{
 	},
 }
 
-var Enzymelookup = map[string]map[string]TypeIIs{
+var Enzymelookup = map[string]map[string]wtype.TypeIIs{
 	// array of strings returned correspond to 5'overhang and 3'overhang
-	"MoClo_Raven": map[string]TypeIIs{
+	"MoClo_Raven": map[string]wtype.TypeIIs{
 		"Level0": BsaIenz,
 		"Level1": BpiIenz,
 	},
-	"MoClo": map[string]TypeIIs{
+	"MoClo": map[string]wtype.TypeIIs{
 		"Level0": BsaIenz,
 		"Level1": BpiIenz,
 	},
@@ -474,12 +474,12 @@ var MoClo AssemblyStandard{
 
 */
 type AssemblyStandardLevel struct {
-	Enzyme    TypeIIs
+	Enzyme    wtype.TypeIIs
 	Levelname string
 }
 
 type AssemblyStandard struct {
 	Endstable       map[string]map[string]map[int]map[int]string
-	EnzymeTable     map[string]map[string]TypeIIs
+	EnzymeTable     map[string]map[string]wtype.TypeIIs
 	VectorEndstable map[string]map[string][]string // Vector 5prime can also be found in Endstable position 0
 }

@@ -216,7 +216,7 @@ func Pair(digestedtopstrand []string, digestedbottomstrand []string, topstickyen
 	return pairs
 }
 
-func DigestionPairs(Doublestrandedpair []wtype.DNASequence, typeIIsenzyme TypeIIs) (digestionproducts []Digestedfragment) {
+func DigestionPairs(Doublestrandedpair []wtype.DNASequence, typeIIsenzyme wtype.TypeIIs) (digestionproducts []Digestedfragment) {
 	topstrands, topstickyends5, topstickyends3 := TypeIIsdigest(Doublestrandedpair[0], typeIIsenzyme)
 	bottomstrands, bottomstickyends5, bottomstickyends3 := TypeIIsdigest(Doublestrandedpair[1], typeIIsenzyme)
 	if len(topstrands) == len(bottomstrands) {
@@ -240,7 +240,7 @@ func Digest(sequence wtype.DNASequence, typeIIenzyme wtype.LogicalRestrictionEnz
 		/*for _, lookup := range ...
 		add code to lookup isoschizers from rebase
 		*/
-		var typeIIsenz = TypeIIs{typeIIenzyme, typeIIenzyme.Name, isoschizomers, typeIIenzyme.Topstrand3primedistancefromend, typeIIenzyme.Bottomstrand5primedistancefromend}
+		var typeIIsenz = wtype.TypeIIs{typeIIenzyme, typeIIenzyme.Name, isoschizomers, typeIIenzyme.Topstrand3primedistancefromend, typeIIenzyme.Bottomstrand5primedistancefromend}
 
 		Finalfragments, Stickyends_5prime, Stickyends_3prime = TypeIIsdigest(sequence, typeIIsenz)
 	}
@@ -592,7 +592,7 @@ func TypeIIDigest(sequence wtype.DNASequence, typeIIenzyme wtype.LogicalRestrict
 
 // A function is called by the first word (note the capital letter!); it takes in the input variables in the first parenthesis and returns the contents of the second parenthesis
 // currently this doesn't work well for plasmids which are cut on reverse strand or cut twice
-func TypeIIsdigest(sequence wtype.DNASequence, typeIIsenzyme TypeIIs) (Finalfragments []string, Stickyends_5prime []string, Stickyends_3prime []string) {
+func TypeIIsdigest(sequence wtype.DNASequence, typeIIsenzyme wtype.TypeIIs) (Finalfragments []string, Stickyends_5prime []string, Stickyends_3prime []string) {
 	if typeIIsenzyme.Class != "TypeIIs" {
 		return Finalfragments, Stickyends_5prime, Stickyends_3prime
 	}
@@ -757,7 +757,7 @@ func Digestionsimulator(assemblyparameters Assemblyparameters) (digestedfragemen
 	return digestedfragementarray
 }
 
-func EndReport(restrictionenzyme TypeIIs, vectordata wtype.DNASequence, parts []wtype.DNASequence) (endreport string) {
+func EndReport(restrictionenzyme wtype.TypeIIs, vectordata wtype.DNASequence, parts []wtype.DNASequence) (endreport string) {
 	_, stickyends5, stickyends3 := TypeIIsdigest(vectordata, restrictionenzyme)
 
 	allends := make([]string, 0)

@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/REBASE"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -16,10 +16,6 @@ import (
 	"strings"
 	"sync"
 )
-
-//"github.com/mgutz/ansi"
-
-//"log"
 
 // Input parameters for this protocol (data)
 
@@ -66,21 +62,20 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 
 		if strings.Contains(part, "BBa_") == true {
 
-			/*err := igem.UpdateRegistryfile()
-			if err != nil {
-				log.Panic(err)
-			}*/
-
 			partDNA.Nm = part
-			partDNA.Seq = igem.GetSequence(part)
+			partproperties := igem.LookUp([]string{part})
+			partDNA.Seq = partproperties.Sequence(part)
+			//partDNA.Seq = igem.GetSequence(part)
 
 			/* We can add logic to check the status of parts too and return a warning if the part
-			   is not characeterised */
+			   is not characterised */
 
-			if strings.Contains(igem.GetResults(part), "Works") != true {
+			if strings.Contains(partproperties.Results(part), "Works") != true {
 
 				warnings = make([]string, 0)
-				warning := fmt.Sprintln("iGem part", part, "results =", igem.GetResults(part), "rating", igem.GetRating(part), "part type", igem.GetType(part), "part decription =", igem.GetDescription(part), "Categories", igem.GetCategories(part))
+				//		warning := fmt.Sprintln("iGem part", part, "results =",  igem.GetResults(part), "rating",igem.GetRating(part), "part type",igem.GetType(part), "part decription =", igem.GetDescription(part), "Categories",igem.GetCategories(part))
+				warning := fmt.Sprintln("iGem part", part, "results =", partproperties.Results(part), "rating", partproperties.Rating(part), "part type", partproperties.Type(part), "part decription =", partproperties.Description(part), "Categories", partproperties.Categories(part))
+
 				warnings = append(warnings, warning)
 
 			}
@@ -102,8 +97,8 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 
 	// this can be slow if there are many parts to check (~2 seconds per block of 14 parts)
 	for _, subpart := range subparts {
-		if strings.Contains(igem.GetDescriptionfromSubset(subpart, partdetails), "RED") &&
-			strings.Contains(igem.GetResultsfromSubset(subpart, partdetails), "WORKS") {
+		if strings.Contains(partdetails.Description(subpart), "RED") &&
+			strings.Contains(partdetails.Results(subpart), "WORKS") {
 			r.BackupParts = append(r.BackupParts, subpart)
 
 		}
@@ -132,7 +127,7 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 	// first lookup enzyme properties
 	enzlist := make([]wtype.LogicalRestrictionEnzyme, 0)
 	for _, site := range p.RestrictionsitetoAvoid {
-		enzsite := rebase.EnzymeLookup(site)
+		enzsite := lookup.EnzymeLookup(site)
 		enzlist = append(enzlist, enzsite)
 	}
 	othersitesfound := enzymes.Restrictionsitefinder(newDNASequence, enzlist)
@@ -142,7 +137,7 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 	}
 
 	// Now let's find out the size of fragments we would get if digested with a common site cutter
-	tspEI := rebase.EnzymeLookup("TspEI")
+	tspEI := lookup.EnzymeLookup("TspEI")
 
 	Testdigestionsizes := enzymes.RestrictionMapper(newDNASequence, tspEI)
 
@@ -177,7 +172,7 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 		r.Status = fmt.Sprintln(
 			"Warnings:", r.Warnings,
 			"Simulationpass=", r.Simulationpass,
-			"Back up parts found (which work)", r.BackupParts,
+			"Back up parts found (Reported to work!)", r.BackupParts,
 			"NewDNASequence", r.NewDNASequence,
 			//"partonewithoverhangs", partonewithoverhangs,
 			//"Vector",vectordata,
