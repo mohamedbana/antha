@@ -558,7 +558,7 @@ func PartPropertiesChan(parts []string) chan Rsbpml {
 }
 */
 
-func PartProperties(parts []string) (parsedxml Rsbpml) {
+func LookUp(parts []string) (parsedxml Rsbpml) {
 	fmt.Println("number of parts to find in registry", len(parts))
 	if len(parts) > 14 {
 
@@ -619,6 +619,78 @@ func PartProperties(parts []string) (parsedxml Rsbpml) {
 }
 
 // Add Get funcs to get data from Rsbpml? Would be much faster
+
+func (parsedxml *Rsbpml) Sequence(partname string) (sequence string) {
+
+	for _, part := range parsedxml.Partlist[0].Parts {
+		if part.Part_name == partname {
+			sequence = part.Sequencelist[0].Seq_data
+		}
+	}
+
+	sequence = strings.ToUpper(sequence)
+	return
+}
+
+func (parsedxml *Rsbpml) Type(partname string) (result string) {
+
+	for _, part := range parsedxml.Partlist[0].Parts {
+		if part.Part_name == partname {
+			result = part.Part_type
+		}
+	}
+
+	result = strings.ToUpper(result)
+	return
+}
+
+func (parsedxml *Rsbpml) Categories(partname string) (result Categories) {
+
+	for _, part := range parsedxml.Partlist[0].Parts {
+		if part.Part_name == partname {
+			result = part.Categories
+		}
+	}
+
+	//result = strings.ToUpper(result)
+	return
+}
+
+func (parsedxml *Rsbpml) Results(partname string) (result string) {
+
+	for _, part := range parsedxml.Partlist[0].Parts {
+		if part.Part_name == partname {
+			result = part.Part_results
+		}
+	}
+
+	result = strings.ToUpper(result)
+	return
+}
+
+func (parsedxml *Rsbpml) Rating(partname string) (result string) {
+
+	for _, part := range parsedxml.Partlist[0].Parts {
+		if part.Part_name == partname {
+			result = part.Part_rating
+		}
+	}
+
+	result = strings.ToUpper(result)
+	return
+}
+
+func (parsedxml *Rsbpml) Description(partname string) (result string) {
+
+	for _, part := range parsedxml.Partlist[0].Parts {
+		if part.Part_name == partname {
+			result = part.Part_short_desc
+		}
+	}
+
+	result = strings.ToUpper(result)
+	return
+}
 
 func GetSequence(partname string) (sequence string) {
 

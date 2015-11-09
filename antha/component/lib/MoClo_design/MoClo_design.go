@@ -69,15 +69,19 @@ func (e *MoClo_design) steps(p MoClo_designParamBlock, r *MoClo_designResultBloc
 		if strings.Contains(part, "BBa_") == true {
 
 			partDNA.Nm = part
-			partDNA.Seq = igem.GetSequence(part)
+			partproperties := igem.LookUp([]string{part})
+			partDNA.Seq = partproperties.Sequence(part)
+			//partDNA.Seq = igem.GetSequence(part)
 
 			/* We can add logic to check the status of parts too and return a warning if the part
 			   is not characterised */
 
-			if strings.Contains(igem.GetResults(part), "Works") != true {
+			if strings.Contains(partproperties.Results(part), "Works") != true {
 
 				warnings = make([]string, 0)
-				warning := fmt.Sprintln("iGem part", part, "results =", igem.GetResults(part), "rating", igem.GetRating(part), "part type", igem.GetType(part), "part decription =", igem.GetDescription(part), "Categories", igem.GetCategories(part))
+				//		warning := fmt.Sprintln("iGem part", part, "results =",  igem.GetResults(part), "rating",igem.GetRating(part), "part type",igem.GetType(part), "part decription =", igem.GetDescription(part), "Categories",igem.GetCategories(part))
+				warning := fmt.Sprintln("iGem part", part, "results =", partproperties.Results(part), "rating", partproperties.Rating(part), "part type", partproperties.Type(part), "part decription =", partproperties.Description(part), "Categories", partproperties.Categories(part))
+
 				warnings = append(warnings, warning)
 
 			}
@@ -87,7 +91,7 @@ func (e *MoClo_design) steps(p MoClo_designParamBlock, r *MoClo_designResultBloc
 		}
 
 		if partDNA.Seq == "" || partDNA.Nm == "" {
-			r.Status = fmt.Sprintln("part not found in Inventory so element aborted!")
+			r.Status = text.Print("part: "+partDNA.Nm, partDNA.Seq+": not found in Inventory so element aborted!")
 		}
 		partsinorder = append(partsinorder, partDNA)
 	}

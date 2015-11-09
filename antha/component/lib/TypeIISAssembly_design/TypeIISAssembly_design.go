@@ -97,7 +97,7 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 
 	// or Look up parts from registry according to properties (this will take a couple of minutes the first time)
 	subparts := igem.FilterRegistry([]string{"Fluorescent", "A "})
-	partdetails := igem.PartProperties(subparts)
+	partdetails := igem.LookUp(subparts)
 	//fmt.Println(partdetails)
 
 	// this can be slow if there are many parts to check (~2 seconds per block of 14 parts)
