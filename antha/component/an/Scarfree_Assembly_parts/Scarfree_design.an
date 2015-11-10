@@ -152,7 +152,7 @@ Steps {
 		text.Print("Endreport after digestion: ",endreport),
 		text.Print("Sites per part for " + Enzyme, sites),
 		text.Print("Positions: ", multiple),
-		text.Print("Warnings:", Warnings),
+		text.Print("Warnings:", Warnings.Error()),
 		text.Print("Simulationpass=", Simulationpass),
 		text.Print("NewDNASequence: ",NewDNASequence),
 		partstoorder,

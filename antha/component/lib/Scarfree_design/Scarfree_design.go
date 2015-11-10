@@ -148,7 +148,7 @@ func (e *Scarfree_design) steps(p Scarfree_designParamBlock, r *Scarfree_designR
 			text.Print("Endreport after digestion: ", endreport),
 			text.Print("Sites per part for "+p.Enzyme, sites),
 			text.Print("Positions: ", multiple),
-			text.Print("Warnings:", r.Warnings),
+			text.Print("Warnings:", r.Warnings.Error()),
 			text.Print("Simulationpass=", r.Simulationpass),
 			text.Print("NewDNASequence: ", r.NewDNASequence),
 			partstoorder,

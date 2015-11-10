@@ -1,0 +1,120 @@
+protocol FindPartsthat
+
+import (
+	//"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"fmt"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+//	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
+	"strings"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
+)
+
+// Input parameters for this protocol (data)
+Parameters (
+	//Constructname 				string
+	Parttypes			[]string // e.g. promoter
+	Partdescriptions	[]string  // e.g. arsenic, reporter, alkane, logic gate
+	Parts [][]string
+	//RestrictionsitetoAvoid		[]string
+)
+
+// Physical Inputs to this protocol with types
+Inputs (
+
+)
+
+// Physical outputs from this protocol with types
+Outputs (
+	
+)
+
+// Data which is returned from this protocol, and data types
+Data (
+	Warnings error
+	Status string
+	//Partsfound	[]wtype.DNASequence // map[string]wtype.DNASequence
+	FulllistBackupParts [][]string //map[string][]string
+)
+// Input Requirement specification
+Requirements {
+	
+}
+
+// Conditions to run on startup
+Setup {}
+
+// The core process for this protocol, with the steps to be performed
+// for every input
+Steps {
+	//var msg string
+	// set warnings reported back to user to none initially
+//	warnings := make([]string,0)
+	BackupParts := make([]string,0)
+	status := ""
+	joinedstatus := make([]string,0)
+	// Look up parts from registry according to properties (this will take a couple of minutes the first time)
+	
+	parts := make([][]string,0)
+	subparts := make([]string,0)
+	
+	
+	// first we'll parse the igem registry based on the short description contained in the fasta header for each part sequence
+	for _, desc := range Parttypes {
+	subparts = igem.FilterRegistry([]string{desc, "A "})
+	status = text.Print(desc + " :",subparts)
+	joinedstatus = append(joinedstatus, status)
+	parts = append(parts,subparts)
+	}
+	 
+	
+	
+	for i,subparts := range parts {
+	
+	partdetails := igem.LookUp(subparts)
+	// now we can get detailed information of all of those records to interrogate further
+	// this can be slow if there are many parts to check (~2 seconds per block of 14 parts)
+	for _, subpart := range subparts {
+		
+		if strings.Contains(partdetails.Description(subpart), Partdescriptions[i]) &&
+			strings.Contains(partdetails.Results(subpart), "WORKS") {
+			BackupParts = append(BackupParts, subpart)
+
+		}
+		FulllistBackupParts = append(FulllistBackupParts,BackupParts)
+	}
+	}
+	/*
+	if len(warnings) != 0 {
+	Warnings = fmt.Errorf(strings.Join(warnings,";"))
+	}else{Warnings = nil}
+	*/
+	
+	
+	FulllistBackupParts = parts
+	Status = strings.Join(joinedstatus," ; ")
+	
+	
+	// Print status
+	if Status != "all parts available"{
+		Status = fmt.Sprintln(Status)
+	} else {Status = fmt.Sprintln(
+		"Warnings:", Warnings.Error(),
+		"Back up parts found (Reported to work!)", Parts,
+		"Back up parts found (Reported to work!)", FulllistBackupParts,
+		)
+		}
+	
+}
+
+// Run after controls and a steps block are completed to
+// post process any data and provide downstream results
+Analysis {
+}
+
+// A block of tests to perform to validate that the sample was processed correctly
+// Optionally, destructive tests can be performed to validate results on a
+// dipstick basis
+Validation {
+}
