@@ -23,6 +23,7 @@
 package enzymes
 
 import (
+	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -73,7 +74,27 @@ func SitepositionString(sitesperpart Restrictionsites) (sitepositions string) {
 	for _, site := range sitesperpart.Reversepositions {
 		Num = append(Num, strconv.Itoa(site))
 	}
+
+	sort.Strings(Num)
 	sitepositions = strings.Join(Num, ", ")
+	return
+}
+
+func Sitepositions(sitesperpart Restrictionsites) (sitepositions []int) {
+	Num := make([]int, 0)
+
+	for _, site := range sitesperpart.Forwardpositions {
+		Num = append(Num, site)
+	}
+	for _, site := range sitesperpart.Reversepositions {
+		if BinarySearch(Num, site) == false {
+			Num = append(Num, site)
+			break
+		}
+	}
+
+	sitepositions = Num
+	sort.Ints(Num)
 	return
 }
 

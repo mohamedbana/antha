@@ -30,7 +30,7 @@ import (
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	//"/data"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	//"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"io"
 	"io/ioutil"
@@ -331,7 +331,7 @@ func CountPartsinRegistryContaining(keystrings []string) (numberofparts int) {
 		seqtype := "DNA"
 		class := "not specified"*/
 
-		if enzymes.Containsallthings(record.Desc, keystrings) {
+		if search.Containsallthings(record.Desc, keystrings) {
 			numberofparts = numberofparts + 1
 		}
 		/*	if strings.Contains(record.Desc, "Amino acid") || strings.Contains(record.Id, "aa") {
@@ -406,7 +406,7 @@ func FilterRegistry(keystrings []string) (listofpartIDs []string) {
 		seqtype := "DNA"
 		class := "not specified"*/
 
-		if enzymes.Containsallthings(record.Desc, keystrings) && record.Seq_data != "" {
+		if search.Containsallthings(record.Desc, keystrings) && record.Seq_data != "" {
 			fmt.Println(record.Part_name)
 			listofpartIDs = append(listofpartIDs, record.Part_name)
 		}

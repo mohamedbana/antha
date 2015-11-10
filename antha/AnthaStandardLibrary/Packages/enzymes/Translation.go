@@ -307,6 +307,18 @@ func FindDirectionalORF(seq string, reverse bool) (orf ORF, orftrue bool) {
 	return orf, orftrue
 }
 
+func Translate(dna wtype.DNASequence) (aa wtype.ProteinSequence, err error) {
+	orf, orftrue := FindORF(dna.Seq)
+	if orftrue == false {
+		err = fmt.Errorf("Cannot translate this! no open reading frame detected")
+		return
+	} else {
+		aa.Nm = dna.Nm + "Translated"
+		aa.Seq = orf.ProtSeq
+	}
+	return
+}
+
 func FindORF(seq string) (orf ORF, orftrue bool) { // finds an orf in the forward direction only
 
 	orftrue = false

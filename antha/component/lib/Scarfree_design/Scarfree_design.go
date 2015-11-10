@@ -72,7 +72,7 @@ func (e *Scarfree_design) steps(p Scarfree_designParamBlock, r *Scarfree_designR
 	//lookup restriction enzyme
 	restrictionenzyme, err := lookup.TypeIIsLookup(p.Enzyme)
 	if err != nil {
-		text.Print("Error", err.Error())
+		warnings = append(warnings, text.Print("Error", err.Error()))
 	}
 
 	//  Add overhangs for scarfree assembly based on part seqeunces only, i.e. no Assembly standard

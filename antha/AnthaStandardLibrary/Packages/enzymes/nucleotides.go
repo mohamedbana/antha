@@ -24,6 +24,7 @@ package enzymes
 
 import (
 	"fmt"
+	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"

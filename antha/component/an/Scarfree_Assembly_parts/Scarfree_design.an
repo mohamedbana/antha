@@ -73,7 +73,7 @@ Steps {
 	//lookup restriction enzyme
 	restrictionenzyme,err := lookup.TypeIIsLookup(Enzyme) 
 	if err != nil {
-		text.Print("Error", err.Error())
+		warnings = append(warnings,text.Print("Error", err.Error()))
 	}
 		
 	//  Add overhangs for scarfree assembly based on part seqeunces only, i.e. no Assembly standard
