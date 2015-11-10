@@ -38,6 +38,7 @@ Data (
 	PartswithOverhangs []wtype.DNASequence // parts to order
 	NewDNASequence wtype.DNASequence // desired sequence to end up with after assembly
 	EnzymeUsed wtype.LogicalRestrictionEnzyme
+	BackupEnzymes []string
 )
 // Input Requirement specification
 Requirements {
@@ -52,6 +53,9 @@ Setup {}
 Steps {
 	//var msg string
 	// set warnings reported back to user to none initially
+	
+	
+	
 	warnings := make([]string,0)
 	sitefound := false
 	Enzyme := "No enzymes which passed with these sequences"
@@ -67,6 +71,30 @@ Steps {
 		
 	partsinorder = append(partsinorder,partDNA)
 	}
+	// Find all possible typeIIs enzymes we could use for these sequences (i.e. non cutters of all parts)
+	possibilities := lookup.FindEnzymeNamesofClass("TypeIIs")
+	var backupoption string
+	for _, possibility := range possibilities {
+				// check number of sites per part !
+	enz := lookup.EnzymeLookup(possibility)
+	
+	for _,part := range partsinorder {
+	
+	info := enzymes.Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+	if len(info) != 0 {
+	if info[0].Sitefound == true {
+		sitefound = true
+		break
+	}
+	}
+	}
+	if sitefound == false {
+			backupoption = possibility
+			BackupEnzymes = append(BackupEnzymes,backupoption)
+		}
+	}
+	
+	sitefound = false
 	for _,Enzyme := range ApprovedEnzymes {
 	
 			// check number of sites per part !
@@ -181,12 +209,15 @@ Steps {
 	}
 	// Print status
 	if Status != "all parts available"{
-		Status = fmt.Sprintln(Status)
+		Status = fmt.Sprintln(Status,
+		text.Print("Backup Enzymes: ", BackupEnzymes))
 	} else if sitefound == true {
-			Status = fmt.Sprintln(text.Print("No! Enzyme found", ApprovedEnzymes))
+			Status = fmt.Sprintln(text.Print("No! Enzyme found", ApprovedEnzymes),
+			text.Print("Backup Enzymes: ", BackupEnzymes))
 		
 	}else{
-	Status = fmt.Sprintln(Status)
+	Status = fmt.Sprintln(Status,
+	text.Print("Backup Enzymes: ", BackupEnzymes))
 	
 	}
 	

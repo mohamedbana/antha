@@ -72,7 +72,7 @@ func (e *BlastSearch) steps(p BlastSearchParamBlock, r *BlastSearchResultBlock) 
 	// look for orfs
 	orf, orftrue := enzymes.FindORF(r.AnthaSeq.Seq)
 
-	if orftrue == true {
+	if orftrue == true && len(orf.DNASeq) == len(r.AnthaSeq.Seq) {
 		// if open reading frame is detected, we'll perform a blastP search'
 		fmt.Println("ORF detected:", "full sequence length: ", len(r.AnthaSeq.Seq), "ORF length: ", len(orf.DNASeq))
 		hits, err = blast.MegaBlastP(orf.ProtSeq)
