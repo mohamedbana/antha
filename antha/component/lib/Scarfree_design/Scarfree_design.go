@@ -72,7 +72,7 @@ func (e *Scarfree_design) steps(p Scarfree_designParamBlock, r *Scarfree_designR
 	//lookup restriction enzyme
 	restrictionenzyme, err := lookup.TypeIIsLookup(p.Enzyme)
 	if err != nil {
-		text.Print("Error", err.Error())
+		warnings = append(warnings, text.Print("Error", err.Error()))
 	}
 
 	//  Add overhangs for scarfree assembly based on part seqeunces only, i.e. no Assembly standard
@@ -130,7 +130,7 @@ func (e *Scarfree_design) steps(p Scarfree_designParamBlock, r *Scarfree_designR
 	if len(warnings) == 0 {
 		warnings = append(warnings, "none")
 	}
-	r.Warnings = strings.Join(warnings, ";")
+	r.Warnings = fmt.Errorf(strings.Join(warnings, ";"))
 
 	partsummary := make([]string, 0)
 	for _, part := range r.PartswithOverhangs {
@@ -398,7 +398,7 @@ type Scarfree_designResultBlock struct {
 	PartswithOverhangs []wtype.DNASequence
 	Simulationpass     bool
 	Status             string
-	Warnings           string
+	Warnings           error
 }
 
 type Scarfree_designJSONBlock struct {
@@ -413,7 +413,7 @@ type Scarfree_designJSONBlock struct {
 	PartswithOverhangs *[]wtype.DNASequence
 	Simulationpass     *bool
 	Status             *string
-	Warnings           *string
+	Warnings           *error
 }
 
 func (c *Scarfree_design) ComponentInfo() *execute.ComponentInfo {
@@ -427,7 +427,7 @@ func (c *Scarfree_design) ComponentInfo() *execute.ComponentInfo {
 	outp = append(outp, *execute.NewPortInfo("PartswithOverhangs", "[]wtype.DNASequence", "PartswithOverhangs", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("Simulationpass", "bool", "Simulationpass", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("Status", "string", "Status", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Warnings", "string", "Warnings", true, true, nil, nil))
+	outp = append(outp, *execute.NewPortInfo("Warnings", "error", "Warnings", true, true, nil, nil))
 
 	ci := execute.NewComponentInfo("Scarfree_design", "Scarfree_design", "", false, inp, outp)
 

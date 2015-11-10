@@ -32,7 +32,7 @@ Outputs (
 
 // Data which is returned from this protocol, and data types
 Data (
-	Warnings string
+	Warnings error
 	Status string
 	Simulationpass bool
 	PartswithOverhangs []wtype.DNASequence // parts to order
@@ -73,7 +73,7 @@ Steps {
 	//lookup restriction enzyme
 	restrictionenzyme,err := lookup.TypeIIsLookup(Enzyme) 
 	if err != nil {
-		text.Print("Error", err.Error())
+		warnings = append(warnings,text.Print("Error", err.Error()))
 	}
 		
 	//  Add overhangs for scarfree assembly based on part seqeunces only, i.e. no Assembly standard
@@ -133,7 +133,7 @@ Steps {
 	if len(warnings) == 0 {
 		warnings = append(warnings,"none")
 	}
-	Warnings = strings.Join(warnings,";")
+	Warnings = fmt.Errorf(strings.Join(warnings,";"))
 	
 	partsummary := make([]string,0)
 	for _, part:= range PartswithOverhangs {
