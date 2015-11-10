@@ -12,7 +12,7 @@ import (
 	//"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"encoding/json"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Pubchem"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/flow"
@@ -64,9 +64,9 @@ func (e *Datacrunch) steps(p DatacrunchParamBlock, r *DatacrunchResultBlock) {
 	substrate_mw := pubchem.MakeMolecule(p.Substrate_name)
 
 	// calculate moles
-	submoles := enzymes.Moles(p.SubstrateConc, substrate_mw.MolecularWeight, p.SubstrateVol)
+	submoles := sequences.Moles(p.SubstrateConc, substrate_mw.MolecularWeight, p.SubstrateVol)
 	// calculate molar concentration
-	submolarconc := enzymes.GtoMolarConc(p.SubstrateConc, substrate_mw.MolecularWeight)
+	submolarconc := sequences.GtoMolarConc(p.SubstrateConc, substrate_mw.MolecularWeight)
 
 	// make a new amount
 	s = wunit.NewAmount(submolarconc, "M")
@@ -76,8 +76,8 @@ func (e *Datacrunch) steps(p DatacrunchParamBlock, r *DatacrunchResultBlock) {
 
 	// Now working out Molarity of Substrate from DNA Sequence
 	// calculate molar concentration
-	dna_mw := enzymes.MassDNA(p.DNA_seq, false, false)
-	dnamolarconc := enzymes.GtoMolarConc(p.DNAConc, dna_mw)
+	dna_mw := sequences.MassDNA(p.DNA_seq, false, false)
+	dnamolarconc := sequences.GtoMolarConc(p.DNAConc, dna_mw)
 
 	// make a new amount
 	s = wunit.NewAmount(dnamolarconc, "M")
@@ -88,16 +88,16 @@ func (e *Datacrunch) steps(p DatacrunchParamBlock, r *DatacrunchResultBlock) {
 	// Now working out Molarity of Substrate from Protein product of dna Sequence
 
 	// translate
-	orf, orftrue := enzymes.FindORF(p.DNA_seq)
+	orf, orftrue := sequences.FindORF(p.DNA_seq)
 	var protein_mw float64
 	if orftrue == true {
-		protein_mw_kDA := enzymes.Molecularweight(orf)
+		protein_mw_kDA := sequences.Molecularweight(orf)
 		protein_mw = protein_mw_kDA * 1000
 		r.Orftrue = orftrue
 	}
 
 	// calculate molar concentration
-	proteinmolarconc := enzymes.GtoMolarConc(p.ProteinConc, protein_mw)
+	proteinmolarconc := sequences.GtoMolarConc(p.ProteinConc, protein_mw)
 
 	// make a new amount
 	s = wunit.NewAmount(submolarconc, "M")

@@ -5,7 +5,7 @@ package BlastSearch
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/blast"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -70,7 +70,7 @@ func (e *BlastSearch) steps(p BlastSearchParamBlock, r *BlastSearchResultBlock) 
 	r.AnthaSeq = wtype.MakeLinearDNASequence(p.Name, p.DNA)
 
 	// look for orfs
-	orf, orftrue := enzymes.FindORF(r.AnthaSeq.Seq)
+	orf, orftrue := sequences.FindORF(r.AnthaSeq.Seq)
 
 	if orftrue == true {
 		// if open reading frame is detected, we'll perform a blastP search'

@@ -5,7 +5,7 @@ protocol BlastSearch
 import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/blast"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	biogo "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	
@@ -71,7 +71,7 @@ Steps {
 	AnthaSeq = wtype.MakeLinearDNASequence(Name, DNA)
 	
 	// look for orfs
-	orf, orftrue := enzymes.FindORF(AnthaSeq.Seq)
+	orf, orftrue := sequences.FindORF(AnthaSeq.Seq)
 	
 	if orftrue == true {
 		// if open reading frame is detected, we'll perform a blastP search'

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -66,8 +67,8 @@ func (e *TypeIISConstructAssembly_sim) steps(p TypeIISConstructAssembly_simParam
 	molesofeachdnaelement := make([]float64, 0)
 	molarratios := make([]float64, 0)
 
-	vector_mw := enzymes.MassDNA(vectordata.Seq, false, true)
-	vector_moles := enzymes.Moles(p.VectorConcentration, vector_mw, p.VectorVol)
+	vector_mw := sequences.MassDNA(vectordata.Seq, false, true)
+	vector_moles := sequences.Moles(p.VectorConcentration, vector_mw, p.VectorVol)
 	molesofeachdnaelement = append(molesofeachdnaelement, vector_moles)
 
 	molarratios = append(molarratios, (vector_moles / vector_moles))
@@ -76,8 +77,8 @@ func (e *TypeIISConstructAssembly_sim) steps(p TypeIISConstructAssembly_simParam
 	var part_moles float64
 	for i := 0; i < len(p.Partsinorder); i++ {
 
-		part_mw = enzymes.MassDNA(partsinorder[i].Seq, false, true)
-		part_moles = enzymes.Moles(p.PartConcs[i], part_mw, p.PartVols[i])
+		part_mw = sequences.MassDNA(partsinorder[i].Seq, false, true)
+		part_moles = sequences.Moles(p.PartConcs[i], part_mw, p.PartVols[i])
 
 		molesofeachdnaelement = append(molesofeachdnaelement, part_moles)
 		molarratios = append(molarratios, (part_moles / vector_moles))
