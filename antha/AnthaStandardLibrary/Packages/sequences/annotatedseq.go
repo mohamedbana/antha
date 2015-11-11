@@ -25,6 +25,7 @@ package sequences
 import (
 	"fmt"
 	//. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"strings"
 )
 
@@ -51,7 +52,7 @@ type Feature struct {
 
 type AnnotatedSeq struct {
 	Nm       string
-	Seq      string
+	Seq      wtype.DNASequence
 	features []Feature
 }
 
@@ -92,17 +93,40 @@ func MakeFeature(name string, seq string, sequencetype string, class string, rev
 	return feature
 }
 
+func MakeAnnotatedSeq(name string, seq string, circular bool, features []Feature) (annotated AnnotatedSeq, err error) {
+	annotated.Nm = name
+	annotated.Seq.Nm = name
+	annotated.Seq.Seq = seq
+	annotated.Seq.Plasmid = circular
+
+	for _, feature := range features {
+		if strings.Contains(seq, feature.DNASeq) {
+			feature.StartPosition = strings.Index(seq, feature.DNASeq)
+			feature.EndPosition = feature.EndPosition + feature.StartPosition
+		} else if strings.Contains(seq, RevComp(feature.DNASeq)) {
+			feature.StartPosition = strings.Index(seq, feature.DNASeq)
+			feature.EndPosition = feature.EndPosition + feature.StartPosition
+			err = fmt.Errorf(feature.Name, " Feature only found in reverse direction")
+		} else {
+			err = fmt.Errorf(feature.Name, " not found in sequence")
+		}
+	}
+	annotated.features = features
+	return
+}
+
 func ConcatenateFeatures(name string, featuresinorder []Feature) (annotated AnnotatedSeq) {
 
 	annotated.Nm = name
-	annotated.Seq = featuresinorder[0].DNASeq
+	annotated.Seq.Nm = name
+	annotated.Seq.Seq = featuresinorder[0].DNASeq
 	annotated.features = make([]Feature, 0)
 	annotated.features = append(annotated.features, featuresinorder[0])
 	for i := 1; i < len(featuresinorder); i++ {
 		nextfeature := featuresinorder[i]
 		nextfeature.StartPosition = nextfeature.StartPosition + annotated.features[i-1].EndPosition
 		nextfeature.EndPosition = nextfeature.EndPosition + annotated.features[i-1].EndPosition
-		annotated.Seq = annotated.Seq + featuresinorder[i].DNASeq
+		annotated.Seq.Seq = annotated.Seq.Seq + featuresinorder[i].DNASeq
 		annotated.features = append(annotated.features, nextfeature)
 	}
 	return annotated
