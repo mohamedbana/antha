@@ -5,6 +5,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 )
 
@@ -96,8 +97,8 @@ Steps {
 	molesofeachdnaelement := make ([]float64,0)
 		molarratios := make ([]float64,0)
 
-		vector_mw := enzymes.MassDNA(vectordata.Seq,false,true)
-		vector_moles := enzymes.Moles(VectorConcentration,vector_mw,VectorVol)
+		vector_mw := sequences.MassDNA(vectordata.Seq,false,true)
+		vector_moles := sequences.Moles(VectorConcentration,vector_mw,VectorVol)
 		molesofeachdnaelement = append(molesofeachdnaelement,vector_moles)
 		
 		molarratios = append(molarratios,(vector_moles/vector_moles))
@@ -106,8 +107,8 @@ Steps {
 		var part_moles float64
 	for i := 0; i < len(Partsinorder);i++ {
        
-		part_mw = enzymes.MassDNA(partsinorder[i].Seq,false,true)
-		part_moles = enzymes.Moles(PartConcs[i],part_mw,PartVols[i])
+		part_mw = sequences.MassDNA(partsinorder[i].Seq,false,true)
+		part_moles = sequences.Moles(PartConcs[i],part_mw,PartVols[i])
                
 		molesofeachdnaelement = append(molesofeachdnaelement,part_moles)
 		molarratios = append(molarratios,(part_moles/vector_moles))

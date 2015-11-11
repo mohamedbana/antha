@@ -39,7 +39,6 @@ import (
 	"os"
 	"strings"
 	//"time"
-	//"github.com/mgutz/ansi"
 	"path/filepath"
 )
 
@@ -109,62 +108,13 @@ func MakeXMLURL(partnames []string) (Urlstring string) {
 func SlurpOutput(Urlstring string) (output []byte) {
 	fmt.Println("Slurping...", Urlstring)
 
-	//var res *io.Reader
-
 	res, err := http.Get(Urlstring)
 	if err != nil {
 		log.Fatal(err)
 	}
-	//fmt.Println("step 1")
 
-	/*reader := bufio.NewReader(res.Body)
-
-	//_, err = io.ReadFull(reader, output)
-
-	output, err = reader.Peek(int(res.ContentLength)) returns negative count!
-
-	fmt.Println("hello")
-	fmt.Println(string(output))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	/*for{
-
-	}
-	*/
-
-	//you should stream the resp.Body to disk by creating a file using os.Create() and io.Copy(file, resp.Body)
-	//if _, err := os.Stat("Registry.fasta"); err != nil {
-	//	if os.IsNotExist(err) {
-	//		fmt.Printf("downloading registry.fasta")
-	//f, _ := os.Create("temp.tmp")
-
-	//err := ioutil.WriteFile("temp.tmp", res.Body, 0777)
-	//fmt.Println("step 2")
-	//_, _ = io.Copy(f, res.Body)
-	//fmt.Println("step 3")
-	//		return
-	//	}
-	//}
-
-	//fmt.Println("step 4")
-	//output, err = ioutil.ReadFile("temp.tmp") // this is a very fast step!
-
-	/*body := make([]byte, int64(res.ContentLength))
-	b := bytes.NewBuffer(body)
-	fmt.Println("step 2")
-	_, err = b.ReadFrom(res.Body)
-	fmt.Println("step 3")
-	output = b.Bytes()*/
 	output, err = ioutil.ReadAll(res.Body) // this is a slow step!
-	//fmt.Println("step 5")
 
-	//res.Body.Close()
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//fmt.Println(Urlstring, "=", string(output))
 	return output
 }
 
@@ -176,23 +126,11 @@ func UpdateRegistryfile() (err error) {
 	}
 	fmt.Println("step 1: creating registry file")
 
-	/*for{
-
-	}
-	*/
-
-	//you should stream the resp.Body to disk by creating a file using os.Create() and io.Copy(file, resp.Body)
-	//if _, err := os.Stat("Registry.fasta"); err != nil {
-	//	if os.IsNotExist(err) {
-	//		fmt.Printf("downloading registry.fasta")
 	anthapath.CreatedotAnthafolder()
 	f, _ := os.Create(filepath.Join(anthapath.Dirpath(), "iGem_registry.txt"))
 	fmt.Println("step 2: copying registry... This could take a few minutes, don't go anywhere")
 	_, err = io.Copy(f, res.Body) // takes just as long as ioutil.Readall()
 	fmt.Println("step 3")
-	//		return
-	//	}
-	//}
 
 	fmt.Println("step 4")
 
@@ -371,25 +309,6 @@ func FilterRegistry(keystrings []string) (listofpartIDs []string) {
 		fmt.Println("error:", err)
 	}
 
-	/*f, _ := filepath.Abs("$GOPATH/src/github.com/antha-lang/antha/antha/AnthaStandardLibrary/Localdata")
-	fmt.Println(f)
-
-	err := os.Chdir("$GOPATH/src/github.com/antha-lang/antha/antha/AnthaStandardLibrary/Localdata")
-	if err != nil {
-		fmt.Println("error:", err)
-	}
-	*/
-	//allparts, err := ioutil.ReadFile("iGem_registry.txt")
-	/*if err != nil {
-		fmt.Println("error:", err)
-	}
-
-	//err = os.Chdir("cd -")
-
-	if err != nil {
-		fmt.Println("error:", err)
-	}
-	*/
 	fmt.Println("slurped registry")
 	fastaFh := bytes.NewReader(allparts)
 
@@ -469,15 +388,14 @@ func Partpropertiesmini(parts []string) (parsedxml Rsbpml) {
 }
 
 /*
-
 func PartPropertiesChan(parts []string) chan Rsbpml {
 
 	outputChannel := make(chan Fasta)
 
 	fmt.Println("len(parts =", len(parts))
-	if len(parts) > 10 {
+	if len(parts) > 14 {
 
-		partslice := parts[0:10]
+		partslice := parts[0:14]
 		fmt.Println("len(partslice) =", len(partslice))
 
 		go func() {

@@ -20,11 +20,11 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
-package enzymes
+package sequences
 
 import (
 	"fmt"
-	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	//. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"strings"
 )

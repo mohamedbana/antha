@@ -10,7 +10,7 @@ import (
 	"fmt"
 	//"math"
 	//"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Pubchem"
 )
 // Input parameters for this protocol
@@ -77,9 +77,9 @@ Steps {
 	substrate_mw := pubchem.MakeMolecule(Substrate_name)
 	
 	// calculate moles
-	submoles := enzymes.Moles(SubstrateConc, substrate_mw.MolecularWeight, SubstrateVol)
+	submoles := sequences.Moles(SubstrateConc, substrate_mw.MolecularWeight, SubstrateVol)
 	// calculate molar concentration
-	submolarconc := enzymes.GtoMolarConc(SubstrateConc,substrate_mw.MolecularWeight)
+	submolarconc := sequences.GtoMolarConc(SubstrateConc,substrate_mw.MolecularWeight)
 	
 	// make a new amount
 	s = wunit.NewAmount(submolarconc,"M")
@@ -89,8 +89,8 @@ Steps {
 	
 	// Now working out Molarity of Substrate from DNA Sequence
 	// calculate molar concentration
-	dna_mw := enzymes.MassDNA(DNA_seq,false,false)
-	dnamolarconc := enzymes.GtoMolarConc(DNAConc,dna_mw)
+	dna_mw := sequences.MassDNA(DNA_seq,false,false)
+	dnamolarconc := sequences.GtoMolarConc(DNAConc,dna_mw)
 	
 	// make a new amount
 	s = wunit.NewAmount(dnamolarconc,"M")
@@ -101,16 +101,16 @@ Steps {
 	// Now working out Molarity of Substrate from Protein product of dna Sequence
 	
 	// translate
-	orf,orftrue := enzymes.FindORF(DNA_seq)
+	orf,orftrue := sequences.FindORF(DNA_seq)
 	var protein_mw float64
 	if orftrue == true {
-	protein_mw_kDA := enzymes.Molecularweight(orf)
+	protein_mw_kDA := sequences.Molecularweight(orf)
 	protein_mw = protein_mw_kDA*1000
 	Orftrue = orftrue
 	}
 	
 	// calculate molar concentration
-	proteinmolarconc := enzymes.GtoMolarConc(ProteinConc,protein_mw)
+	proteinmolarconc := sequences.GtoMolarConc(ProteinConc,protein_mw)
 	
 	// make a new amount
 	s = wunit.NewAmount(submolarconc,"M")
