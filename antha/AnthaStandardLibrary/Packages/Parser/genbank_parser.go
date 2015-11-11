@@ -23,16 +23,18 @@
 package parser
 
 import (
-	"bufio"
+	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"io"
-	"math"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
+	//"io/ioutil"
+	"bufio"
+	"log"
+	"os"
 	"strconv"
 	"strings"
 )
 
-func ParseGenbankfile(filename string) (annotatedseq sequences.AnnotatedSeq, err error) {
+func ParseGenbankfile(filename string) (annotated sequences.AnnotatedSeq, err error) {
 	line := ""
 	genbanklines := make([]string, 0)
 	file, err := os.Open(filename)
@@ -51,7 +53,7 @@ func ParseGenbankfile(filename string) (annotatedseq sequences.AnnotatedSeq, err
 		log.Fatal(err)
 	}
 
-	annotated, err := HandleGenbank(genbanklines)
+	annotated, err = HandleGenbank(genbanklines)
 
 	return
 
