@@ -34,7 +34,7 @@ import (
 	"strings"
 )
 
-func ParseGenbankfile(filename string) (annotated sequences.AnnotatedSeq, err error) {
+func ParseGenbankfilename(filename string) (annotated sequences.AnnotatedSeq, err error) {
 	line := ""
 	genbanklines := make([]string, 0)
 	file, err := os.Open(filename)
@@ -58,24 +58,45 @@ func ParseGenbankfile(filename string) (annotated sequences.AnnotatedSeq, err er
 	return
 
 }
+
+func ParseGenbankfile(file *os.File) (annotated sequences.AnnotatedSeq, err error) {
+	line := ""
+	genbanklines := make([]string, 0)
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line = fmt.Sprintln(scanner.Text())
+		genbanklines = append(genbanklines, line)
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	annotated, err = HandleGenbank(genbanklines)
+
+	return
+
+}
 func HandleGenbank(lines []string) (annotatedseq sequences.AnnotatedSeq, err error) {
 
 	if lines[0][0:5] == `LOCUS` {
 		fmt.Println("in Locus")
-		name, _, seqtype, circular, _, err := Locusline(lines[0])
+		name, _, _, circular, _, err := Locusline(lines[0])
 		fmt.Println("foundout this stuff", name, err)
 		if err != nil {
 			return annotatedseq, err
 		}
-		if seqtype != "DNA" {
+		/*if seqtype != "DNA" {
 			err = fmt.Errorf("Can't parse genbank files which are not classified as type DNA at present")
 			fmt.Println(err.Error())
 			return annotatedseq, err
-		}
+		}*/
 		seq := HandleSequence(lines)
 		fmt.Println("foundout this seq", seq)
 
-		features := HandleFeatures(lines, seq, seqtype)
+		features := HandleFeatures(lines, seq, "DNA")
 		fmt.Println("found these features", features)
 		annotatedseq, err = sequences.MakeAnnotatedSeq(name, seq, circular, features)
 
@@ -150,25 +171,42 @@ func Featureline1(line string) (reverse bool, class string, startposition int, e
 
 	for _, s := range newarray {
 
-		if strings.Contains(s, `complement`) {
-			reverse = true
-			s = strings.TrimLeft(s, `(complement)`)
-			s = strings.TrimRight(s, ")")
-		}
-		index := strings.Index(s, "..")
-		if index != -1 {
+		if strings.Contains(s, `join`) {
+			err = fmt.Errorf("double position of feature!!", s, "adding as one feature only for now")
+			s = strings.Replace(s, "Join(", "", -1)
+			s = strings.Replace(s, ")", "", -1)
+			//index := strings.Index(s, "..")
+			joinhandler := strings.Split(s, `,`)
+			split := strings.Split(joinhandler[0], "..")
+			startposition, err = strconv.Atoi(split[0])
 
-			startposition, err = strconv.Atoi(s[0:index])
-			if err != nil {
-				fmt.Println(err.Error())
+			split = strings.Split(joinhandler[1], "..")
+			endposition, err = strconv.Atoi(strings.TrimRight(split[1], "\n"))
+
+		} else {
+			if strings.Contains(s, `complement`) {
+				reverse = true
+				s = strings.TrimLeft(s, `(complement)`)
+				s = strings.TrimRight(s, ")")
 			}
-			ss := strings.SplitAfter(s, "..")
-			if strings.Contains(ss[1], ")") {
-				ss[1] = strings.Replace(ss[1], ")", "", -1)
-			}
-			endposition, err = strconv.Atoi(strings.TrimRight(ss[1], "\n"))
-			if err != nil {
-				fmt.Println(err.Error())
+			index := strings.Index(s, "..")
+			if index != -1 {
+
+				startposition, err = strconv.Atoi(s[0:index])
+				if err != nil {
+					fmt.Println(err.Error())
+				}
+				ss := strings.SplitAfter(s, "..")
+				if strings.Contains(ss[1], ")") {
+					ss[1] = strings.Replace(ss[1], ")", "", -1)
+				}
+				if strings.Contains(ss[1], "bp") {
+					ss[1] = strings.Replace(ss[1], "bp", "", -1)
+				}
+				endposition, err = strconv.Atoi(strings.TrimRight(ss[1], "\n"))
+				if err != nil {
+					fmt.Println(err.Error())
+				}
 			}
 		}
 	}
@@ -224,16 +262,18 @@ func HandleFeature(lines []string) (description string, reverse bool, class stri
 }
 func DetectFeature(lines []string) (detected bool, startlineindex int, endlineindex int) {
 	for i := 0; i < len(lines); i++ {
-
+		if string(lines[i][0]) != " " {
+			return
+		}
 		if startlineindex != -1 && endlineindex != 0 {
 			detected = true
 			//		fmt.Println("Yay, detected")
 			return
 		}
-		//	fmt.Println(lines[i])
+		fmt.Println("linerz", lines[i])
 		if string(lines[i][7]) != " " {
 			startlineindex = i
-			//		fmt.Println("start:", i, lines[i])
+			fmt.Println("start:", i, lines[i])
 		}
 
 		_, found := Featureline2(lines[i])
@@ -247,6 +287,15 @@ func DetectFeature(lines []string) (detected bool, startlineindex int, endlinein
 }
 func HandleFeatures(lines []string, seq string, seqtype string) (features []sequences.Feature) {
 
+	featurespresent := false
+	for _, line := range lines {
+		if strings.Contains(line, "FEATURES") {
+			featurespresent = true
+		}
+	}
+	if featurespresent != true {
+		return
+	}
 	features = make([]sequences.Feature, 0)
 	var feature sequences.Feature
 
