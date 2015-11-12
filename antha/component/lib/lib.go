@@ -6,6 +6,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/Datacrunch"
 	"github.com/antha-lang/antha/antha/component/lib/Evaporationrate"
 	"github.com/antha-lang/antha/antha/component/lib/FindPartsthat"
+	"github.com/antha-lang/antha/antha/component/lib/Iterative_assembly_design"
 	"github.com/antha-lang/antha/antha/component/lib/Kla"
 	"github.com/antha-lang/antha/antha/component/lib/LookUpMolecule"
 	"github.com/antha-lang/antha/antha/component/lib/MakeBuffer"
@@ -93,6 +94,20 @@ func GetComponents() []ComponentDesc {
 	portMap["FindPartsthat"]["FulllistBackupParts"] = false
 	portMap["FindPartsthat"]["Status"] = false
 	portMap["FindPartsthat"]["Warnings"] = false
+
+	portMap["Iterative_assembly_design"] = make(map[string]bool)
+	portMap["Iterative_assembly_design"]["ApprovedEnzymes"] = true
+	portMap["Iterative_assembly_design"]["Constructname"] = true
+	portMap["Iterative_assembly_design"]["Seqsinorder"] = true
+	portMap["Iterative_assembly_design"]["Vector"] = true
+
+	portMap["Iterative_assembly_design"]["BackupEnzymes"] = false
+	portMap["Iterative_assembly_design"]["EnzymeUsed"] = false
+	portMap["Iterative_assembly_design"]["NewDNASequence"] = false
+	portMap["Iterative_assembly_design"]["PartswithOverhangs"] = false
+	portMap["Iterative_assembly_design"]["Simulationpass"] = false
+	portMap["Iterative_assembly_design"]["Status"] = false
+	portMap["Iterative_assembly_design"]["Warnings"] = false
 
 	portMap["Kla"] = make(map[string]bool)
 	portMap["Kla"]["D"] = true
@@ -388,6 +403,7 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "Datacrunch", Constructor: Datacrunch.NewDatacrunch})
 	c = append(c, ComponentDesc{Name: "Evaporationrate", Constructor: Evaporationrate.NewEvaporationrate})
 	c = append(c, ComponentDesc{Name: "FindPartsthat", Constructor: FindPartsthat.NewFindPartsthat})
+	c = append(c, ComponentDesc{Name: "Iterative_assembly_design", Constructor: Iterative_assembly_design.NewIterative_assembly_design})
 	c = append(c, ComponentDesc{Name: "Kla", Constructor: Kla.NewKla})
 	c = append(c, ComponentDesc{Name: "LookUpMolecule", Constructor: LookUpMolecule.NewLookUpMolecule})
 	c = append(c, ComponentDesc{Name: "MakeBuffer", Constructor: MakeBuffer.NewMakeBuffer})

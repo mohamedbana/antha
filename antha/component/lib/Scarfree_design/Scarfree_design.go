@@ -6,6 +6,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/parser"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -56,13 +57,28 @@ func (e *Scarfree_design) steps(p Scarfree_designParamBlock, r *Scarfree_designR
 	// make an empty array of DNA Sequences ready to fill
 	partsinorder := make([]wtype.DNASequence, 0)
 
+	var partDNA wtype.DNASequence
+
 	r.Status = "all parts available"
 	for i, part := range p.Seqsinorder {
-		if strings.Contains(part, "BBa_") {
-			part = igem.GetSequence(part)
-		}
-		partDNA := wtype.MakeLinearDNASequence("Part "+strconv.Itoa(i), part)
+		if strings.Contains(part, ".gb") && strings.Contains(part, "Feature:") {
 
+			split := strings.SplitAfter(part, ".gb")
+			file := split[0]
+
+			split2 := strings.Split(split[1], ":")
+			feature := split2[1]
+
+			partDNA, _ = parser.GenbankFeaturetoDNASequence(file, feature)
+		} else if strings.Contains(part, ".gb") {
+			partDNA, _ = parser.GenbanktoDNASequence(part)
+		} else {
+
+			if strings.Contains(part, "BBa_") {
+				part = igem.GetSequence(part)
+			}
+			partDNA = wtype.MakeLinearDNASequence("Part "+strconv.Itoa(i), part)
+		}
 		partsinorder = append(partsinorder, partDNA)
 	}
 

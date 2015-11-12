@@ -25,6 +25,7 @@ package parser
 import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	//"io/ioutil"
 	"bufio"
@@ -33,6 +34,72 @@ import (
 	"strconv"
 	"strings"
 )
+
+func GenbanktoDNASequence(filename string) (standardseq wtype.DNASequence, err error) {
+
+	var annotated sequences.AnnotatedSeq
+	line := ""
+	genbanklines := make([]string, 0)
+	file, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line = fmt.Sprintln(scanner.Text())
+		genbanklines = append(genbanklines, line)
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	annotated, err = HandleGenbank(genbanklines)
+
+	standardseq = annotated.Seq
+
+	return
+
+}
+
+func GenbankFeaturetoDNASequence(filename string, featurename string) (standardseq wtype.DNASequence, err error) {
+
+	var annotated sequences.AnnotatedSeq
+	line := ""
+	genbanklines := make([]string, 0)
+	file, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line = fmt.Sprintln(scanner.Text())
+		genbanklines = append(genbanklines, line)
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	annotated, err = HandleGenbank(genbanklines)
+
+	for _, feature := range annotated.Features {
+
+		if strings.Contains(feature.Name, featurename) {
+			standardseq.Nm = feature.Name
+			standardseq.Seq = feature.DNASeq
+			return
+		}
+
+	}
+
+	return
+
+}
 
 func ParseGenbankfilename(filename string) (annotated sequences.AnnotatedSeq, err error) {
 	line := ""
@@ -217,6 +284,18 @@ func Featureline2(line string) (description string, found bool) {
 	fields := strings.Split(line, " ")
 	//fmt.Println("length of fields", len(fields))
 
+	// reassemble fields to preserve linked items with spaces e.g. "Green fluorescent protein"
+	for i, field := range fields {
+		if strings.Contains(field, `"`) {
+			tempfields := make([]string, i)
+			tempfield := strings.Join(fields[i:len(fields)-1], " ")
+			tempfields = fields[0 : i-1]
+			tempfields = append(tempfields, tempfield)
+			fields = tempfields
+			break
+		}
+	}
+
 	newarray := make([]string, 0)
 	for _, s := range fields {
 		if s != "" && s != " " {
@@ -229,6 +308,23 @@ func Featureline2(line string) (description string, found bool) {
 			parts := strings.SplitAfterN(line, "=", 2)
 			if len(parts) == 2 {
 				description = strings.TrimSpace(parts[1])
+				found = true
+				return
+			}
+
+		}
+
+	}
+	for _, line := range newarray {
+		if strings.Contains(line, `/product`) {
+			parts := strings.SplitAfterN(line, `="`, 2)
+			if len(parts) == 2 {
+				fmt.Println("line", line)
+				fmt.Println("parts", parts)
+				fmt.Println("len(parts) =2 yes")
+				fmt.Println("parts[1]", parts[1])
+				description = parts[1] //strings.Replace(parts[1], " ", "_", -1)
+				fmt.Println("Huh!", description)
 				found = true
 				return
 			}
