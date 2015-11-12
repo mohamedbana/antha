@@ -4,7 +4,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/parser"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
 	"strconv"

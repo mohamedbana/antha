@@ -24,6 +24,7 @@ package enzymes
 
 import (
 	"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -197,6 +198,33 @@ func MakeStandardTypeIIsassemblyParts(parts []wtype.DNASequence, assemblystandar
 	return partswithends
 }
 
+func CheckForExistingTypeIISEnds(part wtype.DNASequence, enzyme wtype.TypeIIs) (numberofsitesfound int, stickyends5 []string, stickyends3 []string) {
+
+	enz := lookup.EnzymeLookup(enzyme.Name)
+
+	sites := Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+
+	numberofsitesfound = sites[0].Numberofsites
+	_, stickyends5, stickyends3 = TypeIIsdigest(part, enzyme)
+
+	return
+}
+
+/*
+
+func HandleExistingEnds (parts []wtype.DNASequence, enzymewtype.LogicalRestrictionEnzyme)(partswithoverhangs []wtype.DNASequence {
+	partswithexistingsites := make([]RestrictionSites, 0)
+
+	for _, part := range parts {
+		sites := Restrictionsitefinder(part, wtype.LogicalRestrictionEnzyme{enzyme})
+		if len(sites) != 0 {
+			partswithexistingsites = append(partswithexistingsites, sites)
+		}
+
+	}
+	return
+}
+*/
 func MakeScarfreeCustomTypeIIsassemblyParts(parts []wtype.DNASequence, vector wtype.DNASequence, enzyme wtype.TypeIIs) (partswithends []wtype.DNASequence) {
 
 	partswithends = make([]wtype.DNASequence, 0)
