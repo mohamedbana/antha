@@ -26,7 +26,6 @@ package execution
 import (
 	"encoding/json"
 	"fmt"
-
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"

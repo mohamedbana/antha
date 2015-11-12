@@ -113,12 +113,19 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 
 func (this *Liquidhandler) do_setup(rq *LHRequest) {
 	this.Properties.Driver.RemoveAllPlates()
+	fmt.Println("LOOK AT ME MUMMY")
 	for position, plateid := range this.Properties.PosLookup {
 		if plateid == "" {
 			continue
 		}
 		plate := this.Properties.PlateLookup[plateid]
 		name := plate.(wtype.Named).GetName()
+
+		switch plate.(type) {
+		case *wtype.LHTipbox:
+			fmt.Println("LOOK AT THIS: ", name, " ", plate.(*wtype.LHTipbox).AsWell)
+		}
+
 		this.Properties.Driver.AddPlateTo(position, plate, name)
 	}
 
