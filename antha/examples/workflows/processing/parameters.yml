@@ -1,0 +1,17 @@
+{
+    "Parameters": [
+        {
+            "Equals":{
+                "A": "A string",
+                "B": "B string"
+            },
+            "Cond" : {
+                "True": "True string",
+                "False": "False string"
+            }
+        }
+    ],
+    "Config": {
+        "OUTPUT_COUNT": 1
+    }
+}

@@ -12,14 +12,14 @@ import (
 )
 // Input parameters for this protocol
 Parameters (
-	DNA string //wtype.DNASequence//string
-	Name string
+	AnthaSeq wtype.DNASequencestring //wtype.DNASequence//string
+	//Name string
 )
 
 // Data which is returned from this protocol; output data
 Data (
 	Hits string
-	AnthaSeq wtype.DNASequence
+	//AnthaSeq wtype.DNASequence
 )
 
 // Physical inputs to this protocol
@@ -68,7 +68,7 @@ Steps {
 	
 	
 	// Convert the sequence to an anthatype
-	AnthaSeq = wtype.MakeLinearDNASequence(Name, DNA)
+	//AnthaSeq = wtype.MakeLinearDNASequence(Name, DNA)
 	
 	// look for orfs
 	orf, orftrue := sequences.FindORF(AnthaSeq.Seq)

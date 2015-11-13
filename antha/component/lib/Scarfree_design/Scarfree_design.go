@@ -71,7 +71,11 @@ func (e *Scarfree_design) steps(p Scarfree_designParamBlock, r *Scarfree_designR
 
 			partDNA, _ = parser.GenbankFeaturetoDNASequence(file, feature)
 		} else if strings.Contains(part, ".gb") {
-			partDNA, _ = parser.GenbanktoDNASequence(part)
+
+			/*annotated,_ := parser.GenbanktoAnnotatedSeq(part)
+			partDNA = annotated.DNASequence */
+
+			partDNA, _ = parser.GenbanktoAnnotatedSeq(part)
 		} else {
 
 			if strings.Contains(part, "BBa_") {
@@ -126,6 +130,7 @@ func (e *Scarfree_design) steps(p Scarfree_designParamBlock, r *Scarfree_designR
 			allends = append(allends, ends)
 		}
 		endreport = strings.Join(allends, " ")
+		warnings = append(warnings, endreport)
 	}
 
 	// check number of sites per part !

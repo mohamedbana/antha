@@ -58,7 +58,7 @@ func GenbanktoDNASequence(filename string) (standardseq wtype.DNASequence, err e
 
 	annotated, err = HandleGenbank(genbanklines)
 
-	standardseq = annotated.Seq
+	standardseq = annotated.DNASequence
 
 	return
 
@@ -101,7 +101,7 @@ func GenbankFeaturetoDNASequence(filename string, featurename string) (standards
 
 }
 
-func ParseGenbankfilename(filename string) (annotated sequences.AnnotatedSeq, err error) {
+func GenbanktoAnnotatedSeq(filename string) (annotated sequences.AnnotatedSeq, err error) {
 	line := ""
 	genbanklines := make([]string, 0)
 	file, err := os.Open(filename)

@@ -51,8 +51,8 @@ type Feature struct {
 }
 
 type AnnotatedSeq struct {
-	Nm       string
-	Seq      wtype.DNASequence
+	//Nm string
+	wtype.DNASequence
 	Features []Feature
 }
 
@@ -95,9 +95,9 @@ func MakeFeature(name string, seq string, sequencetype string, class string, rev
 
 func MakeAnnotatedSeq(name string, seq string, circular bool, features []Feature) (annotated AnnotatedSeq, err error) {
 	annotated.Nm = name
-	annotated.Seq.Nm = name
-	annotated.Seq.Seq = seq
-	annotated.Seq.Plasmid = circular
+	//annotated.Seq.Nm = name
+	annotated.Seq = seq //.Seq = seq
+	annotated.Plasmid = circular
 
 	for _, feature := range features {
 		if strings.Contains(seq, feature.DNASeq) {
@@ -118,15 +118,15 @@ func MakeAnnotatedSeq(name string, seq string, circular bool, features []Feature
 func ConcatenateFeatures(name string, featuresinorder []Feature) (annotated AnnotatedSeq) {
 
 	annotated.Nm = name
-	annotated.Seq.Nm = name
-	annotated.Seq.Seq = featuresinorder[0].DNASeq
+	//annotated.Seq.Nm = name
+	annotated.Seq = featuresinorder[0].DNASeq
 	annotated.Features = make([]Feature, 0)
 	annotated.Features = append(annotated.Features, featuresinorder[0])
 	for i := 1; i < len(featuresinorder); i++ {
 		nextfeature := featuresinorder[i]
 		nextfeature.StartPosition = nextfeature.StartPosition + annotated.Features[i-1].EndPosition
 		nextfeature.EndPosition = nextfeature.EndPosition + annotated.Features[i-1].EndPosition
-		annotated.Seq.Seq = annotated.Seq.Seq + featuresinorder[i].DNASeq
+		annotated.Seq = annotated.Seq + featuresinorder[i].DNASeq
 		annotated.Features = append(annotated.Features, nextfeature)
 	}
 	return annotated
