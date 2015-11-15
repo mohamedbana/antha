@@ -18,9 +18,12 @@ import (
 
 // Input parameters for this protocol
 
-//wtype.DNASequence//string
+//string //wtype.DNASequence//string
+//Name string
 
 // Data which is returned from this protocol; output data
+
+//AnthaSeq wtype.DNASequence
 
 // Physical inputs to this protocol
 
@@ -67,18 +70,18 @@ func (e *BlastSearch) steps(p BlastSearchParamBlock, r *BlastSearchResultBlock) 
 	*/
 
 	// Convert the sequence to an anthatype
-	r.AnthaSeq = wtype.MakeLinearDNASequence(p.Name, p.DNA)
+	//AnthaSeq = wtype.MakeLinearDNASequence(Name, DNA)
 
 	// look for orfs
-	orf, orftrue := sequences.FindORF(r.AnthaSeq.Seq)
+	orf, orftrue := sequences.FindORF(p.AnthaSeq.Seq)
 
-	if orftrue == true && len(orf.DNASeq) == len(r.AnthaSeq.Seq) {
+	if orftrue == true && len(orf.DNASeq) == len(p.AnthaSeq.Seq) {
 		// if open reading frame is detected, we'll perform a blastP search'
-		fmt.Println("ORF detected:", "full sequence length: ", len(r.AnthaSeq.Seq), "ORF length: ", len(orf.DNASeq))
+		fmt.Println("ORF detected:", "full sequence length: ", len(p.AnthaSeq.Seq), "ORF length: ", len(orf.DNASeq))
 		hits, err = blast.MegaBlastP(orf.ProtSeq)
 	} else {
 		// otherwise we'll blast the nucleotide sequence
-		hits, err = r.AnthaSeq.Blast()
+		hits, err = p.AnthaSeq.Blast()
 	}
 	if err != nil {
 		fmt.Println(err.Error())
@@ -88,7 +91,7 @@ func (e *BlastSearch) steps(p BlastSearchParamBlock, r *BlastSearchResultBlock) 
 	r.Hits = fmt.Sprintln(blast.HitSummary(hits))
 
 	// Rename Sequence with ID of top blast hit
-	r.AnthaSeq.Nm = hits[0].Id
+	p.AnthaSeq.Nm = hits[0].Id
 	_ = _wrapper.WaitToEnd()
 
 	//}
@@ -114,14 +117,12 @@ func (e *BlastSearch) validation(p BlastSearchParamBlock, r *BlastSearchResultBl
 func (e *BlastSearch) Complete(params interface{}) {
 	p := params.(BlastSearchParamBlock)
 	if p.Error {
-		e.AnthaSeq <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
 		e.Hits <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
 		return
 	}
 	r := new(BlastSearchResultBlock)
 	defer func() {
 		if res := recover(); res != nil {
-			e.AnthaSeq <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
 			e.Hits <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
 			execute.AddError(res)
 			return
@@ -129,8 +130,6 @@ func (e *BlastSearch) Complete(params interface{}) {
 	}()
 	e.startup.Do(func() { e.setup(p) })
 	e.steps(p, r)
-
-	e.AnthaSeq <- execute.ThreadParam{Value: r.AnthaSeq, ID: p.ID, Error: false}
 
 	e.Hits <- execute.ThreadParam{Value: r.Hits, ID: p.ID, Error: false}
 
@@ -162,60 +161,34 @@ func NewBlastSearch() interface{} { //*BlastSearch {
 // Mapper function
 func (e *BlastSearch) Map(m map[string]interface{}) interface{} {
 	var res BlastSearchParamBlock
-	res.Error = false || m["DNA"].(execute.ThreadParam).Error || m["Name"].(execute.ThreadParam).Error
+	res.Error = false || m["AnthaSeq"].(execute.ThreadParam).Error
 
-	vDNA, is := m["DNA"].(execute.ThreadParam).Value.(execute.JSONValue)
+	vAnthaSeq, is := m["AnthaSeq"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
 		var temp BlastSearchJSONBlock
-		json.Unmarshal([]byte(vDNA.JSONString), &temp)
-		res.DNA = *temp.DNA
+		json.Unmarshal([]byte(vAnthaSeq.JSONString), &temp)
+		res.AnthaSeq = *temp.AnthaSeq
 	} else {
-		res.DNA = m["DNA"].(execute.ThreadParam).Value.(string)
+		res.AnthaSeq = m["AnthaSeq"].(execute.ThreadParam).Value.(wtype.DNASequence)
 	}
 
-	vName, is := m["Name"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp BlastSearchJSONBlock
-		json.Unmarshal([]byte(vName.JSONString), &temp)
-		res.Name = *temp.Name
-	} else {
-		res.Name = m["Name"].(execute.ThreadParam).Value.(string)
-	}
-
-	res.ID = m["DNA"].(execute.ThreadParam).ID
-	res.BlockID = m["DNA"].(execute.ThreadParam).BlockID
+	res.ID = m["AnthaSeq"].(execute.ThreadParam).ID
+	res.BlockID = m["AnthaSeq"].(execute.ThreadParam).BlockID
 
 	return res
 }
 
-func (e *BlastSearch) OnDNA(param execute.ThreadParam) {
+func (e *BlastSearch) OnAnthaSeq(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(2, e, e)
+		bag.Init(1, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
 
-	fired := bag.AddValue("DNA", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *BlastSearch) OnName(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(2, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Name", param)
+	fired := bag.AddValue("AnthaSeq", param)
 	if fired {
 		e.lock.Lock()
 		delete(e.params, param.ID)
@@ -228,42 +201,35 @@ type BlastSearch struct {
 	lock           sync.Mutex
 	startup        sync.Once
 	params         map[execute.ThreadID]*execute.AsyncBag
-	DNA            <-chan execute.ThreadParam
-	Name           <-chan execute.ThreadParam
-	AnthaSeq       chan<- execute.ThreadParam
+	AnthaSeq       <-chan execute.ThreadParam
 	Hits           chan<- execute.ThreadParam
 }
 
 type BlastSearchParamBlock struct {
-	ID      execute.ThreadID
-	BlockID execute.BlockID
-	Error   bool
-	DNA     string
-	Name    string
-}
-
-type BlastSearchConfig struct {
-	ID      execute.ThreadID
-	BlockID execute.BlockID
-	Error   bool
-	DNA     string
-	Name    string
-}
-
-type BlastSearchResultBlock struct {
 	ID       execute.ThreadID
 	BlockID  execute.BlockID
 	Error    bool
 	AnthaSeq wtype.DNASequence
-	Hits     string
+}
+
+type BlastSearchConfig struct {
+	ID       execute.ThreadID
+	BlockID  execute.BlockID
+	Error    bool
+	AnthaSeq wtype.DNASequence
+}
+
+type BlastSearchResultBlock struct {
+	ID      execute.ThreadID
+	BlockID execute.BlockID
+	Error   bool
+	Hits    string
 }
 
 type BlastSearchJSONBlock struct {
 	ID       *execute.ThreadID
 	BlockID  *execute.BlockID
 	Error    *bool
-	DNA      *string
-	Name     *string
 	AnthaSeq *wtype.DNASequence
 	Hits     *string
 }
@@ -271,9 +237,7 @@ type BlastSearchJSONBlock struct {
 func (c *BlastSearch) ComponentInfo() *execute.ComponentInfo {
 	inp := make([]execute.PortInfo, 0)
 	outp := make([]execute.PortInfo, 0)
-	inp = append(inp, *execute.NewPortInfo("DNA", "string", "DNA", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Name", "string", "Name", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("AnthaSeq", "wtype.DNASequence", "AnthaSeq", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("AnthaSeq", "wtype.DNASequence", "AnthaSeq", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("Hits", "string", "Hits", true, true, nil, nil))
 
 	ci := execute.NewComponentInfo("BlastSearch", "BlastSearch", "", false, inp, outp)

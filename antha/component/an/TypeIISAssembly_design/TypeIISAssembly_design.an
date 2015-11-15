@@ -1,3 +1,9 @@
+// This protocol is intended to design assembly parts using either an assembly standard or a specified enzyme. 
+// parts are added as biobrick IDs, or looked up from the inventory package
+// A simulation is performed and status returned to the user
+// The user can also specify the names of enzyme sites they wish to avoid to check if these are present in the 
+// new dna sequence (if simulation passes that is).
+
 protocol TypeIISAssembly_design
 
 import (

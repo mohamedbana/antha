@@ -1,3 +1,6 @@
+// Example protocol of performing an assembly simulation prior to performing 
+// physical construct assembly if the siulation passes
+
 protocol TypeIISConstructAssembly_sim
 
 import (
@@ -94,6 +97,8 @@ Steps {
 	}	
 	// Monitor molar ratios of parts for possible troubleshooting / success correlation
 	
+	
+	
 	molesofeachdnaelement := make ([]float64,0)
 		molarratios := make ([]float64,0)
 
@@ -126,6 +131,8 @@ Steps {
 		"NewDNASequence",NewDNASequence,
 		"Sitesfound",Sitesfound,
 		)
+		
+	if Simulationpass == true {
 	
 	// Now Perform the physical assembly
 	samples := make([]*wtype.LHComponent, 0)
@@ -161,6 +168,8 @@ Steps {
 	Incubate(Reaction, ReactionTemp, ReactionTime, false)
 	// inactivate
 	Incubate(Reaction, InactivationTemp, InactivationTime, false)
+}
+
 }
 
 // Run after controls and a steps block are completed to

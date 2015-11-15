@@ -1,3 +1,5 @@
+// example protocol for loading a DNAgel
+
 package DNA_gel
 
 import (

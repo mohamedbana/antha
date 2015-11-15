@@ -34,10 +34,8 @@ type ComponentDesc struct {
 func GetComponents() []ComponentDesc {
 	portMap := make(map[string]map[string]bool) //representing component, port name, and true if in
 	portMap["BlastSearch"] = make(map[string]bool)
-	portMap["BlastSearch"]["DNA"] = true
-	portMap["BlastSearch"]["Name"] = true
+	portMap["BlastSearch"]["AnthaSeq"] = true
 
-	portMap["BlastSearch"]["AnthaSeq"] = false
 	portMap["BlastSearch"]["Hits"] = false
 
 	portMap["DNA_gel"] = make(map[string]bool)
@@ -87,6 +85,8 @@ func GetComponents() []ComponentDesc {
 	portMap["Evaporationrate"]["Status"] = false
 
 	portMap["FindPartsthat"] = make(map[string]bool)
+	portMap["FindPartsthat"]["OnlyreturnAvailableParts"] = true
+	portMap["FindPartsthat"]["OnlyreturnWorkingparts"] = true
 	portMap["FindPartsthat"]["Partdescriptions"] = true
 	portMap["FindPartsthat"]["Parts"] = true
 	portMap["FindPartsthat"]["Parttypes"] = true

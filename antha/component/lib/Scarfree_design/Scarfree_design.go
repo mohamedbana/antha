@@ -1,3 +1,10 @@
+// This protocol is intended to design assembly parts using a specified enzyme.
+// overhangs are added to complement the adjacent parts and leave no scar.
+// parts can be entered as genbank (.gb) files, sequences or biobrick IDs
+// If assembly simulation fails after overhangs are added. In order to help the user
+// diagnose the reason, a report of the part overhangs
+// is returned to the user along with a list of cut sites in each part.
+
 package Scarfree_design
 
 import (
@@ -75,7 +82,7 @@ func (e *Scarfree_design) steps(p Scarfree_designParamBlock, r *Scarfree_designR
 			/*annotated,_ := parser.GenbanktoAnnotatedSeq(part)
 			partDNA = annotated.DNASequence */
 
-			partDNA, _ = parser.GenbanktoAnnotatedSeq(part)
+			partDNA, _ = parser.GenbanktoDNASequence(part)
 		} else {
 
 			if strings.Contains(part, "BBa_") {

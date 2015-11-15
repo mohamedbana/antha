@@ -1,3 +1,10 @@
+// This protocol is based on scarfree design so please look at that first.
+// The protocol is intended to design assembly parts using the first enzyme 
+// from a list of ApprovedEnzymes enzymes which is feasible to use. If no enzyme
+// can be used (i.e. due to the presence of existing restriction sites in a part)
+// all typeIIs enzymes will be screened to find feasible backup options
+
+
 protocol Iterative_assembly_design
 
 import (
@@ -212,7 +219,7 @@ Steps {
 		Status = fmt.Sprintln(Status,
 		text.Print("Backup Enzymes: ", BackupEnzymes))
 	} else if sitefound == true {
-			Status = fmt.Sprintln(text.Print("No! Enzyme found", ApprovedEnzymes),
+			Status = fmt.Sprintln(text.Print("No Enzyme found to be compatible from approved list", ApprovedEnzymes),
 			text.Print("Backup Enzymes: ", BackupEnzymes))
 		
 	}else{
