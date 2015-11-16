@@ -5,7 +5,7 @@ dependson:
 modules:
     golang:
         package: github.com/antha-lang/antha
-        buildpaths:
+        buildpackages:
             - ~internal
     docker:
         packages:
