@@ -19,6 +19,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/Transformation"
 	"github.com/antha-lang/antha/antha/component/lib/TypeIISAssembly_design"
 	"github.com/antha-lang/antha/antha/component/lib/TypeIISConstructAssembly"
+	"github.com/antha-lang/antha/antha/component/lib/TypeIISConstructAssemblyMMX"
 	"github.com/antha-lang/antha/antha/component/lib/TypeIISConstructAssembly_alt"
 	"github.com/antha-lang/antha/antha/component/lib/TypeIISConstructAssembly_sim"
 )
@@ -49,27 +50,26 @@ func GetComponents() []ComponentDesc {
 	portMap["DNA_gel"]["Loadedgel"] = false
 
 	portMap["Datacrunch"] = make(map[string]bool)
-	portMap["Datacrunch"]["Substrate_name"] = true
-	portMap["Datacrunch"]["DNAConc"] = true
-	portMap["Datacrunch"]["Km"] = true
-	portMap["Datacrunch"]["Vmax"] = true
-	portMap["Datacrunch"]["Vunit"] = true
-	portMap["Datacrunch"]["S"] = true
-	portMap["Datacrunch"]["Gene_name"] = true
 	portMap["Datacrunch"]["ProteinConc"] = true
-	portMap["Datacrunch"]["Kmunit"] = true
 	portMap["Datacrunch"]["Vmaxunit"] = true
+	portMap["Datacrunch"]["Vunit"] = true
 	portMap["Datacrunch"]["Sunit"] = true
-	portMap["Datacrunch"]["DNA_seq"] = true
-	portMap["Datacrunch"]["SubstrateConc"] = true
 	portMap["Datacrunch"]["SubstrateVol"] = true
+	portMap["Datacrunch"]["DNAConc"] = true
+	portMap["Datacrunch"]["Substrate_name"] = true
+	portMap["Datacrunch"]["Gene_name"] = true
+	portMap["Datacrunch"]["Km"] = true
+	portMap["Datacrunch"]["Kmunit"] = true
+	portMap["Datacrunch"]["Vmax"] = true
+	portMap["Datacrunch"]["S"] = true
+	portMap["Datacrunch"]["SubstrateConc"] = true
+	portMap["Datacrunch"]["DNA_seq"] = true
 
 	portMap["Datacrunch"]["V"] = false
 	portMap["Datacrunch"]["Orftrue"] = false
 	portMap["Datacrunch"]["Status"] = false
 
 	portMap["Evaporationrate"] = make(map[string]bool)
-	portMap["Evaporationrate"]["Platetype"] = true
 	portMap["Evaporationrate"]["Volumeperwell"] = true
 	portMap["Evaporationrate"]["Pa"] = true
 	portMap["Evaporationrate"]["Temp"] = true
@@ -77,85 +77,86 @@ func GetComponents() []ComponentDesc {
 	portMap["Evaporationrate"]["Airvelocity"] = true
 	portMap["Evaporationrate"]["Executiontime"] = true
 	portMap["Evaporationrate"]["Liquid"] = true
+	portMap["Evaporationrate"]["Platetype"] = true
 
-	portMap["Evaporationrate"]["Evaporatedliquid"] = false
 	portMap["Evaporationrate"]["Estimatedevaporationtime"] = false
 	portMap["Evaporationrate"]["Status"] = false
 	portMap["Evaporationrate"]["Evaporationrateestimate"] = false
+	portMap["Evaporationrate"]["Evaporatedliquid"] = false
 
 	portMap["Kla"] = make(map[string]bool)
-	portMap["Kla"]["Platetype"] = true
-	portMap["Kla"]["Liquid"] = true
 	portMap["Kla"]["Shakertype"] = true
 	portMap["Kla"]["Rpm"] = true
 	portMap["Kla"]["Fillvolume"] = true
 	portMap["Kla"]["TargetRE"] = true
 	portMap["Kla"]["D"] = true
+	portMap["Kla"]["Platetype"] = true
+	portMap["Kla"]["Liquid"] = true
 
+	portMap["Kla"]["Ncrit"] = false
 	portMap["Kla"]["Status"] = false
 	portMap["Kla"]["Flowstate"] = false
 	portMap["Kla"]["Necessaryshakerspeed"] = false
 	portMap["Kla"]["CalculatedKla"] = false
-	portMap["Kla"]["Ncrit"] = false
 
 	portMap["LookUpMolecule"] = make(map[string]bool)
-	portMap["LookUpMolecule"]["Compoundlist"] = true
 	portMap["LookUpMolecule"]["Compound"] = true
+	portMap["LookUpMolecule"]["Compoundlist"] = true
 
-	portMap["LookUpMolecule"]["Jsonstring"] = false
-	portMap["LookUpMolecule"]["Status"] = false
 	portMap["LookUpMolecule"]["Compoundprops"] = false
 	portMap["LookUpMolecule"]["List"] = false
+	portMap["LookUpMolecule"]["Jsonstring"] = false
+	portMap["LookUpMolecule"]["Status"] = false
 
 	portMap["MakeBuffer"] = make(map[string]bool)
-	portMap["MakeBuffer"]["Buffername"] = true
-	portMap["MakeBuffer"]["Bufferstockconc"] = true
-	portMap["MakeBuffer"]["Diluentname"] = true
-	portMap["MakeBuffer"]["Bufferstock"] = true
-	portMap["MakeBuffer"]["Diluent"] = true
-	portMap["MakeBuffer"]["Bufferstockvolume"] = true
 	portMap["MakeBuffer"]["FinalConcentration"] = true
+	portMap["MakeBuffer"]["Diluent"] = true
+	portMap["MakeBuffer"]["InPlate"] = true
+	portMap["MakeBuffer"]["Buffername"] = true
+	portMap["MakeBuffer"]["Bufferstockvolume"] = true
+	portMap["MakeBuffer"]["Bufferstockconc"] = true
 	portMap["MakeBuffer"]["FinalVolume"] = true
 	portMap["MakeBuffer"]["Diluentvolume"] = true
+	portMap["MakeBuffer"]["Diluentname"] = true
+	portMap["MakeBuffer"]["Bufferstock"] = true
 	portMap["MakeBuffer"]["OutPlate"] = true
-	portMap["MakeBuffer"]["InPlate"] = true
 
 	portMap["MakeBuffer"]["Buffer"] = false
 	portMap["MakeBuffer"]["Status"] = false
 
 	portMap["MoClo_design"] = make(map[string]bool)
-	portMap["MoClo_design"]["Constructname"] = true
 	portMap["MoClo_design"]["Partsinorder"] = true
 	portMap["MoClo_design"]["AssemblyStandard"] = true
 	portMap["MoClo_design"]["Level"] = true
 	portMap["MoClo_design"]["Vector"] = true
 	portMap["MoClo_design"]["PartMoClotypesinorder"] = true
+	portMap["MoClo_design"]["Constructname"] = true
 
+	portMap["MoClo_design"]["Simulationpass"] = false
 	portMap["MoClo_design"]["PartswithOverhangs"] = false
 	portMap["MoClo_design"]["NewDNASequence"] = false
 	portMap["MoClo_design"]["Warnings"] = false
 	portMap["MoClo_design"]["Status"] = false
-	portMap["MoClo_design"]["Simulationpass"] = false
 
 	portMap["NewDNASequence"] = make(map[string]bool)
-	portMap["NewDNASequence"]["Linear"] = true
-	portMap["NewDNASequence"]["SingleStranded"] = true
 	portMap["NewDNASequence"]["DNA_seq"] = true
 	portMap["NewDNASequence"]["Gene_name"] = true
 	portMap["NewDNASequence"]["Plasmid"] = true
+	portMap["NewDNASequence"]["Linear"] = true
+	portMap["NewDNASequence"]["SingleStranded"] = true
 
 	portMap["NewDNASequence"]["DNA"] = false
 
 	portMap["OD"] = make(map[string]bool)
 	portMap["OD"]["ODtoDCWconversionfactor"] = true
-	portMap["OD"]["Heightof100ulinm"] = true
 	portMap["OD"]["Blank_absorbance"] = true
 	portMap["OD"]["Sampletotest"] = true
-	portMap["OD"]["Diluent"] = true
-	portMap["OD"]["Sample_volume"] = true
-	portMap["OD"]["Wlength"] = true
 	portMap["OD"]["ODplate"] = true
+	portMap["OD"]["Sample_volume"] = true
 	portMap["OD"]["Diluent_volume"] = true
+	portMap["OD"]["Wlength"] = true
+	portMap["OD"]["Heightof100ulinm"] = true
+	portMap["OD"]["Diluent"] = true
 
 	portMap["OD"]["Sample_absorbance"] = false
 	portMap["OD"]["Blankcorrected_absorbance"] = false
@@ -163,49 +164,49 @@ func GetComponents() []ComponentDesc {
 	portMap["OD"]["Estimateddrycellweight_conc"] = false
 
 	portMap["PCR"] = make(map[string]bool)
-	portMap["PCR"]["FwdPrimerConc"] = true
-	portMap["PCR"]["DNTPconc"] = true
-	portMap["PCR"]["Numberofcycles"] = true
-	portMap["PCR"]["PCRPolymerase"] = true
-	portMap["PCR"]["Buffer"] = true
-	portMap["PCR"]["ReactionVolume"] = true
-	portMap["PCR"]["Additiveconc"] = true
-	portMap["PCR"]["Extensiontemp"] = true
-	portMap["PCR"]["FwdPrimer"] = true
-	portMap["PCR"]["Additives"] = true
-	portMap["PCR"]["RevPrimerConc"] = true
-	portMap["PCR"]["Templatevolume"] = true
-	portMap["PCR"]["InitDenaturationtime"] = true
-	portMap["PCR"]["Denaturationtime"] = true
-	portMap["PCR"]["AnnealingTemp"] = true
-	portMap["PCR"]["Extensiontime"] = true
-	portMap["PCR"]["Finalextensiontime"] = true
 	portMap["PCR"]["OutPlate"] = true
-	portMap["PCR"]["TargetpolymeraseConcentration"] = true
-	portMap["PCR"]["Annealingtime"] = true
-	portMap["PCR"]["RevPrimer"] = true
+	portMap["PCR"]["FwdPrimerConc"] = true
+	portMap["PCR"]["Additiveconc"] = true
+	portMap["PCR"]["Numberofcycles"] = true
+	portMap["PCR"]["Extensiontemp"] = true
+	portMap["PCR"]["Finalextensiontime"] = true
 	portMap["PCR"]["DNTPS"] = true
+	portMap["PCR"]["Buffer"] = true
 	portMap["PCR"]["Template"] = true
+	portMap["PCR"]["RevPrimerConc"] = true
+	portMap["PCR"]["TargetpolymeraseConcentration"] = true
+	portMap["PCR"]["Templatevolume"] = true
+	portMap["PCR"]["Extensiontime"] = true
+	portMap["PCR"]["RevPrimer"] = true
+	portMap["PCR"]["Additives"] = true
+	portMap["PCR"]["ReactionVolume"] = true
+	portMap["PCR"]["DNTPconc"] = true
+	portMap["PCR"]["InitDenaturationtime"] = true
+	portMap["PCR"]["Annealingtime"] = true
+	portMap["PCR"]["AnnealingTemp"] = true
+	portMap["PCR"]["Denaturationtime"] = true
+	portMap["PCR"]["FwdPrimer"] = true
+	portMap["PCR"]["PCRPolymerase"] = true
 
 	portMap["PCR"]["Reaction"] = false
 
 	portMap["Phytip_miniprep"] = make(map[string]bool)
-	portMap["Phytip_miniprep"]["Drytime"] = true
-	portMap["Phytip_miniprep"]["Phytips"] = true
-	portMap["Phytip_miniprep"]["Lysisstep"] = true
+	portMap["Phytip_miniprep"]["Resuspensionstep"] = true
+	portMap["Phytip_miniprep"]["Capturestep"] = true
 	portMap["Phytip_miniprep"]["Blottime"] = true
-	portMap["Phytip_miniprep"]["Vacuum"] = true
 	portMap["Phytip_miniprep"]["Vacuumstrength"] = true
-	portMap["Phytip_miniprep"]["Precipitationstep"] = true
-	portMap["Phytip_miniprep"]["Elutionstep"] = true
-	portMap["Phytip_miniprep"]["Cellpellet"] = true
+	portMap["Phytip_miniprep"]["Phytips"] = true
+	portMap["Phytip_miniprep"]["Airstep"] = true
 	portMap["Phytip_miniprep"]["Washsteps"] = true
+	portMap["Phytip_miniprep"]["Elutionstep"] = true
+	portMap["Phytip_miniprep"]["Vacuum"] = true
+	portMap["Phytip_miniprep"]["Drytime"] = true
+	portMap["Phytip_miniprep"]["Equilibrationstep"] = true
 	portMap["Phytip_miniprep"]["Blotcycles"] = true
 	portMap["Phytip_miniprep"]["Tips"] = true
-	portMap["Phytip_miniprep"]["Resuspensionstep"] = true
-	portMap["Phytip_miniprep"]["Equilibrationstep"] = true
-	portMap["Phytip_miniprep"]["Airstep"] = true
-	portMap["Phytip_miniprep"]["Capturestep"] = true
+	portMap["Phytip_miniprep"]["Cellpellet"] = true
+	portMap["Phytip_miniprep"]["Lysisstep"] = true
+	portMap["Phytip_miniprep"]["Precipitationstep"] = true
 
 	portMap["Phytip_miniprep"]["PlasmidDNAsolution"] = false
 
@@ -215,141 +216,161 @@ func GetComponents() []ComponentDesc {
 	portMap["Printname"]["Fullname"] = false
 
 	portMap["Thawtime"] = make(map[string]bool)
-	portMap["Thawtime"]["Platetype"] = true
-	portMap["Thawtime"]["Liquid"] = true
-	portMap["Thawtime"]["Fillvolume"] = true
 	portMap["Thawtime"]["Airvelocity"] = true
 	portMap["Thawtime"]["SurfaceTemp"] = true
 	portMap["Thawtime"]["BulkTemp"] = true
 	portMap["Thawtime"]["Fudgefactor"] = true
+	portMap["Thawtime"]["Platetype"] = true
+	portMap["Thawtime"]["Liquid"] = true
+	portMap["Thawtime"]["Fillvolume"] = true
 
 	portMap["Thawtime"]["Status"] = false
 	portMap["Thawtime"]["Estimatedthawtime"] = false
 	portMap["Thawtime"]["Thawtimeused"] = false
 
 	portMap["Transformation"] = make(map[string]bool)
-	portMap["Transformation"]["Reactionvolume"] = true
-	portMap["Transformation"]["Preplasmidtemp"] = true
-	portMap["Transformation"]["Postplasmidtime"] = true
-	portMap["Transformation"]["Postplasmidtemp"] = true
-	portMap["Transformation"]["Recoverytime"] = true
-	portMap["Transformation"]["Recoverymedium"] = true
 	portMap["Transformation"]["Preplasmidtime"] = true
 	portMap["Transformation"]["Recoveryvolume"] = true
+	portMap["Transformation"]["Reaction"] = true
+	portMap["Transformation"]["OutPlate"] = true
+	portMap["Transformation"]["CompetentCellvolumeperassembly"] = true
+	portMap["Transformation"]["Reactionvolume"] = true
+	portMap["Transformation"]["Preplasmidtemp"] = true
+	portMap["Transformation"]["Recoverytime"] = true
 	portMap["Transformation"]["Recoverytemp"] = true
 	portMap["Transformation"]["CompetentCells"] = true
-	portMap["Transformation"]["OutPlate"] = true
-	portMap["Transformation"]["AgarPlate"] = true
-	portMap["Transformation"]["CompetentCellvolumeperassembly"] = true
+	portMap["Transformation"]["Postplasmidtemp"] = true
+	portMap["Transformation"]["Postplasmidtime"] = true
 	portMap["Transformation"]["Plateoutvolume"] = true
-	portMap["Transformation"]["Reaction"] = true
+	portMap["Transformation"]["Recoverymedium"] = true
+	portMap["Transformation"]["AgarPlate"] = true
 
 	portMap["Transformation"]["Platedculture"] = false
 
 	portMap["TypeIISAssembly_design"] = make(map[string]bool)
+	portMap["TypeIISAssembly_design"]["Vector"] = true
+	portMap["TypeIISAssembly_design"]["PartMoClotypesinorder"] = true
 	portMap["TypeIISAssembly_design"]["RestrictionsitetoAvoid"] = true
 	portMap["TypeIISAssembly_design"]["Constructname"] = true
 	portMap["TypeIISAssembly_design"]["Partsinorder"] = true
 	portMap["TypeIISAssembly_design"]["AssemblyStandard"] = true
 	portMap["TypeIISAssembly_design"]["Level"] = true
-	portMap["TypeIISAssembly_design"]["Vector"] = true
-	portMap["TypeIISAssembly_design"]["PartMoClotypesinorder"] = true
 
-	portMap["TypeIISAssembly_design"]["NewDNASequence"] = false
-	portMap["TypeIISAssembly_design"]["Sitesfound"] = false
-	portMap["TypeIISAssembly_design"]["BackupParts"] = false
 	portMap["TypeIISAssembly_design"]["Warnings"] = false
 	portMap["TypeIISAssembly_design"]["Status"] = false
 	portMap["TypeIISAssembly_design"]["Simulationpass"] = false
 	portMap["TypeIISAssembly_design"]["PartswithOverhangs"] = false
+	portMap["TypeIISAssembly_design"]["NewDNASequence"] = false
+	portMap["TypeIISAssembly_design"]["Sitesfound"] = false
+	portMap["TypeIISAssembly_design"]["BackupParts"] = false
 
 	portMap["TypeIISConstructAssembly"] = make(map[string]bool)
+	portMap["TypeIISConstructAssembly"]["ReactionVolume"] = true
+	portMap["TypeIISConstructAssembly"]["BufferVol"] = true
+	portMap["TypeIISConstructAssembly"]["InactivationTemp"] = true
+	portMap["TypeIISConstructAssembly"]["OutputReactionName"] = true
 	portMap["TypeIISConstructAssembly"]["Vector"] = true
+	portMap["TypeIISConstructAssembly"]["RestrictionEnzyme"] = true
 	portMap["TypeIISConstructAssembly"]["Buffer"] = true
 	portMap["TypeIISConstructAssembly"]["Atp"] = true
-	portMap["TypeIISConstructAssembly"]["ReactionTime"] = true
-	portMap["TypeIISConstructAssembly"]["InactivationTemp"] = true
-	portMap["TypeIISConstructAssembly"]["InactivationTime"] = true
-	portMap["TypeIISConstructAssembly"]["OutputReactionName"] = true
-	portMap["TypeIISConstructAssembly"]["RestrictionEnzyme"] = true
-	portMap["TypeIISConstructAssembly"]["PartVols"] = true
-	portMap["TypeIISConstructAssembly"]["BufferVol"] = true
-	portMap["TypeIISConstructAssembly"]["ReVol"] = true
-	portMap["TypeIISConstructAssembly"]["Parts"] = true
-	portMap["TypeIISConstructAssembly"]["ReactionTemp"] = true
-	portMap["TypeIISConstructAssembly"]["InPlate"] = true
-	portMap["TypeIISConstructAssembly"]["ReactionVolume"] = true
-	portMap["TypeIISConstructAssembly"]["PartNames"] = true
 	portMap["TypeIISConstructAssembly"]["VectorVol"] = true
-	portMap["TypeIISConstructAssembly"]["AtpVol"] = true
-	portMap["TypeIISConstructAssembly"]["LigVol"] = true
-	portMap["TypeIISConstructAssembly"]["Water"] = true
 	portMap["TypeIISConstructAssembly"]["Ligase"] = true
+	portMap["TypeIISConstructAssembly"]["PartNames"] = true
+	portMap["TypeIISConstructAssembly"]["LigVol"] = true
+	portMap["TypeIISConstructAssembly"]["Parts"] = true
+	portMap["TypeIISConstructAssembly"]["Water"] = true
 	portMap["TypeIISConstructAssembly"]["OutPlate"] = true
+	portMap["TypeIISConstructAssembly"]["PartVols"] = true
+	portMap["TypeIISConstructAssembly"]["AtpVol"] = true
+	portMap["TypeIISConstructAssembly"]["ReVol"] = true
+	portMap["TypeIISConstructAssembly"]["ReactionTemp"] = true
+	portMap["TypeIISConstructAssembly"]["ReactionTime"] = true
+	portMap["TypeIISConstructAssembly"]["InactivationTime"] = true
+	portMap["TypeIISConstructAssembly"]["InPlate"] = true
 
 	portMap["TypeIISConstructAssembly"]["Reaction"] = false
 
 	portMap["TypeIISConstructAssembly_alt"] = make(map[string]bool)
-	portMap["TypeIISConstructAssembly_alt"]["OutPlate"] = true
-	portMap["TypeIISConstructAssembly_alt"]["ReactionVolume"] = true
+	portMap["TypeIISConstructAssembly_alt"]["Buffer"] = true
+	portMap["TypeIISConstructAssembly_alt"]["Water"] = true
+	portMap["TypeIISConstructAssembly_alt"]["Ligase"] = true
+	portMap["TypeIISConstructAssembly_alt"]["PartNames"] = true
+	portMap["TypeIISConstructAssembly_alt"]["LigVol"] = true
+	portMap["TypeIISConstructAssembly_alt"]["InactivationTemp"] = true
+	portMap["TypeIISConstructAssembly_alt"]["InactivationTime"] = true
+	portMap["TypeIISConstructAssembly_alt"]["RestrictionEnzyme"] = true
+	portMap["TypeIISConstructAssembly_alt"]["PartMinVol"] = true
 	portMap["TypeIISConstructAssembly_alt"]["PartConcs"] = true
-	portMap["TypeIISConstructAssembly_alt"]["VectorVol"] = true
-	portMap["TypeIISConstructAssembly_alt"]["ReVol"] = true
+	portMap["TypeIISConstructAssembly_alt"]["AtpVol"] = true
 	portMap["TypeIISConstructAssembly_alt"]["ReactionTime"] = true
+	portMap["TypeIISConstructAssembly_alt"]["OutPlate"] = true
+	portMap["TypeIISConstructAssembly_alt"]["VectorVol"] = true
+	portMap["TypeIISConstructAssembly_alt"]["Parts"] = true
 	portMap["TypeIISConstructAssembly_alt"]["Vector"] = true
 	portMap["TypeIISConstructAssembly_alt"]["Atp"] = true
 	portMap["TypeIISConstructAssembly_alt"]["InPlate"] = true
-	portMap["TypeIISConstructAssembly_alt"]["PartMinVol"] = true
-	portMap["TypeIISConstructAssembly_alt"]["PartNames"] = true
+	portMap["TypeIISConstructAssembly_alt"]["ReactionVolume"] = true
 	portMap["TypeIISConstructAssembly_alt"]["BufferVol"] = true
-	portMap["TypeIISConstructAssembly_alt"]["LigVol"] = true
-	portMap["TypeIISConstructAssembly_alt"]["RestrictionEnzyme"] = true
-	portMap["TypeIISConstructAssembly_alt"]["Ligase"] = true
-	portMap["TypeIISConstructAssembly_alt"]["AtpVol"] = true
-	portMap["TypeIISConstructAssembly_alt"]["InactivationTime"] = true
+	portMap["TypeIISConstructAssembly_alt"]["ReVol"] = true
 	portMap["TypeIISConstructAssembly_alt"]["ReactionTemp"] = true
-	portMap["TypeIISConstructAssembly_alt"]["InactivationTemp"] = true
-	portMap["TypeIISConstructAssembly_alt"]["Parts"] = true
-	portMap["TypeIISConstructAssembly_alt"]["Buffer"] = true
-	portMap["TypeIISConstructAssembly_alt"]["Water"] = true
 
-	portMap["TypeIISConstructAssembly_alt"]["S"] = false
 	portMap["TypeIISConstructAssembly_alt"]["Reaction"] = false
+	portMap["TypeIISConstructAssembly_alt"]["S"] = false
+
+	portMap["TypeIISConstructAssemblyMMX"] = make(map[string]bool)
+	portMap["TypeIISConstructAssemblyMMX"]["PartVols"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["OutputReactionName"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["MasterMix"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["InPlate"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["ReactionVolume"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["VectorVol"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["InactivationTemp"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["Water"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["OutPlate"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["PartNames"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["ReactionTime"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["Parts"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["Vector"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["MMXVol"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["ReactionTemp"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["InactivationTime"] = true
+
+	portMap["TypeIISConstructAssemblyMMX"]["Reaction"] = false
 
 	portMap["TypeIISConstructAssembly_sim"] = make(map[string]bool)
-	portMap["TypeIISConstructAssembly_sim"]["Partsinorder"] = true
-	portMap["TypeIISConstructAssembly_sim"]["Vector"] = true
-	portMap["TypeIISConstructAssembly_sim"]["Buffer"] = true
-	portMap["TypeIISConstructAssembly_sim"]["ReactionVolume"] = true
-	portMap["TypeIISConstructAssembly_sim"]["PartConcs"] = true
-	portMap["TypeIISConstructAssembly_sim"]["AtpVol"] = true
-	portMap["TypeIISConstructAssembly_sim"]["ReVol"] = true
-	portMap["TypeIISConstructAssembly_sim"]["ReactionTime"] = true
-	portMap["TypeIISConstructAssembly_sim"]["InPlate"] = true
-	portMap["TypeIISConstructAssembly_sim"]["Constructname"] = true
-	portMap["TypeIISConstructAssembly_sim"]["PartVols"] = true
 	portMap["TypeIISConstructAssembly_sim"]["LigVol"] = true
-	portMap["TypeIISConstructAssembly_sim"]["InactivationTemp"] = true
-	portMap["TypeIISConstructAssembly_sim"]["Vectordata"] = true
-	portMap["TypeIISConstructAssembly_sim"]["Parts"] = true
-	portMap["TypeIISConstructAssembly_sim"]["Atp"] = true
-	portMap["TypeIISConstructAssembly_sim"]["VectorConcentration"] = true
-	portMap["TypeIISConstructAssembly_sim"]["BufferVol"] = true
+	portMap["TypeIISConstructAssembly_sim"]["ReactionTime"] = true
 	portMap["TypeIISConstructAssembly_sim"]["InactivationTime"] = true
 	portMap["TypeIISConstructAssembly_sim"]["RestrictionEnzyme"] = true
+	portMap["TypeIISConstructAssembly_sim"]["Buffer"] = true
+	portMap["TypeIISConstructAssembly_sim"]["Atp"] = true
+	portMap["TypeIISConstructAssembly_sim"]["ReactionVolume"] = true
+	portMap["TypeIISConstructAssembly_sim"]["Partsinorder"] = true
+	portMap["TypeIISConstructAssembly_sim"]["ReVol"] = true
+	portMap["TypeIISConstructAssembly_sim"]["ReactionTemp"] = true
+	portMap["TypeIISConstructAssembly_sim"]["AtpVol"] = true
+	portMap["TypeIISConstructAssembly_sim"]["InactivationTemp"] = true
+	portMap["TypeIISConstructAssembly_sim"]["Vectordata"] = true
 	portMap["TypeIISConstructAssembly_sim"]["Water"] = true
+	portMap["TypeIISConstructAssembly_sim"]["Constructname"] = true
+	portMap["TypeIISConstructAssembly_sim"]["PartVols"] = true
+	portMap["TypeIISConstructAssembly_sim"]["PartConcs"] = true
+	portMap["TypeIISConstructAssembly_sim"]["BufferVol"] = true
 	portMap["TypeIISConstructAssembly_sim"]["Ligase"] = true
 	portMap["TypeIISConstructAssembly_sim"]["OutPlate"] = true
+	portMap["TypeIISConstructAssembly_sim"]["InPlate"] = true
 	portMap["TypeIISConstructAssembly_sim"]["VectorVol"] = true
-	portMap["TypeIISConstructAssembly_sim"]["ReactionTemp"] = true
+	portMap["TypeIISConstructAssembly_sim"]["VectorConcentration"] = true
+	portMap["TypeIISConstructAssembly_sim"]["Parts"] = true
+	portMap["TypeIISConstructAssembly_sim"]["Vector"] = true
 
+	portMap["TypeIISConstructAssembly_sim"]["Simulationpass"] = false
 	portMap["TypeIISConstructAssembly_sim"]["Molesperpart"] = false
 	portMap["TypeIISConstructAssembly_sim"]["MolarratiotoVector"] = false
 	portMap["TypeIISConstructAssembly_sim"]["NewDNASequence"] = false
 	portMap["TypeIISConstructAssembly_sim"]["Sitesfound"] = false
 	portMap["TypeIISConstructAssembly_sim"]["Reaction"] = false
 	portMap["TypeIISConstructAssembly_sim"]["Status"] = false
-	portMap["TypeIISConstructAssembly_sim"]["Simulationpass"] = false
 
 	portMap["SumVolume"] = make(map[string]bool)
 	portMap["SumVolume"]["A"] = true
@@ -378,6 +399,7 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "TypeIISAssembly_design", Constructor: TypeIISAssembly_design.NewTypeIISAssembly_design})
 	c = append(c, ComponentDesc{Name: "TypeIISConstructAssembly", Constructor: TypeIISConstructAssembly.NewTypeIISConstructAssembly})
 	c = append(c, ComponentDesc{Name: "TypeIISConstructAssembly_alt", Constructor: TypeIISConstructAssembly_alt.NewTypeIISConstructAssembly_alt})
+	c = append(c, ComponentDesc{Name: "TypeIISConstructAssemblyMMX", Constructor: TypeIISConstructAssemblyMMX.NewTypeIISConstructAssemblyMMX})
 	c = append(c, ComponentDesc{Name: "TypeIISConstructAssembly_sim", Constructor: TypeIISConstructAssembly_sim.NewTypeIISConstructAssembly_sim})
 	c = append(c, ComponentDesc{Name: "SumVolume", Constructor: SumVolume.NewSumVolume})
 

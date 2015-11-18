@@ -138,6 +138,7 @@ func MakeDefaultPolicy() LHPolicy {
 	defaultpolicy["DEFAULTPIPETTESPEED"] = 1.0
 	defaultpolicy["MANUALPTZ"] = false
 	defaultpolicy["JUSTBLOWOUT"] = false
+	defaultpolicy["DONT_BE_DIRTY"] = true
 	return defaultpolicy
 }
 

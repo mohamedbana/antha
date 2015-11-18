@@ -25,6 +25,7 @@ package liquidhandling
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/antha-lang/antha/antha/anthalib/material"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -313,10 +314,12 @@ func (lhp *LHProperties) AddTipBox(tipbox *wtype.LHTipbox) {
 		return
 	}
 
+	// surely this should not be fatal
 	logger.Fatal("NO TIP SPACES LEFT")
 	panic("NO TIP SPACES LEFT")
 }
 func (lhp *LHProperties) AddTipBoxTo(pos string, tipbox *wtype.LHTipbox) {
+	fmt.Println("Adding tip box of type, ", tipbox.Type, " To position ", pos)
 	if lhp.PosLookup[pos] != "" {
 		logger.Fatal("CAN'T ADD TIPBOX TO FULL POSITION")
 		panic("CAN'T ADD TIPBOX TO FULL POSITION")
@@ -440,6 +443,19 @@ func (lhp *LHProperties) GetCleanTips(tiptype string, channel *wtype.LHChannelPa
 	positions = make([]string, multi)
 	boxtypes = make([]string, multi)
 
+	// hack -- count tips left
+	n_tips_left := 0
+	for _, pos := range lhp.Tip_preferences {
+		bx := lhp.Tipboxes[pos]
+		if bx.Tiptype.Type != tiptype {
+			continue
+		}
+
+		n_tips_left += bx.N_clean_tips()
+	}
+
+	logger.Debug(fmt.Sprintf("There are %d clean tips of type %s left", n_tips_left, tiptype))
+
 	foundit := false
 
 	for _, pos := range lhp.Tip_preferences {
@@ -496,4 +512,41 @@ func (lhp *LHProperties) DropDirtyTips(channel *wtype.LHChannelParameter, multi 
 //GetMaterialType implement stockableMaterial
 func (lhp *LHProperties) GetMaterialType() material.MaterialType {
 	return lhp.MaterialType
+}
+func (lhp *LHProperties) GetTimer() *LHTimer {
+	return GetTimerFor(lhp.Model, lhp.Mnfr)
+}
+
+// records timing info
+
+type LHTimer struct {
+	Times []time.Duration
+}
+
+func NewTimer() *LHTimer {
+	var t LHTimer
+	t.Times = new([]time.Duration, 0, 20)
+	return &t
+}
+
+func (t *LHTimer) TimeFor(i int) time.Duration {
+	_, ok := t.Times[i]
+
+	if !ok {
+		d, _ := time.ParseDuration("0s")
+		return d
+	}
+
+	d := t.Times[i]
+	return d
+}
+
+func (t *LHTimer) TimeOperations(instrx []*RobotInstruction) time.Duration {
+	var d time.Duration
+
+	for _, i := range instrx {
+
+	}
+
+	return d
 }

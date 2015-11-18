@@ -1111,6 +1111,18 @@ func (tb *LHTipbox) GetName() string {
 	return tb.Boxname
 }
 
+func (tb *LHTipbox) N_clean_tips() int {
+	c := 0
+	for j := 0; j < tb.Nrows; j++ {
+		for i := 0; i < tb.Ncols; i++ {
+			if tb.Tips[i][j] != nil && !tb.Tips[i][j].Dirty {
+				c += 1
+			}
+		}
+	}
+	return c
+}
+
 // actually useful functions
 // TODO implement Mirror
 

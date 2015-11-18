@@ -94,8 +94,10 @@ func (w *Wrapper) MixInto(outplate *wtype.LHPlate, components ...*wtype.LHCompon
 		config["RESIDUAL_VOLUME_WEIGHT"] = 1.0
 		config["OUTPUT_COUNT"] = w.outputCount
 		config["BLOCKID"] = w.blockID.String()
+		// these should come from the paramblock... for now though
 		config["INPUT_PLATETYPE"] = "pcrplate_with_cooler"
 		config["OUTPUT_PLATETYPE"] = "pcrplate_with_cooler"
+
 		configString, err := json.Marshal(config)
 		if err != nil {
 			panic(fmt.Sprintf("error configuring liquid handling request: %s", err))
