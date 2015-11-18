@@ -16,6 +16,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/PCR"
 	"github.com/antha-lang/antha/antha/component/lib/Phytip_miniprep"
 	"github.com/antha-lang/antha/antha/component/lib/Printname"
+	"github.com/antha-lang/antha/antha/component/lib/RemoveRestrictionSites"
 	"github.com/antha-lang/antha/antha/component/lib/Scarfree_design"
 	"github.com/antha-lang/antha/antha/component/lib/SumVolume"
 	"github.com/antha-lang/antha/antha/component/lib/Thawtime"
@@ -171,6 +172,8 @@ func GetComponents() []ComponentDesc {
 	portMap["NewDNASequence"]["SingleStranded"] = true
 
 	portMap["NewDNASequence"]["DNA"] = false
+	portMap["NewDNASequence"]["DNAwithORFs"] = false
+	portMap["NewDNASequence"]["Status"] = false
 
 	portMap["OD"] = make(map[string]bool)
 	portMap["OD"]["Blank_absorbance"] = true
@@ -239,6 +242,19 @@ func GetComponents() []ComponentDesc {
 	portMap["Printname"]["Name"] = true
 
 	portMap["Printname"]["Fullname"] = false
+
+	portMap["RemoveRestrictionSites"] = make(map[string]bool)
+	portMap["RemoveRestrictionSites"]["EnzymeforRestrictionmapping"] = true
+	portMap["RemoveRestrictionSites"]["PreserveTranslatedseq"] = true
+	portMap["RemoveRestrictionSites"]["RemoveifnotinORF"] = true
+	portMap["RemoveRestrictionSites"]["RestrictionsitetoAvoid"] = true
+	portMap["RemoveRestrictionSites"]["Sequence"] = true
+
+	portMap["RemoveRestrictionSites"]["FragmentSizesfromRestrictionmapping"] = false
+	portMap["RemoveRestrictionSites"]["SiteFreeSequence"] = false
+	portMap["RemoveRestrictionSites"]["Sitesfoundinoriginal"] = false
+	portMap["RemoveRestrictionSites"]["Status"] = false
+	portMap["RemoveRestrictionSites"]["Warnings"] = false
 
 	portMap["Scarfree_design"] = make(map[string]bool)
 	portMap["Scarfree_design"]["Constructname"] = true
@@ -413,6 +429,7 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "PCR", Constructor: PCR.NewPCR})
 	c = append(c, ComponentDesc{Name: "Phytip_miniprep", Constructor: Phytip_miniprep.NewPhytip_miniprep})
 	c = append(c, ComponentDesc{Name: "Printname", Constructor: Printname.NewPrintname})
+	c = append(c, ComponentDesc{Name: "RemoveRestrictionSites", Constructor: RemoveRestrictionSites.NewRemoveRestrictionSites})
 	c = append(c, ComponentDesc{Name: "Scarfree_design", Constructor: Scarfree_design.NewScarfree_design})
 	c = append(c, ComponentDesc{Name: "SumVolume", Constructor: SumVolume.NewSumVolume})
 	c = append(c, ComponentDesc{Name: "Thawtime", Constructor: Thawtime.NewThawtime})

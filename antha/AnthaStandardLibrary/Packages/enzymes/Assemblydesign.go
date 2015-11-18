@@ -157,17 +157,17 @@ func AddCustomEnds(part wtype.DNASequence, enzyme wtype.TypeIIs, desiredstickyen
 		bittoadd = ""
 	}
 	bittoadd5prime := Makeoverhang(enzyme, "5prime", bittoadd, ChooseSpacer(enzyme.Topstrand3primedistancefromend, "", []string{}))
-	fmt.Println("bittoadd5prime", bittoadd5prime)
+
 	partwith5primeend := Addoverhang(part.Seq, bittoadd5prime, "5prime")
 
 	bittoadd3 := desiredstickyend3prime
-	fmt.Println("bittoadd3", bittoadd3)
+
 	if strings.HasSuffix(part.Seq, bittoadd3) == true {
 		bittoadd3 = ""
 	}
-	//fmt.Println("bittoadd3", bittoadd3)
+
 	bittoadd3prime := Makeoverhang(enzyme, "3prime", bittoadd3, ChooseSpacer(enzyme.Topstrand3primedistancefromend, "", []string{}))
-	fmt.Println("bittoadd3prime", bittoadd3prime)
+
 	partwithends := Addoverhang(partwith5primeend, bittoadd3prime, "3prime")
 
 	Partwithends.Nm = part.Nm
@@ -224,7 +224,12 @@ func HandleExistingEnds (parts []wtype.DNASequence, enzymewtype.LogicalRestricti
 	}
 	return
 }
+
+func AddStandardVectorEnds (vector wtype.DNASequence, standard, level string) (vectrowithends wtype.DNASequence) {
+
+	}
 */
+
 func MakeScarfreeCustomTypeIIsassemblyParts(parts []wtype.DNASequence, vector wtype.DNASequence, enzyme wtype.TypeIIs) (partswithends []wtype.DNASequence) {
 
 	partswithends = make([]wtype.DNASequence, 0)
@@ -262,12 +267,9 @@ func MakeScarfreeCustomTypeIIsassemblyParts(parts []wtype.DNASequence, vector wt
 		}
 		partwithends = AddCustomEnds(parts[i], enzyme, desiredstickyend5prime, desiredstickyend3prime)
 		partswithends = append(partswithends, partwithends)
-		//
+
 		desiredstickyend5prime = Suffix(parts[i].Seq, enzyme.LogicalRestrictionEnzyme.EndLength)
-		fmt.Println("HEYYYYYYYYYYY", enzyme.LogicalRestrictionEnzyme.EndLength)
-		fmt.Println("HEYYYYYYYYYYY", desiredstickyend5prime)
-		//dnaseqcut := dnaseq.Seq[(len(dnaseq.Seq) - 4):]
-		fmt.Println(desiredstickyend5prime)
+
 	}
 
 	return partswithends
@@ -295,42 +297,6 @@ func Makeallspaceroptions(spacerlength int) (finalarray []string) {
 
 	finalarray = AllCombinations(newarray)
 
-	/*
-		//if len(seqstoavoid)>0{
-		s := ""
-		var newarray []string
-		var intermediatearray []string
-		finalarray = make([]string, 0)
-		//for i := 0; i < spacerlength; i++ {
-		newarray = Addnucleotide(s)
-		fmt.Println("newarray", newarray)
-		if spacerlength == 1 {
-			finalarray = newarray
-		}
-
-		for _, array_part_s := range newarray {
-			intermediatearray = Addnucleotide(array_part_s)
-			fmt.Println("intermediatearray", intermediatearray)
-			if spacerlength == 2 {
-				for _, partofintermediatearray := range intermediatearray {
-					finalarray = append(finalarray, partofintermediatearray)
-					fmt.Println("finalarray", finalarray)
-				}
-			}
-		}
-		/*if spacerlength == 3 {
-			finalarray2 := finalarray
-			var finalarray3 []string
-			finalarray = make([]string, 0)
-			for _, partoffinalarray := range finalarray2 {
-				finalarray = Addnucleotide(partoffinalarray)
-				finalarray3 = append(finalarray3, partoffinalarray)
-				finalarray = append(finalarray,finalarray3)
-				fmt.Println("finalarray", finalarray)
-			}
-		}*/
-
-	//	}
 	return finalarray
 }
 
@@ -414,6 +380,13 @@ var Endlinks = map[string]map[string]map[int]map[int]string{
 			},
 		},
 	},
+	"Electra": map[string]map[int]map[int]string{
+		"Level0": map[int]map[int]string{
+			1: map[int]string{
+				0: "ATG",
+			},
+		},
+	},
 }
 var EndlinksString = map[string]map[string]map[string][]string{
 	"MoClo": map[string]map[string][]string{
@@ -483,6 +456,10 @@ var Vectorends = map[string]map[string][]string{
 		"Level0": []string{"", ""},
 		"Level1": []string{"", ""},
 	},
+	"Electra": map[string][]string{
+		"Level0": []string{"GGT", "ATG"},
+		"Level1": []string{"", ""},
+	},
 }
 
 var Enzymelookup = map[string]map[string]wtype.TypeIIs{
@@ -494,6 +471,9 @@ var Enzymelookup = map[string]map[string]wtype.TypeIIs{
 	"MoClo": map[string]wtype.TypeIIs{
 		"Level0": BsaIenz,
 		"Level1": BpiIenz,
+	},
+	"Electra": map[string]wtype.TypeIIs{
+		"Level0": SapIenz,
 	},
 }
 

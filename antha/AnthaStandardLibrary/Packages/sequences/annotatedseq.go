@@ -26,6 +26,7 @@ import (
 	"fmt"
 	//. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"strconv"
 	"strings"
 )
 
@@ -50,10 +51,46 @@ type Feature struct {
 	Protseq       string
 }
 
+func (feat *Feature) Coordinates() (pair []int) {
+	pair[0] = feat.StartPosition
+	pair[1] = feat.EndPosition
+	return
+}
+
 type AnnotatedSeq struct {
 	//Nm string
 	wtype.DNASequence
 	Features []Feature
+}
+
+func Annotate(dnaseq wtype.DNASequence, features []Feature) (annotated AnnotatedSeq) {
+	annotated.DNASequence = dnaseq
+	annotated.Features = features
+	return
+}
+
+func AddFeatures(annotated AnnotatedSeq, features []Feature) (updated AnnotatedSeq) {
+
+	for _, feature := range features {
+		annotated.Features = append(annotated.Features, feature)
+	}
+	return
+}
+
+func ORFs2Features(orfs []ORF) (features []Feature) {
+
+	features = make([]Feature, 0)
+
+	for i, orf := range orfs {
+		// currently just names each orf + number of orf. Add Rename orf function and sort by struct field function to run first to put orfs in order
+		reverse := false
+		if strings.ToUpper(orf.Direction) == strings.ToUpper("REVERSE") {
+			reverse = true
+		}
+		feature := Feature{"orf" + strconv.Itoa(i), "orf", reverse, orf.StartPosition, orf.EndPosition, orf.DNASeq, orf.ProtSeq}
+		features = append(features, feature)
+	}
+	return
 }
 
 func MakeFeature(name string, seq string, sequencetype string, class string, reverse string) (feature Feature) {

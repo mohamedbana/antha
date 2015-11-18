@@ -4,6 +4,8 @@ import (
 	"fmt"
 	//"math"
 	"encoding/json"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/execute"
@@ -12,7 +14,6 @@ import (
 	"sync"
 )
 
-//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 // Input parameters for this protocol
 
 // Data which is returned from this protocol
@@ -39,7 +40,7 @@ func (e *NewDNASequence) steps(p NewDNASequenceParamBlock, r *NewDNASequenceResu
 	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
-	fmt.Println("IN steps!")
+	fmt.Println("In steps!")
 	if p.Plasmid != p.Linear {
 		if p.Plasmid {
 			r.DNA = wtype.MakePlasmidDNASequence(p.Gene_name, p.DNA_seq)
@@ -48,8 +49,19 @@ func (e *NewDNASequence) steps(p NewDNASequenceParamBlock, r *NewDNASequenceResu
 		} else if p.SingleStranded {
 			r.DNA = wtype.MakeSingleStrandedDNASequence(p.Gene_name, p.DNA_seq)
 		}
+
+		orfs := sequences.FindallORFs(r.DNA.Seq)
+		features := sequences.ORFs2Features(orfs)
+
+		r.DNAwithORFs = sequences.Annotate(r.DNA, features)
+
+		r.Status = fmt.Sprintln(
+			text.Print("DNA_Seq: ", p.DNA_seq),
+			text.Print("ORFs: ", r.DNAwithORFs.Features),
+		)
+
 	} else {
-		fmt.Println("correct conditions not met")
+		r.Status = fmt.Sprintln("correct conditions not met")
 	}
 	_ = _wrapper.WaitToEnd()
 
@@ -75,12 +87,16 @@ func (e *NewDNASequence) Complete(params interface{}) {
 	p := params.(NewDNASequenceParamBlock)
 	if p.Error {
 		e.DNA <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
+		e.DNAwithORFs <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
+		e.Status <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
 		return
 	}
 	r := new(NewDNASequenceResultBlock)
 	defer func() {
 		if res := recover(); res != nil {
 			e.DNA <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
+			e.DNAwithORFs <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
+			e.Status <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
 			execute.AddError(res)
 			return
 		}
@@ -89,6 +105,10 @@ func (e *NewDNASequence) Complete(params interface{}) {
 	e.steps(p, r)
 
 	e.DNA <- execute.ThreadParam{Value: r.DNA, ID: p.ID, Error: false}
+
+	e.DNAwithORFs <- execute.ThreadParam{Value: r.DNAwithORFs, ID: p.ID, Error: false}
+
+	e.Status <- execute.ThreadParam{Value: r.Status, ID: p.ID, Error: false}
 
 	e.analysis(p, r)
 
@@ -268,6 +288,8 @@ type NewDNASequence struct {
 	Plasmid        <-chan execute.ThreadParam
 	SingleStranded <-chan execute.ThreadParam
 	DNA            chan<- execute.ThreadParam
+	DNAwithORFs    chan<- execute.ThreadParam
+	Status         chan<- execute.ThreadParam
 }
 
 type NewDNASequenceParamBlock struct {
@@ -293,10 +315,12 @@ type NewDNASequenceConfig struct {
 }
 
 type NewDNASequenceResultBlock struct {
-	ID      execute.ThreadID
-	BlockID execute.BlockID
-	Error   bool
-	DNA     wtype.DNASequence
+	ID          execute.ThreadID
+	BlockID     execute.BlockID
+	Error       bool
+	DNA         wtype.DNASequence
+	DNAwithORFs sequences.AnnotatedSeq
+	Status      string
 }
 
 type NewDNASequenceJSONBlock struct {
@@ -309,6 +333,8 @@ type NewDNASequenceJSONBlock struct {
 	Plasmid        *bool
 	SingleStranded *bool
 	DNA            *wtype.DNASequence
+	DNAwithORFs    *sequences.AnnotatedSeq
+	Status         *string
 }
 
 func (c *NewDNASequence) ComponentInfo() *execute.ComponentInfo {
@@ -320,6 +346,8 @@ func (c *NewDNASequence) ComponentInfo() *execute.ComponentInfo {
 	inp = append(inp, *execute.NewPortInfo("Plasmid", "bool", "Plasmid", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("SingleStranded", "bool", "SingleStranded", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("DNA", "wtype.DNASequence", "DNA", true, true, nil, nil))
+	outp = append(outp, *execute.NewPortInfo("DNAwithORFs", "sequences.AnnotatedSeq", "DNAwithORFs", true, true, nil, nil))
+	outp = append(outp, *execute.NewPortInfo("Status", "string", "Status", true, true, nil, nil))
 
 	ci := execute.NewComponentInfo("NewDNASequence", "NewDNASequence", "", false, inp, outp)
 

@@ -111,93 +111,139 @@ func Translatestring (seq string) (aa string,err error) {
 }
 */
 // Translate dna sequence into amino acid sequence; need to update to deal with wobble
+
+var RevCodonTable = map[string][]string{
+
+	"N": []string{"AAC", "AAT"},
+	"K": []string{"AAA", "AAG"},
+
+	"T": []string{"ACC", "ACT", "ACA", "ACG"},
+
+	"I": []string{"ATC", "ATT", "ATA"},
+
+	"M": []string{"ATG"},
+
+	"R": []string{"AGA", "AGG", "CGC", "CGT", "CGA", "CGG"},
+
+	"Y": []string{"TAC", "TAT"},
+
+	"*": []string{"TAA", "TAG", "TGA"},
+
+	"S": []string{"AGC", "AGT", "TCC", "TCT", "TCA", "TCG"},
+
+	"F": []string{"TTC", "TTT"},
+
+	"L": []string{"TTA", "TTG", "CTC", "CTT", "CTA", "CTG"},
+
+	"C": []string{"TGC", "TGT"},
+
+	"W": []string{"TGG"},
+
+	"D": []string{"GAC", "GAT"},
+
+	"E": []string{"GAA", "GAG"},
+
+	"V": []string{"GTC", "GTT", "GTA", "GTG"},
+
+	"A": []string{"GCA", "GCC", "GCG", "GCT"},
+
+	"G": []string{"GGC", "GGT", "GGA", "GGG"},
+
+	"H": []string{"CAC", "CAT"},
+
+	"Q": []string{"CAA", "CAG"},
+
+	"P": []string{"CCC", "CCT", "CCA", "CCG"},
+}
+
+var Codontable = map[string]string{
+
+	"AAC": "N",
+	"AAT": "N",
+	"AAA": "K",
+	"AAG": "K",
+
+	"ACC": "T",
+	"ACT": "T",
+	"ACA": "T",
+	"ACG": "T",
+
+	"ATC": "I",
+	"ATT": "I",
+	"ATA": "I",
+	"ATG": "M",
+
+	"AGC": "S",
+	"AGT": "S",
+	"AGA": "R",
+	"AGG": "R",
+
+	"TAC": "Y",
+	"TAT": "Y",
+	"TAA": "*",
+	"TAG": "*",
+
+	"TCC": "S",
+	"TCT": "S",
+	"TCA": "S",
+	"TCG": "S",
+
+	"TTC": "F",
+	"TTT": "F",
+	"TTA": "L",
+	"TTG": "L",
+
+	"TGC": "C",
+	"TGT": "C",
+	"TGA": "*",
+	"TGG": "W",
+
+	"GAC": "D",
+	"GAT": "D",
+	"GAA": "E",
+	"GAG": "E",
+
+	"GTC": "V",
+	"GTT": "V",
+	"GTA": "V",
+	"GTG": "V",
+
+	"GCA": "A",
+	"GCC": "A",
+	"GCG": "A",
+	"GCT": "A",
+
+	"GGC": "G",
+	"GGT": "G",
+	"GGA": "G",
+	"GGG": "G",
+
+	"CAC": "H",
+	"CAT": "H",
+	"CAA": "Q",
+	"CAG": "Q",
+
+	"CCC": "P",
+	"CCT": "P",
+	"CCA": "P",
+	"CCG": "P",
+
+	"CTC": "L",
+	"CTT": "L",
+	"CTA": "L",
+	"CTG": "L",
+
+	"CGC": "R",
+	"CGT": "R",
+	"CGA": "R",
+	"CGG": "R",
+}
+
 func DNAtoAASeq(s []string) string {
 	r := make([]string, 0)
-	m := map[string]string{
-
-		"AAC": "N",
-		"AAT": "N",
-		"AAA": "K",
-		"AAG": "K",
-
-		"ACC": "T",
-		"ACT": "T",
-		"ACA": "T",
-		"ACG": "T",
-
-		"ATC": "I",
-		"ATT": "I",
-		"ATA": "I",
-		"ATG": "M",
-
-		"AGC": "S",
-		"AGT": "S",
-		"AGA": "R",
-		"AGG": "R",
-
-		"TAC": "Y",
-		"TAT": "Y",
-		"TAA": "*",
-		"TAG": "*",
-
-		"TCC": "S",
-		"TCT": "S",
-		"TCA": "S",
-		"TCG": "S",
-
-		"TTC": "F",
-		"TTT": "F",
-		"TTA": "L",
-		"TTG": "L",
-
-		"TGC": "C",
-		"TGT": "C",
-		"TGA": "*",
-		"TGG": "W",
-
-		"GAC": "D",
-		"GAT": "D",
-		"GAA": "E",
-		"GAG": "E",
-
-		"GTC": "V",
-		"GTT": "V",
-		"GTA": "V",
-		"GTG": "V",
-
-		"GCA": "A",
-		"GCC": "A",
-		"GCG": "A",
-		"GCT": "A",
-
-		"GGC": "G",
-		"GGT": "G",
-		"GGA": "G",
-		"GGG": "G",
-
-		"CAC": "H",
-		"CAT": "H",
-		"CAA": "Q",
-		"CAG": "Q",
-
-		"CCC": "P",
-		"CCT": "P",
-		"CCA": "P",
-		"CCG": "P",
-
-		"CTC": "L",
-		"CTT": "L",
-		"CTA": "L",
-		"CTG": "L",
-
-		"CGC": "R",
-		"CGT": "R",
-		"CGA": "R",
-		"CGG": "R",
-	}
 
 	for _, c := range s {
-		r = append(r, m[string(c)])
+		r = append(r, Codontable[string(c)])
 	}
 	rstring := strings.Join(r, "")
 	return rstring
@@ -388,7 +434,7 @@ func FindORF(seq string) (orf ORF, orftrue bool) { // finds an orf in the forwar
 	return orf, orftrue
 }
 
-func Findallorfs(seq string) (orfs []ORF) {
+func Findorfsinstrand(seq string) (orfs []ORF) {
 
 	orfs = make([]ORF, 0)
 	neworf, orftrue := FindORF(seq)
@@ -423,6 +469,22 @@ func Findallorfs(seq string) (orfs []ORF) {
 	/**/
 
 	return orfs
+}
+func LookforSpecificORF(seq string, targetAASeq string) (present bool) {
+	ORFS := DoublestrandedORFS(seq)
+	present = false
+	for _, orf := range ORFS.TopstrandORFS {
+		if strings.Contains(orf.ProtSeq, targetAASeq) {
+			present = true
+			return present
+		}
+	}
+	for _, revorf := range ORFS.BottomstrandORFS {
+		if strings.Contains(revorf.ProtSeq, targetAASeq) {
+			present = true
+		}
+	}
+	return present
 }
 
 /*
@@ -475,23 +537,40 @@ func FindFullorfs(seq string) (orfs []ORF) {
 }
 */
 
+func FindallORFs(seq string) []ORF {
+	return MergeORFs(DoublestrandedORFS(seq))
+}
+
 func DoublestrandedORFS(seq string) (features features) {
-	features.TopstrandORFS = Findallorfs(seq)
-	//fmt.Println("SEEEEEEEEEQQQQQQQQQQQ", seq)
+	features.TopstrandORFS = Findorfsinstrand(seq)
 	revseq := RevComp(strings.ToUpper(seq))
-	fmt.Println("REEEVVVVSEQ", revseq)
-	reverseorfs := Findallorfs(revseq)
+	reverseorfs := Findorfsinstrand(revseq)
 	revORFpositionsreassigned := make([]ORF, 0)
 	for _, orf := range reverseorfs {
 		orf.Direction = "Reverse"
-		//tempend := orf.EndPosition
-		//orf.DNASeq = RevComp(orf.DNASeq)
 		orf.EndPosition = (len(seq) + 1 - orf.EndPosition)
 		orf.StartPosition = (len(seq) + 1 - orf.StartPosition)
 		revORFpositionsreassigned = append(revORFpositionsreassigned, orf)
 	}
 	features.BottomstrandORFS = revORFpositionsreassigned
 	return features
+}
+
+func MergeORFs(feats features) (orfs []ORF) {
+	orfs = make([]ORF, 0)
+	for _, top := range feats.TopstrandORFS {
+		orfs = append(orfs, top)
+	}
+	for _, bottom := range feats.BottomstrandORFS {
+		orfs = append(orfs, bottom)
+	}
+	return
+}
+
+// should make this an interface
+type features struct {
+	TopstrandORFS    []ORF
+	BottomstrandORFS []ORF
 }
 
 /*
@@ -505,25 +584,3 @@ func DoublestrandedFullORFS(seq string) (features features) {
 	return features
 }
 */
-func LookforSpecificORF(seq string, targetAASeq string) (present bool) {
-	ORFS := DoublestrandedORFS(seq)
-	present = false
-	for _, orf := range ORFS.TopstrandORFS {
-		if strings.Contains(orf.ProtSeq, targetAASeq) {
-			present = true
-			return present
-		}
-	}
-	for _, revorf := range ORFS.BottomstrandORFS {
-		if strings.Contains(revorf.ProtSeq, targetAASeq) {
-			present = true
-		}
-	}
-	return present
-}
-
-// should make this an interface
-type features struct {
-	TopstrandORFS    []ORF
-	BottomstrandORFS []ORF
-}
