@@ -24,13 +24,13 @@ package liquidhandling
 
 import (
 	"fmt"
-	"log"
-	"sync"
-
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
+	"log"
+	"sync"
+	"time"
 )
 
 // the liquid handler structure defines the interface to a particular liquid handling
@@ -103,10 +103,21 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 		RaiseError("Cannot execute request: no instructions")
 	}
 
+	// some timing info for the log (only) for now
+
+	timer := this.Properties.GetTimer()
+	var d time.Duration
+
 	for _, ins := range instructions {
 		logger.Debug(fmt.Sprintln(liquidhandling.InsToString(ins)))
 		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(this.Properties.Driver)
+
+		if timer != nil {
+			d += timer.TimeFor(ins)
+		}
 	}
+
+	logger.Debug(fmt.Sprintf("Total time estimate: %s", d.String()))
 
 	return nil
 }

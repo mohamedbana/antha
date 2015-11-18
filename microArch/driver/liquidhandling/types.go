@@ -514,7 +514,7 @@ func (lhp *LHProperties) GetMaterialType() material.MaterialType {
 	return lhp.MaterialType
 }
 func (lhp *LHProperties) GetTimer() *LHTimer {
-	return GetTimerFor(lhp.Model, lhp.Mnfr)
+	return GetTimerFor(lhp.Mnfr, lhp.Model)
 }
 
 // records timing info
@@ -536,16 +536,7 @@ func (t *LHTimer) TimeFor(r RobotInstruction) time.Duration {
 	var d time.Duration
 	if r.InstructionType() > 0 && r.InstructionType() < len(t.Times) {
 		d = t.Times[r.InstructionType()]
+	} else {
 	}
-	return d
-}
-
-func (t *LHTimer) TimeOperations(instrx []RobotInstruction) time.Duration {
-	var d time.Duration
-
-	for _, i := range instrx {
-		d += t.TimeFor(i)
-	}
-
 	return d
 }
