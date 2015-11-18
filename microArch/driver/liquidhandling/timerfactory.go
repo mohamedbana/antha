@@ -1,5 +1,9 @@
 package liquidhandling
 
+import (
+	"time"
+)
+
 func GetTimerFor(model, mnfr string) *LHTimer {
 	timers := makeTimers()
 	_, ok := timers[model+mnfr]
@@ -18,6 +22,12 @@ func makeTimers() map[string]*LHTimer {
 	return timers
 }
 
-func makeGilsonPipetMaxTimer() *LHTimer {
-
+func makeGilsonPipetmaxTimer() *LHTimer {
+	// first instance an intermediate level of detail is probably the best we can do
+	t := NewTimer()
+	t.Times[7], _ = time.ParseDuration("8s")
+	t.Times[8], _ = time.ParseDuration("6s")
+	t.Times[19], _ = time.ParseDuration("4s")
+	t.Times[20], _ = time.ParseDuration("4s")
+	return t
 }

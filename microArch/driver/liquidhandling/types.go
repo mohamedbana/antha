@@ -528,27 +528,23 @@ type LHTimer struct {
 
 func NewTimer() *LHTimer {
 	var t LHTimer
-	t.Times = new([]time.Duration, 0, 20)
+	t.Times = make([]time.Duration, 50)
 	return &t
 }
 
 func (t *LHTimer) TimeFor(r RobotInstruction) time.Duration {
-	_, ok := t.Times[r.InstructionType()]
-
-	if !ok {
-		d, _ := time.ParseDuration("0s")
-		return d
+	var d time.Duration
+	if r.InstructionType() > 0 && r.InstructionType() < len(t.Times) {
+		d = t.Times[r.InstructionType()]
 	}
-
-	d := t.Times[r.InstructionType()]
 	return d
 }
 
-func (t *LHTimer) TimeOperations(instrx []*RobotInstruction) time.Duration {
+func (t *LHTimer) TimeOperations(instrx []RobotInstruction) time.Duration {
 	var d time.Duration
 
 	for _, i := range instrx {
-		d += t.TimeFor[i]
+		d += t.TimeFor(i)
 	}
 
 	return d
