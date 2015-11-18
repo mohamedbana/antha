@@ -39,6 +39,7 @@ func (e *NewDNASequence) steps(p NewDNASequenceParamBlock, r *NewDNASequenceResu
 	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
+	fmt.Println("IN steps!")
 	if p.Plasmid != p.Linear {
 		if p.Plasmid {
 			r.DNA = wtype.MakePlasmidDNASequence(p.Gene_name, p.DNA_seq)

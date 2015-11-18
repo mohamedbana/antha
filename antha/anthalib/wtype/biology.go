@@ -25,7 +25,7 @@ package wtype
 import (
 	"fmt"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/blast"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	. "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
@@ -54,6 +54,30 @@ type LogicalRestrictionEnzyme struct {
 	CommercialSource                  []string //string "attr, <5>"
 	References                        []int
 	Class                             string
+}
+
+type TypeIIs struct {
+	LogicalRestrictionEnzyme
+	Name                              string
+	Isoschizomers                     []string
+	Topstrand3primedistancefromend    int
+	Bottomstrand5primedistancefromend int
+}
+
+func ToTypeIIs(typeIIenzyme LogicalRestrictionEnzyme) (typeIIsenz TypeIIs, err error) {
+	if typeIIenzyme.Class == "TypeII" {
+		err = fmt.Errorf("You can't do this, enzyme is not a type IIs")
+	}
+	if typeIIenzyme.Class == "TypeIIs" {
+
+		var isoschizomers = make([]string, 0)
+		/*for _, lookup := range ...
+		add code to lookup isoschizers from rebase
+		*/
+		typeIIsenz = TypeIIs{typeIIenzyme, typeIIenzyme.Name, isoschizomers, typeIIenzyme.Topstrand3primedistancefromend, typeIIenzyme.Bottomstrand5primedistancefromend}
+
+	}
+	return
 }
 
 // structure which defines an organism. These need specific handling
@@ -128,13 +152,13 @@ func MakeDNASequence(name string, seqstring string, properties []string) (seq DN
 }
 func MakeLinearDNASequence(name string, seqstring string) (seq DNASequence) {
 	seq.Nm = name
-	seq.Seq = seqstring
+	seq.Seq = strings.ToUpper(seqstring)
 
 	return
 }
 func MakePlasmidDNASequence(name string, seqstring string) (seq DNASequence) {
 	seq.Nm = name
-	seq.Seq = seqstring
+	seq.Seq = strings.ToUpper(seqstring)
 	seq.Plasmid = true
 	return
 }
@@ -184,11 +208,11 @@ func MakeOverhang(sequence DNASequence, end int, toporbottom int, length int, ph
 	}
 	if toporbottom == 1 {
 		overhang.Type = 2
-		overhang.Sequence = sequences.Prefix(sequence.Seq, length)
+		overhang.Sequence = Prefix(sequence.Seq, length)
 	}
 	if toporbottom == 2 {
 		overhang.Type = -1
-		overhang.Sequence = sequences.Suffix(sequences.RevComp(sequence.Seq), length)
+		overhang.Sequence = Suffix(RevComp(sequence.Seq), length)
 	}
 	overhang.Phosphorylation = phosphorylated
 	return
@@ -349,4 +373,55 @@ func makeABunchaRandomSeqs(n_seq_sets, seqs_per_set, min_len, len_var int) [][]D
 		}
 	}
 	return seqs
+}
+func Prefix(seq string, lengthofprefix int) (prefix string) {
+	prefix = seq[:lengthofprefix]
+	return prefix
+}
+func Suffix(seq string, lengthofsuffix int) (suffix string) {
+	suffix = seq[(len(seq) - lengthofsuffix):]
+	return suffix
+}
+func Rev(s string) string {
+	r := ""
+
+	for i := len(s) - 1; i >= 0; i-- {
+		r += string(s[i])
+	}
+
+	return r
+}
+func Comp(s string) string {
+	r := ""
+
+	m := map[string]string{
+		"A": "T",
+		"T": "A",
+		"U": "A",
+		"C": "G",
+		"G": "C",
+		"Y": "R",
+		"R": "Y",
+		"W": "W",
+		"S": "S",
+		"K": "M",
+		"M": "K",
+		"D": "H",
+		"V": "B",
+		"H": "D",
+		"B": "V",
+		"N": "N",
+		"X": "X",
+	}
+
+	for _, c := range s {
+		r += m[string(c)]
+	}
+
+	return r
+}
+
+// Reverse Complement
+func RevComp(s string) string {
+	return Comp(Rev(s))
 }

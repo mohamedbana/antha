@@ -24,6 +24,8 @@ package enzymes
 
 import (
 	"fmt"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/REBASE"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"strconv"
@@ -75,7 +77,7 @@ func Jointwoparts(upstreampart []Digestedfragment, downstreampart []Digestedfrag
 	return assembledfragments, plasmidproducts, err
 }
 
-func Jointwopartsfromsequence(vector wtype.DNASequence, part1 wtype.DNASequence, enzyme TypeIIs) (assembledfragments []Digestedfragment, plasmidproducts []wtype.DNASequence) {
+func Jointwopartsfromsequence(vector wtype.DNASequence, part1 wtype.DNASequence, enzyme wtype.TypeIIs) (assembledfragments []Digestedfragment, plasmidproducts []wtype.DNASequence) {
 	doublestrandedpart1 := MakedoublestrandedDNA(part1)
 	digestedpart1 := DigestionPairs(doublestrandedpart1, enzyme)
 
@@ -87,7 +89,7 @@ func Jointwopartsfromsequence(vector wtype.DNASequence, part1 wtype.DNASequence,
 	return assembledfragments, plasmidproducts
 }
 
-func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequence, enzyme TypeIIs) (assembledfragments []Digestedfragment, plasmidproducts []wtype.DNASequence, err error) {
+func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequence, enzyme wtype.TypeIIs) (assembledfragments []Digestedfragment, plasmidproducts []wtype.DNASequence, err error) {
 
 	if vector.Seq == "" {
 		err = fmt.Errorf("No Vector sequence found")
@@ -284,8 +286,11 @@ func MultipleAssemblies(parameters []Assemblyparameters) (s string, successfulas
 				sitestring := ""
 				//for i := 0; i < len(plasmidproductsfromXprimaryseq); i++ {
 				//enzyme := TypeIIsEnzymeproperties[strings.ToUpper(construct.Enzymename)]
-				//enzyme := rebase.EnzymeLookup(construct.Enzymename)
-				enzyme := SapI
+				enzyme := lookup.EnzymeLookup(construct.Enzymename)
+				/*if err != nil {
+					constructsitesstring = append(constructsitesstring, enzerr.Error())
+				}*/
+				//enzyme := SapI
 				sitesperpart = Restrictionsitefinder(construct.Vector, []wtype.LogicalRestrictionEnzyme{enzyme})
 				if sitesperpart[0].Numberofsites != 2 {
 					// need to loop through sitesperpart

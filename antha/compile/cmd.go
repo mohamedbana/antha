@@ -1,22 +1,22 @@
 // antha/compile/cmd.go: Part of the Antha language
 // Copyright (C) 2015 The Antha authors. All rights reserved.
-// 
+//
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-// 
+//
 // For more information relating to the software or licensing issues please
-// contact license@antha-lang.org or write to the Antha team c/o 
+// contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
@@ -29,6 +29,7 @@ import (
 	"github.com/antha-lang/antha/antha/ast"
 	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/antha/token"
+	"sort"
 	"strings"
 	"text/template"
 	"unicode"
@@ -232,20 +233,44 @@ func main() {
 	return
 }
 
+type componentSpec struct {
+	Name            string
+	ConstructorFunc string
+	InPorts         []string
+	OutPorts        []string
+}
+
+type graphRunnerSpec struct {
+	Components       []componentSpec
+	WorkingDirectory string
+	Package          string
+}
+
+type componentSpecs []componentSpec
+
+func (a componentSpecs) Len() int {
+	return len(a)
+}
+
+func (a componentSpecs) Less(i, j int) bool {
+	return a[i].Name < a[j].Name
+}
+
+func (a componentSpecs) Swap(i, j int) {
+	a[j], a[i] = a[i], a[j]
+}
+
+func (a *graphRunnerSpec) Sort() {
+	sort.Sort(componentSpecs(a.Components))
+	for _, c := range a.Components {
+		sort.Strings(c.InPorts)
+		sort.Strings(c.OutPorts)
+	}
+}
+
 // GenerateGraphLib builds a go file defining processes (i.e., go struct
 // instances) defined by components
 func GenerateComponentLib(b *bytes.Buffer, components []execute.ComponentInfo, workingDirectory string, package_ string) {
-	type ComponentSpec struct {
-		Name            string
-		ConstructorFunc string
-		InPorts         []string
-		OutPorts        []string
-	}
-	type GraphRunnerSpec struct {
-		Components       []ComponentSpec
-		WorkingDirectory string
-		Package          string
-	}
 	var tmplt = `package {{.Package}}
 
 import (
@@ -272,11 +297,11 @@ func GetComponents() []ComponentDesc {
 	return c
 }`
 
-	var graphRunnerSpec GraphRunnerSpec
-	graphRunnerSpec.Package = package_
-	graphRunnerSpec.WorkingDirectory = workingDirectory
+	var spec graphRunnerSpec
+	spec.Package = package_
+	spec.WorkingDirectory = workingDirectory
 	for _, component := range components {
-		var cs ComponentSpec
+		var cs componentSpec
 		cs.Name = component.Name
 		cs.ConstructorFunc = fmt.Sprintf("New%s", component.Name)
 		for _, ip := range component.InPorts {
@@ -285,27 +310,19 @@ func GetComponents() []ComponentDesc {
 		for _, ip := range component.OutPorts {
 			cs.OutPorts = append(cs.OutPorts, ip.Id)
 		}
-		graphRunnerSpec.Components = append(graphRunnerSpec.Components, cs)
+		spec.Components = append(spec.Components, cs)
 	}
 
+	spec.Sort()
+
 	t := template.Must(template.New("MainGrapher").Parse(tmplt))
-	t.Execute(b, graphRunnerSpec)
+	t.Execute(b, spec)
 }
 
 // GenerateGraphRunner builds a go file capable of running FBP (Flow-based
 // programming) graphs with processes defined by the components included in the
 // components argument.
 func GenerateGraphRunner(b *bytes.Buffer, components []execute.ComponentInfo, workingDirectory string) {
-	type ComponentSpec struct {
-		Name            string
-		ConstructorFunc string
-		InPorts         []string
-		OutPorts        []string
-	}
-	type GraphRunnerSpec struct {
-		Components       []ComponentSpec
-		WorkingDirectory string
-	}
 	var tmplt = `package main
 
 import (
@@ -404,10 +421,10 @@ func main() {
 	<-graph.Wait()
 }`
 
-	var graphRunnerSpec GraphRunnerSpec
-	graphRunnerSpec.WorkingDirectory = workingDirectory
+	var spec graphRunnerSpec
+	spec.WorkingDirectory = workingDirectory
 	for _, component := range components {
-		var cs ComponentSpec
+		var cs componentSpec
 		cs.Name = component.Name
 		cs.ConstructorFunc = fmt.Sprintf("New%s", component.Name)
 		for _, ip := range component.InPorts {
@@ -416,11 +433,13 @@ func main() {
 		for _, ip := range component.OutPorts {
 			cs.OutPorts = append(cs.OutPorts, ip.Id)
 		}
-		graphRunnerSpec.Components = append(graphRunnerSpec.Components, cs)
+		spec.Components = append(spec.Components, cs)
 	}
 
+	spec.Sort()
+
 	t := template.Must(template.New("MainGrapher").Parse(tmplt))
-	t.Execute(b, graphRunnerSpec)
+	t.Execute(b, spec)
 }
 
 func (cfg *Config) GetFileComponentInfo(fset *token.FileSet, node interface{}) execute.ComponentInfo {

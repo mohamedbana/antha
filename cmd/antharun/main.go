@@ -30,6 +30,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/antha-lang/antha/antha/component/lib"
 	"github.com/antha-lang/antha/antha/execute/util"
 )
 
@@ -38,6 +39,7 @@ var (
 	parametersFile string
 	workflowFile   string
 	driverURI      string
+	list           bool
 )
 
 func run() error {
@@ -117,11 +119,21 @@ func run() error {
 }
 
 func main() {
+	flag.BoolVar(&list, "list", false, "list the available components")
 	flag.StringVar(&parametersFile, "parameters", "parameters.yml", "parameters to workflow")
 	flag.StringVar(&workflowFile, "workflow", "workflow.json", "workflow definition file")
 	flag.StringVar(&logFile, "log", "", "log file")
 	flag.StringVar(&driverURI, "driver", "", "uri where a grpc driver implementation listens")
 	flag.Parse()
+
+	if list {
+		fmt.Println("Available Components")
+		fmt.Println("====================")
+		for _, v := range lib.GetComponents() {
+			fmt.Printf("\t %q.\n", v.Name)
+		}
+		fmt.Println("====================")
+	}
 
 	if len(parametersFile) == 0 || len(workflowFile) == 0 {
 		flag.PrintDefaults()

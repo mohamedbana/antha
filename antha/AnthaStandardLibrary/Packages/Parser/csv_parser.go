@@ -32,6 +32,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"os"
 	"strings"
@@ -179,7 +180,7 @@ func ReadParts(filename string) map[string]wtype.DNASequence {
 
 				if strings.ToUpper(each[3]) == "AA" || strings.ToUpper(each[3]) == "Protein" || strings.ToUpper(each[3]) == "Amino Acid" {
 
-					part.Seq = enzymes.RevTranslatetoNstring(each[1])
+					part.Seq = sequences.RevTranslatetoNstring(each[1])
 				} else if each[3] == "DNA" || each[3] == "RNA" {
 					part.Seq = strings.ToUpper(each[1])
 				}

@@ -4,16 +4,11 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/REBASE"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 	"strings"
 	"strconv"
-
-	//"github.com/mgutz/ansi"
-
-	//"log"
-
 )
 
 // Input parameters for this protocol (data)
@@ -71,26 +66,22 @@ Steps {
 	Status = "all parts available"
 	for _, part := range Partsinorder {
 		
-		
 		if strings.Contains(part,"BBa_") ==true{
-
-			
-
-			/*err := igem.UpdateRegistryfile()
-			if err != nil {
-				log.Panic(err)
-			}*/
-
+		
 			partDNA.Nm = part
-			partDNA.Seq = igem.GetSequence(part)
+			partproperties := igem.LookUp([]string{part})
+			partDNA.Seq = partproperties.Sequence(part)
+			//partDNA.Seq = igem.GetSequence(part)
 		
 			/* We can add logic to check the status of parts too and return a warning if the part 
-			   is not characeterised */
+			   is not characterised */
 			
-			if strings.Contains(igem.GetResults(part),"Works") != true{
+		if strings.Contains(partproperties.Results(part),"Works") != true{
 					
 				warnings = make([]string,0)
-				warning := fmt.Sprintln("iGem part", part, "results =", igem.GetResults(part), "rating",igem.GetRating(part), "part type",igem.GetType(part), "part decription =", igem.GetDescription(part), "Categories",igem.GetCategories(part))
+		//		warning := fmt.Sprintln("iGem part", part, "results =",  igem.GetResults(part), "rating",igem.GetRating(part), "part type",igem.GetType(part), "part decription =", igem.GetDescription(part), "Categories",igem.GetCategories(part))
+				warning := fmt.Sprintln("iGem part", part, "results =", partproperties.Results(part), "rating",partproperties.Rating(part), "part type",partproperties.Type(part), "part decription =", partproperties.Description(part), "Categories",partproperties.Categories(part))
+
 				warnings = append(warnings,warning)
 				
 		}
@@ -107,19 +98,18 @@ Steps {
 
 	// or Look up parts from registry according to properties (this will take a couple of minutes the first time)
 	subparts := igem.FilterRegistry([]string{"Fluorescent", "A "})
-	partdetails := igem.PartProperties(subparts)
+	partdetails := igem.LookUp(subparts)
 	//fmt.Println(partdetails)
 	
 	
 	// this can be slow if there are many parts to check (~2 seconds per block of 14 parts)
 	for _, subpart := range subparts {
-		if strings.Contains(igem.GetDescriptionfromSubset(subpart, partdetails), "RED") &&
-			strings.Contains(igem.GetResultsfromSubset(subpart, partdetails), "WORKS") {
+		if strings.Contains(partdetails.Description(subpart), "RED") &&
+			strings.Contains(partdetails.Results(subpart), "WORKS") {
 			BackupParts = append(BackupParts, subpart)
 
 		}
 	}
-	
 	
 	
 	// lookup vector sequence
@@ -147,7 +137,7 @@ Steps {
 	// first lookup enzyme properties
 	enzlist := make([]wtype.LogicalRestrictionEnzyme, 0)
 	for _, site := range RestrictionsitetoAvoid {
-		enzsite := rebase.EnzymeLookup(site)
+		enzsite := lookup.EnzymeLookup(site)
 	enzlist = append(enzlist, enzsite)
 	}
 	othersitesfound := enzymes.Restrictionsitefinder(newDNASequence,enzlist) 
@@ -157,7 +147,7 @@ Steps {
 	}
 	
 	// Now let's find out the size of fragments we would get if digested with a common site cutter
-	tspEI := rebase.EnzymeLookup("TspEI")
+	tspEI := lookup.EnzymeLookup("TspEI")
 	
 	Testdigestionsizes := enzymes.RestrictionMapper(newDNASequence, tspEI)
 	
@@ -193,7 +183,7 @@ Steps {
 	} else {Status = fmt.Sprintln(
 		"Warnings:", Warnings,
 		"Simulationpass=", Simulationpass,
-		"Back up parts found (which work)", BackupParts,
+		"Back up parts found (Reported to work!)", BackupParts,
 		"NewDNASequence",NewDNASequence,
 		//"partonewithoverhangs", partonewithoverhangs,
 		//"Vector",vectordata,

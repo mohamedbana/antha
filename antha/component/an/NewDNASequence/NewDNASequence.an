@@ -41,7 +41,7 @@ Setup {
 
 // Core process of the protocol: steps to be performed for each input
 Steps {
-	
+	fmt.Println("IN steps!")
 	if Plasmid != Linear {
 		if Plasmid  {
 			DNA = wtype.MakePlasmidDNASequence(Gene_name,DNA_seq)

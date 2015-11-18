@@ -20,11 +20,11 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
-package enzymes
+package sequences
 
 import (
 	"fmt"
-	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	//. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"strings"
 )
@@ -305,6 +305,18 @@ func FindDirectionalORF(seq string, reverse bool) (orf ORF, orftrue bool) {
 		orf.StartPosition = (len(seq) + 1 - orf.StartPosition)
 	}
 	return orf, orftrue
+}
+
+func Translate(dna wtype.DNASequence) (aa wtype.ProteinSequence, err error) {
+	orf, orftrue := FindORF(dna.Seq)
+	if orftrue == false {
+		err = fmt.Errorf("Cannot translate this! no open reading frame detected")
+		return
+	} else {
+		aa.Nm = dna.Nm + "Translated"
+		aa.Seq = orf.ProtSeq
+	}
+	return
 }
 
 func FindORF(seq string) (orf ORF, orftrue bool) { // finds an orf in the forward direction only

@@ -23,49 +23,21 @@
 package rebase
 
 import (
-	"bytes"
+	//"bytes"
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
+	//"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/internal/github.com/jlaffaye/ftp"
 	"io"
-	"io/ioutil"
+	//"io/ioutil"
 	"log"
 	//"net/http"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"os"
-	//"strings"
 	"path/filepath"
+	//"strings"
 )
-
-func EnzymeLookup(name string) (enzyme wtype.LogicalRestrictionEnzyme) {
-	if anthapath.Anthafileexists("REBASETypeII.txt") == false {
-		err := UpdateRebasefile()
-		if err != nil {
-			fmt.Println("error:", err)
-		}
-	}
-	enzymes, err := ioutil.ReadFile(filepath.Join(anthapath.Dirpath(), "REBASETypeII.txt"))
-	if err != nil {
-		fmt.Println("error:", err)
-	}
-
-	rebaseFh := bytes.NewReader(enzymes)
-
-	for record := range parser.RebaseParse(rebaseFh) {
-		/*plasmidstatus := "FALSE"
-		seqtype := "DNA"
-		class := "not specified"*/
-
-		if record.Name == name {
-			fmt.Println(record)
-			//RecognitionSeqs = append(RecognitionSeqs, record)
-			enzyme = record
-		}
-
-	}
-	return enzyme
-}
 
 /*
 func LookupEnzymes(names []string) (enzymelist []wtype.LogicalRestrictionEnzyme) {
@@ -137,35 +109,6 @@ func UpdateRebasefile() (err error) {
 	return err
 }
 
-func OEnzymeLookup(name string) (enzyme wtype.LogicalRestrictionEnzyme) {
-	if Exists("REBASETypeII.txt") == false {
-		err := UpdateRebasefile()
-		if err != nil {
-			fmt.Println("error:", err)
-		}
-	}
-	enzymes, err := ioutil.ReadFile("REBASETypeII.txt")
-	if err != nil {
-		fmt.Println("error:", err)
-	}
-
-	rebaseFh := bytes.NewReader(enzymes)
-
-	for record := range parser.RebaseParse(rebaseFh) {
-		/*plasmidstatus := "FALSE"
-		seqtype := "DNA"
-		class := "not specified"*/
-
-		if record.Name == name {
-			fmt.Println(record)
-			//RecognitionSeqs = append(RecognitionSeqs, record)
-			enzyme = record
-		}
-
-	}
-	return enzyme
-}
-
 /*
 func LookupEnzymes(names []string) (enzymelist []wtype.LogicalRestrictionEnzyme) {
 	if Exists("REBASETypeII.txt") == false {
@@ -199,41 +142,6 @@ func LookupEnzymes(names []string) (enzymelist []wtype.LogicalRestrictionEnzyme)
 	return enzymelist
 }
 */
-
-func OUpdateRebasefile() (err error) {
-	fmt.Println("Slurping...", "ftp://ftp.neb.com/pub/rebase/type2.txt")
-
-	c, err := ftp.Dial("ftp.neb.com:21")
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = c.Login("anonymous", "anonymous")
-	if err != nil {
-		panic(err)
-	}
-
-	err = c.ChangeDir("/pub/rebase")
-	if err != nil {
-		panic(err)
-	}
-
-	r, err := c.Retr("type2.txt")
-	if err != nil {
-		panic(err)
-	} else {
-		f, _ := os.Create("REBASETypeII.txt")
-		fmt.Println("step 2: copying registry")
-		_, err = io.Copy(f, r)
-		if err != nil {
-			panic(err)
-		}
-
-		r.Close()
-		c.Quit()
-	}
-
-	return err
-}
 
 func Exists(filename string) bool {
 	if _, err := os.Stat(filename); err != nil {

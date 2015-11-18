@@ -30,7 +30,7 @@ import (
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	//"/data"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	//"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"io"
 	"io/ioutil"
@@ -39,7 +39,6 @@ import (
 	"os"
 	"strings"
 	//"time"
-	//"github.com/mgutz/ansi"
 	"path/filepath"
 )
 
@@ -109,62 +108,13 @@ func MakeXMLURL(partnames []string) (Urlstring string) {
 func SlurpOutput(Urlstring string) (output []byte) {
 	fmt.Println("Slurping...", Urlstring)
 
-	//var res *io.Reader
-
 	res, err := http.Get(Urlstring)
 	if err != nil {
 		log.Fatal(err)
 	}
-	//fmt.Println("step 1")
 
-	/*reader := bufio.NewReader(res.Body)
-
-	//_, err = io.ReadFull(reader, output)
-
-	output, err = reader.Peek(int(res.ContentLength)) returns negative count!
-
-	fmt.Println("hello")
-	fmt.Println(string(output))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	/*for{
-
-	}
-	*/
-
-	//you should stream the resp.Body to disk by creating a file using os.Create() and io.Copy(file, resp.Body)
-	//if _, err := os.Stat("Registry.fasta"); err != nil {
-	//	if os.IsNotExist(err) {
-	//		fmt.Printf("downloading registry.fasta")
-	//f, _ := os.Create("temp.tmp")
-
-	//err := ioutil.WriteFile("temp.tmp", res.Body, 0777)
-	//fmt.Println("step 2")
-	//_, _ = io.Copy(f, res.Body)
-	//fmt.Println("step 3")
-	//		return
-	//	}
-	//}
-
-	//fmt.Println("step 4")
-	//output, err = ioutil.ReadFile("temp.tmp") // this is a very fast step!
-
-	/*body := make([]byte, int64(res.ContentLength))
-	b := bytes.NewBuffer(body)
-	fmt.Println("step 2")
-	_, err = b.ReadFrom(res.Body)
-	fmt.Println("step 3")
-	output = b.Bytes()*/
 	output, err = ioutil.ReadAll(res.Body) // this is a slow step!
-	//fmt.Println("step 5")
 
-	//res.Body.Close()
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//fmt.Println(Urlstring, "=", string(output))
 	return output
 }
 
@@ -176,23 +126,11 @@ func UpdateRegistryfile() (err error) {
 	}
 	fmt.Println("step 1: creating registry file")
 
-	/*for{
-
-	}
-	*/
-
-	//you should stream the resp.Body to disk by creating a file using os.Create() and io.Copy(file, resp.Body)
-	//if _, err := os.Stat("Registry.fasta"); err != nil {
-	//	if os.IsNotExist(err) {
-	//		fmt.Printf("downloading registry.fasta")
 	anthapath.CreatedotAnthafolder()
 	f, _ := os.Create(filepath.Join(anthapath.Dirpath(), "iGem_registry.txt"))
 	fmt.Println("step 2: copying registry... This could take a few minutes, don't go anywhere")
 	_, err = io.Copy(f, res.Body) // takes just as long as ioutil.Readall()
 	fmt.Println("step 3")
-	//		return
-	//	}
-	//}
 
 	fmt.Println("step 4")
 
@@ -331,7 +269,7 @@ func CountPartsinRegistryContaining(keystrings []string) (numberofparts int) {
 		seqtype := "DNA"
 		class := "not specified"*/
 
-		if enzymes.Containsallthings(record.Desc, keystrings) {
+		if search.Containsallthings(record.Desc, keystrings) {
 			numberofparts = numberofparts + 1
 		}
 		/*	if strings.Contains(record.Desc, "Amino acid") || strings.Contains(record.Id, "aa") {
@@ -371,25 +309,6 @@ func FilterRegistry(keystrings []string) (listofpartIDs []string) {
 		fmt.Println("error:", err)
 	}
 
-	/*f, _ := filepath.Abs("$GOPATH/src/github.com/antha-lang/antha/antha/AnthaStandardLibrary/Localdata")
-	fmt.Println(f)
-
-	err := os.Chdir("$GOPATH/src/github.com/antha-lang/antha/antha/AnthaStandardLibrary/Localdata")
-	if err != nil {
-		fmt.Println("error:", err)
-	}
-	*/
-	//allparts, err := ioutil.ReadFile("iGem_registry.txt")
-	/*if err != nil {
-		fmt.Println("error:", err)
-	}
-
-	//err = os.Chdir("cd -")
-
-	if err != nil {
-		fmt.Println("error:", err)
-	}
-	*/
 	fmt.Println("slurped registry")
 	fastaFh := bytes.NewReader(allparts)
 
@@ -406,7 +325,7 @@ func FilterRegistry(keystrings []string) (listofpartIDs []string) {
 		seqtype := "DNA"
 		class := "not specified"*/
 
-		if enzymes.Containsallthings(record.Desc, keystrings) && record.Seq_data != "" {
+		if search.Containsallthings(record.Desc, keystrings) && record.Seq_data != "" {
 			fmt.Println(record.Part_name)
 			listofpartIDs = append(listofpartIDs, record.Part_name)
 		}
@@ -469,15 +388,14 @@ func Partpropertiesmini(parts []string) (parsedxml Rsbpml) {
 }
 
 /*
-
 func PartPropertiesChan(parts []string) chan Rsbpml {
 
 	outputChannel := make(chan Fasta)
 
 	fmt.Println("len(parts =", len(parts))
-	if len(parts) > 10 {
+	if len(parts) > 14 {
 
-		partslice := parts[0:10]
+		partslice := parts[0:14]
 		fmt.Println("len(partslice) =", len(partslice))
 
 		go func() {
@@ -558,7 +476,7 @@ func PartPropertiesChan(parts []string) chan Rsbpml {
 }
 */
 
-func PartProperties(parts []string) (parsedxml Rsbpml) {
+func LookUp(parts []string) (parsedxml Rsbpml) {
 	fmt.Println("number of parts to find in registry", len(parts))
 	if len(parts) > 14 {
 
@@ -619,6 +537,79 @@ func PartProperties(parts []string) (parsedxml Rsbpml) {
 }
 
 // Add Get funcs to get data from Rsbpml? Would be much faster
+
+func (parsedxml *Rsbpml) Sequence(partname string) (sequence string) {
+
+	for _, part := range parsedxml.Partlist[0].Parts {
+		if part.Part_name == partname {
+			sequence = part.Sequencelist[0].Seq_data
+		}
+	}
+
+	sequence = strings.ToUpper(sequence)
+	return
+}
+
+func (parsedxml *Rsbpml) Type(partname string) (result string) {
+
+	for _, part := range parsedxml.Partlist[0].Parts {
+		if part.Part_name == partname {
+			result = part.Part_type
+		}
+	}
+
+	result = strings.ToUpper(result)
+	return
+}
+
+func (parsedxml *Rsbpml) Categories(partname string) (result Categories) {
+
+	for _, part := range parsedxml.Partlist[0].Parts {
+		if part.Part_name == partname {
+			result = part.Categories
+		}
+	}
+
+	//result = strings.ToUpper(result)
+	return
+}
+
+func (parsedxml *Rsbpml) Results(partname string) (result string) {
+
+	for _, part := range parsedxml.Partlist[0].Parts {
+		if part.Part_name == partname {
+			result = part.Part_results
+		}
+	}
+
+	result = strings.ToUpper(result)
+	return
+}
+
+func (parsedxml *Rsbpml) Rating(partname string) (result string) {
+
+	for _, part := range parsedxml.Partlist[0].Parts {
+		if part.Part_name == partname {
+			result = part.Part_rating
+		}
+	}
+
+	result = strings.ToUpper(result)
+	return
+}
+
+func (parsedxml *Rsbpml) Description(partname string) (result string) {
+
+	for _, part := range parsedxml.Partlist[0].Parts {
+		if part.Part_name == partname {
+			result = part.Part_short_desc
+		}
+	}
+
+	result = strings.ToUpper(result)
+
+	return
+}
 
 func GetSequence(partname string) (sequence string) {
 
