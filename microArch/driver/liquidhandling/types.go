@@ -518,6 +518,9 @@ func (lhp *LHProperties) GetTimer() *LHTimer {
 }
 
 // records timing info
+// preliminary implementation assumes all instructions of a given
+// type have the same timing, TimeFor is expressed in terms of the instruction
+// however so it will be possible to modify this behaviour in future
 
 type LHTimer struct {
 	Times []time.Duration
@@ -529,15 +532,15 @@ func NewTimer() *LHTimer {
 	return &t
 }
 
-func (t *LHTimer) TimeFor(i int) time.Duration {
-	_, ok := t.Times[i]
+func (t *LHTimer) TimeFor(r RobotInstruction) time.Duration {
+	_, ok := t.Times[r.InstructionType()]
 
 	if !ok {
 		d, _ := time.ParseDuration("0s")
 		return d
 	}
 
-	d := t.Times[i]
+	d := t.Times[r.InstructionType()]
 	return d
 }
 
@@ -545,7 +548,7 @@ func (t *LHTimer) TimeOperations(instrx []*RobotInstruction) time.Duration {
 	var d time.Duration
 
 	for _, i := range instrx {
-
+		d += t.TimeFor[i]
 	}
 
 	return d
