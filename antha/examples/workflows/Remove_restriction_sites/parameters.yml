@@ -1,0 +1,16 @@
+{
+    "Parameters": [{
+        "RemoveRestrictionSites":{
+            "SequenceKey": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGGGGGGGGGGGAGCTCGGGGGGGGGGGGGGGGGGGGGGGGG", 				
+            "RestrictionsitetoAvoid": [
+            "SacI",
+            ],
+            "RemoveifnotinORF": true,
+			"PreserveTranslatedseq":true,
+			"EnzymeforRestrictionmapping":"BsaI",
+        }
+    }],
+    "Config": {
+        "OUTPUT_COUNT": 1
+    }
+}
