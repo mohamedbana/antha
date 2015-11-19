@@ -166,7 +166,7 @@ func HandleGenbank(lines []string) (annotatedseq sequences.AnnotatedSeq, err err
 		features := HandleFeatures(lines, seq, "DNA")
 		fmt.Println("found these features", features)
 		annotatedseq, err = sequences.MakeAnnotatedSeq(name, seq, circular, features)
-
+		fmt.Println("annotated", annotatedseq)
 	} else {
 		err = fmt.Errorf("no LOCUS found on first line")
 	}

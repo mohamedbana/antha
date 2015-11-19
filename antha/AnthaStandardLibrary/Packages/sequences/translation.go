@@ -116,43 +116,24 @@ var RevCodonTable = map[string][]string{
 
 	"N": []string{"AAC", "AAT"},
 	"K": []string{"AAA", "AAG"},
-
 	"T": []string{"ACC", "ACT", "ACA", "ACG"},
-
 	"I": []string{"ATC", "ATT", "ATA"},
-
 	"M": []string{"ATG"},
-
 	"R": []string{"AGA", "AGG", "CGC", "CGT", "CGA", "CGG"},
-
 	"Y": []string{"TAC", "TAT"},
-
 	"*": []string{"TAA", "TAG", "TGA"},
-
 	"S": []string{"AGC", "AGT", "TCC", "TCT", "TCA", "TCG"},
-
 	"F": []string{"TTC", "TTT"},
-
 	"L": []string{"TTA", "TTG", "CTC", "CTT", "CTA", "CTG"},
-
 	"C": []string{"TGC", "TGT"},
-
 	"W": []string{"TGG"},
-
 	"D": []string{"GAC", "GAT"},
-
 	"E": []string{"GAA", "GAG"},
-
 	"V": []string{"GTC", "GTT", "GTA", "GTG"},
-
 	"A": []string{"GCA", "GCC", "GCG", "GCT"},
-
 	"G": []string{"GGC", "GGT", "GGA", "GGG"},
-
 	"H": []string{"CAC", "CAT"},
-
 	"Q": []string{"CAA", "CAG"},
-
 	"P": []string{"CCC", "CCT", "CCA", "CCG"},
 }
 
@@ -267,6 +248,10 @@ The weights used for Glx and Asx are averages.
 http://www.basic.northwestern.edu/biotools/proteincalc.html
 
 */
+
+var (
+	startcodons = []string{"ATG", "CTG", "GTG"}
+)
 
 // Estimate molecular weight of protein product
 func Molecularweight(orf ORF) (kDa float64) {
