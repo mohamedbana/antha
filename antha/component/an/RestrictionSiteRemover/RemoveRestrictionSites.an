@@ -17,7 +17,7 @@ import (
 
 // Input parameters for this protocol (data)
 Parameters (
-	Sequence					wtype.DNASequence
+	Sequencekey					string //wtype.DNASequence
 	RestrictionsitetoAvoid		[]string
 	RemoveifnotinORF 			bool
 	PreserveTranslatedseq 		bool
@@ -54,7 +54,10 @@ Setup {}
 // The core process for this protocol, with the steps to be performed
 // for every input
 Steps {
-
+	
+	
+	Sequence := wtype.MakeLinearDNASequence("Test", Sequencekey)	
+	
 	// set warnings reported back to user to none initially
 	warnings := make([]string,0)
 	
@@ -93,7 +96,7 @@ Steps {
 			var err error
 			
 			orfs := sequences.FindallORFs(Sequence.Seq)
-			
+			warnings = append(warnings,text.Print("orfs: ",orfs))
 			features := sequences.ORFs2Features(orfs)
 			
 			//set up a boolean to change to true if a sequence is found in an ORF
@@ -101,6 +104,7 @@ Steps {
 			//set up an index for each orf found with site within it (need enzyme name too but will recheck all anyway!)
 			orfswithsites:= make([]int,0)
 			
+			if len(orfs) > 0 {
 			for i,orf := range orfs {
 				
 				// change func to handle this step of making dnaseq first
@@ -109,11 +113,18 @@ Steps {
 				
 				foundinorfs := enzymes.Restrictionsitefinder(dnaseq,enzlist) // won't work yet orf is actually type features
 				
-				if len(foundinorfs) !=0 {
-					foundinorf = true
-					warning := text.Print("sites found in orf" +  dnaseq.Nm,foundinorfs)
+				for _, siteinorf := range foundinorfs {
+					if siteinorf.Sitefound == true {
+						foundinorf = true
+					}
+				}
+				
+				if foundinorf == true{
+					
+					warning := text.Print("sites found in orf" +  dnaseq.Nm,orf)
 					warnings = append(warnings,warning)
 				}
+			}
 			}
 			if RemoveifnotinORF {
 					if foundinorf == false{
@@ -135,7 +146,7 @@ Steps {
 							warnings = append(warnings,err.Error())
 						}
 					}
-				}else {
+		}//		}else {
 			if PreserveTranslatedseq {
 					// make func to check codon and swap site to preserve aa sequence product
 					for _, orfnumber:= range orfswithsites {
@@ -154,11 +165,11 @@ Steps {
 				}
 			
 			
-		}
+		
 		SiteFreeSequence = tempseq
 	}
 	}
-}
+}			
 	
 	// Now let's find out the size of fragments we would get if digested with a common site cutter
 	mapenz := lookup.EnzymeLookup(EnzymeforRestrictionmapping)
@@ -171,8 +182,8 @@ Steps {
 	Warnings = strings.Join(warnings,";")
 		
 	// Print status
-	if Status != "all parts available"{
-		Status = fmt.Sprintln(Status)
+	if Status == ""{
+		Status = fmt.Sprintln("Something went wrong!")
 	} else {Status = fmt.Sprintln(
 		text.Print("Warnings:", Warnings),
 		text.Print("Sequence",Sequence),
