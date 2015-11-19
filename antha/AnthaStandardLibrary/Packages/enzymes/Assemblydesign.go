@@ -453,7 +453,7 @@ var Vectorends = map[string]map[string][]string{
 		"Level1": []string{"", ""},
 	},
 	"Synthace": map[string][]string{
-		"Level0": []string{"", ""},
+		"Level0": []string{"GGT", "GAA"},
 		"Level1": []string{"", ""},
 	},
 	"Electra": map[string][]string{
