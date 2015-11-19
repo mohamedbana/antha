@@ -434,7 +434,7 @@ func HandleFeatures(lines []string, seq string, seqtype string) (features []sequ
 			if reverse {
 				rev = "Reverse"
 			}
-			feature = sequences.MakeFeature(description, seq[startposition:endposition], seqtype, class, rev)
+			feature = sequences.MakeFeature(description, seq[startposition-1:endposition], seqtype, class, rev)
 			if start > end {
 				return
 			}
@@ -480,6 +480,8 @@ func HandleSequence(lines []string) (dnaseq string) {
 					seq = strings.Replace(seq, "\n", "", -1)
 					seq = strings.Replace(seq, "//", "", -1)
 					dnaseq = seq
+
+					fmt.Println("dnaseq:", dnaseq)
 					return
 				}
 			}
