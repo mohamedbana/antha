@@ -213,7 +213,7 @@ func RemoveSitesOutsideofFeatures(dnaseq wtype.DNASequence, site string, algorit
 
 	newseq = dnaseq
 
-	pairs := make([]StartEndPair, 0)
+	pairs := make([]StartEndPair, 2)
 	var pair StartEndPair
 
 	for _, feature := range featurelisttoavoid {
@@ -245,7 +245,7 @@ func ReplaceAvoidingPositionPairs(seq string, positionpairs []StartEndPair, orig
 	temp := "£££££££££££"
 	newseq = ""
 	for _, pair := range positionpairs {
-		if pair[1] < pair[0] {
+		if pair[0] < pair[1] {
 			newseq = strings.Replace(seq[pair[0]-1:pair[1]-1], original, temp, -1)
 		}
 	}
@@ -256,8 +256,9 @@ func ReplaceAvoidingPositionPairs(seq string, positionpairs []StartEndPair, orig
 
 	// now look for reverse
 	for _, pair := range positionpairs {
-		if pair[1] > pair[0] {
-			newseq = strings.Replace(seq[pair[1]-1:pair[0]-1], RevComp(original), temp, -1)
+		if pair[0] > pair[1] {
+
+			newseq = strings.Replace(seq[pair[1]+1:pair[0]+1], RevComp(original), temp, -1)
 		}
 	}
 
@@ -267,7 +268,7 @@ func ReplaceAvoidingPositionPairs(seq string, positionpairs []StartEndPair, orig
 	return
 }
 
-type StartEndPair []int
+type StartEndPair [2]int
 
 func MakeStartendPair(start, end int) (pair StartEndPair) {
 
