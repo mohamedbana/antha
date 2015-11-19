@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
 	"strconv"
@@ -25,7 +26,8 @@ Parameters (
 	Constructname 			string
 	Seqsinorder				[]string
 	Vector					string
-	Enzyme					string
+	Enzymename				string
+	ORFstoConfirm			[]string // enter each as amino acid sequence
 )
 
 // Physical Inputs to this protocol with types
@@ -45,6 +47,7 @@ Data (
 	Simulationpass bool
 	PartswithOverhangs []wtype.DNASequence // parts to order
 	NewDNASequence wtype.DNASequence // desired sequence to end up with after assembly
+	ORFmissing bool
 )
 // Input Requirement specification
 Requirements {
@@ -61,7 +64,8 @@ Steps {
 	// set warnings reported back to user to none initially
 	warnings := make([]string,0)
 	
-	
+	var warning string
+	var err error
 	// make an empty array of DNA Sequences ready to fill
 	partsinorder := make([]wtype.DNASequence,0)
 	
@@ -98,7 +102,7 @@ Steps {
 	vectordata := wtype.MakePlasmidDNASequence("Vector",Vector)
 	
 	//lookup restriction enzyme
-	restrictionenzyme,err := lookup.TypeIIsLookup(Enzyme) 
+	restrictionenzyme,err := lookup.TypeIIsLookup(Enzymename) 
 	if err != nil {
 		warnings = append(warnings,text.Print("Error", err.Error()))
 	}
@@ -143,19 +147,27 @@ Steps {
 	}	
 	
 		// check number of sites per part !
-	enz := lookup.EnzymeLookup(Enzyme)
+	
 	sites := make([]int,0)
 	multiple := make ([]string,0)
 	for _,part := range PartswithOverhangs {
 	
-	
+		enz := lookup.EnzymeLookup(Enzymename)
 	info := enzymes.Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
 	
 	sitepositions := enzymes.SitepositionString(info[0])
 	
 	sites = append(sites,info[0].Numberofsites)
-	sitepositions = text.Print(part.Nm + " " + Enzyme + " positions:", sitepositions)
+	sitepositions = text.Print(part.Nm + " " + Enzymename + " positions:", sitepositions)
 	multiple = append(multiple,sitepositions)
+	}
+	
+	for _,orf := range ORFstoConfirm {
+		if sequences.LookforSpecificORF(NewDNASequence.Seq,orf) == false {
+			warning = text.Print("orf not present: ", orf)
+			warnings = append(warnings,warning)
+			ORFmissing = true
+		}
 	}
 	
 	if len(warnings) == 0 {
@@ -178,11 +190,12 @@ Steps {
 	} else {Status = fmt.Sprintln(
 		text.Print("simulator status: ", status),
 		text.Print("Endreport after digestion: ",endreport),
-		text.Print("Sites per part for " + Enzyme, sites),
+		text.Print("Sites per part for " + Enzymename, sites),
 		text.Print("Positions: ", multiple),
 		text.Print("Warnings:", Warnings.Error()),
 		text.Print("Simulationpass=", Simulationpass),
 		text.Print("NewDNASequence: ",NewDNASequence),
+		text.Print("Any Orfs to confirm missing from new DNA sequence:", ORFmissing),
 		partstoorder,
 		)
 	}
