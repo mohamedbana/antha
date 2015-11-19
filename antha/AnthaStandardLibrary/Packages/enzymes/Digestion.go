@@ -73,10 +73,10 @@ func (sites *Restrictionsites) Positions(fwdRevorNil string) (positions []int) {
 	} else if strings.ToUpper(fwdRevorNil) == strings.ToUpper("") ||
 		strings.ToUpper(fwdRevorNil) == strings.ToUpper("ALL") {
 		positions = make([]int, 0)
-		for pos := range sites.Forwardpositions {
+		for _, pos := range sites.Forwardpositions {
 			positions = append(positions, pos)
 		}
-		for pos := range sites.Reversepositions {
+		for _, pos := range sites.Reversepositions {
 			positions = append(positions, pos)
 		}
 	}
