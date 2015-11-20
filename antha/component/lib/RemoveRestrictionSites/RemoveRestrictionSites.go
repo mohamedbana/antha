@@ -22,6 +22,8 @@ import (
 
 // Input parameters for this protocol (data)
 
+//wtype.DNASequence
+
 // Physical Inputs to this protocol with types
 
 // Physical outputs from this protocol with types
@@ -50,6 +52,8 @@ func (e *RemoveRestrictionSites) steps(p RemoveRestrictionSitesParamBlock, r *Re
 	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
+	Sequence := wtype.MakeLinearDNASequence("Test", p.Sequencekey)
+
 	// set warnings reported back to user to none initially
 	warnings := make([]string, 0)
 
@@ -61,13 +65,13 @@ func (e *RemoveRestrictionSites) steps(p RemoveRestrictionSitesParamBlock, r *Re
 	}
 
 	// check for sites in the sequence
-	sitesfound := enzymes.Restrictionsitefinder(p.Sequence, enzlist)
+	sitesfound := enzymes.Restrictionsitefinder(Sequence, enzlist)
 
 	// if no sites found skip to restriction map stage
 	if len(sitesfound) == 0 {
 		r.Warnings = "none"
 		r.Status = "No sites found in sequence to remove so same sequence returned"
-		r.SiteFreeSequence = p.Sequence
+		r.SiteFreeSequence = Sequence
 		r.Sitesfoundinoriginal = sitesfound
 
 	} else {
@@ -86,8 +90,8 @@ func (e *RemoveRestrictionSites) steps(p RemoveRestrictionSitesParamBlock, r *Re
 				var tempseq wtype.DNASequence
 				var err error
 
-				orfs := sequences.FindallORFs(p.Sequence.Seq)
-
+				orfs := sequences.FindallORFs(Sequence.Seq)
+				warnings = append(warnings, text.Print("orfs: ", orfs))
 				features := sequences.ORFs2Features(orfs)
 
 				//set up a boolean to change to true if a sequence is found in an ORF
@@ -95,23 +99,31 @@ func (e *RemoveRestrictionSites) steps(p RemoveRestrictionSitesParamBlock, r *Re
 				//set up an index for each orf found with site within it (need enzyme name too but will recheck all anyway!)
 				orfswithsites := make([]int, 0)
 
-				for i, orf := range orfs {
+				if len(orfs) > 0 {
+					for i, orf := range orfs {
 
-					// change func to handle this step of making dnaseq first
+						// change func to handle this step of making dnaseq first
 
-					dnaseq := wtype.MakeLinearDNASequence("orf"+strconv.Itoa(i), orf.DNASeq)
+						dnaseq := wtype.MakeLinearDNASequence("orf"+strconv.Itoa(i), orf.DNASeq)
 
-					foundinorfs := enzymes.Restrictionsitefinder(dnaseq, enzlist) // won't work yet orf is actually type features
+						foundinorfs := enzymes.Restrictionsitefinder(dnaseq, enzlist) // won't work yet orf is actually type features
 
-					if len(foundinorfs) != 0 {
-						foundinorf = true
-						warning := text.Print("sites found in orf"+dnaseq.Nm, foundinorfs)
-						warnings = append(warnings, warning)
+						for _, siteinorf := range foundinorfs {
+							if siteinorf.Sitefound == true {
+								foundinorf = true
+							}
+						}
+
+						if foundinorf == true {
+
+							warning := text.Print("sites found in orf"+dnaseq.Nm, orf)
+							warnings = append(warnings, warning)
+						}
 					}
 				}
 				if p.RemoveifnotinORF {
 					if foundinorf == false {
-						tempseq, err = sequences.RemoveSite(p.Sequence, site.Enzyme, allsitestoavoid)
+						tempseq, err = sequences.RemoveSite(Sequence, site.Enzyme, allsitestoavoid)
 						if err != nil {
 							warning := text.Print("removal of site failed! improve your algorithm!", err.Error())
 							warnings = append(warnings, warning)
@@ -124,29 +136,28 @@ func (e *RemoveRestrictionSites) steps(p RemoveRestrictionSitesParamBlock, r *Re
 					}
 					if foundinorf == true {
 
-						r.SiteFreeSequence, err = sequences.RemoveSitesOutsideofFeatures(p.Sequence, site.Enzyme.RecognitionSequence, sequences.ReplaceBycomplement, features)
+						r.SiteFreeSequence, err = sequences.RemoveSitesOutsideofFeatures(Sequence, site.Enzyme.RecognitionSequence, sequences.ReplaceBycomplement, features)
 						if err != nil {
 							warnings = append(warnings, err.Error())
 						}
 					}
-				} else {
-					if p.PreserveTranslatedseq {
-						// make func to check codon and swap site to preserve aa sequence product
-						for _, orfnumber := range orfswithsites {
+				} //		}else {
+				if p.PreserveTranslatedseq {
+					// make func to check codon and swap site to preserve aa sequence product
+					for _, orfnumber := range orfswithsites {
 
-							for _, position := range site.Positions("ALL") {
-								orfcoordinates := sequences.MakeStartendPair(orfs[orfnumber].StartPosition, orfs[orfnumber].EndPosition)
-								tempseq, err = sequences.ReplaceCodoninORF(tempseq, orfcoordinates, position, allsitestoavoid)
-								if err != nil {
-									warning := text.Print("removal of site from orf "+strconv.Itoa(orfnumber), " failed! improve your algorithm! "+err.Error())
-									warnings = append(warnings, warning)
-								}
+						for _, position := range site.Positions("ALL") {
+							orfcoordinates := sequences.MakeStartendPair(orfs[orfnumber].StartPosition, orfs[orfnumber].EndPosition)
+							tempseq, _, _, err = sequences.ReplaceCodoninORF(tempseq, orfcoordinates, position, allsitestoavoid)
+							if err != nil {
+								warning := text.Print("removal of site from orf "+strconv.Itoa(orfnumber), " failed! improve your algorithm! "+err.Error())
+								warnings = append(warnings, warning)
 							}
-
 						}
-					}
 
+					}
 				}
+
 				r.SiteFreeSequence = tempseq
 			}
 		}
@@ -155,7 +166,7 @@ func (e *RemoveRestrictionSites) steps(p RemoveRestrictionSitesParamBlock, r *Re
 	// Now let's find out the size of fragments we would get if digested with a common site cutter
 	mapenz := lookup.EnzymeLookup(p.EnzymeforRestrictionmapping)
 
-	r.FragmentSizesfromRestrictionmapping = enzymes.RestrictionMapper(p.Sequence, mapenz)
+	r.FragmentSizesfromRestrictionmapping = enzymes.RestrictionMapper(Sequence, mapenz)
 
 	// allow the data to be exported by capitalising the first letter of the variable
 	r.Sitesfoundinoriginal = sitesfound
@@ -163,12 +174,12 @@ func (e *RemoveRestrictionSites) steps(p RemoveRestrictionSitesParamBlock, r *Re
 	r.Warnings = strings.Join(warnings, ";")
 
 	// Print status
-	if r.Status != "all parts available" {
-		r.Status = fmt.Sprintln(r.Status)
+	if r.Status == "" {
+		r.Status = fmt.Sprintln("Something went wrong!")
 	} else {
 		r.Status = fmt.Sprintln(
 			text.Print("Warnings:", r.Warnings),
-			text.Print("Sequence", p.Sequence),
+			text.Print("Sequence", Sequence),
 			text.Print("Sitesfound", r.Sitesfoundinoriginal),
 			text.Print("Test digestion sizes with"+p.EnzymeforRestrictionmapping, r.FragmentSizesfromRestrictionmapping),
 		)
@@ -260,7 +271,7 @@ func NewRemoveRestrictionSites() interface{} { //*RemoveRestrictionSites {
 // Mapper function
 func (e *RemoveRestrictionSites) Map(m map[string]interface{}) interface{} {
 	var res RemoveRestrictionSitesParamBlock
-	res.Error = false || m["EnzymeforRestrictionmapping"].(execute.ThreadParam).Error || m["PreserveTranslatedseq"].(execute.ThreadParam).Error || m["RemoveifnotinORF"].(execute.ThreadParam).Error || m["RestrictionsitetoAvoid"].(execute.ThreadParam).Error || m["Sequence"].(execute.ThreadParam).Error
+	res.Error = false || m["EnzymeforRestrictionmapping"].(execute.ThreadParam).Error || m["PreserveTranslatedseq"].(execute.ThreadParam).Error || m["RemoveifnotinORF"].(execute.ThreadParam).Error || m["RestrictionsitetoAvoid"].(execute.ThreadParam).Error || m["Sequencekey"].(execute.ThreadParam).Error
 
 	vEnzymeforRestrictionmapping, is := m["EnzymeforRestrictionmapping"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
@@ -298,13 +309,13 @@ func (e *RemoveRestrictionSites) Map(m map[string]interface{}) interface{} {
 		res.RestrictionsitetoAvoid = m["RestrictionsitetoAvoid"].(execute.ThreadParam).Value.([]string)
 	}
 
-	vSequence, is := m["Sequence"].(execute.ThreadParam).Value.(execute.JSONValue)
+	vSequencekey, is := m["Sequencekey"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
 		var temp RemoveRestrictionSitesJSONBlock
-		json.Unmarshal([]byte(vSequence.JSONString), &temp)
-		res.Sequence = *temp.Sequence
+		json.Unmarshal([]byte(vSequencekey.JSONString), &temp)
+		res.Sequencekey = *temp.Sequencekey
 	} else {
-		res.Sequence = m["Sequence"].(execute.ThreadParam).Value.(wtype.DNASequence)
+		res.Sequencekey = m["Sequencekey"].(execute.ThreadParam).Value.(string)
 	}
 
 	res.ID = m["EnzymeforRestrictionmapping"].(execute.ThreadParam).ID
@@ -381,7 +392,7 @@ func (e *RemoveRestrictionSites) OnRestrictionsitetoAvoid(param execute.ThreadPa
 		e.lock.Unlock()
 	}
 }
-func (e *RemoveRestrictionSites) OnSequence(param execute.ThreadParam) {
+func (e *RemoveRestrictionSites) OnSequencekey(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -391,7 +402,7 @@ func (e *RemoveRestrictionSites) OnSequence(param execute.ThreadParam) {
 	}
 	e.lock.Unlock()
 
-	fired := bag.AddValue("Sequence", param)
+	fired := bag.AddValue("Sequencekey", param)
 	if fired {
 		e.lock.Lock()
 		delete(e.params, param.ID)
@@ -408,7 +419,7 @@ type RemoveRestrictionSites struct {
 	PreserveTranslatedseq               <-chan execute.ThreadParam
 	RemoveifnotinORF                    <-chan execute.ThreadParam
 	RestrictionsitetoAvoid              <-chan execute.ThreadParam
-	Sequence                            <-chan execute.ThreadParam
+	Sequencekey                         <-chan execute.ThreadParam
 	FragmentSizesfromRestrictionmapping chan<- execute.ThreadParam
 	SiteFreeSequence                    chan<- execute.ThreadParam
 	Sitesfoundinoriginal                chan<- execute.ThreadParam
@@ -424,7 +435,7 @@ type RemoveRestrictionSitesParamBlock struct {
 	PreserveTranslatedseq       bool
 	RemoveifnotinORF            bool
 	RestrictionsitetoAvoid      []string
-	Sequence                    wtype.DNASequence
+	Sequencekey                 string
 }
 
 type RemoveRestrictionSitesConfig struct {
@@ -435,7 +446,7 @@ type RemoveRestrictionSitesConfig struct {
 	PreserveTranslatedseq       bool
 	RemoveifnotinORF            bool
 	RestrictionsitetoAvoid      []string
-	Sequence                    wtype.DNASequence
+	Sequencekey                 string
 }
 
 type RemoveRestrictionSitesResultBlock struct {
@@ -457,7 +468,7 @@ type RemoveRestrictionSitesJSONBlock struct {
 	PreserveTranslatedseq               *bool
 	RemoveifnotinORF                    *bool
 	RestrictionsitetoAvoid              *[]string
-	Sequence                            *wtype.DNASequence
+	Sequencekey                         *string
 	FragmentSizesfromRestrictionmapping *[]int
 	SiteFreeSequence                    *wtype.DNASequence
 	Sitesfoundinoriginal                *[]enzymes.Restrictionsites
@@ -472,7 +483,7 @@ func (c *RemoveRestrictionSites) ComponentInfo() *execute.ComponentInfo {
 	inp = append(inp, *execute.NewPortInfo("PreserveTranslatedseq", "bool", "PreserveTranslatedseq", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("RemoveifnotinORF", "bool", "RemoveifnotinORF", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("RestrictionsitetoAvoid", "[]string", "RestrictionsitetoAvoid", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Sequence", "wtype.DNASequence", "Sequence", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Sequencekey", "string", "Sequencekey", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("FragmentSizesfromRestrictionmapping", "[]int", "FragmentSizesfromRestrictionmapping", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("SiteFreeSequence", "wtype.DNASequence", "SiteFreeSequence", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("Sitesfoundinoriginal", "[]enzymes.Restrictionsites", "Sitesfoundinoriginal", true, true, nil, nil))

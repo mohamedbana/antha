@@ -73,7 +73,7 @@ func main() {
 				var tempseq wtype.DNASequence
 				var err error
 
-				orfs := sequences.FindallORFs(Sequence.Seq)
+				orfs := sequences.FindallNonOverlappingORFS(Sequence.Seq)
 				warnings = append(warnings, text.Print("orfs: ", orfs))
 				features := sequences.ORFs2Features(orfs)
 
@@ -112,14 +112,19 @@ func main() {
 							warnings = append(warnings, warning)
 
 						}
+						fmt.Println("in 1")
 						SiteFreeSequence = tempseq
 
 						// all done if all sites are not in orfs!
 						// make proper remove allsites func
 					}
 					if foundinorf == true {
-
+						fmt.Println("in 2")
+						fmt.Println("Sequence", Sequence)
+						fmt.Println("enz", site.Enzyme.RecognitionSequence)
+						//fmt.Println("features", features)
 						SiteFreeSequence, err = sequences.RemoveSitesOutsideofFeatures(Sequence, site.Enzyme.RecognitionSequence, sequences.ReplaceBycomplement, features)
+						fmt.Println("sitefreesequence", SiteFreeSequence)
 						if err != nil {
 							warnings = append(warnings, err.Error())
 						}
@@ -128,10 +133,10 @@ func main() {
 					if PreserveTranslatedseq {
 						// make func to check codon and swap site to preserve aa sequence product
 						for _, orfnumber := range orfswithsites {
-
+							fmt.Println("in 3")
 							for _, position := range site.Positions("ALL") {
 								orfcoordinates := sequences.MakeStartendPair(orfs[orfnumber].StartPosition, orfs[orfnumber].EndPosition)
-								tempseq, err = sequences.ReplaceCodoninORF(tempseq, orfcoordinates, position, allsitestoavoid)
+								tempseq, _, _, err = sequences.ReplaceCodoninORF(tempseq, orfcoordinates, position, allsitestoavoid)
 								if err != nil {
 									warning := text.Print("removal of site from orf "+strconv.Itoa(orfnumber), " failed! improve your algorithm! "+err.Error())
 									warnings = append(warnings, warning)
@@ -140,9 +145,9 @@ func main() {
 
 						}
 					}
-
+					SiteFreeSequence = tempseq
 				}
-				SiteFreeSequence = tempseq
+
 			}
 		}
 	}
