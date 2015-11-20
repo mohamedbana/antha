@@ -13,6 +13,14 @@ func Print(description string, value interface{}) (fmtd string) {
 	return
 }
 
+func Annotate(stringtoannotate string, colour string) (fmtd string) {
+	// currently leads to undesired behaviour with string manipulation
+	//fmtd = fmt.Sprint(ansi.Color(stringtoannotate, colour))
+	_ = colour
+	fmtd = stringtoannotate
+	return
+}
+
 /*
 func Printfield( value interface{}) (fmtd string) {
 
