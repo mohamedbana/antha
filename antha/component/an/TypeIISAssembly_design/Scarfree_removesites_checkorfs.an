@@ -117,7 +117,7 @@ Steps {
 					warning = "problem site found in " + part.Nm
 					warnings = append(warnings, warning)
 					orf, orftrue := sequences.FindBiggestORF(part.Seq)
-					warning = fmt.Sprintln("site found in orf ", part.Nm, " ", orftrue, " site positions ", anysites.Positions("ALL"), "orf between", orf.StartPosition, " and ", orf.EndPosition, orf.DNASeq[orf.StartPosition:orf.EndPosition])
+					warning = fmt.Sprintln("site found in orf ", part.Nm, " ", orftrue, " site positions ", anysites.Positions("ALL"), "orf between", orf.StartPosition, " and ", orf.EndPosition, /*orf.DNASeq[orf.StartPosition:orf.EndPosition]*/)
 					warnings = append(warnings, warning)
 					if orftrue /* && len(orf.ProtSeq) > 20 */ {
 						allsitestoavoid := make([]string, 0)
@@ -136,8 +136,13 @@ Steps {
 									warnings = append(warnings, warning)
 								}
 							} else {
-								warning = text.Print("position found to be outside of orf: "+orf.DNASeq, " failed! improve your algorithm! "+err.Error())
-								warnings = append(warnings, warning)
+								allsitestoavoid := make([]string, 0)
+								part, err = sequences.RemoveSite(part, anysites.Enzyme, allsitestoavoid)
+								if err != nil {
+
+									warning = text.Print("position found to be outside of orf: "+orf.DNASeq, " failed! improve your algorithm! "+err.Error())
+									warnings = append(warnings, warning)
+								}
 							}
 						}
 					} else {

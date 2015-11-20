@@ -4,8 +4,8 @@
             "RemoveproblemRestrictionSites":true,
 			"Constructname": "Assemblyproduct", 				
             "Seqsinorder": [
-            "CGCGGAACCCCTATTTGTTTATTTTTCTAAATACATTCAAATATGTATCCGCTCATGAGACAATAACCCTGATAAATGCTTCAATAATATTGAAAAAGGAAGAGT",
-            "aaagaggagaaa",
+            "CGCGGAACCCCTGAGACCGATTTGTTTATTTTTCTAAATACATTCAAATATGTATCCGCTCATGAGACAATAACCCTGATAAATGCTTCAATAATATTGAAAAAGGAAGAGT",
+            "aaagaGAGACCggagaaa",
             "test.gb Feature:Aequoria victoria green fluorescent", 
             "ccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata"
             ],

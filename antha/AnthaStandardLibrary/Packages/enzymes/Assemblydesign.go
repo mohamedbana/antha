@@ -27,6 +27,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"strings"
 )
@@ -276,6 +277,8 @@ func MakeScarfreeCustomTypeIIsassemblyParts(parts []wtype.DNASequence, vector wt
 }
 
 func Addoverhang(seq string, bittoadd string, end string) (seqwithoverhang string) {
+
+	bittoadd = text.Annotate(bittoadd, "blue")
 
 	if end == "5prime" {
 		seqwithoverhang = strings.Join([]string{bittoadd, seq}, "")

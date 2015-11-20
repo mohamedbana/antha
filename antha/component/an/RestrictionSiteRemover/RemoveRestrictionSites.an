@@ -153,7 +153,7 @@ Steps {
 						
 						for _,position := range site.Positions("ALL"){
 						orfcoordinates := sequences.MakeStartendPair(orfs[orfnumber].StartPosition,orfs[orfnumber].EndPosition)
-						tempseq, err = sequences.ReplaceCodoninORF(tempseq,orfcoordinates,position,allsitestoavoid)
+						tempseq, _,_,err = sequences.ReplaceCodoninORF(tempseq,orfcoordinates,position,allsitestoavoid)
 						if err != nil {
 						warning := text.Print("removal of site from orf " +strconv.Itoa(orfnumber),  " failed! improve your algorithm! " + err.Error())
 						warnings = append(warnings,warning)
