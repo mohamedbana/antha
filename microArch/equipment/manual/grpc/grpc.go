@@ -1,22 +1,22 @@
 // microArch/equipment/manual/grpc/grpc.go: Part of the Antha language
 // Copyright (C) 2015 The Antha authors. All rights reserved.
-// 
+//
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-// 
+//
 // For more information relating to the software or licensing issues please
-// contact license@antha-lang.org or write to the Antha team c/o 
+// contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
@@ -367,8 +367,15 @@ func EncodeLHChannelParameter(arg i_1.LHChannelParameter) *pb.LHChannelParameter
 	return &ret
 }
 func DecodeLHChannelParameter(arg *pb.LHChannelParameterMessage) i_1.LHChannelParameter {
-	ret := i_1.LHChannelParameter{(string)(arg.Arg_1), (string)(arg.Arg_2), (*i_2.Volume)(DecodePtrToVolume(arg.Arg_3)), (*i_2.Volume)(DecodePtrToVolume(arg.Arg_4)), (*i_2.FlowRate)(DecodePtrToFlowRate(arg.Arg_5)), (*i_2.FlowRate)(DecodePtrToFlowRate(arg.Arg_6)), (int)(arg.Arg_7), (bool)(arg.Arg_8), (int)(arg.Arg_9), (int)(arg.Arg_10)}
-	return ret
+	// this could be nil
+	if arg == nil {
+		// return an empty thing
+		var v i_1.LHChannelParameter
+		return v
+	} else {
+		ret := i_1.LHChannelParameter{(string)(arg.Arg_1), (string)(arg.Arg_2), (*i_2.Volume)(DecodePtrToVolume(arg.Arg_3)), (*i_2.Volume)(DecodePtrToVolume(arg.Arg_4)), (*i_2.FlowRate)(DecodePtrToFlowRate(arg.Arg_5)), (*i_2.FlowRate)(DecodePtrToFlowRate(arg.Arg_6)), (int)(arg.Arg_7), (bool)(arg.Arg_8), (int)(arg.Arg_9), (int)(arg.Arg_10)}
+		return ret
+	}
 }
 func EncodeMapstringstringMessage(arg map[string]string) *pb.MapstringstringMessage {
 	a := make([]*pb.MapstringstringMessageFieldEntry, 0, len(arg))
@@ -419,8 +426,12 @@ func EncodeLHTip(arg i_1.LHTip) *pb.LHTipMessage {
 	return &ret
 }
 func DecodeLHTip(arg *pb.LHTipMessage) i_1.LHTip {
-	ret := i_1.LHTip{(string)(arg.Arg_1), (string)(arg.Arg_2), (string)(arg.Arg_3), (bool)(arg.Arg_4), (*i_2.Volume)(DecodePtrToVolume(arg.Arg_5)), (*i_2.Volume)(DecodePtrToVolume(arg.Arg_6))}
-	return ret
+	if arg == nil {
+		return i_1.LHTip{}
+	} else {
+		ret := i_1.LHTip{(string)(arg.Arg_1), (string)(arg.Arg_2), (string)(arg.Arg_3), (bool)(arg.Arg_4), (*i_2.Volume)(DecodePtrToVolume(arg.Arg_5)), (*i_2.Volume)(DecodePtrToVolume(arg.Arg_6))}
+		return ret
+	}
 }
 func EncodeArrayOfPtrToLHChannelParameter(arg []*i_1.LHChannelParameter) *pb.ArrayOfPtrToLHChannelParameterMessage {
 	a := make([]*pb.PtrToLHChannelParameterMessage, len(arg))
@@ -587,7 +598,14 @@ func EncodePtrToLHChannelParameter(arg *i_1.LHChannelParameter) *pb.PtrToLHChann
 }
 func DecodePtrToLHChannelParameter(arg *pb.PtrToLHChannelParameterMessage) *i_1.LHChannelParameter {
 	ret := DecodeLHChannelParameter(arg.Arg_1)
-	return &ret
+	// pointers-to-empty-things are actually considered nil
+	// this needs addressing correctly in the future
+	if ret.ID == "" {
+		// this only happens if the structure has not been properly initialized
+		return nil
+	} else {
+		return &ret
+	}
 }
 func EncodePtrToLHPosition(arg *i_1.LHPosition) *pb.PtrToLHPositionMessage {
 	if arg == nil { //@jmanart fix when arg is nil, try to get a pointer

@@ -730,12 +730,26 @@ func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms
 	ret = append(ret, GetTips(tiptype, prms, channel, 1, false))
 	n_tip_uses := 0
 
+	var last_thing *wtype.LHComponent
+
+	last_thing = nil
+
 	for t := 0; t < len(ins.Volume); t++ {
 		newchannel, newtiptype := ChooseChannel(ins.Volume[t], prms)
 		tvs := TransferVolumes(*ins.Volume[t], *channel.Minvol, *channel.Maxvol)
 		for _, vol := range tvs {
-			// change tips if we need to
-			if n_tip_uses > pol["TIP_REUSE_LIMIT"].(int) || channel != newchannel || newtiptype != tiptype {
+			// determine whether to change tips
+			change_tips := false
+			change_tips = n_tip_uses > pol["TIP_REUSE_LIMIT"].(int)
+			change_tips = change_tips || channel != newchannel
+			change_tips = change_tips || newtiptype != tiptype
+
+			if pol["DONT_BE_DIRTY"].(bool) && last_thing != nil {
+				// check
+			}
+
+			//	if n_tip_uses > pol["TIP_REUSE_LIMIT"].(int) || channel != newchannel || newtiptype != tiptype {
+			if change_tips {
 				// maybe wrap this as a ChangeTips function call
 				// these need parameters
 				ret = append(ret, DropTips(tiptype, prms, channel, 1))
@@ -743,6 +757,7 @@ func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms
 				tiptype = newtiptype
 				channel = newchannel
 				n_tip_uses = 0
+				last_thing = nil
 			}
 
 			stci := NewSingleChannelTransferInstruction()

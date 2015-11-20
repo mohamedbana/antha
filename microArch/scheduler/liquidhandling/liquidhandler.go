@@ -24,13 +24,13 @@ package liquidhandling
 
 import (
 	"fmt"
-	"log"
-	"sync"
-
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
+	"log"
+	"sync"
+	"time"
 )
 
 // the liquid handler structure defines the interface to a particular liquid handling
@@ -103,10 +103,21 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 		RaiseError("Cannot execute request: no instructions")
 	}
 
+	// some timing info for the log (only) for now
+
+	timer := this.Properties.GetTimer()
+	var d time.Duration
+
 	for _, ins := range instructions {
 		logger.Debug(fmt.Sprintln(liquidhandling.InsToString(ins)))
 		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(this.Properties.Driver)
+
+		if timer != nil {
+			d += timer.TimeFor(ins)
+		}
 	}
+
+	logger.Debug(fmt.Sprintf("Total time estimate: %s", d.String()))
 
 	return nil
 }
@@ -273,6 +284,9 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 	// TODO this has to be sorted out
 	// SERIOUSLY
 	max_n_tipboxes := len(this.Properties.Tip_preferences)
+
+	fmt.Println("MAX N TIPBOXES: ", max_n_tipboxes)
+
 	for i := 0; i < max_n_tipboxes; i++ {
 		//		this.Properties.AddTipBox(request.Tip_Type.Dup())//TODO get this from where it comes, quick hack now!
 		//		this.Properties.AddTipBox(factory.GetTipboxByType("Gilson20"))
@@ -283,7 +297,10 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 		if request.Tip_Type == nil || request.Tip_Type.GenericSolid == nil {
 			logger.Debug(fmt.Sprintf("LiquidHandling model is %q", this.Properties.Model))
 			if this.Properties.Model == "Pipetmax" {
+				fmt.Println("WEll this should be OK, no?")
 				this.Properties.AddTipBox(factory.GetTipboxByType("Gilson20"))
+				this.Properties.Tips = make([]*wtype.LHTip, 1)
+				this.Properties.Tips[0] = factory.GetTipboxByType("Gilson20").Tiptype
 			} else { //if this.Properties.Model == "GeneTheatre" { //TODO handle general case differently
 				this.Properties.AddTipBox(factory.GetTipboxByType("CyBio50Tipbox"))
 				this.Properties.Tips = make([]*wtype.LHTip, 1)

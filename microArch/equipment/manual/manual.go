@@ -476,7 +476,9 @@ func (e *AnthaManualGrpc) Shutdown() error {
 //Init driver will be initialized when registered
 func (e *AnthaManualGrpc) Init() error {
 	//e.properties = factory.GetLiquidhandlerByType("GilsonPipetmax")
-	e.properties = factory.GetLiquidhandlerByType("CyBioGeneTheatre")
+	//e.properties = factory.GetLiquidhandlerByType("CyBioGeneTheatre")
+	p, _ := e.driver.GetCapabilities()
+	e.properties = &p
 	e.properties.Driver = e.driver
 	return nil
 }

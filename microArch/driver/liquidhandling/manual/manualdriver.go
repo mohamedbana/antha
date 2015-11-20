@@ -130,7 +130,7 @@ func (m *ManualDriver) Move(deckposition []string, wellcoords []string, referenc
 	params["plate_type"] = fmt.Sprintf("%v", plate_type)
 	params["head"] = fmt.Sprintf("%v", head)
 
-	desc := fmt.Sprintf("Deck Postition %v @well %v with reference %v", m.lookupPlateName(deckposition[0]), wellcoords, reference)
+	desc := fmt.Sprintf("Deck Position %v @well %v with reference %v", m.lookupPlateName(deckposition[0]), wellcoords, reference)
 	ad := *equipment.NewActionDescription(action.LH_MOVE, desc, params)
 	err := m.sendActionToEquipment(ad)
 	if err != nil {
@@ -149,7 +149,7 @@ func (m *ManualDriver) Move(deckposition []string, wellcoords []string, referenc
 func (m *ManualDriver) MoveExplicit(deckposition []string, wellcoords []string, reference []int, offsetX, offsetY, offsetZ []float64, plate_type []*wtype.LHPlate, head int) driver.CommandStatus {
 	params := make(map[string]string)
 
-	desc := fmt.Sprintf("Deck Postition %v @well %v with reference %v", deckposition, wellcoords, reference)
+	desc := fmt.Sprintf("Deck Position %v @well %v with reference %v", deckposition, wellcoords, reference)
 	ad := *equipment.NewActionDescription(action.LH_MOVE_EXPLICIT, desc, params)
 	err := m.sendActionToEquipment(ad)
 	if err != nil {
