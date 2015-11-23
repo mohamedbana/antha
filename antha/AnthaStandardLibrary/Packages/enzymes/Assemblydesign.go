@@ -238,7 +238,7 @@ func MakeScarfreeCustomTypeIIsassemblyParts(parts []wtype.DNASequence, vector wt
 
 	// find sticky ends from cutting vector with enzyme
 
-	_, stickyends5, _ := TypeIIsdigest(vector, enzyme)
+	fragments, stickyends5, _ := TypeIIsdigest(vector, enzyme)
 
 	//initialise
 
@@ -247,15 +247,21 @@ func MakeScarfreeCustomTypeIIsassemblyParts(parts []wtype.DNASequence, vector wt
 	vector3primestickyend := ""
 
 	// add better logic for the scenarios where the vector is cut more than twice or we want to add fragment in either direction
-	for i := 0; i < len(stickyends5); i++ {
-		if stickyends5[i] != "" {
+	// picks largest fragment
 
+	for i := 0; i < len(stickyends5)-1; i++ {
+
+		currentlargestfragment := ""
+
+		if stickyends5[i] != "" && len(fragments[i]) > len(currentlargestfragment) {
+
+			currentlargestfragment = fragments[i]
 			// RevComp() // fill in later
 			vector3primestickyend = stickyends5[i]
 			desiredstickyend5prime = stickyends5[i+1]
-			{
+			/*{
 				break
-			}
+			}*/
 		}
 	} // fill in later
 
