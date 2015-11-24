@@ -9,6 +9,7 @@ import (
 	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/flow"
 	"github.com/antha-lang/antha/microArch/execution"
+	"runtime/debug"
 	"strings"
 	"sync"
 )
@@ -118,7 +119,7 @@ func (e *TypeIISConstructAssembly_alt) Complete(params interface{}) {
 		if res := recover(); res != nil {
 			e.Reaction <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
 			e.S <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			execute.AddError(res)
+			execute.AddError(&execute.RuntimeError{BaseError: res, Stack: debug.Stack()})
 			return
 		}
 	}()
