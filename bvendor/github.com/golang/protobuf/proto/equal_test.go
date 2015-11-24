@@ -35,7 +35,7 @@ import (
 	"testing"
 
 	. "github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto"
-	pb "github.com/golang/protobuf/proto/testdata"
+	pb "github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto/testdata"
 )
 
 // Four identical base messages.

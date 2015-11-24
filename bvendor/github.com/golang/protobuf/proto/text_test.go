@@ -41,8 +41,8 @@ import (
 
 	"github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto"
 
-	proto3pb "github.com/golang/protobuf/proto/proto3_proto"
-	pb "github.com/golang/protobuf/proto/testdata"
+	proto3pb "github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto/proto3_proto"
+	pb "github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto/testdata"
 )
 
 // textMessage implements the methods that allow it to marshal and unmarshal

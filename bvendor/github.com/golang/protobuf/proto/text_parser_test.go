@@ -37,8 +37,8 @@ import (
 	"testing"
 
 	. "github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto"
-	proto3pb "github.com/golang/protobuf/proto/proto3_proto"
-	. "github.com/golang/protobuf/proto/testdata"
+	proto3pb "github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto/proto3_proto"
+	. "github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto/testdata"
 )
 
 type UnmarshalTextTest struct {

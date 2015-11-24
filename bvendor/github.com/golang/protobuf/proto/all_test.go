@@ -45,7 +45,7 @@ import (
 	"time"
 
 	. "github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto"
-	. "github.com/golang/protobuf/proto/testdata"
+	. "github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto/testdata"
 )
 
 var globalO *Buffer
