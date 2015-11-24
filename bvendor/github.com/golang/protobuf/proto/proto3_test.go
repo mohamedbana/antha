@@ -35,8 +35,8 @@ import (
 	"testing"
 
 	"github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto"
-	pb "github.com/golang/protobuf/proto/proto3_proto"
-	tpb "github.com/golang/protobuf/proto/testdata"
+	pb "github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto/proto3_proto"
+	tpb "github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto/testdata"
 )
 
 func TestProto3ZeroValues(t *testing.T) {
