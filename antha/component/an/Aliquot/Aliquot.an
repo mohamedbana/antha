@@ -1,0 +1,67 @@
+protocol Aliquot
+
+import (
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	//"github.com/antha-lang/antha/antha/anthalib/wutil"
+	"github.com/antha-lang/antha/antha/anthalib/mixer"
+)
+
+
+// Input parameters for this protocol (data)
+Parameters (
+	SolutionVolume Volume
+	VolumePerAliquot  Volume
+	NumberofAliquots int
+)
+
+// Data which is returned from this protocol, and data types
+Data (
+	
+)
+
+
+// Physical Inputs to this protocol with types
+Inputs (
+	Solution *wtype.LHComponent
+	OutPlate *wtype.LHPlate
+)
+
+// Physical outputs from this protocol with types
+Outputs (
+	Aliquots []*wtype.LHSolution
+)
+
+Requirements {
+}
+
+// Conditions to run on startup
+Setup {
+}
+
+// The core process for this protocol, with the steps to be performed
+// for every input
+Steps {
+	//preAliquot := make([]*wtype.LHComponent, 0)
+	aliquots := make([]*wtype.LHSolution,0)
+	//number := SolutionVolume.SIValue()/VolumePerAliquot.SIValue()
+	//NumberofAliquots, _ = wutil.RoundDown(number)
+	
+	for i := 0; i < NumberofAliquots; i++ {
+		aliquotSample := mixer.Sample(Solution, VolumePerAliquot)
+		//preAliquot = append(preAliquot,aliquotSample)
+		aliquot := MixInto(OutPlate, aliquotSample)
+		aliquots = append(aliquots,aliquot)
+		//preAliquot = make([]*wtype.LHComponent, 0)
+	}
+	Aliquots = aliquots
+}
+// Run after controls and a steps block are completed to
+// post process any data and provide downstream results
+Analysis {
+}
+
+// A block of tests to perform to validate that the sample was processed correctly
+// Optionally, destructive tests can be performed to validate results on a
+// dipstick basis
+Validation {
+}
