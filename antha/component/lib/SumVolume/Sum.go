@@ -32,7 +32,8 @@ func (e *SumVolume) requirements() {
 
 // Actions to perform before protocol itself
 func (e *SumVolume) setup(p SumVolumeParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -40,7 +41,8 @@ func (e *SumVolume) setup(p SumVolumeParamBlock) {
 
 // Core process of the protocol: steps to be performed for each input
 func (e *SumVolume) steps(p SumVolumeParamBlock, r *SumVolumeResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 
 	//var Dmassconc wunit.MassConcentration = D
@@ -65,14 +67,16 @@ func (e *SumVolume) steps(p SumVolumeParamBlock, r *SumVolumeResultBlock) {
 
 // Actions to perform after steps block to analyze data
 func (e *SumVolume) analysis(p SumVolumeParamBlock, r *SumVolumeResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 
 func (e *SumVolume) validation(p SumVolumeParamBlock, r *SumVolumeResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

@@ -35,7 +35,8 @@ func (e *TypeIISConstructAssembly_sim) requirements() {
 
 // Conditions to run on startup
 func (e *TypeIISConstructAssembly_sim) setup(p TypeIISConstructAssembly_simParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -44,7 +45,8 @@ func (e *TypeIISConstructAssembly_sim) setup(p TypeIISConstructAssembly_simParam
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *TypeIISConstructAssembly_sim) steps(p TypeIISConstructAssembly_simParamBlock, r *TypeIISConstructAssembly_simResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 
 	// Check that assembly is feasible by simulating assembly of the sequences with the chosen enzyme
@@ -144,7 +146,8 @@ func (e *TypeIISConstructAssembly_sim) steps(p TypeIISConstructAssembly_simParam
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *TypeIISConstructAssembly_sim) analysis(p TypeIISConstructAssembly_simParamBlock, r *TypeIISConstructAssembly_simResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -154,7 +157,8 @@ func (e *TypeIISConstructAssembly_sim) analysis(p TypeIISConstructAssembly_simPa
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *TypeIISConstructAssembly_sim) validation(p TypeIISConstructAssembly_simParamBlock, r *TypeIISConstructAssembly_simResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

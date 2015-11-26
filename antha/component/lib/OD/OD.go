@@ -54,7 +54,8 @@ func (e *OD) requirements() {
 	// sufficient sample volume available to sacrifice
 }
 func (e *OD) setup(p ODParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -64,7 +65,8 @@ func (e *OD) setup(p ODParamBlock) {
 	blank_absorbance = platereader.Read(ODplate,control_blank, wavelength)*/
 }
 func (e *OD) steps(p ODParamBlock, r *ODResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 
 	var product *wtype.LHSolution //WaterSolution
@@ -85,7 +87,8 @@ func (e *OD) steps(p ODParamBlock, r *ODResultBlock) {
 
 } // serial dilution or could write element for finding optimum dilution or search historical data
 func (e *OD) analysis(p ODParamBlock, r *ODResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 
 	// Need to substract blank from measurement; normalise to path length of 1cm for OD value; apply conversion factor to estimate dry cell weight
@@ -98,7 +101,8 @@ func (e *OD) analysis(p ODParamBlock, r *ODResultBlock) {
 
 }
 func (e *OD) validation(p ODParamBlock, r *ODResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

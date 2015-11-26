@@ -48,7 +48,8 @@ func (e *FindPartsthat) requirements() {
 
 // Conditions to run on startup
 func (e *FindPartsthat) setup(p FindPartsthatParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -57,7 +58,8 @@ func (e *FindPartsthat) setup(p FindPartsthatParamBlock) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *FindPartsthat) steps(p FindPartsthatParamBlock, r *FindPartsthatResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 
 	//var msg string
@@ -133,7 +135,8 @@ func (e *FindPartsthat) steps(p FindPartsthatParamBlock, r *FindPartsthatResultB
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *FindPartsthat) analysis(p FindPartsthatParamBlock, r *FindPartsthatResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -143,7 +146,8 @@ func (e *FindPartsthat) analysis(p FindPartsthatParamBlock, r *FindPartsthatResu
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *FindPartsthat) validation(p FindPartsthatParamBlock, r *FindPartsthatResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

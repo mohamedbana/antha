@@ -37,7 +37,8 @@ func (e *BlastSearch) requirements() {
 
 // Actions to perform before protocol itself
 func (e *BlastSearch) setup(p BlastSearchParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -45,7 +46,8 @@ func (e *BlastSearch) setup(p BlastSearchParamBlock) {
 
 // Core process of the protocol: steps to be performed for each input
 func (e *BlastSearch) steps(p BlastSearchParamBlock, r *BlastSearchResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 
 	var err error
@@ -101,14 +103,16 @@ func (e *BlastSearch) steps(p BlastSearchParamBlock, r *BlastSearchResultBlock) 
 
 // Actions to perform after steps block to analyze data
 func (e *BlastSearch) analysis(p BlastSearchParamBlock, r *BlastSearchResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 
 func (e *BlastSearch) validation(p BlastSearchParamBlock, r *BlastSearchResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
