@@ -18,6 +18,7 @@ import (
 	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/flow"
 	"github.com/antha-lang/antha/microArch/execution"
+	"runtime/debug"
 	"strings"
 	"sync"
 )
@@ -163,7 +164,7 @@ func (e *FindPartsthat) Complete(params interface{}) {
 			e.FulllistBackupParts <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
 			e.Status <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
 			e.Warnings <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			execute.AddError(res)
+			execute.AddError(&execute.RuntimeError{BaseError: res, Stack: debug.Stack()})
 			return
 		}
 	}()

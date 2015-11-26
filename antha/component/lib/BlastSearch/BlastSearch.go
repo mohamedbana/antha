@@ -13,6 +13,7 @@ import (
 	"github.com/antha-lang/antha/flow"
 	biogo "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
 	"github.com/antha-lang/antha/microArch/execution"
+	"runtime/debug"
 	"sync"
 )
 
@@ -124,7 +125,7 @@ func (e *BlastSearch) Complete(params interface{}) {
 	defer func() {
 		if res := recover(); res != nil {
 			e.Hits <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			execute.AddError(res)
+			execute.AddError(&execute.RuntimeError{BaseError: res, Stack: debug.Stack()})
 			return
 		}
 	}()

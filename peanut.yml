@@ -7,6 +7,7 @@ modules:
         package: github.com/antha-lang/antha
         buildpackages:
             - ~internal
+            - ~bvendor
     docker:
         packages:
             - libglpk-dev

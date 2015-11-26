@@ -185,12 +185,12 @@ package ExtendedLiquidhandlingDriver
 import (
 	"fmt"
 
-	proto "github.com/antha-lang/antha/internal/github.com/golang/protobuf/proto"
+	proto "github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto"
 )
 
 import (
-	context "github.com/antha-lang/antha/internal/golang.org/x/net/context"
-	grpc "github.com/antha-lang/antha/internal/google.golang.org/grpc"
+	context "github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	grpc "github.com/antha-lang/antha/bvendor/google.golang.org/grpc"
 	//context "golang.org/x/net/context"
 	//grpc "google.golang.org/grpc"
 )

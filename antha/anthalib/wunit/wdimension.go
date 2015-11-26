@@ -23,9 +23,9 @@
 package wunit
 
 import (
-	"strings"
-
+	"fmt"
 	"github.com/antha-lang/antha/microArch/logger"
+	"strings"
 )
 
 // length
@@ -412,10 +412,30 @@ type FlowRate struct {
 
 func NewFlowRate(v float64, unit string) FlowRate {
 	if unit != "ml/min" {
-		logger.Fatal("Can't make densities which aren't in ml/min")
-		panic("Can't make densities which aren't in ml/min")
+		logger.Fatal("Can't make flow rate which aren't in ml/min")
+		panic("Can't make flow rate which aren't in ml/min")
 	}
 	fr := FlowRate{NewMeasurement(v, "", unit)}
 
 	return fr
+}
+
+type Rate struct {
+	Unit     ConcreteMeasurement
+	Timeunit string //time.Duration
+}
+
+func NewRate(unit ConcreteMeasurement, timeunit string) (r Rate, err error) {
+
+	approvedtimeunits := []string{"ns", "us", "µs", "ms", "s", "m", "h"}
+
+	for _, approvedunit := range approvedtimeunits {
+		if timeunit == approvedunit {
+			r.Unit = unit
+			r.Timeunit = timeunit
+			return
+		}
+	}
+	err = fmt.Errorf(timeunit, " Not approved unit. Approved units are: ", approvedtimeunits)
+	return r, err
 }

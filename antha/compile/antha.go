@@ -253,6 +253,7 @@ func (p *compiler) transform(src *ast.File) {
 			"github.com/antha-lang/antha/antha/execute",
 			"github.com/antha-lang/antha/flow",
 			"sync",
+			"runtime/debug",
 			"encoding/json",
 		},
 	)
@@ -356,7 +357,7 @@ func (e *{{.PkgName}}) Complete(params interface{}) {
 	defer func() {
 		if res := recover(); res != nil {
 {{range .Results}}		e.{{.OutputVariableName}} <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-{{end}}		execute.AddError(res)
+{{end}}		execute.AddError(&execute.RuntimeError{BaseError: res, Stack: debug.Stack()})
 			return
 		}
 	}()

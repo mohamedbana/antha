@@ -21,6 +21,7 @@ import (
 	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/flow"
 	"github.com/antha-lang/antha/microArch/execution"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"sync"
@@ -241,7 +242,7 @@ func (e *Scarfree_design) Complete(params interface{}) {
 			e.Simulationpass <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
 			e.Status <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
 			e.Warnings <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			execute.AddError(res)
+			execute.AddError(&execute.RuntimeError{BaseError: res, Stack: debug.Stack()})
 			return
 		}
 	}()

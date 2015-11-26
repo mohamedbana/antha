@@ -77,7 +77,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/antha-lang/antha/internal/golang.org/x/net/context"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/internal/golang.org/x/net/internal/timeseries"
 )
 
