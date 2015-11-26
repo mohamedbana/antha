@@ -28,7 +28,7 @@ import (
 
 type Absorbance struct {
 	Reading    float64
-	Wavelength float64
+	Wavelength int64
 	Pathlength wunit.Length
 	Status     []string
 	Reader     string
