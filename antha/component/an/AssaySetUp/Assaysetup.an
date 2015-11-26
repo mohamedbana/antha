@@ -2,9 +2,7 @@ protocol Assaysetup
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	//"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
-	"fmt"
 )
 
 
@@ -32,9 +30,6 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	/*Reaction1 *wtype.LHSolution
-	Reaction2 *wtype.LHSolution
-	Reaction3 *wtype.LHSolution*/
 	Reactions []*wtype.LHSolution
 )
 
@@ -48,10 +43,9 @@ Setup {
 // The core process for this protocol, with the steps to be performed
 // for every input
 Steps {
-	fmt.Println("Hello", NumberofReactions)
+	
 	reactions := make([]*wtype.LHSolution,0)
-	//number := SolutionVolume.SIValue()/VolumePerAliquot.SIValue()
-	//NumberofAliquots, _ = wutil.RoundDown(number)
+	
 	
 	for i := 0; i < NumberofReactions; i++ {
 		eachreaction := make([]*wtype.LHComponent, 0)
@@ -63,14 +57,10 @@ Steps {
 		eachreaction = append(eachreaction,enzSample)
 		reaction := MixInto(OutPlate, eachreaction...)
 		reactions = append(reactions,reaction)
-		fmt.Println("Hello")
-		//preAliquot = make([]*wtype.LHComponent, 0)
+		
 	}
 	Reactions = reactions
-	/*Reaction1 = reactions[0]
-	Reaction2 = reactions[1]
-	Reaction3 = reactions[2]*/
-	Status = "Hi"
+	
 }
 
 // Run after controls and a steps block are completed to

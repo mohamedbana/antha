@@ -2,7 +2,7 @@ protocol Aliquot
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	//"github.com/antha-lang/antha/antha/anthalib/wutil"
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 )
 
@@ -32,26 +32,32 @@ Outputs (
 )
 
 Requirements {
+	
 }
 
 // Conditions to run on startup
 Setup {
+	
 }
 
 // The core process for this protocol, with the steps to be performed
 // for every input
 Steps {
-	//preAliquot := make([]*wtype.LHComponent, 0)
+	
+	number := SolutionVolume.SIValue()/VolumePerAliquot.SIValue()
+	possiblenumberofAliquots, _ := wutil.RoundDown(number)
+	if possiblenumberofAliquots < NumberofAliquots {
+		panic("Not enough solution for this many aliquots")
+	}
+	
+	
 	aliquots := make([]*wtype.LHSolution,0)
-	//number := SolutionVolume.SIValue()/VolumePerAliquot.SIValue()
-	//NumberofAliquots, _ = wutil.RoundDown(number)
+	
 	
 	for i := 0; i < NumberofAliquots; i++ {
 		aliquotSample := mixer.Sample(Solution, VolumePerAliquot)
-		//preAliquot = append(preAliquot,aliquotSample)
 		aliquot := MixInto(OutPlate, aliquotSample)
 		aliquots = append(aliquots,aliquot)
-		//preAliquot = make([]*wtype.LHComponent, 0)
 	}
 	Aliquots = aliquots
 }
@@ -64,4 +70,5 @@ Analysis {
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 Validation {
+	
 }

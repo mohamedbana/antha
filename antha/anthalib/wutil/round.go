@@ -22,6 +22,11 @@
 
 package wutil
 
+import (
+	"fmt"
+	"math"
+)
+
 func RoundInt(v float64) int {
 	f := 1.0
 	if v < 0 {
@@ -29,4 +34,13 @@ func RoundInt(v float64) int {
 	}
 
 	return int(f * (0.5 + (f * v)))
+}
+
+func RoundDown(v float64) (int, error) {
+	if v < 0 {
+		err := fmt.Errorf("Cannot round down negative float64")
+		return 0, err
+	}
+
+	return int(math.Floor(v)), nil
 }
