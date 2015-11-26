@@ -54,7 +54,8 @@ func (e *OD) requirements() {
 	// sufficient sample volume available to sacrifice
 }
 func (e *OD) setup(p ODParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -64,28 +65,33 @@ func (e *OD) setup(p ODParamBlock) {
 	blank_absorbance = platereader.Read(ODplate,control_blank, wavelength)*/
 }
 func (e *OD) steps(p ODParamBlock, r *ODResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 
 	var product *wtype.LHSolution //WaterSolution
 
+	i := 0
+	limitonnumberofdilutions := 3
 	for {
 		product = _wrapper.MixInto(p.ODplate, mixer.Sample(p.Sampletotest, p.Sample_volume), mixer.Sample(p.Diluent, p.Diluent_volume))
 		/*Is it necessary to include platetype in Read function?
 		or is the info on volume, opacity, pathlength etc implied in LHSolution?*/
-		r.Sample_absorbance = platereader.ReadAbsorbance(*p.ODplate, *product, p.Wlength)
+		r.Sample_absorbance = platereader.ReadAbsorbance(*p.ODplate, *product, p.Wlength, nil)
 
-		if r.Sample_absorbance.Reading < 1 {
+		if r.Sample_absorbance.Reading < 1 || i == limitonnumberofdilutions {
 			break
 		}
 		p.Diluent_volume.Mvalue += 1 //diluent_volume = diluent_volume + 1
+		i = i + 1
 
 	}
 	_ = _wrapper.WaitToEnd()
 
 } // serial dilution or could write element for finding optimum dilution or search historical data
 func (e *OD) analysis(p ODParamBlock, r *ODResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 
 	// Need to substract blank from measurement; normalise to path length of 1cm for OD value; apply conversion factor to estimate dry cell weight
@@ -98,7 +104,8 @@ func (e *OD) analysis(p ODParamBlock, r *ODResultBlock) {
 
 }
 func (e *OD) validation(p ODParamBlock, r *ODResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -253,7 +260,7 @@ func (e *OD) Map(m map[string]interface{}) interface{} {
 		json.Unmarshal([]byte(vWlength.JSONString), &temp)
 		res.Wlength = *temp.Wlength
 	} else {
-		res.Wlength = m["Wlength"].(execute.ThreadParam).Value.(float64)
+		res.Wlength = m["Wlength"].(execute.ThreadParam).Value.(int64)
 	}
 
 	res.ID = m["Blank_absorbance"].(execute.ThreadParam).ID
@@ -448,7 +455,7 @@ type ODParamBlock struct {
 	ODtoDCWconversionfactor float64
 	Sample_volume           wunit.Volume
 	Sampletotest            *wtype.LHComponent
-	Wlength                 float64
+	Wlength                 int64
 }
 
 type ODConfig struct {
@@ -463,7 +470,7 @@ type ODConfig struct {
 	ODtoDCWconversionfactor float64
 	Sample_volume           wunit.Volume
 	Sampletotest            wtype.FromFactory
-	Wlength                 float64
+	Wlength                 int64
 }
 
 type ODResultBlock struct {
@@ -488,7 +495,7 @@ type ODJSONBlock struct {
 	ODtoDCWconversionfactor     *float64
 	Sample_volume               *wunit.Volume
 	Sampletotest                **wtype.LHComponent
-	Wlength                     *float64
+	Wlength                     *int64
 	Blankcorrected_absorbance   *wtype.Absorbance
 	Estimateddrycellweight_conc *wunit.Concentration
 	OD                          *wtype.Absorbance
@@ -506,7 +513,7 @@ func (c *OD) ComponentInfo() *execute.ComponentInfo {
 	inp = append(inp, *execute.NewPortInfo("ODtoDCWconversionfactor", "float64", "ODtoDCWconversionfactor", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Sample_volume", "wunit.Volume", "Sample_volume", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Sampletotest", "*wtype.LHComponent", "Sampletotest", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Wlength", "float64", "Wlength", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Wlength", "int64", "Wlength", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("Blankcorrected_absorbance", "wtype.Absorbance", "Blankcorrected_absorbance", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("Estimateddrycellweight_conc", "wunit.Concentration", "Estimateddrycellweight_conc", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("OD", "wtype.Absorbance", "OD", true, true, nil, nil))
