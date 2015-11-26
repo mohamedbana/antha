@@ -14,6 +14,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -26,6 +27,8 @@ import (
 )
 
 // Input parameters for this protocol (data)
+
+// enter each as amino acid sequence
 
 // Physical Inputs to this protocol with types
 
@@ -61,6 +64,8 @@ func (e *Scarfree_design) steps(p Scarfree_designParamBlock, r *Scarfree_designR
 	// set warnings reported back to user to none initially
 	warnings := make([]string, 0)
 
+	var warning string
+	var err error
 	// make an empty array of DNA Sequences ready to fill
 	partsinorder := make([]wtype.DNASequence, 0)
 
@@ -97,7 +102,7 @@ func (e *Scarfree_design) steps(p Scarfree_designParamBlock, r *Scarfree_designR
 	vectordata := wtype.MakePlasmidDNASequence("Vector", p.Vector)
 
 	//lookup restriction enzyme
-	restrictionenzyme, err := lookup.TypeIIsLookup(p.Enzyme)
+	restrictionenzyme, err := lookup.TypeIIsLookup(p.Enzymename)
 	if err != nil {
 		warnings = append(warnings, text.Print("Error", err.Error()))
 	}
@@ -141,18 +146,27 @@ func (e *Scarfree_design) steps(p Scarfree_designParamBlock, r *Scarfree_designR
 	}
 
 	// check number of sites per part !
-	enz := lookup.EnzymeLookup(p.Enzyme)
+
 	sites := make([]int, 0)
 	multiple := make([]string, 0)
 	for _, part := range r.PartswithOverhangs {
 
+		enz := lookup.EnzymeLookup(p.Enzymename)
 		info := enzymes.Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
 
 		sitepositions := enzymes.SitepositionString(info[0])
 
 		sites = append(sites, info[0].Numberofsites)
-		sitepositions = text.Print(part.Nm+" "+p.Enzyme+" positions:", sitepositions)
+		sitepositions = text.Print(part.Nm+" "+p.Enzymename+" positions:", sitepositions)
 		multiple = append(multiple, sitepositions)
+	}
+
+	for _, orf := range p.ORFstoConfirm {
+		if sequences.LookforSpecificORF(r.NewDNASequence.Seq, orf) == false {
+			warning = text.Print("orf not present: ", orf)
+			warnings = append(warnings, warning)
+			r.ORFmissing = true
+		}
 	}
 
 	if len(warnings) == 0 {
@@ -174,11 +188,12 @@ func (e *Scarfree_design) steps(p Scarfree_designParamBlock, r *Scarfree_designR
 		r.Status = fmt.Sprintln(
 			text.Print("simulator status: ", status),
 			text.Print("Endreport after digestion: ", endreport),
-			text.Print("Sites per part for "+p.Enzyme, sites),
+			text.Print("Sites per part for "+p.Enzymename, sites),
 			text.Print("Positions: ", multiple),
 			text.Print("Warnings:", r.Warnings.Error()),
 			text.Print("Simulationpass=", r.Simulationpass),
 			text.Print("NewDNASequence: ", r.NewDNASequence),
+			text.Print("Any Orfs to confirm missing from new DNA sequence:", r.ORFmissing),
 			partstoorder,
 		)
 	}
@@ -210,6 +225,7 @@ func (e *Scarfree_design) Complete(params interface{}) {
 	p := params.(Scarfree_designParamBlock)
 	if p.Error {
 		e.NewDNASequence <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
+		e.ORFmissing <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
 		e.PartswithOverhangs <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
 		e.Simulationpass <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
 		e.Status <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
@@ -220,6 +236,7 @@ func (e *Scarfree_design) Complete(params interface{}) {
 	defer func() {
 		if res := recover(); res != nil {
 			e.NewDNASequence <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
+			e.ORFmissing <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
 			e.PartswithOverhangs <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
 			e.Simulationpass <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
 			e.Status <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
@@ -232,6 +249,8 @@ func (e *Scarfree_design) Complete(params interface{}) {
 	e.steps(p, r)
 
 	e.NewDNASequence <- execute.ThreadParam{Value: r.NewDNASequence, ID: p.ID, Error: false}
+
+	e.ORFmissing <- execute.ThreadParam{Value: r.ORFmissing, ID: p.ID, Error: false}
 
 	e.PartswithOverhangs <- execute.ThreadParam{Value: r.PartswithOverhangs, ID: p.ID, Error: false}
 
@@ -269,7 +288,7 @@ func NewScarfree_design() interface{} { //*Scarfree_design {
 // Mapper function
 func (e *Scarfree_design) Map(m map[string]interface{}) interface{} {
 	var res Scarfree_designParamBlock
-	res.Error = false || m["Constructname"].(execute.ThreadParam).Error || m["Enzyme"].(execute.ThreadParam).Error || m["Seqsinorder"].(execute.ThreadParam).Error || m["Vector"].(execute.ThreadParam).Error
+	res.Error = false || m["Constructname"].(execute.ThreadParam).Error || m["Enzymename"].(execute.ThreadParam).Error || m["ORFstoConfirm"].(execute.ThreadParam).Error || m["Seqsinorder"].(execute.ThreadParam).Error || m["Vector"].(execute.ThreadParam).Error
 
 	vConstructname, is := m["Constructname"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
@@ -280,13 +299,22 @@ func (e *Scarfree_design) Map(m map[string]interface{}) interface{} {
 		res.Constructname = m["Constructname"].(execute.ThreadParam).Value.(string)
 	}
 
-	vEnzyme, is := m["Enzyme"].(execute.ThreadParam).Value.(execute.JSONValue)
+	vEnzymename, is := m["Enzymename"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
 		var temp Scarfree_designJSONBlock
-		json.Unmarshal([]byte(vEnzyme.JSONString), &temp)
-		res.Enzyme = *temp.Enzyme
+		json.Unmarshal([]byte(vEnzymename.JSONString), &temp)
+		res.Enzymename = *temp.Enzymename
 	} else {
-		res.Enzyme = m["Enzyme"].(execute.ThreadParam).Value.(string)
+		res.Enzymename = m["Enzymename"].(execute.ThreadParam).Value.(string)
+	}
+
+	vORFstoConfirm, is := m["ORFstoConfirm"].(execute.ThreadParam).Value.(execute.JSONValue)
+	if is {
+		var temp Scarfree_designJSONBlock
+		json.Unmarshal([]byte(vORFstoConfirm.JSONString), &temp)
+		res.ORFstoConfirm = *temp.ORFstoConfirm
+	} else {
+		res.ORFstoConfirm = m["ORFstoConfirm"].(execute.ThreadParam).Value.([]string)
 	}
 
 	vSeqsinorder, is := m["Seqsinorder"].(execute.ThreadParam).Value.(execute.JSONValue)
@@ -318,7 +346,7 @@ func (e *Scarfree_design) OnConstructname(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(4, e, e)
+		bag.Init(5, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -330,17 +358,34 @@ func (e *Scarfree_design) OnConstructname(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Scarfree_design) OnEnzyme(param execute.ThreadParam) {
+func (e *Scarfree_design) OnEnzymename(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(4, e, e)
+		bag.Init(5, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
 
-	fired := bag.AddValue("Enzyme", param)
+	fired := bag.AddValue("Enzymename", param)
+	if fired {
+		e.lock.Lock()
+		delete(e.params, param.ID)
+		e.lock.Unlock()
+	}
+}
+func (e *Scarfree_design) OnORFstoConfirm(param execute.ThreadParam) {
+	e.lock.Lock()
+	var bag *execute.AsyncBag = e.params[param.ID]
+	if bag == nil {
+		bag = new(execute.AsyncBag)
+		bag.Init(5, e, e)
+		e.params[param.ID] = bag
+	}
+	e.lock.Unlock()
+
+	fired := bag.AddValue("ORFstoConfirm", param)
 	if fired {
 		e.lock.Lock()
 		delete(e.params, param.ID)
@@ -352,7 +397,7 @@ func (e *Scarfree_design) OnSeqsinorder(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(4, e, e)
+		bag.Init(5, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -369,7 +414,7 @@ func (e *Scarfree_design) OnVector(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(4, e, e)
+		bag.Init(5, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -388,10 +433,12 @@ type Scarfree_design struct {
 	startup            sync.Once
 	params             map[execute.ThreadID]*execute.AsyncBag
 	Constructname      <-chan execute.ThreadParam
-	Enzyme             <-chan execute.ThreadParam
+	Enzymename         <-chan execute.ThreadParam
+	ORFstoConfirm      <-chan execute.ThreadParam
 	Seqsinorder        <-chan execute.ThreadParam
 	Vector             <-chan execute.ThreadParam
 	NewDNASequence     chan<- execute.ThreadParam
+	ORFmissing         chan<- execute.ThreadParam
 	PartswithOverhangs chan<- execute.ThreadParam
 	Simulationpass     chan<- execute.ThreadParam
 	Status             chan<- execute.ThreadParam
@@ -403,7 +450,8 @@ type Scarfree_designParamBlock struct {
 	BlockID       execute.BlockID
 	Error         bool
 	Constructname string
-	Enzyme        string
+	Enzymename    string
+	ORFstoConfirm []string
 	Seqsinorder   []string
 	Vector        string
 }
@@ -413,7 +461,8 @@ type Scarfree_designConfig struct {
 	BlockID       execute.BlockID
 	Error         bool
 	Constructname string
-	Enzyme        string
+	Enzymename    string
+	ORFstoConfirm []string
 	Seqsinorder   []string
 	Vector        string
 }
@@ -423,6 +472,7 @@ type Scarfree_designResultBlock struct {
 	BlockID            execute.BlockID
 	Error              bool
 	NewDNASequence     wtype.DNASequence
+	ORFmissing         bool
 	PartswithOverhangs []wtype.DNASequence
 	Simulationpass     bool
 	Status             string
@@ -434,10 +484,12 @@ type Scarfree_designJSONBlock struct {
 	BlockID            *execute.BlockID
 	Error              *bool
 	Constructname      *string
-	Enzyme             *string
+	Enzymename         *string
+	ORFstoConfirm      *[]string
 	Seqsinorder        *[]string
 	Vector             *string
 	NewDNASequence     *wtype.DNASequence
+	ORFmissing         *bool
 	PartswithOverhangs *[]wtype.DNASequence
 	Simulationpass     *bool
 	Status             *string
@@ -448,10 +500,12 @@ func (c *Scarfree_design) ComponentInfo() *execute.ComponentInfo {
 	inp := make([]execute.PortInfo, 0)
 	outp := make([]execute.PortInfo, 0)
 	inp = append(inp, *execute.NewPortInfo("Constructname", "string", "Constructname", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Enzyme", "string", "Enzyme", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Enzymename", "string", "Enzymename", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("ORFstoConfirm", "[]string", "ORFstoConfirm", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Seqsinorder", "[]string", "Seqsinorder", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Vector", "string", "Vector", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("NewDNASequence", "wtype.DNASequence", "NewDNASequence", true, true, nil, nil))
+	outp = append(outp, *execute.NewPortInfo("ORFmissing", "bool", "ORFmissing", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("PartswithOverhangs", "[]wtype.DNASequence", "PartswithOverhangs", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("Simulationpass", "bool", "Simulationpass", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("Status", "string", "Status", true, true, nil, nil))
