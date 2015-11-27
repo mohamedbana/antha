@@ -50,6 +50,19 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 
 	A = wtype.NewLHComponent()
 	A.GenericMatter = matter["water"]
+	A.CName = "Yellow"
+	A.Type = "water"
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "Blue"
+	A.Type = "water"
+	A.Smax = 9999
+	cmap[A.CName] = A
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
 	A.CName = "DNAsolution"
 	A.Type = "dna"
 	A.Smax = 1.0
