@@ -1,0 +1,126 @@
+{
+  "Parameters": [{
+    "Paintmix": {
+	"Colour1": "component:Yellow",
+	"Colour2": "component:Blue",
+      "Outplate": "plate:pcrplate_with_cooler",
+      "TipType": "tipbox:Gilson20",
+      "Colour1vol": "10ul",
+	"Colour2vol": "10ul",
+	"NumberofCopies":8
+     }
+  },
+{
+    "Paintmix": {
+	"Colour1": "component:Yellow",
+	"Colour2": "component:Blue",
+      "Outplate": "plate:pcrplate_with_cooler",
+      "TipType": "tipbox:Gilson20",
+      "Colour1vol": "10ul",
+	"Colour2vol": "10ul",
+	"NumberofCopies":8
+     }
+  },
+{
+    "Paintmix": {
+	"Colour1": "component:water",
+	"Colour2": "component:water",
+      "Outplate": "plate:pcrplate_with_cooler",
+      "TipType": "tipbox:Gilson20",
+      "Colour1vol": "20ul",
+	"Colour2vol": "0ul",
+	"NumberofCopies":8
+     }
+  },
+{
+    "Paintmix": {
+	"Colour1": "component:Yellow",
+	"Colour2": "component:Blue",
+      "Outplate": "plate:pcrplate_with_cooler",
+      "TipType": "tipbox:Gilson20",
+      "Colour1vol": "10ul",
+	"Colour2vol": "10ul",
+	"NumberofCopies":8
+     }
+  },
+{
+    "Paintmix": {
+	"Colour1": "component:Yellow",
+	"Colour2": "component:Blue",
+      "Outplate": "plate:pcrplate_with_cooler",
+      "TipType": "tipbox:Gilson20",
+      "Colour1vol": "10ul",
+	"Colour2vol": "10ul",
+	"NumberofCopies":8
+     }
+  },
+{
+    "Paintmix": {
+	"Colour1": "component:Yellow",
+	"Colour2": "component:Blue",
+      "Outplate": "plate:pcrplate_with_cooler",
+      "TipType": "tipbox:Gilson20",
+      "Colour1vol": "10ul",
+	"Colour2vol": "10ul",
+	"NumberofCopies":8
+     }
+  },
+{
+    "Paintmix": {
+	"Colour1": "component:Yellow",
+	"Colour2": "component:Blue",
+      "Outplate": "plate:pcrplate_with_cooler",
+      "TipType": "tipbox:Gilson20",
+      "Colour1vol": "10ul",
+	"Colour2vol": "10ul",
+	"NumberofCopies":8
+     }
+  },
+{
+    "Paintmix": {
+	"Colour1": "component:Yellow",
+	"Colour2": "component:Blue",
+      "Outplate": "plate:pcrplate_with_cooler",
+      "TipType": "tipbox:Gilson20",
+      "Colour1vol": "10ul",
+	"Colour2vol": "10ul",
+	"NumberofCopies":8
+     }
+  },
+{
+    "Paintmix": {
+	"Colour1": "component:Yellow",
+	"Colour2": "component:Blue",
+      "Outplate": "plate:pcrplate_with_cooler",
+      "TipType": "tipbox:Gilson20",
+      "Colour1vol": "10ul",
+	"Colour2vol": "10ul",
+	"NumberofCopies":8
+     }
+  },
+{
+    "Paintmix": {
+	"Colour1": "component:Yellow",
+	"Colour2": "component:Blue",
+      "Outplate": "plate:pcrplate_with_cooler",
+      "TipType": "tipbox:Gilson20",
+      "Colour1vol": "10ul",
+	"Colour2vol": "10ul",
+	"NumberofCopies":8
+     }
+  },
+{
+    "Paintmix": {
+	"Colour1": "component:Yellow",
+	"Colour2": "component:Blue",
+      "Outplate": "plate:pcrplate_with_cooler",
+      "TipType": "tipbox:Gilson20",
+      "Colour1vol": "10ul",
+	"Colour2vol": "10ul",
+	"NumberofCopies":8
+     }
+  }],
+  "Config": {
+    "OUTPUT_COUNT": 88
+  }
+}
