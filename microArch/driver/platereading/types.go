@@ -1,5 +1,9 @@
 package platereading
 
+import (
+	"time"
+)
+
 // these are taken from a specific type of platereader... most likely need
 // generalising
 
@@ -16,6 +20,25 @@ type WaveSet struct {
 	Min int // minimum
 	Max int // maximum
 	Inc int // increment
+}
+
+type PRMeasurement struct {
+	EWavelength int       //	excitation wavelength
+	RWavelength int       //	emission wavelength
+	Reading     int       // 	value read
+	Xoff        int       //	position - x, relative to well centre
+	Yoff        int       //	position - y, relative to well centre
+	Zoff        int       // 	position - z, relative to well centre
+	Timestamp   time.Time // instant measurement was taken
+	Temp        int       //   temperature
+	O2          int       // o2 conc when measurement was taken
+	CO2         int       // co2 conc when measurement was taken
+}
+
+type PRMeasurementSet []PRmeasurement
+
+type PROutput struct {
+	Readings []PRMeasurementSet
 }
 
 type PRProperties struct {
