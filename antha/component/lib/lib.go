@@ -16,6 +16,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/NewDNASequence"
 	"github.com/antha-lang/antha/antha/component/lib/OD"
 	"github.com/antha-lang/antha/antha/component/lib/PCR"
+	"github.com/antha-lang/antha/antha/component/lib/Paintmix"
 	"github.com/antha-lang/antha/antha/component/lib/Phytip_miniprep"
 	"github.com/antha-lang/antha/antha/component/lib/Printname"
 	"github.com/antha-lang/antha/antha/component/lib/RemoveRestrictionSites"
@@ -243,6 +244,17 @@ func GetComponents() []ComponentDesc {
 	portMap["PCR"]["Templatevolume"] = true
 
 	portMap["PCR"]["Reaction"] = false
+
+	portMap["Paintmix"] = make(map[string]bool)
+	portMap["Paintmix"]["Colour1"] = true
+	portMap["Paintmix"]["Colour1vol"] = true
+	portMap["Paintmix"]["Colour2"] = true
+	portMap["Paintmix"]["Colour2vol"] = true
+	portMap["Paintmix"]["Numberofcopies"] = true
+	portMap["Paintmix"]["OutPlate"] = true
+
+	portMap["Paintmix"]["NewColours"] = false
+	portMap["Paintmix"]["Status"] = false
 
 	portMap["Phytip_miniprep"] = make(map[string]bool)
 	portMap["Phytip_miniprep"]["Airstep"] = true
@@ -492,6 +504,7 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "NewDNASequence", Constructor: NewDNASequence.NewNewDNASequence})
 	c = append(c, ComponentDesc{Name: "OD", Constructor: OD.NewOD})
 	c = append(c, ComponentDesc{Name: "PCR", Constructor: PCR.NewPCR})
+	c = append(c, ComponentDesc{Name: "Paintmix", Constructor: Paintmix.NewPaintmix})
 	c = append(c, ComponentDesc{Name: "Phytip_miniprep", Constructor: Phytip_miniprep.NewPhytip_miniprep})
 	c = append(c, ComponentDesc{Name: "Printname", Constructor: Printname.NewPrintname})
 	c = append(c, ComponentDesc{Name: "RemoveRestrictionSites", Constructor: RemoveRestrictionSites.NewRemoveRestrictionSites})
