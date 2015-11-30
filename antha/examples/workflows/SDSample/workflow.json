@@ -1,0 +1,15 @@
+{
+"properties": {
+        "name": "main"
+    },
+    "processes": {
+        "SDSample": {
+            "component": "SDSample",
+            "metadata": {
+                "label": "CS"
+            }
+        }
+    },
+    "connections": [ ]
+}
+

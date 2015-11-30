@@ -20,6 +20,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/Phytip_miniprep"
 	"github.com/antha-lang/antha/antha/component/lib/Printname"
 	"github.com/antha-lang/antha/antha/component/lib/RemoveRestrictionSites"
+	"github.com/antha-lang/antha/antha/component/lib/SDSample"
 	"github.com/antha-lang/antha/antha/component/lib/Scarfree_design"
 	"github.com/antha-lang/antha/antha/component/lib/Scarfree_siteremove_orfcheck"
 	"github.com/antha-lang/antha/antha/component/lib/SumVolume"
@@ -294,6 +295,24 @@ func GetComponents() []ComponentDesc {
 	portMap["RemoveRestrictionSites"]["Status"] = false
 	portMap["RemoveRestrictionSites"]["Warnings"] = false
 
+	portMap["SDSample"] = make(map[string]bool)
+	portMap["SDSample"]["Buffer"] = true
+	portMap["SDSample"]["BufferName"] = true
+	portMap["SDSample"]["BufferStockConc"] = true
+	portMap["SDSample"]["BufferVolume"] = true
+	portMap["SDSample"]["DenatureTemp"] = true
+	portMap["SDSample"]["DenatureTime"] = true
+	portMap["SDSample"]["FinalConcentration"] = true
+	portMap["SDSample"]["InPlate"] = true
+	portMap["SDSample"]["OutPlate"] = true
+	portMap["SDSample"]["Protein"] = true
+	portMap["SDSample"]["ReactionVolume"] = true
+	portMap["SDSample"]["SampleName"] = true
+	portMap["SDSample"]["SampleVolume"] = true
+
+	portMap["SDSample"]["LoadSample"] = false
+	portMap["SDSample"]["Status"] = false
+
 	portMap["Scarfree_design"] = make(map[string]bool)
 	portMap["Scarfree_design"]["Constructname"] = true
 	portMap["Scarfree_design"]["Enzymename"] = true
@@ -508,6 +527,7 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "Phytip_miniprep", Constructor: Phytip_miniprep.NewPhytip_miniprep})
 	c = append(c, ComponentDesc{Name: "Printname", Constructor: Printname.NewPrintname})
 	c = append(c, ComponentDesc{Name: "RemoveRestrictionSites", Constructor: RemoveRestrictionSites.NewRemoveRestrictionSites})
+	c = append(c, ComponentDesc{Name: "SDSample", Constructor: SDSample.NewSDSample})
 	c = append(c, ComponentDesc{Name: "Scarfree_design", Constructor: Scarfree_design.NewScarfree_design})
 	c = append(c, ComponentDesc{Name: "Scarfree_siteremove_orfcheck", Constructor: Scarfree_siteremove_orfcheck.NewScarfree_siteremove_orfcheck})
 	c = append(c, ComponentDesc{Name: "SumVolume", Constructor: SumVolume.NewSumVolume})
