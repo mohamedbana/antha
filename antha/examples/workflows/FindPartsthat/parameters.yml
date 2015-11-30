@@ -8,6 +8,8 @@
 		 "Partdescriptions": [
             "Double",
             ],
+			"OnlyreturnAvailableParts":true,
+			"OnlyreturnWorkingparts":true,
         }
     }],
     "Config": {

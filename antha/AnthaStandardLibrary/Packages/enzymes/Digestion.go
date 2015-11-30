@@ -65,6 +65,24 @@ type Restrictionsites struct {
 	Reversepositions    []int
 }
 
+func (sites *Restrictionsites) Positions(fwdRevorNil string) (positions []int) {
+	if strings.ToUpper(fwdRevorNil) == strings.ToUpper("FWD") {
+		positions = sites.Forwardpositions
+	} else if strings.ToUpper(fwdRevorNil) == strings.ToUpper("REV") {
+		positions = sites.Reversepositions
+	} else if strings.ToUpper(fwdRevorNil) == strings.ToUpper("") ||
+		strings.ToUpper(fwdRevorNil) == strings.ToUpper("ALL") {
+		positions = make([]int, 0)
+		for _, pos := range sites.Forwardpositions {
+			positions = append(positions, pos)
+		}
+		for _, pos := range sites.Reversepositions {
+			positions = append(positions, pos)
+		}
+	}
+	return
+}
+
 func SitepositionString(sitesperpart Restrictionsites) (sitepositions string) {
 	Num := make([]string, 0)
 

@@ -1,3 +1,9 @@
+// This protocol is intended to design assembly parts using either an assembly standard or a specified enzyme.
+// parts are added as biobrick IDs, or looked up from the inventory package
+// A simulation is performed and status returned to the user
+// The user can also specify the names of enzyme sites they wish to avoid to check if these are present in the
+// new dna sequence (if simulation passes that is).
+
 package TypeIISAssembly_design
 
 import (
@@ -36,7 +42,8 @@ func (e *TypeIISAssembly_design) requirements() {
 
 // Conditions to run on startup
 func (e *TypeIISAssembly_design) setup(p TypeIISAssembly_designParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -45,7 +52,8 @@ func (e *TypeIISAssembly_design) setup(p TypeIISAssembly_designParamBlock) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *TypeIISAssembly_designResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 
 	//var msg string
@@ -192,7 +200,8 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *TypeIISAssembly_design) analysis(p TypeIISAssembly_designParamBlock, r *TypeIISAssembly_designResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -202,7 +211,8 @@ func (e *TypeIISAssembly_design) analysis(p TypeIISAssembly_designParamBlock, r 
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *TypeIISAssembly_design) validation(p TypeIISAssembly_designParamBlock, r *TypeIISAssembly_designResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

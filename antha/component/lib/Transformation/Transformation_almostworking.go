@@ -47,7 +47,8 @@ func (e *Transformation) requirements() {
 
 // Conditions to run on startup
 func (e *Transformation) setup(p TransformationParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -56,7 +57,8 @@ func (e *Transformation) setup(p TransformationParamBlock) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *Transformation) steps(p TransformationParamBlock, r *TransformationResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 
 	competentcells := make([]*wtype.LHComponent, 0)
@@ -139,7 +141,8 @@ func (e *Transformation) steps(p TransformationParamBlock, r *TransformationResu
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *Transformation) analysis(p TransformationParamBlock, r *TransformationResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -149,7 +152,8 @@ func (e *Transformation) analysis(p TransformationParamBlock, r *TransformationR
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *Transformation) validation(p TransformationParamBlock, r *TransformationResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

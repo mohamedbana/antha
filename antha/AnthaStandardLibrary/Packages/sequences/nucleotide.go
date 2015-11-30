@@ -138,7 +138,7 @@ func Wobble(seq string) (alloptions []string) {
 
 		optionsforcharacterx := WobbleMap[string(character)]
 		arrayofarray = append(arrayofarray, optionsforcharacterx)
-		fmt.Println("arrayofarray", arrayofarray)
+		//fmt.Println("arrayofarray", arrayofarray)
 	}
 
 	alloptions = AllCombinations(arrayofarray)

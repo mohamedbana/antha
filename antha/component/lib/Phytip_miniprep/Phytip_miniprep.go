@@ -7,8 +7,9 @@ import (
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/devices"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/UnitOperations"
 	//"github.com/antha-lang/antha/antha/anthalib/mixer"
-	"encoding/json"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	//"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"encoding/json"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/flow"
@@ -108,13 +109,15 @@ func (e *Phytip_miniprep) requirements() {
 
 }
 func (e *Phytip_miniprep) setup(p Phytip_miniprepParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 func (e *Phytip_miniprep) steps(p Phytip_miniprepParamBlock, r *Phytip_miniprepResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 
 	resuspension, _ := UnitOperations.Resuspend(p.Cellpellet, p.Resuspensionstep, p.Tips)
@@ -153,13 +156,15 @@ func (e *Phytip_miniprep) steps(p Phytip_miniprepParamBlock, r *Phytip_miniprepR
 
 }
 func (e *Phytip_miniprep) analysis(p Phytip_miniprepParamBlock, r *Phytip_miniprepResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 func (e *Phytip_miniprep) validation(p Phytip_miniprepParamBlock, r *Phytip_miniprepResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

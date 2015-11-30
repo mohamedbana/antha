@@ -25,6 +25,7 @@ package parser
 import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	//"io/ioutil"
 	"bufio"
@@ -34,7 +35,73 @@ import (
 	"strings"
 )
 
-func ParseGenbankfilename(filename string) (annotated sequences.AnnotatedSeq, err error) {
+func GenbanktoDNASequence(filename string) (standardseq wtype.DNASequence, err error) {
+
+	var annotated sequences.AnnotatedSeq
+	line := ""
+	genbanklines := make([]string, 0)
+	file, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line = fmt.Sprintln(scanner.Text())
+		genbanklines = append(genbanklines, line)
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	annotated, err = HandleGenbank(genbanklines)
+
+	standardseq = annotated.DNASequence
+
+	return
+
+}
+
+func GenbankFeaturetoDNASequence(filename string, featurename string) (standardseq wtype.DNASequence, err error) {
+
+	var annotated sequences.AnnotatedSeq
+	line := ""
+	genbanklines := make([]string, 0)
+	file, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line = fmt.Sprintln(scanner.Text())
+		genbanklines = append(genbanklines, line)
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	annotated, err = HandleGenbank(genbanklines)
+
+	for _, feature := range annotated.Features {
+
+		if strings.Contains(feature.Name, featurename) {
+			standardseq.Nm = feature.Name
+			standardseq.Seq = feature.DNASeq
+			return
+		}
+
+	}
+
+	return
+
+}
+
+func GenbanktoAnnotatedSeq(filename string) (annotated sequences.AnnotatedSeq, err error) {
 	line := ""
 	genbanklines := make([]string, 0)
 	file, err := os.Open(filename)
@@ -99,7 +166,7 @@ func HandleGenbank(lines []string) (annotatedseq sequences.AnnotatedSeq, err err
 		features := HandleFeatures(lines, seq, "DNA")
 		fmt.Println("found these features", features)
 		annotatedseq, err = sequences.MakeAnnotatedSeq(name, seq, circular, features)
-
+		fmt.Println("annotated", annotatedseq)
 	} else {
 		err = fmt.Errorf("no LOCUS found on first line")
 	}
@@ -217,6 +284,18 @@ func Featureline2(line string) (description string, found bool) {
 	fields := strings.Split(line, " ")
 	//fmt.Println("length of fields", len(fields))
 
+	// reassemble fields to preserve linked items with spaces e.g. "Green fluorescent protein"
+	for i, field := range fields {
+		if strings.Contains(field, `"`) {
+			tempfields := make([]string, i)
+			tempfield := strings.Join(fields[i:len(fields)-1], " ")
+			tempfields = fields[0 : i-1]
+			tempfields = append(tempfields, tempfield)
+			fields = tempfields
+			break
+		}
+	}
+
 	newarray := make([]string, 0)
 	for _, s := range fields {
 		if s != "" && s != " " {
@@ -229,6 +308,23 @@ func Featureline2(line string) (description string, found bool) {
 			parts := strings.SplitAfterN(line, "=", 2)
 			if len(parts) == 2 {
 				description = strings.TrimSpace(parts[1])
+				found = true
+				return
+			}
+
+		}
+
+	}
+	for _, line := range newarray {
+		if strings.Contains(line, `/product`) {
+			parts := strings.SplitAfterN(line, `="`, 2)
+			if len(parts) == 2 {
+				fmt.Println("line", line)
+				fmt.Println("parts", parts)
+				fmt.Println("len(parts) =2 yes")
+				fmt.Println("parts[1]", parts[1])
+				description = parts[1] //strings.Replace(parts[1], " ", "_", -1)
+				fmt.Println("Huh!", description)
 				found = true
 				return
 			}
@@ -338,7 +434,7 @@ func HandleFeatures(lines []string, seq string, seqtype string) (features []sequ
 			if reverse {
 				rev = "Reverse"
 			}
-			feature = sequences.MakeFeature(description, seq[startposition:endposition], seqtype, class, rev)
+			feature = sequences.MakeFeature(description, seq[startposition-1:endposition], seqtype, class, rev)
 			if start > end {
 				return
 			}
@@ -384,6 +480,8 @@ func HandleSequence(lines []string) (dnaseq string) {
 					seq = strings.Replace(seq, "\n", "", -1)
 					seq = strings.Replace(seq, "//", "", -1)
 					dnaseq = seq
+
+					fmt.Println("dnaseq:", dnaseq)
 					return
 				}
 			}

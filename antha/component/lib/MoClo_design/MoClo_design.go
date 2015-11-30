@@ -1,3 +1,11 @@
+// This protocol is intended to design assembly parts using the MoClo assembly standard.
+// Overhangs for a part are chosen according to the designated class of each part (e.g. promoter).
+// The MoClo standard is hierarchical so the enzyme is chosen based on the level of assembly.
+// i.e. first level 0 parts are made which may comprise of a promoter, 5prime upstream part, coding sequene, and terminator.
+// Level 0 parts can then be assembled together by using level 1 enzymes and overhangs.
+// currently this protocol only supports level 0 steps.
+// see http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0016765
+
 package MoClo_design
 
 import (
@@ -42,7 +50,8 @@ func (e *MoClo_design) requirements() {
 
 // Conditions to run on startup
 func (e *MoClo_design) setup(p MoClo_designParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -51,7 +60,8 @@ func (e *MoClo_design) setup(p MoClo_designParamBlock) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *MoClo_design) steps(p MoClo_designParamBlock, r *MoClo_designResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 
 	//var msg string
@@ -169,7 +179,8 @@ func (e *MoClo_design) steps(p MoClo_designParamBlock, r *MoClo_designResultBloc
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *MoClo_design) analysis(p MoClo_designParamBlock, r *MoClo_designResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -179,7 +190,8 @@ func (e *MoClo_design) analysis(p MoClo_designParamBlock, r *MoClo_designResultB
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *MoClo_design) validation(p MoClo_designParamBlock, r *MoClo_designResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

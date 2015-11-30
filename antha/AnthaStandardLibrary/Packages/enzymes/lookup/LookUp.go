@@ -49,3 +49,69 @@ func EnzymeLookup(name string) (enzyme wtype.LogicalRestrictionEnzyme) {
 	}
 	return enzyme
 }
+
+func FindEnzymesofClass(class string) (enzymelist []wtype.LogicalRestrictionEnzyme) {
+
+	var enzyme wtype.LogicalRestrictionEnzyme
+
+	if anthapath.Anthafileexists("REBASETypeII.txt") == false {
+		err := rebase.UpdateRebasefile()
+		if err != nil {
+			fmt.Println("error:", err)
+		}
+	}
+	enzymes, err := ioutil.ReadFile(filepath.Join(anthapath.Dirpath(), "REBASETypeII.txt"))
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+
+	rebaseFh := bytes.NewReader(enzymes)
+
+	for record := range rebase.RebaseParse(rebaseFh) {
+		/*plasmidstatus := "FALSE"
+		seqtype := "DNA"
+		class := "not specified"*/
+
+		if strings.ToUpper(record.Class) == strings.ToUpper(class) {
+			fmt.Println(record)
+			//RecognitionSeqs = append(RecognitionSeqs, record)
+			enzyme = record
+			enzymelist = append(enzymelist, enzyme)
+		}
+
+	}
+	return enzymelist
+}
+
+func FindEnzymeNamesofClass(class string) (enzymelist []string) {
+
+	var enzyme string
+
+	if anthapath.Anthafileexists("REBASETypeII.txt") == false {
+		err := rebase.UpdateRebasefile()
+		if err != nil {
+			fmt.Println("error:", err)
+		}
+	}
+	enzymes, err := ioutil.ReadFile(filepath.Join(anthapath.Dirpath(), "REBASETypeII.txt"))
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+
+	rebaseFh := bytes.NewReader(enzymes)
+
+	for record := range rebase.RebaseParse(rebaseFh) {
+		/*plasmidstatus := "FALSE"
+		seqtype := "DNA"
+		class := "not specified"*/
+
+		if strings.ToUpper(record.Class) == strings.ToUpper(class) {
+			fmt.Println(record)
+			//RecognitionSeqs = append(RecognitionSeqs, record)
+			enzyme = record.Name
+			enzymelist = append(enzymelist, enzyme)
+		}
+
+	}
+	return enzymelist
+}

@@ -24,8 +24,10 @@ package enzymes
 
 import (
 	"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"strings"
 )
@@ -156,17 +158,17 @@ func AddCustomEnds(part wtype.DNASequence, enzyme wtype.TypeIIs, desiredstickyen
 		bittoadd = ""
 	}
 	bittoadd5prime := Makeoverhang(enzyme, "5prime", bittoadd, ChooseSpacer(enzyme.Topstrand3primedistancefromend, "", []string{}))
-	fmt.Println("bittoadd5prime", bittoadd5prime)
+
 	partwith5primeend := Addoverhang(part.Seq, bittoadd5prime, "5prime")
 
 	bittoadd3 := desiredstickyend3prime
-	fmt.Println("bittoadd3", bittoadd3)
+
 	if strings.HasSuffix(part.Seq, bittoadd3) == true {
 		bittoadd3 = ""
 	}
-	//fmt.Println("bittoadd3", bittoadd3)
+
 	bittoadd3prime := Makeoverhang(enzyme, "3prime", bittoadd3, ChooseSpacer(enzyme.Topstrand3primedistancefromend, "", []string{}))
-	fmt.Println("bittoadd3prime", bittoadd3prime)
+
 	partwithends := Addoverhang(partwith5primeend, bittoadd3prime, "3prime")
 
 	Partwithends.Nm = part.Nm
@@ -197,6 +199,38 @@ func MakeStandardTypeIIsassemblyParts(parts []wtype.DNASequence, assemblystandar
 	return partswithends
 }
 
+func CheckForExistingTypeIISEnds(part wtype.DNASequence, enzyme wtype.TypeIIs) (numberofsitesfound int, stickyends5 []string, stickyends3 []string) {
+
+	enz := lookup.EnzymeLookup(enzyme.Name)
+
+	sites := Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+
+	numberofsitesfound = sites[0].Numberofsites
+	_, stickyends5, stickyends3 = TypeIIsdigest(part, enzyme)
+
+	return
+}
+
+/*
+
+func HandleExistingEnds (parts []wtype.DNASequence, enzymewtype.LogicalRestrictionEnzyme)(partswithoverhangs []wtype.DNASequence {
+	partswithexistingsites := make([]RestrictionSites, 0)
+
+	for _, part := range parts {
+		sites := Restrictionsitefinder(part, wtype.LogicalRestrictionEnzyme{enzyme})
+		if len(sites) != 0 {
+			partswithexistingsites = append(partswithexistingsites, sites)
+		}
+
+	}
+	return
+}
+
+func AddStandardVectorEnds (vector wtype.DNASequence, standard, level string) (vectrowithends wtype.DNASequence) {
+
+	}
+*/
+
 func MakeScarfreeCustomTypeIIsassemblyParts(parts []wtype.DNASequence, vector wtype.DNASequence, enzyme wtype.TypeIIs) (partswithends []wtype.DNASequence) {
 
 	partswithends = make([]wtype.DNASequence, 0)
@@ -204,7 +238,7 @@ func MakeScarfreeCustomTypeIIsassemblyParts(parts []wtype.DNASequence, vector wt
 
 	// find sticky ends from cutting vector with enzyme
 
-	_, stickyends5, _ := TypeIIsdigest(vector, enzyme)
+	fragments, stickyends5, _ := TypeIIsdigest(vector, enzyme)
 
 	//initialise
 
@@ -213,15 +247,21 @@ func MakeScarfreeCustomTypeIIsassemblyParts(parts []wtype.DNASequence, vector wt
 	vector3primestickyend := ""
 
 	// add better logic for the scenarios where the vector is cut more than twice or we want to add fragment in either direction
-	for i := 0; i < len(stickyends5); i++ {
-		if stickyends5[i] != "" {
+	// picks largest fragment
 
+	for i := 0; i < len(stickyends5)-1; i++ {
+
+		currentlargestfragment := ""
+
+		if stickyends5[i] != "" && len(fragments[i]) > len(currentlargestfragment) {
+
+			currentlargestfragment = fragments[i]
 			// RevComp() // fill in later
 			vector3primestickyend = stickyends5[i]
 			desiredstickyend5prime = stickyends5[i+1]
-			{
+			/*{
 				break
-			}
+			}*/
 		}
 	} // fill in later
 
@@ -234,18 +274,17 @@ func MakeScarfreeCustomTypeIIsassemblyParts(parts []wtype.DNASequence, vector wt
 		}
 		partwithends = AddCustomEnds(parts[i], enzyme, desiredstickyend5prime, desiredstickyend3prime)
 		partswithends = append(partswithends, partwithends)
-		//
+
 		desiredstickyend5prime = Suffix(parts[i].Seq, enzyme.LogicalRestrictionEnzyme.EndLength)
-		fmt.Println("HEYYYYYYYYYYY", enzyme.LogicalRestrictionEnzyme.EndLength)
-		fmt.Println("HEYYYYYYYYYYY", desiredstickyend5prime)
-		//dnaseqcut := dnaseq.Seq[(len(dnaseq.Seq) - 4):]
-		fmt.Println(desiredstickyend5prime)
+
 	}
 
 	return partswithends
 }
 
 func Addoverhang(seq string, bittoadd string, end string) (seqwithoverhang string) {
+
+	bittoadd = text.Annotate(bittoadd, "blue")
 
 	if end == "5prime" {
 		seqwithoverhang = strings.Join([]string{bittoadd, seq}, "")
@@ -267,42 +306,6 @@ func Makeallspaceroptions(spacerlength int) (finalarray []string) {
 
 	finalarray = AllCombinations(newarray)
 
-	/*
-		//if len(seqstoavoid)>0{
-		s := ""
-		var newarray []string
-		var intermediatearray []string
-		finalarray = make([]string, 0)
-		//for i := 0; i < spacerlength; i++ {
-		newarray = Addnucleotide(s)
-		fmt.Println("newarray", newarray)
-		if spacerlength == 1 {
-			finalarray = newarray
-		}
-
-		for _, array_part_s := range newarray {
-			intermediatearray = Addnucleotide(array_part_s)
-			fmt.Println("intermediatearray", intermediatearray)
-			if spacerlength == 2 {
-				for _, partofintermediatearray := range intermediatearray {
-					finalarray = append(finalarray, partofintermediatearray)
-					fmt.Println("finalarray", finalarray)
-				}
-			}
-		}
-		/*if spacerlength == 3 {
-			finalarray2 := finalarray
-			var finalarray3 []string
-			finalarray = make([]string, 0)
-			for _, partoffinalarray := range finalarray2 {
-				finalarray = Addnucleotide(partoffinalarray)
-				finalarray3 = append(finalarray3, partoffinalarray)
-				finalarray = append(finalarray,finalarray3)
-				fmt.Println("finalarray", finalarray)
-			}
-		}*/
-
-	//	}
 	return finalarray
 }
 
@@ -386,6 +389,13 @@ var Endlinks = map[string]map[string]map[int]map[int]string{
 			},
 		},
 	},
+	"Electra": map[string]map[int]map[int]string{
+		"Level0": map[int]map[int]string{
+			1: map[int]string{
+				0: "ATG",
+			},
+		},
+	},
 }
 var EndlinksString = map[string]map[string]map[string][]string{
 	"MoClo": map[string]map[string][]string{
@@ -452,7 +462,11 @@ var Vectorends = map[string]map[string][]string{
 		"Level1": []string{"", ""},
 	},
 	"Synthace": map[string][]string{
-		"Level0": []string{"", ""},
+		"Level0": []string{"GGT", "GAA"},
+		"Level1": []string{"", ""},
+	},
+	"Electra": map[string][]string{
+		"Level0": []string{"GGT", "ATG"},
 		"Level1": []string{"", ""},
 	},
 }
@@ -466,6 +480,9 @@ var Enzymelookup = map[string]map[string]wtype.TypeIIs{
 	"MoClo": map[string]wtype.TypeIIs{
 		"Level0": BsaIenz,
 		"Level1": BpiIenz,
+	},
+	"Electra": map[string]wtype.TypeIIs{
+		"Level0": SapIenz,
 	},
 }
 

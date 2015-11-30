@@ -12,14 +12,14 @@ import (
 )
 // Input parameters for this protocol
 Parameters (
-	DNA string //wtype.DNASequence//string
-	Name string
+	AnthaSeq wtype.DNASequence //string //wtype.DNASequence//string
+	//Name string
 )
 
 // Data which is returned from this protocol; output data
 Data (
 	Hits string
-	AnthaSeq wtype.DNASequence
+	//AnthaSeq wtype.DNASequence
 )
 
 // Physical inputs to this protocol
@@ -68,12 +68,12 @@ Steps {
 	
 	
 	// Convert the sequence to an anthatype
-	AnthaSeq = wtype.MakeLinearDNASequence(Name, DNA)
+	//AnthaSeq = wtype.MakeLinearDNASequence(Name, DNA)
 	
 	// look for orfs
 	orf, orftrue := sequences.FindORF(AnthaSeq.Seq)
 	
-	if orftrue == true {
+	if orftrue == true && len(orf.DNASeq) == len(AnthaSeq.Seq){
 		// if open reading frame is detected, we'll perform a blastP search'
 		fmt.Println("ORF detected:", "full sequence length: ", len(AnthaSeq.Seq), "ORF length: ", len(orf.DNASeq))
 		hits, err = blast.MegaBlastP(orf.ProtSeq)

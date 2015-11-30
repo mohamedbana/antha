@@ -25,7 +25,8 @@ func (e *TypeIISConstructAssembly) requirements() { _ = wunit.Make_units }
 
 // Conditions to run on startup
 func (e *TypeIISConstructAssembly) setup(p TypeIISConstructAssemblyParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -34,7 +35,8 @@ func (e *TypeIISConstructAssembly) setup(p TypeIISConstructAssemblyParamBlock) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *TypeIISConstructAssembly) steps(p TypeIISConstructAssemblyParamBlock, r *TypeIISConstructAssemblyResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 
 	samples := make([]*wtype.LHComponent, 0)
@@ -77,7 +79,8 @@ func (e *TypeIISConstructAssembly) steps(p TypeIISConstructAssemblyParamBlock, r
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *TypeIISConstructAssembly) analysis(p TypeIISConstructAssemblyParamBlock, r *TypeIISConstructAssemblyResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -87,7 +90,8 @@ func (e *TypeIISConstructAssembly) analysis(p TypeIISConstructAssemblyParamBlock
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *TypeIISConstructAssembly) validation(p TypeIISConstructAssemblyParamBlock, r *TypeIISConstructAssemblyResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

@@ -1,11 +1,14 @@
 package lib
 
 import (
+	"github.com/antha-lang/antha/antha/component/lib/Aliquot"
+	"github.com/antha-lang/antha/antha/component/lib/Assaysetup"
 	"github.com/antha-lang/antha/antha/component/lib/BlastSearch"
 	"github.com/antha-lang/antha/antha/component/lib/DNA_gel"
 	"github.com/antha-lang/antha/antha/component/lib/Datacrunch"
 	"github.com/antha-lang/antha/antha/component/lib/Evaporationrate"
 	"github.com/antha-lang/antha/antha/component/lib/FindPartsthat"
+	"github.com/antha-lang/antha/antha/component/lib/Iterative_assembly_design"
 	"github.com/antha-lang/antha/antha/component/lib/Kla"
 	"github.com/antha-lang/antha/antha/component/lib/LookUpMolecule"
 	"github.com/antha-lang/antha/antha/component/lib/MakeBuffer"
@@ -13,9 +16,12 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/NewDNASequence"
 	"github.com/antha-lang/antha/antha/component/lib/OD"
 	"github.com/antha-lang/antha/antha/component/lib/PCR"
+	"github.com/antha-lang/antha/antha/component/lib/Paintmix"
 	"github.com/antha-lang/antha/antha/component/lib/Phytip_miniprep"
 	"github.com/antha-lang/antha/antha/component/lib/Printname"
+	"github.com/antha-lang/antha/antha/component/lib/RemoveRestrictionSites"
 	"github.com/antha-lang/antha/antha/component/lib/Scarfree_design"
+	"github.com/antha-lang/antha/antha/component/lib/Scarfree_siteremove_orfcheck"
 	"github.com/antha-lang/antha/antha/component/lib/SumVolume"
 	"github.com/antha-lang/antha/antha/component/lib/Thawtime"
 	"github.com/antha-lang/antha/antha/component/lib/Transformation"
@@ -33,11 +39,31 @@ type ComponentDesc struct {
 
 func GetComponents() []ComponentDesc {
 	portMap := make(map[string]map[string]bool) //representing component, port name, and true if in
-	portMap["BlastSearch"] = make(map[string]bool)
-	portMap["BlastSearch"]["DNA"] = true
-	portMap["BlastSearch"]["Name"] = true
+	portMap["Aliquot"] = make(map[string]bool)
+	portMap["Aliquot"]["NumberofAliquots"] = true
+	portMap["Aliquot"]["OutPlate"] = true
+	portMap["Aliquot"]["Solution"] = true
+	portMap["Aliquot"]["SolutionVolume"] = true
+	portMap["Aliquot"]["VolumePerAliquot"] = true
 
-	portMap["BlastSearch"]["AnthaSeq"] = false
+	portMap["Aliquot"]["Aliquots"] = false
+
+	portMap["Assaysetup"] = make(map[string]bool)
+	portMap["Assaysetup"]["Buffer"] = true
+	portMap["Assaysetup"]["Enzyme"] = true
+	portMap["Assaysetup"]["EnzymeVolume"] = true
+	portMap["Assaysetup"]["NumberofReactions"] = true
+	portMap["Assaysetup"]["OutPlate"] = true
+	portMap["Assaysetup"]["Substrate"] = true
+	portMap["Assaysetup"]["SubstrateVolume"] = true
+	portMap["Assaysetup"]["TotalVolume"] = true
+
+	portMap["Assaysetup"]["Reactions"] = false
+	portMap["Assaysetup"]["Status"] = false
+
+	portMap["BlastSearch"] = make(map[string]bool)
+	portMap["BlastSearch"]["AnthaSeq"] = true
+
 	portMap["BlastSearch"]["Hits"] = false
 
 	portMap["DNA_gel"] = make(map[string]bool)
@@ -87,6 +113,8 @@ func GetComponents() []ComponentDesc {
 	portMap["Evaporationrate"]["Status"] = false
 
 	portMap["FindPartsthat"] = make(map[string]bool)
+	portMap["FindPartsthat"]["OnlyreturnAvailableParts"] = true
+	portMap["FindPartsthat"]["OnlyreturnWorkingparts"] = true
 	portMap["FindPartsthat"]["Partdescriptions"] = true
 	portMap["FindPartsthat"]["Parts"] = true
 	portMap["FindPartsthat"]["Parttypes"] = true
@@ -94,6 +122,20 @@ func GetComponents() []ComponentDesc {
 	portMap["FindPartsthat"]["FulllistBackupParts"] = false
 	portMap["FindPartsthat"]["Status"] = false
 	portMap["FindPartsthat"]["Warnings"] = false
+
+	portMap["Iterative_assembly_design"] = make(map[string]bool)
+	portMap["Iterative_assembly_design"]["ApprovedEnzymes"] = true
+	portMap["Iterative_assembly_design"]["Constructname"] = true
+	portMap["Iterative_assembly_design"]["Seqsinorder"] = true
+	portMap["Iterative_assembly_design"]["Vector"] = true
+
+	portMap["Iterative_assembly_design"]["BackupEnzymes"] = false
+	portMap["Iterative_assembly_design"]["EnzymeUsed"] = false
+	portMap["Iterative_assembly_design"]["NewDNASequence"] = false
+	portMap["Iterative_assembly_design"]["PartswithOverhangs"] = false
+	portMap["Iterative_assembly_design"]["Simulationpass"] = false
+	portMap["Iterative_assembly_design"]["Status"] = false
+	portMap["Iterative_assembly_design"]["Warnings"] = false
 
 	portMap["Kla"] = make(map[string]bool)
 	portMap["Kla"]["D"] = true
@@ -157,6 +199,8 @@ func GetComponents() []ComponentDesc {
 	portMap["NewDNASequence"]["SingleStranded"] = true
 
 	portMap["NewDNASequence"]["DNA"] = false
+	portMap["NewDNASequence"]["DNAwithORFs"] = false
+	portMap["NewDNASequence"]["Status"] = false
 
 	portMap["OD"] = make(map[string]bool)
 	portMap["OD"]["Blank_absorbance"] = true
@@ -201,6 +245,17 @@ func GetComponents() []ComponentDesc {
 
 	portMap["PCR"]["Reaction"] = false
 
+	portMap["Paintmix"] = make(map[string]bool)
+	portMap["Paintmix"]["Colour1"] = true
+	portMap["Paintmix"]["Colour1vol"] = true
+	portMap["Paintmix"]["Colour2"] = true
+	portMap["Paintmix"]["Colour2vol"] = true
+	portMap["Paintmix"]["Numberofcopies"] = true
+	portMap["Paintmix"]["OutPlate"] = true
+
+	portMap["Paintmix"]["NewColours"] = false
+	portMap["Paintmix"]["Status"] = false
+
 	portMap["Phytip_miniprep"] = make(map[string]bool)
 	portMap["Phytip_miniprep"]["Airstep"] = true
 	portMap["Phytip_miniprep"]["Blotcycles"] = true
@@ -226,17 +281,47 @@ func GetComponents() []ComponentDesc {
 
 	portMap["Printname"]["Fullname"] = false
 
+	portMap["RemoveRestrictionSites"] = make(map[string]bool)
+	portMap["RemoveRestrictionSites"]["EnzymeforRestrictionmapping"] = true
+	portMap["RemoveRestrictionSites"]["PreserveTranslatedseq"] = true
+	portMap["RemoveRestrictionSites"]["RemoveifnotinORF"] = true
+	portMap["RemoveRestrictionSites"]["RestrictionsitetoAvoid"] = true
+	portMap["RemoveRestrictionSites"]["Sequencekey"] = true
+
+	portMap["RemoveRestrictionSites"]["FragmentSizesfromRestrictionmapping"] = false
+	portMap["RemoveRestrictionSites"]["SiteFreeSequence"] = false
+	portMap["RemoveRestrictionSites"]["Sitesfoundinoriginal"] = false
+	portMap["RemoveRestrictionSites"]["Status"] = false
+	portMap["RemoveRestrictionSites"]["Warnings"] = false
+
 	portMap["Scarfree_design"] = make(map[string]bool)
 	portMap["Scarfree_design"]["Constructname"] = true
-	portMap["Scarfree_design"]["Enzyme"] = true
+	portMap["Scarfree_design"]["Enzymename"] = true
+	portMap["Scarfree_design"]["ORFstoConfirm"] = true
 	portMap["Scarfree_design"]["Seqsinorder"] = true
 	portMap["Scarfree_design"]["Vector"] = true
 
 	portMap["Scarfree_design"]["NewDNASequence"] = false
+	portMap["Scarfree_design"]["ORFmissing"] = false
 	portMap["Scarfree_design"]["PartswithOverhangs"] = false
 	portMap["Scarfree_design"]["Simulationpass"] = false
 	portMap["Scarfree_design"]["Status"] = false
 	portMap["Scarfree_design"]["Warnings"] = false
+
+	portMap["Scarfree_siteremove_orfcheck"] = make(map[string]bool)
+	portMap["Scarfree_siteremove_orfcheck"]["Constructname"] = true
+	portMap["Scarfree_siteremove_orfcheck"]["Enzymename"] = true
+	portMap["Scarfree_siteremove_orfcheck"]["ORFstoConfirm"] = true
+	portMap["Scarfree_siteremove_orfcheck"]["RemoveproblemRestrictionSites"] = true
+	portMap["Scarfree_siteremove_orfcheck"]["Seqsinorder"] = true
+	portMap["Scarfree_siteremove_orfcheck"]["Vector"] = true
+
+	portMap["Scarfree_siteremove_orfcheck"]["NewDNASequence"] = false
+	portMap["Scarfree_siteremove_orfcheck"]["ORFmissing"] = false
+	portMap["Scarfree_siteremove_orfcheck"]["PartswithOverhangs"] = false
+	portMap["Scarfree_siteremove_orfcheck"]["Simulationpass"] = false
+	portMap["Scarfree_siteremove_orfcheck"]["Status"] = false
+	portMap["Scarfree_siteremove_orfcheck"]["Warnings"] = false
 
 	portMap["SumVolume"] = make(map[string]bool)
 	portMap["SumVolume"]["A"] = true
@@ -404,11 +489,14 @@ func GetComponents() []ComponentDesc {
 	portMap["TypeIISConstructAssembly_sim"]["Status"] = false
 
 	c := make([]ComponentDesc, 0)
+	c = append(c, ComponentDesc{Name: "Aliquot", Constructor: Aliquot.NewAliquot})
+	c = append(c, ComponentDesc{Name: "Assaysetup", Constructor: Assaysetup.NewAssaysetup})
 	c = append(c, ComponentDesc{Name: "BlastSearch", Constructor: BlastSearch.NewBlastSearch})
 	c = append(c, ComponentDesc{Name: "DNA_gel", Constructor: DNA_gel.NewDNA_gel})
 	c = append(c, ComponentDesc{Name: "Datacrunch", Constructor: Datacrunch.NewDatacrunch})
 	c = append(c, ComponentDesc{Name: "Evaporationrate", Constructor: Evaporationrate.NewEvaporationrate})
 	c = append(c, ComponentDesc{Name: "FindPartsthat", Constructor: FindPartsthat.NewFindPartsthat})
+	c = append(c, ComponentDesc{Name: "Iterative_assembly_design", Constructor: Iterative_assembly_design.NewIterative_assembly_design})
 	c = append(c, ComponentDesc{Name: "Kla", Constructor: Kla.NewKla})
 	c = append(c, ComponentDesc{Name: "LookUpMolecule", Constructor: LookUpMolecule.NewLookUpMolecule})
 	c = append(c, ComponentDesc{Name: "MakeBuffer", Constructor: MakeBuffer.NewMakeBuffer})
@@ -416,9 +504,12 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "NewDNASequence", Constructor: NewDNASequence.NewNewDNASequence})
 	c = append(c, ComponentDesc{Name: "OD", Constructor: OD.NewOD})
 	c = append(c, ComponentDesc{Name: "PCR", Constructor: PCR.NewPCR})
+	c = append(c, ComponentDesc{Name: "Paintmix", Constructor: Paintmix.NewPaintmix})
 	c = append(c, ComponentDesc{Name: "Phytip_miniprep", Constructor: Phytip_miniprep.NewPhytip_miniprep})
 	c = append(c, ComponentDesc{Name: "Printname", Constructor: Printname.NewPrintname})
+	c = append(c, ComponentDesc{Name: "RemoveRestrictionSites", Constructor: RemoveRestrictionSites.NewRemoveRestrictionSites})
 	c = append(c, ComponentDesc{Name: "Scarfree_design", Constructor: Scarfree_design.NewScarfree_design})
+	c = append(c, ComponentDesc{Name: "Scarfree_siteremove_orfcheck", Constructor: Scarfree_siteremove_orfcheck.NewScarfree_siteremove_orfcheck})
 	c = append(c, ComponentDesc{Name: "SumVolume", Constructor: SumVolume.NewSumVolume})
 	c = append(c, ComponentDesc{Name: "Thawtime", Constructor: Thawtime.NewThawtime})
 	c = append(c, ComponentDesc{Name: "Transformation", Constructor: Transformation.NewTransformation})

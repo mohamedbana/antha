@@ -29,6 +29,7 @@ import (
 type Thingfound struct {
 	Thing     string
 	Positions []int
+	Reverse   bool
 }
 
 // not perfect yet! issue with byte conversion of certain characters!

@@ -4,7 +4,8 @@ import (
 	"fmt"
 	//"math"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 )
 // Input parameters for this protocol
 Parameters (
@@ -19,6 +20,8 @@ Parameters (
 // Data which is returned from this protocol
 Data (
 	DNA wtype.DNASequence
+	DNAwithORFs sequences.AnnotatedSeq
+	Status string
 )
 
 // Physical inputs to this protocol
@@ -41,7 +44,7 @@ Setup {
 
 // Core process of the protocol: steps to be performed for each input
 Steps {
-	fmt.Println("IN steps!")
+	fmt.Println("In steps!")
 	if Plasmid != Linear {
 		if Plasmid  {
 			DNA = wtype.MakePlasmidDNASequence(Gene_name,DNA_seq)
@@ -50,7 +53,18 @@ Steps {
 							} else if SingleStranded {
 									DNA = wtype.MakeSingleStrandedDNASequence(Gene_name,DNA_seq)	
 									} 
-}else {fmt.Println("correct conditions not met")}
+									
+	orfs := sequences.FindallORFs(DNA.Seq)
+	features := sequences.ORFs2Features(orfs)
+	
+	DNAwithORFs = sequences.Annotate(DNA,features)
+	
+	Status = fmt.Sprintln(
+		text.Print("DNA_Seq: ",DNA_seq),
+		text.Print("ORFs: ", DNAwithORFs.Features),
+	)
+	
+}else {Status = fmt.Sprintln("correct conditions not met")}
 
 }
 // Actions to perform after steps block to analyze data

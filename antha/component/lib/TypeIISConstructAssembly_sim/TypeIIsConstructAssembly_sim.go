@@ -1,3 +1,6 @@
+// Example protocol of performing an assembly simulation prior to performing
+// physical construct assembly if the siulation passes
+
 package TypeIISConstructAssembly_sim
 
 import (
@@ -32,7 +35,8 @@ func (e *TypeIISConstructAssembly_sim) requirements() {
 
 // Conditions to run on startup
 func (e *TypeIISConstructAssembly_sim) setup(p TypeIISConstructAssembly_simParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -41,7 +45,8 @@ func (e *TypeIISConstructAssembly_sim) setup(p TypeIISConstructAssembly_simParam
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *TypeIISConstructAssembly_sim) steps(p TypeIISConstructAssembly_simParamBlock, r *TypeIISConstructAssembly_simResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 
 	// Check that assembly is feasible by simulating assembly of the sequences with the chosen enzyme
@@ -97,40 +102,43 @@ func (e *TypeIISConstructAssembly_sim) steps(p TypeIISConstructAssembly_simParam
 		"Sitesfound", r.Sitesfound,
 	)
 
-	// Now Perform the physical assembly
-	samples := make([]*wtype.LHComponent, 0)
-	waterSample := mixer.SampleForTotalVolume(p.Water, p.ReactionVolume)
-	samples = append(samples, waterSample)
+	if r.Simulationpass == true {
 
-	bufferSample := mixer.Sample(p.Buffer, p.BufferVol)
-	samples = append(samples, bufferSample)
+		// Now Perform the physical assembly
+		samples := make([]*wtype.LHComponent, 0)
+		waterSample := mixer.SampleForTotalVolume(p.Water, p.ReactionVolume)
+		samples = append(samples, waterSample)
 
-	atpSample := mixer.Sample(p.Atp, p.AtpVol)
-	samples = append(samples, atpSample)
+		bufferSample := mixer.Sample(p.Buffer, p.BufferVol)
+		samples = append(samples, bufferSample)
 
-	//vectorSample := mixer.Sample(Vector, VectorVol)
-	vectorSample := mixer.Sample(p.Vector, p.VectorVol)
-	samples = append(samples, vectorSample)
+		atpSample := mixer.Sample(p.Atp, p.AtpVol)
+		samples = append(samples, atpSample)
 
-	for k, part := range p.Parts {
-		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", p.Partsinorder[k], " vol ", p.PartVols[k])
-		partSample := mixer.Sample(part, p.PartVols[k])
-		partSample.CName = p.Partsinorder[k]
-		samples = append(samples, partSample)
+		//vectorSample := mixer.Sample(Vector, VectorVol)
+		vectorSample := mixer.Sample(p.Vector, p.VectorVol)
+		samples = append(samples, vectorSample)
+
+		for k, part := range p.Parts {
+			fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", p.Partsinorder[k], " vol ", p.PartVols[k])
+			partSample := mixer.Sample(part, p.PartVols[k])
+			partSample.CName = p.Partsinorder[k]
+			samples = append(samples, partSample)
+		}
+
+		reSample := mixer.Sample(p.RestrictionEnzyme, p.ReVol)
+		samples = append(samples, reSample)
+
+		ligSample := mixer.Sample(p.Ligase, p.LigVol)
+		samples = append(samples, ligSample)
+
+		r.Reaction = _wrapper.MixInto(p.OutPlate, samples...)
+
+		// incubate the reaction mixture
+		_wrapper.Incubate(r.Reaction, p.ReactionTemp, p.ReactionTime, false)
+		// inactivate
+		_wrapper.Incubate(r.Reaction, p.InactivationTemp, p.InactivationTime, false)
 	}
-
-	reSample := mixer.Sample(p.RestrictionEnzyme, p.ReVol)
-	samples = append(samples, reSample)
-
-	ligSample := mixer.Sample(p.Ligase, p.LigVol)
-	samples = append(samples, ligSample)
-
-	r.Reaction = _wrapper.MixInto(p.OutPlate, samples...)
-
-	// incubate the reaction mixture
-	_wrapper.Incubate(r.Reaction, p.ReactionTemp, p.ReactionTime, false)
-	// inactivate
-	_wrapper.Incubate(r.Reaction, p.InactivationTemp, p.InactivationTime, false)
 	_ = _wrapper.WaitToEnd()
 
 }
@@ -138,7 +146,8 @@ func (e *TypeIISConstructAssembly_sim) steps(p TypeIISConstructAssembly_simParam
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *TypeIISConstructAssembly_sim) analysis(p TypeIISConstructAssembly_simParamBlock, r *TypeIISConstructAssembly_simResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -148,7 +157,8 @@ func (e *TypeIISConstructAssembly_sim) analysis(p TypeIISConstructAssembly_simPa
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *TypeIISConstructAssembly_sim) validation(p TypeIISConstructAssembly_simParamBlock, r *TypeIISConstructAssembly_simResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID,
+		p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

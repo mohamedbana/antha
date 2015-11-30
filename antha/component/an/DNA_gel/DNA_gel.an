@@ -1,3 +1,5 @@
+// example protocol for loading a DNAgel
+
 protocol DNA_gel
 import (
 	//"LiquidHandler"

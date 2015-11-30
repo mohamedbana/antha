@@ -1,3 +1,8 @@
+// example protocol which allows a primitive method for searching the igem registry
+// for parts with specified functions or a specified status (e.g. A = available or "Works", or results != none)
+// see the igem package ("github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem")
+// and igem website for more details about how to make the most of this http://parts.igem.org/Registry_API
+
 protocol FindPartsthat
 
 import (
@@ -17,6 +22,8 @@ Parameters (
 	Parttypes			[]string // e.g. promoter
 	Partdescriptions	[]string  // e.g. arsenic, reporter, alkane, logic gate
 	Parts [][]string
+	OnlyreturnAvailableParts bool
+	OnlyreturnWorkingparts bool
 	//RestrictionsitetoAvoid		[]string
 )
 
@@ -59,26 +66,38 @@ Steps {
 	parts := make([][]string,0)
 	subparts := make([]string,0)
 	
+	partstatus := ""
+	
+	if OnlyreturnAvailableParts {
+		partstatus = "A"
+	} 
 	
 	// first we'll parse the igem registry based on the short description contained in the fasta header for each part sequence
 	for _, desc := range Parttypes {
-	subparts = igem.FilterRegistry([]string{desc, "A "})
+	
+	subparts = igem.FilterRegistry([]string{desc, partstatus})
 	status = text.Print(desc + " :",subparts)
 	joinedstatus = append(joinedstatus, status)
 	parts = append(parts,subparts)
 	}
 	 
 	
+	othercriteria := ""
+	if OnlyreturnWorkingparts {
+		othercriteria = "WORKS"
+		}
 	
 	for i,subparts := range parts {
 	
 	partdetails := igem.LookUp(subparts)
 	// now we can get detailed information of all of those records to interrogate further
 	// this can be slow if there are many parts to check (~2 seconds per block of 14 parts)
+	
+	
 	for _, subpart := range subparts {
 		
 		if strings.Contains(partdetails.Description(subpart), Partdescriptions[i]) &&
-			strings.Contains(partdetails.Results(subpart), "WORKS") {
+			strings.Contains(partdetails.Results(subpart), othercriteria) {
 			BackupParts = append(BackupParts, subpart)
 
 		}
