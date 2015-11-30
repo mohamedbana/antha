@@ -1,4 +1,5 @@
 package electroporator
 
-type ElectroporationDriver struct {
+type ElectroporationDriver interface {
+	Pulse(Voltage, Capacitance, Resistance int)
 }
