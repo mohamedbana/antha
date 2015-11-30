@@ -35,7 +35,7 @@ type PRMeasurement struct {
 	CO2         int       // co2 conc when measurement was taken
 }
 
-type PRMeasurementSet []PRmeasurement
+type PRMeasurementSet []PRMeasurement
 
 type PROutput struct {
 	Readings []PRMeasurementSet
