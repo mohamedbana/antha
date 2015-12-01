@@ -1,0 +1,22 @@
+{
+    "Parameters": [{
+        "MakeMedia":{
+            "Name": "M9Medium",
+            "Water": "component:water",
+            "TotalVolume": "100ul",
+            "LiqComponentVolumes": [
+			"10ul",
+			"10ul"
+			],
+            "LiqComponents":[
+			"component:10x_M9Salts",
+			"component:100x_MEMVitamins"
+			],
+            "Vessel": "plate:1L_DuranBottle",
+            "TipType": "tipbox:Gilson20"
+        }
+    }],
+    "Config": {
+        "OUTPUT_COUNT": 1
+    }
+}

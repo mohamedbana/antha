@@ -58,6 +58,23 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	//plates[plate.Type] = plate
 	plate = wtype.NewLHPlate("pcrplate_with_cooler", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 15.5)
 	plates[plate.Type] = plate
+
+	rwshp = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
+	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 250, 5, rwshp, 0, 5.5, 5.5, 20.4, 1.4, "mm")
+	//plate = wtype.NewLHPlate("pcrplate", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 6.5)
+	//plates[plate.Type] = plate
+	plate = wtype.NewLHPlate("pcrplate_skirted", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 15.5)
+	plates[plate.Type] = plate
+
+	/// placeholder for non plate container for testing
+	rwshp = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
+	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 250, 5, rwshp, 0, 5.5, 5.5, 20.4, 1.4, "mm")
+	//plate = wtype.NewLHPlate("pcrplate", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 6.5)
+	//plates[plate.Type] = plate
+	plate = wtype.NewLHPlate("1L_DuranBottle", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 15.5)
+	plates[plate.Type] = plate
+
+	//NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64)
 	return plates
 }
 
