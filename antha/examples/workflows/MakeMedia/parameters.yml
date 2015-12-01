@@ -12,6 +12,9 @@
 			"component:10x_M9Salts",
 			"component:100x_MEMVitamins"
 			],
+			"PH_setPoint": 7.2,
+			"PH_tolerance":0.2,
+			"PH_setPointTemp": "25C",
             "Vessel": "plate:1L_DuranBottle",
             "TipType": "tipbox:Gilson20"
         }
