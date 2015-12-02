@@ -74,9 +74,10 @@ func (gp *GenericPhysical) SetVolume(v wunit.Volume) wunit.Volume {
 	return ov
 }
 
-func (gp *GenericPhysical) Concentration() wunit.Concentration {
-	conc := gp.Mymass.SIValue() / gp.Myvol.SIValue()
-	return wunit.NewConcentration(conc, "g/L")
+func (gp *GenericPhysical) Density() wunit.Density {
+	densgperl := gp.Mymass.SIValue() / gp.Myvol.SIValue()
+	// g/l == kg/m^3
+	return wunit.NewDensity(densgperl, "kg/m^3")
 }
 
 /*
