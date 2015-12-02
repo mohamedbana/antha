@@ -102,6 +102,7 @@ type BioSequence interface {
 	Append(string)
 	Prepend(string)
 	Blast() ([]Hit, error)
+	MolecularWeight() float64
 }
 
 // defines something as physical DNA
@@ -284,6 +285,49 @@ func (seq *DNASequence) Blast() (hits []Hit, err error) {
 	return
 }
 
+var nucleotidegpermol = map[string]float64{
+	"A":    313.2,
+	"T":    304.2,
+	"C":    289.2,
+	"G":    329.2,
+	"N":    303.7,
+	"dATP": 491.2,
+	"dCTP": 467.2,
+	"dGTP": 507.2,
+	"dTTP": 482.2,
+	"dNTP": 487.0,
+}
+
+func (seq *DNASequence) MolecularWeight() float64 {
+	//Calculate Molecular weight of DNA
+
+	// need to add effect of methylation on molecular weight
+	fwdsequence := seq.Seq
+	phosphate5prime := seq.Overhang5prime.Phosphorylation
+	phosphate3prime := seq.Overhang3prime.Phosphorylation
+	singlestranded := seq.Singlestranded
+
+	numberofAs := strings.Count(fwdsequence, "A")
+	numberofTs := strings.Count(fwdsequence, "T")
+	numberofCs := strings.Count(fwdsequence, "C")
+	numberofGs := strings.Count(fwdsequence, "G")
+	massofAs := (float64(numberofAs) * nucleotidegpermol["A"])
+	massofTs := (float64(numberofTs) * nucleotidegpermol["T"])
+	massofCs := (float64(numberofCs) * nucleotidegpermol["C"])
+	massofGs := (float64(numberofGs) * nucleotidegpermol["G"])
+	mw := (massofAs + massofTs + massofCs + massofGs)
+	if phosphate5prime == true {
+		mw = mw + 79.0 // extra for phosphate left at 5' end following digestion, not relevant for primer extension
+	}
+	if phosphate3prime == true {
+		mw = mw + 79.0 // extra for phosphate left at 3' end following digestion, not relevant for primer extension
+	}
+	if singlestranded != true {
+		mw = 2 * mw
+	}
+	return mw
+}
+
 // RNA sample: physical RNA, has an RNASequence object
 type RNA struct {
 	GenericPhysical
@@ -349,6 +393,48 @@ func (seq *ProteinSequence) Blast() (hits []Hit, err error) {
 	hits, err = blast.MegaBlastP(seq.Seq)
 	return
 }
+
+// Estimate molecular weight of protein product
+func (seq *ProteinSequence) Molecularweight() (daltons float64) {
+	aaarray := strings.Split(seq.Seq, "")
+	array := make([]float64, len(aaarray))
+	for i := 0; i < len(aaarray); i++ {
+		array = append(array, (aa_mw[aaarray[i]] - 18.0))
+	}
+	sum := 0.0
+	for j := 0; j < len(array); j++ {
+		sum += array[j]
+	}
+	daltons = sum
+	//kDa = sum / 1000
+	return
+
+}
+
+var aa_mw = map[string]float64{
+	//1-letter Code	Molecular Weight (g/mol)
+	"A": 89.09,
+	"R": 174.2,
+	"N": 132.12,
+	"D": 133.1,
+	"C": 121.16,
+	"E": 147.13,
+	"Q": 146.15,
+	"G": 75.07,
+	"H": 155.16,
+	"I": 131.18,
+	"L": 131.18,
+	"K": 146.19,
+	"M": 149.21,
+	"F": 165.19,
+	"P": 115.13,
+	"S": 105.09,
+	"T": 119.12,
+	"W": 204.23,
+	"Y": 181.19,
+	"V": 117.15,
+}
+
 func random_dna_seq(leng int) string {
 	s := ""
 	for i := 0; i < leng; i++ {

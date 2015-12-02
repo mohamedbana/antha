@@ -74,6 +74,11 @@ func (gp *GenericPhysical) SetVolume(v wunit.Volume) wunit.Volume {
 	return ov
 }
 
+func (gp *GenericPhysical) Concentration() wunit.Concentration {
+	conc := gp.Mymass.SIValue() / gp.Myvol.SIValue()
+	return wunit.NewConcentration(conc, "g/L")
+}
+
 /*
 func (gp *GenericPhysical)Location() coordinates{
 	return gp.loc

@@ -26,7 +26,7 @@ package enzymes
 import (
 	//"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	//"github.com/antha-lang/antha/antha/anthalib/wunit"
 	//"time"
 )
 
@@ -191,6 +191,7 @@ var TypeIIsEnzymeproperties = map[string]wtype.TypeIIs{
 }
 
 type Enzymeproperties struct {
+	Class         string
 	typeIIsenzyme wtype.TypeIIs
 	storageBuffer SimpleBuffer
 	assaybuffer   SimpleBuffer
@@ -231,7 +232,7 @@ type Buffer struct {
 
 type buffercomponent struct {
 	Molecule Molecule
-	Molarity float64 //wunit.Moles
+	Molarity float64 //wunit.Moles g/Mol
 
 }
 
@@ -299,9 +300,10 @@ func Newbuffer(buffer Buffer, diluent Buffer, dilution float64) (newbuffer Buffe
 	return newbuffer
 }
 
+/*
 var Enzymes = map[string]Enzymeproperties{
 	"R0569L": {SapIenz, SapIstoragebuffer, Cutsmartbuffer, 10000.0, "NEB", true, false, false, false, false, "GCTCTTC"}, // {Nm: "asasd", Seq: "asdasd"}, {Nm: "asasd", Seq: "asdasd"}},
-}
+}*/
 
 /*var NewsapIstock = Restrictionstock{
 	"R0569L",
@@ -317,7 +319,7 @@ var Enzymes = map[string]Enzymeproperties{
 	SapIstoragebuffer,
 	"PS-R0569S/L v1.0",
 }*/
-
+/*
 type Restrictionstock struct {
 	Productcode  string
 	Barcode      string
@@ -333,3 +335,4 @@ type Restrictionstock struct {
 	Storagebuffer string
 	SpecVersion   string
 }
+*/

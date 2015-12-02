@@ -22,7 +22,7 @@ import (
 
 //SolidComponentMasses []Volume //Mass // Should be Mass
 
-// number of decimal places. Should be +/- x instead e.g. 7 +/- 0.2
+//  +/- x  e.g. 7.0 +/- 0.2
 
 //LiqComponentkeys	[]string
 //Solidcomponentkeys	[]string // name or barcode id

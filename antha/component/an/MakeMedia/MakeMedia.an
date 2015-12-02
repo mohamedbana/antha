@@ -19,7 +19,7 @@ Parameters (
 
 	//SolidComponentMasses []Volume //Mass // Should be Mass
 	PH_setPoint float64
-	PH_tolerance float64 // number of decimal places. Should be +/- x instead e.g. 7 +/- 0.2 
+	PH_tolerance float64 //  +/- x  e.g. 7.0 +/- 0.2 
 	PH_setPointTemp	wunit.Temperature
 	
 	//LiqComponentkeys	[]string
