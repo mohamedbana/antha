@@ -8,8 +8,6 @@ import (
 	"time"
 )
 
-
-
 type Pellet struct {
 	wtype.Physical
 }

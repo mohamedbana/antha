@@ -203,11 +203,6 @@ func NewEnergy(v float64, unit string) Energy {
 	return e
 }
 
-// mass or mole
-type SubstanceQuantity interface {
-	Quantity() Measurement
-}
-
 // a Force
 type Force struct {
 	ConcreteMeasurement
@@ -244,6 +239,7 @@ func NewPressure(v float64, unit string) Pressure {
 // defines a concentration unit
 type Concentration struct {
 	ConcreteMeasurement
+	//MolecularWeight *float64
 }
 
 // make a new concentration in SI units... either M/l or kg/l
@@ -258,10 +254,11 @@ func NewConcentration(v float64, unit string) Concentration {
 	return c
 }
 
-/*
-type Molecule interface {
-	MolecularWeight() wtype.Mass
+// mass or mole
+type SubstanceQuantity interface {
+	Quantity() Measurement
 }
+
 /*
 type Protein interface {
 	Molecule
@@ -274,20 +271,24 @@ type Enzyme struct {
 }
 */
 /*
-func (p *Molecule) MolecularWeight() wtype.Mass {
+type Molecule interface {
+	MolecularWeight() wtype.Mass
+}
+
+func (p *DNASequence) MolecularWeight() wtype.Mass {
 
 }
 
-func (d *DNA) MolecularWeight() wtype.Mass {
+func (d *ProteinSequence) MolecularWeight() wtype.Mass {
 
 }
-
+/*
 func (e *Enzyme) AASequence() string {
 
 }
 */
-
-/* Sid's stuff
+/*
+// Sid's stuff
 
 type Conc interface {
 	AsMolar(mass Mass) MolarConcentration
@@ -322,26 +323,30 @@ func (m MassConcentration) AsMass(mass Mass) MassConcentration {
 }
 */
 /*
-func ConcinGperL(conc Concentration, molecularweight float64) (conc_g Concentration) {
-	if conc.BaseSISymbol()="g/l"{
-		conc_g = conc
-		}
-	if conc.BaseSISymbol()="M/l"{
-		conc_g = NewConcentration((conc.SIValue()*molecularweight),"M/l")
-		}
+func (conc *Concentration)AddMolecularweight(molecularweight float64){
+	conc.MolecularWeight = molecularweight
+}
+*/
+func (conc *Concentration) GramPerL(molecularweight float64) (conc_g Concentration) {
+	if conc.Munit.BaseSISymbol() == "g/l" {
+		conc_g = *conc
+	}
+	if conc.Munit.BaseSISymbol() == "M/l" {
+		conc_g = NewConcentration((conc.SIValue() * molecularweight), "M/l")
+	}
 	return conc_g
 }
 
-func ConcinMperL(conc Concentration, molecularweight float64) (conc_M Concentration) {
-	if conc.BaseSISymbol()="g/l"{
-		conc_M = NewConcentration((conc.SIValue()/molecularweight),"g/l")
-		}
-	if conc.BaseSISymbol()="M/l"{
-		conc_M = conc
-		}
+func (conc *Concentration) MolPerL(molecularweight float64) (conc_M Concentration) {
+	if conc.Munit.BaseSISymbol() == "g/l" {
+		conc_M = NewConcentration((conc.SIValue() / molecularweight), "g/l")
+	}
+	if conc.Munit.BaseSISymbol() == "M/l" {
+		conc_M = *conc
+	}
 	return conc_M
 }
-*/
+
 /*
 type Conc interface {
 	AsMolar(gperl Concentration) MoleculeConcentration

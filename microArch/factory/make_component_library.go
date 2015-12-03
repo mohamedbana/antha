@@ -43,7 +43,56 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 
 	A = wtype.NewLHComponent()
 	A.GenericMatter = matter["water"]
+	A.CName = "10x_M9Salts"
+	A.Type = "water"
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "100x_MEMVitamins"
+	A.Type = "water"
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "Yeat extract"
+	A.Type = "water"
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "Tryptone"
+	A.Type = "water"
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
 	A.CName = "tartrazine"
+	A.Type = "water"
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "Yellow"
+	A.Type = "water"
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "Blue"
+	A.Type = "water"
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "Green"
 	A.Type = "water"
 	A.Smax = 9999
 	cmap[A.CName] = A
@@ -79,6 +128,13 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	A = wtype.NewLHComponent()
 	A.GenericMatter = matter["glycerol"]
 	A.CName = "T4Ligase"
+	A.Type = "glycerol"
+	A.Smax = 1.0
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["glycerol"]
+	A.CName = "EcoRI"
 	A.Type = "glycerol"
 	A.Smax = 1.0
 	cmap[A.CName] = A

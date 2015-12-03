@@ -206,12 +206,6 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 
 	if this.Counter > 0 {
-		/*
-			logger.Fatal("DOUBLE CALL TO GETINPUTS!")
-			panic("You only GetInputs() once")
-		*/
-
-		// I don't think we need to be quite so graceless
 		return request
 	}
 	this.Counter += 1

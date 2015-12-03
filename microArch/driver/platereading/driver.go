@@ -29,5 +29,9 @@ import (
 type PlateReadingDriver interface {
 	Initialize() driver.CommandStatus
 	Finalize() driver.CommandStatus
-	ReadPlate(matter, reading *interface{}) driver.CommandStatus
+	GetState() (*PRState, driver.CommandStatus)
+	GetCapabilities() (*PRProperties, driver.CommandStatus)
+	Run(protocol string) (*PROutput, driver.CommandStatus)
+	Open() driver.CommandStatus
+	Close() driver.CommandStatus
 }

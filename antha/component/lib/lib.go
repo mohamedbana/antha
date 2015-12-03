@@ -12,10 +12,12 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/Kla"
 	"github.com/antha-lang/antha/antha/component/lib/LookUpMolecule"
 	"github.com/antha-lang/antha/antha/component/lib/MakeBuffer"
+	"github.com/antha-lang/antha/antha/component/lib/MakeMedia"
 	"github.com/antha-lang/antha/antha/component/lib/MoClo_design"
 	"github.com/antha-lang/antha/antha/component/lib/NewDNASequence"
 	"github.com/antha-lang/antha/antha/component/lib/OD"
 	"github.com/antha-lang/antha/antha/component/lib/PCR"
+	"github.com/antha-lang/antha/antha/component/lib/Paintmix"
 	"github.com/antha-lang/antha/antha/component/lib/Phytip_miniprep"
 	"github.com/antha-lang/antha/antha/component/lib/Printname"
 	"github.com/antha-lang/antha/antha/component/lib/RemoveRestrictionSites"
@@ -176,6 +178,23 @@ func GetComponents() []ComponentDesc {
 	portMap["MakeBuffer"]["Buffer"] = false
 	portMap["MakeBuffer"]["Status"] = false
 
+	portMap["MakeMedia"] = make(map[string]bool)
+	portMap["MakeMedia"]["LiqComponentVolumes"] = true
+	portMap["MakeMedia"]["LiqComponents"] = true
+	portMap["MakeMedia"]["Name"] = true
+	portMap["MakeMedia"]["PH_setPoint"] = true
+	portMap["MakeMedia"]["PH_setPointTemp"] = true
+	portMap["MakeMedia"]["PH_tolerance"] = true
+	portMap["MakeMedia"]["SolidComponentDensities"] = true
+	portMap["MakeMedia"]["SolidComponentMasses"] = true
+	portMap["MakeMedia"]["SolidComponents"] = true
+	portMap["MakeMedia"]["TotalVolume"] = true
+	portMap["MakeMedia"]["Vessel"] = true
+	portMap["MakeMedia"]["Water"] = true
+
+	portMap["MakeMedia"]["Media"] = false
+	portMap["MakeMedia"]["Status"] = false
+
 	portMap["MoClo_design"] = make(map[string]bool)
 	portMap["MoClo_design"]["AssemblyStandard"] = true
 	portMap["MoClo_design"]["Constructname"] = true
@@ -243,6 +262,17 @@ func GetComponents() []ComponentDesc {
 	portMap["PCR"]["Templatevolume"] = true
 
 	portMap["PCR"]["Reaction"] = false
+
+	portMap["Paintmix"] = make(map[string]bool)
+	portMap["Paintmix"]["Colour1"] = true
+	portMap["Paintmix"]["Colour1vol"] = true
+	portMap["Paintmix"]["Colour2"] = true
+	portMap["Paintmix"]["Colour2vol"] = true
+	portMap["Paintmix"]["Numberofcopies"] = true
+	portMap["Paintmix"]["OutPlate"] = true
+
+	portMap["Paintmix"]["NewColours"] = false
+	portMap["Paintmix"]["Status"] = false
 
 	portMap["Phytip_miniprep"] = make(map[string]bool)
 	portMap["Phytip_miniprep"]["Airstep"] = true
@@ -488,10 +518,12 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "Kla", Constructor: Kla.NewKla})
 	c = append(c, ComponentDesc{Name: "LookUpMolecule", Constructor: LookUpMolecule.NewLookUpMolecule})
 	c = append(c, ComponentDesc{Name: "MakeBuffer", Constructor: MakeBuffer.NewMakeBuffer})
+	c = append(c, ComponentDesc{Name: "MakeMedia", Constructor: MakeMedia.NewMakeMedia})
 	c = append(c, ComponentDesc{Name: "MoClo_design", Constructor: MoClo_design.NewMoClo_design})
 	c = append(c, ComponentDesc{Name: "NewDNASequence", Constructor: NewDNASequence.NewNewDNASequence})
 	c = append(c, ComponentDesc{Name: "OD", Constructor: OD.NewOD})
 	c = append(c, ComponentDesc{Name: "PCR", Constructor: PCR.NewPCR})
+	c = append(c, ComponentDesc{Name: "Paintmix", Constructor: Paintmix.NewPaintmix})
 	c = append(c, ComponentDesc{Name: "Phytip_miniprep", Constructor: Phytip_miniprep.NewPhytip_miniprep})
 	c = append(c, ComponentDesc{Name: "Printname", Constructor: Printname.NewPrintname})
 	c = append(c, ComponentDesc{Name: "RemoveRestrictionSites", Constructor: RemoveRestrictionSites.NewRemoveRestrictionSites})

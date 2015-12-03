@@ -23,6 +23,7 @@
 package wtype
 
 import (
+	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 )
 
@@ -33,6 +34,8 @@ type GenericPhysical struct {
 	Mymass wunit.Mass
 	Myvol  wunit.Volume
 	Mytemp wunit.Temperature
+	//MyDensity wunit.Density
+	//MyState   string
 }
 
 func (gp *GenericPhysical) Name() string {
@@ -46,12 +49,12 @@ func (gp *GenericPhysical) SetName(s string) string {
 }
 
 func NewGenericPhysical(mattertype string) GenericPhysical {
-	gp := GenericPhysical{MatterByName(mattertype), mattertype, wunit.NewMass(0.0, "g"), wunit.NewVolume(0.0, "L"), wunit.NewTemperature(0.0, "˚C")}
+	gp := GenericPhysical{MatterByName(mattertype), mattertype, wunit.NewMass(0.0, "g"), wunit.NewVolume(0.0, "L"), wunit.NewTemperature(0.0, "˚C") /*, wunit.NewDensity(1000.0, "kg/m^3"), "use .State() method to caclulate state"*/}
 	return gp
 }
 
 func (gp *GenericPhysical) Clone() GenericPhysical {
-	return GenericPhysical{gp.GenericMatter.Clone(), gp.Name(), gp.Mymass, gp.Myvol, gp.Mytemp}
+	return GenericPhysical{gp.GenericMatter.Clone(), gp.Name(), gp.Mymass, gp.Myvol, gp.Mytemp /*, gp.MyDensity, gp.MyState*/}
 }
 
 func (gp *GenericPhysical) Mass() wunit.Mass {
@@ -72,6 +75,38 @@ func (gp *GenericPhysical) SetVolume(v wunit.Volume) wunit.Volume {
 	ov := gp.Myvol
 	gp.Myvol = v
 	return ov
+}
+
+func (gp *GenericPhysical) State() (state string, err error) {
+
+	if gp.BoilingPoint().Munit == nil {
+		err = fmt.Errorf("No boiling point known")
+	}
+	if gp.MeltingPoint().Munit == nil {
+		err = fmt.Errorf("No melting point known")
+	}
+	if gp.Mytemp.Munit == nil {
+		err = fmt.Errorf("No temp known")
+	}
+
+	mytemp := gp.Mytemp.SIValue()
+	bp := gp.BoilingPoint() //.SIValue()
+	mp := gp.MeltingPoint() //.SIValue()
+
+	bpsi := bp.SIValue()
+	mpsi := mp.SIValue()
+	if mytemp > bpsi {
+		state = "gas"
+	} else if mytemp < mpsi {
+		state = "solid"
+	} else if mytemp < bpsi && mytemp > mpsi {
+		state = "liquid"
+	} else if mytemp == bpsi {
+		state = "boiling"
+	} else if mytemp == mpsi {
+		state = "melting"
+	}
+	return
 }
 
 /*
