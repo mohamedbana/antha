@@ -58,8 +58,18 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	//plates[plate.Type] = plate
 	plate = wtype.NewLHPlate("pcrplate_with_cooler", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 15.5)
 	plates[plate.Type] = plate
+
+	ep48g := wtype.NewShape("trap", "mm", 2, 4, 2)
+	welltype = wtype.NewLHWell("EPAGE48", "", "", "ul", 15, 0, ep48g, 0, 2, 4, 2, 48, "mm")
+	plate = wtype.NewLHPlate("EPAGE48", "Invitrogen", 2, 26, 50, "mm", welltype, 9, 22, 0.0, 0.0, 50.0)
+	plates[plate.Type] = plate
+
 	return plates
 }
+//	ep48g := wtype.NewShape("box", "mm", 2, 4, 2)
+//  welltype := wtype.NewLhWell("EPAGE48", "", "", "ul", 15, 0, ep48g, 0, 2, 4, 2, bottomh, "mm")
+//  plate = wtype.LHPlate("EPAGE48", "Invitrogen", 2, 26, height, "mm", welltype, 9, 22, 0.0, 0.0, 50.0)
+//	plates[plate.Type] = plate
 
 func GetPlateByType(typ string) *wtype.LHPlate {
 	plates := makePlateLibrary()
