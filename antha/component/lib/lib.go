@@ -185,6 +185,9 @@ func GetComponents() []ComponentDesc {
 	portMap["MakeMedia"]["PH_setPoint"] = true
 	portMap["MakeMedia"]["PH_setPointTemp"] = true
 	portMap["MakeMedia"]["PH_tolerance"] = true
+	portMap["MakeMedia"]["SolidComponentDensities"] = true
+	portMap["MakeMedia"]["SolidComponentMasses"] = true
+	portMap["MakeMedia"]["SolidComponents"] = true
 	portMap["MakeMedia"]["TotalVolume"] = true
 	portMap["MakeMedia"]["Vessel"] = true
 	portMap["MakeMedia"]["Water"] = true

@@ -382,6 +382,14 @@ func (lhc *LHComponent) Sample(v wunit.Volume) Liquid {
 	return smp
 }
 
+func (lhc *LHComponent) SampleSolidtoLiquid(m wunit.Mass, d wunit.Density) Liquid {
+
+	// calculate volume to add from density
+	v := wunit.MasstoVolume(m, d)
+	ret := lhc.Sample(v)
+	return ret
+}
+
 func (lhc *LHComponent) GetStockConcentration() float64 {
 	return lhc.StockConcentration
 }

@@ -20,7 +20,7 @@ import (
 
 // Input parameters for this protocol (data)
 
-//SolidComponentMasses []Volume //Mass // Should be Mass
+//Volume //Mass // Should be Mass
 
 //  +/- x  e.g. 7.0 +/- 0.2
 
@@ -31,8 +31,8 @@ import (
 
 // Physical Inputs to this protocol with types
 
-/*SolidComponents		[]*wtype.LHComponent // should be new type or field indicating solid and mass
-Acid				*wtype.LHComponent
+// should be new type or field indicating solid and mass
+/*Acid				*wtype.LHComponent
 Base 				*wtype.LHComponent
 */
 
@@ -79,13 +79,13 @@ func (e *MakeMedia) steps(p MakeMediaParamBlock, r *MakeMediaResultBlock) {
 
 	//solids := make([]*wtype.LHComponent,0)
 
-	/*for k, sol := range SolidComponents {
-		solsamp := mixer.Sample(sol,SolidComponentMasses[k])
-		liquids = append(liquids,solsamp)
-		step = text.Print("Step" + strconv.Itoa(stepcounter) + ": ", "add " + SolidComponentMasses[k].ToString() + " of " + sol.CName)
-		recipestring = append(recipestring,step)
+	for k, sol := range p.SolidComponents {
+		solsamp := mixer.SampleSolidtoLiquid(sol, p.SolidComponentMasses[k], p.SolidComponentDensities[k])
+		liquids = append(liquids, solsamp)
+		step = text.Print("Step"+strconv.Itoa(stepcounter)+": ", "add "+p.SolidComponentMasses[k].ToString()+" of "+sol.CName)
+		recipestring = append(recipestring, step)
 		stepcounter = stepcounter + k
-	}*/
+	}
 
 	watersample := mixer.SampleForTotalVolume(p.Water, p.TotalVolume)
 	liquids = append(liquids, watersample)
@@ -204,7 +204,7 @@ func NewMakeMedia() interface{} { //*MakeMedia {
 // Mapper function
 func (e *MakeMedia) Map(m map[string]interface{}) interface{} {
 	var res MakeMediaParamBlock
-	res.Error = false || m["LiqComponentVolumes"].(execute.ThreadParam).Error || m["LiqComponents"].(execute.ThreadParam).Error || m["Name"].(execute.ThreadParam).Error || m["PH_setPoint"].(execute.ThreadParam).Error || m["PH_setPointTemp"].(execute.ThreadParam).Error || m["PH_tolerance"].(execute.ThreadParam).Error || m["TotalVolume"].(execute.ThreadParam).Error || m["Vessel"].(execute.ThreadParam).Error || m["Water"].(execute.ThreadParam).Error
+	res.Error = false || m["LiqComponentVolumes"].(execute.ThreadParam).Error || m["LiqComponents"].(execute.ThreadParam).Error || m["Name"].(execute.ThreadParam).Error || m["PH_setPoint"].(execute.ThreadParam).Error || m["PH_setPointTemp"].(execute.ThreadParam).Error || m["PH_tolerance"].(execute.ThreadParam).Error || m["SolidComponentDensities"].(execute.ThreadParam).Error || m["SolidComponentMasses"].(execute.ThreadParam).Error || m["SolidComponents"].(execute.ThreadParam).Error || m["TotalVolume"].(execute.ThreadParam).Error || m["Vessel"].(execute.ThreadParam).Error || m["Water"].(execute.ThreadParam).Error
 
 	vLiqComponentVolumes, is := m["LiqComponentVolumes"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
@@ -260,6 +260,33 @@ func (e *MakeMedia) Map(m map[string]interface{}) interface{} {
 		res.PH_tolerance = m["PH_tolerance"].(execute.ThreadParam).Value.(float64)
 	}
 
+	vSolidComponentDensities, is := m["SolidComponentDensities"].(execute.ThreadParam).Value.(execute.JSONValue)
+	if is {
+		var temp MakeMediaJSONBlock
+		json.Unmarshal([]byte(vSolidComponentDensities.JSONString), &temp)
+		res.SolidComponentDensities = *temp.SolidComponentDensities
+	} else {
+		res.SolidComponentDensities = m["SolidComponentDensities"].(execute.ThreadParam).Value.([]wunit.Density)
+	}
+
+	vSolidComponentMasses, is := m["SolidComponentMasses"].(execute.ThreadParam).Value.(execute.JSONValue)
+	if is {
+		var temp MakeMediaJSONBlock
+		json.Unmarshal([]byte(vSolidComponentMasses.JSONString), &temp)
+		res.SolidComponentMasses = *temp.SolidComponentMasses
+	} else {
+		res.SolidComponentMasses = m["SolidComponentMasses"].(execute.ThreadParam).Value.([]wunit.Mass)
+	}
+
+	vSolidComponents, is := m["SolidComponents"].(execute.ThreadParam).Value.(execute.JSONValue)
+	if is {
+		var temp MakeMediaJSONBlock
+		json.Unmarshal([]byte(vSolidComponents.JSONString), &temp)
+		res.SolidComponents = *temp.SolidComponents
+	} else {
+		res.SolidComponents = m["SolidComponents"].(execute.ThreadParam).Value.([]*wtype.LHComponent)
+	}
+
 	vTotalVolume, is := m["TotalVolume"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
 		var temp MakeMediaJSONBlock
@@ -303,7 +330,7 @@ func (e *MakeMedia) OnLiqComponentVolumes(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(9, e, e)
+		bag.Init(12, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -320,7 +347,7 @@ func (e *MakeMedia) OnLiqComponents(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(9, e, e)
+		bag.Init(12, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -337,7 +364,7 @@ func (e *MakeMedia) OnName(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(9, e, e)
+		bag.Init(12, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -354,7 +381,7 @@ func (e *MakeMedia) OnPH_setPoint(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(9, e, e)
+		bag.Init(12, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -371,7 +398,7 @@ func (e *MakeMedia) OnPH_setPointTemp(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(9, e, e)
+		bag.Init(12, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -388,7 +415,7 @@ func (e *MakeMedia) OnPH_tolerance(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(9, e, e)
+		bag.Init(12, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -400,12 +427,63 @@ func (e *MakeMedia) OnPH_tolerance(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
+func (e *MakeMedia) OnSolidComponentDensities(param execute.ThreadParam) {
+	e.lock.Lock()
+	var bag *execute.AsyncBag = e.params[param.ID]
+	if bag == nil {
+		bag = new(execute.AsyncBag)
+		bag.Init(12, e, e)
+		e.params[param.ID] = bag
+	}
+	e.lock.Unlock()
+
+	fired := bag.AddValue("SolidComponentDensities", param)
+	if fired {
+		e.lock.Lock()
+		delete(e.params, param.ID)
+		e.lock.Unlock()
+	}
+}
+func (e *MakeMedia) OnSolidComponentMasses(param execute.ThreadParam) {
+	e.lock.Lock()
+	var bag *execute.AsyncBag = e.params[param.ID]
+	if bag == nil {
+		bag = new(execute.AsyncBag)
+		bag.Init(12, e, e)
+		e.params[param.ID] = bag
+	}
+	e.lock.Unlock()
+
+	fired := bag.AddValue("SolidComponentMasses", param)
+	if fired {
+		e.lock.Lock()
+		delete(e.params, param.ID)
+		e.lock.Unlock()
+	}
+}
+func (e *MakeMedia) OnSolidComponents(param execute.ThreadParam) {
+	e.lock.Lock()
+	var bag *execute.AsyncBag = e.params[param.ID]
+	if bag == nil {
+		bag = new(execute.AsyncBag)
+		bag.Init(12, e, e)
+		e.params[param.ID] = bag
+	}
+	e.lock.Unlock()
+
+	fired := bag.AddValue("SolidComponents", param)
+	if fired {
+		e.lock.Lock()
+		delete(e.params, param.ID)
+		e.lock.Unlock()
+	}
+}
 func (e *MakeMedia) OnTotalVolume(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(9, e, e)
+		bag.Init(12, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -422,7 +500,7 @@ func (e *MakeMedia) OnVessel(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(9, e, e)
+		bag.Init(12, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -439,7 +517,7 @@ func (e *MakeMedia) OnWater(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(9, e, e)
+		bag.Init(12, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -453,51 +531,60 @@ func (e *MakeMedia) OnWater(param execute.ThreadParam) {
 }
 
 type MakeMedia struct {
-	flow.Component      // component "superclass" embedded
-	lock                sync.Mutex
-	startup             sync.Once
-	params              map[execute.ThreadID]*execute.AsyncBag
-	LiqComponentVolumes <-chan execute.ThreadParam
-	LiqComponents       <-chan execute.ThreadParam
-	Name                <-chan execute.ThreadParam
-	PH_setPoint         <-chan execute.ThreadParam
-	PH_setPointTemp     <-chan execute.ThreadParam
-	PH_tolerance        <-chan execute.ThreadParam
-	TotalVolume         <-chan execute.ThreadParam
-	Vessel              <-chan execute.ThreadParam
-	Water               <-chan execute.ThreadParam
-	Media               chan<- execute.ThreadParam
-	Status              chan<- execute.ThreadParam
+	flow.Component          // component "superclass" embedded
+	lock                    sync.Mutex
+	startup                 sync.Once
+	params                  map[execute.ThreadID]*execute.AsyncBag
+	LiqComponentVolumes     <-chan execute.ThreadParam
+	LiqComponents           <-chan execute.ThreadParam
+	Name                    <-chan execute.ThreadParam
+	PH_setPoint             <-chan execute.ThreadParam
+	PH_setPointTemp         <-chan execute.ThreadParam
+	PH_tolerance            <-chan execute.ThreadParam
+	SolidComponentDensities <-chan execute.ThreadParam
+	SolidComponentMasses    <-chan execute.ThreadParam
+	SolidComponents         <-chan execute.ThreadParam
+	TotalVolume             <-chan execute.ThreadParam
+	Vessel                  <-chan execute.ThreadParam
+	Water                   <-chan execute.ThreadParam
+	Media                   chan<- execute.ThreadParam
+	Status                  chan<- execute.ThreadParam
 }
 
 type MakeMediaParamBlock struct {
-	ID                  execute.ThreadID
-	BlockID             execute.BlockID
-	Error               bool
-	LiqComponentVolumes []wunit.Volume
-	LiqComponents       []*wtype.LHComponent
-	Name                string
-	PH_setPoint         float64
-	PH_setPointTemp     wunit.Temperature
-	PH_tolerance        float64
-	TotalVolume         wunit.Volume
-	Vessel              *wtype.LHPlate
-	Water               *wtype.LHComponent
+	ID                      execute.ThreadID
+	BlockID                 execute.BlockID
+	Error                   bool
+	LiqComponentVolumes     []wunit.Volume
+	LiqComponents           []*wtype.LHComponent
+	Name                    string
+	PH_setPoint             float64
+	PH_setPointTemp         wunit.Temperature
+	PH_tolerance            float64
+	SolidComponentDensities []wunit.Density
+	SolidComponentMasses    []wunit.Mass
+	SolidComponents         []*wtype.LHComponent
+	TotalVolume             wunit.Volume
+	Vessel                  *wtype.LHPlate
+	Water                   *wtype.LHComponent
 }
 
 type MakeMediaConfig struct {
-	ID                  execute.ThreadID
-	BlockID             execute.BlockID
-	Error               bool
-	LiqComponentVolumes []wunit.Volume
-	LiqComponents       []wtype.FromFactory
-	Name                string
-	PH_setPoint         float64
-	PH_setPointTemp     wunit.Temperature
-	PH_tolerance        float64
-	TotalVolume         wunit.Volume
-	Vessel              wtype.FromFactory
-	Water               wtype.FromFactory
+	ID                      execute.ThreadID
+	BlockID                 execute.BlockID
+	Error                   bool
+	LiqComponentVolumes     []wunit.Volume
+	LiqComponents           []wtype.FromFactory
+	Name                    string
+	PH_setPoint             float64
+	PH_setPointTemp         wunit.Temperature
+	PH_tolerance            float64
+	SolidComponentDensities []wunit.Density
+	SolidComponentMasses    []wunit.Mass
+	SolidComponents         []wtype.FromFactory
+	TotalVolume             wunit.Volume
+	Vessel                  wtype.FromFactory
+	Water                   wtype.FromFactory
 }
 
 type MakeMediaResultBlock struct {
@@ -509,20 +596,23 @@ type MakeMediaResultBlock struct {
 }
 
 type MakeMediaJSONBlock struct {
-	ID                  *execute.ThreadID
-	BlockID             *execute.BlockID
-	Error               *bool
-	LiqComponentVolumes *[]wunit.Volume
-	LiqComponents       *[]*wtype.LHComponent
-	Name                *string
-	PH_setPoint         *float64
-	PH_setPointTemp     *wunit.Temperature
-	PH_tolerance        *float64
-	TotalVolume         *wunit.Volume
-	Vessel              **wtype.LHPlate
-	Water               **wtype.LHComponent
-	Media               **wtype.LHSolution
-	Status              *string
+	ID                      *execute.ThreadID
+	BlockID                 *execute.BlockID
+	Error                   *bool
+	LiqComponentVolumes     *[]wunit.Volume
+	LiqComponents           *[]*wtype.LHComponent
+	Name                    *string
+	PH_setPoint             *float64
+	PH_setPointTemp         *wunit.Temperature
+	PH_tolerance            *float64
+	SolidComponentDensities *[]wunit.Density
+	SolidComponentMasses    *[]wunit.Mass
+	SolidComponents         *[]*wtype.LHComponent
+	TotalVolume             *wunit.Volume
+	Vessel                  **wtype.LHPlate
+	Water                   **wtype.LHComponent
+	Media                   **wtype.LHSolution
+	Status                  *string
 }
 
 func (c *MakeMedia) ComponentInfo() *execute.ComponentInfo {
@@ -534,6 +624,9 @@ func (c *MakeMedia) ComponentInfo() *execute.ComponentInfo {
 	inp = append(inp, *execute.NewPortInfo("PH_setPoint", "float64", "PH_setPoint", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("PH_setPointTemp", "wunit.Temperature", "PH_setPointTemp", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("PH_tolerance", "float64", "PH_tolerance", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("SolidComponentDensities", "[]wunit.Density", "SolidComponentDensities", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("SolidComponentMasses", "[]wunit.Mass", "SolidComponentMasses", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("SolidComponents", "[]*wtype.LHComponent", "SolidComponents", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("TotalVolume", "wunit.Volume", "TotalVolume", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Vessel", "*wtype.LHPlate", "Vessel", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Water", "*wtype.LHComponent", "Water", true, true, nil, nil))

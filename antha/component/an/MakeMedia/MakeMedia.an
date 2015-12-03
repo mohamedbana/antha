@@ -16,8 +16,8 @@ Parameters (
 	Name string
 	TotalVolume			Volume
 	LiqComponentVolumes []Volume
-
-	//SolidComponentMasses []Volume //Mass // Should be Mass
+	SolidComponentMasses []wunit.Mass //Volume //Mass // Should be Mass
+	SolidComponentDensities []wunit.Density
 	PH_setPoint float64
 	PH_tolerance float64 //  +/- x  e.g. 7.0 +/- 0.2 
 	PH_setPointTemp	wunit.Temperature
@@ -32,9 +32,8 @@ Parameters (
 Inputs (
 	Water				*wtype.LHComponent
 	LiqComponents		[]*wtype.LHComponent
-	
-	/*SolidComponents		[]*wtype.LHComponent // should be new type or field indicating solid and mass
-	Acid				*wtype.LHComponent
+	SolidComponents		[]*wtype.LHComponent // should be new type or field indicating solid and mass
+	/*Acid				*wtype.LHComponent
 	Base 				*wtype.LHComponent
 	*/
 	
@@ -80,13 +79,13 @@ Steps {
 		
 		//solids := make([]*wtype.LHComponent,0)
 		
-		/*for k, sol := range SolidComponents {
-			solsamp := mixer.Sample(sol,SolidComponentMasses[k])
+		for k, sol := range SolidComponents {
+			solsamp := mixer.SampleSolidtoLiquid(sol,SolidComponentMasses[k],SolidComponentDensities[k])
 			liquids = append(liquids,solsamp)
 			step = text.Print("Step" + strconv.Itoa(stepcounter) + ": ", "add " + SolidComponentMasses[k].ToString() + " of " + sol.CName)
 			recipestring = append(recipestring,step)
 			stepcounter = stepcounter + k
-		}*/
+		}
 		
 		watersample := mixer.SampleForTotalVolume(Water,TotalVolume)
 		liquids = append(liquids,watersample)
