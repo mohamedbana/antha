@@ -249,6 +249,7 @@ func (m *Force) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+/*
 func (m *Rate) MarshalJSON() ([]byte, error) {
 	return marshal(m)
 
@@ -264,3 +265,4 @@ func (m *Rate) UnmarshalJSON(b []byte) (err error) {
 	}
 	return err
 }
+*/

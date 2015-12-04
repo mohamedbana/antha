@@ -425,6 +425,7 @@ func NewFlowRate(v float64, unit string) FlowRate {
 	return fr
 }
 
+/*
 type Rate struct {
 	ConcreteMeasurement
 	Timeunit string //time.Duration
@@ -456,3 +457,4 @@ func NewRate(v float64, unit string, timeunit string) (r Rate, err error) {
 	err = fmt.Errorf(timeunit, " Not approved time unit. Approved units time are: ", approvedtimeunits)
 	return r, err
 }
+*/
