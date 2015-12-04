@@ -91,6 +91,7 @@ type Graph struct {
 	ready chan struct{}
 	// isRunning indicates that the network is currently running
 	isRunning bool
+	lock      sync.Mutex
 }
 
 // InitGraphState method initializes graph fields and allocates memory.
@@ -126,6 +127,9 @@ func init() {
 
 // Increments SendChanRefCount
 func (n *Graph) IncSendChanRefCount(c reflect.Value) {
+	n.lock.Lock()
+	defer n.lock.Unlock()
+
 	ptr := c.Pointer()
 	cnt := n.sendChanRefCount[ptr]
 	cnt += 1
@@ -135,6 +139,9 @@ func (n *Graph) IncSendChanRefCount(c reflect.Value) {
 // Decrements SendChanRefCount
 // It returns true if the RefCount has reached 0
 func (n *Graph) DecSendChanRefCount(c reflect.Value) bool {
+	n.lock.Lock()
+	defer n.lock.Unlock()
+
 	ptr := c.Pointer()
 	cnt := n.sendChanRefCount[ptr]
 	if cnt == 0 {

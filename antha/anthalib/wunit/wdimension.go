@@ -426,21 +426,33 @@ func NewFlowRate(v float64, unit string) FlowRate {
 }
 
 type Rate struct {
-	Unit     ConcreteMeasurement
+	ConcreteMeasurement
 	Timeunit string //time.Duration
 }
 
-func NewRate(unit ConcreteMeasurement, timeunit string) (r Rate, err error) {
+func (cm *Rate) ToString() string {
+	return fmt.Sprintf("%-6.3f%s", cm.RawValue(), cm.Unit().PrefixedSymbol(), cm.Timeunit)
+}
+func NewRate(v float64, unit string, timeunit string) (r Rate, err error) {
+	if unit != `/` {
+		err = fmt.Errorf("Can't make flow rate which aren't in per")
+		logger.Fatal(err.Error())
+		panic(err.Error())
+	}
+	concrete := NewMeasurement(v, "", unit)
 
 	approvedtimeunits := []string{"ns", "us", "µs", "ms", "s", "m", "h"}
+	//Mvalue float64
+	// the relevant units
 
 	for _, approvedunit := range approvedtimeunits {
 		if timeunit == approvedunit {
-			r.Unit = unit
+			r.Mvalue = concrete.Mvalue
+			r.Munit = concrete.Munit
 			r.Timeunit = timeunit
 			return
 		}
 	}
-	err = fmt.Errorf(timeunit, " Not approved unit. Approved units are: ", approvedtimeunits)
+	err = fmt.Errorf(timeunit, " Not approved time unit. Approved units time are: ", approvedtimeunits)
 	return r, err
 }

@@ -123,13 +123,14 @@ func NewWorkflowRun(id execute.BlockID, wf *Workflow, cf *Config) (*WorkflowRun,
 	flow.RunNet(&wf.Graph)
 
 	sg := sync.WaitGroup{}
+	sg.Add(len(outs))
+
 	for _, ch := range outs {
-		sg.Add(1)
 		go func(ch chan execute.ThreadParam) {
+			defer sg.Done()
 			for v := range ch {
 				messages <- v
 			}
-			sg.Done()
 		}(ch)
 	}
 
