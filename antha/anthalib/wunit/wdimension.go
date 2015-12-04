@@ -23,7 +23,6 @@
 package wunit
 
 import (
-	"fmt"
 	"github.com/antha-lang/antha/microArch/logger"
 	"strings"
 )
