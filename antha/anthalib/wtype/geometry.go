@@ -52,13 +52,13 @@ type Shape struct {
 
 // let shape implement geometry
 
-func (sh *Shape) Height() wunit.Length {
+func (sh *Shape) Height() wunit.Length { // y?
 	return wunit.NewLength(sh.H, sh.LengthUnit)
 }
-func (sh *Shape) Width() wunit.Length {
+func (sh *Shape) Width() wunit.Length { // X?
 	return wunit.NewLength(sh.W, sh.LengthUnit)
 }
-func (sh *Shape) Depth() wunit.Length {
+func (sh *Shape) Depth() wunit.Length { // Z?
 	return wunit.NewLength(sh.D, sh.LengthUnit)
 }
 
