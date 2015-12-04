@@ -269,8 +269,8 @@ Steps {
 		partstoorder,
 		)
 		// export data to file
-		//anthapath.ExporttoFile("Report"+"_"+Constructname+".txt",[]byte(Status))
-	anthapath.ExportTextFile("Report"+"_"+Constructname+".txt",Status)
+		anthapath.ExporttoFile("Report"+"_"+Constructname+".txt",[]byte(Status))
+	//anthapath.ExportTextFile("Report"+"_"+Constructname+".txt",Status)
 
 	}
 	

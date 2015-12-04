@@ -271,8 +271,8 @@ func (e *Scarfree_siteremove_orfcheck) steps(p Scarfree_siteremove_orfcheckParam
 			partstoorder,
 		)
 		// export data to file
-		//anthapath.ExporttoFile("Report"+"_"+Constructname+".txt",[]byte(Status))
-		anthapath.ExportTextFile("Report"+"_"+p.Constructname+".txt", r.Status)
+		anthapath.ExporttoFile("Report"+"_"+p.Constructname+".txt", []byte(r.Status))
+		//anthapath.ExportTextFile("Report"+"_"+Constructname+".txt",Status)
 
 	}
 	_ = _wrapper.WaitToEnd()
