@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func TestOneRead(t *testing.T) {
+func TestGoOneRead(t *testing.T) {
 	ctx, cancel, allDone := NewContext(context.Background())
 	defer cancel()
 
@@ -71,6 +71,84 @@ func TestNestedCommandSequence(t *testing.T) {
 		}
 		return nil
 	})
+
+	select {
+	case <-allDone():
+		if err := ctx.Err(); err != nil {
+			t.Error(err)
+		}
+	case <-time.After(1 * time.Second):
+		t.Fatal("timeout")
+	}
+}
+
+func TestGoGoReadAll(t *testing.T) {
+	ctx, cancel, allDone := NewContext(context.Background())
+	defer cancel()
+
+	Go(ctx, func(ctx context.Context) error {
+		for i := 0; i < 5; i += 1 {
+			pidx := i
+			Go(ctx, func(ctx context.Context) error {
+				var promises []*Promise
+				for i := 0; i < 5; i += 1 {
+					promises = append(promises, IssueCommand(ctx, fmt.Sprintf("noop.%d.%d", pidx, i)))
+				}
+				if _, err := ReadAll(ctx, promises...); err != nil {
+					return err
+				}
+				return nil
+			})
+		}
+		return nil
+	})
+
+	select {
+	case <-allDone():
+		if err := ctx.Err(); err != nil {
+			t.Error(err)
+		}
+	case <-time.After(1 * time.Second):
+		t.Fatal("timeout")
+	}
+}
+func TestGoReadAll(t *testing.T) {
+	ctx, cancel, allDone := NewContext(context.Background())
+	defer cancel()
+
+	Go(ctx, func(ctx context.Context) error {
+		var promises []*Promise
+		for i := 0; i < 5; i += 1 {
+			promises = append(promises, IssueCommand(ctx, fmt.Sprintf("noop.%d", i)))
+		}
+		if _, err := ReadAll(ctx, promises...); err != nil {
+			return err
+		}
+		return nil
+	})
+
+	select {
+	case <-allDone():
+		if err := ctx.Err(); err != nil {
+			t.Error(err)
+		}
+	case <-time.After(1 * time.Second):
+		t.Fatal("timeout")
+	}
+}
+
+func TestReadAll(t *testing.T) {
+	ctx, cancel, allDone := NewContext(context.Background())
+	defer cancel()
+
+	var promises []*Promise
+	for i := 0; i < 5; i += 1 {
+		promises = append(promises, IssueCommand(ctx, fmt.Sprintf("noop.%d", i)))
+	}
+	if _, err := ReadAll(ctx, promises...); err != nil {
+		t.Error(err)
+		cancel()
+	}
 
 	select {
 	case <-allDone():

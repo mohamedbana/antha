@@ -15,6 +15,7 @@ const theInstrKey instrKey = 0
 const thePoolKey poolKey = 0
 
 var poolDoneError error = errors.New("trace: done error") // Dummy error to signal sucessful execution
+var rootPromise *Promise = &Promise{}
 
 type poolCtx struct {
 	context.Context
@@ -61,15 +62,25 @@ func (a *poolCtx) cancel(err error) {
 	a.cancelWithLock(err)
 }
 
+func (a *poolCtx) remove(p *Promise) {
+	a.lock.Lock()
+	defer a.lock.Unlock()
+	delete(a.blocked, p)
+}
+
 type DoneFunc func() <-chan struct{}
 
 func WithPool(parent context.Context) (context.Context, context.CancelFunc, DoneFunc) {
+	tr := getTrace(parent)
 	done := make(chan struct{})
 	pctx := &poolCtx{
 		Context: parent,
 		done:    done,
+		alive:   1,
 		blocked: make(map[*Promise]bool),
 	}
+	pctx.blocked[rootPromise] = true
+
 	if parent.Done() != nil {
 		go func() {
 			select {
@@ -79,9 +90,12 @@ func WithPool(parent context.Context) (context.Context, context.CancelFunc, Done
 			}
 		}()
 	}
+
 	return pctx,
 		func() { pctx.cancel(context.Canceled) },
 		func() <-chan struct{} {
+			pctx.remove(rootPromise)
+			decrement(pctx, tr, 1, nil)
 			return done
 		}
 }
@@ -171,19 +185,17 @@ func IssueCommand(ctx context.Context, op string, args ...Value) *Promise {
 	return p
 }
 
-func tryUnblock(ctx context.Context, pctx *poolCtx, tr *Trace) {
-	if pctx.alive == len(pctx.blocked) {
-		if err := tr.execute(ctx); err != nil {
-			pctx.cancelWithLock(err)
-		}
+func tryUnblock(tr *Trace, pctx *poolCtx) {
+	if err := tr.signal(pctx); err != nil {
+		pctx.cancelWithLock(err)
 	}
 }
 
-func decrement(ctx context.Context, pctx *poolCtx, tr *Trace, err error) {
+func decrement(pctx *poolCtx, tr *Trace, delta int, err error) {
 	pctx.lock.Lock()
 	defer pctx.lock.Unlock()
-	pctx.alive -= 1
-	tryUnblock(ctx, pctx, tr)
+	pctx.alive -= delta
+	tryUnblock(tr, pctx)
 
 	var cancel error
 	if err != nil {
@@ -207,7 +219,7 @@ func Read(ctx context.Context, p *Promise) (Value, error) {
 
 	pctx.lock.Lock()
 	pctx.blocked[p] = true
-	tryUnblock(ctx, pctx, tr)
+	tryUnblock(tr, pctx)
 	pctx.lock.Unlock()
 
 	var err error
@@ -224,27 +236,31 @@ func Read(ctx context.Context, p *Promise) (Value, error) {
 		err = p.Err()
 	}
 
-	pctx.lock.Lock()
-	delete(pctx.blocked, p)
-	pctx.lock.Unlock()
+	pctx.remove(p)
 
 	return p.Value(), err
 }
 
 func ReadAll(parent context.Context, ps ...*Promise) ([]Value, error) {
+	var mapLock sync.Mutex
 	vs := make(map[int]Value)
 
 	pctx, cancel, allDone := WithPool(parent)
 	defer cancel()
 
-	for idx, p := range ps {
+	for idx, promise := range ps {
 		i := idx
+		p := promise
 		Go(pctx, func(ctx context.Context) error {
 			v, err := Read(ctx, p)
 			if err != nil {
 				return err
 			}
+
+			mapLock.Lock()
+			defer mapLock.Unlock()
 			vs[i] = v
+
 			return nil
 		})
 	}
@@ -273,6 +289,6 @@ func Go(parent context.Context, fn func(ctx context.Context) error) {
 
 	go func() {
 		err := fn(ctx)
-		decrement(ctx, pctx, tr, err)
+		decrement(pctx, tr, 1, err)
 	}()
 }

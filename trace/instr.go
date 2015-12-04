@@ -30,6 +30,10 @@ func (a *Promise) Value() Value {
 }
 
 func (a *Promise) set(v interface{}) {
+	if a.construct == nil {
+		return
+	}
+
 	a.lock.Lock()
 	defer a.lock.Unlock()
 

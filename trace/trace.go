@@ -1,7 +1,7 @@
 package trace
 
 import (
-	"golang.org/x/net/context"
+	//"log"
 	"sync"
 )
 
@@ -11,11 +11,22 @@ type Trace struct {
 	retired [][]instr
 }
 
-func (a *Trace) execute(context.Context) error {
-	// XXX: Sort instructions
+func (a *Trace) signal(lockedPool *poolCtx) error {
 	a.lock.Lock()
 	defer a.lock.Unlock()
+	return a.signalWithLock(lockedPool)
+}
 
+func (a *Trace) signalWithLock(lockedPool *poolCtx) error {
+	// XXX don't execute until all active all blocked
+	if lockedPool.alive == len(lockedPool.blocked) {
+		return a.execute()
+	}
+	return nil
+}
+
+func (a *Trace) execute() error {
+	// XXX: Sort instructions
 	for _, v := range a.issue {
 		v.promise.set(nil)
 		close(v.promise.out)
