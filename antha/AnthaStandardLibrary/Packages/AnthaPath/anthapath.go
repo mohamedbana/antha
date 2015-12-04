@@ -86,11 +86,42 @@ func AddFile(filename string) (f *os.File, err error) {
 }
 
 func ExporttoFile(filename string, contents []byte) (err error) {
-	f, err := AddFile(filename)
+	_, err = AddFile(filename)
+	if err != nil {
+		fmt.Println("1")
+		log.Panic(err)
+	}
+	fmt.Println("hi")
+	f, err := os.Open(filepath.Join(Dirpath(), filename))
+	fmt.Println("ho")
+	if err != nil {
+		fmt.Println("2")
+		log.Panic(err)
+	}
+	fmt.Println("silver")
+	defer f.Close()
+
+	_, err = f.Write(contents)
+	fmt.Println("lining")
+	if err != nil {
+		fmt.Println("3")
+		log.Fatal(err)
+	}
+
+	return err
+}
+
+func ExportTextFile(filename string, contents string) (err error) {
+	_, err = AddFile(filename)
 	if err != nil {
 		log.Panic(err)
 	}
-	_, err = f.Write(contents)
+	f, err := os.Open(filepath.Join(Dirpath(), filename))
+	if err != nil {
+		log.Panic(err)
+	}
+	defer f.Close()
+	_, err = fmt.Fprintln(f, contents)
 
 	if err != nil {
 		log.Fatal(err)

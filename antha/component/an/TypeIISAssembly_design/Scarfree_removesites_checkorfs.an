@@ -18,7 +18,7 @@ import (
 	"strconv"
 	"strings"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/anthapath"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 
 
 )
@@ -269,7 +269,9 @@ Steps {
 		partstoorder,
 		)
 		// export data to file
-		anthapath.ExporttoFile("Report"+"_"+Constructname+".txt",[]byte(Status))
+		//anthapath.ExporttoFile("Report"+"_"+Constructname+".txt",[]byte(Status))
+	anthapath.ExportTextFile("Report"+"_"+Constructname+".txt",Status)
+
 	}
 	
 }
