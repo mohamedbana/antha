@@ -85,6 +85,20 @@ func AddFile(filename string) (f *os.File, err error) {
 	return
 }
 
+func ExporttoFile(filename string, contents []byte) (err error) {
+	f, err := AddFile(filename)
+	if err != nil {
+		log.Panic(err)
+	}
+	_, err = f.Write(contents)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return err
+}
+
 func Dirpath() (dirpath string) {
 	u, err := user.Current()
 	if err != nil {
