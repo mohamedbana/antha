@@ -64,14 +64,14 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	welltype = wtype.NewLHWell("Reservoir", "", "", "ul", 100000, 10000, reservoirbox, 0, 107, 71, 38, 3, "mm")
 	plate = wtype.NewLHPlate("reservoir", "unknown", 1, 1, 45, "mm", welltype, 58, 13, 0, 0, 10)
 	plates[plate.Type] = plate
-
-	rwshp = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
-	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 250, 5, rwshp, 0, 5.5, 5.5, 20.4, 1.4, "mm")
-	//plate = wtype.NewLHPlate("pcrplate", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 6.5)
-	//plates[plate.Type] = plate
-	plate = wtype.NewLHPlate("pcrplate_with_cooler", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 15.5)
-	plates[plate.Type] = plate
-
+	/*
+		rwshp = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
+		welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 250, 5, rwshp, 0, 5.5, 5.5, 20.4, 1.4, "mm")
+		//plate = wtype.NewLHPlate("pcrplate", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 6.5)
+		//plates[plate.Type] = plate
+		plate = wtype.NewLHPlate("pcrplate_with_skirt", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 15.5)
+		plates[plate.Type] = plate
+	*/
 	/// placeholder for non plate container for testing
 	rwshp = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
 	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 250, 5, rwshp, 0, 5.5, 5.5, 20.4, 1.4, "mm")
