@@ -30,21 +30,38 @@ import (
 	"io/ioutil"
 	"os"
 )
+func MakePolicies() map[string] LHPolicy {
+        pols := make(map[string] LHPolicy)
 
-func MakePolicies() map[string]LHPolicy {
-	pols := make(map[string]LHPolicy)
-
-	// what policies do we need?
-	pols["water"] = MakeWaterPolicy()
-	pols["culture"] = MakeCulturePolicy()
-	pols["glycerol"] = MakeGlycerolPolicy()
-	pols["solvent"] = MakeSolventPolicy()
-	pols["default"] = MakeDefaultPolicy()
-	pols["foamy"] = MakeFoamyPolicy()
-	pols["dna"] = MakeDNAPolicy()
-	return pols
+        // what policies do we need?
+        pols["water"] = MakeWaterPolicy()
+        pols["culture"] = MakeCulturePolicy()
+        pols["glycerol"] = MakeGlycerolPolicy()
+        pols["solvent"] = MakeSolventPolicy()
+        pols["default"] = MakeDefaultPolicy()
+        pols["foamy"] = MakeFoamyPolicy()
+        pols["lysate"] = MakeLysatePolicy()
+        pols["protein"] = MakeProteinPolicy()
+        return pols
 }
-
+func MakeLysatePolicy() LHPolicy {
+        lysatepolicy := make(LHPolicy, 6)
+        lysatepolicy["ASP_SPEED"] = 1.0
+        lysatepolicy["DSP_SPEED"] = 1.0
+        lysatepolicy["ASP_WAIT"] = 2
+        lysatepolicy["DSP_WAIT"] = 2
+        lysatepolicy["PREMIX"] = 5
+        lysatepolicy["CAN_MSA"]= false
+        return lysatepolicy
+}
+func MakeProteinPolicy() LHPolicy {
+        proteinpolicy := make(LHPolicy, 4)
+        proteinpolicy["DSPREFERENCE"] = 2
+        proteinpolicy["CAN_MULTI"] = true
+        proteinpolicy["PREMIX"] = 3
+        proteinpolicy["CAN_MSA"] = false
+        return proteinpolicy
+}
 func MakeWaterPolicy() LHPolicy {
 	waterpolicy := make(LHPolicy, 6)
 	waterpolicy["DSPREFERENCE"] = 0
@@ -54,7 +71,6 @@ func MakeWaterPolicy() LHPolicy {
 	waterpolicy["DSPZOFFSET"] = 0.5
 	return waterpolicy
 }
-
 func MakeFoamyPolicy() LHPolicy {
 	foamypolicy := make(LHPolicy, 5)
 	foamypolicy["DSPREFERENCE"] = 0
@@ -64,7 +80,6 @@ func MakeFoamyPolicy() LHPolicy {
 	foamypolicy["CAN_SDD"] = true
 	return foamypolicy
 }
-
 func MakeCulturePolicy() LHPolicy {
 	culturepolicy := make(LHPolicy, 10)
 	culturepolicy["ASPSPEED"] = 0.5
@@ -78,7 +93,6 @@ func MakeCulturePolicy() LHPolicy {
 	culturepolicy["NO_AIR_DISPENSE"] = true
 	return culturepolicy
 }
-
 func MakeGlycerolPolicy() LHPolicy {
 	glycerolpolicy := make(LHPolicy, 5)
 	glycerolpolicy["ASP_SPEED"] = 1.5
