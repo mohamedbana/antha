@@ -202,6 +202,30 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	A.Smax = 1.0 // not sure if this is correct
 	cmap[A.CName] = A
 	return cmap
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "ProteinMarker"
+	A.Type = "protein"
+	A.Smax = 1.0 //not sure if this is correct
+	cmap[A.CName] = A
+	return cmap
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "EColiLysate"
+	A.Type = "lysate"
+	A.Smax = 1.0 //not sure what this is!
+	cmap[A.CName] = A
+	return cmap
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["foamy"]
+	A.CName = "SDSbuffer"
+	A.Type = "foamy"
+	A.Smax = 1.0 //still not sure....
+	cmap[A.CName] = A
+	return cmap
 }
 
 func GetComponentByType(typ string) *wtype.LHComponent {
