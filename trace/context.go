@@ -15,7 +15,6 @@ const theInstrKey instrKey = 0
 const thePoolKey poolKey = 0
 
 var poolDoneError error = errors.New("trace: done error") // Dummy error to signal sucessful execution
-var rootPromise *Promise = &Promise{}
 
 type poolCtx struct {
 	context.Context
@@ -79,6 +78,7 @@ func WithPool(parent context.Context) (context.Context, context.CancelFunc, Done
 		alive:   1,
 		blocked: make(map[*Promise]bool),
 	}
+	rootPromise := &Promise{}
 	pctx.blocked[rootPromise] = true
 
 	if parent.Done() != nil {
