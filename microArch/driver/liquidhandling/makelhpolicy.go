@@ -44,6 +44,7 @@ func MakePolicies() map[string]LHPolicy {
 	pols["dna"] = MakeDNAPolicy()
 	pols["DoNotMix"] = MakeDefaultPolicy()
 	pols["NeedToMix"] = MakeNeedToMixPolicy()
+	pols["viscous"] = MakeViscousPolicy()
 	return pols
 }
 
@@ -91,6 +92,15 @@ func MakeGlycerolPolicy() LHPolicy {
 	return glycerolpolicy
 }
 
+func MakeViscousPolicy() LHPolicy {
+	glycerolpolicy := make(LHPolicy, 4)
+	glycerolpolicy["ASP_SPEED"] = 1.5
+	glycerolpolicy["DSP_SPEED"] = 1.5
+	glycerolpolicy["ASP_WAIT"] = 1.0
+	glycerolpolicy["DSP_WAIT"] = 1.0
+	//glycerolpolicy["TIP_REUSE_LIMIT"] = 0
+	return glycerolpolicy
+}
 func MakeSolventPolicy() LHPolicy {
 	solventpolicy := make(LHPolicy, 4)
 	solventpolicy["PRE_MIX"] = 3

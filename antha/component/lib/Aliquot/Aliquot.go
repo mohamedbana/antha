@@ -51,7 +51,9 @@ func (e *Aliquot) steps(p AliquotParamBlock, r *AliquotResultBlock) {
 	aliquots := make([]*wtype.LHSolution, 0)
 
 	for i := 0; i < p.NumberofAliquots; i++ {
-		p.Solution.Type = "DoNotMix"
+		if p.Solution.Type == "dna" {
+			p.Solution.Type = "DoNotMix"
+		}
 		aliquotSample := mixer.Sample(p.Solution, p.VolumePerAliquot)
 		aliquot := _wrapper.MixInto(p.OutPlate, aliquotSample)
 		aliquots = append(aliquots, aliquot)

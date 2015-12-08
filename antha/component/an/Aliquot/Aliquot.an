@@ -56,7 +56,9 @@ Steps {
 	
 	
 	for i := 0; i < NumberofAliquots; i++ {
+		if Solution.Type == "dna"{
 		Solution.Type = "DoNotMix"
+		}
 		aliquotSample := mixer.Sample(Solution, VolumePerAliquot)
 		aliquot := MixInto(OutPlate, aliquotSample)
 		aliquots = append(aliquots,aliquot)
