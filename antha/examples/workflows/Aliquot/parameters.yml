@@ -2,24 +2,26 @@
   "Parameters": [{
     "Aliquot": {
       "Solution": "component:PrimerFw",
-      "Outplate": "plate:pcrplate_with_cooler",
+	  "InPlate": "plate:pcrplate_with_cooler",
+      "Outplate": "plate:Kombi2mlEpp",
       "TipType": "tipbox:Gilson20",
       "SolutionVolume": "100ul",
-      "VolumePerAliquot": "10ul",
-	"NumberofAliquots":3,
+      "VolumePerAliquot": "20ul",
+	"NumberofAliquots":5,
     }
   },
 {
     "Aliquot": {
       "Solution": "component:PrimerRev",
-      "Outplate": "plate:pcrplate_with_cooler",
+		"InPlate": "plate:pcrplate_with_cooler",
+      "Outplate": "plate:Kombi2mlEpp",
       "TipType": "tipbox:Gilson20",
       "SolutionVolume": "100ul",
-      "VolumePerAliquot": "10ul",
-	"NumberofAliquots":3,
+      "VolumePerAliquot": "20ul",
+	"NumberofAliquots":0,
     }
   }],
   "Config": {
-    "OUTPUT_COUNT": 6
+    "OUTPUT_COUNT": 5
   }
 }

@@ -23,6 +23,7 @@ Data (
 // Physical Inputs to this protocol with types
 Inputs (
 	Solution *wtype.LHComponent
+	InPlate *wtype.LHPlate
 	OutPlate *wtype.LHPlate
 )
 
@@ -55,6 +56,7 @@ Steps {
 	
 	
 	for i := 0; i < NumberofAliquots; i++ {
+		Solution.Type = "DoNotMix"
 		aliquotSample := mixer.Sample(Solution, VolumePerAliquot)
 		aliquot := MixInto(OutPlate, aliquotSample)
 		aliquots = append(aliquots,aliquot)

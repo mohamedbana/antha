@@ -41,6 +41,7 @@ type ComponentDesc struct {
 func GetComponents() []ComponentDesc {
 	portMap := make(map[string]map[string]bool) //representing component, port name, and true if in
 	portMap["Aliquot"] = make(map[string]bool)
+	portMap["Aliquot"]["InPlate"] = true
 	portMap["Aliquot"]["NumberofAliquots"] = true
 	portMap["Aliquot"]["OutPlate"] = true
 	portMap["Aliquot"]["Solution"] = true

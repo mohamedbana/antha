@@ -71,6 +71,26 @@ func SampleForConcentration(l wtype.Liquid, c wunit.Concentration) *wtype.LHComp
 	return ret
 }
 
+func SampleMass(s wtype.Liquid, m wunit.Mass, d wunit.Density) *wtype.LHComponent {
+
+	// calculate volume to add from density
+	v := wunit.MasstoVolume(m, d)
+
+	ret := wtype.NewLHComponent()
+	ret.CName = s.Name()
+	ret.Type = s.GetType()
+	ret.Vol = v.RawValue()
+	ret.Vunit = v.Unit().PrefixedSymbol()
+	ret.Extra = s.GetExtra()
+	ret.Smax = s.GetSmax()
+	ret.Visc = s.GetVisc()
+	if s.Container() != nil {
+		ret.LContainer = s.Container().(*wtype.LHWell)
+	}
+
+	return ret
+}
+
 // take a sample of this liquid to be used to make the solution up to
 // a particular total volume
 func SampleForTotalVolume(l wtype.Liquid, v wunit.Volume) *wtype.LHComponent {

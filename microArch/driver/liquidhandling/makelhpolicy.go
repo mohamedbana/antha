@@ -42,6 +42,8 @@ func MakePolicies() map[string]LHPolicy {
 	pols["default"] = MakeDefaultPolicy()
 	pols["foamy"] = MakeFoamyPolicy()
 	pols["dna"] = MakeDNAPolicy()
+	pols["DoNotMix"] = MakeDefaultPolicy()
+	pols["NeedToMix"] = MakeNeedToMixPolicy()
 	return pols
 }
 
@@ -99,6 +101,22 @@ func MakeSolventPolicy() LHPolicy {
 }
 
 func MakeDNAPolicy() LHPolicy {
+	dnapolicy := make(LHPolicy, 10)
+	dnapolicy["POST_MIX"] = 3
+	dnapolicy["POST_MIX_VOLUME"] = 50
+	dnapolicy["ASPSPEED"] = 2.0
+	dnapolicy["DSPSPEED"] = 2.0
+	dnapolicy["CAN_MULTI"] = false
+	dnapolicy["CAN_MSA"] = false
+	dnapolicy["CAN_SDD"] = false
+	dnapolicy["DSPREFERENCE"] = 0
+	dnapolicy["DSPZOFFSET"] = 0.5
+	dnapolicy["TIP_REUSE_LIMIT"] = 0
+	dnapolicy["NO_AIR_DISPENSE"] = true
+	return dnapolicy
+}
+
+func MakeNeedToMixPolicy() LHPolicy {
 	dnapolicy := make(LHPolicy, 10)
 	dnapolicy["POST_MIX"] = 3
 	dnapolicy["POST_MIX_VOLUME"] = 50
