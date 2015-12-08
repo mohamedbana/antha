@@ -8,47 +8,47 @@ import (
 
 var alreadyAdded = errors.New("already added")
 
-type Registry struct {
-	lock     sync.Mutex
-	parent   context.Context
-	registry map[Name]Runner
+type registry struct {
+	lock   sync.Mutex
+	parent context.Context
+	reg    map[Name]Runner
 	// XXX: add remote registries...
 }
 
 // Unique identifier for Runner
 type Name struct {
-	Host string
-	Repo string
-	Tag  string
+	Host string // Host
+	Repo string // Name
+	Tag  string // Version
 }
 
 // Query for a Runner
 type NameQuery struct {
-	Repo string
-	Tag  string
+	Repo string // Name
+	Tag  string // Version
 }
 
-func (a *Registry) Add(name Name, runner Runner) error {
+func (a *registry) Add(name Name, runner Runner) error {
 	a.lock.Lock()
 	defer a.lock.Unlock()
 
-	if a.registry == nil {
-		a.registry = make(map[Name]Runner)
+	if a.reg == nil {
+		a.reg = make(map[Name]Runner)
 	}
-	if r := a.registry[name]; r != nil {
+	if r := a.reg[name]; r != nil {
 		return alreadyAdded
 	}
-	a.registry[name] = runner
+	a.reg[name] = runner
 	return nil
 }
 
 // XXX: lift more complicated search/typing logic out
-func (a *Registry) Find(query NameQuery) ([]Runner, error) {
+func (a *registry) Find(query NameQuery) ([]Runner, error) {
 	a.lock.Lock()
 	defer a.lock.Unlock()
 
 	name := Name{Repo: query.Repo, Tag: query.Tag}
-	if r := a.registry[name]; r == nil {
+	if r := a.reg[name]; r == nil {
 		return nil, nil
 	} else {
 		return []Runner{r}, nil

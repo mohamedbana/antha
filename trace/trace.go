@@ -1,23 +1,26 @@
+// Package trace provides deferred execution of instruction streams generated
+// at runtime. IssueCommand adds a command to be executed while the actual
+// execution is deferred until all goroutines in a trace context are blocked
+// on Reads of instruction results (i.e., Promises).
 package trace
 
 import (
-	//"log"
 	"sync"
 )
 
-type Trace struct {
+type trace struct {
 	lock    sync.Mutex
 	issue   []instr
 	retired [][]instr
 }
 
-func (a *Trace) signal(lockedPool *poolCtx) error {
+func (a *trace) signal(lockedPool *poolCtx) error {
 	a.lock.Lock()
 	defer a.lock.Unlock()
 	return a.signalWithLock(lockedPool)
 }
 
-func (a *Trace) signalWithLock(lockedPool *poolCtx) error {
+func (a *trace) signalWithLock(lockedPool *poolCtx) error {
 	// XXX don't execute until all active all blocked
 	if lockedPool.alive == len(lockedPool.blocked) {
 		return a.execute()
@@ -25,7 +28,7 @@ func (a *Trace) signalWithLock(lockedPool *poolCtx) error {
 	return nil
 }
 
-func (a *Trace) execute() error {
+func (a *trace) execute() error {
 	// XXX: Sort instructions
 	for _, v := range a.issue {
 		v.promise.set(nil)

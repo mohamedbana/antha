@@ -1,3 +1,6 @@
+// Package workflow implements DAG scheduling of networks of functions
+// generated at runtime. The execution uses the inject package to allow
+// late-binding of functions.
 package workflow
 
 import (
@@ -49,12 +52,12 @@ func (a endpoint) String() string {
 }
 
 type node struct {
-	lock      sync.Mutex            // Lock on Params and Ins during Execute
-	Process   string                // Name of this instance
-	Component string                // Function that should be called
-	Params    inject.Value          // Parameters to this function
-	Outs      map[string][]endpoint // Out edges
-	Ins       map[string]bool       // In edges
+	lock     sync.Mutex            // Lock on Params and Ins during Execute
+	Process  string                // Name of this instance
+	FuncName string                // Function that should be called
+	Params   inject.Value          // Parameters to this function
+	Outs     map[string][]endpoint // Out edges
+	Ins      map[string]bool       // In edges
 }
 
 func (a *node) removeIn(port string) (int, error) {
@@ -77,10 +80,11 @@ func (a *node) setParam(port string, value interface{}) error {
 	return nil
 }
 
+// State to execute a workflow
 type Workflow struct {
 	roots   []*node
 	nodes   map[string]*node
-	Outputs map[Port]interface{}
+	Outputs map[Port]interface{} // Values generated that were not connected to another process
 }
 
 // Set initial parameter values before executing
@@ -122,7 +126,7 @@ func updateOutParams(n *node, out inject.Value, unmatched map[Port]interface{}) 
 }
 
 func (a *Workflow) run(ctx context.Context, n *node) ([]*node, error) {
-	out, err := inject.Call(ctx, inject.NameQuery{Repo: n.Component}, n.Params)
+	out, err := inject.Call(ctx, inject.NameQuery{Repo: n.FuncName}, n.Params)
 	if err != nil {
 		return nil, err
 	}
@@ -191,21 +195,23 @@ func (a *Workflow) Run(parent context.Context) error {
 	return ctx.Err()
 }
 
-func (a *Workflow) AddNode(process, component string) error {
+// Add a process to a workflow that executes funcName
+func (a *Workflow) AddNode(process, funcName string) error {
 	if a.nodes[process] != nil {
 		return fmt.Errorf("process %q already defined", process)
 	}
 	n := &node{
-		Process:   process,
-		Component: component,
-		Params:    make(inject.Value),
-		Outs:      make(map[string][]endpoint),
-		Ins:       make(map[string]bool),
+		Process:  process,
+		FuncName: funcName,
+		Params:   make(inject.Value),
+		Outs:     make(map[string][]endpoint),
+		Ins:      make(map[string]bool),
 	}
 	a.nodes[process] = n
 	return nil
 }
 
+// Connect an output of one process to an input of another
 func (a *Workflow) AddEdge(src, tgt Port) error {
 	snode := a.nodes[src.Process]
 	if snode == nil {
@@ -226,10 +232,12 @@ func (a *Workflow) AddEdge(src, tgt Port) error {
 	return nil
 }
 
+// Options for creating a new Workflow
 type Options struct {
 	FromBytes []byte
 }
 
+// Create a new Workflow
 func New(opt Options) (*Workflow, error) {
 	w := &Workflow{
 		nodes:   make(map[string]*node),

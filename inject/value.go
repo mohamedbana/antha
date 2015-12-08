@@ -10,6 +10,8 @@ import (
 var notStructOrValue = errors.New("not pointer to struct or map[string]interface{}")
 var stringType = reflect.TypeOf("")
 
+// Input and output of injectable functions. Implementation of named and typed
+// function parameters.
 type Value map[string]interface{}
 
 func MakeValue(x interface{}) map[string]interface{} {
@@ -102,10 +104,16 @@ func assign(from, to interface{}, set bool) error {
 	return nil
 }
 
-func AssignableTo(from, to interface{}) error {
-	return assign(from, to, false)
+// Return if src is assignable to dst. Typing rule is as follows: (1) every
+// field of src must have a field of the same name in dst, (2) the type of the
+// src field must be golang assignable to the dst field, and (3) the dst fields
+// must be golang settable (i.e., have an address).
+func AssignableTo(src, dst interface{}) error {
+	return assign(src, dst, false)
 }
 
-func Assign(from, to interface{}) error {
-	return assign(from, to, true)
+// Assign values from Value or struct to Value or struct. If src is not
+// AssignableTo dst, return an error.
+func Assign(src, dst interface{}) error {
+	return assign(src, dst, true)
 }

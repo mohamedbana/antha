@@ -5,12 +5,15 @@ import (
 	"golang.org/x/net/context"
 )
 
+// Basic signature of injectable functions
 type RunFunc func(context.Context, Value) (Value, error)
 
+// An injectable function
 type Runner interface {
-	Run(context.Context, Value) (Value, error)
+	Run(context.Context, Value) (Value, error) // Run the function and return results
 }
 
+// Untyped injectable function
 type FuncRunner struct {
 	RunFunc
 }
@@ -19,6 +22,8 @@ func (a *FuncRunner) Run(ctx context.Context, value Value) (Value, error) {
 	return a.RunFunc(ctx, value)
 }
 
+// Typed injectable function. Check if input parameter is assignable to In and
+// output parameter is assignable to Out.
 type CheckedRunner struct {
 	RunFunc
 	In  interface{}

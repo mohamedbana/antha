@@ -4,29 +4,31 @@ import (
 	"sync"
 )
 
+// Wrapper around instruction inputs and outputs
 type Value interface {
 	Name() Name
 	Get() interface{}
 }
 
+// Placeholder for value to be returned by an instruction
 type Promise struct {
 	lock      sync.Mutex
 	construct func(interface{}) Value
-	value     Value
-	err       error
+	v         Value
+	e         error
 	out       chan interface{}
 }
 
-func (a *Promise) Err() error {
+func (a *Promise) err() error {
 	a.lock.Lock()
 	defer a.lock.Unlock()
-	return a.err
+	return a.e
 }
 
-func (a *Promise) Value() Value {
+func (a *Promise) value() Value {
 	a.lock.Lock()
 	defer a.lock.Unlock()
-	return a.value
+	return a.v
 }
 
 func (a *Promise) set(v interface{}) {
@@ -37,8 +39,8 @@ func (a *Promise) set(v interface{}) {
 	a.lock.Lock()
 	defer a.lock.Unlock()
 
-	if a.value != nil {
-		a.value = a.construct(v)
+	if a.v != nil {
+		a.v = a.construct(v)
 	}
 }
 
@@ -84,6 +86,7 @@ func (a *promiseValue) Name() Name {
 	return a.name
 }
 
+// Scope for a name
 type Scope struct {
 	lock   sync.Mutex
 	parent *Scope
@@ -91,6 +94,7 @@ type Scope struct {
 	count  int
 }
 
+// Create a child name scope
 func (a *Scope) MakeScope() *Scope {
 	a.lock.Lock()
 	defer a.lock.Unlock()
@@ -99,6 +103,7 @@ func (a *Scope) MakeScope() *Scope {
 	return s
 }
 
+// Make a name in this scope
 func (a *Scope) MakeName(desc string) Name {
 	a.lock.Lock()
 	defer a.lock.Unlock()
@@ -107,6 +112,7 @@ func (a *Scope) MakeName(desc string) Name {
 	return n
 }
 
+// A name
 type Name struct {
 	scope *Scope
 	idx   int

@@ -69,6 +69,8 @@ func (a *poolCtx) remove(p *Promise) {
 
 type DoneFunc func() <-chan struct{}
 
+// Create a pool context. It is done when all Go()-created routines return
+// normally or when any return an error.
 func WithPool(parent context.Context) (context.Context, context.CancelFunc, DoneFunc) {
 	tr := getTrace(parent)
 	done := make(chan struct{})
@@ -100,7 +102,7 @@ func WithPool(parent context.Context) (context.Context, context.CancelFunc, Done
 		}
 }
 
-func WithScope(parent context.Context) context.Context {
+func withScope(parent context.Context) context.Context {
 	pscope, _ := parent.Value(theScopeKey).(*Scope)
 	var s *Scope
 	if pscope == nil {
@@ -112,12 +114,23 @@ func WithScope(parent context.Context) context.Context {
 	return context.WithValue(parent, theScopeKey, s)
 }
 
-func WithTrace(parent context.Context) context.Context {
-	return context.WithValue(parent, theInstrKey, &Trace{})
+func withTrace(parent context.Context) context.Context {
+	return context.WithValue(parent, theInstrKey, &trace{})
 }
 
+// Create a new trace and pool context. The general template for clients is:
+//   ctx, cancel, allDone := NewContext(parent)
+//   defer cancel()
+//   ...
+//   Go(ctx, ...)
+//   ...
+//   select {
+//     case <-allDone():
+//       return ctx.Err()
+//     ...
+//   }
 func NewContext(parent context.Context) (context.Context, context.CancelFunc, DoneFunc) {
-	c, cfn, dfn := WithPool(WithTrace(WithScope(parent)))
+	c, cfn, dfn := WithPool(withTrace(withScope(parent)))
 	return c, cfn, dfn
 }
 
@@ -137,14 +150,15 @@ func getScope(ctx context.Context) *Scope {
 	return s
 }
 
-func getTrace(ctx context.Context) *Trace {
-	t := ctx.Value(theInstrKey).(*Trace)
+func getTrace(ctx context.Context) *trace {
+	t := ctx.Value(theInstrKey).(*trace)
 	if t == nil {
 		panic("trace: trace not found")
 	}
 	return t
 }
 
+// Create a value that has no relation to any existing values.
 func MakeValue(ctx context.Context, desc string, v interface{}) Value {
 	return &basicValue{
 		name: getScope(ctx).MakeName(desc),
@@ -152,6 +166,8 @@ func MakeValue(ctx context.Context, desc string, v interface{}) Value {
 	}
 }
 
+// Create a value that is a function of some existing values. This information
+// is used to track value dependencies across instructions.
 func MakeValueFrom(ctx context.Context, desc string, v interface{}, from ...Value) Value {
 	return &fromValue{
 		name: getScope(ctx).MakeName(desc),
@@ -160,6 +176,8 @@ func MakeValueFrom(ctx context.Context, desc string, v interface{}, from ...Valu
 	}
 }
 
+// Issue a command to execute in the trace context; return promise for return
+// value.
 func IssueCommand(ctx context.Context, op string, args ...Value) *Promise {
 	result := getScope(ctx).MakeName("")
 	out := make(chan interface{})
@@ -185,13 +203,13 @@ func IssueCommand(ctx context.Context, op string, args ...Value) *Promise {
 	return p
 }
 
-func tryUnblock(tr *Trace, pctx *poolCtx) {
+func tryUnblock(tr *trace, pctx *poolCtx) {
 	if err := tr.signal(pctx); err != nil {
 		pctx.cancelWithLock(err)
 	}
 }
 
-func decrement(pctx *poolCtx, tr *Trace, delta int, err error) {
+func decrement(pctx *poolCtx, tr *trace, delta int, err error) {
 	pctx.lock.Lock()
 	defer pctx.lock.Unlock()
 	pctx.alive -= delta
@@ -209,8 +227,9 @@ func decrement(pctx *poolCtx, tr *Trace, delta int, err error) {
 	}
 }
 
+// Read a promise value
 func Read(ctx context.Context, p *Promise) (Value, error) {
-	if v := p.Value(); v != nil {
+	if v := p.value(); v != nil {
 		return v, nil
 	}
 
@@ -233,14 +252,15 @@ func Read(ctx context.Context, p *Promise) (Value, error) {
 	}
 
 	if err == nil {
-		err = p.Err()
+		err = p.err()
 	}
 
 	pctx.remove(p)
 
-	return p.Value(), err
+	return p.value(), err
 }
 
+// Read all promises concurrently
 func ReadAll(parent context.Context, ps ...*Promise) ([]Value, error) {
 	var mapLock sync.Mutex
 	vs := make(map[int]Value)
@@ -277,9 +297,10 @@ func ReadAll(parent context.Context, ps ...*Promise) ([]Value, error) {
 	return ret, nil
 }
 
+// Create a new goroutine in the pool context
 func Go(parent context.Context, fn func(ctx context.Context) error) {
 	pctx := getPool(parent)
-	ctx := WithScope(parent)
+	ctx := withScope(parent)
 	tr := getTrace(parent)
 
 	pctx.lock.Lock()
