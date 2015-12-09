@@ -1,22 +1,22 @@
 // antha/anthalib/wtype/serialize_test.go: Part of the Antha language
 // Copyright (C) 2015 The Antha authors. All rights reserved.
-// 
+//
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-// 
+//
 // For more information relating to the software or licensing issues please
-// contact license@antha-lang.org or write to the Antha team c/o 
+// contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
@@ -32,7 +32,7 @@ import (
 )
 
 func TestDeserializeLHSolution(t *testing.T) {
-	str := `{"Iname":"","Imp":"0.000 ","Ibp":"0.000 ","Ishc":{"Mvalue":0,"Munit":null},"Myname":"","Mymass":{"Mvalue":0,"Munit":null},"Myvol":"0.000 ","Mytemp":"0.000 ","ID":"da7c48f7-b21e-4d7b-a55a-0e73e1238b0f","BlockID":{"ThreadID":"default","OutputCount":1},"Inst":"","SName":"Reaction","Order":0,"ContainerType":"pcrplate_with_cooler","Welladdress":"","Plateaddress":"","PlateID":"","Platetype":"pcrplate_with_cooler","Vol":0,"Type":"","Conc":0,"Tvol":0,"Majorlayoutgroup":0,"Minorlayoutgroup":0}`
+	str := `{"ID":"","BlockID":{"ThreadID":"","OutputCount":0},"Inst":"","SName":"","Order":0,"Components":null,"ContainerType":"","Welladdress":"","Plateaddress":"","PlateID":"","Platetype":"","Vol":0,"Type":"","Conc":0,"Tvol":0,"Majorlayoutgroup":0,"Minorlayoutgroup":0}`
 	var sol LHSolution
 	err := json.Unmarshal([]byte(str), &sol)
 	if err != nil {
@@ -41,10 +41,21 @@ func TestDeserializeLHSolution(t *testing.T) {
 }
 
 func TestDeserializeGenericPhysical(t *testing.T) {
-	str := `{"Iname":"","Imp":"0.000 ","Ibp":"0.000 ","Ishc":{"Mvalue":0,"Munit":null},"Myname":"","Mymass":{"Mvalue":0,"Munit":null},"Myvol":"0.000 ","Mytemp":"0.000 "}`
+	str := `{"Iname":"","Imp":"0.000 ","Ibp":"0.000 ","Ishc":{"Mvalue":0,"Munit":null},"Myname":"","Mymass":"0.000 ","Myvol":"0.000 ","Mytemp":"0.000 "}`
 	var gp GenericPhysical
 	err := json.Unmarshal([]byte(str), &gp)
 	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestIdempotentGenericPhysical(t *testing.T) {
+	var gp LHSolution
+	bs, err := json.Marshal(&gp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := json.Unmarshal(bs, &gp); err != nil {
 		t.Fatal(err)
 	}
 }
