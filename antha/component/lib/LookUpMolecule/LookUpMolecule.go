@@ -26,15 +26,13 @@ func (e *LookUpMolecule) requirements() {
 
 }
 func (e *LookUpMolecule) setup(p LookUpMoleculeParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 func (e *LookUpMolecule) steps(p LookUpMoleculeParamBlock, r *LookUpMoleculeResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	// method of making molecule from name
@@ -59,16 +57,14 @@ func (e *LookUpMolecule) steps(p LookUpMoleculeParamBlock, r *LookUpMoleculeResu
 
 }
 func (e *LookUpMolecule) analysis(p LookUpMoleculeParamBlock, r *LookUpMoleculeResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 
 func (e *LookUpMolecule) validation(p LookUpMoleculeParamBlock, r *LookUpMoleculeResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

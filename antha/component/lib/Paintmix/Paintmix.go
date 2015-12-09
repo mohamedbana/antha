@@ -27,8 +27,7 @@ func (e *Paintmix) requirements() {
 
 // Conditions to run on startup
 func (e *Paintmix) setup(p PaintmixParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -37,8 +36,7 @@ func (e *Paintmix) setup(p PaintmixParamBlock) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *Paintmix) steps(p PaintmixParamBlock, r *PaintmixResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	reactions := make([]*wtype.LHSolution, 0)
@@ -61,8 +59,7 @@ func (e *Paintmix) steps(p PaintmixParamBlock, r *PaintmixResultBlock) {
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *Paintmix) analysis(p PaintmixParamBlock, r *PaintmixResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -72,8 +69,7 @@ func (e *Paintmix) analysis(p PaintmixParamBlock, r *PaintmixResultBlock) {
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *Paintmix) validation(p PaintmixParamBlock, r *PaintmixResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

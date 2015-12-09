@@ -50,8 +50,7 @@ func (e *Scarfree_siteremove_orfcheck) requirements() {
 
 // Conditions to run on startup
 func (e *Scarfree_siteremove_orfcheck) setup(p Scarfree_siteremove_orfcheckParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -60,8 +59,7 @@ func (e *Scarfree_siteremove_orfcheck) setup(p Scarfree_siteremove_orfcheckParam
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *Scarfree_siteremove_orfcheck) steps(p Scarfree_siteremove_orfcheckParamBlock, r *Scarfree_siteremove_orfcheckResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	//var msg string
@@ -282,8 +280,7 @@ func (e *Scarfree_siteremove_orfcheck) steps(p Scarfree_siteremove_orfcheckParam
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *Scarfree_siteremove_orfcheck) analysis(p Scarfree_siteremove_orfcheckParamBlock, r *Scarfree_siteremove_orfcheckResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -293,8 +290,7 @@ func (e *Scarfree_siteremove_orfcheck) analysis(p Scarfree_siteremove_orfcheckPa
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *Scarfree_siteremove_orfcheck) validation(p Scarfree_siteremove_orfcheckParamBlock, r *Scarfree_siteremove_orfcheckResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

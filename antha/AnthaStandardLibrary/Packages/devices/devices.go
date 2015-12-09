@@ -20,6 +20,7 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
+// Look up tables stroring device properties. E.g. for use in calculating relative centrifugal force.
 package devices
 
 var (

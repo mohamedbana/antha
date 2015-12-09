@@ -25,8 +25,7 @@ func (e *TypeIISConstructAssemblyMMX) requirements() { _ = wunit.Make_units }
 
 // Conditions to run on startup
 func (e *TypeIISConstructAssemblyMMX) setup(p TypeIISConstructAssemblyMMXParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -35,8 +34,7 @@ func (e *TypeIISConstructAssemblyMMX) setup(p TypeIISConstructAssemblyMMXParamBl
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *TypeIISConstructAssemblyMMX) steps(p TypeIISConstructAssemblyMMXParamBlock, r *TypeIISConstructAssemblyMMXResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	samples := make([]*wtype.LHComponent, 0)
@@ -69,8 +67,7 @@ func (e *TypeIISConstructAssemblyMMX) steps(p TypeIISConstructAssemblyMMXParamBl
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *TypeIISConstructAssemblyMMX) analysis(p TypeIISConstructAssemblyMMXParamBlock, r *TypeIISConstructAssemblyMMXResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -80,8 +77,7 @@ func (e *TypeIISConstructAssemblyMMX) analysis(p TypeIISConstructAssemblyMMXPara
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *TypeIISConstructAssemblyMMX) validation(p TypeIISConstructAssemblyMMXParamBlock, r *TypeIISConstructAssemblyMMXResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

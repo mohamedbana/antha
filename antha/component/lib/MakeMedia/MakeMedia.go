@@ -48,8 +48,7 @@ func (e *MakeMedia) requirements() {
 
 // Conditions to run on startup
 func (e *MakeMedia) setup(p MakeMediaParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -58,8 +57,7 @@ func (e *MakeMedia) setup(p MakeMediaParamBlock) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *MakeMedia) steps(p MakeMediaParamBlock, r *MakeMediaResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	recipestring := make([]string, 0)
@@ -134,8 +132,7 @@ func (e *MakeMedia) steps(p MakeMediaParamBlock, r *MakeMediaResultBlock) {
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *MakeMedia) analysis(p MakeMediaParamBlock, r *MakeMediaResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -145,8 +142,7 @@ func (e *MakeMedia) analysis(p MakeMediaParamBlock, r *MakeMediaResultBlock) {
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *MakeMedia) validation(p MakeMediaParamBlock, r *MakeMediaResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

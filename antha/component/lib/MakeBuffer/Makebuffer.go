@@ -32,8 +32,7 @@ func (e *MakeBuffer) requirements() {
 
 // Conditions to run on startup
 func (e *MakeBuffer) setup(p MakeBufferParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -42,8 +41,7 @@ func (e *MakeBuffer) setup(p MakeBufferParamBlock) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *MakeBuffer) steps(p MakeBufferParamBlock, r *MakeBufferResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	//Bufferstockvolume := wunit.NewVolume((FinalVolume.SIValue() * FinalConcentration.SIValue()/Bufferstockconc.SIValue()),"l")
@@ -63,8 +61,7 @@ func (e *MakeBuffer) steps(p MakeBufferParamBlock, r *MakeBufferResultBlock) {
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *MakeBuffer) analysis(p MakeBufferParamBlock, r *MakeBufferResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -74,8 +71,7 @@ func (e *MakeBuffer) analysis(p MakeBufferParamBlock, r *MakeBufferResultBlock) 
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *MakeBuffer) validation(p MakeBufferParamBlock, r *MakeBufferResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

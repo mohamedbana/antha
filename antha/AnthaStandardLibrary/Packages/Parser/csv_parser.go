@@ -20,8 +20,7 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
-// Needs to generate array of part names per construct for sockets
-// Needs to generate an array of part sequences for validation.
+// Package for reading file formats, in particular focused toward dna sequence parsing
 //
 
 package parser

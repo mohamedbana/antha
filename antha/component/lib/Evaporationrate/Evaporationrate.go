@@ -60,22 +60,19 @@ func (e *Evaporationrate) requirements() {
 
 }
 func (e *Evaporationrate) setup(p EvaporationrateParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 func (e *Evaporationrate) steps(p EvaporationrateParamBlock, r *EvaporationrateResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 func (e *Evaporationrate) analysis(p EvaporationrateParamBlock, r *EvaporationrateResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	tempinKelvin := (p.Temp.SIValue() + 273.15)
@@ -103,8 +100,7 @@ func (e *Evaporationrate) analysis(p EvaporationrateParamBlock, r *Evaporationra
 } // works in either analysis or steps sections
 
 func (e *Evaporationrate) validation(p EvaporationrateParamBlock, r *EvaporationrateResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	if r.Evaporatedliquid.SIValue() > p.Volumeperwell.SIValue() {

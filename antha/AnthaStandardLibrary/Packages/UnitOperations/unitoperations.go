@@ -1,4 +1,4 @@
-// Example syntax
+// Package for working with bioprocessing unitoperations (e.g. Chromatography)
 package UnitOperations
 
 import (

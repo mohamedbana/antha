@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+// package for interacting with the ncbi BLAST service
+
 var (
 	email     = "no-reply@antha-lang.com"
 	tool      = "blast-biogo-antha"

@@ -28,8 +28,7 @@ func (e *Aliquot) requirements() {
 
 // Conditions to run on startup
 func (e *Aliquot) setup(p AliquotParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -38,8 +37,7 @@ func (e *Aliquot) setup(p AliquotParamBlock) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *Aliquot) steps(p AliquotParamBlock, r *AliquotResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	number := p.SolutionVolume.SIValue() / p.VolumePerAliquot.SIValue()
@@ -66,8 +64,7 @@ func (e *Aliquot) steps(p AliquotParamBlock, r *AliquotResultBlock) {
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *Aliquot) analysis(p AliquotParamBlock, r *AliquotResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -77,8 +74,7 @@ func (e *Aliquot) analysis(p AliquotParamBlock, r *AliquotResultBlock) {
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *Aliquot) validation(p AliquotParamBlock, r *AliquotResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

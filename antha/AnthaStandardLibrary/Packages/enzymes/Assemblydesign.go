@@ -20,6 +20,8 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
+// Package for working with enzymes; in particular restriction enzymes are particularly well characterised at present
+
 package enzymes
 
 import (
@@ -53,6 +55,7 @@ func LengthofPrefixOverlap(seq string, subseq string) (number int, end string) {
 	return number
 }
 */
+
 func AddStandardStickyEnds(part wtype.DNASequence, assemblystandard string, level string, numberofparts int, position int) (Partwithends wtype.DNASequence) {
 
 	if part.Seq != "" {

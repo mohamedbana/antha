@@ -60,8 +60,7 @@ func (e *PCR) requirements() {
 
 // Conditions to run on startup
 func (e *PCR) setup(p PCRParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -70,8 +69,7 @@ func (e *PCR) setup(p PCRParamBlock) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *PCR) steps(p PCRParamBlock, r *PCRResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	// Mix components
@@ -134,8 +132,7 @@ func (e *PCR) steps(p PCRParamBlock, r *PCRResultBlock) {
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *PCR) analysis(p PCRParamBlock, r *PCRResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -145,8 +142,7 @@ func (e *PCR) analysis(p PCRParamBlock, r *PCRResultBlock) {
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *PCR) validation(p PCRParamBlock, r *PCRResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

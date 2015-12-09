@@ -83,10 +83,7 @@ Steps {
 			
 			partDNA,_ = parser.GenbankFeaturetoDNASequence(file,feature)
 		}else if strings.Contains(part, ".gb") {
-			
-			/*annotated,_ := parser.GenbanktoAnnotatedSeq(part)
-			partDNA = annotated.DNASequence */
-			
+	
 			partDNA, _ = parser.GenbanktoDNASequence(part)
 		}else {
 		

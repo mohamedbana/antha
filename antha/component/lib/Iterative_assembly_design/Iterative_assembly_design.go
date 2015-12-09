@@ -44,8 +44,7 @@ func (e *Iterative_assembly_design) requirements() {
 
 // Conditions to run on startup
 func (e *Iterative_assembly_design) setup(p Iterative_assembly_designParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -54,8 +53,7 @@ func (e *Iterative_assembly_design) setup(p Iterative_assembly_designParamBlock)
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *Iterative_assembly_design) steps(p Iterative_assembly_designParamBlock, r *Iterative_assembly_designResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	//var msg string
@@ -228,8 +226,7 @@ func (e *Iterative_assembly_design) steps(p Iterative_assembly_designParamBlock,
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *Iterative_assembly_design) analysis(p Iterative_assembly_designParamBlock, r *Iterative_assembly_designResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -239,8 +236,7 @@ func (e *Iterative_assembly_design) analysis(p Iterative_assembly_designParamBlo
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *Iterative_assembly_design) validation(p Iterative_assembly_designParamBlock, r *Iterative_assembly_designResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

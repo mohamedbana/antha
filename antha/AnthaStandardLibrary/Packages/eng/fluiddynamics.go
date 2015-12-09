@@ -20,11 +20,12 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
+// Package containing formulae for the estimation of mixing properties
 package eng
 
 import "math"
 
-//Islam et al:
+//Equations from Islam et al:
 
 func CentripetalForce(mass float64, angularfrequency float64, radius float64) (force float64) {
 	force = mass * math.Pow(angularfrequency, 2) * radius
