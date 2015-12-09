@@ -10,7 +10,6 @@ package Scarfree_siteremove_orfcheck
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
@@ -27,6 +26,8 @@ import (
 	"strings"
 	"sync"
 )
+
+//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 
 // Input parameters for this protocol (data)
 
@@ -269,7 +270,7 @@ func (e *Scarfree_siteremove_orfcheck) steps(p Scarfree_siteremove_orfcheckParam
 			partstoorder,
 		)
 		// export data to file
-		anthapath.ExporttoFile("Report"+"_"+p.Constructname+".txt", []byte(r.Status))
+		//anthapath.ExporttoFile("Report"+"_"+Constructname+".txt",[]byte(Status))
 		//anthapath.ExportTextFile("Report"+"_"+Constructname+".txt",Status)
 
 	}
