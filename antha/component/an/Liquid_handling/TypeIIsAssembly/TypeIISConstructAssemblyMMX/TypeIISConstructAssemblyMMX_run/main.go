@@ -6,22 +6,21 @@ import "os"
 import "io"
 import "encoding/json"
 import "log"
-import typeIISConstructAssemblyMMX "github.com/antha-lang/antha/antha/component/an/TypeIISConstructAssemblyMMX"
+import typeIISConstructAssemblyMMX "github.com/antha-lang/antha/antha/component/lib/TypeIISConstructAssemblyMMX"
 
 var (
 	exitCode = 0
 )
 
-
 type App struct {
-    flow.Graph
+	flow.Graph
 }
 
 func NewApp() *App {
-    n := new(App)
-    n.InitGraphState()
+	n := new(App)
+	n.InitGraphState()
 
-    n.Add(typeIISConstructAssemblyMMX.NewTypeIISConstructAssemblyMMX(), "TypeIISConstructAssemblyMMX")
+	n.Add(typeIISConstructAssemblyMMX.NewTypeIISConstructAssemblyMMX(), "TypeIISConstructAssemblyMMX")
 
 	n.MapInPort("InPlate", "TypeIISConstructAssemblyMMX", "InPlate")
 	n.MapInPort("InactivationTemp", "TypeIISConstructAssemblyMMX", "InactivationTemp")
@@ -42,52 +41,49 @@ func NewApp() *App {
 
 	n.MapOutPort("Reaction", "TypeIISConstructAssemblyMMX", "Reaction")
 
-
-   return n
+	return n
 }
 
 func referenceMain() {
-    net := NewApp()
+	net := NewApp()
 
 	InPlateChan := make(chan execute.ThreadParam)
-    net.SetInPort("InPlate", InPlateChan)
+	net.SetInPort("InPlate", InPlateChan)
 	InactivationTempChan := make(chan execute.ThreadParam)
-    net.SetInPort("InactivationTemp", InactivationTempChan)
+	net.SetInPort("InactivationTemp", InactivationTempChan)
 	InactivationTimeChan := make(chan execute.ThreadParam)
-    net.SetInPort("InactivationTime", InactivationTimeChan)
+	net.SetInPort("InactivationTime", InactivationTimeChan)
 	MMXVolChan := make(chan execute.ThreadParam)
-    net.SetInPort("MMXVol", MMXVolChan)
+	net.SetInPort("MMXVol", MMXVolChan)
 	MasterMixChan := make(chan execute.ThreadParam)
-    net.SetInPort("MasterMix", MasterMixChan)
+	net.SetInPort("MasterMix", MasterMixChan)
 	OutPlateChan := make(chan execute.ThreadParam)
-    net.SetInPort("OutPlate", OutPlateChan)
+	net.SetInPort("OutPlate", OutPlateChan)
 	OutputReactionNameChan := make(chan execute.ThreadParam)
-    net.SetInPort("OutputReactionName", OutputReactionNameChan)
+	net.SetInPort("OutputReactionName", OutputReactionNameChan)
 	PartNamesChan := make(chan execute.ThreadParam)
-    net.SetInPort("PartNames", PartNamesChan)
+	net.SetInPort("PartNames", PartNamesChan)
 	PartVolsChan := make(chan execute.ThreadParam)
-    net.SetInPort("PartVols", PartVolsChan)
+	net.SetInPort("PartVols", PartVolsChan)
 	PartsChan := make(chan execute.ThreadParam)
-    net.SetInPort("Parts", PartsChan)
+	net.SetInPort("Parts", PartsChan)
 	ReactionTempChan := make(chan execute.ThreadParam)
-    net.SetInPort("ReactionTemp", ReactionTempChan)
+	net.SetInPort("ReactionTemp", ReactionTempChan)
 	ReactionTimeChan := make(chan execute.ThreadParam)
-    net.SetInPort("ReactionTime", ReactionTimeChan)
+	net.SetInPort("ReactionTime", ReactionTimeChan)
 	ReactionVolumeChan := make(chan execute.ThreadParam)
-    net.SetInPort("ReactionVolume", ReactionVolumeChan)
+	net.SetInPort("ReactionVolume", ReactionVolumeChan)
 	VectorChan := make(chan execute.ThreadParam)
-    net.SetInPort("Vector", VectorChan)
+	net.SetInPort("Vector", VectorChan)
 	VectorVolChan := make(chan execute.ThreadParam)
-    net.SetInPort("VectorVol", VectorVolChan)
+	net.SetInPort("VectorVol", VectorVolChan)
 	WaterChan := make(chan execute.ThreadParam)
-    net.SetInPort("Water", WaterChan)
-
+	net.SetInPort("Water", WaterChan)
 
 	ReactionChan := make(chan execute.ThreadParam)
-    net.SetOutPort("Reaction", ReactionChan)
+	net.SetOutPort("Reaction", ReactionChan)
 
-
-    flow.RunNet(net)
+	flow.RunNet(net)
 
 	dec := json.NewDecoder(os.Stdin)
 	enc := json.NewEncoder(os.Stdout)
@@ -110,7 +106,6 @@ func referenceMain() {
 		defer close(VectorChan)
 		defer close(VectorVolChan)
 		defer close(WaterChan)
-
 
 		for {
 			var p typeIISConstructAssemblyMMX.TypeIISConstructAssemblyMMXJSONBlock
@@ -204,7 +199,6 @@ func referenceMain() {
 			}
 		}
 	}()
-
 
 	<-net.Wait()
 }
