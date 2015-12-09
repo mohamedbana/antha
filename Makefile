@@ -3,6 +3,6 @@ all:
 	gofmt -w -s antha/component/lib
 
 test:
-	go test -v `go list ./... | grep -v internal`
+	go test -v `go list ./... | grep -v internal | grep -v bvendor`
 
 .PHONY: all
