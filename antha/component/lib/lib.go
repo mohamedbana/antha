@@ -20,11 +20,13 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/Paintmix"
 	"github.com/antha-lang/antha/antha/component/lib/Phytip_miniprep"
 	"github.com/antha-lang/antha/antha/component/lib/Printname"
+	"github.com/antha-lang/antha/antha/component/lib/ProtocolName_from_an_file"
 	"github.com/antha-lang/antha/antha/component/lib/RemoveRestrictionSites"
 	"github.com/antha-lang/antha/antha/component/lib/Scarfree_design"
 	"github.com/antha-lang/antha/antha/component/lib/Scarfree_siteremove_orfcheck"
 	"github.com/antha-lang/antha/antha/component/lib/SumVolume"
 	"github.com/antha-lang/antha/antha/component/lib/Thawtime"
+	"github.com/antha-lang/antha/antha/component/lib/Transfer"
 	"github.com/antha-lang/antha/antha/component/lib/Transformation"
 	"github.com/antha-lang/antha/antha/component/lib/TypeIISAssembly_design"
 	"github.com/antha-lang/antha/antha/component/lib/TypeIISConstructAssembly"
@@ -300,6 +302,16 @@ func GetComponents() []ComponentDesc {
 
 	portMap["Printname"]["Fullname"] = false
 
+	portMap["ProtocolName_from_an_file"] = make(map[string]bool)
+	portMap["ProtocolName_from_an_file"]["InputVariable"] = true
+	portMap["ProtocolName_from_an_file"]["OutPlate"] = true
+	portMap["ProtocolName_from_an_file"]["ParameterVariableAsValuewithunit"] = true
+	portMap["ProtocolName_from_an_file"]["ParameterVariableAsint"] = true
+	portMap["ProtocolName_from_an_file"]["ParameterVariablestring"] = true
+
+	portMap["ProtocolName_from_an_file"]["OutputData"] = false
+	portMap["ProtocolName_from_an_file"]["PhysicalOutput"] = false
+
 	portMap["RemoveRestrictionSites"] = make(map[string]bool)
 	portMap["RemoveRestrictionSites"]["EnzymeforRestrictionmapping"] = true
 	portMap["RemoveRestrictionSites"]["PreserveTranslatedseq"] = true
@@ -362,6 +374,15 @@ func GetComponents() []ComponentDesc {
 	portMap["Thawtime"]["Estimatedthawtime"] = false
 	portMap["Thawtime"]["Status"] = false
 	portMap["Thawtime"]["Thawtimeused"] = false
+
+	portMap["Transfer"] = make(map[string]bool)
+	portMap["Transfer"]["LiquidVolume"] = true
+	portMap["Transfer"]["Liquidname"] = true
+	portMap["Transfer"]["OutPlate"] = true
+	portMap["Transfer"]["Startingsolution"] = true
+
+	portMap["Transfer"]["FinalSolution"] = false
+	portMap["Transfer"]["Status"] = false
 
 	portMap["Transformation"] = make(map[string]bool)
 	portMap["Transformation"]["AgarPlate"] = true
@@ -527,11 +548,13 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "Paintmix", Constructor: Paintmix.NewPaintmix})
 	c = append(c, ComponentDesc{Name: "Phytip_miniprep", Constructor: Phytip_miniprep.NewPhytip_miniprep})
 	c = append(c, ComponentDesc{Name: "Printname", Constructor: Printname.NewPrintname})
+	c = append(c, ComponentDesc{Name: "ProtocolName_from_an_file", Constructor: ProtocolName_from_an_file.NewProtocolName_from_an_file})
 	c = append(c, ComponentDesc{Name: "RemoveRestrictionSites", Constructor: RemoveRestrictionSites.NewRemoveRestrictionSites})
 	c = append(c, ComponentDesc{Name: "Scarfree_design", Constructor: Scarfree_design.NewScarfree_design})
 	c = append(c, ComponentDesc{Name: "Scarfree_siteremove_orfcheck", Constructor: Scarfree_siteremove_orfcheck.NewScarfree_siteremove_orfcheck})
 	c = append(c, ComponentDesc{Name: "SumVolume", Constructor: SumVolume.NewSumVolume})
 	c = append(c, ComponentDesc{Name: "Thawtime", Constructor: Thawtime.NewThawtime})
+	c = append(c, ComponentDesc{Name: "Transfer", Constructor: Transfer.NewTransfer})
 	c = append(c, ComponentDesc{Name: "Transformation", Constructor: Transformation.NewTransformation})
 	c = append(c, ComponentDesc{Name: "TypeIISAssembly_design", Constructor: TypeIISAssembly_design.NewTypeIISAssembly_design})
 	c = append(c, ComponentDesc{Name: "TypeIISConstructAssembly", Constructor: TypeIISConstructAssembly.NewTypeIISConstructAssembly})

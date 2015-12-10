@@ -1,6 +1,6 @@
 {
   "Parameters": [{
-    "Aliquot": {
+    "AliquotParams": {
       "Solution": "component:PrimerFw",
 	  "InPlate": "plate:pcrplate_with_cooler",
       "Outplate": "plate:greiner384",
@@ -11,7 +11,7 @@
     }
   },
 {
-    "Aliquot": {
+    "AliquotParams": {
       "Solution": "component:PrimerRev",
 		"InPlate": "plate:pcrplate_with_cooler",
       "Outplate": "plate:greiner384",

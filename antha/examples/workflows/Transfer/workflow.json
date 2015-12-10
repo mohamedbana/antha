@@ -3,8 +3,8 @@
         "name": "main"
     },
     "processes": {
-        "AliquotParams": {
-            "component": "Aliquot",
+        "newparams": {
+            "component": "Transfer",
             "metadata": {
                 "label": "CS"
             }

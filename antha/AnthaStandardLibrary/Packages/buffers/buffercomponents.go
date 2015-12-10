@@ -1,81 +1,123 @@
 // buffercomponents.go
 package buffers
 
-import ()
+import (
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Pubchem"
+	//"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+)
+
+
+
 
 /*
-type molecule struct {
-formula
-mw
-id
+From pubchem...
+type Molecule struct {
+	Moleculename     string
+	MolecularFormula string  `json:"MolecularFormula"`
+	MolecularWeight  float64 `json:"MolecularWeight"`
+	CID              int     `json:"CID"`
 }
 
+
+type Substance struct {
+	Substancename string
+	SID           int `json:"SID"`
+}
+
+*/
 // approximate formula for substance?
 // allow empty field?
 // have distinct struct?
 
-type substance struct {
-id
-}
 
-type organism struct {
-*sequence
-formula
 
-}
-
+/*
 type Proteincomponent struct {
-genericphysical
-molecule
-conc concentration
-seq ProteinSequence
+wtype.LHComponent
+pubchem.Molecule
+Conc wunit.Concentration
+Seq wtype.ProteinSequence
 }
 
 type DNAcomponent struct {
-genericphysical
-molecule
-conc concentration
-seq DNASequence
+wtype.LHComponent
+pubchem.Molecule
+conc wunit.Concentration
+Seq wtype.DNASequence
 }
 
 type Substancecomponent struct {
-genericphysical
-conc concentration
+wtype.LHComponent
+pubchem.Substance 
 }
 
-type moleculecomponent struct {
-genericphysical
-molecule
-conc concentration
+type Moleculecomponent struct {
+wtype.LHComponent
+Molecule pubchem.Molecule
+Conc wunit.Concentration
 }
 
-type organismcomponent struct {
-genericphysical
+type Organismcomponent struct {
+wtype.LHComponent
+Organism wtype.Organism
 
 }
 
 
-type component struct {
-genericphysical
-conc concentration
-*molecule
-*seq
+type Component struct {
+wtype.LHComponent
+Conc wunit.Concentration
+Molecule *pubchem.Molecule
+Sequence *Seq
+}
+*/
+
+type Buffercomponent struct {
+	wtype.LHComponent
+	Type int
+	Typestruct interface {}
 }
 
-type buffercomponent
-
-type buffer struct {
-[]components
+type Buffer struct {
+Components[]Buffercomponent
+BufferPH *PH
 }
 
 const (
-Molecule // e.g. nh4
+Molecule  iota// e.g. nh4
 Substance // e.g. yeast extract
-Protein e.g.
-DNA e.g.
+Protein //e.g.
+DNA //e.g.
+Organism
 )
 
-type Component struct {
-LHComponent
+
+func (b *Buffercomponent) MolecularWeight() (mw float64,err error) {
+	
+	b.
+	
+	if b.Type == 0 {
+		mw = b.Typestruct.MolecularWeight
+		return mw, nil
+	}else if b.Type == 1 {
+		mw = b.Typestruct.MolecularWeight()
+		err = fmt.Errorf("Only approximate molecular weight possible with Substance component")
+		return mw,err
+	}else if b.Type == 2 {
+		mw = b.Typestruct.MolecularWeight()
+		err = fmt.Errorf("Only approximate molecular weight possible with Protein component")
+		return mw,err
+	}else if b.Type == 3 {
+		mw = b.Typestruct.MolecularWeight()
+		err = fmt.Errorf("Only approximate molecular weight possible with DNA component")
+		return mw,err
+	}else if b.Type == 4 {
+		mw = b.Typestruct.MolecularWeight()
+		err = fmt.Errorf("Only approximate molecular weight possible with organism component")
+		return mw,err
+	}else {
+		err = fmt.Errorf("unkwown component type")
+		return err
+	}
 }
-*/
