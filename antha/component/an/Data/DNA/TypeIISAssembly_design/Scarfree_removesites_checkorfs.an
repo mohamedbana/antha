@@ -19,8 +19,6 @@ import (
 	"strings"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 //"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
-
-
 )
 
 // Input parameters for this protocol (data)
