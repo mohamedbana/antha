@@ -29,6 +29,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/eng"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Labware"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Liquidclasses"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Setpoints"
 	//"github.com/montanaflynn/stats"
 
@@ -38,7 +39,7 @@ Parameters (
 	Liquid string
 	Shakertype string
 	
-	Rpm float64
+	Rpm wunit.Rate //float64
 	Fillvolume Volume
 	
 	TargetRE float64
@@ -49,9 +50,9 @@ Parameters (
 Data (
 	Status string
 	Flowstate string
-	Necessaryshakerspeed float64 
+	Necessaryshakerspeed wunit.Rate //float64 
 	CalculatedKla float64 
-	Ncrit float64
+	Ncrit wunit.Rate//float64
 	
 )
 Inputs (
@@ -70,7 +71,16 @@ Steps {
 	ro := liquidclasses.Liquidclass[Liquid]["ro"] //density, kg 􏰀/ m􏰁3 999.7 // environment dependent
 	mu := liquidclasses.Liquidclass[Liquid]["mu"] //0.001           environment dependent                        //liquidclasses.Liquidclass[liquid]["mu"] viscosity, kg 􏰀/ m􏰁 /􏰀 s
 
-	n := Rpm / 60 //shaking frequency, s􏰁1
+	var n float64 //shaking frequency per second
+	
+	if Rpm.Unit().RawSymbol() == `/s`{
+		n = Rpm.RawValue()
+	}else if Rpm.Unit().RawSymbol() == `/min`{
+		n = Rpm.RawValue()/60
+	}
+	
+	
+	//n = Rpm / 60 //shaking frequency, s􏰁1
 	//const exp = Eulers number, 2.718281828
 
 	//Fr = Froude number = dt(2 * math.Pi * n)^2 /(2 * g), (dimensionless)
@@ -111,7 +121,7 @@ Steps {
 	
 	CalculatedKla = eng.KLa_squaremicrowell(D, dv, ai, Re, a, Fr, b)
 	
-	Status = fmt.Sprintln("TargetRE = ", TargetRE,"Calculated Reynolds number = ", Re,"shakerspeedrequired for targetRE= ", Necessaryshakerspeed*60,"Froude number = ", Fr,"kla =", CalculatedKla, "/h", "Ncrit	=", Ncrit,"/S")
+	Status = fmt.Sprintln("TargetRE = ", TargetRE,"Calculated Reynolds number = ", Re,"shakerspeedrequired for targetRE= ", Necessaryshakerspeed.ToString() /* *60 */,"Froude number = ", Fr,"kla =", CalculatedKla, "/h", "Ncrit	=", Ncrit.ToString()/*,"/S"*/)
 	//CalculatedKla = setpoints.CalculateKlasquaremicrowell(Platetype, Liquid, Rpm, Shakertype, TargetRE, D)
 	
 	/*	
