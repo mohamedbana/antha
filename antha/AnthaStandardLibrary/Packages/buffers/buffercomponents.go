@@ -2,13 +2,10 @@
 package buffers
 
 import (
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Pubchem"
-	//"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
+//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Pubchem"
+//"github.com/antha-lang/antha/antha/anthalib/wunit"
+//"github.com/antha-lang/antha/antha/anthalib/wtype"
 )
-
-
-
 
 /*
 From pubchem...
@@ -30,8 +27,6 @@ type Substance struct {
 // allow empty field?
 // have distinct struct?
 
-
-
 /*
 type Proteincomponent struct {
 wtype.LHComponent
@@ -49,7 +44,7 @@ Seq wtype.DNASequence
 
 type Substancecomponent struct {
 wtype.LHComponent
-pubchem.Substance 
+pubchem.Substance
 }
 
 type Moleculecomponent struct {
@@ -72,52 +67,53 @@ Molecule *pubchem.Molecule
 Sequence *Seq
 }
 */
-
+/*
 type Buffercomponent struct {
 	wtype.LHComponent
-	Type int
-	Typestruct interface {}
+	Type       int
+	Typestruct interface{}
 }
 
 type Buffer struct {
-Components[]Buffercomponent
-BufferPH *PH
+	Components []Buffercomponent
+	BufferPH   *PH
 }
 
 const (
-Molecule  iota// e.g. nh4
-Substance // e.g. yeast extract
-Protein //e.g.
-DNA //e.g.
-Organism
+	Molecule  = iota // e.g. nh4
+	Substance        // e.g. yeast extract
+	Protein          //e.g.
+	DNA              //e.g.
+	Organism
 )
+*/
+/*
+func (b *Buffercomponent) MolecularWeight() (mw float64, err error) {
 
+	//b.
 
-func (b *Buffercomponent) MolecularWeight() (mw float64,err error) {
-	
-	b.
-	
 	if b.Type == 0 {
 		mw = b.Typestruct.MolecularWeight
 		return mw, nil
-	}else if b.Type == 1 {
+	} else if b.Type == 1 {
 		mw = b.Typestruct.MolecularWeight()
 		err = fmt.Errorf("Only approximate molecular weight possible with Substance component")
-		return mw,err
-	}else if b.Type == 2 {
+		return mw, err
+	} else if b.Type == 2 {
 		mw = b.Typestruct.MolecularWeight()
 		err = fmt.Errorf("Only approximate molecular weight possible with Protein component")
-		return mw,err
-	}else if b.Type == 3 {
+		return mw, err
+	} else if b.Type == 3 {
 		mw = b.Typestruct.MolecularWeight()
 		err = fmt.Errorf("Only approximate molecular weight possible with DNA component")
-		return mw,err
-	}else if b.Type == 4 {
+		return mw, err
+	} else if b.Type == 4 {
 		mw = b.Typestruct.MolecularWeight()
 		err = fmt.Errorf("Only approximate molecular weight possible with organism component")
-		return mw,err
-	}else {
+		return mw, err
+	} else {
 		err = fmt.Errorf("unkwown component type")
 		return err
 	}
 }
+*/
