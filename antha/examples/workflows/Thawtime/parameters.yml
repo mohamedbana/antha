@@ -3,7 +3,7 @@
     "Thawtime": {
       "Platetype": "PCR_plate",
       "Liquid": "water",
-      "Airvelocity": 20,
+      "Airvelocity": 20m/s,
       "SurfaceTemp": "25˚C",
       "BulkTemp": "0˚C",
       "Fillvolume": "200ul",

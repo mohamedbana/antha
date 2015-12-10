@@ -249,6 +249,20 @@ func (m *Force) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+func (m *Velocity) MarshalJSON() ([]byte, error) {
+	return marshal(m)
+
+}
+
+func (m *Velocity) UnmarshalJSON(b []byte) error {
+	if value, unit, err := unmarshal(b); err != nil {
+		return err
+	} else if unit != "" {
+		*m = NewVelocity(value, unit)
+	}
+	return nil
+}
+
 /*
 func (m *Rate) MarshalJSON() ([]byte, error) {
 	return marshal(m)

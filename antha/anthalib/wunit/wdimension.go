@@ -424,6 +424,23 @@ func NewFlowRate(v float64, unit string) FlowRate {
 	return fr
 }
 
+type Velocity struct {
+	ConcreteMeasurement
+}
+
+// new velocity in m/s
+
+func NewVelocity(v float64, unit string) Velocity {
+
+	if unit != "m/s" {
+		logger.Fatal("Can't make flow rate which aren't in m/s")
+		panic("Can't make flow rate which aren't in m/s")
+	}
+	fr := Velocity{NewMeasurement(v, "", unit)}
+
+	return fr
+}
+
 /*
 type Rate struct {
 	ConcreteMeasurement
