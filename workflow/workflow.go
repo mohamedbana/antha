@@ -15,10 +15,13 @@ import (
 
 // XXX: deterministic node name/order
 
-var cyclicWorkflow = errors.New("cyclic workflow")
-var unknownPort = errors.New("unknown port")
-var alreadyAssigned = errors.New("already assigned")
-var alreadyRemoved = errors.New("already removed")
+var (
+	cyclicWorkflow  = errors.New("cyclic workflow")
+	unknownPort     = errors.New("unknown port")
+	unknownProcess  = errors.New("unknown process")
+	alreadyAssigned = errors.New("already assigned")
+	alreadyRemoved  = errors.New("already removed")
+)
 
 // Unique identifier for an input or output parameter
 type Port struct {
@@ -85,6 +88,14 @@ type Workflow struct {
 	roots   []*node
 	nodes   map[string]*node
 	Outputs map[Port]interface{} // Values generated that were not connected to another process
+}
+
+func (a *Workflow) FuncName(process string) (string, error) {
+	if n, ok := a.nodes[process]; !ok {
+		return "", unknownProcess
+	} else {
+		return n.FuncName, nil
+	}
 }
 
 // Set initial parameter values before executing
