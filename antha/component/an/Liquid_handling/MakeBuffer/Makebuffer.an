@@ -23,7 +23,6 @@ Parameters (
 Inputs (
 	Bufferstock		*wtype.LHComponent
 	Diluent			*wtype.LHComponent
-
 	OutPlate 		*wtype.LHPlate
 	InPlate 		*wtype.LHPlate
 )
