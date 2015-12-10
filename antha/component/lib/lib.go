@@ -10,6 +10,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/FindPartsthat"
 	"github.com/antha-lang/antha/antha/component/lib/Iterative_assembly_design"
 	"github.com/antha-lang/antha/antha/component/lib/Kla"
+	"github.com/antha-lang/antha/antha/component/lib/LoadGel"
 	"github.com/antha-lang/antha/antha/component/lib/LookUpMolecule"
 	"github.com/antha-lang/antha/antha/component/lib/MakeBuffer"
 	"github.com/antha-lang/antha/antha/component/lib/MakeMedia"
@@ -153,6 +154,19 @@ func GetComponents() []ComponentDesc {
 	portMap["Kla"]["Ncrit"] = false
 	portMap["Kla"]["Necessaryshakerspeed"] = false
 	portMap["Kla"]["Status"] = false
+
+	portMap["LoadGel"] = make(map[string]bool)
+	portMap["LoadGel"]["GelPlate"] = true
+	portMap["LoadGel"]["InPlate"] = true
+	portMap["LoadGel"]["LoadVolume"] = true
+	portMap["LoadGel"]["Protein"] = true
+	portMap["LoadGel"]["SampleName"] = true
+	portMap["LoadGel"]["Water"] = true
+	portMap["LoadGel"]["WaterName"] = true
+	portMap["LoadGel"]["WaterVolume"] = true
+
+	portMap["LoadGel"]["RunSolution"] = false
+	portMap["LoadGel"]["Status"] = false
 
 	portMap["LookUpMolecule"] = make(map[string]bool)
 	portMap["LookUpMolecule"]["Compound"] = true
@@ -535,6 +549,7 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "FindPartsthat", Constructor: FindPartsthat.NewFindPartsthat})
 	c = append(c, ComponentDesc{Name: "Iterative_assembly_design", Constructor: Iterative_assembly_design.NewIterative_assembly_design})
 	c = append(c, ComponentDesc{Name: "Kla", Constructor: Kla.NewKla})
+	c = append(c, ComponentDesc{Name: "LoadGel", Constructor: LoadGel.NewLoadGel})
 	c = append(c, ComponentDesc{Name: "LookUpMolecule", Constructor: LookUpMolecule.NewLookUpMolecule})
 	c = append(c, ComponentDesc{Name: "MakeBuffer", Constructor: MakeBuffer.NewMakeBuffer})
 	c = append(c, ComponentDesc{Name: "MakeMedia", Constructor: MakeMedia.NewMakeMedia})

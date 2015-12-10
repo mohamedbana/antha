@@ -29,6 +29,7 @@ import (
 	"github.com/antha-lang/antha/internal/github.com/ghodss/yaml"
 	"io/ioutil"
 	"os"
+	
 )
 func MakePolicies() map[string]LHPolicy {
         pols := make(map[string]LHPolicy)
@@ -157,6 +158,17 @@ func MakeProteinPolicy() LHPolicy {
         proteinpolicy["TIP_REUSE_LIMIT"] = 0
         proteinpolicy["NO_AIR_DISPENSE"] = true
         return proteinpolicy
+}
+func MakeLoadPolicy() LHPolicy {
+		loadpolicy := make(LHPolicy, )
+		loadpolicy["ASPSPEED"] = 2.0
+		loadpolicy["DSPSPEED"] = 0.5
+		loadpolicy["CAN_MULTI"] = false
+		loadpolicy["CAN_MSA"] = false
+		loadpolicy["CAN_SDD"] = false
+		loadpolicy["TIP_REUSE_LIMIT"] = 0
+		loadpolicy["NO_AIR_DISPENSE"] = true
+		return loadpolicy
 }
 
 func MakeDefaultPolicy() LHPolicy {

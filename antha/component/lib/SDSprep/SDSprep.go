@@ -62,7 +62,7 @@ func (e *SDSprep) steps(p SDSprepParamBlock, r *SDSprepResultBlock) {
 	//	LoadSample = MixInto(OutPlate,
 	//	mixer.Sample(Protein, SampleVolume),
 	//	mixer.Sample(Buffer, BufferVolume))
-	//Try something else. Outputs are an array taking in a single (not array) of protein and buffer.
+	//Try something else. Outputs are an array taking in a single (not array) of protein and buffer. Do this 12 times.
 
 	samples := make([]*wtype.LHComponent, 0)
 	bufferSample := mixer.Sample(p.Buffer, p.BufferVolume)
