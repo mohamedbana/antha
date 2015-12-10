@@ -26,27 +26,34 @@ package eng
 
 import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Liquidclasses"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"math"
 )
 
-func Θ(liquid string, airvelocity float64) float64 {
+func Θ(liquid string, airvelocity wunit.Velocity) float64 {
 
-	return (liquidclasses.Liquidclass[liquid]["c"]) + ((liquidclasses.Liquidclass[liquid]["d"]) * airvelocity)
+	return (liquidclasses.Liquidclass[liquid]["c"]) + ((liquidclasses.Liquidclass[liquid]["d"]) * airvelocity.SIValue())
 }
 
 //Some functions to calculate evaporation
-func Pws(Temp float64) float64 {
-	return (math.Pow(math.E, (77.3450+(0.0057*Temp)-7235/Temp)) / math.Pow(Temp, 8.2))
+func Pws(Temp wunit.Temperature) float64 {
+	var tempinKelvin float64
+	if Temp.Unit().RawSymbol() == "K" {
+		tempinKelvin = Temp.RawValue()
+	} else if Temp.Unit().RawSymbol() == "C" || Temp.Unit().RawSymbol() == "˚C" {
+		tempinKelvin = (Temp.SIValue() + 273.15)
+	}
+	return (math.Pow(math.E, (77.3450+(0.0057*tempinKelvin)-7235/tempinKelvin)) / math.Pow(tempinKelvin, 8.2))
 }
 
 func Pw(Relativehumidity float64, PWS float64) float64 {
 	return (Relativehumidity * PWS)
 }
 
-func Xs(pws float64, Pa float64) float64 {
-	return (0.62198 * pws / (Pa - pws))
+func Xs(pws float64, Pa wunit.Pressure) float64 {
+	return (0.62198 * pws / (Pa.SIValue() - pws))
 }
 
-func X(pw float64, Pa float64) float64 {
-	return (0.62198 * pw / (Pa - pw))
+func X(pw float64, Pa wunit.Pressure) float64 {
+	return (0.62198 * pw / (Pa.SIValue() - pw))
 }

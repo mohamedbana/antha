@@ -6,6 +6,7 @@ import (
 	"fmt" // we need this go library to print
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/eng" // all of our functions used here are in the Thaw.go file in the eng package which this points to
 	//"github.com/montanaflynn/stats" // a rounding function is used from this third party library
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 )
 Parameters (
 	
@@ -18,7 +19,7 @@ Parameters (
 	Fillvolume Volume
 	
 	// These should be captured via sensors just prior to execution
-	Airvelocity float64
+	Airvelocity wunit.Velocity
 	SurfaceTemp Temperature
 	
 	// This will be monitored via the thermometer in the freezer in which the sample was stored
@@ -33,7 +34,6 @@ Data (
 	Status string
 	Estimatedthawtime Time
 	Thawtimeused Time
-	
 )
 Inputs (
 )
@@ -63,7 +63,7 @@ Steps {
 	only validated between air velocities 2 - 20 m/s. It could also be adjusted to calculate heat transfer if the sample 
 	is agitated on a shaker to speed up thawing. */
 	
-	hc_air := eng.Hc_air(Airvelocity)
+	hc_air := eng.Hc_air(Airvelocity.SIValue())
 	
 	/*  Step 4. The rate of heat transfer by convection is then calculated using this value combined with the temperature differential 
 	(measured by the temp sensor) and surface area dictated by the plate type (another look up called from the eng library!)*/

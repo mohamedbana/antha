@@ -23,12 +23,16 @@
 // Package containing formulae for the estimation of mixing properties
 package eng
 
-import "math"
+import (
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"math"
+)
 
 //Equations from Islam et al:
 
-func CentripetalForce(mass float64, angularfrequency float64, radius float64) (force float64) {
-	force = mass * math.Pow(angularfrequency, 2) * radius
+func CentripetalForce(mass wunit.Mass, angularfrequency float64, radius wunit.Length) (force wunit.Force) {
+	forcefloat := mass.SIValue() * math.Pow(angularfrequency, 2) * radius.SIValue()
+	force = wunit.NewForce(forcefloat, "N")
 	return force
 }
 
@@ -41,11 +45,15 @@ func KLa_squaremicrowell(D float64, dv float64, ai float64, RE float64, a float6
 } // a little unclear whether exp is e to (afr^b) from paper but assumed this is the case
 
 func RE(ro float64, n float64, mu float64, dv float64) float64 { // Reynolds number
+
 	return (ro * n * dv * 2 / mu)
 }
 
-func Shakerspeed(TargetRE float64, ro float64, mu float64, dv float64) float64 { // calulate shaker speed from target Reynolds number
-	return (TargetRE * mu / (ro * dv * 2))
+func Shakerspeed(TargetRE float64, ro float64, mu float64, dv float64) (rate wunit.Rate) /*float64*/ { // calulate shaker speed from target Reynolds number
+	rps := (TargetRE * mu / (ro * dv * 2))
+	rate, _ = wunit.NewRate(rps, "/s")
+	//rate = rpm
+	return rate
 }
 
 func Froude(dt float64, n float64, g float64) float64 { // froude number  dt = shaken diamter in m
@@ -56,7 +64,9 @@ const G float64 = 9.81 //acceleration due to gravity in meters per second square
 
 //Micheletti 2006:
 
-func Ncrit_srw(sigma float64, dv float64, Vl float64, ro float64, dt float64) float64 {
-	return math.Sqrt((sigma * dv) / (4 * math.Pi * Vl * ro * dt)) //unit = per S // established for srw with Vl = 200ul
+func Ncrit_srw(sigma float64, dv float64, Vl float64, ro float64, dt float64) (rate wunit.Rate) {
+	rps := math.Sqrt((sigma * dv) / (4 * math.Pi * Vl * ro * dt)) //unit = per S // established for srw with Vl = 200ul
+	rate, _ = wunit.NewRate(rps, "/s")
+	return rate
 	//sigma = liquid surface tension N /m; dt = shaken diamter in m
 }
