@@ -35,8 +35,7 @@ func Add(parent context.Context, name Name, runner Runner) error {
 	return reg.Add(name, runner)
 }
 
-// Call a function that satisfies the query
-func Call(parent context.Context, query NameQuery, value Value) (Value, error) {
+func Find(parent context.Context, query NameQuery) (Runner, error) {
 	type result struct {
 		runner Runner
 		level  int
@@ -62,7 +61,16 @@ func Call(parent context.Context, query NameQuery, value Value) (Value, error) {
 	// XXX: better matching heuristics?
 
 	for _, r := range results {
-		return r.runner.Run(parent, value)
+		return r.runner, nil
 	}
 	return nil, funcNotFound
+}
+
+// Call a function that satisfies the query
+func Call(parent context.Context, query NameQuery, value Value) (Value, error) {
+	r, err := Find(parent, query)
+	if err != nil {
+		return nil, err
+	}
+	return r.Run(parent, value)
 }
