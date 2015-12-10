@@ -24,6 +24,7 @@ package wutil
 
 import (
 	"fmt"
+	"github.com/antha-lang/antha/internal/github.com/montanaflynn/stats"
 	"math"
 )
 
@@ -43,4 +44,9 @@ func RoundDown(v float64) (int, error) {
 	}
 
 	return int(math.Floor(v)), nil
+}
+
+func Roundto(input float64, places int) (rounded float64, err error) {
+	rounded, err = stats.Round(input, places)
+	return
 }

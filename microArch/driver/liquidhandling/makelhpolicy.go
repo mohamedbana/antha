@@ -30,8 +30,8 @@ import (
 	"io/ioutil"
 	"os"
 )
-func MakePolicies() map[string] LHPolicy {
-        pols := make(map[string] LHPolicy)
+func MakePolicies() map[string]LHPolicy {
+        pols := make(map[string]LHPolicy)
 
         // what policies do we need?
         pols["water"] = MakeWaterPolicy()
@@ -40,28 +40,29 @@ func MakePolicies() map[string] LHPolicy {
         pols["solvent"] = MakeSolventPolicy()
         pols["default"] = MakeDefaultPolicy()
         pols["foamy"] = MakeFoamyPolicy()
-        pols["lysate"] = MakeLysatePolicy()
+//        pols["lysate"] = MakeLysatePolicy()
         pols["protein"] = MakeProteinPolicy()
+		pols["detergent"] = MakeDetergentPolicy()
         return pols
 }
-func MakeLysatePolicy() LHPolicy {
-        lysatepolicy := make(LHPolicy, 6)
-        lysatepolicy["ASP_SPEED"] = 1.0
-        lysatepolicy["DSP_SPEED"] = 1.0
-        lysatepolicy["ASP_WAIT"] = 2
-        lysatepolicy["DSP_WAIT"] = 2
-        lysatepolicy["PREMIX"] = 5
-        lysatepolicy["CAN_MSA"]= false
-        return lysatepolicy
-}
-func MakeProteinPolicy() LHPolicy {
-        proteinpolicy := make(LHPolicy, 4)
-        proteinpolicy["DSPREFERENCE"] = 2
-        proteinpolicy["CAN_MULTI"] = true
-        proteinpolicy["PREMIX"] = 3
-        proteinpolicy["CAN_MSA"] = false
-        return proteinpolicy
-}
+//func MakeLysatePolicy() LHPolicy {
+//        lysatepolicy := make(LHPolicy, 6)
+//        lysatepolicy["ASPSPEED"] = 1.0
+//        lysatepolicy["DSPSPEED"] = 1.0
+//        lysatepolicy["ASP_WAIT"] = 2.0
+//        lysatepolicy["DSP_WAIT"] = 2.0
+//        lysatepolicy["PRE_MIX"] = 5
+//        lysatepolicy["CAN_MSA"]= false
+//        return lysatepolicy
+//}
+//func MakeProteinPolicy() LHPolicy {
+//        proteinpolicy := make(LHPolicy, 4)
+//        proteinpolicy["DSPREFERENCE"] = 2
+//        proteinpolicy["CAN_MULTI"] = true
+//        proteinpolicy["PRE_MIX"] = 3
+//        proteinpolicy["CAN_MSA"] = false
+//        return proteinpolicy
+//}
 func MakeWaterPolicy() LHPolicy {
 	waterpolicy := make(LHPolicy, 6)
 	waterpolicy["DSPREFERENCE"] = 0
@@ -114,8 +115,8 @@ func MakeSolventPolicy() LHPolicy {
 
 func MakeDNAPolicy() LHPolicy {
 	dnapolicy := make(LHPolicy, 10)
-	dnapolicy["POST_MIX"] = 3
 	dnapolicy["POST_MIX_VOLUME"] = 50
+	dnapolicy["POST_MIX"] = 3
 	dnapolicy["ASPSPEED"] = 2.0
 	dnapolicy["DSPSPEED"] = 2.0
 	dnapolicy["CAN_MULTI"] = false
@@ -126,6 +127,36 @@ func MakeDNAPolicy() LHPolicy {
 	dnapolicy["TIP_REUSE_LIMIT"] = 0
 	dnapolicy["NO_AIR_DISPENSE"] = true
 	return dnapolicy
+}
+
+func MakeDetergentPolicy() LHPolicy {
+        detergentpolicy := make(LHPolicy, 9)
+//        detergentpolicy["POST_MIX"] = 3
+        detergentpolicy["ASPSPEED"] = 1.0
+        detergentpolicy["DSPSPEED"] = 1.0
+        detergentpolicy["CAN_MULTI"] = false
+        detergentpolicy["CAN_MSA"] = false
+        detergentpolicy["CAN_SDD"] = false
+        detergentpolicy["DSPREFERENCE"] = 0
+        detergentpolicy["DSPZOFFSET"] = 0.5
+        detergentpolicy["TIP_REUSE_LIMIT"] = 8
+        detergentpolicy["NO_AIR_DISPENSE"] = true
+        return detergentpolicy
+}
+func MakeProteinPolicy() LHPolicy {
+        proteinpolicy := make(LHPolicy, 10)
+        proteinpolicy["POST_MIX"] = 5
+        proteinpolicy["POST_MIX_VOLUME"] = 50
+        proteinpolicy["ASPSPEED"] = 2.0
+        proteinpolicy["DSPSPEED"] = 2.0
+        proteinpolicy["CAN_MULTI"] = false
+        proteinpolicy["CAN_MSA"] = false
+        proteinpolicy["CAN_SDD"] = false
+        proteinpolicy["DSPREFERENCE"] = 0
+        proteinpolicy["DSPZOFFSET"] = 0.5
+        proteinpolicy["TIP_REUSE_LIMIT"] = 0
+        proteinpolicy["NO_AIR_DISPENSE"] = true
+        return proteinpolicy
 }
 
 func MakeDefaultPolicy() LHPolicy {

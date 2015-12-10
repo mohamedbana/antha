@@ -10,6 +10,7 @@ package Scarfree_siteremove_orfcheck
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
@@ -269,6 +270,10 @@ func (e *Scarfree_siteremove_orfcheck) steps(p Scarfree_siteremove_orfcheckParam
 			text.Print("Any Orfs to confirm missing from new DNA sequence:", r.ORFmissing),
 			partstoorder,
 		)
+		// export data to file
+		anthapath.ExporttoFile("Report"+"_"+p.Constructname+".txt", []byte(r.Status))
+		//anthapath.ExportTextFile("Report"+"_"+Constructname+".txt",Status)
+
 	}
 	_ = _wrapper.WaitToEnd()
 

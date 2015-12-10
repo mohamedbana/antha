@@ -8,8 +8,18 @@
       "VolumePerAliquot": "10ul",
 	"NumberofAliquots":3,
     }
+  },
+{
+    "Aliquot": {
+      "Solution": "component:PrimerRev",
+      "Outplate": "plate:pcrplate_with_cooler",
+      "TipType": "tipbox:Gilson20",
+      "SolutionVolume": "100ul",
+      "VolumePerAliquot": "10ul",
+	"NumberofAliquots":3,
+    }
   }],
   "Config": {
-    "OUTPUT_COUNT": 3
+    "OUTPUT_COUNT": 6
   }
 }

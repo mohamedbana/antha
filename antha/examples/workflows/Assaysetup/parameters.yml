@@ -4,15 +4,15 @@
       "Buffer": "component:water",
 	"Substrate": "component:CutsmartBuffer",
 	"Enzyme": "component:T4Ligase",
-      "Outplate": "plate:pcrplate_with_cooler",
+      "Outplate": "plate:reservoir",
       "TipType": "tipbox:Gilson20",
       "TotalVolume": "100ul",
       "SubstrateVolume": "10ul",
 	"EnzymeVolume": "10ul",
-	"NumberofReactions":3
+	"NumberofReactions":1
     }
   }],
   "Config": {
-    "OUTPUT_COUNT": 3
+    "OUTPUT_COUNT": 1
   }
 }

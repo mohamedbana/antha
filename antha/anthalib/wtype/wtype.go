@@ -68,6 +68,25 @@ type Entity interface {
 type Solid interface {
 	Physical
 	Shape() *Shape
+	//Sample(v unit.Mass) Liquid // produces a liquid assuming we sample into liquid
+}
+
+type Powder interface {
+	SampleSolidtoLiquid(m wunit.Mass, d wunit.Density) Liquid
+	Physical
+	Viscosity() float64
+	// take some of this liquid
+	Sample(v wunit.Volume) Liquid
+	Container() LiquidContainer
+	Add(v wunit.Volume)
+	GetSmax() float64
+	GetVisc() float64
+	GetExtra() map[string]interface{}
+	GetConc() float64
+	GetCunit() string
+	GetVunit() string
+	GetStockConcentration() float64
+	GetType() string
 }
 
 // liquid state

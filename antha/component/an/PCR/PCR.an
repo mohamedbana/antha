@@ -29,6 +29,7 @@ Parameters (
 	TargetpolymeraseConcentration Concentration
 	Templatevolume Volume
 	DNTPconc Concentration
+	/*
 	// let's be ambitious and try this as part of type polymerase Polymeraseconc Volume
 	
 	//Templatetype string  // e.g. colony, genomic, pure plasmid... will effect efficiency. We could get more sophisticated here later on... 
@@ -36,7 +37,7 @@ Parameters (
 	//FullTemplatelength int	// clearly could be calculated from the sequence... Sid will have a method to do this already so check!
 	//TargetTemplatesequence string // better to use Sid's type system here after proof of concept
 	//TargetTemplatelengthinBP int
-	
+	*/
 	// Reaction parameters: (could be a entered as thermocycle parameters type possibly?)
 	Numberofcycles int 
 	InitDenaturationtime Time
@@ -81,6 +82,8 @@ Setup {
 // The core process for this protocol, with the steps to be performed
 // for every input
 Steps {
+	
+	// Mix components
 	samples := make([]*wtype.LHComponent, 0)
 	bufferSample := mixer.SampleForTotalVolume(Buffer, ReactionVolume)
 	samples = append(samples, bufferSample)

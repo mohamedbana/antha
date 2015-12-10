@@ -114,3 +114,155 @@ func (m *Time) UnmarshalJSON(b []byte) error {
 	}
 	return nil
 }
+func (m *Density) MarshalJSON() ([]byte, error) {
+	return marshal(m)
+
+}
+
+func (m *Density) UnmarshalJSON(b []byte) error {
+	if value, unit, err := unmarshal(b); err != nil {
+		return err
+	} else if unit != "" {
+		*m = NewDensity(value, unit)
+	}
+	return nil
+}
+func (m *Mass) MarshalJSON() ([]byte, error) {
+	return marshal(m)
+
+}
+
+func (m *Mass) UnmarshalJSON(b []byte) error {
+	if value, unit, err := unmarshal(b); err != nil {
+		return err
+	} else if unit != "" {
+		*m = NewMass(value, unit)
+	}
+	return nil
+}
+
+func (m *FlowRate) MarshalJSON() ([]byte, error) {
+	return marshal(m)
+
+}
+
+func (m *FlowRate) UnmarshalJSON(b []byte) error {
+	if value, unit, err := unmarshal(b); err != nil {
+		return err
+	} else if unit != "" {
+		*m = NewFlowRate(value, unit)
+	}
+	return nil
+}
+
+func (m *Amount) MarshalJSON() ([]byte, error) {
+	return marshal(m)
+
+}
+
+func (m *Amount) UnmarshalJSON(b []byte) error {
+	if value, unit, err := unmarshal(b); err != nil {
+		return err
+	} else if unit != "" {
+		*m = NewAmount(value, unit)
+	}
+	return nil
+}
+
+func (m *Pressure) MarshalJSON() ([]byte, error) {
+	return marshal(m)
+
+}
+
+func (m *Pressure) UnmarshalJSON(b []byte) error {
+	if value, unit, err := unmarshal(b); err != nil {
+		return err
+	} else if unit != "" {
+		*m = NewPressure(value, unit)
+	}
+	return nil
+}
+
+func (m *Length) MarshalJSON() ([]byte, error) {
+	return marshal(m)
+
+}
+
+func (m *Length) UnmarshalJSON(b []byte) error {
+	if value, unit, err := unmarshal(b); err != nil {
+		return err
+	} else if unit != "" {
+		*m = NewLength(value, unit)
+	}
+	return nil
+}
+func (m *Area) MarshalJSON() ([]byte, error) {
+	return marshal(m)
+
+}
+
+func (m *Area) UnmarshalJSON(b []byte) error {
+	if value, unit, err := unmarshal(b); err != nil {
+		return err
+	} else if unit != "" {
+		*m = NewArea(value, unit)
+	}
+	return nil
+}
+func (m *Angle) MarshalJSON() ([]byte, error) {
+	return marshal(m)
+
+}
+
+func (m *Angle) UnmarshalJSON(b []byte) error {
+	if value, unit, err := unmarshal(b); err != nil {
+		return err
+	} else if unit != "" {
+		*m = NewAngle(value, unit)
+	}
+	return nil
+}
+func (m *Energy) MarshalJSON() ([]byte, error) {
+	return marshal(m)
+
+}
+
+func (m *Energy) UnmarshalJSON(b []byte) error {
+	if value, unit, err := unmarshal(b); err != nil {
+		return err
+	} else if unit != "" {
+		*m = NewEnergy(value, unit)
+	}
+	return nil
+}
+func (m *Force) MarshalJSON() ([]byte, error) {
+	return marshal(m)
+
+}
+
+func (m *Force) UnmarshalJSON(b []byte) error {
+	if value, unit, err := unmarshal(b); err != nil {
+		return err
+	} else if unit != "" {
+		*m = NewForce(value, unit)
+	}
+	return nil
+}
+
+/*
+func (m *Rate) MarshalJSON() ([]byte, error) {
+	return marshal(m)
+
+}
+
+func (m *Rate) UnmarshalJSON(b []byte) (err error) {
+	if value, unit, err := unmarshal(b); err != nil {
+		return err
+	} else if unit != "" {
+		if string(unit[0]) == `/` {
+			*m, err = NewRate(value, string(unit[0]), unit[1:])
+		}
+	}
+	return err
+}
+*/

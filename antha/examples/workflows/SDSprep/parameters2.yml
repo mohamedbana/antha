@@ -1,7 +1,7 @@
 {
 "Parameters":[
 	{
-        "SDSample":{
+        "SDSprep":{
                 "SampleName":"Marker",
                 "SampleVolume": "40ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -9,17 +9,17 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:water",
-                "Buffer": "component:water",                
-		"OutPlate": "plate:pcrplate_with_cooler",
+                "Protein": "component:ProteinMarker",
+                "Buffer": "component:SDSbuffer",                
+		            "OutPlate": "plate:pcrplate_with_cooler",
                 "InPlate": "plate:pcrplate_with_cooler",
                 "TipType": "tipbox:Gilson20",                
-		"DenatureTemp": "0C",
+		            "DenatureTemp": "0C",
                 "DenatureTime": "0s"
         	}
 	},
 	{
-	"SDSample":{
+	"SDSprep":{
                 "SampleName":"Lysate",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -27,17 +27,16 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:water",
-                "Buffer": "component:water",
+                "Protein": "component:EColiLysate",
+                "Buffer": "component:SDSbuffer",
                 "OutPlate": "plate:pcrplate_with_cooler",
                 "InPlate": "plate:pcrplate_with_cooler",
                 "TipType": "tipbox:Gilson20",
                 "DenatureTemp": "95C",
                 "DenatureTime": "300s"
         	}	
-	},
-        
-	{"SDSample":{
+	}, 
+	{"SDSprep":{
                 "SampleName":"Flowthrough",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -45,8 +44,8 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:water",
-                "Buffer": "component:water",
+                "Protein": "component:ProteinFraction",
+                "Buffer": "component:SDSbuffer",
                 "OutPlate": "plate:pcrplate_with_cooler",
                 "InPlate": "plate:pcrplate_with_cooler",
                 "TipType": "tipbox:Gilson20",
@@ -55,7 +54,7 @@
         	}
 	},
 	{
-	"SDSample":{
+	"SDSprep":{
                 "SampleName":"Wash1",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -63,8 +62,8 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:water",
-                "Buffer": "component:water",
+                "Protein": "component:ProteinFraction",
+                "Buffer": "component:SDSbuffer",
                 "OutPlate": "plate:pcrplate_with_cooler",
                 "InPlate": "plate:pcrplate_with_cooler",
                 "TipType": "tipbox:Gilson20",
@@ -73,7 +72,7 @@
 		}
 	},
         {
-	"SDSample":{
+	"SDSprep":{
                 "SampleName":"Wash2",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -81,8 +80,8 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:water",
-                "Buffer": "component:water",
+                "Protein": "component:ProteinFraction",
+                "Buffer": "component:SDSbuffer",
                 "OutPlate": "plate:pcrplate_with_cooler",
                 "InPlate": "plate:pcrplate_with_cooler",
                 "TipType": "tipbox:Gilson20",
@@ -91,7 +90,7 @@
         	}
 	},
         {
-        "SDSample":{
+        "SDSprep":{
                 "SampleName":"Wash3",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -99,8 +98,8 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:water",
-                "Buffer": "component:water",
+                "Protein": "component:ProteinFraction",
+                "Buffer": "component:SDSbuffer",
                 "OutPlate": "plate:pcrplate_with_cooler",
                 "InPlate": "plate:pcrplate_with_cooler",
                 "TipType": "tipbox:Gilson20",
@@ -109,7 +108,7 @@
                 }
         },
         {
-        "SDSample":{
+        "SDSprep":{
                 "SampleName":"Elution1",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -117,8 +116,8 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:water",
-                "Buffer": "component:water",
+                "Protein": "component:ProteinFraction",
+                "Buffer": "component:SDSbuffer",
                 "OutPlate": "plate:pcrplate_with_cooler",
                 "InPlate": "plate:pcrplate_with_cooler",
                 "TipType": "tipbox:Gilson20",
@@ -127,7 +126,7 @@
                 }
         },
         {
-        "SDSample":{
+        "SDSprep":{
                 "SampleName":"Elution2",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -135,8 +134,8 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:water",
-                "Buffer": "component:water",
+                "Protein": "component:ProteinFraction",
+                "Buffer": "component:SDSbuffer",
                 "OutPlate": "plate:pcrplate_with_cooler",
                 "InPlate": "plate:pcrplate_with_cooler",
                 "TipType": "tipbox:Gilson20",
@@ -145,7 +144,7 @@
                 }
         },
         {
-        "SDSample":{
+        "SDSprep":{
                 "SampleName":"Elution3",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -153,8 +152,8 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:water",
-                "Buffer": "component:water",
+                "Protein": "component:ProteinFraction",
+                "Buffer": "component:SDSbuffer",
                 "OutPlate": "plate:pcrplate_with_cooler",
                 "InPlate": "plate:pcrplate_with_cooler",
                 "TipType": "tipbox:Gilson20",
@@ -163,7 +162,7 @@
                 }
         },
         {
-        "SDSample":{
+        "SDSprep":{
                 "SampleName":"Elution4",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -171,8 +170,8 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:water",
-                "Buffer": "component:water",
+                "Protein": "component:ProteinFraction",
+                "Buffer": "component:SDSbuffer",
                 "OutPlate": "plate:pcrplate_with_cooler",
                 "InPlate": "plate:pcrplate_with_cooler",
                 "TipType": "tipbox:Gilson20",
@@ -181,7 +180,7 @@
                 }
         },
         {
-        "SDSample":{
+        "SDSprep":{
                 "SampleName":"Elution5",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -189,8 +188,8 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:water",
-                "Buffer": "component:water",
+                "Protein": "component:ProteinFraction",
+                "Buffer": "component:SDSbuffer",
                 "OutPlate": "plate:pcrplate_with_cooler",
                 "InPlate": "plate:pcrplate_with_cooler",
                 "TipType": "tipbox:Gilson20",
@@ -199,7 +198,7 @@
                 }
         },
         {
-        "SDSample":{
+        "SDSprep":{
                 "SampleName":"Elution6",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -207,8 +206,8 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:water",
-                "Buffer": "component:water",
+                "Protein": "component:ProteinFraction",
+                "Buffer": "component:SDSbuffer",
                 "OutPlate": "plate:pcrplate_with_cooler",
                 "InPlate": "plate:pcrplate_with_cooler",
                 "TipType": "tipbox:Gilson20",

@@ -18,6 +18,8 @@ import (
 	"strconv"
 	"strings"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
+
 
 )
 
@@ -266,6 +268,10 @@ Steps {
 		text.Print("Any Orfs to confirm missing from new DNA sequence:", ORFmissing),
 		partstoorder,
 		)
+		// export data to file
+		anthapath.ExporttoFile("Report"+"_"+Constructname+".txt",[]byte(Status))
+	//anthapath.ExportTextFile("Report"+"_"+Constructname+".txt",Status)
+
 	}
 	
 }

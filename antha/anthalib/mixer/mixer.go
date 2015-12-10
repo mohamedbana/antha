@@ -88,6 +88,26 @@ func SampleForTotalVolume(l wtype.Liquid, v wunit.Volume) *wtype.LHComponent {
 	return ret
 }
 
+func SampleSolidtoLiquid(s wtype.Powder, m wunit.Mass, d wunit.Density) *wtype.LHComponent {
+
+	// calculate volume to add from density
+	v := wunit.MasstoVolume(m, d)
+
+	ret := wtype.NewLHComponent()
+	ret.CName = s.Name()
+	ret.Type = s.GetType()
+	ret.Vol = v.RawValue()
+	ret.Vunit = v.Unit().PrefixedSymbol()
+	ret.Extra = s.GetExtra()
+	ret.Smax = s.GetSmax()
+	ret.Visc = s.GetVisc()
+	if s.Container() != nil {
+		ret.LContainer = s.Container().(*wtype.LHWell)
+	}
+
+	return ret
+}
+
 // Temp hack to mix solutions
 func MixLiquidstemp(liquids ...*wtype.LHSolution) *wtype.LHSolution {
 	// we must respect the order in which things are mixed.

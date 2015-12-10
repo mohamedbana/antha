@@ -12,6 +12,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/Kla"
 	"github.com/antha-lang/antha/antha/component/lib/LookUpMolecule"
 	"github.com/antha-lang/antha/antha/component/lib/MakeBuffer"
+	"github.com/antha-lang/antha/antha/component/lib/MakeMedia"
 	"github.com/antha-lang/antha/antha/component/lib/MoClo_design"
 	"github.com/antha-lang/antha/antha/component/lib/NewDNASequence"
 	"github.com/antha-lang/antha/antha/component/lib/OD"
@@ -20,7 +21,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/Phytip_miniprep"
 	"github.com/antha-lang/antha/antha/component/lib/Printname"
 	"github.com/antha-lang/antha/antha/component/lib/RemoveRestrictionSites"
-	"github.com/antha-lang/antha/antha/component/lib/SDSample"
+	"github.com/antha-lang/antha/antha/component/lib/SDSprep"
 	"github.com/antha-lang/antha/antha/component/lib/Scarfree_design"
 	"github.com/antha-lang/antha/antha/component/lib/Scarfree_siteremove_orfcheck"
 	"github.com/antha-lang/antha/antha/component/lib/SumVolume"
@@ -178,6 +179,23 @@ func GetComponents() []ComponentDesc {
 	portMap["MakeBuffer"]["Buffer"] = false
 	portMap["MakeBuffer"]["Status"] = false
 
+	portMap["MakeMedia"] = make(map[string]bool)
+	portMap["MakeMedia"]["LiqComponentVolumes"] = true
+	portMap["MakeMedia"]["LiqComponents"] = true
+	portMap["MakeMedia"]["Name"] = true
+	portMap["MakeMedia"]["PH_setPoint"] = true
+	portMap["MakeMedia"]["PH_setPointTemp"] = true
+	portMap["MakeMedia"]["PH_tolerance"] = true
+	portMap["MakeMedia"]["SolidComponentDensities"] = true
+	portMap["MakeMedia"]["SolidComponentMasses"] = true
+	portMap["MakeMedia"]["SolidComponents"] = true
+	portMap["MakeMedia"]["TotalVolume"] = true
+	portMap["MakeMedia"]["Vessel"] = true
+	portMap["MakeMedia"]["Water"] = true
+
+	portMap["MakeMedia"]["Media"] = false
+	portMap["MakeMedia"]["Status"] = false
+
 	portMap["MoClo_design"] = make(map[string]bool)
 	portMap["MoClo_design"]["AssemblyStandard"] = true
 	portMap["MoClo_design"]["Constructname"] = true
@@ -295,23 +313,23 @@ func GetComponents() []ComponentDesc {
 	portMap["RemoveRestrictionSites"]["Status"] = false
 	portMap["RemoveRestrictionSites"]["Warnings"] = false
 
-	portMap["SDSample"] = make(map[string]bool)
-	portMap["SDSample"]["Buffer"] = true
-	portMap["SDSample"]["BufferName"] = true
-	portMap["SDSample"]["BufferStockConc"] = true
-	portMap["SDSample"]["BufferVolume"] = true
-	portMap["SDSample"]["DenatureTemp"] = true
-	portMap["SDSample"]["DenatureTime"] = true
-	portMap["SDSample"]["FinalConcentration"] = true
-	portMap["SDSample"]["InPlate"] = true
-	portMap["SDSample"]["OutPlate"] = true
-	portMap["SDSample"]["Protein"] = true
-	portMap["SDSample"]["ReactionVolume"] = true
-	portMap["SDSample"]["SampleName"] = true
-	portMap["SDSample"]["SampleVolume"] = true
+	portMap["SDSprep"] = make(map[string]bool)
+	portMap["SDSprep"]["Buffer"] = true
+	portMap["SDSprep"]["BufferName"] = true
+	portMap["SDSprep"]["BufferStockConc"] = true
+	portMap["SDSprep"]["BufferVolume"] = true
+	portMap["SDSprep"]["DenatureTemp"] = true
+	portMap["SDSprep"]["DenatureTime"] = true
+	portMap["SDSprep"]["FinalConcentration"] = true
+	portMap["SDSprep"]["InPlate"] = true
+	portMap["SDSprep"]["OutPlate"] = true
+	portMap["SDSprep"]["Protein"] = true
+	portMap["SDSprep"]["ReactionVolume"] = true
+	portMap["SDSprep"]["SampleName"] = true
+	portMap["SDSprep"]["SampleVolume"] = true
 
-	portMap["SDSample"]["LoadSample"] = false
-	portMap["SDSample"]["Status"] = false
+	portMap["SDSprep"]["LoadSample"] = false
+	portMap["SDSprep"]["Status"] = false
 
 	portMap["Scarfree_design"] = make(map[string]bool)
 	portMap["Scarfree_design"]["Constructname"] = true
@@ -519,6 +537,7 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "Kla", Constructor: Kla.NewKla})
 	c = append(c, ComponentDesc{Name: "LookUpMolecule", Constructor: LookUpMolecule.NewLookUpMolecule})
 	c = append(c, ComponentDesc{Name: "MakeBuffer", Constructor: MakeBuffer.NewMakeBuffer})
+	c = append(c, ComponentDesc{Name: "MakeMedia", Constructor: MakeMedia.NewMakeMedia})
 	c = append(c, ComponentDesc{Name: "MoClo_design", Constructor: MoClo_design.NewMoClo_design})
 	c = append(c, ComponentDesc{Name: "NewDNASequence", Constructor: NewDNASequence.NewNewDNASequence})
 	c = append(c, ComponentDesc{Name: "OD", Constructor: OD.NewOD})
@@ -527,7 +546,7 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "Phytip_miniprep", Constructor: Phytip_miniprep.NewPhytip_miniprep})
 	c = append(c, ComponentDesc{Name: "Printname", Constructor: Printname.NewPrintname})
 	c = append(c, ComponentDesc{Name: "RemoveRestrictionSites", Constructor: RemoveRestrictionSites.NewRemoveRestrictionSites})
-	c = append(c, ComponentDesc{Name: "SDSample", Constructor: SDSample.NewSDSample})
+	c = append(c, ComponentDesc{Name: "SDSprep", Constructor: SDSprep.NewSDSprep})
 	c = append(c, ComponentDesc{Name: "Scarfree_design", Constructor: Scarfree_design.NewScarfree_design})
 	c = append(c, ComponentDesc{Name: "Scarfree_siteremove_orfcheck", Constructor: Scarfree_siteremove_orfcheck.NewScarfree_siteremove_orfcheck})
 	c = append(c, ComponentDesc{Name: "SumVolume", Constructor: SumVolume.NewSumVolume})

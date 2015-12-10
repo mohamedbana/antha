@@ -1,4 +1,4 @@
-protocol SDSample
+protocol SDSprep
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"

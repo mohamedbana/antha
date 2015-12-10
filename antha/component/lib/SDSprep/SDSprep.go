@@ -1,4 +1,4 @@
-package SDSample
+package SDSprep
 
 import (
 	"encoding/json"
@@ -42,7 +42,7 @@ import (
 
 //Biologicals
 
-func (e *SDSample) setup(p SDSampleParamBlock) {
+func (e *SDSprep) setup(p SDSprepParamBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
 		p.BlockID, p)
 	_ = _wrapper
@@ -50,7 +50,7 @@ func (e *SDSample) setup(p SDSampleParamBlock) {
 
 }
 
-func (e *SDSample) steps(p SDSampleParamBlock, r *SDSampleResultBlock) {
+func (e *SDSprep) steps(p SDSprepParamBlock, r *SDSprepResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
 		p.BlockID, p)
 	_ = _wrapper
@@ -109,7 +109,7 @@ func (e *SDSample) steps(p SDSampleParamBlock, r *SDSampleResultBlock) {
 	//	Status = fmtSprintln(BufferVolume.ToString() "uL of", BufferName,"mixed with", SampleVolume.ToString(), "uL of", SampleName, "Total load sample available is", ReactionVolume.ToString())
 }
 
-func (e *SDSample) analysis(p SDSampleParamBlock, r *SDSampleResultBlock) {
+func (e *SDSprep) analysis(p SDSprepParamBlock, r *SDSprepResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
 		p.BlockID, p)
 	_ = _wrapper
@@ -117,7 +117,7 @@ func (e *SDSample) analysis(p SDSampleParamBlock, r *SDSampleResultBlock) {
 
 }
 
-func (e *SDSample) validation(p SDSampleParamBlock, r *SDSampleResultBlock) {
+func (e *SDSprep) validation(p SDSprepParamBlock, r *SDSprepResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID,
 		p.BlockID, p)
 	_ = _wrapper
@@ -126,14 +126,14 @@ func (e *SDSample) validation(p SDSampleParamBlock, r *SDSampleResultBlock) {
 }
 
 // AsyncBag functions
-func (e *SDSample) Complete(params interface{}) {
-	p := params.(SDSampleParamBlock)
+func (e *SDSprep) Complete(params interface{}) {
+	p := params.(SDSprepParamBlock)
 	if p.Error {
 		e.LoadSample <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
 		e.Status <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
 		return
 	}
-	r := new(SDSampleResultBlock)
+	r := new(SDSprepResultBlock)
 	defer func() {
 		if res := recover(); res != nil {
 			e.LoadSample <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
@@ -156,32 +156,32 @@ func (e *SDSample) Complete(params interface{}) {
 }
 
 // init function, read characterization info from seperate file to validate ranges?
-func (e *SDSample) init() {
+func (e *SDSprep) init() {
 	e.params = make(map[execute.ThreadID]*execute.AsyncBag)
 }
 
-func (e *SDSample) NewConfig() interface{} {
-	return &SDSampleConfig{}
+func (e *SDSprep) NewConfig() interface{} {
+	return &SDSprepConfig{}
 }
 
-func (e *SDSample) NewParamBlock() interface{} {
-	return &SDSampleParamBlock{}
+func (e *SDSprep) NewParamBlock() interface{} {
+	return &SDSprepParamBlock{}
 }
 
-func NewSDSample() interface{} { //*SDSample {
-	e := new(SDSample)
+func NewSDSprep() interface{} { //*SDSprep {
+	e := new(SDSprep)
 	e.init()
 	return e
 }
 
 // Mapper function
-func (e *SDSample) Map(m map[string]interface{}) interface{} {
-	var res SDSampleParamBlock
+func (e *SDSprep) Map(m map[string]interface{}) interface{} {
+	var res SDSprepParamBlock
 	res.Error = false || m["Buffer"].(execute.ThreadParam).Error || m["BufferName"].(execute.ThreadParam).Error || m["BufferStockConc"].(execute.ThreadParam).Error || m["BufferVolume"].(execute.ThreadParam).Error || m["DenatureTemp"].(execute.ThreadParam).Error || m["DenatureTime"].(execute.ThreadParam).Error || m["FinalConcentration"].(execute.ThreadParam).Error || m["InPlate"].(execute.ThreadParam).Error || m["OutPlate"].(execute.ThreadParam).Error || m["Protein"].(execute.ThreadParam).Error || m["ReactionVolume"].(execute.ThreadParam).Error || m["SampleName"].(execute.ThreadParam).Error || m["SampleVolume"].(execute.ThreadParam).Error
 
 	vBuffer, is := m["Buffer"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp SDSampleJSONBlock
+		var temp SDSprepJSONBlock
 		json.Unmarshal([]byte(vBuffer.JSONString), &temp)
 		res.Buffer = *temp.Buffer
 	} else {
@@ -190,7 +190,7 @@ func (e *SDSample) Map(m map[string]interface{}) interface{} {
 
 	vBufferName, is := m["BufferName"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp SDSampleJSONBlock
+		var temp SDSprepJSONBlock
 		json.Unmarshal([]byte(vBufferName.JSONString), &temp)
 		res.BufferName = *temp.BufferName
 	} else {
@@ -199,7 +199,7 @@ func (e *SDSample) Map(m map[string]interface{}) interface{} {
 
 	vBufferStockConc, is := m["BufferStockConc"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp SDSampleJSONBlock
+		var temp SDSprepJSONBlock
 		json.Unmarshal([]byte(vBufferStockConc.JSONString), &temp)
 		res.BufferStockConc = *temp.BufferStockConc
 	} else {
@@ -208,7 +208,7 @@ func (e *SDSample) Map(m map[string]interface{}) interface{} {
 
 	vBufferVolume, is := m["BufferVolume"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp SDSampleJSONBlock
+		var temp SDSprepJSONBlock
 		json.Unmarshal([]byte(vBufferVolume.JSONString), &temp)
 		res.BufferVolume = *temp.BufferVolume
 	} else {
@@ -217,7 +217,7 @@ func (e *SDSample) Map(m map[string]interface{}) interface{} {
 
 	vDenatureTemp, is := m["DenatureTemp"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp SDSampleJSONBlock
+		var temp SDSprepJSONBlock
 		json.Unmarshal([]byte(vDenatureTemp.JSONString), &temp)
 		res.DenatureTemp = *temp.DenatureTemp
 	} else {
@@ -226,7 +226,7 @@ func (e *SDSample) Map(m map[string]interface{}) interface{} {
 
 	vDenatureTime, is := m["DenatureTime"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp SDSampleJSONBlock
+		var temp SDSprepJSONBlock
 		json.Unmarshal([]byte(vDenatureTime.JSONString), &temp)
 		res.DenatureTime = *temp.DenatureTime
 	} else {
@@ -235,7 +235,7 @@ func (e *SDSample) Map(m map[string]interface{}) interface{} {
 
 	vFinalConcentration, is := m["FinalConcentration"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp SDSampleJSONBlock
+		var temp SDSprepJSONBlock
 		json.Unmarshal([]byte(vFinalConcentration.JSONString), &temp)
 		res.FinalConcentration = *temp.FinalConcentration
 	} else {
@@ -244,7 +244,7 @@ func (e *SDSample) Map(m map[string]interface{}) interface{} {
 
 	vInPlate, is := m["InPlate"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp SDSampleJSONBlock
+		var temp SDSprepJSONBlock
 		json.Unmarshal([]byte(vInPlate.JSONString), &temp)
 		res.InPlate = *temp.InPlate
 	} else {
@@ -253,7 +253,7 @@ func (e *SDSample) Map(m map[string]interface{}) interface{} {
 
 	vOutPlate, is := m["OutPlate"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp SDSampleJSONBlock
+		var temp SDSprepJSONBlock
 		json.Unmarshal([]byte(vOutPlate.JSONString), &temp)
 		res.OutPlate = *temp.OutPlate
 	} else {
@@ -262,7 +262,7 @@ func (e *SDSample) Map(m map[string]interface{}) interface{} {
 
 	vProtein, is := m["Protein"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp SDSampleJSONBlock
+		var temp SDSprepJSONBlock
 		json.Unmarshal([]byte(vProtein.JSONString), &temp)
 		res.Protein = *temp.Protein
 	} else {
@@ -271,7 +271,7 @@ func (e *SDSample) Map(m map[string]interface{}) interface{} {
 
 	vReactionVolume, is := m["ReactionVolume"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp SDSampleJSONBlock
+		var temp SDSprepJSONBlock
 		json.Unmarshal([]byte(vReactionVolume.JSONString), &temp)
 		res.ReactionVolume = *temp.ReactionVolume
 	} else {
@@ -280,7 +280,7 @@ func (e *SDSample) Map(m map[string]interface{}) interface{} {
 
 	vSampleName, is := m["SampleName"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp SDSampleJSONBlock
+		var temp SDSprepJSONBlock
 		json.Unmarshal([]byte(vSampleName.JSONString), &temp)
 		res.SampleName = *temp.SampleName
 	} else {
@@ -289,7 +289,7 @@ func (e *SDSample) Map(m map[string]interface{}) interface{} {
 
 	vSampleVolume, is := m["SampleVolume"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp SDSampleJSONBlock
+		var temp SDSprepJSONBlock
 		json.Unmarshal([]byte(vSampleVolume.JSONString), &temp)
 		res.SampleVolume = *temp.SampleVolume
 	} else {
@@ -302,7 +302,7 @@ func (e *SDSample) Map(m map[string]interface{}) interface{} {
 	return res
 }
 
-func (e *SDSample) OnBuffer(param execute.ThreadParam) {
+func (e *SDSprep) OnBuffer(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -319,7 +319,7 @@ func (e *SDSample) OnBuffer(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *SDSample) OnBufferName(param execute.ThreadParam) {
+func (e *SDSprep) OnBufferName(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -336,7 +336,7 @@ func (e *SDSample) OnBufferName(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *SDSample) OnBufferStockConc(param execute.ThreadParam) {
+func (e *SDSprep) OnBufferStockConc(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -353,7 +353,7 @@ func (e *SDSample) OnBufferStockConc(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *SDSample) OnBufferVolume(param execute.ThreadParam) {
+func (e *SDSprep) OnBufferVolume(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -370,7 +370,7 @@ func (e *SDSample) OnBufferVolume(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *SDSample) OnDenatureTemp(param execute.ThreadParam) {
+func (e *SDSprep) OnDenatureTemp(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -387,7 +387,7 @@ func (e *SDSample) OnDenatureTemp(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *SDSample) OnDenatureTime(param execute.ThreadParam) {
+func (e *SDSprep) OnDenatureTime(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -404,7 +404,7 @@ func (e *SDSample) OnDenatureTime(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *SDSample) OnFinalConcentration(param execute.ThreadParam) {
+func (e *SDSprep) OnFinalConcentration(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -421,7 +421,7 @@ func (e *SDSample) OnFinalConcentration(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *SDSample) OnInPlate(param execute.ThreadParam) {
+func (e *SDSprep) OnInPlate(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -438,7 +438,7 @@ func (e *SDSample) OnInPlate(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *SDSample) OnOutPlate(param execute.ThreadParam) {
+func (e *SDSprep) OnOutPlate(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -455,7 +455,7 @@ func (e *SDSample) OnOutPlate(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *SDSample) OnProtein(param execute.ThreadParam) {
+func (e *SDSprep) OnProtein(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -472,7 +472,7 @@ func (e *SDSample) OnProtein(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *SDSample) OnReactionVolume(param execute.ThreadParam) {
+func (e *SDSprep) OnReactionVolume(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -489,7 +489,7 @@ func (e *SDSample) OnReactionVolume(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *SDSample) OnSampleName(param execute.ThreadParam) {
+func (e *SDSprep) OnSampleName(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -506,7 +506,7 @@ func (e *SDSample) OnSampleName(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *SDSample) OnSampleVolume(param execute.ThreadParam) {
+func (e *SDSprep) OnSampleVolume(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -524,7 +524,7 @@ func (e *SDSample) OnSampleVolume(param execute.ThreadParam) {
 	}
 }
 
-type SDSample struct {
+type SDSprep struct {
 	flow.Component     // component "superclass" embedded
 	lock               sync.Mutex
 	startup            sync.Once
@@ -546,7 +546,7 @@ type SDSample struct {
 	Status             chan<- execute.ThreadParam
 }
 
-type SDSampleParamBlock struct {
+type SDSprepParamBlock struct {
 	ID                 execute.ThreadID
 	BlockID            execute.BlockID
 	Error              bool
@@ -565,7 +565,7 @@ type SDSampleParamBlock struct {
 	SampleVolume       wunit.Volume
 }
 
-type SDSampleConfig struct {
+type SDSprepConfig struct {
 	ID                 execute.ThreadID
 	BlockID            execute.BlockID
 	Error              bool
@@ -584,7 +584,7 @@ type SDSampleConfig struct {
 	SampleVolume       wunit.Volume
 }
 
-type SDSampleResultBlock struct {
+type SDSprepResultBlock struct {
 	ID         execute.ThreadID
 	BlockID    execute.BlockID
 	Error      bool
@@ -592,7 +592,7 @@ type SDSampleResultBlock struct {
 	Status     string
 }
 
-type SDSampleJSONBlock struct {
+type SDSprepJSONBlock struct {
 	ID                 *execute.ThreadID
 	BlockID            *execute.BlockID
 	Error              *bool
@@ -613,7 +613,7 @@ type SDSampleJSONBlock struct {
 	Status             *string
 }
 
-func (c *SDSample) ComponentInfo() *execute.ComponentInfo {
+func (c *SDSprep) ComponentInfo() *execute.ComponentInfo {
 	inp := make([]execute.PortInfo, 0)
 	outp := make([]execute.PortInfo, 0)
 	inp = append(inp, *execute.NewPortInfo("Buffer", "*wtype.LHComponent", "Buffer", true, true, nil, nil))
@@ -632,7 +632,7 @@ func (c *SDSample) ComponentInfo() *execute.ComponentInfo {
 	outp = append(outp, *execute.NewPortInfo("LoadSample", "*wtype.LHSolution", "LoadSample", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("Status", "string", "Status", true, true, nil, nil))
 
-	ci := execute.NewComponentInfo("SDSample", "SDSample", "", false, inp, outp)
+	ci := execute.NewComponentInfo("SDSprep", "SDSprep", "", false, inp, outp)
 
 	return ci
 }

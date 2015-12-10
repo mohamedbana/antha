@@ -32,7 +32,7 @@ import (
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	//"github.com/antha-lang/antha/antha/anthalib/wtype"
 	//"io"
-	//"io/ioutil"
+	"io/ioutil"
 	"log"
 	//"net/http"
 	"os"
@@ -83,6 +83,37 @@ func AddFile(filename string) (f *os.File, err error) {
 		fmt.Printf("Created file %s\n", f.Name())
 	}
 	return
+}
+
+func ExporttoFile(filename string, contents []byte) (err error) {
+
+	err = ioutil.WriteFile(filepath.Join(Dirpath(), filename), contents, os.ModeDir)
+	fmt.Println("lining")
+	if err != nil {
+		fmt.Println("3")
+		log.Fatal(err)
+	}
+
+	return err
+}
+
+func ExportTextFile(filename string, contents string) (err error) {
+	_, err = AddFile(filename)
+	if err != nil {
+		log.Panic(err)
+	}
+	f, err := os.Open(filepath.Join(Dirpath(), filename))
+	if err != nil {
+		log.Panic(err)
+	}
+	defer f.Close()
+	_, err = fmt.Fprint(f, contents)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return err
 }
 
 func Dirpath() (dirpath string) {

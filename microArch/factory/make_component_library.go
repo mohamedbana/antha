@@ -72,7 +72,7 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	A.GenericMatter = matter["glycerol"]
 	A.CName = "restrictionenzyme"
 	A.Type = "glycerol"
-	A.Smax = 100
+	A.Smax = 1.0
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
@@ -201,7 +201,7 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	A.Type = "water"
 	A.Smax = 1.0 // not sure if this is correct
 	cmap[A.CName] = A
-	return cmap
+	
 
 	A = wtype.NewLHComponent()
 	A.GenericMatter = matter["water"]
@@ -209,20 +209,28 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	A.Type = "protein"
 	A.Smax = 1.0 //not sure if this is correct
 	cmap[A.CName] = A
-	return cmap
+	
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "ProteinFraction"
+	A.Type = "protein"
+	A.Smax = 1.0 //still not sure
+	cmap[A.CName] =A
+	
 
 	A = wtype.NewLHComponent()
 	A.GenericMatter = matter["water"]
 	A.CName = "EColiLysate"
-	A.Type = "lysate"
+	A.Type = "protein"
 	A.Smax = 1.0 //not sure what this is!
 	cmap[A.CName] = A
-	return cmap
+	
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["foamy"]
+	A.GenericMatter = matter["water"]
 	A.CName = "SDSbuffer"
-	A.Type = "foamy"
+	A.Type = "detergent"
 	A.Smax = 1.0 //still not sure....
 	cmap[A.CName] = A
 	return cmap

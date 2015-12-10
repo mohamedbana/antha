@@ -29,14 +29,15 @@ import (
 
 // PCRprep parameters:
 
-// let's be ambitious and try this as part of type polymerase Polymeraseconc Volume
+/*
+	// let's be ambitious and try this as part of type polymerase Polymeraseconc Volume
 
-//Templatetype string  // e.g. colony, genomic, pure plasmid... will effect efficiency. We could get more sophisticated here later on...
-//FullTemplatesequence string // better to use Sid's type system here after proof of concept
-//FullTemplatelength int	// clearly could be calculated from the sequence... Sid will have a method to do this already so check!
-//TargetTemplatesequence string // better to use Sid's type system here after proof of concept
-//TargetTemplatelengthinBP int
-
+	//Templatetype string  // e.g. colony, genomic, pure plasmid... will effect efficiency. We could get more sophisticated here later on...
+	//FullTemplatesequence string // better to use Sid's type system here after proof of concept
+	//FullTemplatelength int	// clearly could be calculated from the sequence... Sid will have a method to do this already so check!
+	//TargetTemplatesequence string // better to use Sid's type system here after proof of concept
+	//TargetTemplatelengthinBP int
+*/
 // Reaction parameters: (could be a entered as thermocycle parameters type possibly?)
 
 //Denaturationtemp Temperature
@@ -73,6 +74,7 @@ func (e *PCR) steps(p PCRParamBlock, r *PCRResultBlock) {
 		p.BlockID, p)
 	_ = _wrapper
 
+	// Mix components
 	samples := make([]*wtype.LHComponent, 0)
 	bufferSample := mixer.SampleForTotalVolume(p.Buffer, p.ReactionVolume)
 	samples = append(samples, bufferSample)

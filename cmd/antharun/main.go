@@ -97,17 +97,17 @@ func run() error {
 	sg.Add(1)
 	sg.Add(1)
 	go func() {
+		defer sg.Done()
 		for m := range wr.Messages {
 			fe.SendAlert(fmt.Sprintf("%v", m))
 		}
-		sg.Done()
 	}()
 
 	go func() {
+		defer sg.Done()
 		for e := range wr.Errors {
 			fe.SendAlert(fmt.Sprintf("%v", e))
 		}
-		sg.Done()
 	}()
 
 	<-wr.Done

@@ -69,19 +69,19 @@ func MakePolicies() map[string]liquidhandling.LHPolicy {
 }
 func MakeLysatePolicy() liquidhandling.LHPolicy {
 	lysatepolicy := make(liquidhandling.LHPolicy, 6)
-	lysatepolicy["ASP_SPEED"] = 1.0
-	lysatepolicy["DSP_SPEED"] = 1.0
+	lysatepolicy["ASPSPEED"] = 1.0
+	lysatepolicy["DSPSPEED"] = 1.0
 	lysatepolicy["ASP_WAIT"] = 2
 	lysatepolicy["DSP_WAIT"] = 2
-	lysatepolicy["PREMIX"] = 5
+	lysatepolicy["PRE_MIX"] = 5
 	lysatepolicy["CAN_MSA"]= false 
 	return lysatepolicy
 }	
 func MakeProteinPolicy() liquidhandling.LHPolicy {
-	proteinpolicy make(liquidhandling.LHPolicy, 4)
+	proteinpolicy := make(liquidhandling.LHPolicy, 4)
 	proteinpolicy["DSPREFERENCE"] = 2
 	proteinpolicy["CAN_MULTI"] = true
-	proteinpolicy["PREMIX"] = 3
+	proteinpolicy["PRE_MIX"] = 3
 	proteinpolicy["CAN_MSA"] = false
 	return proteinpolicy
 }

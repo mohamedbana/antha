@@ -3,8 +3,8 @@
         "name": "main"
     },
     "processes": {
-        "SDSample": {
-            "component": "SDSample",
+        "SDSprep": {
+            "component": "SDSprep",
             "metadata": {
                 "label": "CS"
             }
