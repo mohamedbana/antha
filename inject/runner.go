@@ -22,12 +22,26 @@ func (a *FuncRunner) Run(ctx context.Context, value Value) (Value, error) {
 	return a.RunFunc(ctx, value)
 }
 
+type TypedRunner interface {
+	Runner
+	Input() interface{}
+	Output() interface{}
+}
+
 // Typed injectable function. Check if input parameter is assignable to In and
 // output parameter is assignable to Out.
 type CheckedRunner struct {
 	RunFunc
 	In  interface{}
 	Out interface{}
+}
+
+func (a *CheckedRunner) Input() interface{} {
+	return a.In
+}
+
+func (a *CheckedRunner) Output() interface{} {
+	return a.Out
 }
 
 func (a *CheckedRunner) Run(ctx context.Context, value Value) (Value, error) {

@@ -28,15 +28,14 @@ package compile
 import (
 	"bytes"
 	"fmt"
+	"github.com/antha-lang/antha/antha/ast"
+	"github.com/antha-lang/antha/antha/parser"
+	"github.com/antha-lang/antha/antha/token"
 	"log"
 	"reflect"
 	"sort"
 	"strings"
 	"text/template"
-
-	"github.com/antha-lang/antha/antha/ast"
-	"github.com/antha-lang/antha/antha/parser"
-	"github.com/antha-lang/antha/antha/token"
 )
 
 // Augmentation to compiler state to parse Antha files
@@ -50,6 +49,7 @@ type antha struct {
 	reuseMap    map[token.Token]map[string]bool // map use of data through execution phases
 	intrinsics  map[string]string               // replacements for identifiers in expressions in functions
 	types       map[string]string               // replacement for type names in type expressions and type and type lists
+	imports     map[string]string               // additional imports with additional expression to suppress unused import
 }
 
 func (p *compiler) anthaInit() {
@@ -61,9 +61,9 @@ func (p *compiler) anthaInit() {
 		p.reuseMap[tok] = make(map[string]bool)
 	}
 	p.intrinsics = map[string]string{
-		"MixInto":  "_wrapper.MixInto",
-		"Mix":      "_wrapper.Mix",
-		"Incubate": "_wrapper.Incubate",
+		"MixInto":  "execute.MixInto",
+		"Mix":      "execute.Mix",
+		"Incubate": "execute.Incubate",
 	}
 	p.types = map[string]string{
 		"Temperature":       "wunit.Temperature",
@@ -77,6 +77,12 @@ func (p *compiler) anthaInit() {
 		"Angle":             "wunit.Angle",
 		"Energy":            "wunit.Energy",
 		"SubstanceQuantity": "wunit.SubstantQuantity",
+	}
+	p.imports = map[string]string{
+		"github.com/antha-lang/antha/antha/anthalib/wunit": "wunit.Make_units",
+		"github.com/antha-lang/antha/execute":              "execute.MixInto",
+		"github.com/antha-lang/antha/inject":               "",
+		"golang.org/x/net/context":                         "",
 	}
 }
 
@@ -135,43 +141,6 @@ func (p *compiler) addAnthaImports(file *ast.File, paths []string) {
 	// which are annoying to generate now. A gofmt on the generated file should
 	// be just as good.
 	//ast.SortImports(token.NewFileSet(), file)
-}
-
-// Generate message handler for parameter
-func (p *compiler) genOnFunction(name string, paramCount int) {
-	type anthaParam struct {
-		PkgName    string
-		ParamName  string
-		ParamCount int
-	}
-
-	const tpl = `func (e *{{.PkgName}}) On{{.ParamName}}(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init({{.ParamCount}}, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("{{.ParamName}}", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}`
-	var funcVals anthaParam
-	funcVals.PkgName = p.pkgName
-	funcVals.ParamName = strings.Title(name)
-	funcVals.ParamCount = paramCount
-
-	t := template.Must(template.New("On" + name).Parse(tpl))
-
-	var b bytes.Buffer
-	t.Execute(&b, funcVals)
-	p.print(b, newline)
 }
 
 // Return appropriate go type string for an antha (type) expr
@@ -246,17 +215,11 @@ func (p *compiler) removeParamDecls(src *ast.File) {
 
 // Modify AST
 func (p *compiler) transform(src *ast.File) {
-	p.addAnthaImports(src,
-		[]string{
-			"github.com/antha-lang/antha/microArch/execution",
-			"github.com/antha-lang/antha/antha/anthalib/wunit",
-			"github.com/antha-lang/antha/antha/execute",
-			"github.com/antha-lang/antha/flow",
-			"sync",
-			"runtime/debug",
-			"encoding/json",
-		},
-	)
+	var imports []string
+	for i := range p.imports {
+		imports = append(imports, i)
+	}
+	p.addAnthaImports(src, imports)
 	p.sugarAST(src.Decls)
 	p.addPreamble(src.Decls)
 	p.removeParamDecls(src)
@@ -265,13 +228,7 @@ func (p *compiler) transform(src *ast.File) {
 // Print out additional go code for each antha file
 func (p *compiler) generate() {
 	p.genBoilerplate()
-
-	for _, param := range p.params {
-		p.genOnFunction(param, len(p.params))
-	}
-
 	p.genStructs()
-	p.genComponentInfo()
 }
 
 func sortKeys(m map[string]string) []string {
@@ -346,171 +303,74 @@ func (p *compiler) recordOutputUse(decls []ast.Decl) {
 
 // function to generate boilerplate antha element code //TODO insert blockID
 func (p *compiler) genBoilerplate() {
-	var boilerPlateTemplate = `// AsyncBag functions
-func (e *{{.PkgName}}) Complete(params interface{}) {
-	p := params.({{.PkgName}}ParamBlock)
-	if p.Error {
-{{range .Results}}		e.{{.OutputVariableName}} <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-{{end}}		return
+	var boilerPlateTemplate = `
+func _run(_ctx context.Context, value inject.Value) (inject.Value, error) {
+	input := &Input_{}
+	output := &Output_{}
+	if err := inject.Assign(value, input); err != nil {
+		return nil, err
 	}
-	r := new({{.PkgName}}ResultBlock)
-	defer func() {
-		if res := recover(); res != nil {
-{{range .Results}}		e.{{.OutputVariableName}} <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-{{end}}		execute.AddError(&execute.RuntimeError{BaseError: res, Stack: debug.Stack()})
-			return
-		}
-	}()
-	e.startup.Do(func() { e.setup(p) })
-	e.steps(p, r)
-{{range .StepsOutput}}
-	e.{{.OutputVariableName}} <- execute.ThreadParam{Value: r.{{.ResultVariableName}}, ID: p.ID, Error: false}
-{{end}}
-	e.analysis(p, r)
-{{range .AnalysisOutput}}
-	e.{{.OutputVariableName}} <- execute.ThreadParam{Value: r.{{.ResultVariableName}}, ID: p.ID, Error: false}
-{{end}}
-	e.validation(p, r)
-{{range .ValidationOutput}}	e.{{.OutputVariableName}} <- execute.ThreadParam{Value: r.{{.ResultVariableName}}, ID: p.ID, Error: false}
-{{end}}
+	_setup(_ctx, input)
+	_steps(_ctx, input, output)
+	_analysis(_ctx, input, output)
+	_validation(_ctx, input, output)
+	return inject.MakeValue(output), nil
 }
 
-// init function, read characterization info from seperate file to validate ranges?
-func (e *{{.PkgName}}) init() {
-	e.params = make(map[execute.ThreadID]*execute.AsyncBag)
-}
+var (
+	{{range .Uses}} _ = {{.}}
+	{{end}}
+)
 
-func (e *{{.PkgName}}) NewConfig() interface{} {
-	return &{{.PkgName}}Config{}
-}
-
-func (e *{{.PkgName}}) NewParamBlock() interface{} {
-	return &{{.PkgName}}ParamBlock{}
-}
-
-func New{{.PkgName}}() interface{} {//*{{.PkgName}} {
-	e := new({{.PkgName}})
-	e.init()
-	return e
-}
-{{$p := .PkgName}}
-// Mapper function
-func (e *{{.PkgName}}) Map(m map[string]interface{}) interface{} {
-	var res {{.PkgName}}ParamBlock
-	res.Error = false {{range .Params}} || m["{{.Name}}"].(execute.ThreadParam).Error{{end}}
-{{range .Params}}
-	v{{.Name}}, is := m["{{.Name}}"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp {{$p}}JSONBlock
-		json.Unmarshal([]byte(v{{.Name}}.JSONString), &temp)
-		res.{{.Name}} = *temp.{{.Name}}
-	} else {
-		res.{{.Name}} = m["{{.Name}}"].(execute.ThreadParam).Value.({{.Type}})
+func New() interface{} {
+	return &Element_{
+		inject.CheckedRunner {
+			RunFunc: _run,
+			In: 	 &Input_{},
+			Out: 	 &Output_{},
+		},
 	}
-{{end}}
-{{if .HasIdLine}}
-	res.ID = m["{{.IdVarName}}"].(execute.ThreadParam).ID
-	res.BlockID = m["{{.IdVarName}}"].(execute.ThreadParam).BlockID
-{{end}}
-	return res
 }
-
 `
-	//res.Error = false {{range .Params}} || m["{{.IdVarName}}"].(execute.ThreadParam).Error {{end}}
-	type BoilerPlateParamVars struct {
-		Name, Type string
+	var params struct {
+		Uses []string
 	}
-	type OutputRedirection struct {
-		OutputVariableName, ResultVariableName string
-	}
-	type BoilerPlateVars struct {
-		PkgName          string
-		Params           []BoilerPlateParamVars
-		HasIdLine        bool
-		IdVarName        string
-		StepsOutput      []OutputRedirection
-		AnalysisOutput   []OutputRedirection
-		ValidationOutput []OutputRedirection
-		Results          []OutputRedirection
-	}
-
-	bpVars := BoilerPlateVars{PkgName: p.pkgName}
-	for _, name := range p.params {
-		bpVars.Params = append(bpVars.Params, BoilerPlateParamVars{name, p.paramTypes[name]})
-	}
-	// TODO(ddn): Check if first or alphabetically first param can serve as ID
-	if len(p.params) > 0 {
-		bpVars.HasIdLine = true
-		bpVars.IdVarName = p.params[0]
-	}
-	for _, name := range p.results {
-		if name[0:1] == strings.ToUpper(name[0:1]) { // only upper case are external
-			bpVars.Results = append(bpVars.Results, OutputRedirection{name, name})
-			_, an := p.reuseMap[token.ANALYSIS][name]
-			_, va := p.reuseMap[token.VALIDATION][name]
-			if !(an || va) { //steps is the last one it appeared (if it did)
-				bpVars.StepsOutput = append(bpVars.StepsOutput, OutputRedirection{name, name})
-			} else if !va { //analysis is the last one it appeared (if it did)
-				bpVars.AnalysisOutput = append(bpVars.AnalysisOutput, OutputRedirection{name, name})
-			} else { //validation is the last one it appeared (if it did)
-				bpVars.ValidationOutput = append(bpVars.ValidationOutput, OutputRedirection{name, name})
-			}
+	for _, use := range p.imports {
+		if len(use) > 0 {
+			params.Uses = append(params.Uses, use)
 		}
 	}
+	sort.Strings(params.Uses)
 
-	var b bytes.Buffer
-	t := template.Must(template.New(p.pkgName + "_boilerplate").Parse(boilerPlateTemplate))
-	t.Execute(&b, bpVars)
-	p.print(b, newline)
+	var buf bytes.Buffer
+	t := template.Must(template.New("").Parse(boilerPlateTemplate))
+	t.Execute(&buf, params)
+	p.print(buf, newline)
 }
 
 // helper function to generate the paramblock and primary element structs
 func (p *compiler) genStructs() {
-	var structTemplate = `type {{.ElementName}} struct {
-	flow.Component                    // component "superclass" embedded
-	lock           sync.Mutex
-	startup        sync.Once
-	params         map[execute.ThreadID]*execute.AsyncBag{{range .Inports}}
-	{{.Name}}		<-chan execute.ThreadParam{{end}}{{range .Outports}}
-	{{.Name}}		chan<- execute.ThreadParam{{end}}
+	var structTemplate = `type Element_ struct {
+	inject.CheckedRunner
 }
 
-type {{.ElementName}}ParamBlock struct{
-	ID		execute.ThreadID
-	BlockID	execute.BlockID
-	Error	bool{{range .Params}}
-	{{.Name}}		{{.Type}}{{end}}
+type Input_ struct {
+	{{range .Params}}{{.Name}} {{.Type}}
+	{{end}}
 }
 
-type {{.ElementName}}Config struct{
-	ID		execute.ThreadID
-	BlockID	execute.BlockID
-	Error	bool{{range .Configs}}
-	{{.Name}}		{{.Type}}{{end}}
-}
-
-type {{.ElementName}}ResultBlock struct{
-	ID		execute.ThreadID
-	BlockID	execute.BlockID
-	Error	bool{{range .Results}}
-	{{.Name}}		{{.Type}}{{end}}
-}
-
-type {{.ElementName}}JSONBlock struct{
-	ID			*execute.ThreadID
-	BlockID		*execute.BlockID
-	Error		*bool{{range .Params}}
-	{{.Name}}		*{{.Type}}{{end}}{{range .Results}}
-	{{.Name}}		*{{.Type}}{{end}}
+type Output_ struct{
+	{{range .Results}}{{.Name}} {{.Type}}
+	{{end}}
 }`
 
 	type VarSpec struct {
 		Name, Type string
 	}
 	type StructSpec struct {
-		ElementName              string
-		Params, Inports, Configs []VarSpec
-		Results, Outports        []VarSpec
+		ElementName string
+		Params      []VarSpec
+		Results     []VarSpec
 	}
 
 	t := template.Must(template.New(p.pkgName + "_struct").Parse(structTemplate))
@@ -519,54 +379,10 @@ type {{.ElementName}}JSONBlock struct{
 	structSpec.ElementName = p.pkgName
 	for _, name := range p.params {
 		ts := p.paramTypes[name]
-		cs := p.configTypes[name]
 		structSpec.Params = append(structSpec.Params, VarSpec{name, ts})
-		structSpec.Inports = append(structSpec.Inports, VarSpec{name, ts})
-		structSpec.Configs = append(structSpec.Configs, VarSpec{name, cs})
 	}
 	for _, name := range p.results {
 		structSpec.Results = append(structSpec.Results, VarSpec{name, p.resultTypes[name]})
-		if name[0:1] == strings.ToUpper(name[0:1]) {
-			structSpec.Outports = append(structSpec.Outports, VarSpec{name, p.resultTypes[name]})
-		}
-	}
-	var b bytes.Buffer
-	t.Execute(&b, structSpec)
-	p.print(b, newline)
-}
-
-func (p *compiler) genComponentInfo() {
-	var tmp = `
-func (c *{{.ElementName}}) ComponentInfo() *execute.ComponentInfo {
-	inp := make([]execute.PortInfo,0)
-	outp := make([]execute.PortInfo,0)
-{{range .Inports}}	inp = append(inp, *execute.NewPortInfo( "{{.Name}}", "{{.Type}}", "{{.Name}}", true, true, nil, nil))
-{{end}}{{range .Outports}}	outp = append(outp, *execute.NewPortInfo( "{{.Name}}", "{{.Type}}", "{{.Name}}", true, true, nil, nil))
-{{end}}
-	ci := execute.NewComponentInfo("{{.ElementName}}", "{{.ElementName}}", "", false, inp, outp)
-
-	return ci
-}`
-
-	type VarSpec struct {
-		Name, Type string
-	}
-	type StructSpec struct {
-		ElementName       string
-		Inports, Outports []VarSpec
-	}
-
-	t := template.Must(template.New(p.pkgName + "_jsonDesc").Parse(tmp))
-
-	var structSpec StructSpec
-	structSpec.ElementName = p.pkgName
-	for _, name := range p.params {
-		structSpec.Inports = append(structSpec.Inports, VarSpec{name, p.paramTypes[name]})
-	}
-	for _, name := range p.results {
-		if name[0:1] == strings.ToUpper(name[0:1]) {
-			structSpec.Outports = append(structSpec.Outports, VarSpec{name, p.resultTypes[name]})
-		}
 	}
 	var b bytes.Buffer
 	t.Execute(&b, structSpec)
@@ -575,57 +391,23 @@ func (c *{{.ElementName}}) ComponentInfo() *execute.ComponentInfo {
 
 // Add statements to the beginning of antha decls
 func (p *compiler) addPreamble(decls []ast.Decl) {
-	for _, decl := range decls {
-		switch d := decl.(type) {
-		case *ast.AnthaDecl:
-			if d.Tok == token.REQUIREMENTS {
-				//_ = wunit.Make_units
-				s2Lhs, _ := parser.ParseExpr("_")
-				s2Rhs, _ := parser.ParseExpr("wunit.Make_units")
-				s2 := &ast.AssignStmt{
-					Lhs:    []ast.Expr{s2Lhs},
-					Rhs:    []ast.Expr{s2Rhs},
-					TokPos: d.TokPos,
-					Tok:    token.ASSIGN,
-				}
-				d.Body.List = append([]ast.Stmt{s2}, d.Body.List...)
-
-				continue
-			}
-			// `_wrapper := execution.NewWrapper()`
-			s1Lhs, _ := parser.ParseExpr("_wrapper")
-			s1Rhs, _ := parser.ParseExpr("execution.NewWrapper(p.ID, p.BlockID, p)")
-			s1 := &ast.AssignStmt{
-				Lhs:    []ast.Expr{s1Lhs},
-				Rhs:    []ast.Expr{s1Rhs},
-				TokPos: d.TokPos,
-				Tok:    token.DEFINE,
-			}
-			// `_ = _wrapper`
-			s2Lhs, _ := parser.ParseExpr("_")
-			s2Rhs, _ := parser.ParseExpr("_wrapper")
-			s2 := &ast.AssignStmt{
-				Lhs:    []ast.Expr{s2Lhs},
-				Rhs:    []ast.Expr{s2Rhs},
-				TokPos: d.TokPos,
-				Tok:    token.ASSIGN,
-			}
-
-			s3Lhs, _ := parser.ParseExpr("_")
-			s3Rhs, _ := parser.ParseExpr("_wrapper.WaitToEnd()") //TODO won't handle intermediate waiting
-			s3 := &ast.AssignStmt{
-				Lhs:    []ast.Expr{s3Lhs},
-				Rhs:    []ast.Expr{s3Rhs},
-				TokPos: d.TokPos,
-				Tok:    token.ASSIGN,
-			}
-
-			d.Body.List = append([]ast.Stmt{s1, s2}, d.Body.List...)
-			d.Body.List = append(d.Body.List, s3)
-		default:
-			continue
-		}
-	}
+	//for _, decl := range decls {
+	//	switch d := decl.(type) {
+	//	case *ast.AnthaDecl:
+	//		// `_wrapper := execution.NewWrapper()`
+	//		s1Lhs, _ := parser.ParseExpr("_wrapper")
+	//		s1Rhs, _ := parser.ParseExpr("execution.NewWrapper(p.ID, p.BlockID, p)")
+	//		s1 := &ast.AssignStmt{
+	//			Lhs:    []ast.Expr{s1Lhs},
+	//			Rhs:    []ast.Expr{s1Rhs},
+	//			TokPos: d.TokPos,
+	//			Tok:    token.DEFINE,
+	//		}
+	//		d.Body.List = append([]ast.Stmt{s1, s2}, d.Body.List...)
+	//	default:
+	//		continue
+	//	}
+	//}
 }
 
 // Update AST for antha semantics
@@ -729,41 +511,29 @@ func (p *compiler) sugarForParams(body *ast.BlockStmt) {
 	// TODO(ddn): merge with sugarForTypes or clone and adopt a similar strategy to
 	// restrict replacements to unqualified variable use. Right now, the code below
 	// can rewrite field accesses, etc.
-	list := body.List
-
-	for i := range list {
-		ast.Inspect(list[i], func(n ast.Node) bool {
+	for _, node := range body.List {
+		ast.Inspect(node, func(n ast.Node) bool {
 			switch node := n.(type) {
 			case nil:
 				return false
 			case *ast.Ident:
 				// sugar the name if it is a known param
 				if _, ok := p.paramTypes[node.Name]; ok {
-					node.Name = "p." + node.Name
+					node.Name = "_input." + node.Name
 				} else if _, ok := p.resultTypes[node.Name]; ok {
-					node.Name = "r." + node.Name
+					node.Name = "_output." + node.Name
 				}
 				// test if the left hand side of an assignment is to a results variable
 				// if so, sugar it by replacing the = with a channel operation
 			case *ast.AssignStmt:
 				// test if a result is being assigned to.
-				fix_assign := false
 				for j := range node.Lhs {
 					if ident, ok := node.Lhs[j].(*ast.Ident); ok {
 						isUpper := ident.Name[0:1] == strings.ToUpper(ident.Name[0:1])
 						if _, fixme := p.resultTypes[ident.Name]; fixme && isUpper {
-							//fix_assign = true
-							ident.Name = "r." + ident.Name
+							ident.Name = "_output." + ident.Name
 						}
 					}
-				}
-				//TODO: generate multiple stmts if needed
-				if fix_assign {
-					if len(node.Rhs) > 1 {
-						// currently undefined so panic
-						panic("too many right hand exprs")
-					}
-					list[i] = &ast.SendStmt{node.Lhs[0], node.TokPos, p.wrapParamExpr(node.Rhs[0])}
 				}
 			default:
 			}
@@ -773,21 +543,20 @@ func (p *compiler) sugarForParams(body *ast.BlockStmt) {
 }
 
 // Replace bare antha function names with go qualified names
-func (p *compiler) sugarForIntrinsics(root ast.Node) {
-	// TODO(ddn): merge with sugarForTypes or clone and adopt a similar strategy to
-	// restrict replacements to unqualified variable use. Right now, the code below
-	// can rewrite field accesses, etc.
-	ast.Inspect(root, func(n ast.Node) bool {
-		switch n := n.(type) {
+func (p *compiler) sugarForIntrinsics(body *ast.BlockStmt) {
+	ast.Inspect(body, func(node ast.Node) bool {
+		switch n := node.(type) {
 		case nil:
-			return false
-		case *ast.Ident:
-			// sugar the name if it is a known param
-			if sugar, ok := p.intrinsics[n.Name]; ok {
-				n.Name = sugar
+		case *ast.CallExpr:
+			if ident, direct := n.Fun.(*ast.Ident); !direct {
+				break
+			} else if sugar, ok := p.intrinsics[ident.Name]; !ok {
+				break
+			} else {
+				ident.Name = sugar
+				expr, _ := parser.ParseExpr("_ctx")
+				n.Args = append([]ast.Expr{expr}, n.Args...)
 			}
-			// test if the left hand side of an assignment is to a results variable
-			// if so, sugar it by replacing the = with a channel operation
 		default:
 		}
 		return true

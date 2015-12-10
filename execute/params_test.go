@@ -2,6 +2,7 @@ package execute
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/factory"
 	"reflect"
 	"testing"
@@ -168,6 +169,23 @@ func TestConstructSlice(t *testing.T) {
 	} else if bb, ok := s[1].(*wtype.LHPlate); !ok {
 		t.Errorf("expecting %v but got %v instead", golden, s)
 	} else if aa.Type != bb.Type {
+		t.Errorf("expecting %v but got %v instead", golden, s)
+	}
+}
+
+func TestSetTime(t *testing.T) {
+	type Value map[string]interface{}
+	x := Value{
+		"A": wunit.Time{},
+	}
+	golden := Value{
+		"A": wunit.NewTime(60.0, "s"),
+	}
+	if v, err := unmarshal(reflect.ValueOf(x), []byte(`{ "A": "60s" }`)); err != nil {
+		t.Fatal(err)
+	} else if s, ok := v.Interface().(Value); !ok {
+		t.Fatalf("expecting %T but got %T instead", x, v.Interface())
+	} else if !reflect.DeepEqual(s, golden) {
 		t.Errorf("expecting %v but got %v instead", golden, s)
 	}
 }

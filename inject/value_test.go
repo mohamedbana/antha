@@ -1,6 +1,7 @@
 package inject
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -56,5 +57,22 @@ func TestAssign(t *testing.T) {
 		t.Error(err)
 	} else if x2.A != 3 || x2.B != "hello" {
 		t.Errorf("expecting %v got %v", x1, x2)
+	}
+}
+
+func TestMakeValue(t *testing.T) {
+	type Alpha struct {
+		A int
+		B string
+	}
+
+	var a, b Alpha
+
+	a.A = 1
+	a.B = "hello"
+	b = a
+
+	if !reflect.DeepEqual(MakeValue(a), MakeValue(&b)) {
+		t.Errorf("expecting %v to equal %v", a, b)
 	}
 }

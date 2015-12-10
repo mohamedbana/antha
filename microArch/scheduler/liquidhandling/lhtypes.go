@@ -25,14 +25,13 @@ package liquidhandling
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 )
 
 // structure for defining a request to the liquid handler
 type LHRequest struct {
 	ID                         string
-	BlockID                    execute.BlockID
+	BlockID                    wtype.BlockID
 	BlockName                  string
 	OutputCount                int
 	Output_solutions           map[string]*wtype.LHSolution

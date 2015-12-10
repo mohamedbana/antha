@@ -3,7 +3,6 @@ package inject
 import (
 	"errors"
 	"fmt"
-	"github.com/fatih/structs"
 	"reflect"
 )
 
@@ -14,8 +13,34 @@ var stringType = reflect.TypeOf("")
 // function parameters.
 type Value map[string]interface{}
 
+func makeValue(value reflect.Value) map[string]interface{} {
+	var m map[string]interface{}
+
+	switch value.Type().Kind() {
+	case reflect.Map:
+		m = make(map[string]interface{})
+		for _, key := range value.MapKeys() {
+			skey, ok := key.Interface().(string)
+			if ok {
+				m[skey] = value.MapIndex(key).Interface()
+			}
+		}
+	case reflect.Struct:
+		m = make(map[string]interface{})
+		typ := value.Type()
+		for idx, l := 0, value.NumField(); idx < l; idx += 1 {
+			name := typ.Field(idx).Name
+			m[name] = value.Field(idx).Interface()
+		}
+	case reflect.Ptr:
+		return makeValue(value.Elem())
+	default:
+	}
+	return m
+}
+
 func MakeValue(x interface{}) map[string]interface{} {
-	return structs.Map(x)
+	return makeValue(reflect.ValueOf(x))
 }
 
 func isStringMap(value reflect.Value) bool {
