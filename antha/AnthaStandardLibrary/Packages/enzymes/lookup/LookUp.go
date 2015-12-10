@@ -14,6 +14,7 @@ import (
 	"strings"
 )
 
+// Package for looking up restriction enzyme properties
 func TypeIIsLookup(name string) (enzyme wtype.TypeIIs, err error) {
 	enz := EnzymeLookup(name)
 
