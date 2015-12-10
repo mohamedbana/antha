@@ -155,12 +155,12 @@ func (m *FlowRate) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (m *Amount) MarshalJSON() ([]byte, error) {
+func (m *Moles) MarshalJSON() ([]byte, error) {
 	return marshal(m)
 
 }
 
-func (m *Amount) UnmarshalJSON(b []byte) error {
+func (m *Moles) UnmarshalJSON(b []byte) error {
 	if value, unit, err := unmarshal(b); err != nil {
 		return err
 	} else if unit != "" {

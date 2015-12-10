@@ -151,23 +151,23 @@ func (m *Mass) Quantity() Measurement {
 }
 
 // mole
-type Amount struct {
+type Moles struct {
 	ConcreteMeasurement
 }
 
 // generate a new Amount in moles
-func NewAmount(v float64, unit string) Amount {
+func NewAmount(v float64, unit string) Moles {
 	if unit != "M" {
 		logger.Fatal("Can't make amounts which aren't in moles")
 		panic("Can't make amounts which aren't in moles")
 	}
 
-	m := Amount{NewMeasurement(v, "", unit)}
+	m := Moles{NewMeasurement(v, "", unit)}
 	return m
 }
 
 // defines Amount to be a SubstanceQuantity
-func (a *Amount) Quantity() Measurement {
+func (a *Moles) Quantity() Measurement {
 	return a
 }
 

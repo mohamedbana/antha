@@ -18,13 +18,18 @@ type PHperdegC float64
 type PHMeasurement struct {
 	Component       *wtype.LHComponent
 	Location        *wtype.LHPlate
-	PH              float64
+	PHValue         float64
 	Temp            wunit.Temperature
 	TempCorrected   *float64
 	RefTemp         *wunit.Temperature
 	TempCoefficient *PHperdegC
 	Adjusted        *float64
 	Adjustedwith    *wtype.LHComponent
+}
+
+type PH struct {
+	PHValue PH
+	Temp    wunit.Temperature
 }
 
 func (ph *PHMeasurement) TempCompensation(reftemp wunit.Temperature, tempcoefficientforsolution PHperdegC) (compensatedph float64) {

@@ -3,8 +3,8 @@
         "name": "main"
     },
     "processes": {
-        "AliquotParams": {
-            "component": "Aliquot",
+        "EnterNameForYourParameters": {
+            "component": "ProtocolName_from_an_file",
             "metadata": {
                 "label": "CS"
             }
