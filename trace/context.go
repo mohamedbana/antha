@@ -3,6 +3,7 @@ package trace
 import (
 	"errors"
 	"golang.org/x/net/context"
+	"runtime/debug"
 	"sync"
 )
 
@@ -309,7 +310,15 @@ func Go(parent context.Context, fn func(ctx context.Context) error) {
 	pctx.alive += 1
 
 	go func() {
-		err := fn(ctx)
-		decrement(pctx, tr, 1, err)
+		var err error
+		defer func() {
+			decrement(pctx, tr, 1, err)
+		}()
+		defer func() {
+			if res := recover(); res != nil {
+				err = &goError{BaseError: res, Stack: debug.Stack()}
+			}
+		}()
+		err = fn(ctx)
 	}()
 }

@@ -30,6 +30,7 @@ func (a *trace) signalWithLock(lockedPool *poolCtx) error {
 
 func (a *trace) execute() error {
 	// XXX: Sort instructions
+
 	for _, v := range a.issue {
 		v.promise.set(nil)
 		close(v.promise.out)
