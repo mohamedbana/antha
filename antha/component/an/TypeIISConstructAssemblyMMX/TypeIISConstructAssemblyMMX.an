@@ -18,6 +18,8 @@ Parameters (
 	InactivationTemp			Temperature
 	InactivationTime			Time
 	OutputReactionName			string
+	OutputLocation 				string
+	OutputPlateNum				int
 )
 
 // Physical Inputs to this protocol with types
@@ -27,7 +29,6 @@ Inputs (
 	Water			*wtype.LHComponent
 	MasterMix		*wtype.LHComponent
 	OutPlate		*wtype.LHPlate
-	InPlate			*wtype.LHPlate
 )
 
 
@@ -64,7 +65,7 @@ Steps {
 		samples = append(samples, partSample)
 	}
 
-	Reaction = MixInto(OutPlate, samples...)
+	Reaction = MixTo(OutPlate, OutputLocation, samples...)
 
 	// incubate the reaction mixture
 	Incubate(Reaction, ReactionTemp, ReactionTime, false)

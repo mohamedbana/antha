@@ -61,6 +61,7 @@ func (p *compiler) anthaInit() {
 		p.reuseMap[tok] = make(map[string]bool)
 	}
 	p.intrinsics = map[string]string{
+		"MixTo":    "_wrapper.MixTo",
 		"MixInto":  "_wrapper.MixInto",
 		"Mix":      "_wrapper.Mix",
 		"Incubate": "_wrapper.Incubate",
@@ -76,7 +77,7 @@ func (p *compiler) anthaInit() {
 		"Mass":              "wunit.Mass",
 		"Angle":             "wunit.Angle",
 		"Energy":            "wunit.Energy",
-		"SubstanceQuantity": "wunit.SubstantQuantity",
+		"SubstanceQuantity": "wunit.SubstanceQuantity",
 	}
 }
 

@@ -149,3 +149,26 @@ func MixInto(destination *wtype.LHPlate, components ...*wtype.LHComponent) *wtyp
 
 	return ret
 }
+
+// mix the specified wtype.LHComponents together into the destination
+// specified as the first argument
+func MixTo(destination *wtype.LHPlate, address string, components ...*wtype.LHComponent) *wtype.LHSolution {
+	// we must respect the order in which things are mixed.
+	// the convention is that mix(X,Y) corresponds to "Add Y to X"
+
+	ret := wtype.NewLHSolution()
+
+	// we use the first argument to specify the destination
+
+	ret.ContainerType = destination.Type
+	ret.Platetype = destination.Type
+	ret.Welladdress = address
+	ret.Components = components
+
+	// this translates to the component ordering in the resulting solution
+	for i, cmp := range components {
+		cmp.Order = i
+	}
+
+	return ret
+}

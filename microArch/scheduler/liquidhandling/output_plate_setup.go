@@ -41,6 +41,7 @@ func output_plate_setup(request *LHRequest) *LHRequest {
 		wutil.Error(errors.New("plate_setup: No output plate type defined"))
 	}
 
+	// this might be OK if we have pre-defined output
 	if (*request).Output_major_group_layouts == nil {
 		wutil.Error(errors.New("plate setup: Output major groups undefined"))
 	}

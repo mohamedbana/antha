@@ -40,6 +40,7 @@ var (
 	workflowFile   string
 	driverURI      string
 	list           bool
+	inputPlateFile string
 )
 
 func run() error {
@@ -54,6 +55,16 @@ func run() error {
 	}
 
 	cfData, err := ioutil.ReadFile(parametersFile)
+	if err != nil {
+		return err
+	}
+
+	var ipData []byte
+
+	if inputPlateFile != "" {
+		ipData, err = ioutil.ReadFile(inputPlateFile)
+	}
+
 	if err != nil {
 		return err
 	}
@@ -124,6 +135,7 @@ func main() {
 	flag.StringVar(&workflowFile, "workflow", "workflow.json", "workflow definition file")
 	flag.StringVar(&logFile, "log", "", "log file")
 	flag.StringVar(&driverURI, "driver", "", "uri where a grpc driver implementation listens")
+	flag.StringVar(&inputPlateFile, "inputFile", "", "filename for an input plate definition")
 	flag.Parse()
 
 	if list {

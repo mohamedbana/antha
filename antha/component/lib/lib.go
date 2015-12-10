@@ -413,6 +413,8 @@ func GetComponents() []ComponentDesc {
 	portMap["TypeIISConstructAssemblyMMX"]["MMXVol"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["MasterMix"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["OutPlate"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["OutputLocation"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["OutputPlateNum"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["OutputReactionName"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["PartNames"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["PartVols"] = true

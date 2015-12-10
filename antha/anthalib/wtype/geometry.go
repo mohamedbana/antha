@@ -114,3 +114,10 @@ func (wc *WellCoords) FormatA1() string {
 func (wc *WellCoords) WellNumber() int {
 	return (8*(wc.X-1) + wc.Y)
 }
+
+func (wc *WellCoords) ColNumString() string {
+	return strconv.Itoa(wc.X + 1)
+}
+func (wc *WellCoords) RowLettString() string {
+	return NumToAlpha(wc.Y + 1)
+}
