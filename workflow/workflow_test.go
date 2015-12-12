@@ -3,7 +3,7 @@ package workflow
 import (
 	"fmt"
 	"github.com/antha-lang/antha/inject"
-	"golang.org/x/net/context"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"io/ioutil"
 	"path/filepath"
 	"testing"

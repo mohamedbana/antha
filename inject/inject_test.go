@@ -1,7 +1,7 @@
 package inject
 
 import (
-	"golang.org/x/net/context"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"testing"
 )
 

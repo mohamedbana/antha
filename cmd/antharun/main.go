@@ -28,7 +28,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
-	"golang.org/x/net/context"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"io/ioutil"
 	"log"
 	"os"

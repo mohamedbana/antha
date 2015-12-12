@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/trace"
-	"golang.org/x/net/context"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"sync"
 )
 

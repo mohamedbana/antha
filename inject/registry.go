@@ -2,7 +2,7 @@ package inject
 
 import (
 	"errors"
-	"golang.org/x/net/context"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"sync"
 )
 

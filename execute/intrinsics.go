@@ -9,7 +9,7 @@ import (
 	"github.com/antha-lang/antha/microArch/equipment"
 	"github.com/antha-lang/antha/microArch/equipment/action"
 	"github.com/antha-lang/antha/microArch/logger"
-	"golang.org/x/net/context"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 )
 
 func Incubate(ctx context.Context, what *wtype.LHSolution, temp wunit.Temperature, time wunit.Time, shaking bool) {

@@ -7,7 +7,7 @@ import (
 	"github.com/antha-lang/antha/microArch/equipment"
 	"github.com/antha-lang/antha/microArch/equipment/action"
 	"github.com/antha-lang/antha/microArch/equipmentManager"
-	"golang.org/x/net/context"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 )
 
 var (

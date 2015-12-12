@@ -79,10 +79,10 @@ func (p *compiler) anthaInit() {
 		"SubstanceQuantity": "wunit.SubstantQuantity",
 	}
 	p.imports = map[string]string{
-		"github.com/antha-lang/antha/antha/anthalib/wunit": "wunit.Make_units",
-		"github.com/antha-lang/antha/execute":              "execute.MixInto",
-		"github.com/antha-lang/antha/inject":               "",
-		"golang.org/x/net/context":                         "",
+		"github.com/antha-lang/antha/antha/anthalib/wunit":              "wunit.Make_units",
+		"github.com/antha-lang/antha/execute":                           "execute.MixInto",
+		"github.com/antha-lang/antha/inject":                            "",
+		"github.com/antha-lang/antha/bvendor/golang.org/x/net/context": "",
 	}
 }
 

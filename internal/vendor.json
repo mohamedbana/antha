@@ -3,18 +3,14 @@
 	"ignore": "",
 	"package": [
 		{
-			"canonical": "code.google.com/p/go-sqlite/go1/sqlite3",
-			"comment": "",
-			"local": "code.google.com/p/go-sqlite/go1/sqlite3",
-			"revision": "6e75c20f8fc4",
-			"revisionTime": "2013-09-15T19:25:44-04:00"
+			"path": "",
+			"revision": "cad5a317cd03372c35d86059dd99344b5542a072",
+			"revisionTime": "2015-05-06T14:43:48+09:30"
 		},
 		{
-			"canonical": "code.google.com/p/go-sqlite/go1/sqlite3/codec",
-			"comment": "",
-			"local": "code.google.com/p/go-sqlite/go1/sqlite3/codec",
-			"revision": "6e75c20f8fc4",
-			"revisionTime": "2013-09-15T19:25:44-04:00"
+			"path": "",
+			"revision": "c3eb24aeea63668ebdac08d2e252f20df8b6b1ae",
+			"revisionTime": "2015-03-27T18:25:44-07:00"
 		},
 		{
 			"path": "",
@@ -67,17 +63,17 @@
 			"revisionTime": "2015-05-06T14:43:48+09:30"
 		},
 		{
-			"path": "",
-			"revision": "cad5a317cd03372c35d86059dd99344b5542a072",
-			"revisionTime": "2015-05-06T14:43:48+09:30"
-		},
-		{
-			"path": "",
-			"revision": "c3eb24aeea63668ebdac08d2e252f20df8b6b1ae",
-			"revisionTime": "2015-03-27T18:25:44-07:00"
+			"path": "code.google.com/p/go-sqlite/go1/sqlite3",
+			"revision": "6e75c20f8fc4",
+			"revisionTime": "2013-09-15T19:25:44-04:00"
 		},
 		{
 			"path": "code.google.com/p/go-sqlite/go1/sqlite3",
+			"revision": "6e75c20f8fc4",
+			"revisionTime": "2013-09-15T19:25:44-04:00"
+		},
+		{
+			"path": "code.google.com/p/go-sqlite/go1/sqlite3/codec",
 			"revision": "6e75c20f8fc4",
 			"revisionTime": "2013-09-15T19:25:44-04:00"
 		},
@@ -135,6 +131,11 @@
 			"path": "github.com/tealeg/xlsx",
 			"revision": "c2885b3e5cb5fb9b241bdab3430ca6e1c1057079",
 			"revisionTime": "2015-07-24T21:09:55+02:00"
+		},
+		{
+			"path": "golang.org/x/net/context",
+			"revision": "042ba42fa6633b34205efc66ba5719cd3afd8d38",
+			"revisionTime": "2015-11-08T11:16:06+01:00"
 		},
 		{
 			"path": "golang.org/x/net/html",
