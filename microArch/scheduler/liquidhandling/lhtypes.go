@@ -33,7 +33,6 @@ type LHRequest struct {
 	ID                         string
 	BlockID                    wtype.BlockID
 	BlockName                  string
-	OutputCount                int
 	Output_solutions           map[string]*wtype.LHSolution
 	Input_solutions            map[string][]*wtype.LHComponent
 	Plates                     map[string]*wtype.LHPlate
