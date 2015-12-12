@@ -1,15 +1,12 @@
 package Transformation
 
 import (
-	"encoding/json"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/antha/execute"
-	"github.com/antha-lang/antha/flow"
-	"github.com/antha-lang/antha/microArch/execution"
-	"runtime/debug"
-	"sync"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/execute"
+	"github.com/antha-lang/antha/inject"
 )
 
 // Input parameters for this protocol (data)
@@ -40,60 +37,64 @@ InactivationTime wunit.Time
 
 // Physical outputs from this protocol with types
 
-func (e *Transformation) requirements() {
-	_ = wunit.Make_units
-
+func _requirements() {
 }
 
 // Conditions to run on startup
-func (e *Transformation) setup(p TransformationParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
+func _setup(_ctx context.Context, _input *Input_) {
 }
 
 // The core process for this protocol, with the steps to be performed
 // for every input
-func (e *Transformation) steps(p TransformationParamBlock, r *TransformationResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-
+func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 	competentcells := make([]*wtype.LHComponent, 0)
-	competentcells = append(competentcells, p.CompetentCells)
-	readycompetentcells := _wrapper.MixInto(p.OutPlate, competentcells...)            // readycompetentcells IS now a LHSolution
-	_wrapper.Incubate(readycompetentcells, p.Preplasmidtemp, p.Preplasmidtime, false) // we can incubate an LHSolution so this is fine
+	competentcells = append(competentcells, _input.CompetentCells)
+	readycompetentcells := execute.MixInto(_ctx,
+
+		_input.OutPlate, competentcells...) // readycompetentcells IS now a LHSolution
+	execute.Incubate(_ctx,
+
+		readycompetentcells, _input.Preplasmidtemp, _input.Preplasmidtime, false) // we can incubate an LHSolution so this is fine
 
 	readycompetentcellsComp := wtype.SolutionToComponent(readycompetentcells)
 
-	competetentcellmix := mixer.Sample(readycompetentcellsComp, p.CompetentCellvolumeperassembly) // ERROR! mixer.Sample needs a liquid, not an LHSolution! however, the typeIIs method worked with a *wtype.LHComponent from inputs!
+	competetentcellmix := mixer.Sample(readycompetentcellsComp, _input.CompetentCellvolumeperassembly) // ERROR! mixer.Sample needs a liquid, not an LHSolution! however, the typeIIs method worked with a *wtype.LHComponent from inputs!
 	transformationmix := make([]*wtype.LHComponent, 0)
 	transformationmix = append(transformationmix, competetentcellmix)
-	DNAsample := mixer.Sample(p.Reaction, p.Reactionvolume)
+	DNAsample := mixer.Sample(_input.Reaction, _input.Reactionvolume)
 	transformationmix = append(transformationmix, DNAsample)
 
-	transformedcells := _wrapper.MixInto(p.OutPlate, transformationmix...)
+	transformedcells := execute.MixInto(_ctx,
 
-	_wrapper.Incubate(transformedcells, p.Postplasmidtemp, p.Postplasmidtime, false)
+		_input.OutPlate, transformationmix...)
+
+	execute.Incubate(_ctx,
+
+		transformedcells, _input.Postplasmidtemp, _input.Postplasmidtime, false)
 
 	transformedcellsComp := wtype.SolutionToComponent(transformedcells)
 
 	recoverymix := make([]*wtype.LHComponent, 0)
-	recoverymixture := mixer.Sample(p.Recoverymedium, p.Recoveryvolume)
+	recoverymixture := mixer.Sample(_input.Recoverymedium, _input.Recoveryvolume)
 
 	recoverymix = append(recoverymix, transformedcellsComp) // ERROR! transformedcells is now an LHSolution, not a liquid, so can't be used here
 	recoverymix = append(recoverymix, recoverymixture)
-	recoverymix2 := _wrapper.MixInto(p.OutPlate, recoverymix...)
+	recoverymix2 := execute.MixInto(_ctx,
 
-	_wrapper.Incubate(recoverymix2, p.Recoverytemp, p.Recoverytime, true)
+		_input.OutPlate, recoverymix...)
+
+	execute.Incubate(_ctx,
+
+		recoverymix2, _input.Recoverytemp, _input.Recoverytime, true)
 
 	recoverymix2Comp := wtype.SolutionToComponent(recoverymix2)
 
-	plateout := mixer.Sample(recoverymix2Comp, p.Plateoutvolume) // ERROR! recoverymix2 is now an LHSolution, not a liquid, so can't be used here
-	platedculture := _wrapper.MixInto(p.AgarPlate, plateout)
+	plateout := mixer.Sample(recoverymix2Comp, _input.Plateoutvolume) // ERROR! recoverymix2 is now an LHSolution, not a liquid, so can't be used here
+	platedculture := execute.MixInto(_ctx,
 
-	r.Platedculture = platedculture
-	_ = _wrapper.WaitToEnd()
+		_input.AgarPlate, plateout)
+
+	_output.Platedculture = platedculture
 
 	/*atpSample := mixer.Sample(Atp, AtpVol)
 	samples = append(samples, atpSample)
@@ -138,497 +139,48 @@ func (e *Transformation) steps(p TransformationParamBlock, r *TransformationResu
 
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
-func (e *Transformation) analysis(p TransformationParamBlock, r *TransformationResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
+func _analysis(_ctx context.Context, _input *Input_, _output *Output_) {
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
-func (e *Transformation) validation(p TransformationParamBlock, r *TransformationResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
+func _validation(_ctx context.Context, _input *Input_, _output *Output_) {
 }
 
-// AsyncBag functions
-func (e *Transformation) Complete(params interface{}) {
-	p := params.(TransformationParamBlock)
-	if p.Error {
-		e.Platedculture <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		return
+func _run(_ctx context.Context, value inject.Value) (inject.Value, error) {
+	input := &Input_{}
+	output := &Output_{}
+	if err := inject.Assign(value, input); err != nil {
+		return nil, err
 	}
-	r := new(TransformationResultBlock)
-	defer func() {
-		if res := recover(); res != nil {
-			e.Platedculture <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			execute.AddError(&execute.RuntimeError{BaseError: res, Stack: debug.Stack()})
-			return
-		}
-	}()
-	e.startup.Do(func() { e.setup(p) })
-	e.steps(p, r)
-
-	e.Platedculture <- execute.ThreadParam{Value: r.Platedculture, ID: p.ID, Error: false}
-
-	e.analysis(p, r)
-
-	e.validation(p, r)
-
+	_setup(_ctx, input)
+	_steps(_ctx, input, output)
+	_analysis(_ctx, input, output)
+	_validation(_ctx, input, output)
+	return inject.MakeValue(output), nil
 }
 
-// init function, read characterization info from seperate file to validate ranges?
-func (e *Transformation) init() {
-	e.params = make(map[execute.ThreadID]*execute.AsyncBag)
-}
+var (
+	_ = execute.MixInto
+	_ = wunit.Make_units
+)
 
-func (e *Transformation) NewConfig() interface{} {
-	return &TransformationConfig{}
-}
-
-func (e *Transformation) NewParamBlock() interface{} {
-	return &TransformationParamBlock{}
-}
-
-func NewTransformation() interface{} { //*Transformation {
-	e := new(Transformation)
-	e.init()
-	return e
-}
-
-// Mapper function
-func (e *Transformation) Map(m map[string]interface{}) interface{} {
-	var res TransformationParamBlock
-	res.Error = false || m["AgarPlate"].(execute.ThreadParam).Error || m["CompetentCells"].(execute.ThreadParam).Error || m["CompetentCellvolumeperassembly"].(execute.ThreadParam).Error || m["OutPlate"].(execute.ThreadParam).Error || m["Plateoutvolume"].(execute.ThreadParam).Error || m["Postplasmidtemp"].(execute.ThreadParam).Error || m["Postplasmidtime"].(execute.ThreadParam).Error || m["Preplasmidtemp"].(execute.ThreadParam).Error || m["Preplasmidtime"].(execute.ThreadParam).Error || m["Reaction"].(execute.ThreadParam).Error || m["Reactionvolume"].(execute.ThreadParam).Error || m["Recoverymedium"].(execute.ThreadParam).Error || m["Recoverytemp"].(execute.ThreadParam).Error || m["Recoverytime"].(execute.ThreadParam).Error || m["Recoveryvolume"].(execute.ThreadParam).Error
-
-	vAgarPlate, is := m["AgarPlate"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TransformationJSONBlock
-		json.Unmarshal([]byte(vAgarPlate.JSONString), &temp)
-		res.AgarPlate = *temp.AgarPlate
-	} else {
-		res.AgarPlate = m["AgarPlate"].(execute.ThreadParam).Value.(*wtype.LHPlate)
-	}
-
-	vCompetentCells, is := m["CompetentCells"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TransformationJSONBlock
-		json.Unmarshal([]byte(vCompetentCells.JSONString), &temp)
-		res.CompetentCells = *temp.CompetentCells
-	} else {
-		res.CompetentCells = m["CompetentCells"].(execute.ThreadParam).Value.(*wtype.LHComponent)
-	}
-
-	vCompetentCellvolumeperassembly, is := m["CompetentCellvolumeperassembly"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TransformationJSONBlock
-		json.Unmarshal([]byte(vCompetentCellvolumeperassembly.JSONString), &temp)
-		res.CompetentCellvolumeperassembly = *temp.CompetentCellvolumeperassembly
-	} else {
-		res.CompetentCellvolumeperassembly = m["CompetentCellvolumeperassembly"].(execute.ThreadParam).Value.(wunit.Volume)
-	}
-
-	vOutPlate, is := m["OutPlate"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TransformationJSONBlock
-		json.Unmarshal([]byte(vOutPlate.JSONString), &temp)
-		res.OutPlate = *temp.OutPlate
-	} else {
-		res.OutPlate = m["OutPlate"].(execute.ThreadParam).Value.(*wtype.LHPlate)
-	}
-
-	vPlateoutvolume, is := m["Plateoutvolume"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TransformationJSONBlock
-		json.Unmarshal([]byte(vPlateoutvolume.JSONString), &temp)
-		res.Plateoutvolume = *temp.Plateoutvolume
-	} else {
-		res.Plateoutvolume = m["Plateoutvolume"].(execute.ThreadParam).Value.(wunit.Volume)
-	}
-
-	vPostplasmidtemp, is := m["Postplasmidtemp"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TransformationJSONBlock
-		json.Unmarshal([]byte(vPostplasmidtemp.JSONString), &temp)
-		res.Postplasmidtemp = *temp.Postplasmidtemp
-	} else {
-		res.Postplasmidtemp = m["Postplasmidtemp"].(execute.ThreadParam).Value.(wunit.Temperature)
-	}
-
-	vPostplasmidtime, is := m["Postplasmidtime"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TransformationJSONBlock
-		json.Unmarshal([]byte(vPostplasmidtime.JSONString), &temp)
-		res.Postplasmidtime = *temp.Postplasmidtime
-	} else {
-		res.Postplasmidtime = m["Postplasmidtime"].(execute.ThreadParam).Value.(wunit.Time)
-	}
-
-	vPreplasmidtemp, is := m["Preplasmidtemp"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TransformationJSONBlock
-		json.Unmarshal([]byte(vPreplasmidtemp.JSONString), &temp)
-		res.Preplasmidtemp = *temp.Preplasmidtemp
-	} else {
-		res.Preplasmidtemp = m["Preplasmidtemp"].(execute.ThreadParam).Value.(wunit.Temperature)
-	}
-
-	vPreplasmidtime, is := m["Preplasmidtime"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TransformationJSONBlock
-		json.Unmarshal([]byte(vPreplasmidtime.JSONString), &temp)
-		res.Preplasmidtime = *temp.Preplasmidtime
-	} else {
-		res.Preplasmidtime = m["Preplasmidtime"].(execute.ThreadParam).Value.(wunit.Time)
-	}
-
-	vReaction, is := m["Reaction"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TransformationJSONBlock
-		json.Unmarshal([]byte(vReaction.JSONString), &temp)
-		res.Reaction = *temp.Reaction
-	} else {
-		res.Reaction = m["Reaction"].(execute.ThreadParam).Value.(*wtype.LHComponent)
-	}
-
-	vReactionvolume, is := m["Reactionvolume"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TransformationJSONBlock
-		json.Unmarshal([]byte(vReactionvolume.JSONString), &temp)
-		res.Reactionvolume = *temp.Reactionvolume
-	} else {
-		res.Reactionvolume = m["Reactionvolume"].(execute.ThreadParam).Value.(wunit.Volume)
-	}
-
-	vRecoverymedium, is := m["Recoverymedium"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TransformationJSONBlock
-		json.Unmarshal([]byte(vRecoverymedium.JSONString), &temp)
-		res.Recoverymedium = *temp.Recoverymedium
-	} else {
-		res.Recoverymedium = m["Recoverymedium"].(execute.ThreadParam).Value.(*wtype.LHComponent)
-	}
-
-	vRecoverytemp, is := m["Recoverytemp"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TransformationJSONBlock
-		json.Unmarshal([]byte(vRecoverytemp.JSONString), &temp)
-		res.Recoverytemp = *temp.Recoverytemp
-	} else {
-		res.Recoverytemp = m["Recoverytemp"].(execute.ThreadParam).Value.(wunit.Temperature)
-	}
-
-	vRecoverytime, is := m["Recoverytime"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TransformationJSONBlock
-		json.Unmarshal([]byte(vRecoverytime.JSONString), &temp)
-		res.Recoverytime = *temp.Recoverytime
-	} else {
-		res.Recoverytime = m["Recoverytime"].(execute.ThreadParam).Value.(wunit.Time)
-	}
-
-	vRecoveryvolume, is := m["Recoveryvolume"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TransformationJSONBlock
-		json.Unmarshal([]byte(vRecoveryvolume.JSONString), &temp)
-		res.Recoveryvolume = *temp.Recoveryvolume
-	} else {
-		res.Recoveryvolume = m["Recoveryvolume"].(execute.ThreadParam).Value.(wunit.Volume)
-	}
-
-	res.ID = m["AgarPlate"].(execute.ThreadParam).ID
-	res.BlockID = m["AgarPlate"].(execute.ThreadParam).BlockID
-
-	return res
-}
-
-func (e *Transformation) OnAgarPlate(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("AgarPlate", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Transformation) OnCompetentCells(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("CompetentCells", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Transformation) OnCompetentCellvolumeperassembly(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("CompetentCellvolumeperassembly", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Transformation) OnOutPlate(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("OutPlate", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Transformation) OnPlateoutvolume(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Plateoutvolume", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Transformation) OnPostplasmidtemp(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Postplasmidtemp", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Transformation) OnPostplasmidtime(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Postplasmidtime", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Transformation) OnPreplasmidtemp(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Preplasmidtemp", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Transformation) OnPreplasmidtime(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Preplasmidtime", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Transformation) OnReaction(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Reaction", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Transformation) OnReactionvolume(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Reactionvolume", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Transformation) OnRecoverymedium(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Recoverymedium", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Transformation) OnRecoverytemp(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Recoverytemp", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Transformation) OnRecoverytime(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Recoverytime", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Transformation) OnRecoveryvolume(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Recoveryvolume", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
+func New() interface{} {
+	return &Element_{
+		inject.CheckedRunner{
+			RunFunc: _run,
+			In:      &Input_{},
+			Out:     &Output_{},
+		},
 	}
 }
 
-type Transformation struct {
-	flow.Component                 // component "superclass" embedded
-	lock                           sync.Mutex
-	startup                        sync.Once
-	params                         map[execute.ThreadID]*execute.AsyncBag
-	AgarPlate                      <-chan execute.ThreadParam
-	CompetentCells                 <-chan execute.ThreadParam
-	CompetentCellvolumeperassembly <-chan execute.ThreadParam
-	OutPlate                       <-chan execute.ThreadParam
-	Plateoutvolume                 <-chan execute.ThreadParam
-	Postplasmidtemp                <-chan execute.ThreadParam
-	Postplasmidtime                <-chan execute.ThreadParam
-	Preplasmidtemp                 <-chan execute.ThreadParam
-	Preplasmidtime                 <-chan execute.ThreadParam
-	Reaction                       <-chan execute.ThreadParam
-	Reactionvolume                 <-chan execute.ThreadParam
-	Recoverymedium                 <-chan execute.ThreadParam
-	Recoverytemp                   <-chan execute.ThreadParam
-	Recoverytime                   <-chan execute.ThreadParam
-	Recoveryvolume                 <-chan execute.ThreadParam
-	Platedculture                  chan<- execute.ThreadParam
+type Element_ struct {
+	inject.CheckedRunner
 }
 
-type TransformationParamBlock struct {
-	ID                             execute.ThreadID
-	BlockID                        execute.BlockID
-	Error                          bool
+type Input_ struct {
 	AgarPlate                      *wtype.LHPlate
 	CompetentCells                 *wtype.LHComponent
 	CompetentCellvolumeperassembly wunit.Volume
@@ -646,77 +198,6 @@ type TransformationParamBlock struct {
 	Recoveryvolume                 wunit.Volume
 }
 
-type TransformationConfig struct {
-	ID                             execute.ThreadID
-	BlockID                        execute.BlockID
-	Error                          bool
-	AgarPlate                      wtype.FromFactory
-	CompetentCells                 wtype.FromFactory
-	CompetentCellvolumeperassembly wunit.Volume
-	OutPlate                       wtype.FromFactory
-	Plateoutvolume                 wunit.Volume
-	Postplasmidtemp                wunit.Temperature
-	Postplasmidtime                wunit.Time
-	Preplasmidtemp                 wunit.Temperature
-	Preplasmidtime                 wunit.Time
-	Reaction                       wtype.FromFactory
-	Reactionvolume                 wunit.Volume
-	Recoverymedium                 wtype.FromFactory
-	Recoverytemp                   wunit.Temperature
-	Recoverytime                   wunit.Time
-	Recoveryvolume                 wunit.Volume
-}
-
-type TransformationResultBlock struct {
-	ID            execute.ThreadID
-	BlockID       execute.BlockID
-	Error         bool
+type Output_ struct {
 	Platedculture *wtype.LHSolution
-}
-
-type TransformationJSONBlock struct {
-	ID                             *execute.ThreadID
-	BlockID                        *execute.BlockID
-	Error                          *bool
-	AgarPlate                      **wtype.LHPlate
-	CompetentCells                 **wtype.LHComponent
-	CompetentCellvolumeperassembly *wunit.Volume
-	OutPlate                       **wtype.LHPlate
-	Plateoutvolume                 *wunit.Volume
-	Postplasmidtemp                *wunit.Temperature
-	Postplasmidtime                *wunit.Time
-	Preplasmidtemp                 *wunit.Temperature
-	Preplasmidtime                 *wunit.Time
-	Reaction                       **wtype.LHComponent
-	Reactionvolume                 *wunit.Volume
-	Recoverymedium                 **wtype.LHComponent
-	Recoverytemp                   *wunit.Temperature
-	Recoverytime                   *wunit.Time
-	Recoveryvolume                 *wunit.Volume
-	Platedculture                  **wtype.LHSolution
-}
-
-func (c *Transformation) ComponentInfo() *execute.ComponentInfo {
-	inp := make([]execute.PortInfo, 0)
-	outp := make([]execute.PortInfo, 0)
-	inp = append(inp, *execute.NewPortInfo("AgarPlate", "*wtype.LHPlate", "AgarPlate", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("CompetentCells", "*wtype.LHComponent", "CompetentCells", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("CompetentCellvolumeperassembly", "wunit.Volume", "CompetentCellvolumeperassembly", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("OutPlate", "*wtype.LHPlate", "OutPlate", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Plateoutvolume", "wunit.Volume", "Plateoutvolume", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Postplasmidtemp", "wunit.Temperature", "Postplasmidtemp", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Postplasmidtime", "wunit.Time", "Postplasmidtime", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Preplasmidtemp", "wunit.Temperature", "Preplasmidtemp", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Preplasmidtime", "wunit.Time", "Preplasmidtime", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Reaction", "*wtype.LHComponent", "Reaction", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Reactionvolume", "wunit.Volume", "Reactionvolume", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Recoverymedium", "*wtype.LHComponent", "Recoverymedium", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Recoverytemp", "wunit.Temperature", "Recoverytemp", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Recoverytime", "wunit.Time", "Recoverytime", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Recoveryvolume", "wunit.Volume", "Recoveryvolume", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Platedculture", "*wtype.LHSolution", "Platedculture", true, true, nil, nil))
-
-	ci := execute.NewComponentInfo("Transformation", "Transformation", "", false, inp, outp)
-
-	return ci
 }
