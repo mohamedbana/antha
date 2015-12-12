@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/microArch/equipment"
 	"github.com/antha-lang/antha/microArch/equipment/action"
 	"github.com/antha-lang/antha/microArch/equipmentManager"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 )
 
 var (
@@ -27,7 +27,14 @@ func getLh(ctx context.Context) equipment.Equipment {
 	return v
 }
 
-func newLHContext(parent context.Context) (context.Context, func(), error) {
+func getNumOrDef(x, def float64) float64 {
+	if x == 0.0 {
+		return def
+	}
+	return x
+}
+
+func newLHContext(parent context.Context, cdata *ConfigData) (context.Context, func(), error) {
 	em := equipmentManager.GetEquipmentManager()
 	if em == nil {
 		return nil, nil, noEquipmentManager
@@ -42,11 +49,11 @@ func newLHContext(parent context.Context) (context.Context, func(), error) {
 	// this aggregation layer and that will allow us to run multiple protocols.
 	//prepare the values
 	id := getId(parent)
-	config := make(map[string]interface{}) //new(wtype.ConfigItem)
-	config["MAX_N_PLATES"] = 4.5
-	config["MAX_N_WELLS"] = 278.0
-	config["RESIDUAL_VOLUME_WEIGHT"] = 1.0
+	config := make(map[string]interface{})
 	config["BLOCKID"] = wtype.BlockID{ThreadID: wtype.ThreadID(id)}
+	config["MAX_N_PLATES"] = getNumOrDef(cdata.MaxPlates, 4.5)
+	config["MAX_N_WELLS"] = getNumOrDef(cdata.MaxWells, 278.0)
+	config["RESIDUAL_VOLUME_WEIGHT"] = getNumOrDef(cdata.ResidualVolumeWeight, 1.0)
 	// these should come from the paramblock... for now though
 	config["INPUT_PLATETYPE"] = "pcrplate_with_cooler"
 	config["OUTPUT_PLATETYPE"] = "pcrplate_with_cooler"

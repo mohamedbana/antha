@@ -2,8 +2,8 @@ package execute
 
 import (
 	"fmt"
-	"github.com/antha-lang/antha/workflow"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/workflow"
 )
 
 type idKey int
@@ -30,11 +30,12 @@ func Run(parent context.Context, opt Options) (*workflow.Workflow, error) {
 		return nil, err
 	}
 
-	if err := setParams(parent, opt.ParamData, w); err != nil {
+	cd, err := setParams(parent, opt.ParamData, w)
+	if err != nil {
 		return nil, fmt.Errorf("cannot set initial parameters: %s", err)
 	}
 
-	ctx, done, err := newLHContext(context.WithValue(parent, theIdKey, opt.Id))
+	ctx, done, err := newLHContext(context.WithValue(parent, theIdKey, opt.Id), cd)
 	if done != nil {
 		defer done()
 	}

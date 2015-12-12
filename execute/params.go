@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/workflow"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"reflect"
 )
 
@@ -41,9 +41,22 @@ func constructOrError(v interface{}) (interface{}, error) {
 	return v, nil
 }
 
-// Structure of parameter data
-type ParamsData struct {
+type ConfigData struct {
+	MaxPlates            float64
+	MaxWells             float64
+	ResidualVolumeWeight float64
+}
+
+// Structure of parameter data for unmarshalling
+type RawParams struct {
 	Parameters map[string]map[string]json.RawMessage
+	Config     ConfigData
+}
+
+// Structure of parameter data for marshalling
+type Params struct {
+	Parameters map[string]map[string]interface{}
+	Config     ConfigData
 }
 
 func findConstructor(typ reflect.Type) constructor {
@@ -142,30 +155,30 @@ func setParam(w *workflow.Workflow, process, name string, data []byte, in map[st
 	return w.SetParam(workflow.Port{Process: process, Port: name}, value.Interface())
 }
 
-func setParams(ctx context.Context, data []byte, w *workflow.Workflow) error {
-	var params ParamsData
+func setParams(ctx context.Context, data []byte, w *workflow.Workflow) (*ConfigData, error) {
+	var params RawParams
 	if err := json.Unmarshal(data, &params); err != nil {
-		return err
+		return nil, err
 	}
 	for process, params := range params.Parameters {
 		c, err := w.FuncName(process)
 		if err != nil {
-			return fmt.Errorf("cannot get component for process %q: %s", process, err)
+			return nil, fmt.Errorf("cannot get component for process %q: %s", process, err)
 		}
 		runner, err := inject.Find(ctx, inject.NameQuery{Repo: c})
 		if err != nil {
-			return fmt.Errorf("unknown component %q: %s", c, err)
+			return nil, fmt.Errorf("unknown component %q: %s", c, err)
 		}
 		cr, ok := runner.(inject.TypedRunner)
 		if !ok {
-			return fmt.Errorf("cannot get type information for component %q: type %T", c, runner)
+			return nil, fmt.Errorf("cannot get type information for component %q: type %T", c, runner)
 		}
 		in := inject.MakeValue(cr.Input())
 		for name, value := range params {
 			if err := setParam(w, process, name, value, in); err != nil {
-				return fmt.Errorf("cannot assign parameter %q of process %q to %s: %s", name, process, string(value), err)
+				return nil, fmt.Errorf("cannot assign parameter %q of process %q to %s: %s", name, process, string(value), err)
 			}
 		}
 	}
-	return nil
+	return &params.Config, nil
 }
