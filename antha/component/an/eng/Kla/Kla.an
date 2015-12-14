@@ -104,7 +104,7 @@ Steps {
 	//Criticalshakerspeed := "error"
 	if labware.Labwaregeometry[Platetype]["numberofwellsides"] == 4.0 {
 		Ncrit = eng.Ncrit_srw(Sigma, dv, Vl , ro , dt ) 
-	}else{Criticalshakerspeed := "error: kla estimation for this plate type not yet implemented"}
+	}/*else{Criticalshakerspeed := "error: kla estimation for this plate type not yet implemented"}
 	/*if i == 4.0 {
 		Criticalshakerspeed := "error"
 	}	
