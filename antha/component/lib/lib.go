@@ -22,6 +22,8 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/Printname"
 	"github.com/antha-lang/antha/antha/component/lib/ProtocolName_from_an_file"
 	"github.com/antha-lang/antha/antha/component/lib/RemoveRestrictionSites"
+	"github.com/antha-lang/antha/antha/component/lib/RestrictionDigestion"
+	"github.com/antha-lang/antha/antha/component/lib/RestrictionDigestion_conc"
 	"github.com/antha-lang/antha/antha/component/lib/Scarfree_design"
 	"github.com/antha-lang/antha/antha/component/lib/Scarfree_siteremove_orfcheck"
 	"github.com/antha-lang/antha/antha/component/lib/SumVolume"
@@ -324,6 +326,52 @@ func GetComponents() []ComponentDesc {
 	portMap["RemoveRestrictionSites"]["Status"] = false
 	portMap["RemoveRestrictionSites"]["Warnings"] = false
 
+	portMap["RestrictionDigestion"] = make(map[string]bool)
+	portMap["RestrictionDigestion"]["BSAoptional"] = true
+	portMap["RestrictionDigestion"]["BSAvol"] = true
+	portMap["RestrictionDigestion"]["Buffer"] = true
+	portMap["RestrictionDigestion"]["BufferVol"] = true
+	portMap["RestrictionDigestion"]["DNAName"] = true
+	portMap["RestrictionDigestion"]["DNASolution"] = true
+	portMap["RestrictionDigestion"]["DNAVol"] = true
+	portMap["RestrictionDigestion"]["EnzSolutions"] = true
+	portMap["RestrictionDigestion"]["EnzVolumestoadd"] = true
+	portMap["RestrictionDigestion"]["EnzymeNames"] = true
+	portMap["RestrictionDigestion"]["InPlate"] = true
+	portMap["RestrictionDigestion"]["InactivationTemp"] = true
+	portMap["RestrictionDigestion"]["InactivationTime"] = true
+	portMap["RestrictionDigestion"]["OutPlate"] = true
+	portMap["RestrictionDigestion"]["ReactionTemp"] = true
+	portMap["RestrictionDigestion"]["ReactionTime"] = true
+	portMap["RestrictionDigestion"]["ReactionVolume"] = true
+	portMap["RestrictionDigestion"]["Water"] = true
+
+	portMap["RestrictionDigestion"]["Reaction"] = false
+
+	portMap["RestrictionDigestion_conc"] = make(map[string]bool)
+	portMap["RestrictionDigestion_conc"]["BSAoptional"] = true
+	portMap["RestrictionDigestion_conc"]["BSAvol"] = true
+	portMap["RestrictionDigestion_conc"]["Buffer"] = true
+	portMap["RestrictionDigestion_conc"]["BufferConcX"] = true
+	portMap["RestrictionDigestion_conc"]["DNAConc"] = true
+	portMap["RestrictionDigestion_conc"]["DNAMassperReaction"] = true
+	portMap["RestrictionDigestion_conc"]["DNAName"] = true
+	portMap["RestrictionDigestion_conc"]["DNASolution"] = true
+	portMap["RestrictionDigestion_conc"]["DesiredConcinUperml"] = true
+	portMap["RestrictionDigestion_conc"]["EnzSolutions"] = true
+	portMap["RestrictionDigestion_conc"]["EnzymeNames"] = true
+	portMap["RestrictionDigestion_conc"]["InPlate"] = true
+	portMap["RestrictionDigestion_conc"]["InactivationTemp"] = true
+	portMap["RestrictionDigestion_conc"]["InactivationTime"] = true
+	portMap["RestrictionDigestion_conc"]["OutPlate"] = true
+	portMap["RestrictionDigestion_conc"]["ReactionTemp"] = true
+	portMap["RestrictionDigestion_conc"]["ReactionTime"] = true
+	portMap["RestrictionDigestion_conc"]["ReactionVolume"] = true
+	portMap["RestrictionDigestion_conc"]["StockReConcinUperml"] = true
+	portMap["RestrictionDigestion_conc"]["Water"] = true
+
+	portMap["RestrictionDigestion_conc"]["Reaction"] = false
+
 	portMap["Scarfree_design"] = make(map[string]bool)
 	portMap["Scarfree_design"]["Constructname"] = true
 	portMap["Scarfree_design"]["Enzymename"] = true
@@ -549,6 +597,8 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "Printname", Constructor: Printname.NewPrintname})
 	c = append(c, ComponentDesc{Name: "ProtocolName_from_an_file", Constructor: ProtocolName_from_an_file.NewProtocolName_from_an_file})
 	c = append(c, ComponentDesc{Name: "RemoveRestrictionSites", Constructor: RemoveRestrictionSites.NewRemoveRestrictionSites})
+	c = append(c, ComponentDesc{Name: "RestrictionDigestion", Constructor: RestrictionDigestion.NewRestrictionDigestion})
+	c = append(c, ComponentDesc{Name: "RestrictionDigestion_conc", Constructor: RestrictionDigestion_conc.NewRestrictionDigestion_conc})
 	c = append(c, ComponentDesc{Name: "Scarfree_design", Constructor: Scarfree_design.NewScarfree_design})
 	c = append(c, ComponentDesc{Name: "Scarfree_siteremove_orfcheck", Constructor: Scarfree_siteremove_orfcheck.NewScarfree_siteremove_orfcheck})
 	c = append(c, ComponentDesc{Name: "SumVolume", Constructor: SumVolume.NewSumVolume})

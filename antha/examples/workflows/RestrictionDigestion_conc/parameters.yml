@@ -3,9 +3,9 @@
         {
             "Standarddigest_conc":{
                 "ReactionVolume": "20ul",
-                "DNAConc": "0.01g/l",
-				"DNAMassperReaction": "0.0001mg",
-				"DNAName":"vector1",
+                "DNAConc": "50ng/ul",
+				"DNAMassperReaction": "100ng",
+				"DNAName":"vector2",
                 "EnzymeNames" : [
                     "Nco1",
                 ],

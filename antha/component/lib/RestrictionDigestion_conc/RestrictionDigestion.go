@@ -15,9 +15,7 @@ import (
 
 // Input parameters for this protocol (data)
 
-//	EnzVolumestoadd				[]Volume
-
-//OutputReactionName			string
+//DNAVol						Volume
 
 // Physical Inputs to this protocol with types
 
@@ -46,7 +44,7 @@ func (e *RestrictionDigestion_conc) steps(p RestrictionDigestion_concParamBlock,
 	samples = append(samples, waterSample)
 
 	// workout volume of buffer to add in SI units
-	BufferVol := wunit.NewVolume(p.ReactionVolume.SIValue()/float64(p.BufferConcX), "l")
+	BufferVol := wunit.NewVolume(1000000*float64(p.ReactionVolume.SIValue()/float64(p.BufferConcX)), "ul")
 
 	bufferSample := mixer.Sample(p.Buffer, BufferVol)
 	samples = append(samples, bufferSample)
@@ -59,8 +57,8 @@ func (e *RestrictionDigestion_conc) steps(p RestrictionDigestion_concParamBlock,
 	p.DNASolution.CName = p.DNAName
 
 	// work out necessary volume to add
-	DNAVol := wunit.NewVolume(p.DNAMassperReaction.SIValue()/p.DNAConc.SIValue(), "l")
-
+	DNAVol := wunit.NewVolume(float64(1000000*(p.DNAMassperReaction.SIValue()/p.DNAConc.SIValue())), "ul")
+	text.Print("DNAVOL", DNAVol.ToString())
 	dnaSample := mixer.Sample(p.DNASolution, DNAVol)
 	samples = append(samples, dnaSample)
 
@@ -78,13 +76,10 @@ func (e *RestrictionDigestion_conc) steps(p RestrictionDigestion_concParamBlock,
 		var enzvoltoadd wunit.Volume
 
 		if enzvoltoaddinul < 1 {
-			enzvoltoadd = wunit.NewVolume(float64(1e-6), "l")
+			enzvoltoadd = wunit.NewVolume(float64(1), "ul")
 		} else {
-			enzvoltoadd = wunit.NewVolume(float64(enzvoltoaddinul)*float64(1e-6), "l")
+			enzvoltoadd = wunit.NewVolume(float64(enzvoltoaddinul), "ul")
 		}
-
-		//volinL := DesiredUinreaction/(StockReConcinUperml*1000) * ReactionVolume.SIValue()
-		//volumetoadd := wunit.NewVolume(volinL,"L")
 		enzyme.CName = p.EnzymeNames[k]
 		text.Print("adding enzyme"+p.EnzymeNames[k], "to"+p.DNAName)
 		enzSample := mixer.Sample(enzyme, enzvoltoadd)

@@ -12,20 +12,18 @@ Parameters (
 	BufferConcX					int
 	DNAConc 					Concentration
 	DNAMassperReaction			Mass
+	//DNAVol						Volume
 	DNAName						string
 	EnzymeNames					[]string
 	BSAvol						Volume
 	
 	StockReConcinUperml 		[]int
 	DesiredConcinUperml	 		[]int
-//	EnzVolumestoadd				[]Volume
 	
 	ReactionTemp 				Temperature
 	ReactionTime 				Time
 	InactivationTemp 			Temperature
 	InactivationTime 			Time
-
-	//OutputReactionName			string
 )
 
 // Physical Inputs to this protocol with types
@@ -62,7 +60,7 @@ Steps {
 	samples = append(samples, waterSample)
 
 	// workout volume of buffer to add in SI units
-	BufferVol := wunit.NewVolume(ReactionVolume.SIValue()/float64(BufferConcX),"l")	
+	BufferVol := wunit.NewVolume(float64(ReactionVolume.SIValue()/float64(BufferConcX)),"l")	
 	
 	bufferSample := mixer.Sample(Buffer, BufferVol)
 	samples = append(samples, bufferSample)
@@ -74,8 +72,8 @@ Steps {
 	DNASolution.CName = DNAName
 	
 	// work out necessary volume to add
-	DNAVol := wunit.NewVolume(DNAMassperReaction.SIValue()/DNAConc.SIValue(),"l")
-	
+	DNAVol := wunit.NewVolume(float64((DNAMassperReaction.SIValue()/DNAConc.SIValue())),"l")
+	text.Print("DNAVOL",DNAVol.ToString())
 	dnaSample := mixer.Sample(DNASolution, DNAVol)
 	samples = append(samples, dnaSample)
 
@@ -93,14 +91,10 @@ Steps {
 		var enzvoltoadd Volume
 		
 		if enzvoltoaddinul < 1 {
-			enzvoltoadd = wunit.NewVolume(float64(1e-6),"l")
+			enzvoltoadd = wunit.NewVolume(float64(1),"ul")
 			}else {
-				enzvoltoadd = wunit.NewVolume(float64(enzvoltoaddinul) * float64(1e-6),"l")
+				enzvoltoadd = wunit.NewVolume(float64(enzvoltoaddinul),"ul")
 				}
-		
-		
-		//volinL := DesiredUinreaction/(StockReConcinUperml*1000) * ReactionVolume.SIValue()
-		//volumetoadd := wunit.NewVolume(volinL,"L")
 		enzyme.CName = EnzymeNames[k]
 		text.Print("adding enzyme" + EnzymeNames[k], "to" + DNAName)
 		enzSample := mixer.Sample(enzyme, enzvoltoadd)
