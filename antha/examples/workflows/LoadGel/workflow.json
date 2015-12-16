@@ -1,0 +1,15 @@
+{
+"properties": {
+        "name": "main"
+    },
+    "processes": {
+        "LoadGel": {
+            "component": "LoadGel",
+            "metadata": {
+                "label": "CS"
+            }
+        }
+    },
+    "connections": [ ]
+}
+

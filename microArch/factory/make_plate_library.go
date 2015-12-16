@@ -69,7 +69,7 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 
 	ep48g := wtype.NewShape("trap", "mm", 2, 4, 2)
 	welltype = wtype.NewLHWell("EPAGE48", "", "", "ul", 25, 0, ep48g, 0, 2, 4, 2, 48, "mm")
-	plate = wtype.NewLHPlate("EPAGE48", "Invitrogen", 2, 26, 50, "mm", welltype, 4.5, 34, -1.5, 18.0, 50.0)
+	plate = wtype.NewLHPlate("EPAGE48", "Invitrogen", 2, 26, 50, "mm", welltype, 4.5, 34, -1.5, 18.0, 2.0)
 	plates[plate.Type] = plate
 
 	//	WellXOffset float64
