@@ -33,18 +33,24 @@ import (
 )
 func MakePolicies() map[string]LHPolicy {
         pols := make(map[string]LHPolicy)
-
-        // what policies do we need?
-        pols["water"] = MakeWaterPolicy()
-        pols["culture"] = MakeCulturePolicy()
-        pols["glycerol"] = MakeGlycerolPolicy()
-        pols["solvent"] = MakeSolventPolicy()
-        pols["default"] = MakeDefaultPolicy()
-        pols["foamy"] = MakeFoamyPolicy()
-//        pols["lysate"] = MakeLysatePolicy()
+   
+	// what policies do we need?
+	pols["water"] = MakeWaterPolicy()
+	pols["culture"] = MakeCulturePolicy()
+	pols["glycerol"] = MakeGlycerolPolicy()
+	pols["solvent"] = MakeSolventPolicy()
+	pols["default"] = MakeDefaultPolicy()
+	pols["foamy"] = MakeFoamyPolicy()
+	pols["dna"] = MakeDNAPolicy()
+	pols["DoNotMix"] = MakeDefaultPolicy()
+	pols["NeedToMix"] = MakeNeedToMixPolicy()
+	pols["viscous"] = MakeViscousPolicy()
+//      pols["lysate"] = MakeLysatePolicy()
         pols["protein"] = MakeProteinPolicy()
-		pols["detergent"] = MakeDetergentPolicy()
-        return pols
+        pols["detergent"] = MakeDetergentPolicy()
+
+	return pols
+
 }
 //func MakeLysatePolicy() LHPolicy {
 //        lysatepolicy := make(LHPolicy, 6)
@@ -105,6 +111,15 @@ func MakeGlycerolPolicy() LHPolicy {
 	return glycerolpolicy
 }
 
+func MakeViscousPolicy() LHPolicy {
+	glycerolpolicy := make(LHPolicy, 4)
+	glycerolpolicy["ASP_SPEED"] = 1.5
+	glycerolpolicy["DSP_SPEED"] = 1.5
+	glycerolpolicy["ASP_WAIT"] = 1.0
+	glycerolpolicy["DSP_WAIT"] = 1.0
+	//glycerolpolicy["TIP_REUSE_LIMIT"] = 0
+	return glycerolpolicy
+}
 func MakeSolventPolicy() LHPolicy {
 	solventpolicy := make(LHPolicy, 4)
 	solventpolicy["PRE_MIX"] = 3
@@ -129,6 +144,7 @@ func MakeDNAPolicy() LHPolicy {
 	dnapolicy["NO_AIR_DISPENSE"] = true
 	return dnapolicy
 }
+
 
 func MakeDetergentPolicy() LHPolicy {
         detergentpolicy := make(LHPolicy, 9)
@@ -169,6 +185,22 @@ func MakeLoadPolicy() LHPolicy {
 		loadpolicy["TIP_REUSE_LIMIT"] = 0
 		loadpolicy["NO_AIR_DISPENSE"] = true
 		return loadpolicy
+
+func MakeNeedToMixPolicy() LHPolicy {
+	dnapolicy := make(LHPolicy, 10)
+	dnapolicy["POST_MIX"] = 3
+	dnapolicy["POST_MIX_VOLUME"] = 50
+	dnapolicy["ASPSPEED"] = 2.0
+	dnapolicy["DSPSPEED"] = 2.0
+	dnapolicy["CAN_MULTI"] = false
+	dnapolicy["CAN_MSA"] = false
+	dnapolicy["CAN_SDD"] = false
+	dnapolicy["DSPREFERENCE"] = 0
+	dnapolicy["DSPZOFFSET"] = 0.5
+	dnapolicy["TIP_REUSE_LIMIT"] = 0
+	dnapolicy["NO_AIR_DISPENSE"] = true
+	return dnapolicy
+
 }
 
 func MakeDefaultPolicy() LHPolicy {

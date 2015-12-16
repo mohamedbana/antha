@@ -56,8 +56,9 @@ func MakedoublestrandedDNA(sequence wtype.DNASequence) (Doublestrandedpair []wty
 	return Doublestrandedpair
 }
 
+// Key struct holding information on restriction sites found in a dna sequence
 type Restrictionsites struct {
-	Enzyme              wtype.LogicalRestrictionEnzyme
+	Enzyme              wtype.RestrictionEnzyme
 	Recognitionsequence string
 	Sitefound           bool
 	Numberofsites       int
@@ -65,6 +66,7 @@ type Restrictionsites struct {
 	Reversepositions    []int
 }
 
+// method called on the Restriction sites object to return an array of "FWD", "REV or "ALL" site positions found
 func (sites *Restrictionsites) Positions(fwdRevorNil string) (positions []int) {
 	if strings.ToUpper(fwdRevorNil) == strings.ToUpper("FWD") {
 		positions = sites.Forwardpositions
@@ -83,6 +85,7 @@ func (sites *Restrictionsites) Positions(fwdRevorNil string) (positions []int) {
 	return
 }
 
+// Returns a report of restriction sites found as a string
 func SitepositionString(sitesperpart Restrictionsites) (sitepositions string) {
 	Num := make([]string, 0)
 
@@ -98,6 +101,7 @@ func SitepositionString(sitesperpart Restrictionsites) (sitepositions string) {
 	return
 }
 
+// func for returning list of all site positions; preferable to use the positions method instead.
 func Sitepositions(sitesperpart Restrictionsites) (sitepositions []int) {
 	Num := make([]int, 0)
 
@@ -116,7 +120,8 @@ func Sitepositions(sitesperpart Restrictionsites) (sitepositions []int) {
 	return
 }
 
-func Restrictionsitefinder(sequence wtype.DNASequence, enzymelist []wtype.LogicalRestrictionEnzyme) (sites []Restrictionsites) {
+// key function to find restriction sites in a sequence and return the information as an array of Resriction sites
+func Restrictionsitefinder(sequence wtype.DNASequence, enzymelist []wtype.RestrictionEnzyme) (sites []Restrictionsites) {
 
 	sites = make([]Restrictionsites, 0)
 
@@ -160,14 +165,14 @@ func Restrictionsitefinder(sequence wtype.DNASequence, enzymelist []wtype.Logica
 }
 
 /*
-func CutatSite(startingdnaseq wtype.DNASequence, typeIIenzyme wtype.LogicalRestrictionEnzyme) (Digestproducts []wtype.DNASequence) {
+func CutatSite(startingdnaseq wtype.DNASequence, typeIIenzyme wtype.RestrictionEnzyme) (Digestproducts []wtype.DNASequence) {
 	// not tested and not finished
 
 	Digestproducts = make([]wtype.DNASequence, 0)
 	originalfwdsequence := strings.ToUpper(startingdnaseq.Seq)
 
 	recogseq := strings.ToUpper(typeIIenzyme.RecognitionSequence)
-	sites := Restrictionsitefinder(startingdnaseq, []wtype.LogicalRestrictionEnzyme{typeIIenzyme})
+	sites := Restrictionsitefinder(startingdnaseq, []wtype.RestrictionEnzyme{typeIIenzyme})
 
 	if len(sites) == 0 {
 		Digestproducts = append(Digestproducts, startingdnaseq)
@@ -226,6 +231,7 @@ func CutatSite(startingdnaseq wtype.DNASequence, typeIIenzyme wtype.LogicalRestr
 }
 */
 
+// object carrying info on a fragment following digestion
 type Digestedfragment struct {
 	Topstrand              string
 	Bottomstrand           string
@@ -235,7 +241,8 @@ type Digestedfragment struct {
 	BottomStickyend_3prime string
 }
 
-func Pair(digestedtopstrand []string, digestedbottomstrand []string, topstickyend5prime []string, topstickyend3prime []string, bottomstickyend5prime []string, bottomstickyend3prime []string) (pairs []Digestedfragment) {
+// utility function
+func pairdigestedfragments(digestedtopstrand []string, digestedbottomstrand []string, topstickyend5prime []string, topstickyend3prime []string, bottomstickyend5prime []string, bottomstickyend3prime []string) (pairs []Digestedfragment) {
 
 	pairs = make([]Digestedfragment, 0)
 
@@ -260,16 +267,17 @@ func DigestionPairs(Doublestrandedpair []wtype.DNASequence, typeIIsenzyme wtype.
 	bottomstrands, bottomstickyends5, bottomstickyends3 := TypeIIsdigest(Doublestrandedpair[1], typeIIsenzyme)
 	if len(topstrands) == len(bottomstrands) {
 		if len(topstrands) == 2 {
-			digestionproducts = Pair(topstrands, bottomstrands, topstickyends5, topstickyends3, bottomstickyends5, bottomstickyends3)
+			digestionproducts = pairdigestedfragments(topstrands, bottomstrands, topstickyends5, topstickyends3, bottomstickyends5, bottomstickyends3)
 		}
 		if len(topstrands) == 3 {
-			digestionproducts = Pair(topstrands, Revarrayorder(bottomstrands), topstickyends5, topstickyends3, Revarrayorder(bottomstickyends5), Revarrayorder(bottomstickyends3))
+			digestionproducts = pairdigestedfragments(topstrands, Revarrayorder(bottomstrands), topstickyends5, topstickyends3, Revarrayorder(bottomstickyends5), Revarrayorder(bottomstickyends3))
 		}
 	}
 	return digestionproducts
 }
 
-func Digest(sequence wtype.DNASequence, typeIIenzyme wtype.LogicalRestrictionEnzyme) (Finalfragments []string, Stickyends_5prime []string, Stickyends_3prime []string) {
+// func to digest a dna sequence with a chosen restriction enzyme; returns string arrays of fragments and 5' and 3' sticky ends
+func Digest(sequence wtype.DNASequence, typeIIenzyme wtype.RestrictionEnzyme) (Finalfragments []string, Stickyends_5prime []string, Stickyends_3prime []string) {
 	if typeIIenzyme.Class == "TypeII" {
 		Finalfragments, Stickyends_5prime, Stickyends_3prime = TypeIIDigest(sequence, typeIIenzyme)
 	}
@@ -286,8 +294,9 @@ func Digest(sequence wtype.DNASequence, typeIIenzyme wtype.LogicalRestrictionEnz
 	return
 }
 
-func RestrictionMapper(seq wtype.DNASequence, enzyme wtype.LogicalRestrictionEnzyme) (fraglengths []int) {
-	enzlist := []wtype.LogicalRestrictionEnzyme{enzyme}
+// Returns an array of fragment sizes expected by digesting a dna sequence with a restriction enzyme
+func RestrictionMapper(seq wtype.DNASequence, enzyme wtype.RestrictionEnzyme) (fraglengths []int) {
+	enzlist := []wtype.RestrictionEnzyme{enzyme}
 	frags, _, _ := Digest(seq, enzlist[0]) // doesn't handle non cutters well - returns 1 seq string, blunt, blunt therefore inaccurate representation
 	fraglengths = make([]int, 0)
 	for _, frag := range frags {
@@ -298,7 +307,9 @@ func RestrictionMapper(seq wtype.DNASequence, enzyme wtype.LogicalRestrictionEnz
 
 	return fraglengths
 }
-func SearchandCut(typeIIenzyme wtype.LogicalRestrictionEnzyme, topstranddigestproducts []string, topstrandstickyends_5prime []string, topstrandstickyends_3prime []string) (Finalfragments []string, Stickyends_5prime []string, Stickyends_3prime []string) {
+
+// utility function
+func SearchandCut(typeIIenzyme wtype.RestrictionEnzyme, topstranddigestproducts []string, topstrandstickyends_5prime []string, topstrandstickyends_3prime []string) (Finalfragments []string, Stickyends_5prime []string, Stickyends_3prime []string) {
 	finalfragments, topstrandstickyends_5primeFW, topstrandstickyends_3primeFW :=
 		SearchandCutFWD(typeIIenzyme, topstranddigestproducts, topstrandstickyends_5prime, topstrandstickyends_3prime)
 
@@ -306,7 +317,8 @@ func SearchandCut(typeIIenzyme wtype.LogicalRestrictionEnzyme, topstranddigestpr
 	return
 }
 
-func SearchandCutFWD(typeIIenzyme wtype.LogicalRestrictionEnzyme, topstranddigestproducts []string, topstrandstickyends_5prime []string, topstrandstickyends_3prime []string) (Finalfragments []string, Stickyends_5prime []string, Stickyends_3prime []string) {
+// utility function
+func SearchandCutFWD(typeIIenzyme wtype.RestrictionEnzyme, topstranddigestproducts []string, topstrandstickyends_5prime []string, topstrandstickyends_3prime []string) (Finalfragments []string, Stickyends_5prime []string, Stickyends_3prime []string) {
 
 	Finalfragments = make([]string, 0)
 
@@ -379,7 +391,8 @@ func SearchandCutFWD(typeIIenzyme wtype.LogicalRestrictionEnzyme, topstranddiges
 	return
 }
 
-func SearchandCutRev(typeIIenzyme wtype.LogicalRestrictionEnzyme, topstranddigestproducts []string, topstrandstickyends_5prime []string, topstrandstickyends_3prime []string) (Finalfragments []string, Stickyends_5prime []string, Stickyends_3prime []string) {
+// utility function
+func SearchandCutRev(typeIIenzyme wtype.RestrictionEnzyme, topstranddigestproducts []string, topstrandstickyends_5prime []string, topstrandstickyends_3prime []string) (Finalfragments []string, Stickyends_5prime []string, Stickyends_3prime []string) {
 	Finalfragments = make([]string, 0)
 	reverseenzymeseq := RevComp(strings.ToUpper(typeIIenzyme.RecognitionSequence))
 
@@ -464,7 +477,8 @@ func SearchandCutRev(typeIIenzyme wtype.LogicalRestrictionEnzyme, topstranddiges
 	return
 }
 
-func LineartoPlasmid(fragmentsiflinearstart []string) (fragmentsifplasmidstart []string) {
+// utility function to correct number and order of fragments if digested sequence was a plasmid; (e.g. cutting once in plasmid dna creates one fragment; cutting once in linear dna creates 2 fragments.
+func lineartoPlasmid(fragmentsiflinearstart []string) (fragmentsifplasmidstart []string) {
 
 	// make linear plasmid part by joining last part to first part
 	plasmidcutproducts := make([]string, 0)
@@ -482,7 +496,8 @@ func LineartoPlasmid(fragmentsiflinearstart []string) (fragmentsifplasmidstart [
 	return
 }
 
-func LineartoPlasmidEnds(endsiflinearstart []string) (endsifplasmidstart []string) {
+// utility function to correct number and order of sticky ends if digested sequence was a plasmid; (e.g. cutting once in plasmid dna creates one fragment; cutting once in linear dna creates 2 fragments.
+func lineartoPlasmidEnds(endsiflinearstart []string) (endsifplasmidstart []string) {
 
 	endsifplasmidstart = make([]string, 0)
 
@@ -496,7 +511,8 @@ func LineartoPlasmidEnds(endsiflinearstart []string) (endsifplasmidstart []strin
 	return
 }
 
-func TypeIIDigest(sequence wtype.DNASequence, typeIIenzyme wtype.LogicalRestrictionEnzyme) (Finalfragments []string, Stickyends_5prime []string, Stickyends_3prime []string) {
+// Digests a sequence using a restriction enzyme and returns 3 string arrays: fragments after digestion, 5prime sticky ends, 3prime sticky ends
+func TypeIIDigest(sequence wtype.DNASequence, typeIIenzyme wtype.RestrictionEnzyme) (Finalfragments []string, Stickyends_5prime []string, Stickyends_3prime []string) {
 	// step 1. get sequence in string format from DNASequence, make sure all spaces are removed and all upper case
 
 	if typeIIenzyme.Class != "TypeII" {
@@ -600,7 +616,7 @@ func TypeIIDigest(sequence wtype.DNASequence, typeIIenzyme wtype.LogicalRestrict
 
 	}
 	if len(Finalfragments) > 1 && sequence.Plasmid == true {
-		ifplasmidfinalfragments := LineartoPlasmid(Finalfragments)
+		ifplasmidfinalfragments := lineartoPlasmid(Finalfragments)
 		Finalfragments = ifplasmidfinalfragments
 		// now change order of sticky ends
 		//5'
@@ -630,6 +646,7 @@ func TypeIIDigest(sequence wtype.DNASequence, typeIIenzyme wtype.LogicalRestrict
 }
 
 // A function is called by the first word (note the capital letter!); it takes in the input variables in the first parenthesis and returns the contents of the second parenthesis
+// Digests a sequence using a type IIS restriction enzyme and returns 3 string arrays: fragments after digestion, 5prime sticky ends, 3prime sticky ends
 // currently this doesn't work well for plasmids which are cut on reverse strand or cut twice
 func TypeIIsdigest(sequence wtype.DNASequence, typeIIsenzyme wtype.TypeIIs) (Finalfragments []string, Stickyends_5prime []string, Stickyends_3prime []string) {
 	if typeIIsenzyme.Class != "TypeIIs" {
@@ -642,12 +659,12 @@ func TypeIIsdigest(sequence wtype.DNASequence, typeIIsenzyme wtype.TypeIIs) (Fin
 	topstranddigestproducts := make([]string, 0)
 	topstrandstickyends_5prime := make([]string, 0)
 	topstrandstickyends_3prime := make([]string, 0)
-	if strings.Contains(originalfwdsequence, strings.ToUpper(typeIIsenzyme.LogicalRestrictionEnzyme.RecognitionSequence)) == false {
+	if strings.Contains(originalfwdsequence, strings.ToUpper(typeIIsenzyme.RestrictionEnzyme.RecognitionSequence)) == false {
 		topstranddigestproducts = append(topstranddigestproducts, originalfwdsequence)
 		topstrandstickyends_5prime = append(topstrandstickyends_5prime, "blunt")
 	} else {
 		// step 3. split the sequence (into an array of daughter seqs) after the recognition site! Note! this is a preliminary step, we'll fix the sequence to reflect reality in subsequent steps
-		cuttopstrand := strings.SplitAfter(originalfwdsequence, strings.ToUpper(typeIIsenzyme.LogicalRestrictionEnzyme.RecognitionSequence))
+		cuttopstrand := strings.SplitAfter(originalfwdsequence, strings.ToUpper(typeIIsenzyme.RestrictionEnzyme.RecognitionSequence))
 		// step 4. If this results in only 2 fragments (i.e. only one site in upper strand) it means we can continue. We can add the ability to handle multiple sites later!
 		// add boolean for direction of cut (i.e. need to use different strategy for 3' or 5')
 		if len(cuttopstrand) == 2 {
@@ -684,7 +701,7 @@ func TypeIIsdigest(sequence wtype.DNASequence, typeIIsenzyme wtype.TypeIIs) (Fin
 	}
 	Finalfragments = make([]string, 0)
 
-	reverseenzymeseq := RevComp(strings.ToUpper(typeIIsenzyme.LogicalRestrictionEnzyme.RecognitionSequence))
+	reverseenzymeseq := RevComp(strings.ToUpper(typeIIsenzyme.RestrictionEnzyme.RecognitionSequence))
 
 	for _, digestedfragment := range topstranddigestproducts {
 		if strings.Contains(digestedfragment, reverseenzymeseq) == false {
@@ -759,7 +776,7 @@ func TypeIIsdigest(sequence wtype.DNASequence, typeIIsenzyme wtype.TypeIIs) (Fin
 		topstrandstickyends_5prime = ifplasmidsticky5prime
 
 		//hack to fix wrong sticky end assignment in certain cases
-		if strings.Index(originalfwdsequence, strings.ToUpper(typeIIsenzyme.LogicalRestrictionEnzyme.RecognitionSequence)) > strings.Index(originalfwdsequence, reverseenzymeseq) {
+		if strings.Index(originalfwdsequence, strings.ToUpper(typeIIsenzyme.RestrictionEnzyme.RecognitionSequence)) > strings.Index(originalfwdsequence, reverseenzymeseq) {
 			topstrandstickyends_5prime = Revarrayorder(topstrandstickyends_5prime)
 		}
 		//3'
@@ -779,6 +796,7 @@ func TypeIIsdigest(sequence wtype.DNASequence, typeIIsenzyme wtype.TypeIIs) (Fin
 	return Finalfragments, Stickyends_5prime, Stickyends_3prime
 }
 
+// Simulates digestion of all dna sequences in the Assemblyparameters object using the enzyme in the object.
 func Digestionsimulator(assemblyparameters Assemblyparameters) (digestedfragementarray [][]Digestedfragment) {
 	// fetch enzyme properties from map (this is basically a look up table for those who don't know)
 	digestedfragementarray = make([][]Digestedfragment, 0)
@@ -796,6 +814,7 @@ func Digestionsimulator(assemblyparameters Assemblyparameters) (digestedfragemen
 	return digestedfragementarray
 }
 
+// returns a report as a string of all ends expected from digesting a vector sequence and an array of parts. Intended to aid the user in trouble shooting unsuccessful assemblies
 func EndReport(restrictionenzyme wtype.TypeIIs, vectordata wtype.DNASequence, parts []wtype.DNASequence) (endreport string) {
 	_, stickyends5, stickyends3 := TypeIIsdigest(vectordata, restrictionenzyme)
 

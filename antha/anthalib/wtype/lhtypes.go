@@ -424,6 +424,12 @@ func (lhc *LHComponent) GetCunit() string {
 	return lhc.Cunit
 }
 
+// new
+func (lhc *LHComponent) Concentration() (conc wunit.Concentration) {
+	conc = wunit.NewConcentration(lhc.Conc, lhc.Cunit)
+	return conc
+}
+
 func (lhc *LHComponent) GetVunit() string {
 	return lhc.Vunit
 }
@@ -596,7 +602,6 @@ func (lhp *LHPlate) WellsY() int {
 	return lhp.WlsY
 
 }
-
 func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
 	var lhp LHPlate
 	lhp.Type = platetype

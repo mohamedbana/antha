@@ -49,8 +49,7 @@ func (e *Scarfree_design) requirements() {
 
 // Conditions to run on startup
 func (e *Scarfree_design) setup(p Scarfree_designParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -59,8 +58,7 @@ func (e *Scarfree_design) setup(p Scarfree_designParamBlock) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *Scarfree_design) steps(p Scarfree_designParamBlock, r *Scarfree_designResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	//var msg string
@@ -86,9 +84,6 @@ func (e *Scarfree_design) steps(p Scarfree_designParamBlock, r *Scarfree_designR
 
 			partDNA, _ = parser.GenbankFeaturetoDNASequence(file, feature)
 		} else if strings.Contains(part, ".gb") {
-
-			/*annotated,_ := parser.GenbanktoAnnotatedSeq(part)
-			partDNA = annotated.DNASequence */
 
 			partDNA, _ = parser.GenbanktoDNASequence(part)
 		} else {
@@ -155,7 +150,7 @@ func (e *Scarfree_design) steps(p Scarfree_designParamBlock, r *Scarfree_designR
 	for _, part := range r.PartswithOverhangs {
 
 		enz := lookup.EnzymeLookup(p.Enzymename)
-		info := enzymes.Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+		info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 
 		sitepositions := enzymes.SitepositionString(info[0])
 
@@ -207,8 +202,7 @@ func (e *Scarfree_design) steps(p Scarfree_designParamBlock, r *Scarfree_designR
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *Scarfree_design) analysis(p Scarfree_designParamBlock, r *Scarfree_designResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -218,8 +212,7 @@ func (e *Scarfree_design) analysis(p Scarfree_designParamBlock, r *Scarfree_desi
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *Scarfree_design) validation(p Scarfree_designParamBlock, r *Scarfree_designResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

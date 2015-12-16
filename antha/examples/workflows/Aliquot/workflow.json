@@ -3,7 +3,7 @@
         "name": "main"
     },
     "processes": {
-        "Aliquot": {
+        "AliquotParams": {
             "component": "Aliquot",
             "metadata": {
                 "label": "CS"

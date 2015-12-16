@@ -20,6 +20,8 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
+// Defines a platform independent mechanism for storing files generated when using antha.
+// A folder  ./antha is produced in the home directory.
 package anthapath
 
 import (

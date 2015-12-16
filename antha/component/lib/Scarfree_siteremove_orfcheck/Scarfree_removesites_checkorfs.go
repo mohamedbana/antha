@@ -10,7 +10,6 @@ package Scarfree_siteremove_orfcheck
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
@@ -27,6 +26,8 @@ import (
 	"strings"
 	"sync"
 )
+
+//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 
 // Input parameters for this protocol (data)
 
@@ -50,8 +51,7 @@ func (e *Scarfree_siteremove_orfcheck) requirements() {
 
 // Conditions to run on startup
 func (e *Scarfree_siteremove_orfcheck) setup(p Scarfree_siteremove_orfcheckParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -60,8 +60,7 @@ func (e *Scarfree_siteremove_orfcheck) setup(p Scarfree_siteremove_orfcheckParam
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *Scarfree_siteremove_orfcheck) steps(p Scarfree_siteremove_orfcheckParamBlock, r *Scarfree_siteremove_orfcheckResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	//var msg string
@@ -113,7 +112,7 @@ func (e *Scarfree_siteremove_orfcheck) steps(p Scarfree_siteremove_orfcheckParam
 
 		for _, part := range partsinorder {
 			fmt.Println("PARRRTS:", part)
-			info := enzymes.Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+			info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 
 			for _, anysites := range info {
 				if anysites.Sitefound {
@@ -226,7 +225,7 @@ func (e *Scarfree_siteremove_orfcheck) steps(p Scarfree_siteremove_orfcheckParam
 	multiple := make([]string, 0)
 	for _, part := range r.PartswithOverhangs {
 
-		info := enzymes.Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+		info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 
 		sitepositions := enzymes.SitepositionString(info[0])
 
@@ -271,7 +270,7 @@ func (e *Scarfree_siteremove_orfcheck) steps(p Scarfree_siteremove_orfcheckParam
 			partstoorder,
 		)
 		// export data to file
-		anthapath.ExporttoFile("Report"+"_"+p.Constructname+".txt", []byte(r.Status))
+		//anthapath.ExporttoFile("Report"+"_"+Constructname+".txt",[]byte(Status))
 		//anthapath.ExportTextFile("Report"+"_"+Constructname+".txt",Status)
 
 	}
@@ -282,8 +281,7 @@ func (e *Scarfree_siteremove_orfcheck) steps(p Scarfree_siteremove_orfcheckParam
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *Scarfree_siteremove_orfcheck) analysis(p Scarfree_siteremove_orfcheckParamBlock, r *Scarfree_siteremove_orfcheckResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -293,8 +291,7 @@ func (e *Scarfree_siteremove_orfcheck) analysis(p Scarfree_siteremove_orfcheckPa
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *Scarfree_siteremove_orfcheck) validation(p Scarfree_siteremove_orfcheckParamBlock, r *Scarfree_siteremove_orfcheckResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

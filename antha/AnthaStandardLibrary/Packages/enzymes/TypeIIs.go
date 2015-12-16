@@ -25,6 +25,7 @@ package enzymes
 
 import (
 	//"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/buffers"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	//"github.com/antha-lang/antha/antha/anthalib/wunit"
 	//"time"
@@ -175,13 +176,13 @@ type CutPosition struct {
 	EndLength                         int
 }
 
-var SapI = wtype.LogicalRestrictionEnzyme{"GCTCTTC", 3, "SapI", "", 1, 4, "", []string{"N"}, []int{91, 1109, 1919, 1920}, "TypeIIs"}
+var SapI = wtype.RestrictionEnzyme{"GCTCTTC", 3, "SapI", "", 1, 4, "", []string{"N"}, []int{91, 1109, 1919, 1920}, "TypeIIs"}
 var isoschizomers = []string{"BspQI", "LguI", "PciSI", "VpaK32I"}
 var SapIenz = wtype.TypeIIs{SapI, "SapI", isoschizomers, 1, 4}
-var BsaI = wtype.LogicalRestrictionEnzyme{"GGTCTC", 4, "BsaI", "Eco31I", 1, 5, "?(5)", []string{"N"}, []int{814, 1109, 1912, 1995, 1996}, "TypeIIs"}
+var BsaI = wtype.RestrictionEnzyme{"GGTCTC", 4, "BsaI", "Eco31I", 1, 5, "?(5)", []string{"N"}, []int{814, 1109, 1912, 1995, 1996}, "TypeIIs"}
 var BsaIenz = wtype.TypeIIs{BsaI, "BsaI", []string{"none"}, 1, 5}
 
-var BpiI = wtype.LogicalRestrictionEnzyme{"GAAGAC", 4, "BpiI", "BbvII", 2, 6, "", []string{"B"}, []int{718}, "TypeIIs"}
+var BpiI = wtype.RestrictionEnzyme{"GAAGAC", 4, "BpiI", "BbvII", 2, 6, "", []string{"B"}, []int{718}, "TypeIIs"}
 var BpiIenz = wtype.TypeIIs{BpiI, "BpiI", []string{"BbvII", "BbsI", "BpuAI", "BSTV2I"}, 2, 6}
 
 var TypeIIsEnzymeproperties = map[string]wtype.TypeIIs{
@@ -193,8 +194,8 @@ var TypeIIsEnzymeproperties = map[string]wtype.TypeIIs{
 type Enzymeproperties struct {
 	Class         string
 	typeIIsenzyme wtype.TypeIIs
-	storageBuffer SimpleBuffer
-	assaybuffer   SimpleBuffer
+	storageBuffer buffers.SimpleBuffer
+	assaybuffer   buffers.SimpleBuffer
 	unitsperml    float64
 	//Barcode      int
 	Manufacturer string
@@ -213,91 +214,6 @@ type Enzymeproperties struct {
 	supplier
 	barcode
 	Stochasticmodel*/
-}
-
-type pH struct {
-	pH        float64
-	tempindeg float64 //wunit.Temperature
-}
-
-type SimpleBuffer struct {
-	Components []string
-	pH
-}
-
-type Buffer struct {
-	Components []buffercomponent
-	pH         pH
-}
-
-type buffercomponent struct {
-	Molecule Molecule
-	Molarity float64 //wunit.Moles g/Mol
-
-}
-
-type Molecule struct {
-	Moleculename     string
-	Molecularformula string
-	Molecularweight  float64
-	PubchemCID       int
-}
-
-var PotassiumAcetate50mM = buffercomponent{
-	PotassiumAcetate,
-	0.05,
-}
-
-var PotassiumAcetate = Molecule{
-	"Potassium Acetate",
-	"C2H3KO2",
-	98.14232,
-	31371,
-}
-
-var TrisAcetate = Molecule{
-	"Potassium Acetate",
-	"C4H11NO3",
-	121.13504,
-	6503,
-}
-
-var Cutsmartbuffer = SimpleBuffer{
-	[]string{"PotassiumAcetate50mM",
-		"TrisAcetate20mM",
-		"MagnesiumAcetate10mM",
-		"BSA100μgperml"},
-	pH{7.9, 25.0},
-}
-
-var SapIstoragebuffer = SimpleBuffer{
-	[]string{"300 mM NaCl", "10 mM Tris-HCl (pH 7.4)", "1 mM DTT", "0.1 mM EDTA", "50% Glycerol", "500 µg/ml BSA"},
-	pH{7.4, 25.0},
-}
-
-func Newbuffer(buffer Buffer, diluent Buffer, dilution float64) (newbuffer Buffer) {
-
-	newbuffer.Components = make([]buffercomponent, 0)
-	for i := 0; i < len(buffer.Components); i++ {
-		newbuffer.Components[i].Molecule = buffer.Components[i].Molecule
-		newbuffer.Components[i].Molarity = (buffer.Components[i].Molarity * dilution)
-		newbuffer.Components = append(newbuffer.Components, newbuffer.Components[i])
-		for j := 0; j < len(diluent.Components); j++ {
-			for _, newcomponent := range newbuffer.Components {
-				if newcomponent.Molecule == diluent.Components[j].Molecule {
-					newcomponent.Molarity = (newcomponent.Molarity + diluent.Components[j].Molarity*(1-dilution))
-				}
-				if newcomponent.Molecule != diluent.Components[j].Molecule {
-					newbuffer.Components[i].Molecule = diluent.Components[j].Molecule
-					newbuffer.Components[i].Molarity = (diluent.Components[j].Molarity * (1 - dilution))
-					newbuffer.Components = append(newbuffer.Components, diluent.Components[j])
-				}
-
-			}
-		}
-	}
-	newbuffer.pH = buffer.pH // this is incorrect and needs changing!!!
-	return newbuffer
 }
 
 /*

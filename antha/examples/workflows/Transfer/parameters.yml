@@ -1,0 +1,16 @@
+{
+  "Parameters": [{
+    "newparams": {
+      "Startingsolution": "component:water",
+	  "InPlate": "plate:pcrplate_with_cooler",
+      "Outplate": "plate:greiner384",
+      "TipType": "tipbox:Gilson20",
+      "Liquidname": "Evian",
+      "LiquidVolume": "10ul",
+    }
+  },
+],
+  "Config": {
+    "OUTPUT_COUNT": 1
+  }
+}

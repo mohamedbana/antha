@@ -10,7 +10,6 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/FindPartsthat"
 	"github.com/antha-lang/antha/antha/component/lib/Iterative_assembly_design"
 	"github.com/antha-lang/antha/antha/component/lib/Kla"
-	"github.com/antha-lang/antha/antha/component/lib/LoadGel"
 	"github.com/antha-lang/antha/antha/component/lib/LookUpMolecule"
 	"github.com/antha-lang/antha/antha/component/lib/MakeBuffer"
 	"github.com/antha-lang/antha/antha/component/lib/MakeMedia"
@@ -21,12 +20,15 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/Paintmix"
 	"github.com/antha-lang/antha/antha/component/lib/Phytip_miniprep"
 	"github.com/antha-lang/antha/antha/component/lib/Printname"
+	"github.com/antha-lang/antha/antha/component/lib/ProtocolName_from_an_file"
 	"github.com/antha-lang/antha/antha/component/lib/RemoveRestrictionSites"
-	"github.com/antha-lang/antha/antha/component/lib/SDSprep"
+	"github.com/antha-lang/antha/antha/component/lib/RestrictionDigestion"
+	"github.com/antha-lang/antha/antha/component/lib/RestrictionDigestion_conc"
 	"github.com/antha-lang/antha/antha/component/lib/Scarfree_design"
 	"github.com/antha-lang/antha/antha/component/lib/Scarfree_siteremove_orfcheck"
 	"github.com/antha-lang/antha/antha/component/lib/SumVolume"
 	"github.com/antha-lang/antha/antha/component/lib/Thawtime"
+	"github.com/antha-lang/antha/antha/component/lib/Transfer"
 	"github.com/antha-lang/antha/antha/component/lib/Transformation"
 	"github.com/antha-lang/antha/antha/component/lib/TypeIISAssembly_design"
 	"github.com/antha-lang/antha/antha/component/lib/TypeIISConstructAssembly"
@@ -43,6 +45,7 @@ type ComponentDesc struct {
 func GetComponents() []ComponentDesc {
 	portMap := make(map[string]map[string]bool) //representing component, port name, and true if in
 	portMap["Aliquot"] = make(map[string]bool)
+	portMap["Aliquot"]["InPlate"] = true
 	portMap["Aliquot"]["NumberofAliquots"] = true
 	portMap["Aliquot"]["OutPlate"] = true
 	portMap["Aliquot"]["Solution"] = true
@@ -72,7 +75,6 @@ func GetComponents() []ComponentDesc {
 	portMap["DNA_gel"] = make(map[string]bool)
 	portMap["DNA_gel"]["DNAgel"] = true
 	portMap["DNA_gel"]["DNAgelrunvolume"] = true
-	portMap["DNA_gel"]["DNAladder"] = true
 	portMap["DNA_gel"]["Loadingdye"] = true
 	portMap["DNA_gel"]["Loadingdyeinsample"] = true
 	portMap["DNA_gel"]["Loadingdyevolume"] = true
@@ -154,19 +156,6 @@ func GetComponents() []ComponentDesc {
 	portMap["Kla"]["Ncrit"] = false
 	portMap["Kla"]["Necessaryshakerspeed"] = false
 	portMap["Kla"]["Status"] = false
-
-	portMap["LoadGel"] = make(map[string]bool)
-	portMap["LoadGel"]["GelPlate"] = true
-	portMap["LoadGel"]["InPlate"] = true
-	portMap["LoadGel"]["LoadVolume"] = true
-	portMap["LoadGel"]["Protein"] = true
-	portMap["LoadGel"]["SampleName"] = true
-	portMap["LoadGel"]["Water"] = true
-	portMap["LoadGel"]["WaterName"] = true
-	portMap["LoadGel"]["WaterVolume"] = true
-
-	portMap["LoadGel"]["RunSolution"] = false
-	portMap["LoadGel"]["Status"] = false
 
 	portMap["LookUpMolecule"] = make(map[string]bool)
 	portMap["LookUpMolecule"]["Compound"] = true
@@ -314,6 +303,16 @@ func GetComponents() []ComponentDesc {
 
 	portMap["Printname"]["Fullname"] = false
 
+	portMap["ProtocolName_from_an_file"] = make(map[string]bool)
+	portMap["ProtocolName_from_an_file"]["InputVariable"] = true
+	portMap["ProtocolName_from_an_file"]["OutPlate"] = true
+	portMap["ProtocolName_from_an_file"]["ParameterVariableAsValuewithunit"] = true
+	portMap["ProtocolName_from_an_file"]["ParameterVariableAsint"] = true
+	portMap["ProtocolName_from_an_file"]["ParameterVariablestring"] = true
+
+	portMap["ProtocolName_from_an_file"]["OutputData"] = false
+	portMap["ProtocolName_from_an_file"]["PhysicalOutput"] = false
+
 	portMap["RemoveRestrictionSites"] = make(map[string]bool)
 	portMap["RemoveRestrictionSites"]["EnzymeforRestrictionmapping"] = true
 	portMap["RemoveRestrictionSites"]["PreserveTranslatedseq"] = true
@@ -327,23 +326,51 @@ func GetComponents() []ComponentDesc {
 	portMap["RemoveRestrictionSites"]["Status"] = false
 	portMap["RemoveRestrictionSites"]["Warnings"] = false
 
-	portMap["SDSprep"] = make(map[string]bool)
-	portMap["SDSprep"]["Buffer"] = true
-	portMap["SDSprep"]["BufferName"] = true
-	portMap["SDSprep"]["BufferStockConc"] = true
-	portMap["SDSprep"]["BufferVolume"] = true
-	portMap["SDSprep"]["DenatureTemp"] = true
-	portMap["SDSprep"]["DenatureTime"] = true
-	portMap["SDSprep"]["FinalConcentration"] = true
-	portMap["SDSprep"]["InPlate"] = true
-	portMap["SDSprep"]["OutPlate"] = true
-	portMap["SDSprep"]["Protein"] = true
-	portMap["SDSprep"]["ReactionVolume"] = true
-	portMap["SDSprep"]["SampleName"] = true
-	portMap["SDSprep"]["SampleVolume"] = true
+	portMap["RestrictionDigestion"] = make(map[string]bool)
+	portMap["RestrictionDigestion"]["BSAoptional"] = true
+	portMap["RestrictionDigestion"]["BSAvol"] = true
+	portMap["RestrictionDigestion"]["Buffer"] = true
+	portMap["RestrictionDigestion"]["BufferVol"] = true
+	portMap["RestrictionDigestion"]["DNAName"] = true
+	portMap["RestrictionDigestion"]["DNASolution"] = true
+	portMap["RestrictionDigestion"]["DNAVol"] = true
+	portMap["RestrictionDigestion"]["EnzSolutions"] = true
+	portMap["RestrictionDigestion"]["EnzVolumestoadd"] = true
+	portMap["RestrictionDigestion"]["EnzymeNames"] = true
+	portMap["RestrictionDigestion"]["InPlate"] = true
+	portMap["RestrictionDigestion"]["InactivationTemp"] = true
+	portMap["RestrictionDigestion"]["InactivationTime"] = true
+	portMap["RestrictionDigestion"]["OutPlate"] = true
+	portMap["RestrictionDigestion"]["ReactionTemp"] = true
+	portMap["RestrictionDigestion"]["ReactionTime"] = true
+	portMap["RestrictionDigestion"]["ReactionVolume"] = true
+	portMap["RestrictionDigestion"]["Water"] = true
 
-	portMap["SDSprep"]["LoadSample"] = false
-	portMap["SDSprep"]["Status"] = false
+	portMap["RestrictionDigestion"]["Reaction"] = false
+
+	portMap["RestrictionDigestion_conc"] = make(map[string]bool)
+	portMap["RestrictionDigestion_conc"]["BSAoptional"] = true
+	portMap["RestrictionDigestion_conc"]["BSAvol"] = true
+	portMap["RestrictionDigestion_conc"]["Buffer"] = true
+	portMap["RestrictionDigestion_conc"]["BufferConcX"] = true
+	portMap["RestrictionDigestion_conc"]["DNAConc"] = true
+	portMap["RestrictionDigestion_conc"]["DNAMassperReaction"] = true
+	portMap["RestrictionDigestion_conc"]["DNAName"] = true
+	portMap["RestrictionDigestion_conc"]["DNASolution"] = true
+	portMap["RestrictionDigestion_conc"]["DesiredConcinUperml"] = true
+	portMap["RestrictionDigestion_conc"]["EnzSolutions"] = true
+	portMap["RestrictionDigestion_conc"]["EnzymeNames"] = true
+	portMap["RestrictionDigestion_conc"]["InPlate"] = true
+	portMap["RestrictionDigestion_conc"]["InactivationTemp"] = true
+	portMap["RestrictionDigestion_conc"]["InactivationTime"] = true
+	portMap["RestrictionDigestion_conc"]["OutPlate"] = true
+	portMap["RestrictionDigestion_conc"]["ReactionTemp"] = true
+	portMap["RestrictionDigestion_conc"]["ReactionTime"] = true
+	portMap["RestrictionDigestion_conc"]["ReactionVolume"] = true
+	portMap["RestrictionDigestion_conc"]["StockReConcinUperml"] = true
+	portMap["RestrictionDigestion_conc"]["Water"] = true
+
+	portMap["RestrictionDigestion_conc"]["Reaction"] = false
 
 	portMap["Scarfree_design"] = make(map[string]bool)
 	portMap["Scarfree_design"]["Constructname"] = true
@@ -394,6 +421,15 @@ func GetComponents() []ComponentDesc {
 	portMap["Thawtime"]["Estimatedthawtime"] = false
 	portMap["Thawtime"]["Status"] = false
 	portMap["Thawtime"]["Thawtimeused"] = false
+
+	portMap["Transfer"] = make(map[string]bool)
+	portMap["Transfer"]["LiquidVolume"] = true
+	portMap["Transfer"]["Liquidname"] = true
+	portMap["Transfer"]["OutPlate"] = true
+	portMap["Transfer"]["Startingsolution"] = true
+
+	portMap["Transfer"]["FinalSolution"] = false
+	portMap["Transfer"]["Status"] = false
 
 	portMap["Transformation"] = make(map[string]bool)
 	portMap["Transformation"]["AgarPlate"] = true
@@ -549,7 +585,6 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "FindPartsthat", Constructor: FindPartsthat.NewFindPartsthat})
 	c = append(c, ComponentDesc{Name: "Iterative_assembly_design", Constructor: Iterative_assembly_design.NewIterative_assembly_design})
 	c = append(c, ComponentDesc{Name: "Kla", Constructor: Kla.NewKla})
-	c = append(c, ComponentDesc{Name: "LoadGel", Constructor: LoadGel.NewLoadGel})
 	c = append(c, ComponentDesc{Name: "LookUpMolecule", Constructor: LookUpMolecule.NewLookUpMolecule})
 	c = append(c, ComponentDesc{Name: "MakeBuffer", Constructor: MakeBuffer.NewMakeBuffer})
 	c = append(c, ComponentDesc{Name: "MakeMedia", Constructor: MakeMedia.NewMakeMedia})
@@ -560,12 +595,15 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "Paintmix", Constructor: Paintmix.NewPaintmix})
 	c = append(c, ComponentDesc{Name: "Phytip_miniprep", Constructor: Phytip_miniprep.NewPhytip_miniprep})
 	c = append(c, ComponentDesc{Name: "Printname", Constructor: Printname.NewPrintname})
+	c = append(c, ComponentDesc{Name: "ProtocolName_from_an_file", Constructor: ProtocolName_from_an_file.NewProtocolName_from_an_file})
 	c = append(c, ComponentDesc{Name: "RemoveRestrictionSites", Constructor: RemoveRestrictionSites.NewRemoveRestrictionSites})
-	c = append(c, ComponentDesc{Name: "SDSprep", Constructor: SDSprep.NewSDSprep})
+	c = append(c, ComponentDesc{Name: "RestrictionDigestion", Constructor: RestrictionDigestion.NewRestrictionDigestion})
+	c = append(c, ComponentDesc{Name: "RestrictionDigestion_conc", Constructor: RestrictionDigestion_conc.NewRestrictionDigestion_conc})
 	c = append(c, ComponentDesc{Name: "Scarfree_design", Constructor: Scarfree_design.NewScarfree_design})
 	c = append(c, ComponentDesc{Name: "Scarfree_siteremove_orfcheck", Constructor: Scarfree_siteremove_orfcheck.NewScarfree_siteremove_orfcheck})
 	c = append(c, ComponentDesc{Name: "SumVolume", Constructor: SumVolume.NewSumVolume})
 	c = append(c, ComponentDesc{Name: "Thawtime", Constructor: Thawtime.NewThawtime})
+	c = append(c, ComponentDesc{Name: "Transfer", Constructor: Transfer.NewTransfer})
 	c = append(c, ComponentDesc{Name: "Transformation", Constructor: Transformation.NewTransformation})
 	c = append(c, ComponentDesc{Name: "TypeIISAssembly_design", Constructor: TypeIISAssembly_design.NewTypeIISAssembly_design})
 	c = append(c, ComponentDesc{Name: "TypeIISConstructAssembly", Constructor: TypeIISConstructAssembly.NewTypeIISConstructAssembly})

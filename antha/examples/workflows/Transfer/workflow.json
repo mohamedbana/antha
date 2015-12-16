@@ -1,0 +1,14 @@
+{
+    "properties": {
+        "name": "main"
+    },
+    "processes": {
+        "newparams": {
+            "component": "Transfer",
+            "metadata": {
+                "label": "CS"
+            }
+        }
+    },
+    "connections": [ ]
+}

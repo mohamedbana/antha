@@ -44,7 +44,7 @@ import (
 // ul
 
 // cubesensor streams:
-//wunit.Pressure // in pascals atmospheric pressure of moist air (Pa) 100mBar = 1 pa
+// in pascals atmospheric pressure of moist air (Pa) 100mBar = 1 pa. Not yet built in unit so we import it from wunit.
 // input in deg C will be converted to Kelvin
 // Percentage // density water vapor (kg/m3)
 
@@ -60,26 +60,22 @@ func (e *Evaporationrate) requirements() {
 
 }
 func (e *Evaporationrate) setup(p EvaporationrateParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 func (e *Evaporationrate) steps(p EvaporationrateParamBlock, r *EvaporationrateResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 func (e *Evaporationrate) analysis(p EvaporationrateParamBlock, r *EvaporationrateResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
-	tempinKelvin := (p.Temp.SIValue() + 273.15)
-	var PWS float64 = eng.Pws(tempinKelvin)
+	var PWS float64 = eng.Pws(p.Temp)
 	var pw float64 = eng.Pw(p.Relativehumidity, PWS) // vapour partial pressure in Pascals
 	var Gh = (eng.Θ(p.Liquid, p.Airvelocity) *
 		(labware.Labwaregeometry[p.Platetype]["Surfacearea"] *
@@ -103,8 +99,7 @@ func (e *Evaporationrate) analysis(p EvaporationrateParamBlock, r *Evaporationra
 } // works in either analysis or steps sections
 
 func (e *Evaporationrate) validation(p EvaporationrateParamBlock, r *EvaporationrateResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	if r.Evaporatedliquid.SIValue() > p.Volumeperwell.SIValue() {
@@ -181,7 +176,7 @@ func (e *Evaporationrate) Map(m map[string]interface{}) interface{} {
 		json.Unmarshal([]byte(vAirvelocity.JSONString), &temp)
 		res.Airvelocity = *temp.Airvelocity
 	} else {
-		res.Airvelocity = m["Airvelocity"].(execute.ThreadParam).Value.(float64)
+		res.Airvelocity = m["Airvelocity"].(execute.ThreadParam).Value.(wunit.Velocity)
 	}
 
 	vExecutiontime, is := m["Executiontime"].(execute.ThreadParam).Value.(execute.JSONValue)
@@ -208,7 +203,7 @@ func (e *Evaporationrate) Map(m map[string]interface{}) interface{} {
 		json.Unmarshal([]byte(vPa.JSONString), &temp)
 		res.Pa = *temp.Pa
 	} else {
-		res.Pa = m["Pa"].(execute.ThreadParam).Value.(float64)
+		res.Pa = m["Pa"].(execute.ThreadParam).Value.(wunit.Pressure)
 	}
 
 	vPlatetype, is := m["Platetype"].(execute.ThreadParam).Value.(execute.JSONValue)
@@ -432,10 +427,10 @@ type EvaporationrateParamBlock struct {
 	ID               execute.ThreadID
 	BlockID          execute.BlockID
 	Error            bool
-	Airvelocity      float64
+	Airvelocity      wunit.Velocity
 	Executiontime    wunit.Time
 	Liquid           string
-	Pa               float64
+	Pa               wunit.Pressure
 	Platetype        string
 	Relativehumidity float64
 	Temp             wunit.Temperature
@@ -446,10 +441,10 @@ type EvaporationrateConfig struct {
 	ID               execute.ThreadID
 	BlockID          execute.BlockID
 	Error            bool
-	Airvelocity      float64
+	Airvelocity      wunit.Velocity
 	Executiontime    wunit.Time
 	Liquid           string
-	Pa               float64
+	Pa               wunit.Pressure
 	Platetype        string
 	Relativehumidity float64
 	Temp             wunit.Temperature
@@ -470,10 +465,10 @@ type EvaporationrateJSONBlock struct {
 	ID                       *execute.ThreadID
 	BlockID                  *execute.BlockID
 	Error                    *bool
-	Airvelocity              *float64
+	Airvelocity              *wunit.Velocity
 	Executiontime            *wunit.Time
 	Liquid                   *string
-	Pa                       *float64
+	Pa                       *wunit.Pressure
 	Platetype                *string
 	Relativehumidity         *float64
 	Temp                     *wunit.Temperature
@@ -487,10 +482,10 @@ type EvaporationrateJSONBlock struct {
 func (c *Evaporationrate) ComponentInfo() *execute.ComponentInfo {
 	inp := make([]execute.PortInfo, 0)
 	outp := make([]execute.PortInfo, 0)
-	inp = append(inp, *execute.NewPortInfo("Airvelocity", "float64", "Airvelocity", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Airvelocity", "wunit.Velocity", "Airvelocity", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Executiontime", "wunit.Time", "Executiontime", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Liquid", "string", "Liquid", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Pa", "float64", "Pa", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Pa", "wunit.Pressure", "Pa", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Platetype", "string", "Platetype", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Relativehumidity", "float64", "Relativehumidity", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Temp", "wunit.Temperature", "Temp", true, true, nil, nil))

@@ -21,7 +21,7 @@ import (
 
 // Input parameters for this protocol (data)
 
-// or should this be a concentration?
+//DNAladder Volume // or should this be a concentration?
 
 //DNAgelruntime time.Duration
 //DNAgelwellcapacity Volume
@@ -76,8 +76,7 @@ func (e *DNA_gel) requirements() {
 // Including configuring an controls required, and the blocking level needed
 // for them (in this case, per plate of samples processed)
 func (e *DNA_gel) setup(p DNA_gelParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -91,8 +90,7 @@ func (e *DNA_gel) setup(p DNA_gelParamBlock) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *DNA_gel) steps(p DNA_gelParamBlock, r *DNA_gelResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	// load gel
@@ -142,8 +140,7 @@ func (e *DNA_gel) steps(p DNA_gelParamBlock, r *DNA_gelResultBlock) {
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *DNA_gel) analysis(p DNA_gelParamBlock, r *DNA_gelResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -157,8 +154,7 @@ func (e *DNA_gel) analysis(p DNA_gelParamBlock, r *DNA_gelResultBlock) {
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *DNA_gel) validation(p DNA_gelParamBlock, r *DNA_gelResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -228,7 +224,7 @@ func NewDNA_gel() interface{} { //*DNA_gel {
 // Mapper function
 func (e *DNA_gel) Map(m map[string]interface{}) interface{} {
 	var res DNA_gelParamBlock
-	res.Error = false || m["DNAgel"].(execute.ThreadParam).Error || m["DNAgelrunvolume"].(execute.ThreadParam).Error || m["DNAladder"].(execute.ThreadParam).Error || m["Loadingdye"].(execute.ThreadParam).Error || m["Loadingdyeinsample"].(execute.ThreadParam).Error || m["Loadingdyevolume"].(execute.ThreadParam).Error || m["Sampletotest"].(execute.ThreadParam).Error
+	res.Error = false || m["DNAgel"].(execute.ThreadParam).Error || m["DNAgelrunvolume"].(execute.ThreadParam).Error || m["Loadingdye"].(execute.ThreadParam).Error || m["Loadingdyeinsample"].(execute.ThreadParam).Error || m["Loadingdyevolume"].(execute.ThreadParam).Error || m["Sampletotest"].(execute.ThreadParam).Error
 
 	vDNAgel, is := m["DNAgel"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
@@ -246,15 +242,6 @@ func (e *DNA_gel) Map(m map[string]interface{}) interface{} {
 		res.DNAgelrunvolume = *temp.DNAgelrunvolume
 	} else {
 		res.DNAgelrunvolume = m["DNAgelrunvolume"].(execute.ThreadParam).Value.(wunit.Volume)
-	}
-
-	vDNAladder, is := m["DNAladder"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp DNA_gelJSONBlock
-		json.Unmarshal([]byte(vDNAladder.JSONString), &temp)
-		res.DNAladder = *temp.DNAladder
-	} else {
-		res.DNAladder = m["DNAladder"].(execute.ThreadParam).Value.(wunit.Volume)
 	}
 
 	vLoadingdye, is := m["Loadingdye"].(execute.ThreadParam).Value.(execute.JSONValue)
@@ -306,7 +293,7 @@ func (e *DNA_gel) OnDNAgel(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
+		bag.Init(6, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -323,7 +310,7 @@ func (e *DNA_gel) OnDNAgelrunvolume(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
+		bag.Init(6, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -335,29 +322,12 @@ func (e *DNA_gel) OnDNAgelrunvolume(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *DNA_gel) OnDNAladder(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("DNAladder", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
 func (e *DNA_gel) OnLoadingdye(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
+		bag.Init(6, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -374,7 +344,7 @@ func (e *DNA_gel) OnLoadingdyeinsample(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
+		bag.Init(6, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -391,7 +361,7 @@ func (e *DNA_gel) OnLoadingdyevolume(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
+		bag.Init(6, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -408,7 +378,7 @@ func (e *DNA_gel) OnSampletotest(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
+		bag.Init(6, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -428,7 +398,6 @@ type DNA_gel struct {
 	params             map[execute.ThreadID]*execute.AsyncBag
 	DNAgel             <-chan execute.ThreadParam
 	DNAgelrunvolume    <-chan execute.ThreadParam
-	DNAladder          <-chan execute.ThreadParam
 	Loadingdye         <-chan execute.ThreadParam
 	Loadingdyeinsample <-chan execute.ThreadParam
 	Loadingdyevolume   <-chan execute.ThreadParam
@@ -442,7 +411,6 @@ type DNA_gelParamBlock struct {
 	Error              bool
 	DNAgel             *wtype.LHPlate
 	DNAgelrunvolume    wunit.Volume
-	DNAladder          wunit.Volume
 	Loadingdye         *wtype.LHComponent
 	Loadingdyeinsample bool
 	Loadingdyevolume   wunit.Volume
@@ -455,7 +423,6 @@ type DNA_gelConfig struct {
 	Error              bool
 	DNAgel             wtype.FromFactory
 	DNAgelrunvolume    wunit.Volume
-	DNAladder          wunit.Volume
 	Loadingdye         wtype.FromFactory
 	Loadingdyeinsample bool
 	Loadingdyevolume   wunit.Volume
@@ -475,7 +442,6 @@ type DNA_gelJSONBlock struct {
 	Error              *bool
 	DNAgel             **wtype.LHPlate
 	DNAgelrunvolume    *wunit.Volume
-	DNAladder          *wunit.Volume
 	Loadingdye         **wtype.LHComponent
 	Loadingdyeinsample *bool
 	Loadingdyevolume   *wunit.Volume
@@ -488,7 +454,6 @@ func (c *DNA_gel) ComponentInfo() *execute.ComponentInfo {
 	outp := make([]execute.PortInfo, 0)
 	inp = append(inp, *execute.NewPortInfo("DNAgel", "*wtype.LHPlate", "DNAgel", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("DNAgelrunvolume", "wunit.Volume", "DNAgelrunvolume", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("DNAladder", "wunit.Volume", "DNAladder", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Loadingdye", "*wtype.LHComponent", "Loadingdye", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Loadingdyeinsample", "bool", "Loadingdyeinsample", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Loadingdyevolume", "wunit.Volume", "Loadingdyevolume", true, true, nil, nil))

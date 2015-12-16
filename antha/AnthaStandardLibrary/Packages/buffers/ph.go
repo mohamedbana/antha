@@ -18,13 +18,18 @@ type PHperdegC float64
 type PHMeasurement struct {
 	Component       *wtype.LHComponent
 	Location        *wtype.LHPlate
-	PH              float64
+	PHValue         float64
 	Temp            wunit.Temperature
 	TempCorrected   *float64
 	RefTemp         *wunit.Temperature
 	TempCoefficient *PHperdegC
 	Adjusted        *float64
 	Adjustedwith    *wtype.LHComponent
+}
+
+type PH struct {
+	PHValue float64
+	Temp    wunit.Temperature
 }
 
 func (ph *PHMeasurement) TempCompensation(reftemp wunit.Temperature, tempcoefficientforsolution PHperdegC) (compensatedph float64) {
@@ -34,7 +39,7 @@ func (ph *PHMeasurement) TempCompensation(reftemp wunit.Temperature, tempcoeffic
 
 	tempdiff := ph.Temp.SIValue() - ph.RefTemp.SIValue()
 
-	compensatedph = ph.PH + (float64(tempcoefficientforsolution) * tempdiff)
+	compensatedph = ph.PHValue + (float64(tempcoefficientforsolution) * tempdiff)
 	ph.TempCorrected = &compensatedph
 	return
 }
@@ -59,7 +64,7 @@ func (ph *PHMeasurement) AdjustpH(ph_setpoint float64, ph_tolerance float64, ph_
 
 	//sammake([]wtype.LHComponent,0)
 
-	if ph.PH > pHmax {
+	if ph.PHValue > pHmax {
 		// calculate concentration of solution needed first, for now we'll add 10ul at a time until adjusted
 		for {
 			//newphmeasurement = ph
@@ -67,7 +72,7 @@ func (ph *PHMeasurement) AdjustpH(ph_setpoint float64, ph_tolerance float64, ph_
 			temporary := mixer.MixInto(ph.Location, ph.Component, acidsamp)
 			time.Sleep(10 * time.Second)
 			newphmeasurement := MeasurePH(temporary)
-			if newphmeasurement.PH > pHmax {
+			if newphmeasurement.PHValue > pHmax {
 				*ph = newphmeasurement
 				//}
 				//if {
@@ -85,14 +90,14 @@ func (ph *PHMeasurement) AdjustpH(ph_setpoint float64, ph_tolerance float64, ph_
 	}
 	// basically just a series of sample, stir, wait and recheck pH
 
-	if ph.PH < pHmin {
+	if ph.PHValue < pHmin {
 		for {
 			//newphmeasurement = ph
 			basesamp := mixer.Sample(Base, wunit.NewVolume(10, "ul"))
 			temporary := mixer.MixInto(ph.Location, ph.Component, basesamp)
 			time.Sleep(10 * time.Second)
 			newphmeasurement := MeasurePH(temporary)
-			if newphmeasurement.PH > pHmax {
+			if newphmeasurement.PHValue > pHmax {
 				*ph = newphmeasurement
 			} else {
 				adjustedsol = *ph.Component

@@ -42,36 +42,48 @@ import (
 //"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Setpoints"
 //"github.com/montanaflynn/stats"
 
+//float64
+
 //diffusion coefficient, m2 􏰀 s􏰁1 // from wikipedia: Oxygen (dis) - Water (l) 	@25 degrees C 	2.10x10−5 cm2/s // should call from elsewhere really
 // add temp etc?
+
+//float64
+
+//float64
 
 func (e *Kla) requirements() {
 	_ = wunit.Make_units
 
 }
 func (e *Kla) setup(p KlaParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 func (e *Kla) steps(p KlaParamBlock, r *KlaResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	dv := labware.Labwaregeometry[p.Platetype]["dv"] // microwell vessel diameter, m 0.017 //
 	ai := labware.Labwaregeometry[p.Platetype]["ai"] // initial specific surface area, /m 96.0
-	//var RE = Reynolds number, (ro * n * dv * 2/mu), dimensionless
 
 	ro := liquidclasses.Liquidclass[p.Liquid]["ro"] //density, kg 􏰀/ m􏰁3 999.7 // environment dependent
 	mu := liquidclasses.Liquidclass[p.Liquid]["mu"] //0.001           environment dependent                        //liquidclasses.Liquidclass[liquid]["mu"] viscosity, kg 􏰀/ m􏰁 /􏰀 s
 
-	n := p.Rpm / 60 //shaking frequency, s􏰁1
-	//const exp = Eulers number, 2.718281828
+	var n float64 //shaking frequency per second
 
+	if p.Rpm.Unit().RawSymbol() == `/s` {
+		n = p.Rpm.RawValue()
+	} else if p.Rpm.Unit().RawSymbol() == `/min` {
+		n = p.Rpm.RawValue() / 60
+	}
+
+	//n = Rpm / 60 //shaking frequency, s􏰁1
+	//var RE = Reynolds number, (ro * n * dv * 2/mu), dimensionless
+	//const exp = Eulers number, 2.718281828
 	//Fr = Froude number = dt(2 * math.Pi * n)^2 /(2 * g), (dimensionless)
+
 	dt := devices.Shaker[p.Shakertype]["dt"] //0.008                                  //shaking amplitude, m // move to shaker package
 
 	a := labware.Labwaregeometry[p.Platetype]["a"] //0.88   //
@@ -87,10 +99,11 @@ func (e *Kla) steps(p KlaParamBlock, r *KlaResultBlock) {
 	// Check Ncrit! original paper used this to calculate speed in shallow round well plates... double check paper
 
 	// add loop to use correct formula dependent on Platetype etc...
-	/*Criticalshakerspeed := "error"
-	if labware.Labwaregeometry[Platetype]["numberofwellsides"] == 4.0 {*/
-	r.Ncrit = eng.Ncrit_srw(Sigma, dv, Vl, ro, dt)
-	//}
+	// currently only one plate type supported
+	//Criticalshakerspeed := "error"
+	if labware.Labwaregeometry[p.Platetype]["numberofwellsides"] == 4.0 {
+		r.Ncrit = eng.Ncrit_srw(Sigma, dv, Vl, ro, dt)
+	} /*else{Criticalshakerspeed := "error: kla estimation for this plate type not yet implemented"}
 	/*if i == 4.0 {
 		Criticalshakerspeed := "error"
 	}
@@ -105,29 +118,21 @@ func (e *Kla) steps(p KlaParamBlock, r *KlaResultBlock) {
 
 	r.CalculatedKla = eng.KLa_squaremicrowell(p.D, dv, ai, Re, a, Fr, b)
 
-	r.Status = fmt.Sprintln("TargetRE = ", p.TargetRE, "Calculated Reynolds number = ", Re, "shakerspeedrequired for targetRE= ", r.Necessaryshakerspeed*60, "Froude number = ", Fr, "kla =", r.CalculatedKla, "/h", "Ncrit	=", r.Ncrit, "/S")
+	r.Status = fmt.Sprintln("TargetRE = ", p.TargetRE, "Calculated Reynolds number = ", Re, "shakerspeedrequired for targetRE= ", r.Necessaryshakerspeed.ToString() /* *60 */, "Froude number = ", Fr, "kla =", r.CalculatedKla, "/h", "Ncrit	=", r.Ncrit.ToString() /*,"/S"*/)
 	_ = _wrapper.WaitToEnd()
 
 	//CalculatedKla = setpoints.CalculateKlasquaremicrowell(Platetype, Liquid, Rpm, Shakertype, TargetRE, D)
 
-	/*
-		fmt.Println("shakerspeedrequired= ", stats.Round(Necessaryshakerspeed*60, 3))
-		fmt.Println("Froude number = ", stats.Round(Fr, 3))
-		fmt.Println("kla =", stats.Round(CalculatedKla, 3))
-		fmt.Println("Shaker speed required for turbulence	=", Criticalshakerspeed,"/S")*/
-	//fmt.Println("=", (Criticalshakerspeed*60), 3),"rpm")
 }
 func (e *Kla) analysis(p KlaParamBlock, r *KlaResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 } // works in either analysis or steps sections
 
 func (e *Kla) validation(p KlaParamBlock, r *KlaResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -243,7 +248,7 @@ func (e *Kla) Map(m map[string]interface{}) interface{} {
 		json.Unmarshal([]byte(vRpm.JSONString), &temp)
 		res.Rpm = *temp.Rpm
 	} else {
-		res.Rpm = m["Rpm"].(execute.ThreadParam).Value.(float64)
+		res.Rpm = m["Rpm"].(execute.ThreadParam).Value.(wunit.Rate)
 	}
 
 	vShakertype, is := m["Shakertype"].(execute.ThreadParam).Value.(execute.JSONValue)
@@ -417,7 +422,7 @@ type KlaParamBlock struct {
 	Fillvolume wunit.Volume
 	Liquid     string
 	Platetype  string
-	Rpm        float64
+	Rpm        wunit.Rate
 	Shakertype string
 	TargetRE   float64
 }
@@ -430,7 +435,7 @@ type KlaConfig struct {
 	Fillvolume wunit.Volume
 	Liquid     string
 	Platetype  string
-	Rpm        float64
+	Rpm        wunit.Rate
 	Shakertype string
 	TargetRE   float64
 }
@@ -441,8 +446,8 @@ type KlaResultBlock struct {
 	Error                bool
 	CalculatedKla        float64
 	Flowstate            string
-	Ncrit                float64
-	Necessaryshakerspeed float64
+	Ncrit                wunit.Rate
+	Necessaryshakerspeed wunit.Rate
 	Status               string
 }
 
@@ -454,13 +459,13 @@ type KlaJSONBlock struct {
 	Fillvolume           *wunit.Volume
 	Liquid               *string
 	Platetype            *string
-	Rpm                  *float64
+	Rpm                  *wunit.Rate
 	Shakertype           *string
 	TargetRE             *float64
 	CalculatedKla        *float64
 	Flowstate            *string
-	Ncrit                *float64
-	Necessaryshakerspeed *float64
+	Ncrit                *wunit.Rate
+	Necessaryshakerspeed *wunit.Rate
 	Status               *string
 }
 
@@ -471,13 +476,13 @@ func (c *Kla) ComponentInfo() *execute.ComponentInfo {
 	inp = append(inp, *execute.NewPortInfo("Fillvolume", "wunit.Volume", "Fillvolume", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Liquid", "string", "Liquid", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Platetype", "string", "Platetype", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Rpm", "float64", "Rpm", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Rpm", "wunit.Rate", "Rpm", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Shakertype", "string", "Shakertype", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("TargetRE", "float64", "TargetRE", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("CalculatedKla", "float64", "CalculatedKla", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("Flowstate", "string", "Flowstate", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Ncrit", "float64", "Ncrit", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Necessaryshakerspeed", "float64", "Necessaryshakerspeed", true, true, nil, nil))
+	outp = append(outp, *execute.NewPortInfo("Ncrit", "wunit.Rate", "Ncrit", true, true, nil, nil))
+	outp = append(outp, *execute.NewPortInfo("Necessaryshakerspeed", "wunit.Rate", "Necessaryshakerspeed", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("Status", "string", "Status", true, true, nil, nil))
 
 	ci := execute.NewComponentInfo("Kla", "Kla", "", false, inp, outp)

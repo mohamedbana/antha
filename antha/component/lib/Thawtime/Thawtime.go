@@ -1,12 +1,11 @@
 //status = compiles and calculates; need to fill in correct parameters and check units
 //currently using dummy values only so won't be accurate yet!
-// Once working move from floats to antha types and units
 package Thawtime
 
 import (
 	"encoding/json"
 	"fmt" // we need this go library to print
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/eng"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/eng" // all of our functions used here are in the Thaw.go file in the eng package which this points to
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/flow"
@@ -14,9 +13,6 @@ import (
 	"runtime/debug"
 	"sync"
 )
-
-// all of our functions used here are in the Thaw.go file in the eng package which this points to
-//"github.com/montanaflynn/stats" // a rounding function is used from this third party library
 
 // Many of the real parameters required will be looked up via the specific labware (platetype) and liquid type which are being used.
 
@@ -35,21 +31,17 @@ func (e *Thawtime) requirements() {
 
 }
 func (e *Thawtime) setup(p ThawtimeParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 func (e *Thawtime) steps(p ThawtimeParamBlock, r *ThawtimeResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	/*  Step 1. we need a mass for the following equations so we calculate this by looking up
 	the liquid density and multiplying by the fill volume using this function from the engineering library */
-
-	//fillvolume:= Fillvolume.SIValue()
 
 	mass := eng.Massfromvolume(p.Fillvolume, p.Liquid)
 
@@ -65,7 +57,7 @@ func (e *Thawtime) steps(p ThawtimeParamBlock, r *ThawtimeResultBlock) {
 	only validated between air velocities 2 - 20 m/s. It could also be adjusted to calculate heat transfer if the sample
 	is agitated on a shaker to speed up thawing. */
 
-	hc_air := eng.Hc_air(p.Airvelocity)
+	hc_air := eng.Hc_air(p.Airvelocity.SIValue())
 
 	/*  Step 4. The rate of heat transfer by convection is then calculated using this value combined with the temperature differential
 	(measured by the temp sensor) and surface area dictated by the plate type (another look up called from the eng library!)*/
@@ -97,16 +89,14 @@ func (e *Thawtime) steps(p ThawtimeParamBlock, r *ThawtimeResultBlock) {
 
 }
 func (e *Thawtime) analysis(p ThawtimeParamBlock, r *ThawtimeResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 
 func (e *Thawtime) validation(p ThawtimeParamBlock, r *ThawtimeResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -176,7 +166,7 @@ func (e *Thawtime) Map(m map[string]interface{}) interface{} {
 		json.Unmarshal([]byte(vAirvelocity.JSONString), &temp)
 		res.Airvelocity = *temp.Airvelocity
 	} else {
-		res.Airvelocity = m["Airvelocity"].(execute.ThreadParam).Value.(float64)
+		res.Airvelocity = m["Airvelocity"].(execute.ThreadParam).Value.(wunit.Velocity)
 	}
 
 	vBulkTemp, is := m["BulkTemp"].(execute.ThreadParam).Value.(execute.JSONValue)
@@ -380,7 +370,7 @@ type ThawtimeParamBlock struct {
 	ID          execute.ThreadID
 	BlockID     execute.BlockID
 	Error       bool
-	Airvelocity float64
+	Airvelocity wunit.Velocity
 	BulkTemp    wunit.Temperature
 	Fillvolume  wunit.Volume
 	Fudgefactor float64
@@ -393,7 +383,7 @@ type ThawtimeConfig struct {
 	ID          execute.ThreadID
 	BlockID     execute.BlockID
 	Error       bool
-	Airvelocity float64
+	Airvelocity wunit.Velocity
 	BulkTemp    wunit.Temperature
 	Fillvolume  wunit.Volume
 	Fudgefactor float64
@@ -415,7 +405,7 @@ type ThawtimeJSONBlock struct {
 	ID                *execute.ThreadID
 	BlockID           *execute.BlockID
 	Error             *bool
-	Airvelocity       *float64
+	Airvelocity       *wunit.Velocity
 	BulkTemp          *wunit.Temperature
 	Fillvolume        *wunit.Volume
 	Fudgefactor       *float64
@@ -430,7 +420,7 @@ type ThawtimeJSONBlock struct {
 func (c *Thawtime) ComponentInfo() *execute.ComponentInfo {
 	inp := make([]execute.PortInfo, 0)
 	outp := make([]execute.PortInfo, 0)
-	inp = append(inp, *execute.NewPortInfo("Airvelocity", "float64", "Airvelocity", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Airvelocity", "wunit.Velocity", "Airvelocity", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("BulkTemp", "wunit.Temperature", "BulkTemp", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Fillvolume", "wunit.Volume", "Fillvolume", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Fudgefactor", "float64", "Fudgefactor", true, true, nil, nil))

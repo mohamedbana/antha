@@ -44,7 +44,7 @@ examples/promoter/promoter.go
 cmd/anthafmt/anthafmt
 
 *~
-reports/
+/reports
 
 reference/reference_run/main
 

@@ -41,8 +41,7 @@ func (e *RemoveRestrictionSites) requirements() {
 
 // Conditions to run on startup
 func (e *RemoveRestrictionSites) setup(p RemoveRestrictionSitesParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -51,8 +50,7 @@ func (e *RemoveRestrictionSites) setup(p RemoveRestrictionSitesParamBlock) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *RemoveRestrictionSites) steps(p RemoveRestrictionSitesParamBlock, r *RemoveRestrictionSitesResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	Sequence := wtype.MakeLinearDNASequence("Test", p.Sequencekey)
@@ -61,7 +59,7 @@ func (e *RemoveRestrictionSites) steps(p RemoveRestrictionSitesParamBlock, r *Re
 	warnings := make([]string, 0)
 
 	// first lookup enzyme properties for all enzymes and make a new array
-	enzlist := make([]wtype.LogicalRestrictionEnzyme, 0)
+	enzlist := make([]wtype.RestrictionEnzyme, 0)
 	for _, site := range p.RestrictionsitetoAvoid {
 		enzsite := lookup.EnzymeLookup(site)
 		enzlist = append(enzlist, enzsite)
@@ -194,8 +192,7 @@ func (e *RemoveRestrictionSites) steps(p RemoveRestrictionSitesParamBlock, r *Re
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *RemoveRestrictionSites) analysis(p RemoveRestrictionSitesParamBlock, r *RemoveRestrictionSitesResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -205,8 +202,7 @@ func (e *RemoveRestrictionSites) analysis(p RemoveRestrictionSitesParamBlock, r 
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *RemoveRestrictionSites) validation(p RemoveRestrictionSitesParamBlock, r *RemoveRestrictionSitesResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

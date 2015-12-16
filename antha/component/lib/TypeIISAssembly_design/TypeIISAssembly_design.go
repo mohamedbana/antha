@@ -12,6 +12,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/export"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -42,8 +43,7 @@ func (e *TypeIISAssembly_design) requirements() {
 
 // Conditions to run on startup
 func (e *TypeIISAssembly_design) setup(p TypeIISAssembly_designParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -52,8 +52,7 @@ func (e *TypeIISAssembly_design) setup(p TypeIISAssembly_designParamBlock) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *TypeIISAssembly_designResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	//var msg string
@@ -134,7 +133,7 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 
 	// The default sitesfound produced from the assembly simulator only checks to SapI and BsaI so we'll repeat with the enzymes declared in parameters
 	// first lookup enzyme properties
-	enzlist := make([]wtype.LogicalRestrictionEnzyme, 0)
+	enzlist := make([]wtype.RestrictionEnzyme, 0)
 	for _, site := range p.RestrictionsitetoAvoid {
 		enzsite := lookup.EnzymeLookup(site)
 		enzlist = append(enzlist, enzsite)
@@ -165,11 +164,11 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 
 	partswithOverhangs := make([]*wtype.DNASequence, 0)
 	for i, part := range r.PartswithOverhangs {
-		_ = enzymes.ExportFastaDir(p.Constructname, strconv.Itoa(i+1), &part)
+		_ = export.ExportFastaDir(p.Constructname, strconv.Itoa(i+1), &part)
 		partswithOverhangs = append(partswithOverhangs, &part)
 
 	}
-	_ = enzymes.Makefastaserial(p.Constructname, partswithOverhangs)
+	_ = export.Makefastaserial(p.Constructname, partswithOverhangs)
 
 	//partstoorder := ansi.Color(fmt.Sprintln("PartswithOverhangs", PartswithOverhangs),"red")
 	partstoorder := fmt.Sprintln("PartswithOverhangs", r.PartswithOverhangs)
@@ -200,8 +199,7 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *TypeIISAssembly_design) analysis(p TypeIISAssembly_designParamBlock, r *TypeIISAssembly_designResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -211,8 +209,7 @@ func (e *TypeIISAssembly_design) analysis(p TypeIISAssembly_designParamBlock, r 
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *TypeIISAssembly_design) validation(p TypeIISAssembly_designParamBlock, r *TypeIISAssembly_designResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

@@ -114,7 +114,7 @@ func main() {
 
 		for _, part := range partsinorder {
 			fmt.Println("PARRRTS:", part)
-			info := enzymes.Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+			info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 
 			for _, anysites := range info {
 				if anysites.Sitefound {
@@ -227,7 +227,7 @@ func main() {
 	multiple := make([]string, 0)
 	for _, part := range PartswithOverhangs {
 
-		info := enzymes.Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+		info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 
 		sitepositions := enzymes.SitepositionString(info[0])
 

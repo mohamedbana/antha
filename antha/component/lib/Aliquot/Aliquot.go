@@ -28,8 +28,7 @@ func (e *Aliquot) requirements() {
 
 // Conditions to run on startup
 func (e *Aliquot) setup(p AliquotParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -38,8 +37,7 @@ func (e *Aliquot) setup(p AliquotParamBlock) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *Aliquot) steps(p AliquotParamBlock, r *AliquotResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	number := p.SolutionVolume.SIValue() / p.VolumePerAliquot.SIValue()
@@ -51,6 +49,9 @@ func (e *Aliquot) steps(p AliquotParamBlock, r *AliquotResultBlock) {
 	aliquots := make([]*wtype.LHSolution, 0)
 
 	for i := 0; i < p.NumberofAliquots; i++ {
+		if p.Solution.Type == "dna" {
+			p.Solution.Type = "DoNotMix"
+		}
 		aliquotSample := mixer.Sample(p.Solution, p.VolumePerAliquot)
 		aliquot := _wrapper.MixInto(p.OutPlate, aliquotSample)
 		aliquots = append(aliquots, aliquot)
@@ -63,8 +64,7 @@ func (e *Aliquot) steps(p AliquotParamBlock, r *AliquotResultBlock) {
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *Aliquot) analysis(p AliquotParamBlock, r *AliquotResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -74,8 +74,7 @@ func (e *Aliquot) analysis(p AliquotParamBlock, r *AliquotResultBlock) {
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *Aliquot) validation(p AliquotParamBlock, r *AliquotResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -129,7 +128,16 @@ func NewAliquot() interface{} { //*Aliquot {
 // Mapper function
 func (e *Aliquot) Map(m map[string]interface{}) interface{} {
 	var res AliquotParamBlock
-	res.Error = false || m["NumberofAliquots"].(execute.ThreadParam).Error || m["OutPlate"].(execute.ThreadParam).Error || m["Solution"].(execute.ThreadParam).Error || m["SolutionVolume"].(execute.ThreadParam).Error || m["VolumePerAliquot"].(execute.ThreadParam).Error
+	res.Error = false || m["InPlate"].(execute.ThreadParam).Error || m["NumberofAliquots"].(execute.ThreadParam).Error || m["OutPlate"].(execute.ThreadParam).Error || m["Solution"].(execute.ThreadParam).Error || m["SolutionVolume"].(execute.ThreadParam).Error || m["VolumePerAliquot"].(execute.ThreadParam).Error
+
+	vInPlate, is := m["InPlate"].(execute.ThreadParam).Value.(execute.JSONValue)
+	if is {
+		var temp AliquotJSONBlock
+		json.Unmarshal([]byte(vInPlate.JSONString), &temp)
+		res.InPlate = *temp.InPlate
+	} else {
+		res.InPlate = m["InPlate"].(execute.ThreadParam).Value.(*wtype.LHPlate)
+	}
 
 	vNumberofAliquots, is := m["NumberofAliquots"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
@@ -176,18 +184,35 @@ func (e *Aliquot) Map(m map[string]interface{}) interface{} {
 		res.VolumePerAliquot = m["VolumePerAliquot"].(execute.ThreadParam).Value.(wunit.Volume)
 	}
 
-	res.ID = m["NumberofAliquots"].(execute.ThreadParam).ID
-	res.BlockID = m["NumberofAliquots"].(execute.ThreadParam).BlockID
+	res.ID = m["InPlate"].(execute.ThreadParam).ID
+	res.BlockID = m["InPlate"].(execute.ThreadParam).BlockID
 
 	return res
 }
 
+func (e *Aliquot) OnInPlate(param execute.ThreadParam) {
+	e.lock.Lock()
+	var bag *execute.AsyncBag = e.params[param.ID]
+	if bag == nil {
+		bag = new(execute.AsyncBag)
+		bag.Init(6, e, e)
+		e.params[param.ID] = bag
+	}
+	e.lock.Unlock()
+
+	fired := bag.AddValue("InPlate", param)
+	if fired {
+		e.lock.Lock()
+		delete(e.params, param.ID)
+		e.lock.Unlock()
+	}
+}
 func (e *Aliquot) OnNumberofAliquots(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
+		bag.Init(6, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -204,7 +229,7 @@ func (e *Aliquot) OnOutPlate(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
+		bag.Init(6, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -221,7 +246,7 @@ func (e *Aliquot) OnSolution(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
+		bag.Init(6, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -238,7 +263,7 @@ func (e *Aliquot) OnSolutionVolume(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
+		bag.Init(6, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -255,7 +280,7 @@ func (e *Aliquot) OnVolumePerAliquot(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
+		bag.Init(6, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -273,6 +298,7 @@ type Aliquot struct {
 	lock             sync.Mutex
 	startup          sync.Once
 	params           map[execute.ThreadID]*execute.AsyncBag
+	InPlate          <-chan execute.ThreadParam
 	NumberofAliquots <-chan execute.ThreadParam
 	OutPlate         <-chan execute.ThreadParam
 	Solution         <-chan execute.ThreadParam
@@ -285,6 +311,7 @@ type AliquotParamBlock struct {
 	ID               execute.ThreadID
 	BlockID          execute.BlockID
 	Error            bool
+	InPlate          *wtype.LHPlate
 	NumberofAliquots int
 	OutPlate         *wtype.LHPlate
 	Solution         *wtype.LHComponent
@@ -296,6 +323,7 @@ type AliquotConfig struct {
 	ID               execute.ThreadID
 	BlockID          execute.BlockID
 	Error            bool
+	InPlate          wtype.FromFactory
 	NumberofAliquots int
 	OutPlate         wtype.FromFactory
 	Solution         wtype.FromFactory
@@ -314,6 +342,7 @@ type AliquotJSONBlock struct {
 	ID               *execute.ThreadID
 	BlockID          *execute.BlockID
 	Error            *bool
+	InPlate          **wtype.LHPlate
 	NumberofAliquots *int
 	OutPlate         **wtype.LHPlate
 	Solution         **wtype.LHComponent
@@ -325,6 +354,7 @@ type AliquotJSONBlock struct {
 func (c *Aliquot) ComponentInfo() *execute.ComponentInfo {
 	inp := make([]execute.PortInfo, 0)
 	outp := make([]execute.PortInfo, 0)
+	inp = append(inp, *execute.NewPortInfo("InPlate", "*wtype.LHPlate", "InPlate", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("NumberofAliquots", "int", "NumberofAliquots", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("OutPlate", "*wtype.LHPlate", "OutPlate", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Solution", "*wtype.LHComponent", "Solution", true, true, nil, nil))

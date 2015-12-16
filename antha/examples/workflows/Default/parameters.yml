@@ -1,0 +1,31 @@
+{
+  "Parameters": [{
+    "EnterNameForYourParameters": {
+      "InputVariable": "component:Some component in factory",
+	  "InPlate": "plate:pcrplate_with_cooler",
+      "Outplate": "plate:greiner384",
+      "TipType": "tipbox:Gilson20",
+      "ParameterVariablestring": "Hello World!",
+      "ParameterVariableAsValuewithunit": "10ul",
+	"ParameterVariableAsint":1,
+	"ParameterVariableAsfloat64":3.0,
+	"ParameterVariableAsboolean":true
+    }
+  },
+{
+    "EnterNameForYourParameters": {
+      "InputVariable": "component:Some component in factory",
+	  "InPlate": "plate:pcrplate_with_cooler",
+      "Outplate": "plate:greiner384",
+      "TipType": "tipbox:Gilson20",
+      "ParameterVariablestring": "Hello again",
+      "ParameterVariableAsValuewithunit": "100ul",
+	"ParameterVariableAsint":2,
+	"ParameterVariableAsfloat64":3.55555,
+	"ParameterVariableAsboolean":false
+    }
+  }],
+  "Config": {
+    "OUTPUT_COUNT": 2
+  }
+}

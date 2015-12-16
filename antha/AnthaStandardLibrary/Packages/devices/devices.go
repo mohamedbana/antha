@@ -20,6 +20,7 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
+// Look up tables stroring device properties. E.g. for use in calculating relative centrifugal force.
 package devices
 
 var (
@@ -54,3 +55,22 @@ var (
 		},
 	}
 )
+
+/*
+type ThermalAdaptor struct {
+	Manufacturer string
+	Cat-number string
+	ForPlates []wtype.LHPlate
+}
+var (
+	ShakerAdaptors = map[string]map[string]map[string]float64{
+		"3000 T-elm": map[string]map[string]float64{
+			"PCR_adaptor": map[string]float64{
+			"Height":0.008, //height in m,
+			"wells": 96.0,
+
+
+		},
+		},
+		}
+*/

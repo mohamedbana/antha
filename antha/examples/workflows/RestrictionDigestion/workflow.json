@@ -1,0 +1,14 @@
+{
+    "properties": {
+        "name": "main"
+    },
+    "processes": {
+        "Standarddigestparams": {
+            "component": "RestrictionDigestion",
+            "metadata": {
+                "label": "CS"
+            }
+        }
+    },
+    "connections": [ ]
+}

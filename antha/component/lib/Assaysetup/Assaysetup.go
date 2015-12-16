@@ -27,8 +27,7 @@ func (e *Assaysetup) requirements() {
 
 // Conditions to run on startup
 func (e *Assaysetup) setup(p AssaysetupParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -37,8 +36,7 @@ func (e *Assaysetup) setup(p AssaysetupParamBlock) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func (e *Assaysetup) steps(p AssaysetupParamBlock, r *AssaysetupResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	reactions := make([]*wtype.LHSolution, 0)
@@ -63,8 +61,7 @@ func (e *Assaysetup) steps(p AssaysetupParamBlock, r *AssaysetupResultBlock) {
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func (e *Assaysetup) analysis(p AssaysetupParamBlock, r *AssaysetupResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
@@ -74,8 +71,7 @@ func (e *Assaysetup) analysis(p AssaysetupParamBlock, r *AssaysetupResultBlock) 
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func (e *Assaysetup) validation(p AssaysetupParamBlock, r *AssaysetupResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

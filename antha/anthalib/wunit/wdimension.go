@@ -23,6 +23,7 @@
 package wunit
 
 import (
+	"fmt"
 	"github.com/antha-lang/antha/microArch/logger"
 	"strings"
 )
@@ -72,15 +73,32 @@ type Volume struct {
 }
 
 // make a volume
-func NewVolume(v float64, unit string) Volume {
+func NewVolume(v float64, unit string) (o Volume) {
 	if len(strings.TrimSpace(unit)) == 0 {
 		logger.Fatal("Can't make Volumes without unit")
 		panic("Can't make Volumes without unit")
 	}
-	o := Volume{NewPMeasurement(v, unit)}
-	return o
+	if len(strings.TrimSpace(unit)) == 1 {
+		o = Volume{NewMeasurement(v, "", unit)}
+	}
+	if len(strings.TrimSpace(unit)) > 1 {
+
+		o = Volume{NewPMeasurement(v, unit)}
+	}
+	return
 }
 
+/*
+func NewVolume(v float64, unit string) Volume {
+	if unit != "l" {
+		logger.Fatal("Can't make volumes which aren't in l")
+		panic("Can't make volumes which aren't in l")
+	}
+
+	a := Volume{NewMeasurement(v, "", unit)}
+	return a
+}
+*/
 func CopyVolume(v *Volume) *Volume {
 	ret := NewVolume(v.RawValue(), v.Unit().PrefixedSymbol())
 	return &ret
@@ -124,8 +142,20 @@ type Mass struct {
 
 // make a mass unit
 
-func NewMass(v float64, unit string) Mass {
-	return Mass{NewPMeasurement(v, unit)}
+func NewMass(v float64, unit string) (o Mass) {
+	if len(strings.TrimSpace(unit)) == 0 {
+		logger.Fatal("Can't make masses without unit")
+		panic("Can't make masses without unit")
+	}
+	if len(strings.TrimSpace(unit)) == 1 {
+		o = Mass{NewMeasurement(v, "", unit)}
+	}
+	if len(strings.TrimSpace(unit)) > 1 {
+
+		o = Mass{NewPMeasurement(v, unit)}
+	}
+
+	return //Mass{NewPMeasurement(v, unit)}
 }
 
 /*
@@ -150,23 +180,23 @@ func (m *Mass) Quantity() Measurement {
 }
 
 // mole
-type Amount struct {
+type Moles struct {
 	ConcreteMeasurement
 }
 
 // generate a new Amount in moles
-func NewAmount(v float64, unit string) Amount {
+func NewAmount(v float64, unit string) Moles {
 	if unit != "M" {
 		logger.Fatal("Can't make amounts which aren't in moles")
 		panic("Can't make amounts which aren't in moles")
 	}
 
-	m := Amount{NewMeasurement(v, "", unit)}
+	m := Moles{NewMeasurement(v, "", unit)}
 	return m
 }
 
 // defines Amount to be a SubstanceQuantity
-func (a *Amount) Quantity() Measurement {
+func (a *Moles) Quantity() Measurement {
 	return a
 }
 
@@ -242,6 +272,7 @@ type Concentration struct {
 }
 
 // make a new concentration in SI units... either M/l or kg/l
+/*
 func NewConcentration(v float64, unit string) Concentration {
 	if unit != "g/l" && unit != "M/l" {
 		// this should never be seen by users
@@ -251,6 +282,28 @@ func NewConcentration(v float64, unit string) Concentration {
 
 	c := Concentration{NewMeasurement(v, "", unit)}
 	return c
+}*/
+func NewConcentration(v float64, unit string) (o Concentration) {
+
+	if unit == "mg/ml" {
+		unit = "g/l"
+	} else if unit == "ng/ul" {
+		unit = "mg/l"
+	}
+
+	if len(strings.TrimSpace(unit)) == 0 {
+		logger.Fatal("Can't make concentration without unit")
+		panic("Can't make concentration without unit")
+	}
+	if len(strings.TrimSpace(unit)) == 3 {
+		o = Concentration{NewMeasurement(v, "", unit)}
+	}
+	if len(strings.TrimSpace(unit)) > 3 {
+
+		o = Concentration{NewPMeasurement(v, unit)}
+	}
+
+	return //Mass{NewPMeasurement(v, unit)}
 }
 
 // mass or mole
@@ -422,6 +475,48 @@ func NewFlowRate(v float64, unit string) FlowRate {
 	fr := FlowRate{NewMeasurement(v, "", unit)}
 
 	return fr
+}
+
+type Velocity struct {
+	ConcreteMeasurement
+}
+
+// new velocity in m/s
+
+func NewVelocity(v float64, unit string) Velocity {
+
+	if unit != "m/s" {
+		logger.Fatal("Can't make flow rate which aren't in m/s")
+		panic("Can't make flow rate which aren't in m/s")
+	}
+	fr := Velocity{NewMeasurement(v, "", unit)}
+
+	return fr
+}
+
+type Rate struct {
+	ConcreteMeasurement
+}
+
+func NewRate(v float64, unit string) (r Rate, err error) {
+	if unit != `/min` && unit != `/s` {
+		err = fmt.Errorf("Can't make flow rate which aren't in /min or per /s ")
+		logger.Fatal(err.Error())
+		panic(err.Error())
+	}
+
+	approvedtimeunits := []string{"/min", "/s"}
+
+	if unit[1:] == "min" {
+		r := Rate{NewMeasurement(v*60, "", `/s`)}
+		return r, nil
+	} else if unit[1:] == "s" {
+		r := Rate{NewMeasurement(v, "", `/s`)}
+		return r, nil
+	}
+
+	err = fmt.Errorf(unit, " Not approved time unit. Approved units time are: ", approvedtimeunits)
+	return r, err
 }
 
 /*
