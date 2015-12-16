@@ -176,16 +176,16 @@ func MakeProteinPolicy() LHPolicy {
         return proteinpolicy
 }
 func MakeLoadPolicy() LHPolicy {
-		loadpolicy := make(LHPolicy, )
-		loadpolicy["ASPSPEED"] = 2.0
-		loadpolicy["DSPSPEED"] = 0.5
-		loadpolicy["CAN_MULTI"] = false
-		loadpolicy["CAN_MSA"] = false
-		loadpolicy["CAN_SDD"] = false
-		loadpolicy["TIP_REUSE_LIMIT"] = 0
-		loadpolicy["NO_AIR_DISPENSE"] = true
-		return loadpolicy
-
+	loadpolicy := make(LHPolicy, )
+	loadpolicy["ASPSPEED"] = 2.0
+	loadpolicy["DSPSPEED"] = 0.5
+	loadpolicy["CAN_MULTI"] = false
+	loadpolicy["CAN_MSA"] = false
+	loadpolicy["CAN_SDD"] = false
+	loadpolicy["TIP_REUSE_LIMIT"] = 0
+	loadpolicy["NO_AIR_DISPENSE"] = true
+	return loadpolicy
+}
 func MakeNeedToMixPolicy() LHPolicy {
 	dnapolicy := make(LHPolicy, 10)
 	dnapolicy["POST_MIX"] = 3

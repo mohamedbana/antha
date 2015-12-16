@@ -43,16 +43,14 @@ import (
 //Biologicals
 
 func (e *SDSprep) setup(p SDSprepParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 
 func (e *SDSprep) steps(p SDSprepParamBlock, r *SDSprepResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	//Method 1. Mix two things. DOES NOT WORK as recognises protein to be 1 single entity and wont handle as seperate components. ie end result is 5 things created all
@@ -110,16 +108,14 @@ func (e *SDSprep) steps(p SDSprepParamBlock, r *SDSprepResultBlock) {
 }
 
 func (e *SDSprep) analysis(p SDSprepParamBlock, r *SDSprepResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 
 func (e *SDSprep) validation(p SDSprepParamBlock, r *SDSprepResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 

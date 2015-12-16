@@ -24,16 +24,14 @@ import (
 //Run length in cm, and protein band height and pixed density after digital scanning
 
 func (e *LoadGel) setup(p LoadGelParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 
 func (e *LoadGel) steps(p LoadGelParamBlock, r *LoadGelResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
 	samples := make([]*wtype.LHComponent, 0)
@@ -52,16 +50,14 @@ func (e *LoadGel) steps(p LoadGelParamBlock, r *LoadGelResultBlock) {
 }
 
 func (e *LoadGel) analysis(p LoadGelParamBlock, r *LoadGelResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
 }
 
 func (e *LoadGel) validation(p LoadGelParamBlock, r *LoadGelResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID,
-		p.BlockID, p)
+	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
 
