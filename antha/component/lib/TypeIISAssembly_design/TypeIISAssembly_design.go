@@ -12,6 +12,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/export"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -163,11 +164,11 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 
 	partswithOverhangs := make([]*wtype.DNASequence, 0)
 	for i, part := range r.PartswithOverhangs {
-		_ = enzymes.ExportFastaDir(p.Constructname, strconv.Itoa(i+1), &part)
+		_ = export.ExportFastaDir(p.Constructname, strconv.Itoa(i+1), &part)
 		partswithOverhangs = append(partswithOverhangs, &part)
 
 	}
-	_ = enzymes.Makefastaserial(p.Constructname, partswithOverhangs)
+	_ = export.Makefastaserial(p.Constructname, partswithOverhangs)
 
 	//partstoorder := ansi.Color(fmt.Sprintln("PartswithOverhangs", PartswithOverhangs),"red")
 	partstoorder := fmt.Sprintln("PartswithOverhangs", r.PartswithOverhangs)

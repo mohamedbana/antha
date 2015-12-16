@@ -13,6 +13,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/export"
 	"strings"
 	"strconv"
 )
@@ -172,12 +173,12 @@ Steps {
 	
 	partswithOverhangs := make([]*wtype.DNASequence,0)
 	for i, part := range PartswithOverhangs{
-		_ = enzymes.ExportFastaDir(Constructname,strconv.Itoa(i+1),&part)
+		_ = export.ExportFastaDir(Constructname,strconv.Itoa(i+1),&part)
 		partswithOverhangs=append(partswithOverhangs,&part)
 		
 		
 	}
-	_ = enzymes.Makefastaserial(Constructname,partswithOverhangs)
+	_ = export.Makefastaserial(Constructname,partswithOverhangs)
 	
 	//partstoorder := ansi.Color(fmt.Sprintln("PartswithOverhangs", PartswithOverhangs),"red")
 	partstoorder := fmt.Sprintln("PartswithOverhangs", PartswithOverhangs)

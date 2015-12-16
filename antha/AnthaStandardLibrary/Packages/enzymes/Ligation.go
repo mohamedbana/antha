@@ -164,6 +164,8 @@ func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequen
 	return assembledfragments, plasmidproducts
 }
 */
+
+// struct containing all information required to use AssemblySimulator function
 type Assemblyparameters struct {
 	Constructname string
 	Enzymename    string
@@ -177,6 +179,8 @@ type Assemblyparameters struct {
 	Vector        wtype.DNASequence
 	Partsinorder  []wtype.BioSequence
 }*/
+
+// Simulate assembly success; returns status, number of correct assemblies, any sites found
 func Assemblysimulator(assemblyparameters Assemblyparameters) (s string, successfulassemblies int, sites []Restrictionsites, newDNASequence wtype.DNASequence, err error) {
 
 	// fetch enzyme properties from map (this is basically a look up table for those who don't know)
@@ -184,10 +188,11 @@ func Assemblysimulator(assemblyparameters Assemblyparameters) (s string, success
 	enzymename := strings.ToUpper(assemblyparameters.Enzymename)
 
 	// should change this to rebase lookup; what happens if this fails?
-	enzyme := TypeIIsEnzymeproperties[enzymename]
+	//enzyme := TypeIIsEnzymeproperties[enzymename]
+	enzyme, _ := lookup.TypeIIsLookup(enzymename)
 
 	// need to expand this to include other enzyme possibilities
-	if enzyme.Name != "SapI" && enzyme.Name != "BsaI" && enzyme.Name != "BpiI" {
+	if enzyme.Class != "TypeIIs" { // enzyme.Name != "SapI" && enzyme.Name != "BsaI" && enzyme.Name != "BpiI" {
 		s = fmt.Sprint(enzymename, ": Incorrect Enzyme or no enzyme specified")
 		err = fmt.Errorf(s)
 		return s, successfulassemblies, sites, newDNASequence, err
@@ -204,14 +209,14 @@ func Assemblysimulator(assemblyparameters Assemblyparameters) (s string, success
 	}
 
 	if len(plasmidproductsfromXprimaryseq) == 1 {
-		sites = Restrictionsitefinder(plasmidproductsfromXprimaryseq[0], []wtype.RestrictionEnzyme{BsaI, SapI})
+		sites = Restrictionsitefinder(plasmidproductsfromXprimaryseq[0], []wtype.RestrictionEnzyme{BsaI, SapI, lookup.EnzymeLookup(enzymename)})
 		newDNASequence = plasmidproductsfromXprimaryseq[0]
 	}
 	// returns first plasmid in array! should be changed later!
 	if len(plasmidproductsfromXprimaryseq) > 1 {
 		sites = make([]Restrictionsites, 0)
 		for i := 0; i < len(plasmidproductsfromXprimaryseq); i++ {
-			sitesperplasmid := Restrictionsitefinder(plasmidproductsfromXprimaryseq[i], []wtype.RestrictionEnzyme{BsaI, SapI})
+			sitesperplasmid := Restrictionsitefinder(plasmidproductsfromXprimaryseq[i], []wtype.RestrictionEnzyme{BsaI, SapI, lookup.EnzymeLookup(enzymename)})
 			for _, site := range sitesperplasmid {
 				sites = append(sites, site)
 			}
@@ -244,16 +249,6 @@ func Assemblysimulator(assemblyparameters Assemblyparameters) (s string, success
 		err = fmt.Errorf(s)
 		//err = fmt.Errorf(funk, err.Error())
 		//s = err.Error()
-	}
-
-	for _, assemblyproduct := range plasmidproductsfromXprimaryseq {
-
-		fileprefix := "./"
-		tojoin := make([]string, 0)
-		tojoin = append(tojoin, fileprefix, assemblyparameters.Constructname)
-		filename := strings.Join(tojoin, "")
-		Exporttofile(filename, &assemblyproduct)
-		ExportFasta(filename, &assemblyproduct)
 	}
 
 	if s != "Yay! this should work" {
