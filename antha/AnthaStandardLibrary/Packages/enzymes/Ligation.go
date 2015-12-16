@@ -32,7 +32,7 @@ import (
 	"strings"
 )
 
-func Jointwoparts(upstreampart []Digestedfragment, downstreampart []Digestedfragment) (assembledfragments []Digestedfragment, plasmidproducts []wtype.DNASequence, err error) {
+func jointwoparts(upstreampart []Digestedfragment, downstreampart []Digestedfragment) (assembledfragments []Digestedfragment, plasmidproducts []wtype.DNASequence, err error) {
 
 	sequencestojoin := make([]string, 0)
 
@@ -77,6 +77,7 @@ func Jointwoparts(upstreampart []Digestedfragment, downstreampart []Digestedfrag
 	return assembledfragments, plasmidproducts, err
 }
 
+// key function for returning arrays of partially assembled fragments and fully assembled fragments from performing typeIIS assembly on a vector and a part
 func Jointwopartsfromsequence(vector wtype.DNASequence, part1 wtype.DNASequence, enzyme wtype.TypeIIs) (assembledfragments []Digestedfragment, plasmidproducts []wtype.DNASequence) {
 	doublestrandedpart1 := MakedoublestrandedDNA(part1)
 	digestedpart1 := DigestionPairs(doublestrandedpart1, enzyme)
@@ -84,11 +85,12 @@ func Jointwopartsfromsequence(vector wtype.DNASequence, part1 wtype.DNASequence,
 	doublestrandedvector := MakedoublestrandedDNA(vector)
 	digestedvector := DigestionPairs(doublestrandedvector, enzyme)
 
-	assembledfragments, plasmidproducts, _ = Jointwoparts(digestedvector, digestedpart1)
+	assembledfragments, plasmidproducts, _ = jointwoparts(digestedvector, digestedpart1)
 
 	return assembledfragments, plasmidproducts
 }
 
+// key function for returning an error message, arrays of partially assembled fragments and fully assembled fragments from performing typeIIS assembly on a vector and array of parts
 func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequence, enzyme wtype.TypeIIs) (assembledfragments []Digestedfragment, plasmidproducts []wtype.DNASequence, err error) {
 
 	if vector.Seq == "" {
@@ -110,7 +112,7 @@ func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequen
 	doublestrandedpart := MakedoublestrandedDNA(partsinorder[0])
 	digestedpart := DigestionPairs(doublestrandedpart, enzyme)
 	var newerr error
-	assembledfragments, plasmidproducts, newerr = Jointwoparts(digestedvector, digestedpart)
+	assembledfragments, plasmidproducts, newerr = jointwoparts(digestedvector, digestedpart)
 	if newerr != nil {
 		message := fmt.Sprint(vector.Nm, " and ", partsinorder[0].Nm, ": ", newerr.Error())
 		err = fmt.Errorf(message)
@@ -128,7 +130,7 @@ func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequen
 		doublestrandedpart = MakedoublestrandedDNA(partsinorder[i])
 		digestedpart := DigestionPairs(doublestrandedpart, enzyme)
 		//for _, newfragments := range assembledfragments {
-		assembledfragments, plasmidproducts, newerr = Jointwoparts(assembledfragments, digestedpart)
+		assembledfragments, plasmidproducts, newerr = jointwoparts(assembledfragments, digestedpart)
 		//err = newerr
 		if newerr != nil {
 			//	if err != nil {

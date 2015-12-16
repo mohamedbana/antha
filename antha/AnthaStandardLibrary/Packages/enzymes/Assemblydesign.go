@@ -343,6 +343,7 @@ func ChooseSpacer(spacerlength int, seq string, seqstoavoid []string) (spacer st
 
 var nucleotides = []string{"A", "T", "C", "G"}
 
+// for a dna sequence as a string as input; the function will return an array of 4 sequences appended with either A, T, C or G
 func Addnucleotide(s string) (splus1array []string) {
 
 	splus1 := s
