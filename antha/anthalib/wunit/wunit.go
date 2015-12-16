@@ -93,6 +93,20 @@ type ConcreteMeasurement struct {
 	Munit *GenericPrefixedUnit
 }
 
+/*
+func AddMeasurements(a Measurement, b Measurement) (c Measurement) {
+	if a.Unit().BaseSIUnit() == b.Unit().BaseSIUnit() {
+
+		apointer := *a
+
+		c = &apointer
+		&c.Add(&b)
+		/* *(CopyVolume(&A))
+		(&C).Add(&B)
+	}
+	return c
+}*/
+
 // value when converted to SI units
 func (cm *ConcreteMeasurement) SIValue() float64 {
 	return cm.Mvalue * cm.Munit.BaseSIConversionFactor()

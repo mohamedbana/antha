@@ -204,14 +204,14 @@ func Assemblysimulator(assemblyparameters Assemblyparameters) (s string, success
 	}
 
 	if len(plasmidproductsfromXprimaryseq) == 1 {
-		sites = Restrictionsitefinder(plasmidproductsfromXprimaryseq[0], []wtype.LogicalRestrictionEnzyme{BsaI, SapI})
+		sites = Restrictionsitefinder(plasmidproductsfromXprimaryseq[0], []wtype.RestrictionEnzyme{BsaI, SapI})
 		newDNASequence = plasmidproductsfromXprimaryseq[0]
 	}
 	// returns first plasmid in array! should be changed later!
 	if len(plasmidproductsfromXprimaryseq) > 1 {
 		sites = make([]Restrictionsites, 0)
 		for i := 0; i < len(plasmidproductsfromXprimaryseq); i++ {
-			sitesperplasmid := Restrictionsitefinder(plasmidproductsfromXprimaryseq[i], []wtype.LogicalRestrictionEnzyme{BsaI, SapI})
+			sitesperplasmid := Restrictionsitefinder(plasmidproductsfromXprimaryseq[i], []wtype.RestrictionEnzyme{BsaI, SapI})
 			for _, site := range sitesperplasmid {
 				sites = append(sites, site)
 			}
@@ -291,7 +291,7 @@ func MultipleAssemblies(parameters []Assemblyparameters) (s string, successfulas
 					constructsitesstring = append(constructsitesstring, enzerr.Error())
 				}*/
 				//enzyme := SapI
-				sitesperpart = Restrictionsitefinder(construct.Vector, []wtype.LogicalRestrictionEnzyme{enzyme})
+				sitesperpart = Restrictionsitefinder(construct.Vector, []wtype.RestrictionEnzyme{enzyme})
 				if sitesperpart[0].Numberofsites != 2 {
 					// need to loop through sitesperpart
 
@@ -301,7 +301,7 @@ func MultipleAssemblies(parameters []Assemblyparameters) (s string, successfulas
 				}
 
 				for _, part := range construct.Partsinorder {
-					sitesperpart = Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enzyme})
+					sitesperpart = Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enzyme})
 					if sitesperpart[0].Numberofsites != 2 {
 						sitepositions := SitepositionString(sitesperpart[0])
 						positions := ""

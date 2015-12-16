@@ -44,7 +44,7 @@ func (e *RestrictionDigestion_conc) steps(p RestrictionDigestion_concParamBlock,
 	samples = append(samples, waterSample)
 
 	// workout volume of buffer to add in SI units
-	BufferVol := wunit.NewVolume(1000000*float64(p.ReactionVolume.SIValue()/float64(p.BufferConcX)), "ul")
+	BufferVol := wunit.NewVolume(float64(p.ReactionVolume.SIValue()/float64(p.BufferConcX)), "l")
 
 	bufferSample := mixer.Sample(p.Buffer, BufferVol)
 	samples = append(samples, bufferSample)
@@ -57,7 +57,7 @@ func (e *RestrictionDigestion_conc) steps(p RestrictionDigestion_concParamBlock,
 	p.DNASolution.CName = p.DNAName
 
 	// work out necessary volume to add
-	DNAVol := wunit.NewVolume(float64(1000000*(p.DNAMassperReaction.SIValue()/p.DNAConc.SIValue())), "ul")
+	DNAVol := wunit.NewVolume(float64((p.DNAMassperReaction.SIValue() / p.DNAConc.SIValue())), "l")
 	text.Print("DNAVOL", DNAVol.ToString())
 	dnaSample := mixer.Sample(p.DNASolution, DNAVol)
 	samples = append(samples, dnaSample)

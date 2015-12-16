@@ -164,7 +164,7 @@ func RemoveSiteOnestrand(sequence wtype.DNASequence, enzymeseq string, otherseqs
 	return
 }
 
-func RemoveSite(sequence wtype.DNASequence, enzyme wtype.LogicalRestrictionEnzyme, otherseqstoavoid []string) (newseq wtype.DNASequence, err error) {
+func RemoveSite(sequence wtype.DNASequence, enzyme wtype.RestrictionEnzyme, otherseqstoavoid []string) (newseq wtype.DNASequence, err error) {
 
 	var tempseq wtype.DNASequence
 

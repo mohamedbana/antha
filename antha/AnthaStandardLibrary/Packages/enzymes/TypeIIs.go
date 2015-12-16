@@ -175,13 +175,13 @@ type CutPosition struct {
 	EndLength                         int
 }
 
-var SapI = wtype.LogicalRestrictionEnzyme{"GCTCTTC", 3, "SapI", "", 1, 4, "", []string{"N"}, []int{91, 1109, 1919, 1920}, "TypeIIs"}
+var SapI = wtype.RestrictionEnzyme{"GCTCTTC", 3, "SapI", "", 1, 4, "", []string{"N"}, []int{91, 1109, 1919, 1920}, "TypeIIs"}
 var isoschizomers = []string{"BspQI", "LguI", "PciSI", "VpaK32I"}
 var SapIenz = wtype.TypeIIs{SapI, "SapI", isoschizomers, 1, 4}
-var BsaI = wtype.LogicalRestrictionEnzyme{"GGTCTC", 4, "BsaI", "Eco31I", 1, 5, "?(5)", []string{"N"}, []int{814, 1109, 1912, 1995, 1996}, "TypeIIs"}
+var BsaI = wtype.RestrictionEnzyme{"GGTCTC", 4, "BsaI", "Eco31I", 1, 5, "?(5)", []string{"N"}, []int{814, 1109, 1912, 1995, 1996}, "TypeIIs"}
 var BsaIenz = wtype.TypeIIs{BsaI, "BsaI", []string{"none"}, 1, 5}
 
-var BpiI = wtype.LogicalRestrictionEnzyme{"GAAGAC", 4, "BpiI", "BbvII", 2, 6, "", []string{"B"}, []int{718}, "TypeIIs"}
+var BpiI = wtype.RestrictionEnzyme{"GAAGAC", 4, "BpiI", "BbvII", 2, 6, "", []string{"B"}, []int{718}, "TypeIIs"}
 var BpiIenz = wtype.TypeIIs{BpiI, "BpiI", []string{"BbvII", "BbsI", "BpuAI", "BSTV2I"}, 2, 6}
 
 var TypeIIsEnzymeproperties = map[string]wtype.TypeIIs{

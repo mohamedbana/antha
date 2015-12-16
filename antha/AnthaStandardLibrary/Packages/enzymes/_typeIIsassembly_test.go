@@ -32,10 +32,10 @@ import (
 
 //func
 
-/*var SapI = wtype.LogicalRestrictionEnzyme{"GCTCTTC", 1, 3}
+/*var SapI = wtype.RestrictionEnzyme{"GCTCTTC", 1, 3}
 var isoschizomers = []string{"BspQI", "LguI", "PciSI", "VpaK32I"}
 var SapIenz = TypeIIs{SapI, "SapI", isoschizomers, 1, 4}
-var BsaI = wtype.LogicalRestrictionEnzyme{"GGTCTC", 1, 4}
+var BsaI = wtype.RestrictionEnzyme{"GGTCTC", 1, 4}
 var BsaIenz = TypeIIs{BsaI, "BsaI", []string{"none"}, 1, 5}
 */
 //enzymes = append(enzymes, BsaIenz)
@@ -56,7 +56,7 @@ var dv_ts_CmRsacB = wtype.DNASequence{"dv_ts_CmR+sacB", strings.ToUpper("gaattcg
 //dv_ColE1_tet_1mod+ dv_ColE1_tet_2mod = dv_ColE1_tet
 
 /*type Restrictionsites struct {
-	enzymename          wtype.LogicalRestrictionEnzyme
+	enzymename          wtype.RestrictionEnzyme
 	recognitionsequence string
 	sitefound           bool
 	numberofsites       int
@@ -66,7 +66,7 @@ var dv_ts_CmRsacB = wtype.DNASequence{"dv_ts_CmR+sacB", strings.ToUpper("gaattcg
 // new test type
 type digesttest struct {
 	sequence          wtype.DNASequence
-	enzyme            wtype.LogicalRestrictionEnzyme
+	enzyme            wtype.RestrictionEnzyme
 	doublestranded    []wtype.DNASequence
 	Finalfragments    []string
 	Stickyends_5prime []string
@@ -75,13 +75,13 @@ type digesttest struct {
 
 type restrictionsitetest struct {
 	sequence   wtype.DNASequence
-	enzymelist []wtype.LogicalRestrictionEnzyme
+	enzymelist []wtype.RestrictionEnzyme
 	sitesfound []Restrictionsites
 }
 
 var restrictionsitetests = []restrictionsitetest{
 	{pSEVA651,
-		[]wtype.LogicalRestrictionEnzyme{SapI, BsaI},
+		[]wtype.RestrictionEnzyme{SapI, BsaI},
 		[]Restrictionsites{
 			{
 				SapI,
@@ -395,7 +395,7 @@ var assemblytests = []assemblytest{
 func TestJointwopartsfromsequence(t *testing.T) {
 	desiredproductisamongpossibilities := false
 	for _, assembly := range assemblytests {
-		r, p := Jointwopartsfromsequence(assembly.vector, assembly.parts[0], assembly.enzyme.LogicalRestrictionEnzyme)
+		r, p := Jointwopartsfromsequence(assembly.vector, assembly.parts[0], assembly.enzyme.RestrictionEnzyme)
 		fmt.Println("AAAAAAAAAAAAAAAAASSSSSSSSSSSSSSSSSSSSSembled test sequences", r, "AAAAAAAAAAAAAAAAASSSSSSSSSSSSSSSSSSSSSembled plasmid", p)
 		fmt.Println("\x1b[31;1m", r, len(r), "\x1b[0m")
 		fmt.Println("\x1b[34;1m", p, len(p), "\x1b[0m")
@@ -421,7 +421,7 @@ func TestJointwopartsfromsequence(t *testing.T) {
 func TestJoinXnumberofparts(t *testing.T) {
 	desiredproductisamongpossibilities := false
 	for _, assembly := range assemblytests {
-		r, p := JoinXnumberofparts(assembly.vector, assembly.parts, assembly.enzyme.LogicalRestrictionEnzyme)
+		r, p := JoinXnumberofparts(assembly.vector, assembly.parts, assembly.enzyme.RestrictionEnzyme)
 		//fmt.Println("AAAAAAAAAAAAAAAAASSSSSSSSSSSSSSSSSSSSSembled test sequences", r, "AAAAAAAAAAAAAAAAASSSSSSSSSSSSSSSSSSSSSembled plasmid", p)
 
 		fmt.Println(assembly.vector.Nm, assembly.parts)

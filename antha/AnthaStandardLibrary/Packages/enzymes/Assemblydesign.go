@@ -56,6 +56,59 @@ func LengthofPrefixOverlap(seq string, subseq string) (number int, end string) {
 }
 */
 
+// Key general function to design parts for assembly based on type IIs enzyme, parts in order, fixed vector sequence (containing sites for the corresponding enzyme).
+func MakeScarfreeCustomTypeIIsassemblyParts(parts []wtype.DNASequence, vector wtype.DNASequence, enzyme wtype.TypeIIs) (partswithends []wtype.DNASequence) {
+
+	partswithends = make([]wtype.DNASequence, 0)
+	var partwithends wtype.DNASequence
+
+	// find sticky ends from cutting vector with enzyme
+
+	fragments, stickyends5, _ := TypeIIsdigest(vector, enzyme)
+
+	//initialise
+
+	desiredstickyend5prime := ""
+
+	vector3primestickyend := ""
+
+	// add better logic for the scenarios where the vector is cut more than twice or we want to add fragment in either direction
+	// picks largest fragment
+
+	for i := 0; i < len(stickyends5)-1; i++ {
+
+		currentlargestfragment := ""
+
+		if stickyends5[i] != "" && len(fragments[i]) > len(currentlargestfragment) {
+
+			currentlargestfragment = fragments[i]
+			// RevComp() // fill in later
+			vector3primestickyend = stickyends5[i]
+			desiredstickyend5prime = stickyends5[i+1]
+			/*{
+				break
+			}*/
+		}
+	} // fill in later
+
+	// declare as blank so no end added
+	desiredstickyend3prime := ""
+
+	for i := 0; i < len(parts); i++ {
+		if i == (len(parts) - 1) {
+			desiredstickyend3prime = vector3primestickyend
+		}
+		partwithends = AddCustomEnds(parts[i], enzyme, desiredstickyend5prime, desiredstickyend3prime)
+		partswithends = append(partswithends, partwithends)
+
+		desiredstickyend5prime = Suffix(parts[i].Seq, enzyme.RestrictionEnzyme.EndLength)
+
+	}
+
+	return partswithends
+}
+
+// Adds sticky ends to a dna part based upon an assembly standard (e.g. MoClo) and position of part within an array.
 func AddStandardStickyEnds(part wtype.DNASequence, assemblystandard string, level string, numberofparts int, position int) (Partwithends wtype.DNASequence) {
 
 	if part.Seq != "" {
@@ -110,6 +163,7 @@ func AddStandardStickyEnds(part wtype.DNASequence, assemblystandard string, leve
 	return Partwithends
 }
 
+// Adds sticky ends to dna part according to the class identifier (e.g. PRO, 5U, CDS)
 func AddStandardStickyEndsfromClass(part wtype.DNASequence, assemblystandard string, level string, class string) (Partwithends wtype.DNASequence) {
 
 	//vectorends := Vectorends[assemblystandard][level] // this could also look up Endlinks[assemblystandard][level][numberofparts][0]
@@ -154,6 +208,7 @@ func AddStandardStickyEndsfromClass(part wtype.DNASequence, assemblystandard str
 	return Partwithends
 }
 
+// Adds ends to the part sequence based upon enzyme chosen and the desired overhangs after digestion
 func AddCustomEnds(part wtype.DNASequence, enzyme wtype.TypeIIs, desiredstickyend5prime string, desiredstickyend3prime string) (Partwithends wtype.DNASequence) {
 
 	bittoadd := desiredstickyend5prime
@@ -180,6 +235,7 @@ func AddCustomEnds(part wtype.DNASequence, enzyme wtype.TypeIIs, desiredstickyen
 	return Partwithends
 }
 
+// Add compatible ends to an array of parts based on the rules of a typeIIS assembly standard
 func MakeStandardTypeIIsassemblyParts(parts []wtype.DNASequence, assemblystandard string, level string, optionalpartclasses []string) (partswithends []wtype.DNASequence) {
 
 	partswithends = make([]wtype.DNASequence, 0)
@@ -202,11 +258,12 @@ func MakeStandardTypeIIsassemblyParts(parts []wtype.DNASequence, assemblystandar
 	return partswithends
 }
 
+// Utility function to check whether a part already has typeIIs ends added
 func CheckForExistingTypeIISEnds(part wtype.DNASequence, enzyme wtype.TypeIIs) (numberofsitesfound int, stickyends5 []string, stickyends3 []string) {
 
 	enz := lookup.EnzymeLookup(enzyme.Name)
 
-	sites := Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+	sites := Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 
 	numberofsitesfound = sites[0].Numberofsites
 	_, stickyends5, stickyends3 = TypeIIsdigest(part, enzyme)
@@ -216,11 +273,11 @@ func CheckForExistingTypeIISEnds(part wtype.DNASequence, enzyme wtype.TypeIIs) (
 
 /*
 
-func HandleExistingEnds (parts []wtype.DNASequence, enzymewtype.LogicalRestrictionEnzyme)(partswithoverhangs []wtype.DNASequence {
+func HandleExistingEnds (parts []wtype.DNASequence, enzymewtype.RestrictionEnzyme)(partswithoverhangs []wtype.DNASequence {
 	partswithexistingsites := make([]RestrictionSites, 0)
 
 	for _, part := range parts {
-		sites := Restrictionsitefinder(part, wtype.LogicalRestrictionEnzyme{enzyme})
+		sites := Restrictionsitefinder(part, wtype.RestrictionEnzyme{enzyme})
 		if len(sites) != 0 {
 			partswithexistingsites = append(partswithexistingsites, sites)
 		}
@@ -234,57 +291,7 @@ func AddStandardVectorEnds (vector wtype.DNASequence, standard, level string) (v
 	}
 */
 
-func MakeScarfreeCustomTypeIIsassemblyParts(parts []wtype.DNASequence, vector wtype.DNASequence, enzyme wtype.TypeIIs) (partswithends []wtype.DNASequence) {
-
-	partswithends = make([]wtype.DNASequence, 0)
-	var partwithends wtype.DNASequence
-
-	// find sticky ends from cutting vector with enzyme
-
-	fragments, stickyends5, _ := TypeIIsdigest(vector, enzyme)
-
-	//initialise
-
-	desiredstickyend5prime := ""
-
-	vector3primestickyend := ""
-
-	// add better logic for the scenarios where the vector is cut more than twice or we want to add fragment in either direction
-	// picks largest fragment
-
-	for i := 0; i < len(stickyends5)-1; i++ {
-
-		currentlargestfragment := ""
-
-		if stickyends5[i] != "" && len(fragments[i]) > len(currentlargestfragment) {
-
-			currentlargestfragment = fragments[i]
-			// RevComp() // fill in later
-			vector3primestickyend = stickyends5[i]
-			desiredstickyend5prime = stickyends5[i+1]
-			/*{
-				break
-			}*/
-		}
-	} // fill in later
-
-	// declare as blank so no end added
-	desiredstickyend3prime := ""
-
-	for i := 0; i < len(parts); i++ {
-		if i == (len(parts) - 1) {
-			desiredstickyend3prime = vector3primestickyend
-		}
-		partwithends = AddCustomEnds(parts[i], enzyme, desiredstickyend5prime, desiredstickyend3prime)
-		partswithends = append(partswithends, partwithends)
-
-		desiredstickyend5prime = Suffix(parts[i].Seq, enzyme.LogicalRestrictionEnzyme.EndLength)
-
-	}
-
-	return partswithends
-}
-
+// Lowest level function to add an overhang to a sequence as a string
 func Addoverhang(seq string, bittoadd string, end string) (seqwithoverhang string) {
 
 	bittoadd = text.Annotate(bittoadd, "blue")
@@ -298,6 +305,7 @@ func Addoverhang(seq string, bittoadd string, end string) (seqwithoverhang strin
 	return seqwithoverhang
 }
 
+// Returns an array of all sequence possibilities for a spacer based upon length
 func Makeallspaceroptions(spacerlength int) (finalarray []string) {
 	// only works for spacer length 1 or 2
 
@@ -312,6 +320,7 @@ func Makeallspaceroptions(spacerlength int) (finalarray []string) {
 	return finalarray
 }
 
+// Picks first valid spacer which avoids all sequences to avoid
 func ChooseSpacer(spacerlength int, seq string, seqstoavoid []string) (spacer string) {
 	// very simple case to start with
 
@@ -345,6 +354,7 @@ func Addnucleotide(s string) (splus1array []string) {
 	return splus1array
 }
 
+// Function to add an overhang based upon the enzyme chosen, the choice of end ("5Prime" or "3Prime")
 func Makeoverhang(enzyme wtype.TypeIIs, end string, stickyendseq string, spacer string) (seqwithoverhang string) {
 	if end == "5prime" {
 		if enzyme.Topstrand3primedistancefromend < 0 {
@@ -354,26 +364,27 @@ func Makeoverhang(enzyme wtype.TypeIIs, end string, stickyendseq string, spacer 
 		if len(spacer) != enzyme.Topstrand3primedistancefromend {
 			panic("length of spacer will lead to cutting at run position! change length to match enzyme NN region length")
 		}
-		seqwithoverhang = strings.Join([]string{enzyme.LogicalRestrictionEnzyme.RecognitionSequence, spacer, stickyendseq}, "")
+		seqwithoverhang = strings.Join([]string{enzyme.RestrictionEnzyme.RecognitionSequence, spacer, stickyendseq}, "")
 	}
 
 	// This case needs work, but may not appear in reality so is a place holder for now until a real scenario becomes apparent
 	if end == "3prime" {
 		/*if enzyme.Topstrand3primedistancefromend < 0 && len(spacer) == enzyme.Bottomstrand5primedistancefromend {
-			seqwithoverhang = strings.Join([]string{stickyendseq, spacer, enzyme.LogicalRestrictionEnzyme.RecognitionSequence}, "")
+			seqwithoverhang = strings.Join([]string{stickyendseq, spacer, enzyme.RestrictionEnzyme.RecognitionSequence}, "")
 		}*/
-		seqwithoverhang = strings.Join([]string{stickyendseq, spacer, RevComp(enzyme.LogicalRestrictionEnzyme.RecognitionSequence)}, "")
+		seqwithoverhang = strings.Join([]string{stickyendseq, spacer, RevComp(enzyme.RestrictionEnzyme.RecognitionSequence)}, "")
 	}
 	return seqwithoverhang
 
 }
 
+// map of 5' sticky ends required for parts in an assembly standard based purely on number of parts for assembly and position of each part in the array
 var Endlinks = map[string]map[string]map[int]map[int]string{
 	//map["assembly strategy"]map[number of parts]map[part number]"sticky end to add"
 	"MoClo_Raven": map[string]map[int]map[int]string{
 		"Level0": map[int]map[int]string{
-			4: map[int]string{
-				0: "AAGC",
+			4: map[int]string{ // overall number of parts in assembly
+				0: "AAGC", // position of part in assembly used as key
 				1: "GAGG",
 				2: "TACT",
 				3: "AATG",
@@ -400,6 +411,8 @@ var Endlinks = map[string]map[string]map[int]map[int]string{
 		},
 	},
 }
+
+// Map describing the sticky ends required for each class of an assembly standard at  a particular level.
 var EndlinksString = map[string]map[string]map[string][]string{
 	"MoClo": map[string]map[string][]string{
 		"Level0": map[string][]string{
@@ -454,6 +467,7 @@ const (
 	TERMINATOR
 )
 
+// map of standard vector ends for various assembly standards
 var Vectorends = map[string]map[string][]string{
 	// array of strings returned correspond to [3'overhang and 5'overhang]
 	"MoClo_Raven": map[string][]string{
@@ -474,6 +488,7 @@ var Vectorends = map[string]map[string][]string{
 	},
 }
 
+// map of enzymes used at each level of an assembly standard
 var Enzymelookup = map[string]map[string]wtype.TypeIIs{
 	// array of strings returned correspond to 5'overhang and 3'overhang
 	"MoClo_Raven": map[string]wtype.TypeIIs{

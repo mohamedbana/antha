@@ -83,7 +83,7 @@ func (e *Iterative_assembly_design) steps(p Iterative_assembly_designParamBlock,
 
 		for _, part := range partsinorder {
 
-			info := enzymes.Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+			info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 			if len(info) != 0 {
 				if info[0].Sitefound == true {
 					sitefound = true
@@ -105,7 +105,7 @@ func (e *Iterative_assembly_design) steps(p Iterative_assembly_designParamBlock,
 
 		for _, part := range partsinorder {
 
-			info := enzymes.Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+			info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 			if len(info) != 0 {
 				if info[0].Sitefound == true {
 					sitefound = true
@@ -174,7 +174,7 @@ func (e *Iterative_assembly_design) steps(p Iterative_assembly_designParamBlock,
 		multiple := make([]string, 0)
 		for _, part := range r.PartswithOverhangs {
 
-			info := enzymes.Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+			info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 
 			sitepositions := enzymes.SitepositionString(info[0])
 
@@ -470,7 +470,7 @@ type Iterative_assembly_designResultBlock struct {
 	BlockID            execute.BlockID
 	Error              bool
 	BackupEnzymes      []string
-	EnzymeUsed         wtype.LogicalRestrictionEnzyme
+	EnzymeUsed         wtype.RestrictionEnzyme
 	NewDNASequence     wtype.DNASequence
 	PartswithOverhangs []wtype.DNASequence
 	Simulationpass     bool
@@ -487,7 +487,7 @@ type Iterative_assembly_designJSONBlock struct {
 	Seqsinorder        *[]string
 	Vector             *string
 	BackupEnzymes      *[]string
-	EnzymeUsed         *wtype.LogicalRestrictionEnzyme
+	EnzymeUsed         *wtype.RestrictionEnzyme
 	NewDNASequence     *wtype.DNASequence
 	PartswithOverhangs *[]wtype.DNASequence
 	Simulationpass     *bool
@@ -503,7 +503,7 @@ func (c *Iterative_assembly_design) ComponentInfo() *execute.ComponentInfo {
 	inp = append(inp, *execute.NewPortInfo("Seqsinorder", "[]string", "Seqsinorder", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Vector", "string", "Vector", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("BackupEnzymes", "[]string", "BackupEnzymes", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("EnzymeUsed", "wtype.LogicalRestrictionEnzyme", "EnzymeUsed", true, true, nil, nil))
+	outp = append(outp, *execute.NewPortInfo("EnzymeUsed", "wtype.RestrictionEnzyme", "EnzymeUsed", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("NewDNASequence", "wtype.DNASequence", "NewDNASequence", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("PartswithOverhangs", "[]wtype.DNASequence", "PartswithOverhangs", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("Simulationpass", "bool", "Simulationpass", true, true, nil, nil))

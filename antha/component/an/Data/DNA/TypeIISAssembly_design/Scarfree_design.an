@@ -150,7 +150,7 @@ Steps {
 	for _,part := range PartswithOverhangs {
 	
 		enz := lookup.EnzymeLookup(Enzymename)
-	info := enzymes.Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+	info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 	
 	sitepositions := enzymes.SitepositionString(info[0])
 	

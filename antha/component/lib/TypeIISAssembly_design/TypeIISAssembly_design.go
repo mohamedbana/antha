@@ -132,7 +132,7 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 
 	// The default sitesfound produced from the assembly simulator only checks to SapI and BsaI so we'll repeat with the enzymes declared in parameters
 	// first lookup enzyme properties
-	enzlist := make([]wtype.LogicalRestrictionEnzyme, 0)
+	enzlist := make([]wtype.RestrictionEnzyme, 0)
 	for _, site := range p.RestrictionsitetoAvoid {
 		enzsite := lookup.EnzymeLookup(site)
 		enzlist = append(enzlist, enzsite)

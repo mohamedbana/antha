@@ -45,7 +45,8 @@ Outputs (
 )
 
 // Data which is returned from this protocol, and data types
-Data ()
+Data (
+)
 
 Requirements {}
 

@@ -22,7 +22,7 @@ func TypeIIsLookup(name string) (enzyme wtype.TypeIIs, err error) {
 	return
 }
 
-func EnzymeLookup(name string) (enzyme wtype.LogicalRestrictionEnzyme) {
+func EnzymeLookup(name string) (enzyme wtype.RestrictionEnzyme) {
 	if anthapath.Anthafileexists("REBASETypeII.txt") == false {
 		err := rebase.UpdateRebasefile()
 		if err != nil {
@@ -51,9 +51,9 @@ func EnzymeLookup(name string) (enzyme wtype.LogicalRestrictionEnzyme) {
 	return enzyme
 }
 
-func FindEnzymesofClass(class string) (enzymelist []wtype.LogicalRestrictionEnzyme) {
+func FindEnzymesofClass(class string) (enzymelist []wtype.RestrictionEnzyme) {
 
-	var enzyme wtype.LogicalRestrictionEnzyme
+	var enzyme wtype.RestrictionEnzyme
 
 	if anthapath.Anthafileexists("REBASETypeII.txt") == false {
 		err := rebase.UpdateRebasefile()
