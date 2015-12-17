@@ -182,3 +182,18 @@ func (w *Wrapper) WaitToEnd() error {
 	}
 	return nil
 }
+
+func (w *Wrapper) Centrifuge(sample interface{}, force wunit.Force, time wunit.Time, parameters wtype.CentrifugeParameters) error {
+	// TBD
+	return nil
+}
+
+func (w *Wrapper) Electroshock(sample interface{}, voltage wunit.Voltage, npulse int, ntimes int, resistance wunit.Resistance, capacitance wunit.Capacitance, parameters wtype.ElectroshockParameters) error {
+	// TBD
+	return nil
+}
+
+func (w *Wrapper) ReadEM(sample interface{}, mode string, parameters wtype.ReadEMParameters) error {
+	// TBD
+	return nil
+}

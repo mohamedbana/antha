@@ -158,22 +158,6 @@ func NewMass(v float64, unit string) (o Mass) {
 	return //Mass{NewPMeasurement(v, unit)}
 }
 
-/*
-func NewMass(v float64, unit string) Mass {
-	if unit != "kg" && unit != "g" {
-		panic("Can't make masses which aren't in grammes or kilograms")
-	}
-
-	var t Mass
-
-	if unit == "kg" {
-		t = Mass{NewMeasurement(v, "k", "g")}
-	} else {
-		t = Mass{NewMeasurement(v, "", "g")}
-	}
-	return t
-}
-*/
 // defines mass to be a SubstanceQuantity
 func (m *Mass) Quantity() Measurement {
 	return m
@@ -272,17 +256,6 @@ type Concentration struct {
 }
 
 // make a new concentration in SI units... either M/l or kg/l
-/*
-func NewConcentration(v float64, unit string) Concentration {
-	if unit != "g/l" && unit != "M/l" {
-		// this should never be seen by users
-		logger.Fatal("Can't make concentrations which aren't either Mol/l or g/l")
-		panic("Can't make concentrations which aren't either Mol/l or g/l")
-	}
-
-	c := Concentration{NewMeasurement(v, "", unit)}
-	return c
-}*/
 func NewConcentration(v float64, unit string) (o Concentration) {
 
 	if unit == "mg/ml" {
@@ -421,36 +394,26 @@ func NewRate(v float64, unit string) (r Rate, err error) {
 	return r, err
 }
 
-/*
-type Rate struct {
+type Voltage struct {
 	ConcreteMeasurement
-	Timeunit string //time.Duration
 }
 
-func (cm *Rate) ToString() string {
-	return fmt.Sprintf("%-6.3f%s", cm.RawValue(), cm.Unit().PrefixedSymbol(), cm.Timeunit)
+func NewVoltage(value float64, unit string) (v Voltage, err error) {
+	return Voltage{NewMeasurement(value, "", unit)}, nil
 }
-func NewRate(v float64, unit string, timeunit string) (r Rate, err error) {
-	if unit != `/` {
-		err = fmt.Errorf("Can't make flow rate which aren't in per")
-		logger.Fatal(err.Error())
-		panic(err.Error())
-	}
-	concrete := NewMeasurement(v, "", unit)
 
-	approvedtimeunits := []string{"ns", "us", "µs", "ms", "s", "m", "h"}
-	//Mvalue float64
-	// the relevant units
-
-	for _, approvedunit := range approvedtimeunits {
-		if timeunit == approvedunit {
-			r.Mvalue = concrete.Mvalue
-			r.Munit = concrete.Munit
-			r.Timeunit = timeunit
-			return
-		}
-	}
-	err = fmt.Errorf(timeunit, " Not approved time unit. Approved units time are: ", approvedtimeunits)
-	return r, err
+type Capacitance struct {
+	ConcreteMeasurement
 }
-*/
+
+func NewCapacitance(value float64, unit string) (c Capacitance, err error) {
+	return Capacitance{NewMeasurement(value, "", unit)}, nil
+}
+
+type Resistance struct {
+	ConcreteMeasurement
+}
+
+func NewResistance(value float64, unit string) (r Resistance, err error) {
+	return Resistance{NewMeasurement(value, "", unit)}, nil
+}
