@@ -172,9 +172,12 @@ func NewConfig(data []byte, wf *Workflow) (*Config, error) {
 			if err != nil {
 				return nil, err
 			}
+			fmt.Println("ONEONE")
+			fmt.Println(v)
 			if err := json.Unmarshal(bytes, rawParameters[k]); err != nil {
 				return nil, err
 			}
+			fmt.Println("TWOTWO")
 		}
 
 		// Convert ComponentConfig to ComponentParamBlock

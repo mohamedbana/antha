@@ -59,16 +59,17 @@ func run() error {
 		return err
 	}
 
-	var ipData []byte
+	/*
+		var ipData []byte
 
-	if inputPlateFile != "" {
-		ipData, err = ioutil.ReadFile(inputPlateFile)
-	}
+		if inputPlateFile != "" {
+			ipData, err = ioutil.ReadFile(inputPlateFile)
+		}
 
-	if err != nil {
-		return err
-	}
-
+		if err != nil {
+			return err
+		}
+	*/
 	cf, err := util.NewConfig(cfData, wf)
 	if err != nil {
 		return err
