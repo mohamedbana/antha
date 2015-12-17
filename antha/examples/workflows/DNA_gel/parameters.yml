@@ -1,43 +1,20 @@
 {
-  "Parameters": [{
-    "DNAgelParams": {
+  "Parameters": [ {
+	"DNAgelParams": {
     "Water":"component:water",
-	"Sampletotest": "component:DNAsolution",
-	"Mixingpolicy":"default",
-	"Loadingdye":"component:Blue",
-    "DNAgel": "plate:EPAGE48",
-    "TipType": "tipbox:Gilson20",
-	"WaterVol":"10ul",
-    "Loadingdyevolume": "0ul",
-	"DNAgelrunvolume":"15ul",
-	"Loadingdyeinsample":true
-  }
-},
- {
-"DNAgelParams": {
-    "Water":"component:water",
-	"Sampletotest": "component:DNAsolution",
-	"Mixingpolicy":"water",
+	"Sampletotest": "component:1kb DNA Ladder",
+	"Mixingpolicy":"gelloading",
 	"Loadingdye":"component:Blue",
     "DNAgel": "plate:EPAGE48",
     "TipType": "tipbox:Gilson20",
     "WaterVol":"10ul",
     "Loadingdyevolume": "0ul",
 	"DNAgelrunvolume":"15ul",
-	"Loadingdyeinsample":true
-   }
-},
- {
-	"DNAgelParams": {
-    "Water":"component:water",
-	"Sampletotest": "component:DNAsolution",
-	"Mixingpolicy":"gelloading",
-	"Loadingdye":"component:Blue",
-    "DNAgel": "plate:EPAGE48",
-    "TipType": "tipbox:Gilson20",
-   "WaterVol":"10ul",
-    "Loadingdyevolume": "0ul",
-	"DNAgelrunvolume":"15ul",
+	"Samplenumber":2,
+	"Samplenames":[
+	"Marker 1",
+	"Marker2"
+	],
 	"Loadingdyeinsample":true
   }
 },
@@ -47,29 +24,30 @@
 	"Sampletotest": "component:DNAsolution",
 	"Mixingpolicy":"gelloading",
 	"Loadingdye":"component:Blue",
-    "DNAgel": "plate:greiner384",
-    "TipType": "tipbox:Gilson20",
-   "WaterVol":"10ul",
-    "Loadingdyevolume": "0ul",
-	"DNAgelrunvolume":"15ul",
-	"Loadingdyeinsample":true
-  }
-},
- {
-	"DNAgelParams": {
-    "Water":"component:water",
-	"Sampletotest": "component:DNAsolution",
-	"Mixingpolicy":"DoNotMix",
-	"Loadingdye":"component:Blue",
     "DNAgel": "plate:EPAGE48",
     "TipType": "tipbox:Gilson20",
-   "WaterVol":"10ul",
+    "WaterVol":"10ul",
     "Loadingdyevolume": "0ul",
 	"DNAgelrunvolume":"15ul",
+	"Samplenumber":12,
+	"Samplenames":[
+	"1",
+	"2",
+	"3",
+	"4",
+	"5",
+	"6",
+	"7",
+	"8",
+	"9",
+	"10",
+	"11",
+	"12"
+	],
 	"Loadingdyeinsample":true
   }
 }],
   "Config": {
-    "OUTPUT_COUNT": 4
+    "OUTPUT_COUNT": 14
   }
 }

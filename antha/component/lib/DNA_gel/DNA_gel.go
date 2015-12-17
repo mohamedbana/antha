@@ -8,7 +8,9 @@ import (
 	//"coldplate"
 	//"reagents"
 	//"Devices"
+	//"strconv"
 	"encoding/json"
+	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -93,34 +95,50 @@ func (e *DNA_gel) steps(p DNA_gelParamBlock, r *DNA_gelResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
-	// ready to add water to well
-	waterSample := mixer.Sample(p.Water, p.Watervol)
-
-	// load gel
-	var DNAgelloadmix *wtype.LHComponent
-
-	if p.Loadingdyeinsample == false {
-		DNAgelloadmixsolution := _wrapper.MixInto(
-			p.DNAgel,
-			mixer.Sample(p.Loadingdye, p.Loadingdyevolume),
-			mixer.SampleForTotalVolume(p.Sampletotest, p.DNAgelrunvolume),
-		)
-		DNAgelloadmix = wtype.SolutionToComponent(DNAgelloadmixsolution)
-	} else {
-		DNAgelloadmix = p.Sampletotest
+	if len(p.Samplenames) != p.Samplenumber {
+		panic(fmt.Sprintln("length of sample names:", len(p.Samplenames), "is not equal to sample number:", p.Samplenumber))
 	}
 
-	// Ensure  sample will be dispensed appropriately:
+	loadedsamples := make([]*wtype.LHSolution, 0)
 
-	DNAgelloadmix.Type = p.Mixingpolicy
+	var DNAgelloadmix *wtype.LHComponent
 
-	loadedgel := _wrapper.MixInto(
-		p.DNAgel,
-		waterSample,
-		mixer.Sample(DNAgelloadmix, p.DNAgelrunvolume),
-	)
+	for i := 0; i < p.Samplenumber; i++ {
+		// ready to add water to well
+		waterSample := mixer.Sample(p.Water, p.Watervol)
 
-	r.Loadedgel = loadedgel
+		nothingvol := p.Watervol
+		nothingvol.Mvalue = 1.0
+		nothingSampletostopitcrashing := mixer.Sample(p.Water, nothingvol)
+
+		// load gel
+
+		if p.Loadingdyeinsample == false {
+			DNAgelloadmixsolution := _wrapper.MixInto(
+				p.DNAgel,
+				mixer.Sample(p.Loadingdye, p.Loadingdyevolume),
+				mixer.SampleForTotalVolume(p.Sampletotest, p.DNAgelrunvolume),
+			)
+			DNAgelloadmix = wtype.SolutionToComponent(DNAgelloadmixsolution)
+		} else {
+			DNAgelloadmix = p.Sampletotest
+		}
+
+		// Ensure  sample will be dispensed appropriately:
+
+		DNAgelloadmix.Type = p.Mixingpolicy
+		DNAgelloadmix.CName = p.Samplenames[i] //originalname + strconv.Itoa(i)
+
+		loadedsample := _wrapper.MixInto(
+			p.DNAgel,
+			waterSample,
+			nothingSampletostopitcrashing,
+			mixer.Sample(DNAgelloadmix, p.DNAgelrunvolume),
+		)
+
+		loadedsamples = append(r.Loadedsamples, loadedsample)
+	}
+	r.Loadedsamples = loadedsamples
 	_ = _wrapper.WaitToEnd()
 
 	// Then run the gel
@@ -188,13 +206,13 @@ func (e *DNA_gel) validation(p DNA_gelParamBlock, r *DNA_gelResultBlock) {
 func (e *DNA_gel) Complete(params interface{}) {
 	p := params.(DNA_gelParamBlock)
 	if p.Error {
-		e.Loadedgel <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
+		e.Loadedsamples <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
 		return
 	}
 	r := new(DNA_gelResultBlock)
 	defer func() {
 		if res := recover(); res != nil {
-			e.Loadedgel <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
+			e.Loadedsamples <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
 			execute.AddError(&execute.RuntimeError{BaseError: res, Stack: debug.Stack()})
 			return
 		}
@@ -202,7 +220,7 @@ func (e *DNA_gel) Complete(params interface{}) {
 	e.startup.Do(func() { e.setup(p) })
 	e.steps(p, r)
 
-	e.Loadedgel <- execute.ThreadParam{Value: r.Loadedgel, ID: p.ID, Error: false}
+	e.Loadedsamples <- execute.ThreadParam{Value: r.Loadedsamples, ID: p.ID, Error: false}
 
 	e.analysis(p, r)
 
@@ -232,7 +250,7 @@ func NewDNA_gel() interface{} { //*DNA_gel {
 // Mapper function
 func (e *DNA_gel) Map(m map[string]interface{}) interface{} {
 	var res DNA_gelParamBlock
-	res.Error = false || m["DNAgel"].(execute.ThreadParam).Error || m["DNAgelrunvolume"].(execute.ThreadParam).Error || m["Loadingdye"].(execute.ThreadParam).Error || m["Loadingdyeinsample"].(execute.ThreadParam).Error || m["Loadingdyevolume"].(execute.ThreadParam).Error || m["Mixingpolicy"].(execute.ThreadParam).Error || m["Sampletotest"].(execute.ThreadParam).Error || m["Water"].(execute.ThreadParam).Error || m["Watervol"].(execute.ThreadParam).Error
+	res.Error = false || m["DNAgel"].(execute.ThreadParam).Error || m["DNAgelrunvolume"].(execute.ThreadParam).Error || m["Loadingdye"].(execute.ThreadParam).Error || m["Loadingdyeinsample"].(execute.ThreadParam).Error || m["Loadingdyevolume"].(execute.ThreadParam).Error || m["Mixingpolicy"].(execute.ThreadParam).Error || m["Samplenames"].(execute.ThreadParam).Error || m["Samplenumber"].(execute.ThreadParam).Error || m["Sampletotest"].(execute.ThreadParam).Error || m["Water"].(execute.ThreadParam).Error || m["Watervol"].(execute.ThreadParam).Error
 
 	vDNAgel, is := m["DNAgel"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
@@ -288,6 +306,24 @@ func (e *DNA_gel) Map(m map[string]interface{}) interface{} {
 		res.Mixingpolicy = m["Mixingpolicy"].(execute.ThreadParam).Value.(string)
 	}
 
+	vSamplenames, is := m["Samplenames"].(execute.ThreadParam).Value.(execute.JSONValue)
+	if is {
+		var temp DNA_gelJSONBlock
+		json.Unmarshal([]byte(vSamplenames.JSONString), &temp)
+		res.Samplenames = *temp.Samplenames
+	} else {
+		res.Samplenames = m["Samplenames"].(execute.ThreadParam).Value.([]string)
+	}
+
+	vSamplenumber, is := m["Samplenumber"].(execute.ThreadParam).Value.(execute.JSONValue)
+	if is {
+		var temp DNA_gelJSONBlock
+		json.Unmarshal([]byte(vSamplenumber.JSONString), &temp)
+		res.Samplenumber = *temp.Samplenumber
+	} else {
+		res.Samplenumber = m["Samplenumber"].(execute.ThreadParam).Value.(int)
+	}
+
 	vSampletotest, is := m["Sampletotest"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
 		var temp DNA_gelJSONBlock
@@ -328,7 +364,7 @@ func (e *DNA_gel) OnDNAgel(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(9, e, e)
+		bag.Init(11, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -345,7 +381,7 @@ func (e *DNA_gel) OnDNAgelrunvolume(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(9, e, e)
+		bag.Init(11, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -362,7 +398,7 @@ func (e *DNA_gel) OnLoadingdye(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(9, e, e)
+		bag.Init(11, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -379,7 +415,7 @@ func (e *DNA_gel) OnLoadingdyeinsample(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(9, e, e)
+		bag.Init(11, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -396,7 +432,7 @@ func (e *DNA_gel) OnLoadingdyevolume(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(9, e, e)
+		bag.Init(11, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -413,7 +449,7 @@ func (e *DNA_gel) OnMixingpolicy(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(9, e, e)
+		bag.Init(11, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -425,12 +461,46 @@ func (e *DNA_gel) OnMixingpolicy(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
+func (e *DNA_gel) OnSamplenames(param execute.ThreadParam) {
+	e.lock.Lock()
+	var bag *execute.AsyncBag = e.params[param.ID]
+	if bag == nil {
+		bag = new(execute.AsyncBag)
+		bag.Init(11, e, e)
+		e.params[param.ID] = bag
+	}
+	e.lock.Unlock()
+
+	fired := bag.AddValue("Samplenames", param)
+	if fired {
+		e.lock.Lock()
+		delete(e.params, param.ID)
+		e.lock.Unlock()
+	}
+}
+func (e *DNA_gel) OnSamplenumber(param execute.ThreadParam) {
+	e.lock.Lock()
+	var bag *execute.AsyncBag = e.params[param.ID]
+	if bag == nil {
+		bag = new(execute.AsyncBag)
+		bag.Init(11, e, e)
+		e.params[param.ID] = bag
+	}
+	e.lock.Unlock()
+
+	fired := bag.AddValue("Samplenumber", param)
+	if fired {
+		e.lock.Lock()
+		delete(e.params, param.ID)
+		e.lock.Unlock()
+	}
+}
 func (e *DNA_gel) OnSampletotest(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(9, e, e)
+		bag.Init(11, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -447,7 +517,7 @@ func (e *DNA_gel) OnWater(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(9, e, e)
+		bag.Init(11, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -464,7 +534,7 @@ func (e *DNA_gel) OnWatervol(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(9, e, e)
+		bag.Init(11, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -488,10 +558,12 @@ type DNA_gel struct {
 	Loadingdyeinsample <-chan execute.ThreadParam
 	Loadingdyevolume   <-chan execute.ThreadParam
 	Mixingpolicy       <-chan execute.ThreadParam
+	Samplenames        <-chan execute.ThreadParam
+	Samplenumber       <-chan execute.ThreadParam
 	Sampletotest       <-chan execute.ThreadParam
 	Water              <-chan execute.ThreadParam
 	Watervol           <-chan execute.ThreadParam
-	Loadedgel          chan<- execute.ThreadParam
+	Loadedsamples      chan<- execute.ThreadParam
 }
 
 type DNA_gelParamBlock struct {
@@ -504,6 +576,8 @@ type DNA_gelParamBlock struct {
 	Loadingdyeinsample bool
 	Loadingdyevolume   wunit.Volume
 	Mixingpolicy       string
+	Samplenames        []string
+	Samplenumber       int
 	Sampletotest       *wtype.LHComponent
 	Water              *wtype.LHComponent
 	Watervol           wunit.Volume
@@ -519,16 +593,18 @@ type DNA_gelConfig struct {
 	Loadingdyeinsample bool
 	Loadingdyevolume   wunit.Volume
 	Mixingpolicy       string
+	Samplenames        []string
+	Samplenumber       int
 	Sampletotest       wtype.FromFactory
 	Water              wtype.FromFactory
 	Watervol           wunit.Volume
 }
 
 type DNA_gelResultBlock struct {
-	ID        execute.ThreadID
-	BlockID   execute.BlockID
-	Error     bool
-	Loadedgel *wtype.LHSolution
+	ID            execute.ThreadID
+	BlockID       execute.BlockID
+	Error         bool
+	Loadedsamples []*wtype.LHSolution
 }
 
 type DNA_gelJSONBlock struct {
@@ -541,10 +617,12 @@ type DNA_gelJSONBlock struct {
 	Loadingdyeinsample *bool
 	Loadingdyevolume   *wunit.Volume
 	Mixingpolicy       *string
+	Samplenames        *[]string
+	Samplenumber       *int
 	Sampletotest       **wtype.LHComponent
 	Water              **wtype.LHComponent
 	Watervol           *wunit.Volume
-	Loadedgel          **wtype.LHSolution
+	Loadedsamples      *[]*wtype.LHSolution
 }
 
 func (c *DNA_gel) ComponentInfo() *execute.ComponentInfo {
@@ -556,10 +634,12 @@ func (c *DNA_gel) ComponentInfo() *execute.ComponentInfo {
 	inp = append(inp, *execute.NewPortInfo("Loadingdyeinsample", "bool", "Loadingdyeinsample", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Loadingdyevolume", "wunit.Volume", "Loadingdyevolume", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Mixingpolicy", "string", "Mixingpolicy", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Samplenames", "[]string", "Samplenames", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Samplenumber", "int", "Samplenumber", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Sampletotest", "*wtype.LHComponent", "Sampletotest", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Water", "*wtype.LHComponent", "Water", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Watervol", "wunit.Volume", "Watervol", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Loadedgel", "*wtype.LHSolution", "Loadedgel", true, true, nil, nil))
+	outp = append(outp, *execute.NewPortInfo("Loadedsamples", "[]*wtype.LHSolution", "Loadedsamples", true, true, nil, nil))
 
 	ci := execute.NewComponentInfo("DNA_gel", "DNA_gel", "", false, inp, outp)
 
