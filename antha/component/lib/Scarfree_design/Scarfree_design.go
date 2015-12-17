@@ -150,7 +150,7 @@ func (e *Scarfree_design) steps(p Scarfree_designParamBlock, r *Scarfree_designR
 	for _, part := range r.PartswithOverhangs {
 
 		enz := lookup.EnzymeLookup(p.Enzymename)
-		info := enzymes.Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+		info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 
 		sitepositions := enzymes.SitepositionString(info[0])
 

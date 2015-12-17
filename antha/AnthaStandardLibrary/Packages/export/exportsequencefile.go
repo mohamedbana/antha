@@ -20,16 +20,19 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
-package enzymes
+package export
 
 import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"log"
 	"os"
+	"strings"
 )
 
 // function to export a standard report of sequence properties to a txt file
@@ -150,4 +153,33 @@ func Makefastaserial(dir string, seqs []*wtype.DNASequence) string {
 
 	f.Close()
 	return filename
+}
+
+func ExportFastaandSummaryforEachSeq(assemblyparameters enzymes.Assemblyparameters) (err error) {
+
+	enzymename := strings.ToUpper(assemblyparameters.Enzymename)
+
+	// should change this to rebase lookup; what happens if this fails?
+	//enzyme := TypeIIsEnzymeproperties[enzymename]
+	enzyme, err := lookup.TypeIIsLookup(enzymename)
+	if err != nil {
+		return err
+	}
+	//assemble (note that sapIenz is found in package enzymes)
+	_, plasmidproductsfromXprimaryseq, err := enzymes.JoinXnumberofparts(assemblyparameters.Vector, assemblyparameters.Partsinorder, enzyme)
+
+	if err != nil {
+		return err
+	}
+
+	for _, assemblyproduct := range plasmidproductsfromXprimaryseq {
+
+		fileprefix := anthapath.Dirpath() + "/"
+		tojoin := make([]string, 0)
+		tojoin = append(tojoin, fileprefix, assemblyparameters.Constructname)
+		filename := strings.Join(tojoin, "")
+		Exporttofile(filename, &assemblyproduct)
+		ExportFasta(filename, &assemblyproduct)
+	}
+	return err
 }

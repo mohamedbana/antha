@@ -19,7 +19,7 @@ Parameters (
 	Loadingdyevolume Volume
 	DNAgelrunvolume Volume
 	
-	DNAladder Volume // or should this be a concentration?
+	//DNAladder Volume // or should this be a concentration?
 
 	//DNAgelruntime time.Duration
 	//DNAgelwellcapacity Volume

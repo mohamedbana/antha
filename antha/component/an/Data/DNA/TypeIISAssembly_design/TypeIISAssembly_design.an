@@ -13,6 +13,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/export"
 	"strings"
 	"strconv"
 )
@@ -141,7 +142,7 @@ Steps {
 	
 	// The default sitesfound produced from the assembly simulator only checks to SapI and BsaI so we'll repeat with the enzymes declared in parameters
 	// first lookup enzyme properties
-	enzlist := make([]wtype.LogicalRestrictionEnzyme, 0)
+	enzlist := make([]wtype.RestrictionEnzyme, 0)
 	for _, site := range RestrictionsitetoAvoid {
 		enzsite := lookup.EnzymeLookup(site)
 	enzlist = append(enzlist, enzsite)
@@ -172,12 +173,12 @@ Steps {
 	
 	partswithOverhangs := make([]*wtype.DNASequence,0)
 	for i, part := range PartswithOverhangs{
-		_ = enzymes.ExportFastaDir(Constructname,strconv.Itoa(i+1),&part)
+		_ = export.ExportFastaDir(Constructname,strconv.Itoa(i+1),&part)
 		partswithOverhangs=append(partswithOverhangs,&part)
 		
 		
 	}
-	_ = enzymes.Makefastaserial(Constructname,partswithOverhangs)
+	_ = export.Makefastaserial(Constructname,partswithOverhangs)
 	
 	//partstoorder := ansi.Color(fmt.Sprintln("PartswithOverhangs", PartswithOverhangs),"red")
 	partstoorder := fmt.Sprintln("PartswithOverhangs", PartswithOverhangs)

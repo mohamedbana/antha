@@ -42,7 +42,7 @@ type Enzyme struct {
 	Properties map[string]wunit.Measurement
 }
 
-type LogicalRestrictionEnzyme struct {
+type RestrictionEnzyme struct {
 	// other fields required but for now the main things are...
 	RecognitionSequence               string
 	EndLength                         int
@@ -57,14 +57,14 @@ type LogicalRestrictionEnzyme struct {
 }
 
 type TypeIIs struct {
-	LogicalRestrictionEnzyme
+	RestrictionEnzyme
 	Name                              string
 	Isoschizomers                     []string
 	Topstrand3primedistancefromend    int
 	Bottomstrand5primedistancefromend int
 }
 
-func ToTypeIIs(typeIIenzyme LogicalRestrictionEnzyme) (typeIIsenz TypeIIs, err error) {
+func ToTypeIIs(typeIIenzyme RestrictionEnzyme) (typeIIsenz TypeIIs, err error) {
 	if typeIIenzyme.Class == "TypeII" {
 		err = fmt.Errorf("You can't do this, enzyme is not a type IIs")
 	}

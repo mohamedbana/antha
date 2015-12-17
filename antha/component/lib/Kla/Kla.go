@@ -67,7 +67,6 @@ func (e *Kla) steps(p KlaParamBlock, r *KlaResultBlock) {
 
 	dv := labware.Labwaregeometry[p.Platetype]["dv"] // microwell vessel diameter, m 0.017 //
 	ai := labware.Labwaregeometry[p.Platetype]["ai"] // initial specific surface area, /m 96.0
-	//var RE = Reynolds number, (ro * n * dv * 2/mu), dimensionless
 
 	ro := liquidclasses.Liquidclass[p.Liquid]["ro"] //density, kg 􏰀/ m􏰁3 999.7 // environment dependent
 	mu := liquidclasses.Liquidclass[p.Liquid]["mu"] //0.001           environment dependent                        //liquidclasses.Liquidclass[liquid]["mu"] viscosity, kg 􏰀/ m􏰁 /􏰀 s
@@ -81,9 +80,10 @@ func (e *Kla) steps(p KlaParamBlock, r *KlaResultBlock) {
 	}
 
 	//n = Rpm / 60 //shaking frequency, s􏰁1
+	//var RE = Reynolds number, (ro * n * dv * 2/mu), dimensionless
 	//const exp = Eulers number, 2.718281828
-
 	//Fr = Froude number = dt(2 * math.Pi * n)^2 /(2 * g), (dimensionless)
+
 	dt := devices.Shaker[p.Shakertype]["dt"] //0.008                                  //shaking amplitude, m // move to shaker package
 
 	a := labware.Labwaregeometry[p.Platetype]["a"] //0.88   //
@@ -99,10 +99,11 @@ func (e *Kla) steps(p KlaParamBlock, r *KlaResultBlock) {
 	// Check Ncrit! original paper used this to calculate speed in shallow round well plates... double check paper
 
 	// add loop to use correct formula dependent on Platetype etc...
-	/*Criticalshakerspeed := "error"
-	if labware.Labwaregeometry[Platetype]["numberofwellsides"] == 4.0 {*/
-	r.Ncrit = eng.Ncrit_srw(Sigma, dv, Vl, ro, dt)
-	//}
+	// currently only one plate type supported
+	//Criticalshakerspeed := "error"
+	if labware.Labwaregeometry[p.Platetype]["numberofwellsides"] == 4.0 {
+		r.Ncrit = eng.Ncrit_srw(Sigma, dv, Vl, ro, dt)
+	} /*else{Criticalshakerspeed := "error: kla estimation for this plate type not yet implemented"}
 	/*if i == 4.0 {
 		Criticalshakerspeed := "error"
 	}
@@ -122,12 +123,6 @@ func (e *Kla) steps(p KlaParamBlock, r *KlaResultBlock) {
 
 	//CalculatedKla = setpoints.CalculateKlasquaremicrowell(Platetype, Liquid, Rpm, Shakertype, TargetRE, D)
 
-	/*
-		fmt.Println("shakerspeedrequired= ", stats.Round(Necessaryshakerspeed*60, 3))
-		fmt.Println("Froude number = ", stats.Round(Fr, 3))
-		fmt.Println("kla =", stats.Round(CalculatedKla, 3))
-		fmt.Println("Shaker speed required for turbulence	=", Criticalshakerspeed,"/S")*/
-	//fmt.Println("=", (Criticalshakerspeed*60), 3),"rpm")
 }
 func (e *Kla) analysis(p KlaParamBlock, r *KlaResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)

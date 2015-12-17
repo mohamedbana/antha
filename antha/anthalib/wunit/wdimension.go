@@ -73,15 +73,32 @@ type Volume struct {
 }
 
 // make a volume
-func NewVolume(v float64, unit string) Volume {
+func NewVolume(v float64, unit string) (o Volume) {
 	if len(strings.TrimSpace(unit)) == 0 {
 		logger.Fatal("Can't make Volumes without unit")
 		panic("Can't make Volumes without unit")
 	}
-	o := Volume{NewPMeasurement(v, unit)}
-	return o
+	if len(strings.TrimSpace(unit)) == 1 {
+		o = Volume{NewMeasurement(v, "", unit)}
+	}
+	if len(strings.TrimSpace(unit)) > 1 {
+
+		o = Volume{NewPMeasurement(v, unit)}
+	}
+	return
 }
 
+/*
+func NewVolume(v float64, unit string) Volume {
+	if unit != "l" {
+		logger.Fatal("Can't make volumes which aren't in l")
+		panic("Can't make volumes which aren't in l")
+	}
+
+	a := Volume{NewMeasurement(v, "", unit)}
+	return a
+}
+*/
 func CopyVolume(v *Volume) *Volume {
 	ret := NewVolume(v.RawValue(), v.Unit().PrefixedSymbol())
 	return &ret
@@ -125,8 +142,20 @@ type Mass struct {
 
 // make a mass unit
 
-func NewMass(v float64, unit string) Mass {
-	return Mass{NewPMeasurement(v, unit)}
+func NewMass(v float64, unit string) (o Mass) {
+	if len(strings.TrimSpace(unit)) == 0 {
+		logger.Fatal("Can't make masses without unit")
+		panic("Can't make masses without unit")
+	}
+	if len(strings.TrimSpace(unit)) == 1 {
+		o = Mass{NewMeasurement(v, "", unit)}
+	}
+	if len(strings.TrimSpace(unit)) > 1 {
+
+		o = Mass{NewPMeasurement(v, unit)}
+	}
+
+	return //Mass{NewPMeasurement(v, unit)}
 }
 
 /*
@@ -243,6 +272,7 @@ type Concentration struct {
 }
 
 // make a new concentration in SI units... either M/l or kg/l
+/*
 func NewConcentration(v float64, unit string) Concentration {
 	if unit != "g/l" && unit != "M/l" {
 		// this should never be seen by users
@@ -252,6 +282,28 @@ func NewConcentration(v float64, unit string) Concentration {
 
 	c := Concentration{NewMeasurement(v, "", unit)}
 	return c
+}*/
+func NewConcentration(v float64, unit string) (o Concentration) {
+
+	if unit == "mg/ml" {
+		unit = "g/l"
+	} else if unit == "ng/ul" {
+		unit = "mg/l"
+	}
+
+	if len(strings.TrimSpace(unit)) == 0 {
+		logger.Fatal("Can't make concentration without unit")
+		panic("Can't make concentration without unit")
+	}
+	if len(strings.TrimSpace(unit)) == 3 {
+		o = Concentration{NewMeasurement(v, "", unit)}
+	}
+	if len(strings.TrimSpace(unit)) > 3 {
+
+		o = Concentration{NewPMeasurement(v, unit)}
+	}
+
+	return //Mass{NewPMeasurement(v, unit)}
 }
 
 // mass or mole

@@ -59,7 +59,7 @@ func (e *RemoveRestrictionSites) steps(p RemoveRestrictionSitesParamBlock, r *Re
 	warnings := make([]string, 0)
 
 	// first lookup enzyme properties for all enzymes and make a new array
-	enzlist := make([]wtype.LogicalRestrictionEnzyme, 0)
+	enzlist := make([]wtype.RestrictionEnzyme, 0)
 	for _, site := range p.RestrictionsitetoAvoid {
 		enzsite := lookup.EnzymeLookup(site)
 		enzlist = append(enzlist, enzsite)

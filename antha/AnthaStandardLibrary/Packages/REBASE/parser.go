@@ -63,7 +63,7 @@ type RebaseEntry struct {
 }
 */
 type TypeIIs struct {
-	wtype.LogicalRestrictionEnzyme
+	wtype.RestrictionEnzyme
 	Name                              string
 	Isoschizomers                     []string
 	Topstrand3primedistancefromend    int
@@ -135,9 +135,9 @@ func RecognitionSeqHandler(RecognitionSeq string) (RecognitionSequence string, E
 	return
 }
 
-func Build_rebase(name string, prototype string, recognitionseq string, methylationsite string, commercialsource string, refs string) (Record wtype.LogicalRestrictionEnzyme) {
+func Build_rebase(name string, prototype string, recognitionseq string, methylationsite string, commercialsource string, refs string) (Record wtype.RestrictionEnzyme) {
 
-	var record wtype.LogicalRestrictionEnzyme
+	var record wtype.RestrictionEnzyme
 
 	record.Name = name
 	record.Prototype = prototype
@@ -167,9 +167,9 @@ func Build_rebase(name string, prototype string, recognitionseq string, methylat
 	return Record
 }
 
-func RebaseParse(rebaseRh io.Reader) chan wtype.LogicalRestrictionEnzyme {
+func RebaseParse(rebaseRh io.Reader) chan wtype.RestrictionEnzyme {
 
-	outputChannel := make(chan wtype.LogicalRestrictionEnzyme)
+	outputChannel := make(chan wtype.RestrictionEnzyme)
 
 	scanner := bufio.NewScanner(rebaseRh)
 	// scanner.Split(bufio.ScanLines)

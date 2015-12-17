@@ -2,6 +2,7 @@
   "Parameters": [{
     "PCR": {
       "Additives": [
+        "component:DMSO"
       ],
       "FwdPrimer": "component:PrimerFw",
       "RevPrimer": "component:PrimerRev",

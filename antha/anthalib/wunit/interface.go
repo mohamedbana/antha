@@ -139,6 +139,9 @@ func Make_units() map[string]GenericUnit {
 		if u == "g" {
 			baseunit = "kg"
 		}
+		if u == "g/l" {
+			baseunit = "kg/l"
+		}
 		gu := GenericUnit{unitnames[i], u, unitbaseconvs[i], baseunit}
 		unit_map[u] = gu
 	}

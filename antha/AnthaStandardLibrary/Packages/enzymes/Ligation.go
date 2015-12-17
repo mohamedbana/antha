@@ -32,7 +32,7 @@ import (
 	"strings"
 )
 
-func Jointwoparts(upstreampart []Digestedfragment, downstreampart []Digestedfragment) (assembledfragments []Digestedfragment, plasmidproducts []wtype.DNASequence, err error) {
+func jointwoparts(upstreampart []Digestedfragment, downstreampart []Digestedfragment) (assembledfragments []Digestedfragment, plasmidproducts []wtype.DNASequence, err error) {
 
 	sequencestojoin := make([]string, 0)
 
@@ -77,6 +77,7 @@ func Jointwoparts(upstreampart []Digestedfragment, downstreampart []Digestedfrag
 	return assembledfragments, plasmidproducts, err
 }
 
+// key function for returning arrays of partially assembled fragments and fully assembled fragments from performing typeIIS assembly on a vector and a part
 func Jointwopartsfromsequence(vector wtype.DNASequence, part1 wtype.DNASequence, enzyme wtype.TypeIIs) (assembledfragments []Digestedfragment, plasmidproducts []wtype.DNASequence) {
 	doublestrandedpart1 := MakedoublestrandedDNA(part1)
 	digestedpart1 := DigestionPairs(doublestrandedpart1, enzyme)
@@ -84,11 +85,12 @@ func Jointwopartsfromsequence(vector wtype.DNASequence, part1 wtype.DNASequence,
 	doublestrandedvector := MakedoublestrandedDNA(vector)
 	digestedvector := DigestionPairs(doublestrandedvector, enzyme)
 
-	assembledfragments, plasmidproducts, _ = Jointwoparts(digestedvector, digestedpart1)
+	assembledfragments, plasmidproducts, _ = jointwoparts(digestedvector, digestedpart1)
 
 	return assembledfragments, plasmidproducts
 }
 
+// key function for returning an error message, arrays of partially assembled fragments and fully assembled fragments from performing typeIIS assembly on a vector and array of parts
 func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequence, enzyme wtype.TypeIIs) (assembledfragments []Digestedfragment, plasmidproducts []wtype.DNASequence, err error) {
 
 	if vector.Seq == "" {
@@ -110,7 +112,7 @@ func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequen
 	doublestrandedpart := MakedoublestrandedDNA(partsinorder[0])
 	digestedpart := DigestionPairs(doublestrandedpart, enzyme)
 	var newerr error
-	assembledfragments, plasmidproducts, newerr = Jointwoparts(digestedvector, digestedpart)
+	assembledfragments, plasmidproducts, newerr = jointwoparts(digestedvector, digestedpart)
 	if newerr != nil {
 		message := fmt.Sprint(vector.Nm, " and ", partsinorder[0].Nm, ": ", newerr.Error())
 		err = fmt.Errorf(message)
@@ -128,7 +130,7 @@ func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequen
 		doublestrandedpart = MakedoublestrandedDNA(partsinorder[i])
 		digestedpart := DigestionPairs(doublestrandedpart, enzyme)
 		//for _, newfragments := range assembledfragments {
-		assembledfragments, plasmidproducts, newerr = Jointwoparts(assembledfragments, digestedpart)
+		assembledfragments, plasmidproducts, newerr = jointwoparts(assembledfragments, digestedpart)
 		//err = newerr
 		if newerr != nil {
 			//	if err != nil {
@@ -164,6 +166,8 @@ func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequen
 	return assembledfragments, plasmidproducts
 }
 */
+
+// struct containing all information required to use AssemblySimulator function
 type Assemblyparameters struct {
 	Constructname string
 	Enzymename    string
@@ -177,6 +181,8 @@ type Assemblyparameters struct {
 	Vector        wtype.DNASequence
 	Partsinorder  []wtype.BioSequence
 }*/
+
+// Simulate assembly success; returns status, number of correct assemblies, any sites found
 func Assemblysimulator(assemblyparameters Assemblyparameters) (s string, successfulassemblies int, sites []Restrictionsites, newDNASequence wtype.DNASequence, err error) {
 
 	// fetch enzyme properties from map (this is basically a look up table for those who don't know)
@@ -184,10 +190,11 @@ func Assemblysimulator(assemblyparameters Assemblyparameters) (s string, success
 	enzymename := strings.ToUpper(assemblyparameters.Enzymename)
 
 	// should change this to rebase lookup; what happens if this fails?
-	enzyme := TypeIIsEnzymeproperties[enzymename]
+	//enzyme := TypeIIsEnzymeproperties[enzymename]
+	enzyme, _ := lookup.TypeIIsLookup(enzymename)
 
 	// need to expand this to include other enzyme possibilities
-	if enzyme.Name != "SapI" && enzyme.Name != "BsaI" && enzyme.Name != "BpiI" {
+	if enzyme.Class != "TypeIIs" { // enzyme.Name != "SapI" && enzyme.Name != "BsaI" && enzyme.Name != "BpiI" {
 		s = fmt.Sprint(enzymename, ": Incorrect Enzyme or no enzyme specified")
 		err = fmt.Errorf(s)
 		return s, successfulassemblies, sites, newDNASequence, err
@@ -204,14 +211,14 @@ func Assemblysimulator(assemblyparameters Assemblyparameters) (s string, success
 	}
 
 	if len(plasmidproductsfromXprimaryseq) == 1 {
-		sites = Restrictionsitefinder(plasmidproductsfromXprimaryseq[0], []wtype.LogicalRestrictionEnzyme{BsaI, SapI})
+		sites = Restrictionsitefinder(plasmidproductsfromXprimaryseq[0], []wtype.RestrictionEnzyme{BsaI, SapI, lookup.EnzymeLookup(enzymename)})
 		newDNASequence = plasmidproductsfromXprimaryseq[0]
 	}
 	// returns first plasmid in array! should be changed later!
 	if len(plasmidproductsfromXprimaryseq) > 1 {
 		sites = make([]Restrictionsites, 0)
 		for i := 0; i < len(plasmidproductsfromXprimaryseq); i++ {
-			sitesperplasmid := Restrictionsitefinder(plasmidproductsfromXprimaryseq[i], []wtype.LogicalRestrictionEnzyme{BsaI, SapI})
+			sitesperplasmid := Restrictionsitefinder(plasmidproductsfromXprimaryseq[i], []wtype.RestrictionEnzyme{BsaI, SapI, lookup.EnzymeLookup(enzymename)})
 			for _, site := range sitesperplasmid {
 				sites = append(sites, site)
 			}
@@ -244,16 +251,6 @@ func Assemblysimulator(assemblyparameters Assemblyparameters) (s string, success
 		err = fmt.Errorf(s)
 		//err = fmt.Errorf(funk, err.Error())
 		//s = err.Error()
-	}
-
-	for _, assemblyproduct := range plasmidproductsfromXprimaryseq {
-
-		fileprefix := "./"
-		tojoin := make([]string, 0)
-		tojoin = append(tojoin, fileprefix, assemblyparameters.Constructname)
-		filename := strings.Join(tojoin, "")
-		Exporttofile(filename, &assemblyproduct)
-		ExportFasta(filename, &assemblyproduct)
 	}
 
 	if s != "Yay! this should work" {
@@ -291,7 +288,7 @@ func MultipleAssemblies(parameters []Assemblyparameters) (s string, successfulas
 					constructsitesstring = append(constructsitesstring, enzerr.Error())
 				}*/
 				//enzyme := SapI
-				sitesperpart = Restrictionsitefinder(construct.Vector, []wtype.LogicalRestrictionEnzyme{enzyme})
+				sitesperpart = Restrictionsitefinder(construct.Vector, []wtype.RestrictionEnzyme{enzyme})
 				if sitesperpart[0].Numberofsites != 2 {
 					// need to loop through sitesperpart
 
@@ -301,7 +298,7 @@ func MultipleAssemblies(parameters []Assemblyparameters) (s string, successfulas
 				}
 
 				for _, part := range construct.Partsinorder {
-					sitesperpart = Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enzyme})
+					sitesperpart = Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enzyme})
 					if sitesperpart[0].Numberofsites != 2 {
 						sitepositions := SitepositionString(sitesperpart[0])
 						positions := ""

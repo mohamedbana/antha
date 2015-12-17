@@ -34,7 +34,7 @@ import (
 
 // what about cutting 3prime to recognition site?
 type TypeIIs struct {
-	wtype.LogicalRestrictionEnzyme
+	wtype.RestrictionEnzyme
 	Name                              string
 	Isoschizomers                     []string
 	Topstrand3primedistancefromend    int
@@ -55,10 +55,10 @@ type LogicalRestrictionEnzyme struct {
 	RemoteCutter                      bool
 }
 
-var SapI = wtype.LogicalRestrictionEnzyme{"GCTCTTC", 3, "SapI", "", 1, 4, "", []string{"N"}, []int{91, 1109, 1919, 1920}, "TypeIIs"}
+var SapI = wtype.RestrictionEnzyme{"GCTCTTC", 3, "SapI", "", 1, 4, "", []string{"N"}, []int{91, 1109, 1919, 1920}, "TypeIIs"}
 var isoschizomers = []string{"BspQI", "LguI", "PciSI", "VpaK32I"}
 var SapIenz = TypeIIs{SapI, "SapI", isoschizomers, 1, 4}
-var BsaI = wtype.LogicalRestrictionEnzyme{"GGTCTC", 4, "BsaI", "Eco31I", 1, 5, "?(5)", []string{"N"}, []int{814, 1109, 1912, 1995, 1996}, "TypeIIs"}
+var BsaI = wtype.RestrictionEnzyme{"GGTCTC", 4, "BsaI", "Eco31I", 1, 5, "?(5)", []string{"N"}, []int{814, 1109, 1912, 1995, 1996}, "TypeIIs"}
 var BsaIenz = TypeIIs{BsaI, "BsaI", []string{"none"}, 1, 5}
 
 var TypeIIsEnzymeproperties = map[string]TypeIIs{
