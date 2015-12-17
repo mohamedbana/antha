@@ -1,4 +1,6 @@
 // buffercomponents.go
+
+// Package for dealing with manipulation of buffers
 package buffers
 
 import (

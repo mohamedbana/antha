@@ -21,7 +21,6 @@
 // 2 Royal College St, London NW1 0NH UK
 
 // Package for working with enzymes; in particular restriction enzymes are particularly well characterised at present
-
 package enzymes
 
 import (
