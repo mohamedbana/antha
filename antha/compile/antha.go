@@ -61,22 +61,30 @@ func (p *compiler) anthaInit() {
 		p.reuseMap[tok] = make(map[string]bool)
 	}
 	p.intrinsics = map[string]string{
+		"MixTo":    "_wrapper.MixTo",
 		"MixInto":  "_wrapper.MixInto",
 		"Mix":      "_wrapper.Mix",
 		"Incubate": "_wrapper.Incubate",
 	}
 	p.types = map[string]string{
-		"Temperature":       "wunit.Temperature",
-		"Time":              "wunit.Time",
-		"Length":            "wunit.Length",
-		"Area":              "wunit.Area",
-		"Volume":            "wunit.Volume",
-		"Concentration":     "wunit.Concentration",
-		"Amount":            "wunit.Amount",
-		"Mass":              "wunit.Mass",
-		"Angle":             "wunit.Angle",
-		"Energy":            "wunit.Energy",
-		"SubstanceQuantity": "wunit.SubstantQuantity",
+		"Temperature":          "wunit.Temperature",
+		"Time":                 "wunit.Time",
+		"Length":               "wunit.Length",
+		"Area":                 "wunit.Area",
+		"Volume":               "wunit.Volume",
+		"Concentration":        "wunit.Concentration",
+		"Amount":               "wunit.Amount",
+		"Mass":                 "wunit.Mass",
+		"Angle":                "wunit.Angle",
+		"Energy":               "wunit.Energy",
+		"SubstanceQuantity":    "wunit.SubstanceQuantity",
+		"Force":                "wunit.Force",
+		"Pressure":             "wunit.Pressure",
+		"SpecificHeatCapacity": "wunit.SpecificHeatCapacity",
+		"Density":              "wunit.Density",
+		"FlowRate":             "wunit.FlowRate",
+		"Velocity":             "wunit.Velocity",
+		"Rate":                 "wunit.Rate",
 	}
 }
 

@@ -34,7 +34,6 @@ import (
 // default layout: requests fill plates in column order
 func BasicLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *LHRequest {
 	// we limit this to the case where all outputs go to the same plate type
-
 	plate := request.Output_platetype
 	solutions := request.Output_solutions
 
@@ -86,14 +85,6 @@ func BasicLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *
 			lg = choose_major_layout_group(MajorLayoutGroups, max_major_group_size)
 		}
 
-		/*
-			_,ok=MajorLayoutGroups[MajorLayoutGroupRanks[lg]]
-
-			if !ok{
-				MajorLayoutGroups[MajorLayoutGroupRanks[lg]]=make([]string, 0, 4)
-			}
-
-		*/
 		MajorLayoutGroups[MajorLayoutGroupRanks[lg]] = append(MajorLayoutGroups[MajorLayoutGroupRanks[lg]], id)
 	}
 
@@ -102,6 +93,7 @@ func BasicLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *
 
 	// now we need to set the minor layout groups attribute in request
 	// in this instance this is just mapping everything to columns
+	// this needs to work when outputs are pre-assigned
 
 	minor_group_layouts := make([][]string, 0, len(solutions))
 	assignments := make([]string, 0, len(solutions))
@@ -109,7 +101,7 @@ func BasicLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *
 	for i, grp := range MajorLayoutGroups {
 		dplate := plateLayouts[i]
 
-		plate_minor_groups, plate_assignments := assign_minor_layouts(grp, plate, dplate)
+		plate_minor_groups, plate_assignments := assign_minor_layouts(grp, plate, dplate, solutions)
 
 		minor_group_layouts = append(minor_group_layouts, plate_minor_groups...)
 		for _, as := range plate_assignments {
@@ -123,13 +115,100 @@ func BasicLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *
 	return request
 }
 
-func assign_minor_layouts(group []string, plate *wtype.LHPlate, plateID string) (mgrps [][]string, masss []string) {
-	mgrps = make([][]string, 0, 10)
-	// in this version we just use the number of wells in a column
+func make_get_assignations(solutions map[string]*wtype.LHSolution, WlsX, WlsY int) ([][]string, bool) {
+	assigned := make([][]string, WlsX)
+	for i := 0; i < WlsX; i++ {
+		assigned[i] = make([]string, WlsY)
+	}
 
+	anyassignments := false
+
+	for _, sol := range solutions {
+		ass := sol.Welladdress
+		if ass != "" {
+			anyassignments = true
+			wc := wtype.MakeWellCoordsA1(ass)
+			assigned[wc.X][wc.Y] = sol.ID
+		}
+	}
+
+	return assigned, anyassignments
+}
+
+func assign_minor_layouts(group []string, plate *wtype.LHPlate, plateID string, solutions map[string]*wtype.LHSolution) (mgrps [][]string, masss []string) {
+	// in this version we just use the number of wells in a column
 	colsize := plate.WlsY
 	rowsize := plate.WlsX
+
+	// we need to check for existing assignments and make sure we don't clobber them
+
+	assigned, anyassignments := make_get_assignations(solutions, rowsize, colsize)
+
+	if anyassignments {
+		return make_minor_layouts_hidebound(group, assigned, plateID, solutions, rowsize, colsize)
+	} else {
+		return make_minor_layouts_anew(group, plateID, rowsize, colsize)
+	}
+}
+
+func make_minor_layouts_hidebound(group []string, assigned [][]string, plateID string, solutions map[string]*wtype.LHSolution, rowsize, colsize int) (mgrps [][]string, masss []string) {
+	masss = make([]string, 0, rowsize)
+	mgrps = make([][]string, 0, 10)
+
+	row := 0
+	col := 0
+
+	for i := 0; i < len(group); i += 1 {
+		// a layout group is now just a single entity
+		grp := make([]string, 1)
+		sol := solutions[group[i]]
+		ass := sol.Welladdress
+		grp[0] = sol.ID
+
+		mass := ""
+
+		if ass != "" {
+			wc := wtype.MakeWellCoordsA1(ass)
+			mass = plateID + ":" + wc.RowLettString() + ":" + wc.ColNumString() + ":0:0"
+		} else {
+			// put it in the next free slot
+			tru := false
+			for ; col < rowsize; row++ {
+				if row == colsize {
+					row = 0
+					col += 1
+					continue
+				}
+
+				if assigned[row][col] == "" {
+					tru = true
+					break
+				}
+				row += 1
+			}
+
+			if !tru {
+				RaiseError("Inconsistent plate layout ... uArch/sched/lh/layoutagent")
+			}
+
+			wc := wtype.WellCoords{col, row}
+			mass = plateID + ":" + wc.RowLettString() + ":" + wc.ColNumString() + ":0:0"
+		}
+
+		masss = append(masss, mass)
+		mgrps = append(mgrps, grp)
+
+		if row == colsize {
+			row = 0
+			col += 1
+		}
+	}
+	return mgrps, masss
+}
+
+func make_minor_layouts_anew(group []string, plateID string, rowsize, colsize int) (mgrps [][]string, masss []string) {
 	masss = make([]string, rowsize)
+	mgrps = make([][]string, 0, 10)
 
 	row := 1
 	col := 1
