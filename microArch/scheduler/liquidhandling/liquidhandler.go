@@ -133,6 +133,7 @@ func (this *Liquidhandler) do_setup(rq *LHRequest) {
 		this.Properties.Driver.AddPlateTo(position, plate, name)
 	}
 
+	// XXX -- this needs to check this won't be an error
 	this.Properties.Driver.(liquidhandling.ExtendedLiquidhandlingDriver).UpdateMetaData(this.Properties)
 }
 
@@ -183,9 +184,6 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 
 	// set up the mapping of the outputs
 	// this assumes the input plates are set
-
-	// bet this is where we have issues
-
 	request = this.Layout(request)
 
 	// define the output plates
@@ -291,7 +289,6 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 		if request.Tip_Type == nil || request.Tip_Type.GenericSolid == nil {
 			logger.Debug(fmt.Sprintf("LiquidHandling model is %q", this.Properties.Model))
 			if this.Properties.Model == "Pipetmax" {
-				fmt.Println("WEll this should be OK, no?")
 				this.Properties.AddTipBox(factory.GetTipboxByType("Gilson20"))
 				this.Properties.Tips = make([]*wtype.LHTip, 1)
 				this.Properties.Tips[0] = factory.GetTipboxByType("Gilson20").Tiptype

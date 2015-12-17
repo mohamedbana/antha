@@ -494,12 +494,13 @@ func GetComponents() []ComponentDesc {
 	portMap["TypeIISConstructAssembly"]["Reaction"] = false
 
 	portMap["TypeIISConstructAssemblyMMX"] = make(map[string]bool)
-	portMap["TypeIISConstructAssemblyMMX"]["InPlate"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["InactivationTemp"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["InactivationTime"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["MMXVol"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["MasterMix"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["OutPlate"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["OutputLocation"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["OutputPlateNum"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["OutputReactionName"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["PartNames"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["PartVols"] = true
@@ -507,8 +508,6 @@ func GetComponents() []ComponentDesc {
 	portMap["TypeIISConstructAssemblyMMX"]["ReactionTemp"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["ReactionTime"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["ReactionVolume"] = true
-	portMap["TypeIISConstructAssemblyMMX"]["Vector"] = true
-	portMap["TypeIISConstructAssemblyMMX"]["VectorVol"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["Water"] = true
 
 	portMap["TypeIISConstructAssemblyMMX"]["Reaction"] = false

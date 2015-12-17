@@ -122,18 +122,26 @@ func ExampleEight() {
 	// testing the new conversion methods
 	pu := ParsePrefixedUnit("GHz")
 	pu2 := ParsePrefixedUnit("MHz")
+	pu3 := ParsePrefixedUnit("l")
 	meas := ConcreteMeasurement{10, pu}
 	meas2 := ConcreteMeasurement{50, pu2}
+	meas3 := ConcreteMeasurement{10, pu3}
 
 	fmt.Println(meas.ToString(), " is ", meas.ConvertTo(meas.Unit()), " ", pu.PrefixedSymbol())
 	fmt.Println(meas2.ToString(), " is ", meas2.ConvertTo(meas.Unit()), " ", pu.PrefixedSymbol())
 	fmt.Println(meas2.ToString(), " is ", meas2.ConvertTo(meas2.Unit()), " ", pu2.PrefixedSymbol())
 	fmt.Println(meas.ToString(), " is ", meas.ConvertTo(meas2.Unit()), " ", pu2.PrefixedSymbol())
+	fmt.Println(meas3.ToString())
+	fmt.Println(meas3.Unit().ToString())
+	fmt.Println(pu3.PrefixedSymbol())
 	// Output:
 	// 10.000GHz  is  10   GHz
 	// 50.000MHz  is  0.05   GHz
 	// 50.000MHz  is  50   MHz
 	// 10.000GHz  is  10000   MHz
+	// 10.000 l
+	// Name: litre Symbol: l Conversion: 1    BaseUnit: l
+	//  l
 }
 
 func ExampleNine() {
