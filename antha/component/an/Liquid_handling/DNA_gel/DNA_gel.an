@@ -16,8 +16,12 @@ Parameters (
 	
 	Loadingdyeinsample bool
 	
+	Watervol	Volume
 	Loadingdyevolume Volume
 	DNAgelrunvolume Volume
+	
+	
+	Mixingpolicy string
 	
 	//DNAladder Volume // or should this be a concentration?
 
@@ -44,7 +48,8 @@ Data (
 
 // Physical Inputs to this protocol with types
 Inputs (
-    Sampletotest *wtype.LHComponent//WaterSolution
+    Water	*wtype.LHComponent
+	Sampletotest *wtype.LHComponent//WaterSolution
 	Loadingdye *wtype.LHComponent//WaterSolution //Chemspiderlink // not correct link but similar desirable
 	DNAgel *wtype.LHPlate //Gel
 
@@ -85,7 +90,11 @@ Setup {
 // The core process for this protocol, with the steps to be performed
 // for every input
 Steps {
-
+	
+	// ready to add water to well
+	waterSample := mixer.Sample(Water,Watervol)
+	
+	
 	// load gel
 	var DNAgelloadmix *wtype.LHComponent
 		
@@ -98,8 +107,14 @@ Steps {
 		DNAgelloadmix = wtype.SolutionToComponent(DNAgelloadmixsolution)
 		}else {DNAgelloadmix = Sampletotest}
 
+	// Ensure  sample will be dispensed appropriately:
+
+	DNAgelloadmix.Type = Mixingpolicy	
+
+
 	loadedgel := MixInto(
 	DNAgel,
+	waterSample,
 	mixer.Sample(DNAgelloadmix, DNAgelrunvolume),
 	)
 

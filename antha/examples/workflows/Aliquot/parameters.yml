@@ -9,8 +9,8 @@
       "VolumePerAliquot": "10ul",
 	"NumberofAliquots":3,
     }
-  },
-{
+},
+	{
     "AliquotParams": {
       "Solution": "component:PrimerRev",
 		"InPlate": "plate:pcrplate_with_cooler",

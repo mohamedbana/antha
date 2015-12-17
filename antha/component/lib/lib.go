@@ -80,7 +80,10 @@ func GetComponents() []ComponentDesc {
 	portMap["DNA_gel"]["Loadingdye"] = true
 	portMap["DNA_gel"]["Loadingdyeinsample"] = true
 	portMap["DNA_gel"]["Loadingdyevolume"] = true
+	portMap["DNA_gel"]["Mixingpolicy"] = true
 	portMap["DNA_gel"]["Sampletotest"] = true
+	portMap["DNA_gel"]["Water"] = true
+	portMap["DNA_gel"]["Watervol"] = true
 
 	portMap["DNA_gel"]["Loadedgel"] = false
 

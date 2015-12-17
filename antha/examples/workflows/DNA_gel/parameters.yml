@@ -1,16 +1,75 @@
 {
   "Parameters": [{
     "DNAgelParams": {
-    "Sampletotest": "component:water",
-	"Loadingdye":"component:water",
+    "Water":"component:water",
+	"Sampletotest": "component:DNAsolution",
+	"Mixingpolicy":"default",
+	"Loadingdye":"component:Blue",
+    "DNAgel": "plate:EPAGE48",
+    "TipType": "tipbox:Gilson20",
+	"WaterVol":"10ul",
+    "Loadingdyevolume": "0ul",
+	"DNAgelrunvolume":"15ul",
+	"Loadingdyeinsample":true
+  }
+},
+ {
+"DNAgelParams": {
+    "Water":"component:water",
+	"Sampletotest": "component:DNAsolution",
+	"Mixingpolicy":"water",
+	"Loadingdye":"component:Blue",
+    "DNAgel": "plate:EPAGE48",
+    "TipType": "tipbox:Gilson20",
+    "WaterVol":"10ul",
+    "Loadingdyevolume": "0ul",
+	"DNAgelrunvolume":"15ul",
+	"Loadingdyeinsample":true
+   }
+},
+ {
+	"DNAgelParams": {
+    "Water":"component:water",
+	"Sampletotest": "component:DNAsolution",
+	"Mixingpolicy":"gelloading",
+	"Loadingdye":"component:Blue",
+    "DNAgel": "plate:EPAGE48",
+    "TipType": "tipbox:Gilson20",
+   "WaterVol":"10ul",
+    "Loadingdyevolume": "0ul",
+	"DNAgelrunvolume":"15ul",
+	"Loadingdyeinsample":true
+  }
+},
+{
+	"DNAgelParams": {
+    "Water":"component:water",
+	"Sampletotest": "component:DNAsolution",
+	"Mixingpolicy":"gelloading",
+	"Loadingdye":"component:Blue",
     "DNAgel": "plate:greiner384",
     "TipType": "tipbox:Gilson20",
+   "WaterVol":"10ul",
     "Loadingdyevolume": "0ul",
-	"DNAgelrunvolume":"20ul",
+	"DNAgelrunvolume":"15ul",
 	"Loadingdyeinsample":true
-  },
+  }
+},
+ {
+	"DNAgelParams": {
+    "Water":"component:water",
+	"Sampletotest": "component:DNAsolution",
+	"Mixingpolicy":"DoNotMix",
+	"Loadingdye":"component:Blue",
+    "DNAgel": "plate:EPAGE48",
+    "TipType": "tipbox:Gilson20",
+   "WaterVol":"10ul",
+    "Loadingdyevolume": "0ul",
+	"DNAgelrunvolume":"15ul",
+	"Loadingdyeinsample":true
+  }
 }],
   "Config": {
-    "OUTPUT_COUNT": 1
+    "OUTPUT_COUNT": 4
   }
 }
