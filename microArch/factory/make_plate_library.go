@@ -145,8 +145,8 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 //refactored for reverse position
 
 	ep48g := wtype.NewShape("trap", "mm", 2, 4, 2)
-	welltype = wtype.NewLHWell("EPAGE48", "", "", "ul", 25, 0, ep48g, 0, 2, 4, 2, 48, "mm")
-	plate = wtype.NewLHPlate("EPAGE48", "Invitrogen", 2, 26, 50, "mm", welltype, 4.5, 34, -1.5, 18.0, 2.0)
+	welltype = wtype.NewLHWell("EPAGE48", "", "", "ul", 25, 0, ep48g, 0, 2, 4, 2, 2, "mm")
+	plate = wtype.NewLHPlate("EPAGE48", "Invitrogen", 2, 26, 50, "mm", welltype, 4.5, 34, -1.0, 17.25, 49.5)
 	plates[plate.Type] = plate
 
 	//	WellXOffset float64
@@ -154,7 +154,6 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	//	WellXStart  float64
 	//	WellYStart  float64
 	//	WellZStart  float64
-	
 
 
 

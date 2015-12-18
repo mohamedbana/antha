@@ -46,8 +46,9 @@ func MakePolicies() map[string]LHPolicy {
 	pols["NeedToMix"] = MakeNeedToMixPolicy()
 	pols["viscous"] = MakeViscousPolicy()
 //      pols["lysate"] = MakeLysatePolicy()
-        pols["protein"] = MakeProteinPolicy()
-        pols["detergent"] = MakeDetergentPolicy()
+	pols["protein"] = MakeProteinPolicy()
+	pols["detergent"] = MakeDetergentPolicy()
+	pols["load"] =MakeLoadPolicy()
 
 	return pols
 
@@ -177,11 +178,12 @@ func MakeProteinPolicy() LHPolicy {
 }
 func MakeLoadPolicy() LHPolicy {
 	loadpolicy := make(LHPolicy, )
-	loadpolicy["ASPSPEED"] = 2.0
-	loadpolicy["DSPSPEED"] = 0.5
+	loadpolicy["ASPSPEED"] = 1.0
+	loadpolicy["DSPSPEED"] = 0.1
 	loadpolicy["CAN_MULTI"] = false
 	loadpolicy["CAN_MSA"] = false
 	loadpolicy["CAN_SDD"] = false
+	loadpolicy["TOUCHOFF"] = false
 	loadpolicy["TIP_REUSE_LIMIT"] = 0
 	loadpolicy["NO_AIR_DISPENSE"] = true
 	return loadpolicy
