@@ -3,7 +3,7 @@
     "AliquotParams": {
       "Solution": "component:PrimerFw",
 	  "InPlate": "plate:pcrplate_with_cooler",
-      "Outplate": "plate:EPAGE48",
+      "Outplate": "plate:greiner384",
       "TipType": "tipbox:Gilson20",
       "SolutionVolume": "100ul",
       "VolumePerAliquot": "15ul",
@@ -14,7 +14,7 @@
     "AliquotParams": {
       "Solution": "component:PrimerRev",
 		"InPlate": "plate:pcrplate_with_cooler",
-      "Outplate": "plate:EPAGE48",
+      "Outplate": "plate:greiner384",
       "TipType": "tipbox:Gilson20",
       "SolutionVolume": "100ul",
       "VolumePerAliquot": "15ul",

@@ -69,7 +69,60 @@ func (w *Wrapper) getString(x string) string {
 	}
 }
 
+func (w *Wrapper) MixTo(outplate *wtype.LHPlate, address string, components ...*wtype.LHComponent) *wtype.LHSolution {
+	if !w.usedMix {
+		if em := equipmentManager.GetEquipmentManager(); em != nil {
+			lh := em.GetActionCandidate(*equipment.NewActionDescription(action.LH_MIX, "", nil))
+			if lh == nil {
+				panic("error configuring liquid handling request: could not find equipment that satisfies liquid handler mix instruction")
+			}
+			w.liquidHandler = lh
+		} else {
+			panic("equipment manager not configured")
+		}
+
+		//We are going to configure the liquid handler for a blockId. BlockId will give us the framework and state handling
+		// so, for a certain BlockId config options will be aggregated. Liquid Handler will just regenerate all state per
+		// this aggregation layer and that will allow us to run multiple protocols.
+		//prepare the values
+		config := make(map[string]interface{}) //new(wtype.ConfigItem)
+		config["MAX_N_PLATES"] = 4.5
+		config["MAX_N_WELLS"] = 278.0
+		config["RESIDUAL_VOLUME_WEIGHT"] = 1.0
+		config["OUTPUT_COUNT"] = w.outputCount
+		config["BLOCKID"] = w.blockID.String()
+		// these should come from the paramblock... for now though
+		config["INPUT_PLATETYPE"] = "pcrplate_with_cooler"
+		config["OUTPUT_PLATETYPE"] = "pcrplate_with_cooler"
+
+		configString, err := json.Marshal(config)
+		if err != nil {
+			panic(fmt.Sprintf("error configuring liquid handling request: %s", err))
+		}
+		if w.liquidHandler != nil {
+			w.liquidHandler.Do(*equipment.NewActionDescription(action.LH_CONFIG, string(configString), nil))
+		}
+	}
+
+	reaction := mixer.MixTo(outplate, address, components...)
+	reaction.BlockID = w.blockID
+	reaction.SName = w.getString("OutputReactionName")
+	reqReaction, err := json.Marshal(reaction)
+	if err != nil {
+		panic(fmt.Sprintf("error coding reaction data, %v", err))
+	}
+	if w.liquidHandler != nil {
+		err = w.liquidHandler.Do(*equipment.NewActionDescription(action.LH_MIX, string(reqReaction), nil))
+	}
+	if err != nil {
+		panic(fmt.Sprintf("error running liquid handling request: %s", err))
+	}
+	return reaction
+
+}
+
 func (w *Wrapper) MixInto(outplate *wtype.LHPlate, components ...*wtype.LHComponent) *wtype.LHSolution {
+	//func (w *Wrapper) MixInto(outplate *wtype.LHPlate, components ...*wtype.LHComponent) *wtype.LHSolution {
 	// TODO: need better error handling here so we don't take down the monolith
 	// when, for example, we're asked to simulate a workflow without having a
 	// liquid handler
@@ -95,7 +148,7 @@ func (w *Wrapper) MixInto(outplate *wtype.LHPlate, components ...*wtype.LHCompon
 		config["OUTPUT_COUNT"] = w.outputCount
 		config["BLOCKID"] = w.blockID.String()
 		// these should come from the paramblock... for now though
-		//config["INPUT_PLATETYPE"] = "DSW96" // seems to still be hardcoded as pcr plate with cooler somewhere else
+		//config["INPUT_PLATETYPE"] = "DWR1" // seems to still be hardcoded as pcr plate with cooler somewhere else
 		//config["OUTPUT_PLATETYPE"] = "pcrplate_with_cooler"
 
 		configString, err := json.Marshal(config)
