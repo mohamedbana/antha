@@ -157,10 +157,13 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 		for platetype, nwells := range well_assignments {
 			for i := 0; i < nwells; i++ {
 				curr_plate = plates_in_play[platetype.Type]
+				// curr_plate = plates_in_play["DWST12"] changing here works!
 
 				if curr_plate == nil {
 					plates_in_play[platetype.Type] = factory.GetPlateByType(platetype.Type)
-					curr_plate = plates_in_play[platetype.Type]
+					//curr_plate = plates_in_play[platetype.Type]
+					// going in here!
+					curr_plate = plates_in_play["DWST12"]
 					platename := fmt.Sprintf("Input_plate_%d", curplaten)
 					curr_plate.PlateName = platename
 					curplaten += 1
