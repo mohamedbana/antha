@@ -95,7 +95,7 @@ func (w *Wrapper) MixInto(outplate *wtype.LHPlate, components ...*wtype.LHCompon
 		config["OUTPUT_COUNT"] = w.outputCount
 		config["BLOCKID"] = w.blockID.String()
 		// these should come from the paramblock... for now though
-		//config["INPUT_PLATETYPE"] = "DWR1" // seems to still be hardcoded as pcr plate with cooler somewhere else
+		//config["INPUT_PLATETYPE"] = "DSW96" // seems to still be hardcoded as pcr plate with cooler somewhere else
 		//config["OUTPUT_PLATETYPE"] = "pcrplate_with_cooler"
 
 		configString, err := json.Marshal(config)

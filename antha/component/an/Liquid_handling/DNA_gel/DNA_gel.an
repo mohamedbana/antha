@@ -54,6 +54,7 @@ Inputs (
     Water	*wtype.LHComponent
 	Sampletotest *wtype.LHComponent//WaterSolution
 	Loadingdye *wtype.LHComponent//WaterSolution //Chemspiderlink // not correct link but similar desirable
+	InPlate *wtype.LHPlate
 	DNAgel *wtype.LHPlate //Gel
 
 	//DNAladder *wtype.LHComponent//NucleicacidSolution

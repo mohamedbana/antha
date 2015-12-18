@@ -15,8 +15,6 @@ import (
 
 // Input parameters for this protocol (data)
 
-//DNAVol						Volume
-
 // Physical Inputs to this protocol with types
 
 // Physical outputs from this protocol with types
