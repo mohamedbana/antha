@@ -53,7 +53,7 @@ func (e *SDSprep) steps(p SDSprepParamBlock, r *SDSprepResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
-	//Method 1. Mix two things. DOES NOT WORK as recognises protein to be 1 single entity and wont handle as seperate components. ie end result is 5 things created all
+	//Method 1. Mix two things. DOES NOT WORK as recognises protein to be 1 single entity and won't handle as seperate components. ie end result is 5 things created all
 	//from the same well. Check typeIIs workflow for hints.
 	//
 	//	Step1a

@@ -29,11 +29,11 @@ import (
 	"github.com/antha-lang/antha/internal/github.com/ghodss/yaml"
 	"io/ioutil"
 	"os"
-	
 )
+
 func MakePolicies() map[string]LHPolicy {
-        pols := make(map[string]LHPolicy)
-   
+	pols := make(map[string]LHPolicy)
+
 	// what policies do we need?
 	pols["water"] = MakeWaterPolicy()
 	pols["culture"] = MakeCulturePolicy()
@@ -45,18 +45,23 @@ func MakePolicies() map[string]LHPolicy {
 	pols["DoNotMix"] = MakeDefaultPolicy()
 	pols["NeedToMix"] = MakeNeedToMixPolicy()
 	pols["viscous"] = MakeViscousPolicy()
+
 //      pols["lysate"] = MakeLysatePolicy()
 	pols["protein"] = MakeProteinPolicy()
 	pols["detergent"] = MakeDetergentPolicy()
 	pols["load"] =MakeLoadPolicy()
 
+	//      pols["lysate"] = MakeLysatePolicy()
+
 	return pols
 
 }
+
 //func MakeLysatePolicy() LHPolicy {
 //        lysatepolicy := make(LHPolicy, 6)
 //        lysatepolicy["ASPSPEED"] = 1.0
 //        lysatepolicy["DSPSPEED"] = 1.0
+//        lysatepolicy["ASP_WAIT"] = 2.0
 //        lysatepolicy["ASP_WAIT"] = 2.0
 //        lysatepolicy["DSP_WAIT"] = 2.0
 //        lysatepolicy["PRE_MIX"] = 5
@@ -146,37 +151,37 @@ func MakeDNAPolicy() LHPolicy {
 	return dnapolicy
 }
 
-
 func MakeDetergentPolicy() LHPolicy {
-        detergentpolicy := make(LHPolicy, 9)
-//        detergentpolicy["POST_MIX"] = 3
-        detergentpolicy["ASPSPEED"] = 1.0
-        detergentpolicy["DSPSPEED"] = 1.0
-        detergentpolicy["CAN_MULTI"] = false
-        detergentpolicy["CAN_MSA"] = false
-        detergentpolicy["CAN_SDD"] = false
-        detergentpolicy["DSPREFERENCE"] = 0
-        detergentpolicy["DSPZOFFSET"] = 0.5
-        detergentpolicy["TIP_REUSE_LIMIT"] = 8
-        detergentpolicy["NO_AIR_DISPENSE"] = true
-        return detergentpolicy
+	detergentpolicy := make(LHPolicy, 9)
+	//        detergentpolicy["POST_MIX"] = 3
+	detergentpolicy["ASPSPEED"] = 1.0
+	detergentpolicy["DSPSPEED"] = 1.0
+	detergentpolicy["CAN_MULTI"] = false
+	detergentpolicy["CAN_MSA"] = false
+	detergentpolicy["CAN_SDD"] = false
+	detergentpolicy["DSPREFERENCE"] = 0
+	detergentpolicy["DSPZOFFSET"] = 0.5
+	detergentpolicy["TIP_REUSE_LIMIT"] = 8
+	detergentpolicy["NO_AIR_DISPENSE"] = true
+	return detergentpolicy
 }
 func MakeProteinPolicy() LHPolicy {
-        proteinpolicy := make(LHPolicy, 10)
-        proteinpolicy["POST_MIX"] = 5
-        proteinpolicy["POST_MIX_VOLUME"] = 50
-        proteinpolicy["ASPSPEED"] = 2.0
-        proteinpolicy["DSPSPEED"] = 2.0
-        proteinpolicy["CAN_MULTI"] = false
-        proteinpolicy["CAN_MSA"] = false
-        proteinpolicy["CAN_SDD"] = false
-        proteinpolicy["DSPREFERENCE"] = 0
-        proteinpolicy["DSPZOFFSET"] = 0.5
-        proteinpolicy["TIP_REUSE_LIMIT"] = 0
-        proteinpolicy["NO_AIR_DISPENSE"] = true
-        return proteinpolicy
+	proteinpolicy := make(LHPolicy, 10)
+	proteinpolicy["POST_MIX"] = 5
+	proteinpolicy["POST_MIX_VOLUME"] = 50
+	proteinpolicy["ASPSPEED"] = 2.0
+	proteinpolicy["DSPSPEED"] = 2.0
+	proteinpolicy["CAN_MULTI"] = false
+	proteinpolicy["CAN_MSA"] = false
+	proteinpolicy["CAN_SDD"] = false
+	proteinpolicy["DSPREFERENCE"] = 0
+	proteinpolicy["DSPZOFFSET"] = 0.5
+	proteinpolicy["TIP_REUSE_LIMIT"] = 0
+	proteinpolicy["NO_AIR_DISPENSE"] = true
+	return proteinpolicy
 }
 func MakeLoadPolicy() LHPolicy {
+
 	loadpolicy := make(LHPolicy, )
 	loadpolicy["ASPSPEED"] = 1.0
 	loadpolicy["DSPSPEED"] = 0.1
@@ -186,6 +191,7 @@ func MakeLoadPolicy() LHPolicy {
 	loadpolicy["TOUCHOFF"] = false
 	loadpolicy["TIP_REUSE_LIMIT"] = 0
 	loadpolicy["NO_AIR_DISPENSE"] = true
+	loadpolicy["TOUCHOFF"] = false
 	return loadpolicy
 }
 func MakeNeedToMixPolicy() LHPolicy {
