@@ -107,6 +107,7 @@ func (e *DNA_gel) steps(p DNA_gelParamBlock, r *DNA_gelResultBlock) {
 		// ready to add water to well
 		waterSample := mixer.Sample(p.Water, p.Watervol)
 
+		// for troubleshooting
 		nothingvol := p.Watervol
 		nothingvol.Mvalue = 1.0
 		nothingSampletostopitcrashing := mixer.Sample(p.Water, nothingvol)
