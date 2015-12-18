@@ -70,9 +70,9 @@ Steps {
 Analysis {
 }
 
-// A block of tests to perform to validate that the sample was processed correctly
-// Optionally, destructive tests can be performed to validate results on a
-// dipstick basis
+// A block of tests to perform to validate that the sample was processed 
+//correctly. Optionally, destructive tests can be performed to validate 
+//results on a dipstick basis
 Validation {
 	
 }
