@@ -135,18 +135,22 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	plate = wtype.NewLHPlate("1L_DuranBottle", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 15.5)
 	plates[plate.Type] = plate
 
-//forward position
+	//forward position
 
-//	ep48g := wtype.NewShape("trap", "mm", 2, 4, 2)
-//	welltype = wtype.NewLHWell("EPAGE48", "", "", "ul", 15, 0, ep48g, 0, 2, 4, 2, 48, "mm")
-//	plate = wtype.NewLHPlate("EPAGE48", "Invitrogen", 2, 26, 50, "mm", welltype, 4.5, 34, 0.0, 0.0, 2.0)
-//	plates[plate.Type] = plate
+	//	ep48g := wtype.NewShape("trap", "mm", 2, 4, 2)
+	//	welltype = wtype.NewLHWell("EPAGE48", "", "", "ul", 15, 0, ep48g, 0, 2, 4, 2, 48, "mm")
+	//	plate = wtype.NewLHPlate("EPAGE48", "Invitrogen", 2, 26, 50, "mm", welltype, 4.5, 34, 0.0, 0.0, 2.0)
+	//	plates[plate.Type] = plate
 
-//refactored for reverse position
+	//refactored for reverse position
 
 	ep48g := wtype.NewShape("trap", "mm", 2, 4, 2)
 	welltype = wtype.NewLHWell("EPAGE48", "", "", "ul", 25, 0, ep48g, 0, 2, 4, 2, 2, "mm")
-	plate = wtype.NewLHPlate("EPAGE48", "Invitrogen", 2, 26, 50, "mm", welltype, 4.5, 34, -1.0, 17.25, 49.5)
+	//welltype = wtype.NewLHWell("384flat", "", "", "ul", 100, 10, square, bottomtype, xdim, ydim, zdim, bottomh, "mm")
+	//plate = wtype.NewLHPlate("EPAGE48", "Invitrogen", 2, 26, 50, "mm", welltype, 4.5, 34, -1.0, 17.25, 49.5)
+	plate = wtype.NewLHPlate("EPAGE48", "Invitrogen", 2, 26, 48.5, "mm", welltype, 4.5, 33.75, -1.0, 17.75, 47.5)
+	//plate = wtype.NewLHPlate("greiner384", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+
 	plates[plate.Type] = plate
 
 	//	WellXOffset float64
@@ -154,8 +158,6 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	//	WellXStart  float64
 	//	WellYStart  float64
 	//	WellZStart  float64
-
-
 
 	/*
 		rwshp = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
@@ -177,6 +179,7 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 
 	return plates
 }
+
 //	ep48g := wtype.NewShape("box", "mm", 2, 4, 2)
 //  welltype := wtype.NewLhWell("EPAGE48", "", "", "ul", 15, 0, ep48g, 0, 2, 4, 2, bottomh, "mm")
 //  plate = wtype.LHPlate("EPAGE48", "Invitrogen", 2, 26, height, "mm", welltype, 9, 22, 0.0, 0.0, 50.0)

@@ -70,9 +70,9 @@ func (e *Aliquot) analysis(p AliquotParamBlock, r *AliquotResultBlock) {
 
 }
 
-// A block of tests to perform to validate that the sample was processed
-//correctly. Optionally, destructive tests can be performed to validate
-//results on a dipstick basis
+// A block of tests to perform to validate that the sample was processed correctly
+// Optionally, destructive tests can be performed to validate results on a
+// dipstick basis
 func (e *Aliquot) validation(p AliquotParamBlock, r *AliquotResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper

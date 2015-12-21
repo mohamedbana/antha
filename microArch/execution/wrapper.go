@@ -69,6 +69,7 @@ func (w *Wrapper) getString(x string) string {
 	}
 }
 
+/*
 func (w *Wrapper) MixTo(outplate *wtype.LHPlate, address string, components ...*wtype.LHComponent) *wtype.LHSolution {
 	if !w.usedMix {
 		if em := equipmentManager.GetEquipmentManager(); em != nil {
@@ -120,7 +121,7 @@ func (w *Wrapper) MixTo(outplate *wtype.LHPlate, address string, components ...*
 	return reaction
 
 }
-
+*/
 func (w *Wrapper) MixInto(outplate *wtype.LHPlate, components ...*wtype.LHComponent) *wtype.LHSolution {
 	//func (w *Wrapper) MixInto(outplate *wtype.LHPlate, components ...*wtype.LHComponent) *wtype.LHSolution {
 	// TODO: need better error handling here so we don't take down the monolith

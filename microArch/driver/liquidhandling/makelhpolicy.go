@@ -46,10 +46,11 @@ func MakePolicies() map[string]LHPolicy {
 	pols["NeedToMix"] = MakeNeedToMixPolicy()
 	pols["viscous"] = MakeViscousPolicy()
 
-//      pols["lysate"] = MakeLysatePolicy()
+	//      pols["lysate"] = MakeLysatePolicy()
 	pols["protein"] = MakeProteinPolicy()
 	pols["detergent"] = MakeDetergentPolicy()
-	pols["load"] =MakeLoadPolicy()
+	pols["load"] = MakeLoadPolicy()
+	pols["loadlow"] = MakeLoadPolicy()
 
 	//      pols["lysate"] = MakeLysatePolicy()
 
@@ -182,7 +183,7 @@ func MakeProteinPolicy() LHPolicy {
 }
 func MakeLoadPolicy() LHPolicy {
 
-	loadpolicy := make(LHPolicy, )
+	loadpolicy := make(LHPolicy)
 	loadpolicy["ASPSPEED"] = 1.0
 	loadpolicy["DSPSPEED"] = 0.1
 	loadpolicy["CAN_MULTI"] = false
@@ -194,6 +195,23 @@ func MakeLoadPolicy() LHPolicy {
 	loadpolicy["TOUCHOFF"] = false
 	return loadpolicy
 }
+
+func MakeLoadlowPolicy() LHPolicy {
+
+	loadpolicy := make(LHPolicy)
+	loadpolicy["ASPSPEED"] = 1.0
+	loadpolicy["DSPSPEED"] = 1.0
+	loadpolicy["CAN_MULTI"] = false
+	loadpolicy["CAN_MSA"] = false
+	loadpolicy["CAN_SDD"] = false
+	loadpolicy["TOUCHOFF"] = false
+	loadpolicy["TIP_REUSE_LIMIT"] = 0
+	loadpolicy["DSPZOFFSET"] = 0.5
+	loadpolicy["NO_AIR_DISPENSE"] = true
+	loadpolicy["TOUCHOFF"] = false
+	return loadpolicy
+}
+
 func MakeNeedToMixPolicy() LHPolicy {
 	dnapolicy := make(LHPolicy, 10)
 	dnapolicy["POST_MIX"] = 3

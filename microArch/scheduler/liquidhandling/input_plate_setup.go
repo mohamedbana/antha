@@ -161,9 +161,9 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 
 				if curr_plate == nil {
 					plates_in_play[platetype.Type] = factory.GetPlateByType(platetype.Type)
-					//curr_plate = plates_in_play[platetype.Type]
+					curr_plate = plates_in_play[platetype.Type]
 					// going in here!
-					curr_plate = plates_in_play["DWST12"]
+					//curr_plate = plates_in_play["DWST12"]
 					platename := fmt.Sprintf("Input_plate_%d", curplaten)
 					curr_plate.PlateName = platename
 					curplaten += 1

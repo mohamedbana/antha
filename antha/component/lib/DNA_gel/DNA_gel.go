@@ -104,14 +104,16 @@ func (e *DNA_gel) steps(p DNA_gelParamBlock, r *DNA_gelResultBlock) {
 
 	var DNAgelloadmix *wtype.LHComponent
 
+	p.Water.Type = "load"
+
 	for i := 0; i < p.Samplenumber; i++ {
 		// ready to add water to well
 		waterSample := mixer.Sample(p.Water, p.Watervol)
 
 		// for troubleshooting
-		nothingvol := p.Watervol
-		nothingvol.Mvalue = 1.0
-		nothingSampletostopitcrashing := mixer.Sample(p.Water, nothingvol)
+		//	nothingvol := Watervol
+		//	nothingvol.Mvalue = 1.0
+		//	nothingSampletostopitcrashing := mixer.Sample(Water,nothingvol)
 
 		// load gel
 
@@ -134,7 +136,7 @@ func (e *DNA_gel) steps(p DNA_gelParamBlock, r *DNA_gelResultBlock) {
 		loadedsample := _wrapper.MixInto(
 			p.DNAgel,
 			waterSample,
-			nothingSampletostopitcrashing,
+			//	nothingSampletostopitcrashing,
 			mixer.Sample(DNAgelloadmix, p.DNAgelrunvolume),
 		)
 

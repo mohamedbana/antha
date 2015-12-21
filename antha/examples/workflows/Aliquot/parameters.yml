@@ -5,9 +5,9 @@
 	  "InPlate": "plate:pcrplate_with_cooler",
       "Outplate": "plate:greiner384",
       "TipType": "tipbox:Gilson20",
-      "SolutionVolume": "100ul",
+      "SolutionVolume": "500ul",
       "VolumePerAliquot": "15ul",
-	"NumberofAliquots":3,
+	"NumberofAliquots":24,
     }
 },
 	{
@@ -22,6 +22,6 @@
     }
   }],
   "Config": {
-    "OUTPUT_COUNT": 5
+    "OUTPUT_COUNT": 26
   }
 }

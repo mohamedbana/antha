@@ -3,7 +3,7 @@
 	"DNAgelParams": {
     "Water":"component:water",
 	"Sampletotest": "component:1kb DNA Ladder",
-	"Mixingpolicy":"gelloading",
+	"Mixingpolicy":"load",
 	"Loadingdye":"component:Blue",
     "InPlate":"plate:greiner384",
 	"DNAgel": "plate:EPAGE48",
@@ -14,7 +14,7 @@
 	"Samplenumber":2,
 	"Samplenames":[
 	"Marker 1",
-	"Marker2"
+	"Marker2",
 	],
 	"Loadingdyeinsample":true
   }
@@ -23,7 +23,7 @@
 	"DNAgelParams": {
     "Water":"component:water",
 	"Sampletotest": "component:DNAsolution",
-	"Mixingpolicy":"gelloading",
+	"Mixingpolicy":"load",
 	"Loadingdye":"component:Blue",
 	"InPlate":"plate:greiner384",
     "DNAgel": "plate:EPAGE48",
@@ -31,25 +31,35 @@
     "WaterVol":"10ul",
     "Loadingdyevolume": "0ul",
 	"DNAgelrunvolume":"15ul",
-	"Samplenumber":12,
+	"Samplenumber":2,
 	"Samplenames":[
-	"1",
-	"2",
-	"3",
-	"4",
-	"5",
-	"6",
-	"7",
-	"8",
-	"9",
-	"10",
-	"11",
-	"12"
+	"load1",
+	"load2",
+	],
+	"Loadingdyeinsample":true
+  }
+},
+{
+	"DNAgelParams": {
+    "Water":"component:water",
+	"Sampletotest": "component:DNAsolution",
+	"Mixingpolicy":"loadlow",
+	"Loadingdye":"component:Blue",
+	"InPlate":"plate:greiner384",
+    "DNAgel": "plate:EPAGE48",
+    "TipType": "tipbox:Gilson20",
+    "WaterVol":"10ul",
+    "Loadingdyevolume": "0ul",
+	"DNAgelrunvolume":"15ul",
+	"Samplenumber":2,
+	"Samplenames":[
+	"loadlow1",
+	"loadlow2"
 	],
 	"Loadingdyeinsample":true
   }
 }],
   "Config": {
-    "OUTPUT_COUNT": 14
+    "OUTPUT_COUNT": 6
   }
 }

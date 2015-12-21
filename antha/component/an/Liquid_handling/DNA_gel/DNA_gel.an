@@ -104,15 +104,16 @@ Steps {
 	
 	var DNAgelloadmix *wtype.LHComponent
 
+	Water.Type = "load"
 	
 	for i:= 0;i < Samplenumber;i++{
 	// ready to add water to well
 	waterSample := mixer.Sample(Water,Watervol)
 	
 	// for troubleshooting
-	nothingvol := Watervol
-	nothingvol.Mvalue = 1.0
-	nothingSampletostopitcrashing := mixer.Sample(Water,nothingvol)
+//	nothingvol := Watervol
+//	nothingvol.Mvalue = 1.0
+//	nothingSampletostopitcrashing := mixer.Sample(Water,nothingvol)
 	
 	// load gel
 	
@@ -134,7 +135,7 @@ Steps {
 	loadedsample := MixInto(
 	DNAgel,
 	waterSample,
-	nothingSampletostopitcrashing,
+//	nothingSampletostopitcrashing,
 	mixer.Sample(DNAgelloadmix, DNAgelrunvolume),
 	)
 
