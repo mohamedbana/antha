@@ -15,6 +15,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/LookUpMolecule"
 	"github.com/antha-lang/antha/antha/component/lib/MakeBuffer"
 	"github.com/antha-lang/antha/antha/component/lib/MakeMedia"
+	"github.com/antha-lang/antha/antha/component/lib/Mastermix"
 	"github.com/antha-lang/antha/antha/component/lib/MoClo_design"
 	"github.com/antha-lang/antha/antha/component/lib/NewDNASequence"
 	"github.com/antha-lang/antha/antha/component/lib/OD"
@@ -247,6 +248,19 @@ func GetComponents() []ComponentDesc {
 
 	portMap["MakeMedia"]["Media"] = false
 	portMap["MakeMedia"]["Status"] = false
+
+	portMap["Mastermix"] = make(map[string]bool)
+	portMap["Mastermix"]["AliquotbyRow"] = true
+	portMap["Mastermix"]["Buffer"] = true
+	portMap["Mastermix"]["Inplate"] = true
+	portMap["Mastermix"]["NumberofMastermixes"] = true
+	portMap["Mastermix"]["OtherComponentVolumes"] = true
+	portMap["Mastermix"]["OtherComponents"] = true
+	portMap["Mastermix"]["OutPlate"] = true
+	portMap["Mastermix"]["TotalVolumeperMastermix"] = true
+
+	portMap["Mastermix"]["Mastermixes"] = false
+	portMap["Mastermix"]["Status"] = false
 
 	portMap["MoClo_design"] = make(map[string]bool)
 	portMap["MoClo_design"]["AssemblyStandard"] = true
@@ -657,6 +671,7 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "MakeBuffer", Constructor: MakeBuffer.NewMakeBuffer})
 	c = append(c, ComponentDesc{Name: "MakeMedia", Constructor: MakeMedia.NewMakeMedia})
 	c = append(c, ComponentDesc{Name: "MakeMedia", Constructor: MakeMedia.NewMakeMedia})
+	c = append(c, ComponentDesc{Name: "Mastermix", Constructor: Mastermix.NewMastermix})
 	c = append(c, ComponentDesc{Name: "MoClo_design", Constructor: MoClo_design.NewMoClo_design})
 	c = append(c, ComponentDesc{Name: "NewDNASequence", Constructor: NewDNASequence.NewNewDNASequence})
 	c = append(c, ComponentDesc{Name: "OD", Constructor: OD.NewOD})

@@ -104,20 +104,13 @@ Steps {
 	
 	var DNAgelloadmix *wtype.LHComponent
 
-	Water.Type = "load"
+	Water.Type = "loadwater"
 	
 	for i:= 0;i < Samplenumber;i++{
 	// ready to add water to well
 	waterSample := mixer.Sample(Water,Watervol)
 	
-	// for troubleshooting
-//	nothingvol := Watervol
-//	nothingvol.Mvalue = 1.0
-//	nothingSampletostopitcrashing := mixer.Sample(Water,nothingvol)
-	
 	// load gel
-	
-
 		if Loadingdyeinsample == false {
 		DNAgelloadmixsolution := MixInto(
 		DNAgel,
@@ -129,13 +122,17 @@ Steps {
 
 	// Ensure  sample will be dispensed appropriately:
 
+	
+	// comment this line out to repeat load of same sample in all wells using first sample name
+	DNAgelloadmix.CName = Samplenames[0]//[i] //originalname + strconv.Itoa(i)
+	
+	// replacing following line with temporary hard code whilst developing protocol:
 	DNAgelloadmix.Type = Mixingpolicy	
-	DNAgelloadmix.CName = Samplenames[i] //originalname + strconv.Itoa(i)
+	//DNAgelloadmix.Type = "loadwater"
 	
 	loadedsample := MixInto(
 	DNAgel,
 	waterSample,
-//	nothingSampletostopitcrashing,
 	mixer.Sample(DNAgelloadmix, DNAgelrunvolume),
 	)
 
