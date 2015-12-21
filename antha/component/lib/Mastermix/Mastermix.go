@@ -14,11 +14,14 @@ import (
 
 // Input parameters for this protocol (data)
 
+// if buffer is being added
 //ComponentNames []string
 
 // Data which is returned from this protocol, and data types
 
 // Physical Inputs to this protocol with types
+
+// optional if nil this is ignored
 
 // Physical outputs from this protocol with types
 
@@ -46,10 +49,9 @@ func (e *Mastermix) steps(p MastermixParamBlock, r *MastermixResultBlock) {
 	}
 
 	mastermixes := make([]*wtype.LHSolution, 0)
-	//var mastermix  *wtype.LHSolution
 
 	if p.AliquotbyRow {
-		panic("Add MixTo based method coming soon!")
+		panic("MixTo based method coming soon!")
 	} else {
 		for i := 0; i < p.NumberofMastermixes; i++ {
 
@@ -176,7 +178,7 @@ func (e *Mastermix) Map(m map[string]interface{}) interface{} {
 		json.Unmarshal([]byte(vInplate.JSONString), &temp)
 		res.Inplate = *temp.Inplate
 	} else {
-		res.Inplate = m["Inplate"].(execute.ThreadParam).Value.(*wtype.LHComponent)
+		res.Inplate = m["Inplate"].(execute.ThreadParam).Value.(*wtype.LHPlate)
 	}
 
 	vNumberofMastermixes, is := m["NumberofMastermixes"].(execute.ThreadParam).Value.(execute.JSONValue)
@@ -390,7 +392,7 @@ type MastermixParamBlock struct {
 	Error                   bool
 	AliquotbyRow            bool
 	Buffer                  *wtype.LHComponent
-	Inplate                 *wtype.LHComponent
+	Inplate                 *wtype.LHPlate
 	NumberofMastermixes     int
 	OtherComponentVolumes   []wunit.Volume
 	OtherComponents         []*wtype.LHComponent
@@ -426,7 +428,7 @@ type MastermixJSONBlock struct {
 	Error                   *bool
 	AliquotbyRow            *bool
 	Buffer                  **wtype.LHComponent
-	Inplate                 **wtype.LHComponent
+	Inplate                 **wtype.LHPlate
 	NumberofMastermixes     *int
 	OtherComponentVolumes   *[]wunit.Volume
 	OtherComponents         *[]*wtype.LHComponent
@@ -441,7 +443,7 @@ func (c *Mastermix) ComponentInfo() *execute.ComponentInfo {
 	outp := make([]execute.PortInfo, 0)
 	inp = append(inp, *execute.NewPortInfo("AliquotbyRow", "bool", "AliquotbyRow", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Buffer", "*wtype.LHComponent", "Buffer", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Inplate", "*wtype.LHComponent", "Inplate", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Inplate", "*wtype.LHPlate", "Inplate", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("NumberofMastermixes", "int", "NumberofMastermixes", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("OtherComponentVolumes", "[]wunit.Volume", "OtherComponentVolumes", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("OtherComponents", "[]*wtype.LHComponent", "OtherComponents", true, true, nil, nil))

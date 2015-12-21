@@ -16,6 +16,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/MakeBuffer"
 	"github.com/antha-lang/antha/antha/component/lib/MakeMedia"
 	"github.com/antha-lang/antha/antha/component/lib/Mastermix"
+	"github.com/antha-lang/antha/antha/component/lib/Mastermix_reactions"
 	"github.com/antha-lang/antha/antha/component/lib/MoClo_design"
 	"github.com/antha-lang/antha/antha/component/lib/NewDNASequence"
 	"github.com/antha-lang/antha/antha/component/lib/OD"
@@ -261,6 +262,21 @@ func GetComponents() []ComponentDesc {
 
 	portMap["Mastermix"]["Mastermixes"] = false
 	portMap["Mastermix"]["Status"] = false
+
+	portMap["Mastermix_reactions"] = make(map[string]bool)
+	portMap["Mastermix_reactions"]["AliquotbyRow"] = true
+	portMap["Mastermix_reactions"]["ComponentVolumesperReaction"] = true
+	portMap["Mastermix_reactions"]["Components"] = true
+	portMap["Mastermix_reactions"]["Inplate"] = true
+	portMap["Mastermix_reactions"]["NumberofMastermixes"] = true
+	portMap["Mastermix_reactions"]["OutPlate"] = true
+	portMap["Mastermix_reactions"]["Reactionspermastermix"] = true
+	portMap["Mastermix_reactions"]["TopUpBuffer"] = true
+	portMap["Mastermix_reactions"]["TotalVolumeperreaction"] = true
+	portMap["Mastermix_reactions"]["VolumetoLeaveforDNAperreaction"] = true
+
+	portMap["Mastermix_reactions"]["Mastermixes"] = false
+	portMap["Mastermix_reactions"]["Status"] = false
 
 	portMap["MoClo_design"] = make(map[string]bool)
 	portMap["MoClo_design"]["AssemblyStandard"] = true
@@ -672,6 +688,7 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "MakeMedia", Constructor: MakeMedia.NewMakeMedia})
 	c = append(c, ComponentDesc{Name: "MakeMedia", Constructor: MakeMedia.NewMakeMedia})
 	c = append(c, ComponentDesc{Name: "Mastermix", Constructor: Mastermix.NewMastermix})
+	c = append(c, ComponentDesc{Name: "Mastermix_reactions", Constructor: Mastermix_reactions.NewMastermix_reactions})
 	c = append(c, ComponentDesc{Name: "MoClo_design", Constructor: MoClo_design.NewMoClo_design})
 	c = append(c, ComponentDesc{Name: "NewDNASequence", Constructor: NewDNASequence.NewNewDNASequence})
 	c = append(c, ComponentDesc{Name: "OD", Constructor: OD.NewOD})
