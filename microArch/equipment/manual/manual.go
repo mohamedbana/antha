@@ -388,7 +388,8 @@ func (e *AnthaManualGrpc) configRequest(actionDescription equipment.ActionDescri
 	// oh dear, this code is wronger than I had realised
 	// MIS fix here - only allow a single plate in here
 	if len(req.Input_platetypes) == 0 {
-		pwc := factory.GetPlateByType("pcrplate_with_cooler")
+		//pwc := factory.GetPlateByType("pcrplate_with_cooler")
+		pwc := factory.GetPlateByType("pcrplate_skirted")
 		req.Input_platetypes = append(req.Input_platetypes, pwc)
 	}
 

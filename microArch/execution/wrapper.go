@@ -92,9 +92,13 @@ func (w *Wrapper) MixTo(outplate *wtype.LHPlate, address string, components ...*
 		config["OUTPUT_COUNT"] = w.outputCount
 		config["BLOCKID"] = w.blockID.String()
 		// these should come from the paramblock... for now though
-		config["INPUT_PLATETYPE"] = "pcrplate_with_cooler"
-		config["OUTPUT_PLATETYPE"] = "pcrplate_with_cooler"
+		/*
+			config["INPUT_PLATETYPE"] = "pcrplate_with_cooler"
+			config["OUTPUT_PLATETYPE"] = "pcrplate_with_cooler"
+		*/
 
+		config["INPUT_PLATETYPE"] = "pcrplate_skirted"
+		config["OUTPUT_PLATETYPE"] = "pcrplate_skirted"
 		configString, err := json.Marshal(config)
 		if err != nil {
 			panic(fmt.Sprintf("error configuring liquid handling request: %s", err))
