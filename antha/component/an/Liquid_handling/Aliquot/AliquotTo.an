@@ -1,3 +1,5 @@
+// variant of aliquot.an whereby the low level MixTo command is used to pipette by row  
+
 protocol AliquotTo
 
 import (
@@ -57,16 +59,19 @@ Steps {
 	
 	
 	// work out well coordinates for any plate
-	wellpositionarray := make([]string,0)
+	wellpositionarray := make([]string, 0)
+
 	
 	alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	
-	
-		for j:=0;j<OutPlate.WlsX;j++{
-			for i := 0; i< OutPlate.WlsY;i++ {//countingfrom1iswhatmakesushuman := j + 1
-		wellposition := string(alphabet[j]) + strconv.Itoa(i+1)
-		wellpositionarray = append(wellpositionarray,wellposition)
+	//k := 0
+	for j := 0; j < OutPlate.WlsY; j++ {
+		for i := 0; i < OutPlate.WlsX; i++ { //countingfrom1iswhatmakesushuman := j + 1
+			//k = k + 1
+			wellposition := string(alphabet[j]) + strconv.Itoa(i+1)
+			//fmt.Println(wellposition, k)
+			wellpositionarray = append(wellpositionarray, wellposition)
 		}
+
 	}
 	
 	for k := 0; k < NumberofAliquots; k++ {

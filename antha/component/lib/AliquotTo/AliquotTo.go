@@ -1,3 +1,5 @@
+// variant of aliquot.an whereby the low level MixTo command is used to pipette by row
+
 package AliquotTo
 
 import (
@@ -53,12 +55,15 @@ func (e *AliquotTo) steps(p AliquotToParamBlock, r *AliquotToResultBlock) {
 	wellpositionarray := make([]string, 0)
 
 	alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-	for j := 0; j < p.OutPlate.WlsX; j++ {
-		for i := 0; i < p.OutPlate.WlsY; i++ { //countingfrom1iswhatmakesushuman := j + 1
+	//k := 0
+	for j := 0; j < p.OutPlate.WlsY; j++ {
+		for i := 0; i < p.OutPlate.WlsX; i++ { //countingfrom1iswhatmakesushuman := j + 1
+			//k = k + 1
 			wellposition := string(alphabet[j]) + strconv.Itoa(i+1)
+			//fmt.Println(wellposition, k)
 			wellpositionarray = append(wellpositionarray, wellposition)
 		}
+
 	}
 
 	for k := 0; k < p.NumberofAliquots; k++ {
