@@ -1,9 +1,12 @@
-protocol Aliquot
+// variant of aliquot.an whereby the low level MixTo command is used to pipette by row  
+
+protocol AliquotTo
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
+	"strconv"
 )
 
 
@@ -55,12 +58,28 @@ Steps {
 	aliquots := make([]*wtype.LHSolution,0)
 	
 	
-	for i := 0; i < NumberofAliquots; i++ {
+	// work out well coordinates for any plate
+	wellpositionarray := make([]string, 0)
+
+	
+	alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	//k := 0
+	for j := 0; j < OutPlate.WlsY; j++ {
+		for i := 0; i < OutPlate.WlsX; i++ { //countingfrom1iswhatmakesushuman := j + 1
+			//k = k + 1
+			wellposition := string(alphabet[j]) + strconv.Itoa(i+1)
+			//fmt.Println(wellposition, k)
+			wellpositionarray = append(wellpositionarray, wellposition)
+		}
+
+	}
+	
+	for k := 0; k < NumberofAliquots; k++ {
 		if Solution.Type == "dna"{
 		Solution.Type = "DoNotMix"
 		}
 		aliquotSample := mixer.Sample(Solution, VolumePerAliquot)
-		aliquot := MixInto(OutPlate, aliquotSample)
+		aliquot := MixTo(OutPlate,wellpositionarray[k], aliquotSample)
 		aliquots = append(aliquots,aliquot)
 	}
 	Aliquots = aliquots
@@ -70,9 +89,10 @@ Steps {
 Analysis {
 }
 
-// A block of tests to perform to validate that the sample was processed 
-//correctly. Optionally, destructive tests can be performed to validate 
-//results on a dipstick basis
+// A block of tests to perform to validate that the sample was processed correctly
+// Optionally, destructive tests can be performed to validate results on a
+// dipstick basis
 Validation {
 	
 }
+
