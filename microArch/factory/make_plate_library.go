@@ -84,8 +84,8 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	// Block Kombi 2ml
 	eppy := wtype.NewShape("cylinder", "mm", 8.2, 8.2, 45)
 
-	wellxoffset := 18.0 // centre of well to centre of neightbouring well in x direction
-	wellyoffset := 18.0 //centre of well to centre of neightbouring well in y direction
+	wellxoffset := 18.0 // centre of well to centre of neighbouring well in x direction
+	wellyoffset := 18.0 //centre of well to centre of neighbouring well in y direction
 	xstart := 5.0       // distance from top left side of plate to first well
 	ystart := 5.0       // distance from top left side of plate to first well
 	zstart := 6.0       // offset of bottom of deck to bottom of well

@@ -21,7 +21,6 @@
 // 2 Royal College St, London NW1 0NH UK
 
 // Package containing formulae for the estimation of evaporation times based upon thermodynamics and empirical equations
-
 package eng
 
 import (
