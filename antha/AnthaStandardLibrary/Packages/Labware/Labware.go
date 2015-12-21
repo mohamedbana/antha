@@ -26,7 +26,7 @@ package labware
 var (
 	//radius = 0.005 // radius of surface in m
 
-	// map of liquid classes
+	// map of some labware properties
 
 	Labwaregeometry = map[string]map[string]float64{
 		"96DSW_axygen": map[string]float64{

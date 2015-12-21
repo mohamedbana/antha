@@ -190,7 +190,8 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 
 	A = wtype.NewLHComponent()
 	A.GenericMatter = matter["water"]
-	A.CName = "SapI_Mastermix: 1/5 SapI; 1/5 T4 Ligase; 2/5 Cutsmart; 1/5 1mM ATP"
+	//A.CName = "SapI_Mastermix: 1/5 SapI; 1/5 T4 Ligase; 2/5 Cutsmart; 1/5 1mM ATP"
+	A.CName = "mastermix_sapI"
 	A.Type = "water"
 	A.Smax = 1.0
 	cmap[A.CName] = A
@@ -201,6 +202,16 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	A.Type = "dna"
 	A.Smax = 1.0
 	cmap[A.CName] = A
+
+	//
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "standard_cloning_vector_mark_1"
+	A.Type = "dna"
+	A.Smax = 1.0
+	cmap[A.CName] = A
+
 	// solutions needed for PCR example:
 
 	A = wtype.NewLHComponent()

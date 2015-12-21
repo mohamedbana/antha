@@ -36,6 +36,12 @@ import (
 	"github.com/antha-lang/antha/microArch/logger"
 )
 
+const (
+	COLWISE = iota
+	ROWWISE
+	RANDOM
+)
+
 func AdvancedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHProperties) *LHRequest {
 	// in the first instance we assume this is done component-wise
 	// we also need to identify dependencies, i.e. if certain components
@@ -49,6 +55,11 @@ func AdvancedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 
 	minorlayoutgroups := request.Output_minor_group_layouts
 	ass := request.Output_assignments
+
+	// sort them, we might want to record the acutal order somewhere... also to allow user configuration of this
+
+	minorlayoutgroups = sortOutputOrder(minorlayoutgroups, ass, COLWISE)
+
 	inass := request.Input_assignments
 	output_solutions := request.Output_solutions
 	input_plates := copyplates(request.Input_plates)
@@ -56,15 +67,6 @@ func AdvancedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 	output_plates := copyplates(request.Output_plates)
 	plate_lookup := request.Plate_lookup
 
-	// highly inelegant... we should swap Tip Box Setup
-	// around to take place after, then this whole thing
-	// is a non-issue
-	// more to the point this won't work in general and needs a big fix
-	// we need to allow for more than one type of tip to be available
-	//	tt := make([]*wtype.LHTip, 1)
-	//	tt[0] = request.Tip_Type.Tiptype
-	//	parameters.Tips = tt
-	//TODO this has been removed because it is already handled on the equipmentManager microArch repo code.
 	instructions := liquidhandling.NewRobotInstructionSet(nil)
 	order := request.Input_order
 
@@ -151,7 +153,6 @@ func AdvancedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 			// 	{GUID}:A:1:0:1
 
 			asstx := strings.Split(assignment, ":")
-
 			plate := asstx[0]
 			toplatenum := wutil.ParseInt(plate)
 			row := wutil.AlphaToNum(asstx[1])
@@ -342,4 +343,12 @@ func copyplates(plts map[string]*wtype.LHPlate) map[string]*wtype.LHPlate {
 	}
 
 	return ret
+}
+
+func sortOutputOrder(minorlayoutgroups [][]string, ass []string, sorttype int) [][]string {
+	for k, mlga := range minorlayoutgroups {
+		minorlayoutgroups[k] = mlga
+	}
+
+	return minorlayoutgroups
 }

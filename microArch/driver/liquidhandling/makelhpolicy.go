@@ -260,7 +260,14 @@ func MakeDefaultPolicy() LHPolicy {
 func MakeJBPolicy() LHPolicy {
 	jbp := make(LHPolicy, 1)
 	jbp["JUSTBLOWOUT"] = true
+	//jbp["TOUCHOFF"] = true
 	return jbp
+}
+
+func MakeTOPolicy() LHPolicy {
+	top := make(LHPolicy, 1)
+	top["TOUCHOFF"] = true
+	return top
 }
 
 func MakeLVExtraPolicy() LHPolicy {

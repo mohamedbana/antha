@@ -311,74 +311,6 @@ type SubstanceQuantity interface {
 	Quantity() Measurement
 }
 
-/*
-type Protein interface {
-	Molecule
-	AASequence() string
-}
-
-type Enzyme struct {
-	Class    string
-	Synonyms []string
-}
-*/
-/*
-type Molecule interface {
-	MolecularWeight() wtype.Mass
-}
-
-func (p *DNASequence) MolecularWeight() wtype.Mass {
-
-}
-
-func (d *ProteinSequence) MolecularWeight() wtype.Mass {
-
-}
-/*
-func (e *Enzyme) AASequence() string {
-
-}
-*/
-/*
-// Sid's stuff
-
-type Conc interface {
-	AsMolar(mass Mass) MolarConcentration
-	AsMass(mass Mass) MassConcentration
-}
-
-type MolarConcentration struct {
-	Moles Amount
-	Vol   Volume
-}
-
-func (m MolarConcentration) AsMolar(actualmass Mass) MolarConcentration {
-	return m
-}
-
-// "M" and "g" need to be prefixed units to work!
-func (m MolarConcentration) AsMass(mass Mass) MassConcentration {
-	return MassConcentration{NewMass(m.Moles.ConvertTo(ParsePrefixedUnit("M"))*mass.ConvertTo(ParsePrefixedUnit("g")), "g"), m.Vol}
-}
-
-type MassConcentration struct {
-	Mass Mass
-	Vol  Volume
-}
-
-func (m MassConcentration) AsMolar(mass Mass) MolarConcentration {
-	return MolarConcentration{NewAmount(m.Mass.SIValue()/mass.SIValue(), "M"), m.Vol}
-}
-
-func (m MassConcentration) AsMass(mass Mass) MassConcentration {
-	return m
-}
-*/
-/*
-func (conc *Concentration)AddMolecularweight(molecularweight float64){
-	conc.MolecularWeight = molecularweight
-}
-*/
 func (conc *Concentration) GramPerL(molecularweight float64) (conc_g Concentration) {
 	if conc.Munit.BaseSISymbol() == "g/l" {
 		conc_g = *conc
@@ -399,36 +331,6 @@ func (conc *Concentration) MolPerL(molecularweight float64) (conc_M Concentratio
 	return conc_M
 }
 
-/*
-type Conc interface {
-	AsMolar(gperl Concentration) MoleculeConcentration
-	AsMass(Mperl float64) MoleculeConcentration
-}
-
-type MoleculeConcentration struct {
-	Conc_gperl      Concentration
-	Molecularweight float64 // Really a g/mol
-	//Vol   Volume
-}
-
-const Avogadro = 6.0221417930 * 1E23 // number of molecules in a mol
-
-func (m MoleculeConcentration) AsMolar(gperl Concentration) MoleculeConcentration {
-	return m
-}
-
-func (m MoleculeConcentration) AsMass(mperl Concentration) MoleculeConcentration {
-	return MoleculeConcentration{NewMass(m.Moles.ConvertTo("M")*mass.ConvertTo("g"), "g"), m.Vol}
-}
-
-func (m MassConcentration) AsMolar(mass Mass) MolarConcentration {
-	return MolarConcentration{NewAmount(m.Mass.SIValue()/mass.SIValue(), "M"), m.Vol}
-}
-
-func (m MassConcentration) AsMass(mass Mass) MassConcentration {
-	return m
-}
-*/
 // a structure which defines a specific heat capacity
 type SpecificHeatCapacity struct {
 	ConcreteMeasurement

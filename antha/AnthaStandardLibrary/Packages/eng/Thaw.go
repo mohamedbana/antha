@@ -21,7 +21,6 @@
 // 2 Royal College St, London NW1 0NH UK
 
 // Formulae for the estimation of thaw times based upon thermodynamics and empirical equations
-
 package eng
 
 import (

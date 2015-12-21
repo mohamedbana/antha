@@ -20,6 +20,7 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
+// Package for interacting with and manipulating dna sequences in extension to methods available in wtype
 package sequences
 
 import ()
@@ -96,4 +97,3 @@ func Suffix(seq string, lengthofsuffix int) (suffix string) {
 	suffix = seq[(len(seq) - lengthofsuffix):]
 	return suffix
 }
-

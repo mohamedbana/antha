@@ -1,0 +1,16 @@
+{
+  "Parameters": [{
+    "AliquotParams": {
+      "Solution": "component:PrimerFw",
+	  "InPlate": "plate:pcrplate_with_cooler",
+      "Outplate": "plate:pcrplate_with_cooler",
+      "TipType": "tipbox:Gilson20",
+      "SolutionVolume": "4000ul",
+      "VolumePerAliquot": "10ul",
+	"NumberofAliquots":50,
+    }
+  }],
+  "Config": {
+    "OUTPUT_COUNT": 50
+  }
+}

@@ -21,7 +21,6 @@
 // 2 Royal College St, London NW1 0NH UK
 
 //Package containing functions for manipulating absorbance readings
-
 package platereader
 
 import (

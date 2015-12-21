@@ -2,6 +2,7 @@ package lib
 
 import (
 	"github.com/antha-lang/antha/antha/component/lib/Aliquot"
+	"github.com/antha-lang/antha/antha/component/lib/AliquotTo"
 	"github.com/antha-lang/antha/antha/component/lib/Assaysetup"
 	"github.com/antha-lang/antha/antha/component/lib/BlastSearch"
 	"github.com/antha-lang/antha/antha/component/lib/DNA_gel"
@@ -55,6 +56,16 @@ func GetComponents() []ComponentDesc {
 	portMap["Aliquot"]["VolumePerAliquot"] = true
 
 	portMap["Aliquot"]["Aliquots"] = false
+
+	portMap["AliquotTo"] = make(map[string]bool)
+	portMap["AliquotTo"]["InPlate"] = true
+	portMap["AliquotTo"]["NumberofAliquots"] = true
+	portMap["AliquotTo"]["OutPlate"] = true
+	portMap["AliquotTo"]["Solution"] = true
+	portMap["AliquotTo"]["SolutionVolume"] = true
+	portMap["AliquotTo"]["VolumePerAliquot"] = true
+
+	portMap["AliquotTo"]["Aliquots"] = false
 
 	portMap["Assaysetup"] = make(map[string]bool)
 	portMap["Assaysetup"]["Buffer"] = true
@@ -550,12 +561,13 @@ func GetComponents() []ComponentDesc {
 	portMap["TypeIISConstructAssembly"]["Reaction"] = false
 
 	portMap["TypeIISConstructAssemblyMMX"] = make(map[string]bool)
-	portMap["TypeIISConstructAssemblyMMX"]["InPlate"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["InactivationTemp"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["InactivationTime"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["MMXVol"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["MasterMix"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["OutPlate"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["OutputLocation"] = true
+	portMap["TypeIISConstructAssemblyMMX"]["OutputPlateNum"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["OutputReactionName"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["PartNames"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["PartVols"] = true
@@ -563,8 +575,6 @@ func GetComponents() []ComponentDesc {
 	portMap["TypeIISConstructAssemblyMMX"]["ReactionTemp"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["ReactionTime"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["ReactionVolume"] = true
-	portMap["TypeIISConstructAssemblyMMX"]["Vector"] = true
-	portMap["TypeIISConstructAssemblyMMX"]["VectorVol"] = true
 	portMap["TypeIISConstructAssemblyMMX"]["Water"] = true
 
 	portMap["TypeIISConstructAssemblyMMX"]["Reaction"] = false
@@ -633,6 +643,7 @@ func GetComponents() []ComponentDesc {
 
 	c := make([]ComponentDesc, 0)
 	c = append(c, ComponentDesc{Name: "Aliquot", Constructor: Aliquot.NewAliquot})
+	c = append(c, ComponentDesc{Name: "AliquotTo", Constructor: AliquotTo.NewAliquotTo})
 	c = append(c, ComponentDesc{Name: "Assaysetup", Constructor: Assaysetup.NewAssaysetup})
 	c = append(c, ComponentDesc{Name: "BlastSearch", Constructor: BlastSearch.NewBlastSearch})
 	c = append(c, ComponentDesc{Name: "DNA_gel", Constructor: DNA_gel.NewDNA_gel})
