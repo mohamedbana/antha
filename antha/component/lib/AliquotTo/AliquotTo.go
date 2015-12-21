@@ -66,7 +66,7 @@ func (e *AliquotTo) steps(p AliquotToParamBlock, r *AliquotToResultBlock) {
 			p.Solution.Type = "DoNotMix"
 		}
 		aliquotSample := mixer.Sample(p.Solution, p.VolumePerAliquot)
-		aliquot := MixTo(p.OutPlate, wellpositionarray[k], aliquotSample)
+		aliquot := _wrapper.MixTo(p.OutPlate, wellpositionarray[k], aliquotSample)
 		aliquots = append(aliquots, aliquot)
 	}
 	r.Aliquots = aliquots
