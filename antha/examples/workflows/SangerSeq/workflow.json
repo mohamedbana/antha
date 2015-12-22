@@ -1,0 +1,14 @@
+{
+    "properties": {
+        "name": "main"
+    },
+    "processes": {
+        "EnterNameForYourParameters": {
+            "component": "SangerSeq",
+            "metadata": {
+                "label": "CS"
+            }
+        }
+    },
+    "connections": [ ]
+}
