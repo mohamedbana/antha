@@ -96,6 +96,7 @@ func (p *compiler) anthaInit() {
 		"Plate":                "wtype.LHPlate",
 		"Tipbox":               "wtype.LHTipbox",
 		"Tip":                  "wtype.LHTip",
+		"Well":                 "wtype.LHWell",
 	}
 }
 
