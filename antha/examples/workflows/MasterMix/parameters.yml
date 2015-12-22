@@ -18,11 +18,11 @@
 	"10ul",
 	"10ul"
 	],
-	"NumberofMastermixes":1,
+	"NumberofMastermixes":3,
 	"AliquotbyRow":false
     }
   }],
   "Config": {
-    "OUTPUT_COUNT": 1
+    "OUTPUT_COUNT": 3
   }
 }

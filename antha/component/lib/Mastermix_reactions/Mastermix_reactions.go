@@ -45,7 +45,7 @@ func (e *Mastermix_reactions) steps(p Mastermix_reactionsParamBlock, r *Mastermi
 	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
-	// work out volume to top up to in each case (per reaction):
+	// work out volume to top up to in each case (per reaction) in l:
 	topupVolumeperreacttion := p.TotalVolumeperreaction.SIValue() - p.VolumetoLeaveforDNAperreaction.SIValue()
 
 	// multiply by number of reactions per mastermix
