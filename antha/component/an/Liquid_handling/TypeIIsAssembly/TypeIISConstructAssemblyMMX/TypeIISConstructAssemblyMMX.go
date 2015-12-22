@@ -9,7 +9,6 @@ import (
 	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/flow"
 	"sync"
-	"runtime/debug"
 	"encoding/json"
 )
 
@@ -55,7 +54,7 @@ func (e *TypeIISConstructAssemblyMMX) steps(p TypeIISConstructAssemblyMMXParamBl
 		samples = append(samples, partSample)
 	}
 
-	r.Reaction = _wrapper.MixTo(p.OutPlate, p.OutputLocation, samples...)
+	r.Reaction = MixTo(p.OutPlate, p.OutputLocation, samples...)
 
 	// incubate the reaction mixture
 	_wrapper.Incubate(r.Reaction, p.ReactionTemp, p.ReactionTime, false)
@@ -98,7 +97,7 @@ func (e *TypeIISConstructAssemblyMMX) Complete(params interface{}) {
 	defer func() {
 		if res := recover(); res != nil {
 		e.Reaction <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-		execute.AddError(&execute.RuntimeError{BaseError: res, Stack: debug.Stack()})
+		execute.AddError(res)
 			return
 		}
 	}()

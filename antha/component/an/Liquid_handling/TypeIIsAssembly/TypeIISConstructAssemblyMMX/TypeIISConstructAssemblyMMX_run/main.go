@@ -1,107 +1,207 @@
 package main
 
-import (
-	"encoding/json"
-	"flag"
-	"fmt"
-	"log"
-	"os"
+import "github.com/antha-lang/antha/antha/execute"
+import "github.com/antha-lang/antha/flow"
+import "os"
+import "io"
+import "encoding/json"
+import "log"
+import typeIISConstructAssemblyMMX "github.com/antha-lang/antha/antha/component/an/Liquid_handling/TypeIIsAssembly/TypeIISConstructAssemblyMMX"
 
-	"github.com/antha-lang/antha/antha/execute"
-	"github.com/antha-lang/antha/flow"
-
-	"github.com/antha-lang/antha/antha/component/an/Liquid_handling/TypeIIsAssembly/TypeIISConstructAssemblyMMX"
+var (
+	exitCode = 0
 )
 
-func main() {
-	flag.Parse()
-	if flag.NArg() == 0 {
-		fmt.Println("Graph definition file missing")
-		return
-	}
 
-	portMap := make(map[string]map[string]bool) //representing component, port name, and true if in
-	portMap["TypeIISConstructAssemblyMMX"] = make(map[string]bool)
-	portMap["TypeIISConstructAssemblyMMX"]["TypeIISConstructAssemblyMMX"] = true
-	portMap["TypeIISConstructAssemblyMMX"]["TypeIISConstructAssemblyMMX"] = true
-	portMap["TypeIISConstructAssemblyMMX"]["TypeIISConstructAssemblyMMX"] = true
-	portMap["TypeIISConstructAssemblyMMX"]["TypeIISConstructAssemblyMMX"] = true
-	portMap["TypeIISConstructAssemblyMMX"]["TypeIISConstructAssemblyMMX"] = true
-	portMap["TypeIISConstructAssemblyMMX"]["TypeIISConstructAssemblyMMX"] = true
-	portMap["TypeIISConstructAssemblyMMX"]["TypeIISConstructAssemblyMMX"] = true
-	portMap["TypeIISConstructAssemblyMMX"]["TypeIISConstructAssemblyMMX"] = true
-	portMap["TypeIISConstructAssemblyMMX"]["TypeIISConstructAssemblyMMX"] = true
-	portMap["TypeIISConstructAssemblyMMX"]["TypeIISConstructAssemblyMMX"] = true
-	portMap["TypeIISConstructAssemblyMMX"]["TypeIISConstructAssemblyMMX"] = true
-	portMap["TypeIISConstructAssemblyMMX"]["TypeIISConstructAssemblyMMX"] = true
-	portMap["TypeIISConstructAssemblyMMX"]["TypeIISConstructAssemblyMMX"] = true
-	portMap["TypeIISConstructAssemblyMMX"]["TypeIISConstructAssemblyMMX"] = true
-	portMap["TypeIISConstructAssemblyMMX"]["TypeIISConstructAssemblyMMX"] = true
+type App struct {
+    flow.Graph
+}
 
-	portMap["TypeIISConstructAssemblyMMX"]["TypeIISConstructAssemblyMMX"] = false
+func NewApp() *App {
+    n := new(App)
+    n.InitGraphState()
 
-	flow.Register("TypeIISConstructAssemblyMMX", TypeIISConstructAssemblyMMX.NewTypeIISConstructAssemblyMMX)
+    n.Add(typeIISConstructAssemblyMMX.NewTypeIISConstructAssemblyMMX(), "TypeIISConstructAssemblyMMX")
+
+	n.MapInPort("InactivationTemp", "TypeIISConstructAssemblyMMX", "InactivationTemp")
+	n.MapInPort("InactivationTime", "TypeIISConstructAssemblyMMX", "InactivationTime")
+	n.MapInPort("MMXVol", "TypeIISConstructAssemblyMMX", "MMXVol")
+	n.MapInPort("MasterMix", "TypeIISConstructAssemblyMMX", "MasterMix")
+	n.MapInPort("OutPlate", "TypeIISConstructAssemblyMMX", "OutPlate")
+	n.MapInPort("OutputLocation", "TypeIISConstructAssemblyMMX", "OutputLocation")
+	n.MapInPort("OutputPlateNum", "TypeIISConstructAssemblyMMX", "OutputPlateNum")
+	n.MapInPort("OutputReactionName", "TypeIISConstructAssemblyMMX", "OutputReactionName")
+	n.MapInPort("PartNames", "TypeIISConstructAssemblyMMX", "PartNames")
+	n.MapInPort("PartVols", "TypeIISConstructAssemblyMMX", "PartVols")
+	n.MapInPort("Parts", "TypeIISConstructAssemblyMMX", "Parts")
+	n.MapInPort("ReactionTemp", "TypeIISConstructAssemblyMMX", "ReactionTemp")
+	n.MapInPort("ReactionTime", "TypeIISConstructAssemblyMMX", "ReactionTime")
+	n.MapInPort("ReactionVolume", "TypeIISConstructAssemblyMMX", "ReactionVolume")
+	n.MapInPort("Water", "TypeIISConstructAssemblyMMX", "Water")
+
+	n.MapOutPort("Reaction", "TypeIISConstructAssemblyMMX", "Reaction")
+
+
+   return n
+}
+
+func referenceMain() {
+    net := NewApp()
+
+	InactivationTempChan := make(chan execute.ThreadParam)
+    net.SetInPort("InactivationTemp", InactivationTempChan)
+	InactivationTimeChan := make(chan execute.ThreadParam)
+    net.SetInPort("InactivationTime", InactivationTimeChan)
+	MMXVolChan := make(chan execute.ThreadParam)
+    net.SetInPort("MMXVol", MMXVolChan)
+	MasterMixChan := make(chan execute.ThreadParam)
+    net.SetInPort("MasterMix", MasterMixChan)
+	OutPlateChan := make(chan execute.ThreadParam)
+    net.SetInPort("OutPlate", OutPlateChan)
+	OutputLocationChan := make(chan execute.ThreadParam)
+    net.SetInPort("OutputLocation", OutputLocationChan)
+	OutputPlateNumChan := make(chan execute.ThreadParam)
+    net.SetInPort("OutputPlateNum", OutputPlateNumChan)
+	OutputReactionNameChan := make(chan execute.ThreadParam)
+    net.SetInPort("OutputReactionName", OutputReactionNameChan)
+	PartNamesChan := make(chan execute.ThreadParam)
+    net.SetInPort("PartNames", PartNamesChan)
+	PartVolsChan := make(chan execute.ThreadParam)
+    net.SetInPort("PartVols", PartVolsChan)
+	PartsChan := make(chan execute.ThreadParam)
+    net.SetInPort("Parts", PartsChan)
+	ReactionTempChan := make(chan execute.ThreadParam)
+    net.SetInPort("ReactionTemp", ReactionTempChan)
+	ReactionTimeChan := make(chan execute.ThreadParam)
+    net.SetInPort("ReactionTime", ReactionTimeChan)
+	ReactionVolumeChan := make(chan execute.ThreadParam)
+    net.SetInPort("ReactionVolume", ReactionVolumeChan)
+	WaterChan := make(chan execute.ThreadParam)
+    net.SetInPort("Water", WaterChan)
+
+
+	ReactionChan := make(chan execute.ThreadParam)
+    net.SetOutPort("Reaction", ReactionChan)
+
+
+    flow.RunNet(net)
 
 	dec := json.NewDecoder(os.Stdin)
 	enc := json.NewEncoder(os.Stdout)
 	log.SetOutput(os.Stderr)
 
-	graph := flow.LoadJSON(flag.Arg(0))
-	if graph == nil {
-		fmt.Println("empty graph")
-		return
-	}
-	flow.RunNet(graph)
-
-	//<-graph.Ready()
-
-	for _, port := range graph.GetUnboundOutPorts() {
-		ch := make(chan execute.ThreadParam)
-		graph.SetOutPort(port.Port, ch)
-		go func() {
-			for a := range ch {
-				if err := enc.Encode(&a); err != nil {
-					log.Println(err)
-				}
-			}
-		}()
-	}
-
-	inPortMap := make(map[string]chan execute.ThreadParam)
-	for _, port := range graph.GetUnboundInPorts() {
-		ch := make(chan execute.ThreadParam)
-		inPortMap[port.Port] = ch
-		graph.SetInPort(port.Port, ch)
-	}
 	go func() {
-		for _, ch := range inPortMap {
-			defer close(ch)
-		}
+		defer close(InactivationTempChan)
+		defer close(InactivationTimeChan)
+		defer close(MMXVolChan)
+		defer close(MasterMixChan)
+		defer close(OutPlateChan)
+		defer close(OutputLocationChan)
+		defer close(OutputPlateNumChan)
+		defer close(OutputReactionNameChan)
+		defer close(PartNamesChan)
+		defer close(PartVolsChan)
+		defer close(PartsChan)
+		defer close(ReactionTempChan)
+		defer close(ReactionTimeChan)
+		defer close(ReactionVolumeChan)
+		defer close(WaterChan)
+
 
 		for {
-			var p execute.JSONBlock
+			var p typeIISConstructAssemblyMMX.TypeIISConstructAssemblyMMXJSONBlock
 			if err := dec.Decode(&p); err != nil {
-				log.Println("Error decoding", err)
+				if err != io.EOF {
+					log.Println("Error decoding", err)
+				}
 				return
 			}
-			if p.ID == nil { //TODO add error control in JSONBlock unmarshaling??
+			//log.Print(p)
+			if p.ID == nil {
 				log.Println("Error, no ID")
 				continue
 			}
-			for k, v := range p.Values {
-				tmp := make(map[string]interface{})
-				tmp[k] = v
-				sthg, err := json.Marshal(&tmp)
-				if err != nil {
-					continue
-				}
-				if _, exists := inPortMap[k]; exists {
-					param := execute.ThreadParam{Value: execute.JSONValue{Name: k, JSONString: string(sthg)}, ID: *p.ID, Error: *p.Error}
-					inPortMap[k] <- param
-				}
+			if p.Error == nil {
+				log.Println("Error, no error")
+				continue
+			}
+			if p.InactivationTemp != nil {
+				param := execute.ThreadParam{Value: *(p.InactivationTemp), ID: *(p.ID), Error: *(p.Error)}
+				InactivationTempChan <- param
+			}
+			if p.InactivationTime != nil {
+				param := execute.ThreadParam{Value: *(p.InactivationTime), ID: *(p.ID), Error: *(p.Error)}
+				InactivationTimeChan <- param
+			}
+			if p.MMXVol != nil {
+				param := execute.ThreadParam{Value: *(p.MMXVol), ID: *(p.ID), Error: *(p.Error)}
+				MMXVolChan <- param
+			}
+			if p.MasterMix != nil {
+				param := execute.ThreadParam{Value: *(p.MasterMix), ID: *(p.ID), Error: *(p.Error)}
+				MasterMixChan <- param
+			}
+			if p.OutPlate != nil {
+				param := execute.ThreadParam{Value: *(p.OutPlate), ID: *(p.ID), Error: *(p.Error)}
+				OutPlateChan <- param
+			}
+			if p.OutputLocation != nil {
+				param := execute.ThreadParam{Value: *(p.OutputLocation), ID: *(p.ID), Error: *(p.Error)}
+				OutputLocationChan <- param
+			}
+			if p.OutputPlateNum != nil {
+				param := execute.ThreadParam{Value: *(p.OutputPlateNum), ID: *(p.ID), Error: *(p.Error)}
+				OutputPlateNumChan <- param
+			}
+			if p.OutputReactionName != nil {
+				param := execute.ThreadParam{Value: *(p.OutputReactionName), ID: *(p.ID), Error: *(p.Error)}
+				OutputReactionNameChan <- param
+			}
+			if p.PartNames != nil {
+				param := execute.ThreadParam{Value: *(p.PartNames), ID: *(p.ID), Error: *(p.Error)}
+				PartNamesChan <- param
+			}
+			if p.PartVols != nil {
+				param := execute.ThreadParam{Value: *(p.PartVols), ID: *(p.ID), Error: *(p.Error)}
+				PartVolsChan <- param
+			}
+			if p.Parts != nil {
+				param := execute.ThreadParam{Value: *(p.Parts), ID: *(p.ID), Error: *(p.Error)}
+				PartsChan <- param
+			}
+			if p.ReactionTemp != nil {
+				param := execute.ThreadParam{Value: *(p.ReactionTemp), ID: *(p.ID), Error: *(p.Error)}
+				ReactionTempChan <- param
+			}
+			if p.ReactionTime != nil {
+				param := execute.ThreadParam{Value: *(p.ReactionTime), ID: *(p.ID), Error: *(p.Error)}
+				ReactionTimeChan <- param
+			}
+			if p.ReactionVolume != nil {
+				param := execute.ThreadParam{Value: *(p.ReactionVolume), ID: *(p.ID), Error: *(p.Error)}
+				ReactionVolumeChan <- param
+			}
+			if p.Water != nil {
+				param := execute.ThreadParam{Value: *(p.Water), ID: *(p.ID), Error: *(p.Error)}
+				WaterChan <- param
+			}
+
+		}
+	}()
+
+	go func() {
+		for sequence := range ReactionChan {
+			if err := enc.Encode(&sequence); err != nil {
+				log.Println(err)
 			}
 		}
 	}()
 
-	<-graph.Wait()
+
+	<-net.Wait()
+}
+
+func main() {
+	referenceMain()
+	os.Exit(exitCode)
 }

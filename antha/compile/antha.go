@@ -270,6 +270,7 @@ func (p *compiler) transform(src *ast.File) {
 		[]string{
 			"github.com/antha-lang/antha/microArch/execution",
 			"github.com/antha-lang/antha/antha/anthalib/wunit",
+			"github.com/antha-lang/antha/antha/anthalib/wtype",
 			"github.com/antha-lang/antha/antha/execute",
 			"github.com/antha-lang/antha/flow",
 			"sync",
