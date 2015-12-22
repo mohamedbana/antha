@@ -265,23 +265,6 @@ func GetComponents() []ComponentDesc {
 	portMap["MakeMedia"]["Media"] = false
 	portMap["MakeMedia"]["Status"] = false
 
-	portMap["MakeMedia"] = make(map[string]bool)
-	portMap["MakeMedia"]["LiqComponentVolumes"] = true
-	portMap["MakeMedia"]["LiqComponents"] = true
-	portMap["MakeMedia"]["Name"] = true
-	portMap["MakeMedia"]["PH_setPoint"] = true
-	portMap["MakeMedia"]["PH_setPointTemp"] = true
-	portMap["MakeMedia"]["PH_tolerance"] = true
-	portMap["MakeMedia"]["SolidComponentDensities"] = true
-	portMap["MakeMedia"]["SolidComponentMasses"] = true
-	portMap["MakeMedia"]["SolidComponents"] = true
-	portMap["MakeMedia"]["TotalVolume"] = true
-	portMap["MakeMedia"]["Vessel"] = true
-	portMap["MakeMedia"]["Water"] = true
-
-	portMap["MakeMedia"]["Media"] = false
-	portMap["MakeMedia"]["Status"] = false
-
 	portMap["Mastermix"] = make(map[string]bool)
 	portMap["Mastermix"]["AliquotbyRow"] = true
 	portMap["Mastermix"]["Buffer"] = true
@@ -760,7 +743,6 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "LoadGel", Constructor: LoadGel.NewLoadGel})
 	c = append(c, ComponentDesc{Name: "LookUpMolecule", Constructor: LookUpMolecule.NewLookUpMolecule})
 	c = append(c, ComponentDesc{Name: "MakeBuffer", Constructor: MakeBuffer.NewMakeBuffer})
-	c = append(c, ComponentDesc{Name: "MakeMedia", Constructor: MakeMedia.NewMakeMedia})
 	c = append(c, ComponentDesc{Name: "MakeMedia", Constructor: MakeMedia.NewMakeMedia})
 	c = append(c, ComponentDesc{Name: "Mastermix", Constructor: Mastermix.NewMastermix})
 	c = append(c, ComponentDesc{Name: "Mastermix_reactions", Constructor: Mastermix_reactions.NewMastermix_reactions})

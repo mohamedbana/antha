@@ -162,12 +162,12 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 
 	// 1st type
 	//can't reach all wells; change to 12 wells per row?
-	plate = wtype.NewLHPlate("EGEL96_1", "Invitrogen", 4, 13, 48.5, "mm", welltype, 9, 17.5, 4.5, -1.25, 47.5)
+	plate = wtype.NewLHPlate("EGEL96_1", "Invitrogen", 4, 13, 48.5, "mm", welltype, 9, 18.0, 0, -1.0, 47.5)
 	//plate = wtype.NewLHPlate("greiner384", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
 
 	// 2nd type
-	plate = wtype.NewLHPlate("EGEL96_2", "Invitrogen", 4, 13, 48.5, "mm", welltype, 9, 17.5, 0, 7.75, 47.5)
+	plate = wtype.NewLHPlate("EGEL96_2", "Invitrogen", 4, 13, 48.5, "mm", welltype, 9, 18.0, 4.0, 7.5, 47.5)
 	//plate = wtype.NewLHPlate("greiner384", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 
 	plates[plate.Type] = plate
