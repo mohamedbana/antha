@@ -91,6 +91,11 @@ func (p *compiler) anthaInit() {
 		"Resistance":           "wunit.Resistance",
 		"Capacitance":          "wunit.Capacitance",
 		"Voltage":              "wunit.Voltage",
+		"Component":            "wtype.LHComponent",
+		"Solution":             "wtype.LHComponent",
+		"Plate":                "wtype.LHPlate",
+		"Tipbox":               "wtype.LHTipbox",
+		"Tip":                  "wtype.LHTip",
 	}
 }
 

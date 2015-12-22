@@ -60,6 +60,35 @@ func TestTypeSugaring(t *testing.T) {
 	}
 }
 
+func TestTypeSugaring2(t *testing.T) {
+	nodeSizes := make(map[ast.Node]int)
+	cfg := &Config{}
+	compiler := &compiler{}
+	fset := token.NewFileSet()
+	compiler.init(cfg, fset, nodeSizes)
+
+	expr, err := parser.ParseExpr("func(x Component) Tip {}")
+	if err != nil {
+		t.Fatal(err)
+	}
+	desired, err := parser.ParseExpr("func(x wtype.LHComponent) wtype.LHTip {}")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	compiler.sugarForTypes(expr)
+	var buf1, buf2 bytes.Buffer
+	if err := compiler.Fprint(&buf1, fset, expr); err != nil {
+		t.Fatal(err)
+	}
+	if err := compiler.Fprint(&buf2, fset, desired); err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(buf1.Bytes(), buf2.Bytes()) {
+		t.Errorf("wanted\n'''%s'''\ngot\n'''%s'''\n", buf2.String(), buf1.String())
+	}
+}
+
 // Verify that generation of an empty component produces a valid go file
 func TestGenerateGraphRunnerOfEmptyComponent(t *testing.T) {
 	comp := execute.ComponentInfo{Name: "Test", Description: "", Icon: "", Subgraph: false, InPorts: nil, OutPorts: nil}
