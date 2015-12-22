@@ -5,6 +5,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/AliquotTo"
 	"github.com/antha-lang/antha/antha/component/lib/Assaysetup"
 	"github.com/antha-lang/antha/antha/component/lib/BlastSearch"
+	"github.com/antha-lang/antha/antha/component/lib/Colony_PCR"
 	"github.com/antha-lang/antha/antha/component/lib/DNA_gel"
 	"github.com/antha-lang/antha/antha/component/lib/Datacrunch"
 	"github.com/antha-lang/antha/antha/component/lib/Evaporationrate"
@@ -23,7 +24,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/PCR"
 	"github.com/antha-lang/antha/antha/component/lib/Paintmix"
 	"github.com/antha-lang/antha/antha/component/lib/Phytip_miniprep"
-	"github.com/antha-lang/antha/antha/component/lib/Plateout"
+	"github.com/antha-lang/antha/antha/component/lib/PlateOut"
 	"github.com/antha-lang/antha/antha/component/lib/PreIncubation"
 	"github.com/antha-lang/antha/antha/component/lib/Printname"
 	"github.com/antha-lang/antha/antha/component/lib/ProtocolName_from_an_file"
@@ -90,6 +91,33 @@ func GetComponents() []ComponentDesc {
 	portMap["BlastSearch"]["AnthaSeq"] = true
 
 	portMap["BlastSearch"]["Hits"] = false
+
+	portMap["Colony_PCR"] = make(map[string]bool)
+	portMap["Colony_PCR"]["Additiveconc"] = true
+	portMap["Colony_PCR"]["Additives"] = true
+	portMap["Colony_PCR"]["AnnealingTemp"] = true
+	portMap["Colony_PCR"]["Annealingtime"] = true
+	portMap["Colony_PCR"]["Buffer"] = true
+	portMap["Colony_PCR"]["DNTPS"] = true
+	portMap["Colony_PCR"]["DNTPconc"] = true
+	portMap["Colony_PCR"]["Denaturationtime"] = true
+	portMap["Colony_PCR"]["Extensiontemp"] = true
+	portMap["Colony_PCR"]["Extensiontime"] = true
+	portMap["Colony_PCR"]["Finalextensiontime"] = true
+	portMap["Colony_PCR"]["FwdPrimer"] = true
+	portMap["Colony_PCR"]["FwdPrimerConc"] = true
+	portMap["Colony_PCR"]["InitDenaturationtime"] = true
+	portMap["Colony_PCR"]["Numberofcycles"] = true
+	portMap["Colony_PCR"]["OutPlate"] = true
+	portMap["Colony_PCR"]["PCRPolymerase"] = true
+	portMap["Colony_PCR"]["ReactionVolume"] = true
+	portMap["Colony_PCR"]["RevPrimer"] = true
+	portMap["Colony_PCR"]["RevPrimerConc"] = true
+	portMap["Colony_PCR"]["TargetpolymeraseConcentration"] = true
+	portMap["Colony_PCR"]["Template"] = true
+	portMap["Colony_PCR"]["Templatevolume"] = true
+
+	portMap["Colony_PCR"]["Reaction"] = false
 
 	portMap["DNA_gel"] = make(map[string]bool)
 	portMap["DNA_gel"]["DNAgel"] = true
@@ -381,16 +409,16 @@ func GetComponents() []ComponentDesc {
 
 	portMap["Phytip_miniprep"]["PlasmidDNAsolution"] = false
 
-	portMap["Plateout"] = make(map[string]bool)
-	portMap["Plateout"]["AgarPlate"] = true
-	portMap["Plateout"]["Diluent"] = true
-	portMap["Plateout"]["DilutionX"] = true
-	portMap["Plateout"]["IncubationTemp"] = true
-	portMap["Plateout"]["IncubationTime"] = true
-	portMap["Plateout"]["Plateoutvolume"] = true
-	portMap["Plateout"]["RecoveredCells"] = true
+	portMap["PlateOut"] = make(map[string]bool)
+	portMap["PlateOut"]["AgarPlate"] = true
+	portMap["PlateOut"]["Diluent"] = true
+	portMap["PlateOut"]["DilutionX"] = true
+	portMap["PlateOut"]["IncubationTemp"] = true
+	portMap["PlateOut"]["IncubationTime"] = true
+	portMap["PlateOut"]["Plateoutvolume"] = true
+	portMap["PlateOut"]["RecoveredCells"] = true
 
-	portMap["Plateout"]["Platedculture"] = false
+	portMap["PlateOut"]["Platedculture"] = false
 
 	portMap["PreIncubation"] = make(map[string]bool)
 	portMap["PreIncubation"]["CompetentCells"] = true
@@ -722,6 +750,7 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "AliquotTo", Constructor: AliquotTo.NewAliquotTo})
 	c = append(c, ComponentDesc{Name: "Assaysetup", Constructor: Assaysetup.NewAssaysetup})
 	c = append(c, ComponentDesc{Name: "BlastSearch", Constructor: BlastSearch.NewBlastSearch})
+	c = append(c, ComponentDesc{Name: "Colony_PCR", Constructor: Colony_PCR.NewColony_PCR})
 	c = append(c, ComponentDesc{Name: "DNA_gel", Constructor: DNA_gel.NewDNA_gel})
 	c = append(c, ComponentDesc{Name: "Datacrunch", Constructor: Datacrunch.NewDatacrunch})
 	c = append(c, ComponentDesc{Name: "Evaporationrate", Constructor: Evaporationrate.NewEvaporationrate})
@@ -741,7 +770,7 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "PCR", Constructor: PCR.NewPCR})
 	c = append(c, ComponentDesc{Name: "Paintmix", Constructor: Paintmix.NewPaintmix})
 	c = append(c, ComponentDesc{Name: "Phytip_miniprep", Constructor: Phytip_miniprep.NewPhytip_miniprep})
-	c = append(c, ComponentDesc{Name: "Plateout", Constructor: Plateout.NewPlateout})
+	c = append(c, ComponentDesc{Name: "PlateOut", Constructor: PlateOut.NewPlateOut})
 	c = append(c, ComponentDesc{Name: "PreIncubation", Constructor: PreIncubation.NewPreIncubation})
 	c = append(c, ComponentDesc{Name: "Printname", Constructor: Printname.NewPrintname})
 	c = append(c, ComponentDesc{Name: "ProtocolName_from_an_file", Constructor: ProtocolName_from_an_file.NewProtocolName_from_an_file})

@@ -1,4 +1,4 @@
-protocol Plateout
+protocol PlateOut
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"

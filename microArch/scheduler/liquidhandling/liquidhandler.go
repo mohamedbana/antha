@@ -289,9 +289,9 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 		if request.Tip_Type == nil || request.Tip_Type.GenericSolid == nil {
 			logger.Debug(fmt.Sprintf("LiquidHandling model is %q", this.Properties.Model))
 			if this.Properties.Model == "Pipetmax" {
-				this.Properties.AddTipBox(factory.GetTipboxByType("Gilson200"))
+				this.Properties.AddTipBox(factory.GetTipboxByType("Gilson20"))
 				this.Properties.Tips = make([]*wtype.LHTip, 1)
-				this.Properties.Tips[0] = factory.GetTipboxByType("Gilson200").Tiptype
+				this.Properties.Tips[0] = factory.GetTipboxByType("Gilson20").Tiptype
 			} else { //if this.Properties.Model == "GeneTheatre" { //TODO handle general case differently
 				this.Properties.AddTipBox(factory.GetTipboxByType("CyBio50Tipbox"))
 				this.Properties.Tips = make([]*wtype.LHTip, 1)

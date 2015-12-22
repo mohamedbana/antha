@@ -1,0 +1,17 @@
+{
+    "Parameters": [{
+        "PlateOut":{
+            "RecoveredCells": "component:neb5compcells",
+			"Diluent": "component:water",
+			"DilutionX": 1,
+			"IncubationTime": "57600s",
+			"IncubationTemp": "25C",
+			"Plateoutvolume": "100ul",
+			"AgarPlate": "plate:falcon6wellAgar",
+            "TipType": "tipbox:Gilson20"
+        }
+    }],
+    "Config": {
+        "OUTPUT_COUNT": 1
+    }
+}

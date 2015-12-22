@@ -145,12 +145,57 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	//refactored for reverse position
 
 	ep48g := wtype.NewShape("trap", "mm", 2, 4, 2)
+	//can't reach all wells; change to 24 wells per row?
 	welltype = wtype.NewLHWell("EPAGE48", "", "", "ul", 25, 0, ep48g, 0, 2, 4, 2, 2, "mm")
 	//welltype = wtype.NewLHWell("384flat", "", "", "ul", 100, 10, square, bottomtype, xdim, ydim, zdim, bottomh, "mm")
 	//plate = wtype.NewLHPlate("EPAGE48", "Invitrogen", 2, 26, 50, "mm", welltype, 4.5, 34, -1.0, 17.25, 49.5)
 	plate = wtype.NewLHPlate("EPAGE48", "Invitrogen", 2, 26, 48.5, "mm", welltype, 4.5, 33.75, -1.0, 17.25, 47.5)
 	//plate = wtype.NewLHPlate("greiner384", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 
+	plates[plate.Type] = plate
+
+	// E-GEL 96 definition
+
+	//same welltype as EPAGE
+
+	// due to staggering of wells: 1 96well gel is set up as two well types
+
+	// 1st type
+	//can't reach all wells; change to 12 wells per row?
+	plate = wtype.NewLHPlate("EGEL96_1", "Invitrogen", 4, 13, 48.5, "mm", welltype, 9, 17.5, 4.5, -1.25, 47.5)
+	//plate = wtype.NewLHPlate("greiner384", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+	plates[plate.Type] = plate
+
+	// 2nd type
+	plate = wtype.NewLHPlate("EGEL96_2", "Invitrogen", 4, 13, 48.5, "mm", welltype, 9, 17.5, 0, 7.75, 47.5)
+	//plate = wtype.NewLHPlate("greiner384", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+
+	plates[plate.Type] = plate
+
+	// falcon 6 well plate with Agar flat bottom
+
+	bottomtype = 0
+	xdim = 37.0
+	ydim = 37.0
+	zdim = 20.0
+	bottomh = 9.0 //(this includes agar estimate)
+
+	wellxoffset = 39.0 // centre of well to centre of neighbouring well in x direction
+	wellyoffset = 39.0 //centre of well to centre of neighbouring well in y direction
+	xstart = 5.0       // distance from top left side of plate to first well
+	ystart = 5.0       // distance from top left side of plate to first well
+	zstart = 9.0       // offset of bottom of deck to bottom of well (this includes agar estimate)
+
+	wellsperrow := 3
+	wellspercolumn := 2
+	heightinmm := 20.0
+
+	circle := wtype.NewShape("cylinder", "mm", 37, 37, 20)
+	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
+	welltype = wtype.NewLHWell("falcon6well", "", "", "ul", 100, 10, circle, bottomtype, xdim, ydim, zdim, bottomh, "mm")
+
+	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
+	plate = wtype.NewLHPlate("falcon6wellAgar", "Unknown", wellspercolumn, wellsperrow, heightinmm, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
 
 	//	WellXOffset float64

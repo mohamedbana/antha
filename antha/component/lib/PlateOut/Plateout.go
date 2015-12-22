@@ -1,4 +1,4 @@
-package Plateout
+package PlateOut
 
 import (
 	"encoding/json"
@@ -20,13 +20,13 @@ import (
 
 // Physical outputs from this protocol with types
 
-func (e *Plateout) requirements() {
+func (e *PlateOut) requirements() {
 	_ = wunit.Make_units
 
 }
 
 // Conditions to run on startup
-func (e *Plateout) setup(p PlateoutParamBlock) {
+func (e *PlateOut) setup(p PlateOutParamBlock) {
 	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
@@ -35,7 +35,7 @@ func (e *Plateout) setup(p PlateoutParamBlock) {
 
 // The core process for this protocol, with the steps to be performed
 // for every input
-func (e *Plateout) steps(p PlateoutParamBlock, r *PlateoutResultBlock) {
+func (e *PlateOut) steps(p PlateOutParamBlock, r *PlateOutResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
@@ -58,7 +58,7 @@ func (e *Plateout) steps(p PlateoutParamBlock, r *PlateoutResultBlock) {
 
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
-func (e *Plateout) analysis(p PlateoutParamBlock, r *PlateoutResultBlock) {
+func (e *PlateOut) analysis(p PlateOutParamBlock, r *PlateOutResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
@@ -68,7 +68,7 @@ func (e *Plateout) analysis(p PlateoutParamBlock, r *PlateoutResultBlock) {
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
-func (e *Plateout) validation(p PlateoutParamBlock, r *PlateoutResultBlock) {
+func (e *PlateOut) validation(p PlateOutParamBlock, r *PlateOutResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
@@ -76,13 +76,13 @@ func (e *Plateout) validation(p PlateoutParamBlock, r *PlateoutResultBlock) {
 }
 
 // AsyncBag functions
-func (e *Plateout) Complete(params interface{}) {
-	p := params.(PlateoutParamBlock)
+func (e *PlateOut) Complete(params interface{}) {
+	p := params.(PlateOutParamBlock)
 	if p.Error {
 		e.Platedculture <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
 		return
 	}
-	r := new(PlateoutResultBlock)
+	r := new(PlateOutResultBlock)
 	defer func() {
 		if res := recover(); res != nil {
 			e.Platedculture <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
@@ -102,32 +102,32 @@ func (e *Plateout) Complete(params interface{}) {
 }
 
 // init function, read characterization info from seperate file to validate ranges?
-func (e *Plateout) init() {
+func (e *PlateOut) init() {
 	e.params = make(map[execute.ThreadID]*execute.AsyncBag)
 }
 
-func (e *Plateout) NewConfig() interface{} {
-	return &PlateoutConfig{}
+func (e *PlateOut) NewConfig() interface{} {
+	return &PlateOutConfig{}
 }
 
-func (e *Plateout) NewParamBlock() interface{} {
-	return &PlateoutParamBlock{}
+func (e *PlateOut) NewParamBlock() interface{} {
+	return &PlateOutParamBlock{}
 }
 
-func NewPlateout() interface{} { //*Plateout {
-	e := new(Plateout)
+func NewPlateOut() interface{} { //*PlateOut {
+	e := new(PlateOut)
 	e.init()
 	return e
 }
 
 // Mapper function
-func (e *Plateout) Map(m map[string]interface{}) interface{} {
-	var res PlateoutParamBlock
+func (e *PlateOut) Map(m map[string]interface{}) interface{} {
+	var res PlateOutParamBlock
 	res.Error = false || m["AgarPlate"].(execute.ThreadParam).Error || m["Diluent"].(execute.ThreadParam).Error || m["DilutionX"].(execute.ThreadParam).Error || m["IncubationTemp"].(execute.ThreadParam).Error || m["IncubationTime"].(execute.ThreadParam).Error || m["Plateoutvolume"].(execute.ThreadParam).Error || m["RecoveredCells"].(execute.ThreadParam).Error
 
 	vAgarPlate, is := m["AgarPlate"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp PlateoutJSONBlock
+		var temp PlateOutJSONBlock
 		json.Unmarshal([]byte(vAgarPlate.JSONString), &temp)
 		res.AgarPlate = *temp.AgarPlate
 	} else {
@@ -136,7 +136,7 @@ func (e *Plateout) Map(m map[string]interface{}) interface{} {
 
 	vDiluent, is := m["Diluent"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp PlateoutJSONBlock
+		var temp PlateOutJSONBlock
 		json.Unmarshal([]byte(vDiluent.JSONString), &temp)
 		res.Diluent = *temp.Diluent
 	} else {
@@ -145,7 +145,7 @@ func (e *Plateout) Map(m map[string]interface{}) interface{} {
 
 	vDilutionX, is := m["DilutionX"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp PlateoutJSONBlock
+		var temp PlateOutJSONBlock
 		json.Unmarshal([]byte(vDilutionX.JSONString), &temp)
 		res.DilutionX = *temp.DilutionX
 	} else {
@@ -154,7 +154,7 @@ func (e *Plateout) Map(m map[string]interface{}) interface{} {
 
 	vIncubationTemp, is := m["IncubationTemp"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp PlateoutJSONBlock
+		var temp PlateOutJSONBlock
 		json.Unmarshal([]byte(vIncubationTemp.JSONString), &temp)
 		res.IncubationTemp = *temp.IncubationTemp
 	} else {
@@ -163,7 +163,7 @@ func (e *Plateout) Map(m map[string]interface{}) interface{} {
 
 	vIncubationTime, is := m["IncubationTime"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp PlateoutJSONBlock
+		var temp PlateOutJSONBlock
 		json.Unmarshal([]byte(vIncubationTime.JSONString), &temp)
 		res.IncubationTime = *temp.IncubationTime
 	} else {
@@ -172,7 +172,7 @@ func (e *Plateout) Map(m map[string]interface{}) interface{} {
 
 	vPlateoutvolume, is := m["Plateoutvolume"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp PlateoutJSONBlock
+		var temp PlateOutJSONBlock
 		json.Unmarshal([]byte(vPlateoutvolume.JSONString), &temp)
 		res.Plateoutvolume = *temp.Plateoutvolume
 	} else {
@@ -181,7 +181,7 @@ func (e *Plateout) Map(m map[string]interface{}) interface{} {
 
 	vRecoveredCells, is := m["RecoveredCells"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp PlateoutJSONBlock
+		var temp PlateOutJSONBlock
 		json.Unmarshal([]byte(vRecoveredCells.JSONString), &temp)
 		res.RecoveredCells = *temp.RecoveredCells
 	} else {
@@ -194,7 +194,7 @@ func (e *Plateout) Map(m map[string]interface{}) interface{} {
 	return res
 }
 
-func (e *Plateout) OnAgarPlate(param execute.ThreadParam) {
+func (e *PlateOut) OnAgarPlate(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -211,7 +211,7 @@ func (e *Plateout) OnAgarPlate(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Plateout) OnDiluent(param execute.ThreadParam) {
+func (e *PlateOut) OnDiluent(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -228,7 +228,7 @@ func (e *Plateout) OnDiluent(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Plateout) OnDilutionX(param execute.ThreadParam) {
+func (e *PlateOut) OnDilutionX(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -245,7 +245,7 @@ func (e *Plateout) OnDilutionX(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Plateout) OnIncubationTemp(param execute.ThreadParam) {
+func (e *PlateOut) OnIncubationTemp(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -262,7 +262,7 @@ func (e *Plateout) OnIncubationTemp(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Plateout) OnIncubationTime(param execute.ThreadParam) {
+func (e *PlateOut) OnIncubationTime(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -279,7 +279,7 @@ func (e *Plateout) OnIncubationTime(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Plateout) OnPlateoutvolume(param execute.ThreadParam) {
+func (e *PlateOut) OnPlateoutvolume(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -296,7 +296,7 @@ func (e *Plateout) OnPlateoutvolume(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Plateout) OnRecoveredCells(param execute.ThreadParam) {
+func (e *PlateOut) OnRecoveredCells(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -314,7 +314,7 @@ func (e *Plateout) OnRecoveredCells(param execute.ThreadParam) {
 	}
 }
 
-type Plateout struct {
+type PlateOut struct {
 	flow.Component // component "superclass" embedded
 	lock           sync.Mutex
 	startup        sync.Once
@@ -329,7 +329,7 @@ type Plateout struct {
 	Platedculture  chan<- execute.ThreadParam
 }
 
-type PlateoutParamBlock struct {
+type PlateOutParamBlock struct {
 	ID             execute.ThreadID
 	BlockID        execute.BlockID
 	Error          bool
@@ -342,7 +342,7 @@ type PlateoutParamBlock struct {
 	RecoveredCells *wtype.LHComponent
 }
 
-type PlateoutConfig struct {
+type PlateOutConfig struct {
 	ID             execute.ThreadID
 	BlockID        execute.BlockID
 	Error          bool
@@ -355,14 +355,14 @@ type PlateoutConfig struct {
 	RecoveredCells wtype.FromFactory
 }
 
-type PlateoutResultBlock struct {
+type PlateOutResultBlock struct {
 	ID            execute.ThreadID
 	BlockID       execute.BlockID
 	Error         bool
 	Platedculture *wtype.LHSolution
 }
 
-type PlateoutJSONBlock struct {
+type PlateOutJSONBlock struct {
 	ID             *execute.ThreadID
 	BlockID        *execute.BlockID
 	Error          *bool
@@ -376,7 +376,7 @@ type PlateoutJSONBlock struct {
 	Platedculture  **wtype.LHSolution
 }
 
-func (c *Plateout) ComponentInfo() *execute.ComponentInfo {
+func (c *PlateOut) ComponentInfo() *execute.ComponentInfo {
 	inp := make([]execute.PortInfo, 0)
 	outp := make([]execute.PortInfo, 0)
 	inp = append(inp, *execute.NewPortInfo("AgarPlate", "*wtype.LHPlate", "AgarPlate", true, true, nil, nil))
@@ -388,7 +388,7 @@ func (c *Plateout) ComponentInfo() *execute.ComponentInfo {
 	inp = append(inp, *execute.NewPortInfo("RecoveredCells", "*wtype.LHComponent", "RecoveredCells", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("Platedculture", "*wtype.LHSolution", "Platedculture", true, true, nil, nil))
 
-	ci := execute.NewComponentInfo("Plateout", "Plateout", "", false, inp, outp)
+	ci := execute.NewComponentInfo("PlateOut", "PlateOut", "", false, inp, outp)
 
 	return ci
 }
