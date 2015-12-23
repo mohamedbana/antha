@@ -79,6 +79,7 @@ func (e *TypeIISConstructAssembly_sim) steps(p TypeIISConstructAssembly_simParam
 
 	var part_mw float64
 	var part_moles float64
+
 	for i := 0; i < len(p.Partsinorder); i++ {
 
 		part_mw = sequences.MassDNA(partsinorder[i].Seq, false, true)
