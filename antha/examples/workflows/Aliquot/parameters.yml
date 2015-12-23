@@ -7,7 +7,7 @@
       "TipType": "tipbox:Gilson20",
       "SolutionVolume": "3100ul",
       "VolumePerAliquot": "10ul",
-	"NumberofAliquots":300,
+	"NumberofAliquots":30,
     }
   },
 {
@@ -22,6 +22,6 @@
     }
   }],
   "Config": {
-    "OUTPUT_COUNT": 302
+    "OUTPUT_COUNT": 32
   }
 }
