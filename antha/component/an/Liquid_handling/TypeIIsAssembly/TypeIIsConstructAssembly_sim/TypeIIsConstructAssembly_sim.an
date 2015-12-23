@@ -21,7 +21,7 @@ Parameters (
 	PartConcs					[]Concentration
 	Partsinorder				[]string
 	VectorVol 					Volume
-	VectorConcentration			Concentration
+	VectorConcentration		Concentration
 	BufferVol 					Volume
 	AtpVol 						Volume
 	ReVol 						Volume
@@ -86,7 +86,7 @@ Steps {
 	
 	vectordata := Inventory.Partslist[Vectordata]
 	assembly := enzymes.Assemblyparameters{Constructname, RestrictionEnzyme.CName,vectordata,partsinorder}
-		status,numberofassemblies,sitesfound,newDNASequence,_ := enzymes.Assemblysimulator(assembly)
+	status,numberofassemblies,sitesfound,newDNASequence,_ := enzymes.Assemblysimulator(assembly)
 	
 	NewDNASequence = newDNASequence
 	Sitesfound = sitesfound
@@ -97,9 +97,7 @@ Steps {
 	}	
 	// Monitor molar ratios of parts for possible troubleshooting / success correlation
 	
-	
-	
-	molesofeachdnaelement := make ([]float64,0)
+		molesofeachdnaelement := make ([]float64,0)
 		molarratios := make ([]float64,0)
 
 		vector_mw := sequences.MassDNA(vectordata.Seq,false,true)
@@ -110,6 +108,7 @@ Steps {
 
  		var part_mw float64
 		var part_moles float64
+		
 	for i := 0; i < len(Partsinorder);i++ {
        
 		part_mw = sequences.MassDNA(partsinorder[i].Seq,false,true)
