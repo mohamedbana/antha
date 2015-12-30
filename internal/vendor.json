@@ -138,6 +138,16 @@
 			"revisionTime": "2015-07-24T21:09:55+02:00"
 		},
 		{
+			"path": "golang.org/x/image/bmp",
+			"revision": "baddd3465a05d84a6d8d3507547a91cb188c81ea",
+			"revisionTime": "2015-09-11T13:43:18+10:00"
+		},
+		{
+			"path": "golang.org/x/image/tiff",
+			"revision": "baddd3465a05d84a6d8d3507547a91cb188c81ea",
+			"revisionTime": "2015-09-11T13:43:18+10:00"
+		},
+		{
 			"path": "golang.org/x/net/html",
 			"revision": "b4e17d61b15679caf2335da776c614169a1b4643",
 			"revisionTime": "2015-10-28T13:07:21+01:00"

@@ -20,8 +20,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"golang.org/x/image/bmp"
-	"golang.org/x/image/tiff"
+	"github.com/antha-lang/antha/internal/golang.org/x/image/bmp"
+	"github.com/antha-lang/antha/internal/golang.org/x/image/tiff"
 )
 
 type Format int
