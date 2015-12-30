@@ -1,0 +1,101 @@
+// variant of aliquot.an whereby the low level MixTo command is used to pipette by row  
+
+protocol PipetteImage
+
+import (
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
+	//"github.com/antha-lang/antha/antha/anthalib/wutil"
+	"github.com/antha-lang/antha/antha/anthalib/mixer"
+	//"strconv"
+	"fmt"
+)
+
+
+// Input parameters for this protocol (data)
+Parameters (
+	VolumePerWell  Volume
+	Imagefilename string
+	Palettename string
+	AvailableColours []string
+)
+
+// Data which is returned from this protocol, and data types
+Data (
+	Numberofpixels int
+)
+
+
+// Physical Inputs to this protocol with types
+Inputs (
+	Colourcomponents []*wtype.LHComponent
+	//InPlate *wtype.LHPlate
+	OutPlate *wtype.LHPlate
+)
+
+// Physical outputs from this protocol with types
+Outputs (
+	 Pixels[]*wtype.LHSolution
+)
+
+Requirements {
+	
+}
+
+// Conditions to run on startup
+Setup {
+	
+}
+
+// The core process for this protocol, with the steps to be performed
+// for every input
+Steps {
+	
+	chosencolourpalette := image.AvailablePalettes[Palettename]
+	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, chosencolourpalette) 
+	
+//Pixels = image.PipetteImagetoPlate(OutPlate, positiontocolourmap, AvailableColours, Colourcomponents, VolumePerWell)
+
+componentmap, err := image.MakestringtoComponentMap(AvailableColours, Colourcomponents)
+	if err != nil {
+		panic(err)
+	}
+
+	solutions := make([]*wtype.LHSolution, 0)
+
+	counter := 0
+	// currently set up to only pipette if yellow (to make visualisation easier in trilution simulator
+	for locationkey, colour := range positiontocolourmap {
+		
+		component := componentmap[image.Colourcomponentmap[colour]]
+
+		if component.Type == "dna" {
+			component.Type = "DoNotMix"
+		}
+		fmt.Println(image.Colourcomponentmap[colour])
+		if image.Colourcomponentmap[colour] == "green"{
+			counter = counter + 1
+			fmt.Println("wells",counter)
+		pixelSample := mixer.Sample(component, VolumePerWell)
+		solution := MixTo(OutPlate, locationkey, pixelSample)
+		solutions = append(solutions, solution)
+		}
+	}
+
+	Numberofpixels = len(Pixels)
+	fmt.Println("Pixels =",Numberofpixels)
+	Pixels = solutions
+	
+}
+// Run after controls and a steps block are completed to
+// post process any data and provide downstream results
+Analysis {
+}
+
+// A block of tests to perform to validate that the sample was processed correctly
+// Optionally, destructive tests can be performed to validate results on a
+// dipstick basis
+Validation {
+	
+}
+

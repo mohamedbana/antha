@@ -24,6 +24,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/PCR"
 	"github.com/antha-lang/antha/antha/component/lib/Paintmix"
 	"github.com/antha-lang/antha/antha/component/lib/Phytip_miniprep"
+	"github.com/antha-lang/antha/antha/component/lib/PipetteImage"
 	"github.com/antha-lang/antha/antha/component/lib/PlateOut"
 	"github.com/antha-lang/antha/antha/component/lib/PreIncubation"
 	"github.com/antha-lang/antha/antha/component/lib/Printname"
@@ -392,6 +393,17 @@ func GetComponents() []ComponentDesc {
 
 	portMap["Phytip_miniprep"]["PlasmidDNAsolution"] = false
 
+	portMap["PipetteImage"] = make(map[string]bool)
+	portMap["PipetteImage"]["AvailableColours"] = true
+	portMap["PipetteImage"]["Colourcomponents"] = true
+	portMap["PipetteImage"]["Imagefilename"] = true
+	portMap["PipetteImage"]["OutPlate"] = true
+	portMap["PipetteImage"]["Palettename"] = true
+	portMap["PipetteImage"]["VolumePerWell"] = true
+
+	portMap["PipetteImage"]["Numberofpixels"] = false
+	portMap["PipetteImage"]["Pixels"] = false
+
 	portMap["PlateOut"] = make(map[string]bool)
 	portMap["PlateOut"]["AgarPlate"] = true
 	portMap["PlateOut"]["Diluent"] = true
@@ -752,6 +764,7 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "PCR", Constructor: PCR.NewPCR})
 	c = append(c, ComponentDesc{Name: "Paintmix", Constructor: Paintmix.NewPaintmix})
 	c = append(c, ComponentDesc{Name: "Phytip_miniprep", Constructor: Phytip_miniprep.NewPhytip_miniprep})
+	c = append(c, ComponentDesc{Name: "PipetteImage", Constructor: PipetteImage.NewPipetteImage})
 	c = append(c, ComponentDesc{Name: "PlateOut", Constructor: PlateOut.NewPlateOut})
 	c = append(c, ComponentDesc{Name: "PreIncubation", Constructor: PreIncubation.NewPreIncubation})
 	c = append(c, ComponentDesc{Name: "Printname", Constructor: Printname.NewPrintname})
