@@ -397,6 +397,7 @@ func GetComponents() []ComponentDesc {
 	portMap["PipetteImage"]["AvailableColours"] = true
 	portMap["PipetteImage"]["Colourcomponents"] = true
 	portMap["PipetteImage"]["Imagefilename"] = true
+	portMap["PipetteImage"]["OnlythisColour"] = true
 	portMap["PipetteImage"]["OutPlate"] = true
 	portMap["PipetteImage"]["Palettename"] = true
 	portMap["PipetteImage"]["VolumePerWell"] = true

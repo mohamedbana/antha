@@ -9,8 +9,8 @@
 	"component:yellow",
 	"component:black"
 	],
-	"OnlythisColour":"",
-	  "Imagefilename": "mario.png",
+	"OnlythisColour":"green",
+	  "Imagefilename": "ghost.jpg",
 		"Palettename":"Palette1",
 		"AvailableColours":[
 		"red",
@@ -26,7 +26,7 @@
     }
   }],
   "Config": {
-    "OUTPUT_COUNT": 192
+    "OUTPUT_COUNT": 144
   }
 }
 

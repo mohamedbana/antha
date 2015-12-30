@@ -18,6 +18,7 @@ Parameters (
 	Imagefilename string
 	Palettename string
 	AvailableColours []string
+	OnlythisColour string
 )
 
 // Data which is returned from this protocol, and data types
@@ -56,7 +57,7 @@ Steps {
 	
 //Pixels = image.PipetteImagetoPlate(OutPlate, positiontocolourmap, AvailableColours, Colourcomponents, VolumePerWell)
 
-componentmap, err := image.MakestringtoComponentMap(AvailableColours, Colourcomponents)
+	componentmap, err := image.MakestringtoComponentMap(AvailableColours, Colourcomponents)
 	if err != nil {
 		panic(err)
 	}
@@ -73,7 +74,18 @@ componentmap, err := image.MakestringtoComponentMap(AvailableColours, Colourcomp
 			component.Type = "DoNotMix"
 		}
 		fmt.Println(image.Colourcomponentmap[colour])
-		if image.Colourcomponentmap[colour] == "green"{
+		
+		if OnlythisColour !="" {
+	
+		if image.Colourcomponentmap[colour] == OnlythisColour{
+			counter = counter + 1
+			fmt.Println("wells",counter)
+		pixelSample := mixer.Sample(component, VolumePerWell)
+		solution := MixTo(OutPlate, locationkey, pixelSample)
+		solutions = append(solutions, solution)
+			}
+			
+		}else{
 			counter = counter + 1
 			fmt.Println("wells",counter)
 		pixelSample := mixer.Sample(component, VolumePerWell)

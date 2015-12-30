@@ -69,7 +69,18 @@ func (e *PipetteImage) steps(p PipetteImageParamBlock, r *PipetteImageResultBloc
 			component.Type = "DoNotMix"
 		}
 		fmt.Println(image.Colourcomponentmap[colour])
-		if image.Colourcomponentmap[colour] == "green" {
+
+		if p.OnlythisColour != "" {
+
+			if image.Colourcomponentmap[colour] == p.OnlythisColour {
+				counter = counter + 1
+				fmt.Println("wells", counter)
+				pixelSample := mixer.Sample(component, p.VolumePerWell)
+				solution := _wrapper.MixTo(p.OutPlate, locationkey, pixelSample)
+				solutions = append(solutions, solution)
+			}
+
+		} else {
 			counter = counter + 1
 			fmt.Println("wells", counter)
 			pixelSample := mixer.Sample(component, p.VolumePerWell)
@@ -156,7 +167,7 @@ func NewPipetteImage() interface{} { //*PipetteImage {
 // Mapper function
 func (e *PipetteImage) Map(m map[string]interface{}) interface{} {
 	var res PipetteImageParamBlock
-	res.Error = false || m["AvailableColours"].(execute.ThreadParam).Error || m["Colourcomponents"].(execute.ThreadParam).Error || m["Imagefilename"].(execute.ThreadParam).Error || m["OutPlate"].(execute.ThreadParam).Error || m["Palettename"].(execute.ThreadParam).Error || m["VolumePerWell"].(execute.ThreadParam).Error
+	res.Error = false || m["AvailableColours"].(execute.ThreadParam).Error || m["Colourcomponents"].(execute.ThreadParam).Error || m["Imagefilename"].(execute.ThreadParam).Error || m["OnlythisColour"].(execute.ThreadParam).Error || m["OutPlate"].(execute.ThreadParam).Error || m["Palettename"].(execute.ThreadParam).Error || m["VolumePerWell"].(execute.ThreadParam).Error
 
 	vAvailableColours, is := m["AvailableColours"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
@@ -183,6 +194,15 @@ func (e *PipetteImage) Map(m map[string]interface{}) interface{} {
 		res.Imagefilename = *temp.Imagefilename
 	} else {
 		res.Imagefilename = m["Imagefilename"].(execute.ThreadParam).Value.(string)
+	}
+
+	vOnlythisColour, is := m["OnlythisColour"].(execute.ThreadParam).Value.(execute.JSONValue)
+	if is {
+		var temp PipetteImageJSONBlock
+		json.Unmarshal([]byte(vOnlythisColour.JSONString), &temp)
+		res.OnlythisColour = *temp.OnlythisColour
+	} else {
+		res.OnlythisColour = m["OnlythisColour"].(execute.ThreadParam).Value.(string)
 	}
 
 	vOutPlate, is := m["OutPlate"].(execute.ThreadParam).Value.(execute.JSONValue)
@@ -223,7 +243,7 @@ func (e *PipetteImage) OnAvailableColours(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(6, e, e)
+		bag.Init(7, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -240,7 +260,7 @@ func (e *PipetteImage) OnColourcomponents(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(6, e, e)
+		bag.Init(7, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -257,7 +277,7 @@ func (e *PipetteImage) OnImagefilename(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(6, e, e)
+		bag.Init(7, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -269,12 +289,29 @@ func (e *PipetteImage) OnImagefilename(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
+func (e *PipetteImage) OnOnlythisColour(param execute.ThreadParam) {
+	e.lock.Lock()
+	var bag *execute.AsyncBag = e.params[param.ID]
+	if bag == nil {
+		bag = new(execute.AsyncBag)
+		bag.Init(7, e, e)
+		e.params[param.ID] = bag
+	}
+	e.lock.Unlock()
+
+	fired := bag.AddValue("OnlythisColour", param)
+	if fired {
+		e.lock.Lock()
+		delete(e.params, param.ID)
+		e.lock.Unlock()
+	}
+}
 func (e *PipetteImage) OnOutPlate(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(6, e, e)
+		bag.Init(7, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -291,7 +328,7 @@ func (e *PipetteImage) OnPalettename(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(6, e, e)
+		bag.Init(7, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -308,7 +345,7 @@ func (e *PipetteImage) OnVolumePerWell(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(6, e, e)
+		bag.Init(7, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -329,6 +366,7 @@ type PipetteImage struct {
 	AvailableColours <-chan execute.ThreadParam
 	Colourcomponents <-chan execute.ThreadParam
 	Imagefilename    <-chan execute.ThreadParam
+	OnlythisColour   <-chan execute.ThreadParam
 	OutPlate         <-chan execute.ThreadParam
 	Palettename      <-chan execute.ThreadParam
 	VolumePerWell    <-chan execute.ThreadParam
@@ -343,6 +381,7 @@ type PipetteImageParamBlock struct {
 	AvailableColours []string
 	Colourcomponents []*wtype.LHComponent
 	Imagefilename    string
+	OnlythisColour   string
 	OutPlate         *wtype.LHPlate
 	Palettename      string
 	VolumePerWell    wunit.Volume
@@ -355,6 +394,7 @@ type PipetteImageConfig struct {
 	AvailableColours []string
 	Colourcomponents []wtype.FromFactory
 	Imagefilename    string
+	OnlythisColour   string
 	OutPlate         wtype.FromFactory
 	Palettename      string
 	VolumePerWell    wunit.Volume
@@ -375,6 +415,7 @@ type PipetteImageJSONBlock struct {
 	AvailableColours *[]string
 	Colourcomponents *[]*wtype.LHComponent
 	Imagefilename    *string
+	OnlythisColour   *string
 	OutPlate         **wtype.LHPlate
 	Palettename      *string
 	VolumePerWell    *wunit.Volume
@@ -388,6 +429,7 @@ func (c *PipetteImage) ComponentInfo() *execute.ComponentInfo {
 	inp = append(inp, *execute.NewPortInfo("AvailableColours", "[]string", "AvailableColours", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Colourcomponents", "[]*wtype.LHComponent", "Colourcomponents", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Imagefilename", "string", "Imagefilename", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("OnlythisColour", "string", "OnlythisColour", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("OutPlate", "*wtype.LHPlate", "OutPlate", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("Palettename", "string", "Palettename", true, true, nil, nil))
 	inp = append(inp, *execute.NewPortInfo("VolumePerWell", "wunit.Volume", "VolumePerWell", true, true, nil, nil))
