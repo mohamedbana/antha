@@ -3,7 +3,7 @@
 package image
 
 import (
-	"github.com/disintegration/imaging"
+	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
 	//	"image"
 	"fmt"
 	"image/color"

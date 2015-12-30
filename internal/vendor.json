@@ -3,18 +3,14 @@
 	"ignore": "",
 	"package": [
 		{
-			"canonical": "code.google.com/p/go-sqlite/go1/sqlite3",
-			"comment": "",
-			"local": "code.google.com/p/go-sqlite/go1/sqlite3",
-			"revision": "6e75c20f8fc4",
-			"revisionTime": "2013-09-15T19:25:44-04:00"
+			"path": "",
+			"revision": "cad5a317cd03372c35d86059dd99344b5542a072",
+			"revisionTime": "2015-05-06T14:43:48+09:30"
 		},
 		{
-			"canonical": "code.google.com/p/go-sqlite/go1/sqlite3/codec",
-			"comment": "",
-			"local": "code.google.com/p/go-sqlite/go1/sqlite3/codec",
-			"revision": "6e75c20f8fc4",
-			"revisionTime": "2013-09-15T19:25:44-04:00"
+			"path": "",
+			"revision": "c3eb24aeea63668ebdac08d2e252f20df8b6b1ae",
+			"revisionTime": "2015-03-27T18:25:44-07:00"
 		},
 		{
 			"path": "",
@@ -67,17 +63,17 @@
 			"revisionTime": "2015-05-06T14:43:48+09:30"
 		},
 		{
-			"path": "",
-			"revision": "cad5a317cd03372c35d86059dd99344b5542a072",
-			"revisionTime": "2015-05-06T14:43:48+09:30"
-		},
-		{
-			"path": "",
-			"revision": "c3eb24aeea63668ebdac08d2e252f20df8b6b1ae",
-			"revisionTime": "2015-03-27T18:25:44-07:00"
+			"path": "code.google.com/p/go-sqlite/go1/sqlite3",
+			"revision": "6e75c20f8fc4",
+			"revisionTime": "2013-09-15T19:25:44-04:00"
 		},
 		{
 			"path": "code.google.com/p/go-sqlite/go1/sqlite3",
+			"revision": "6e75c20f8fc4",
+			"revisionTime": "2013-09-15T19:25:44-04:00"
+		},
+		{
+			"path": "code.google.com/p/go-sqlite/go1/sqlite3/codec",
 			"revision": "6e75c20f8fc4",
 			"revisionTime": "2013-09-15T19:25:44-04:00"
 		},
@@ -100,6 +96,11 @@
 			"path": "github.com/biogo/ncbi/ncbi",
 			"revision": "1f2a04055962f693a4fb3d85adc4e0c156b60685",
 			"revisionTime": "2015-10-27T08:49:08+10:30"
+		},
+		{
+			"path": "github.com/disintegration/imaging",
+			"revision": "546cb3c5137b3f1232e123a26aa033aade6b3066",
+			"revisionTime": "2015-10-03T04:44:24+03:00"
 		},
 		{
 			"path": "github.com/kylelemons/godebug/diff",
