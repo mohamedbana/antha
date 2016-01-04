@@ -77,8 +77,8 @@ func Init(properties *liquidhandling.LHProperties) *Liquidhandler {
 // solutions
 func (this *Liquidhandler) MakeSolutions(request *LHRequest) *LHRequest {
 	// the minimal request which is possible defines what solutions are to be made
-	if request.Output_solutions == nil {
-		RaiseError("No solutions defined")
+	if len(request.Output_solutions) == 0 {
+		return request
 	}
 
 	f := func() {
@@ -367,15 +367,16 @@ func DefineOrderOrFail(mapin map[string]map[string]int) []string {
 	ret := make([]string, 0, len(cmps))
 
 	// take in reverse order
+	if len(cmps) > 0 {
+		for j := mx; j >= 0; j-- {
+			a := ord[j]
+			if a == nil {
+				continue
+			}
 
-	for j := mx; j >= 0; j-- {
-		a := ord[j]
-		if a == nil {
-			continue
-		}
-
-		for _, name := range a {
-			ret = append(ret, name)
+			for _, name := range a {
+				ret = append(ret, name)
+			}
 		}
 	}
 
