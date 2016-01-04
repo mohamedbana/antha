@@ -1,5 +1,4 @@
-// variant of aliquot.an whereby the low level MixTo command is used to pipette by row  
-
+// Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours
 protocol PipetteImage
 
 import (
@@ -86,11 +85,13 @@ Steps {
 			}
 			
 		}else{
+			if component.CName !="white"{
 			counter = counter + 1
 			fmt.Println("wells",counter)
 		pixelSample := mixer.Sample(component, VolumePerWell)
 		solution := MixTo(OutPlate, locationkey, pixelSample)
 		solutions = append(solutions, solution)
+		}
 		}
 	}
 

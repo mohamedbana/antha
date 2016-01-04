@@ -81,11 +81,14 @@ func (e *PipetteImage) steps(p PipetteImageParamBlock, r *PipetteImageResultBloc
 			}
 
 		} else {
-			counter = counter + 1
-			fmt.Println("wells", counter)
-			pixelSample := mixer.Sample(component, p.VolumePerWell)
-			solution := _wrapper.MixTo(p.OutPlate, locationkey, pixelSample)
-			solutions = append(solutions, solution)
+			fmt.Println("component.Type=", component.CName)
+			if component.CName != "white" {
+				counter = counter + 1
+				fmt.Println("wells", counter)
+				pixelSample := mixer.Sample(component, p.VolumePerWell)
+				solution := _wrapper.MixTo(p.OutPlate, locationkey, pixelSample)
+				solutions = append(solutions, solution)
+			}
 		}
 	}
 
