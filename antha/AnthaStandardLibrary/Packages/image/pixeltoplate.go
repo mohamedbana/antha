@@ -7,22 +7,25 @@ import (
 	//	"image"
 	"fmt"
 	"image/color"
-	//"image/color/palette"
+	"image/color/palette"
+	"strconv"
+	"strings"
+
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"strconv"
-	"strings"
 )
 
 // Colour palette to use // this would relate to a map of components of these available colours in factor
 
 var AvailablePalettes = map[string]color.Palette{
 	"Palette1": Chosencolourpalette,
+	"WebSafe":  palette.WebSafe, //websafe,
+	"plan9":    palette.Plan9,
 }
 
 var Chosencolourpalette color.Palette = availablecolours //palette.WebSafe
-
+//var websafe color.Palette = palette.WebSafe
 var availablecolours = []color.Color{
 	color.RGBA{R: uint8(242), G: uint8(243), B: uint8(242), A: uint8(255)}, //white
 	color.RGBA{R: uint8(13), G: uint8(105), B: uint8(171), A: uint8(255)},  //blue

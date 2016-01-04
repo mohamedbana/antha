@@ -114,6 +114,28 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	plate = wtype.NewLHPlate("greiner384", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
 
+	// greiner 384 well plate flat bottom on riser
+
+	bottomtype = 0
+	xdim = 4.0
+	ydim = 4.0
+	zdim = 14.0
+	bottomh = 1.0
+
+	wellxoffset = 4.5 // centre of well to centre of neighbouring well in x direction
+	wellyoffset = 4.5 //centre of well to centre of neighbouring well in y direction
+	xstart = -2.5     // distance from top left side of plate to first well
+	ystart = -2.5     // distance from top left side of plate to first well
+	zstart = 43       // offset of bottom of deck to bottom of well
+
+	square = wtype.NewShape("box", "mm", 4, 4, 14)
+	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
+	welltype = wtype.NewLHWell("384flat", "", "", "ul", 100, 10, square, bottomtype, xdim, ydim, zdim, bottomh, "mm")
+
+	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
+	plate = wtype.NewLHPlate("greiner384_riser", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+	plates[plate.Type] = plate
+
 	// 250ml box reservoir (working vol estimated to be 100ml to prevent spillage on moving decks)
 	reservoirbox := wtype.NewShape("box", "mm", 71, 107, 38) // 39?
 	welltype = wtype.NewLHWell("Reservoir", "", "", "ul", 100000, 10000, reservoirbox, 0, 107, 71, 38, 3, "mm")
