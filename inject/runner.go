@@ -57,9 +57,9 @@ func (a *CheckedRunner) Run(ctx context.Context, value Value) (Value, error) {
 	}
 
 	outT := a.Out
-	if err != AssignableTo(out, outT) {
+	if err := AssignableTo(out, outT); err != nil {
 		return nil, fmt.Errorf("output value not assignable to %T: %s", outT, err)
 	}
 
-	return out, err
+	return out, nil
 }
