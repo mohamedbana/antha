@@ -107,9 +107,13 @@ type Temperature struct {
 
 // make a temperature
 func NewTemperature(v float64, unit string) Temperature {
+	if unit != "˚C" && // RING ABOVE, LATIN CAPITAL LETTER C
+		unit != "C" && // LATIN CAPITAL LETTER C
+		unit != "℃" && // DEGREE CELSIUS
+		unit != "°C" { // DEGREE, LATIN CAPITAL LETTER C
 		panic("Can't make temperatures which aren't in degrees C")
 	}
-	t := Temperature{NewMeasurement(v, "", unit)}
+	t := Temperature{NewMeasurement(v, "", "℃")}
 	return t
 }
 
