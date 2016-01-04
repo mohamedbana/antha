@@ -6,8 +6,11 @@ import (
 	"reflect"
 )
 
-var notStructOrValue = errors.New("not pointer to struct or map[string]interface{}")
-var stringType = reflect.TypeOf("")
+var (
+	notStructOrValue = errors.New("not pointer to struct or map[string]interface{}")
+	stringType       = reflect.TypeOf("")
+	zeroValue        reflect.Value
+)
 
 // Input and output of injectable functions. Implementation of named and typed
 // function parameters.
@@ -59,8 +62,11 @@ func makeMapFields(value reflect.Value) map[string]reflect.Value {
 	for _, key := range value.MapKeys() {
 		k := key.Interface().(string)
 		v := value.MapIndex(key)
+		// Try to resolve interfaces to concrete type
 		if v.Kind() == reflect.Interface {
-			v = v.Elem()
+			if vactual := v.Elem(); vactual != zeroValue {
+				v = vactual
+			}
 		}
 		fields[k] = v
 	}
@@ -72,8 +78,14 @@ func makeStructFields(value reflect.Value) map[string]reflect.Value {
 	fields := make(map[string]reflect.Value)
 	for i, n := 0, typ.NumField(); i < n; i += 1 {
 		sf := typ.Field(i)
-		f := value.Field(i)
-		fields[sf.Name] = f
+		v := value.Field(i)
+		// Try to resolve interfaces to concrete type
+		if v.Kind() == reflect.Interface {
+			if vactual := v.Elem(); vactual != zeroValue {
+				v = vactual
+			}
+		}
+		fields[sf.Name] = v
 	}
 	return fields
 }
@@ -93,6 +105,14 @@ func makeFields(value reflect.Value) (map[string]reflect.Value, error) {
 	return nil, notStructOrValue
 }
 
+func nilable(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.Chan, reflect.Func, reflect.Map, reflect.Ptr, reflect.Interface, reflect.Slice:
+		return true
+	}
+	return false
+}
+
 func assign(from, to interface{}, set bool) error {
 	toValue := reflect.ValueOf(to)
 	toFields, err := makeFields(toValue)
@@ -109,14 +129,22 @@ func assign(from, to interface{}, set bool) error {
 	for name, v := range fromFields {
 		toV, ok := toFields[name]
 
+		// Special case: if "from" is nil, AssignableTo may return false (e.g.,
+		// from: interface{}, to: error), but it is always okay to set "to" to
+		// nil
+		toNil := nilable(v) && v.IsNil()
 		if !ok {
 			return fmt.Errorf("missing field %q", name)
-		} else if fromT, toT := v.Type(), toV.Type(); !fromT.AssignableTo(toT) {
-			return fmt.Errorf("field %q of type %s not assignable to %s", name, fromT, toT)
+		} else if fromT, toT := v.Type(), toV.Type(); !fromT.AssignableTo(toT) && !toNil {
+			return fmt.Errorf("field %q of type %s not assignable to type %s", name, fromT, toT)
 		} else if !isToMap && !toV.CanSet() {
 			return fmt.Errorf("cannot set field %q", name)
 		} else if !set {
 			continue
+		}
+
+		if toNil {
+			v = reflect.Zero(toV.Type())
 		}
 
 		if isToMap {
