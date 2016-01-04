@@ -28,7 +28,16 @@ func getLh(ctx context.Context) equipment.Equipment {
 }
 
 func getNumOrDef(x, def float64) float64 {
-	if x == 0.0 {
+	var defv float64
+	if x == defv {
+		return def
+	}
+	return x
+}
+
+func getStrOrDef(x, def string) string {
+	var defv string
+	if x == defv {
 		return def
 	}
 	return x
