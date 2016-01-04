@@ -7,22 +7,18 @@
 package TypeIISAssembly_design
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/export"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/antha/execute"
-	"github.com/antha-lang/antha/flow"
-	"github.com/antha-lang/antha/microArch/execution"
-	"runtime/debug"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/execute"
+	"github.com/antha-lang/antha/inject"
 	"strconv"
 	"strings"
-	"sync"
 )
 
 // Input parameters for this protocol (data)
@@ -36,25 +32,16 @@ import (
 // i.e. parts to order
 
 // Input Requirement specification
-func (e *TypeIISAssembly_design) requirements() {
-	_ = wunit.Make_units
+func _requirements() {
 
 }
 
 // Conditions to run on startup
-func (e *TypeIISAssembly_design) setup(p TypeIISAssembly_designParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
-}
+func _setup(_ctx context.Context, _input *Input_) {}
 
 // The core process for this protocol, with the steps to be performed
 // for every input
-func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *TypeIISAssembly_designResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-
+func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 	//var msg string
 	// set warnings reported back to user to none initially
 	warnings := make([]string, 1)
@@ -65,8 +52,8 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 	partsinorder := make([]wtype.DNASequence, 0)
 	var partDNA = wtype.DNASequence{"", "", false, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, ""}
 
-	r.Status = "all parts available"
-	for _, part := range p.Partsinorder {
+	_output.Status = "all parts available"
+	for _, part := range _input.Partsinorder {
 
 		if strings.Contains(part, "BBa_") == true {
 
@@ -93,7 +80,7 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 		}
 
 		if partDNA.Seq == "" || partDNA.Nm == "" {
-			r.Status = fmt.Sprintln("part not found in Inventory so element aborted!")
+			_output.Status = fmt.Sprintln("part not found in Inventory so element aborted!")
 		}
 		partsinorder = append(partsinorder, partDNA)
 	}
@@ -107,34 +94,34 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 	for _, subpart := range subparts {
 		if strings.Contains(partdetails.Description(subpart), "RED") &&
 			strings.Contains(partdetails.Results(subpart), "WORKS") {
-			r.BackupParts = append(r.BackupParts, subpart)
+			_output.BackupParts = append(_output.BackupParts, subpart)
 
 		}
 	}
 
 	// lookup vector sequence
-	vectordata := Inventory.Partslist[p.Vector]
+	vectordata := Inventory.Partslist[_input.Vector]
 
 	//lookup restriction enzyme
-	restrictionenzyme := enzymes.Enzymelookup[p.AssemblyStandard][p.Level]
+	restrictionenzyme := enzymes.Enzymelookup[_input.AssemblyStandard][_input.Level]
 
 	// (1) Add standard overhangs using chosen assembly standard
 	//PartswithOverhangs = enzymes.MakeStandardTypeIIsassemblyParts(partsinorder, AssemblyStandard, Level, PartMoClotypesinorder)
 
 	// OR (2) Add overhangs for scarfree assembly based on part seqeunces only, i.e. no Assembly standard
-	r.PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
+	_output.PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
 
 	// perfrom mock digest to test fragement overhangs (fragments are hidden by using _, )
 	_, stickyends5, stickyends3 := enzymes.TypeIIsdigest(vectordata, restrictionenzyme)
 
 	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
-	assembly := enzymes.Assemblyparameters{p.Constructname, restrictionenzyme.Name, vectordata, r.PartswithOverhangs}
+	assembly := enzymes.Assemblyparameters{_input.Constructname, restrictionenzyme.Name, vectordata, _output.PartswithOverhangs}
 	status, numberofassemblies, sitesfound, newDNASequence, _ := enzymes.Assemblysimulator(assembly)
 
 	// The default sitesfound produced from the assembly simulator only checks to SapI and BsaI so we'll repeat with the enzymes declared in parameters
 	// first lookup enzyme properties
-	enzlist := make([]wtype.RestrictionEnzyme, 0)
-	for _, site := range p.RestrictionsitetoAvoid {
+	enzlist := make([]wtype.LogicalRestrictionEnzyme, 0)
+	for _, site := range _input.RestrictionsitetoAvoid {
 		enzsite := lookup.EnzymeLookup(site)
 		enzlist = append(enzlist, enzsite)
 	}
@@ -150,359 +137,95 @@ func (e *TypeIISAssembly_design) steps(p TypeIISAssembly_designParamBlock, r *Ty
 	Testdigestionsizes := enzymes.RestrictionMapper(newDNASequence, tspEI)
 
 	// allow the data to be exported by capitalising the first letter of the variable
-	r.Sitesfound = othersitesfound
+	_output.Sitesfound = othersitesfound
 
-	r.NewDNASequence = newDNASequence
+	_output.NewDNASequence = newDNASequence
 	if status == "Yay! this should work" && numberofassemblies == 1 {
 
-		r.Simulationpass = true
+		_output.Simulationpass = true
 	}
 
-	r.Warnings = strings.Join(warnings, ";")
+	_output.Warnings = strings.Join(warnings, ";")
 
 	// Export sequences to order into a fasta file
 
 	partswithOverhangs := make([]*wtype.DNASequence, 0)
-	for i, part := range r.PartswithOverhangs {
-		_ = export.ExportFastaDir(p.Constructname, strconv.Itoa(i+1), &part)
+	for i, part := range _output.PartswithOverhangs {
+		_ = enzymes.ExportFastaDir(_input.Constructname, strconv.Itoa(i+1), &part)
 		partswithOverhangs = append(partswithOverhangs, &part)
 
 	}
-	_ = export.Makefastaserial(p.Constructname, partswithOverhangs)
+	_ = enzymes.Makefastaserial(_input.Constructname, partswithOverhangs)
 
 	//partstoorder := ansi.Color(fmt.Sprintln("PartswithOverhangs", PartswithOverhangs),"red")
-	partstoorder := fmt.Sprintln("PartswithOverhangs", r.PartswithOverhangs)
+	partstoorder := fmt.Sprintln("PartswithOverhangs", _output.PartswithOverhangs)
 
 	// Print status
-	if r.Status != "all parts available" {
-		r.Status = fmt.Sprintln(r.Status)
+	if _output.Status != "all parts available" {
+		_output.Status = fmt.Sprintln(_output.Status)
 	} else {
-		r.Status = fmt.Sprintln(
-			"Warnings:", r.Warnings,
-			"Simulationpass=", r.Simulationpass,
-			"Back up parts found (Reported to work!)", r.BackupParts,
-			"NewDNASequence", r.NewDNASequence,
+		_output.Status = fmt.Sprintln(
+			"Warnings:", _output.Warnings,
+			"Simulationpass=", _output.Simulationpass,
+			"Back up parts found (Reported to work!)", _output.BackupParts,
+			"NewDNASequence", _output.NewDNASequence,
 			//"partonewithoverhangs", partonewithoverhangs,
 			//"Vector",vectordata,
 			"Vector digest:", stickyends5, stickyends3,
 			partstoorder,
-			"Sitesfound", r.Sitesfound,
-			"Partsinorder=", p.Partsinorder, partsinorder,
+			"Sitesfound", _output.Sitesfound,
+			"Partsinorder=", _input.Partsinorder, partsinorder,
 			"Test digestion sizes with TspEI", Testdigestionsizes,
 		//"Restriction Enzyme=",restrictionenzyme,
 		)
 	}
-	_ = _wrapper.WaitToEnd()
 
 }
 
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
-func (e *TypeIISAssembly_design) analysis(p TypeIISAssembly_designParamBlock, r *TypeIISAssembly_designResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
+func _analysis(_ctx context.Context, _input *Input_, _output *Output_) {
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
-func (e *TypeIISAssembly_design) validation(p TypeIISAssembly_designParamBlock, r *TypeIISAssembly_designResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
+func _validation(_ctx context.Context, _input *Input_, _output *Output_) {
 }
 
-// AsyncBag functions
-func (e *TypeIISAssembly_design) Complete(params interface{}) {
-	p := params.(TypeIISAssembly_designParamBlock)
-	if p.Error {
-		e.BackupParts <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		e.NewDNASequence <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		e.PartswithOverhangs <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		e.Simulationpass <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		e.Sitesfound <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		e.Status <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		e.Warnings <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		return
+func _run(_ctx context.Context, value inject.Value) (inject.Value, error) {
+	input := &Input_{}
+	output := &Output_{}
+	if err := inject.Assign(value, input); err != nil {
+		return nil, err
 	}
-	r := new(TypeIISAssembly_designResultBlock)
-	defer func() {
-		if res := recover(); res != nil {
-			e.BackupParts <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			e.NewDNASequence <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			e.PartswithOverhangs <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			e.Simulationpass <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			e.Sitesfound <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			e.Status <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			e.Warnings <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			execute.AddError(&execute.RuntimeError{BaseError: res, Stack: debug.Stack()})
-			return
-		}
-	}()
-	e.startup.Do(func() { e.setup(p) })
-	e.steps(p, r)
-
-	e.BackupParts <- execute.ThreadParam{Value: r.BackupParts, ID: p.ID, Error: false}
-
-	e.NewDNASequence <- execute.ThreadParam{Value: r.NewDNASequence, ID: p.ID, Error: false}
-
-	e.PartswithOverhangs <- execute.ThreadParam{Value: r.PartswithOverhangs, ID: p.ID, Error: false}
-
-	e.Simulationpass <- execute.ThreadParam{Value: r.Simulationpass, ID: p.ID, Error: false}
-
-	e.Sitesfound <- execute.ThreadParam{Value: r.Sitesfound, ID: p.ID, Error: false}
-
-	e.Status <- execute.ThreadParam{Value: r.Status, ID: p.ID, Error: false}
-
-	e.Warnings <- execute.ThreadParam{Value: r.Warnings, ID: p.ID, Error: false}
-
-	e.analysis(p, r)
-
-	e.validation(p, r)
-
+	_setup(_ctx, input)
+	_steps(_ctx, input, output)
+	_analysis(_ctx, input, output)
+	_validation(_ctx, input, output)
+	return inject.MakeValue(output), nil
 }
 
-// init function, read characterization info from seperate file to validate ranges?
-func (e *TypeIISAssembly_design) init() {
-	e.params = make(map[execute.ThreadID]*execute.AsyncBag)
-}
+var (
+	_ = execute.MixInto
+	_ = wunit.Make_units
+)
 
-func (e *TypeIISAssembly_design) NewConfig() interface{} {
-	return &TypeIISAssembly_designConfig{}
-}
-
-func (e *TypeIISAssembly_design) NewParamBlock() interface{} {
-	return &TypeIISAssembly_designParamBlock{}
-}
-
-func NewTypeIISAssembly_design() interface{} { //*TypeIISAssembly_design {
-	e := new(TypeIISAssembly_design)
-	e.init()
-	return e
-}
-
-// Mapper function
-func (e *TypeIISAssembly_design) Map(m map[string]interface{}) interface{} {
-	var res TypeIISAssembly_designParamBlock
-	res.Error = false || m["AssemblyStandard"].(execute.ThreadParam).Error || m["Constructname"].(execute.ThreadParam).Error || m["Level"].(execute.ThreadParam).Error || m["PartMoClotypesinorder"].(execute.ThreadParam).Error || m["Partsinorder"].(execute.ThreadParam).Error || m["RestrictionsitetoAvoid"].(execute.ThreadParam).Error || m["Vector"].(execute.ThreadParam).Error
-
-	vAssemblyStandard, is := m["AssemblyStandard"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISAssembly_designJSONBlock
-		json.Unmarshal([]byte(vAssemblyStandard.JSONString), &temp)
-		res.AssemblyStandard = *temp.AssemblyStandard
-	} else {
-		res.AssemblyStandard = m["AssemblyStandard"].(execute.ThreadParam).Value.(string)
-	}
-
-	vConstructname, is := m["Constructname"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISAssembly_designJSONBlock
-		json.Unmarshal([]byte(vConstructname.JSONString), &temp)
-		res.Constructname = *temp.Constructname
-	} else {
-		res.Constructname = m["Constructname"].(execute.ThreadParam).Value.(string)
-	}
-
-	vLevel, is := m["Level"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISAssembly_designJSONBlock
-		json.Unmarshal([]byte(vLevel.JSONString), &temp)
-		res.Level = *temp.Level
-	} else {
-		res.Level = m["Level"].(execute.ThreadParam).Value.(string)
-	}
-
-	vPartMoClotypesinorder, is := m["PartMoClotypesinorder"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISAssembly_designJSONBlock
-		json.Unmarshal([]byte(vPartMoClotypesinorder.JSONString), &temp)
-		res.PartMoClotypesinorder = *temp.PartMoClotypesinorder
-	} else {
-		res.PartMoClotypesinorder = m["PartMoClotypesinorder"].(execute.ThreadParam).Value.([]string)
-	}
-
-	vPartsinorder, is := m["Partsinorder"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISAssembly_designJSONBlock
-		json.Unmarshal([]byte(vPartsinorder.JSONString), &temp)
-		res.Partsinorder = *temp.Partsinorder
-	} else {
-		res.Partsinorder = m["Partsinorder"].(execute.ThreadParam).Value.([]string)
-	}
-
-	vRestrictionsitetoAvoid, is := m["RestrictionsitetoAvoid"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISAssembly_designJSONBlock
-		json.Unmarshal([]byte(vRestrictionsitetoAvoid.JSONString), &temp)
-		res.RestrictionsitetoAvoid = *temp.RestrictionsitetoAvoid
-	} else {
-		res.RestrictionsitetoAvoid = m["RestrictionsitetoAvoid"].(execute.ThreadParam).Value.([]string)
-	}
-
-	vVector, is := m["Vector"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISAssembly_designJSONBlock
-		json.Unmarshal([]byte(vVector.JSONString), &temp)
-		res.Vector = *temp.Vector
-	} else {
-		res.Vector = m["Vector"].(execute.ThreadParam).Value.(string)
-	}
-
-	res.ID = m["AssemblyStandard"].(execute.ThreadParam).ID
-	res.BlockID = m["AssemblyStandard"].(execute.ThreadParam).BlockID
-
-	return res
-}
-
-func (e *TypeIISAssembly_design) OnAssemblyStandard(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("AssemblyStandard", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISAssembly_design) OnConstructname(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Constructname", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISAssembly_design) OnLevel(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Level", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISAssembly_design) OnPartMoClotypesinorder(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("PartMoClotypesinorder", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISAssembly_design) OnPartsinorder(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Partsinorder", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISAssembly_design) OnRestrictionsitetoAvoid(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("RestrictionsitetoAvoid", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISAssembly_design) OnVector(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Vector", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
+func New() interface{} {
+	return &Element_{
+		inject.CheckedRunner{
+			RunFunc: _run,
+			In:      &Input_{},
+			Out:     &Output_{},
+		},
 	}
 }
 
-type TypeIISAssembly_design struct {
-	flow.Component         // component "superclass" embedded
-	lock                   sync.Mutex
-	startup                sync.Once
-	params                 map[execute.ThreadID]*execute.AsyncBag
-	AssemblyStandard       <-chan execute.ThreadParam
-	Constructname          <-chan execute.ThreadParam
-	Level                  <-chan execute.ThreadParam
-	PartMoClotypesinorder  <-chan execute.ThreadParam
-	Partsinorder           <-chan execute.ThreadParam
-	RestrictionsitetoAvoid <-chan execute.ThreadParam
-	Vector                 <-chan execute.ThreadParam
-	BackupParts            chan<- execute.ThreadParam
-	NewDNASequence         chan<- execute.ThreadParam
-	PartswithOverhangs     chan<- execute.ThreadParam
-	Simulationpass         chan<- execute.ThreadParam
-	Sitesfound             chan<- execute.ThreadParam
-	Status                 chan<- execute.ThreadParam
-	Warnings               chan<- execute.ThreadParam
+type Element_ struct {
+	inject.CheckedRunner
 }
 
-type TypeIISAssembly_designParamBlock struct {
-	ID                     execute.ThreadID
-	BlockID                execute.BlockID
-	Error                  bool
+type Input_ struct {
 	AssemblyStandard       string
 	Constructname          string
 	Level                  string
@@ -512,23 +235,7 @@ type TypeIISAssembly_designParamBlock struct {
 	Vector                 string
 }
 
-type TypeIISAssembly_designConfig struct {
-	ID                     execute.ThreadID
-	BlockID                execute.BlockID
-	Error                  bool
-	AssemblyStandard       string
-	Constructname          string
-	Level                  string
-	PartMoClotypesinorder  []string
-	Partsinorder           []string
-	RestrictionsitetoAvoid []string
-	Vector                 string
-}
-
-type TypeIISAssembly_designResultBlock struct {
-	ID                 execute.ThreadID
-	BlockID            execute.BlockID
-	Error              bool
+type Output_ struct {
 	BackupParts        []string
 	NewDNASequence     wtype.DNASequence
 	PartswithOverhangs []wtype.DNASequence
@@ -536,47 +243,4 @@ type TypeIISAssembly_designResultBlock struct {
 	Sitesfound         []enzymes.Restrictionsites
 	Status             string
 	Warnings           string
-}
-
-type TypeIISAssembly_designJSONBlock struct {
-	ID                     *execute.ThreadID
-	BlockID                *execute.BlockID
-	Error                  *bool
-	AssemblyStandard       *string
-	Constructname          *string
-	Level                  *string
-	PartMoClotypesinorder  *[]string
-	Partsinorder           *[]string
-	RestrictionsitetoAvoid *[]string
-	Vector                 *string
-	BackupParts            *[]string
-	NewDNASequence         *wtype.DNASequence
-	PartswithOverhangs     *[]wtype.DNASequence
-	Simulationpass         *bool
-	Sitesfound             *[]enzymes.Restrictionsites
-	Status                 *string
-	Warnings               *string
-}
-
-func (c *TypeIISAssembly_design) ComponentInfo() *execute.ComponentInfo {
-	inp := make([]execute.PortInfo, 0)
-	outp := make([]execute.PortInfo, 0)
-	inp = append(inp, *execute.NewPortInfo("AssemblyStandard", "string", "AssemblyStandard", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Constructname", "string", "Constructname", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Level", "string", "Level", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("PartMoClotypesinorder", "[]string", "PartMoClotypesinorder", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Partsinorder", "[]string", "Partsinorder", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("RestrictionsitetoAvoid", "[]string", "RestrictionsitetoAvoid", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Vector", "string", "Vector", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("BackupParts", "[]string", "BackupParts", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("NewDNASequence", "wtype.DNASequence", "NewDNASequence", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("PartswithOverhangs", "[]wtype.DNASequence", "PartswithOverhangs", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Simulationpass", "bool", "Simulationpass", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Sitesfound", "[]enzymes.Restrictionsites", "Sitesfound", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Status", "string", "Status", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Warnings", "string", "Warnings", true, true, nil, nil))
-
-	ci := execute.NewComponentInfo("TypeIISAssembly_design", "TypeIISAssembly_design", "", false, inp, outp)
-
-	return ci
 }

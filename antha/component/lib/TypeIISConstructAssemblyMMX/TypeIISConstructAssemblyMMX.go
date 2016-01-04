@@ -1,16 +1,13 @@
 package TypeIISConstructAssemblyMMX
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/antha/execute"
-	"github.com/antha-lang/antha/flow"
-	"github.com/antha-lang/antha/microArch/execution"
-	"runtime/debug"
-	"sync"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/execute"
+	"github.com/antha-lang/antha/inject"
 )
 
 // Input parameters for this protocol (data)
@@ -21,546 +18,95 @@ import (
 
 // Data which is returned from this protocol, and data types
 
-func (e *TypeIISConstructAssemblyMMX) requirements() { _ = wunit.Make_units }
+func _requirements() {}
 
 // Conditions to run on startup
-func (e *TypeIISConstructAssemblyMMX) setup(p TypeIISConstructAssemblyMMXParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
-}
+func _setup(_ctx context.Context, _input *Input_) {}
 
 // The core process for this protocol, with the steps to be performed
 // for every input
-func (e *TypeIISConstructAssemblyMMX) steps(p TypeIISConstructAssemblyMMXParamBlock, r *TypeIISConstructAssemblyMMXResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-
+func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 	samples := make([]*wtype.LHComponent, 0)
-	waterSample := mixer.SampleForTotalVolume(p.Water, p.ReactionVolume)
-	samples = append(samples, waterSample)
-
-	mmxSample := mixer.Sample(p.MasterMix, p.MMXVol)
+	mmxSample := mixer.Sample(_input.MasterMix, _input.MMXVol)
 	samples = append(samples, mmxSample)
 
-	for k, part := range p.Parts {
-		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", p.PartNames[k], " vol ", p.PartVols[k])
-		partSample := mixer.Sample(part, p.PartVols[k])
-		partSample.CName = p.PartNames[k]
+	waterSample := mixer.SampleForTotalVolume(_input.Water, _input.ReactionVolume)
+	samples = append(samples, waterSample)
+
+	vectorSample := mixer.Sample(_input.Vector, _input.VectorVol)
+	samples = append(samples, vectorSample)
+
+	for k, part := range _input.Parts {
+		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", _input.PartNames[k], " vol ", _input.PartVols[k])
+		partSample := mixer.Sample(part, _input.PartVols[k])
+		partSample.CName = _input.PartNames[k]
 		samples = append(samples, partSample)
 	}
 
-	r.Reaction = _wrapper.MixTo(p.OutPlate, p.OutputLocation, samples...)
+	_output.Reaction = execute.MixInto(_ctx,
+
+		_input.OutPlate, samples...)
 
 	// incubate the reaction mixture
-	_wrapper.Incubate(r.Reaction, p.ReactionTemp, p.ReactionTime, false)
-	// inactivate
-	_wrapper.Incubate(r.Reaction, p.InactivationTemp, p.InactivationTime, false)
-	_ = _wrapper.WaitToEnd()
+	execute.Incubate(_ctx,
 
+		_output.Reaction, _input.ReactionTemp, _input.ReactionTime, false)
+	// inactivate
+	execute.Incubate(_ctx,
+
+		_output.Reaction, _input.InactivationTemp, _input.InactivationTime, false)
 }
 
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
-func (e *TypeIISConstructAssemblyMMX) analysis(p TypeIISConstructAssemblyMMXParamBlock, r *TypeIISConstructAssemblyMMXResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
+func _analysis(_ctx context.Context, _input *Input_, _output *Output_) {
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
-func (e *TypeIISConstructAssemblyMMX) validation(p TypeIISConstructAssemblyMMXParamBlock, r *TypeIISConstructAssemblyMMXResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
+func _validation(_ctx context.Context, _input *Input_, _output *Output_) {
 }
 
-// AsyncBag functions
-func (e *TypeIISConstructAssemblyMMX) Complete(params interface{}) {
-	p := params.(TypeIISConstructAssemblyMMXParamBlock)
-	if p.Error {
-		e.Reaction <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		return
+func _run(_ctx context.Context, value inject.Value) (inject.Value, error) {
+	input := &Input_{}
+	output := &Output_{}
+	if err := inject.Assign(value, input); err != nil {
+		return nil, err
 	}
-	r := new(TypeIISConstructAssemblyMMXResultBlock)
-	defer func() {
-		if res := recover(); res != nil {
-			e.Reaction <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			execute.AddError(&execute.RuntimeError{BaseError: res, Stack: debug.Stack()})
-			return
-		}
-	}()
-	e.startup.Do(func() { e.setup(p) })
-	e.steps(p, r)
-
-	e.Reaction <- execute.ThreadParam{Value: r.Reaction, ID: p.ID, Error: false}
-
-	e.analysis(p, r)
-
-	e.validation(p, r)
-
+	_setup(_ctx, input)
+	_steps(_ctx, input, output)
+	_analysis(_ctx, input, output)
+	_validation(_ctx, input, output)
+	return inject.MakeValue(output), nil
 }
 
-// init function, read characterization info from seperate file to validate ranges?
-func (e *TypeIISConstructAssemblyMMX) init() {
-	e.params = make(map[execute.ThreadID]*execute.AsyncBag)
-}
+var (
+	_ = execute.MixInto
+	_ = wunit.Make_units
+)
 
-func (e *TypeIISConstructAssemblyMMX) NewConfig() interface{} {
-	return &TypeIISConstructAssemblyMMXConfig{}
-}
-
-func (e *TypeIISConstructAssemblyMMX) NewParamBlock() interface{} {
-	return &TypeIISConstructAssemblyMMXParamBlock{}
-}
-
-func NewTypeIISConstructAssemblyMMX() interface{} { //*TypeIISConstructAssemblyMMX {
-	e := new(TypeIISConstructAssemblyMMX)
-	e.init()
-	return e
-}
-
-// Mapper function
-func (e *TypeIISConstructAssemblyMMX) Map(m map[string]interface{}) interface{} {
-	var res TypeIISConstructAssemblyMMXParamBlock
-	res.Error = false || m["InactivationTemp"].(execute.ThreadParam).Error || m["InactivationTime"].(execute.ThreadParam).Error || m["MMXVol"].(execute.ThreadParam).Error || m["MasterMix"].(execute.ThreadParam).Error || m["OutPlate"].(execute.ThreadParam).Error || m["OutputLocation"].(execute.ThreadParam).Error || m["OutputPlateNum"].(execute.ThreadParam).Error || m["OutputReactionName"].(execute.ThreadParam).Error || m["PartNames"].(execute.ThreadParam).Error || m["PartVols"].(execute.ThreadParam).Error || m["Parts"].(execute.ThreadParam).Error || m["ReactionTemp"].(execute.ThreadParam).Error || m["ReactionTime"].(execute.ThreadParam).Error || m["ReactionVolume"].(execute.ThreadParam).Error || m["Water"].(execute.ThreadParam).Error
-
-	vInactivationTemp, is := m["InactivationTemp"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISConstructAssemblyMMXJSONBlock
-		json.Unmarshal([]byte(vInactivationTemp.JSONString), &temp)
-		res.InactivationTemp = *temp.InactivationTemp
-	} else {
-		res.InactivationTemp = m["InactivationTemp"].(execute.ThreadParam).Value.(wunit.Temperature)
-	}
-
-	vInactivationTime, is := m["InactivationTime"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISConstructAssemblyMMXJSONBlock
-		json.Unmarshal([]byte(vInactivationTime.JSONString), &temp)
-		res.InactivationTime = *temp.InactivationTime
-	} else {
-		res.InactivationTime = m["InactivationTime"].(execute.ThreadParam).Value.(wunit.Time)
-	}
-
-	vMMXVol, is := m["MMXVol"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISConstructAssemblyMMXJSONBlock
-		json.Unmarshal([]byte(vMMXVol.JSONString), &temp)
-		res.MMXVol = *temp.MMXVol
-	} else {
-		res.MMXVol = m["MMXVol"].(execute.ThreadParam).Value.(wunit.Volume)
-	}
-
-	vMasterMix, is := m["MasterMix"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISConstructAssemblyMMXJSONBlock
-		json.Unmarshal([]byte(vMasterMix.JSONString), &temp)
-		res.MasterMix = *temp.MasterMix
-	} else {
-		res.MasterMix = m["MasterMix"].(execute.ThreadParam).Value.(*wtype.LHComponent)
-	}
-
-	vOutPlate, is := m["OutPlate"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISConstructAssemblyMMXJSONBlock
-		json.Unmarshal([]byte(vOutPlate.JSONString), &temp)
-		res.OutPlate = *temp.OutPlate
-	} else {
-		res.OutPlate = m["OutPlate"].(execute.ThreadParam).Value.(*wtype.LHPlate)
-	}
-
-	vOutputLocation, is := m["OutputLocation"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISConstructAssemblyMMXJSONBlock
-		json.Unmarshal([]byte(vOutputLocation.JSONString), &temp)
-		res.OutputLocation = *temp.OutputLocation
-	} else {
-		res.OutputLocation = m["OutputLocation"].(execute.ThreadParam).Value.(string)
-	}
-
-	vOutputPlateNum, is := m["OutputPlateNum"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISConstructAssemblyMMXJSONBlock
-		json.Unmarshal([]byte(vOutputPlateNum.JSONString), &temp)
-		res.OutputPlateNum = *temp.OutputPlateNum
-	} else {
-		res.OutputPlateNum = m["OutputPlateNum"].(execute.ThreadParam).Value.(string)
-	}
-
-	vOutputReactionName, is := m["OutputReactionName"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISConstructAssemblyMMXJSONBlock
-		json.Unmarshal([]byte(vOutputReactionName.JSONString), &temp)
-		res.OutputReactionName = *temp.OutputReactionName
-	} else {
-		res.OutputReactionName = m["OutputReactionName"].(execute.ThreadParam).Value.(string)
-	}
-
-	vPartNames, is := m["PartNames"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISConstructAssemblyMMXJSONBlock
-		json.Unmarshal([]byte(vPartNames.JSONString), &temp)
-		res.PartNames = *temp.PartNames
-	} else {
-		res.PartNames = m["PartNames"].(execute.ThreadParam).Value.([]string)
-	}
-
-	vPartVols, is := m["PartVols"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISConstructAssemblyMMXJSONBlock
-		json.Unmarshal([]byte(vPartVols.JSONString), &temp)
-		res.PartVols = *temp.PartVols
-	} else {
-		res.PartVols = m["PartVols"].(execute.ThreadParam).Value.([]wunit.Volume)
-	}
-
-	vParts, is := m["Parts"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISConstructAssemblyMMXJSONBlock
-		json.Unmarshal([]byte(vParts.JSONString), &temp)
-		res.Parts = *temp.Parts
-	} else {
-		res.Parts = m["Parts"].(execute.ThreadParam).Value.([]*wtype.LHComponent)
-	}
-
-	vReactionTemp, is := m["ReactionTemp"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISConstructAssemblyMMXJSONBlock
-		json.Unmarshal([]byte(vReactionTemp.JSONString), &temp)
-		res.ReactionTemp = *temp.ReactionTemp
-	} else {
-		res.ReactionTemp = m["ReactionTemp"].(execute.ThreadParam).Value.(wunit.Temperature)
-	}
-
-	vReactionTime, is := m["ReactionTime"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISConstructAssemblyMMXJSONBlock
-		json.Unmarshal([]byte(vReactionTime.JSONString), &temp)
-		res.ReactionTime = *temp.ReactionTime
-	} else {
-		res.ReactionTime = m["ReactionTime"].(execute.ThreadParam).Value.(wunit.Time)
-	}
-
-	vReactionVolume, is := m["ReactionVolume"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISConstructAssemblyMMXJSONBlock
-		json.Unmarshal([]byte(vReactionVolume.JSONString), &temp)
-		res.ReactionVolume = *temp.ReactionVolume
-	} else {
-		res.ReactionVolume = m["ReactionVolume"].(execute.ThreadParam).Value.(wunit.Volume)
-	}
-
-	vWater, is := m["Water"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TypeIISConstructAssemblyMMXJSONBlock
-		json.Unmarshal([]byte(vWater.JSONString), &temp)
-		res.Water = *temp.Water
-	} else {
-		res.Water = m["Water"].(execute.ThreadParam).Value.(*wtype.LHComponent)
-	}
-
-	res.ID = m["InactivationTemp"].(execute.ThreadParam).ID
-	res.BlockID = m["InactivationTemp"].(execute.ThreadParam).BlockID
-
-	return res
-}
-
-func (e *TypeIISConstructAssemblyMMX) OnInactivationTemp(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("InactivationTemp", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISConstructAssemblyMMX) OnInactivationTime(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("InactivationTime", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISConstructAssemblyMMX) OnMMXVol(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("MMXVol", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISConstructAssemblyMMX) OnMasterMix(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("MasterMix", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISConstructAssemblyMMX) OnOutPlate(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("OutPlate", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISConstructAssemblyMMX) OnOutputLocation(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("OutputLocation", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISConstructAssemblyMMX) OnOutputPlateNum(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("OutputPlateNum", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISConstructAssemblyMMX) OnOutputReactionName(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("OutputReactionName", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISConstructAssemblyMMX) OnPartNames(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("PartNames", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISConstructAssemblyMMX) OnPartVols(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("PartVols", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISConstructAssemblyMMX) OnParts(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Parts", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISConstructAssemblyMMX) OnReactionTemp(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("ReactionTemp", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISConstructAssemblyMMX) OnReactionTime(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("ReactionTime", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISConstructAssemblyMMX) OnReactionVolume(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("ReactionVolume", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *TypeIISConstructAssemblyMMX) OnWater(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(15, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Water", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
+func New() interface{} {
+	return &Element_{
+		inject.CheckedRunner{
+			RunFunc: _run,
+			In:      &Input_{},
+			Out:     &Output_{},
+		},
 	}
 }
 
-type TypeIISConstructAssemblyMMX struct {
-	flow.Component     // component "superclass" embedded
-	lock               sync.Mutex
-	startup            sync.Once
-	params             map[execute.ThreadID]*execute.AsyncBag
-	InactivationTemp   <-chan execute.ThreadParam
-	InactivationTime   <-chan execute.ThreadParam
-	MMXVol             <-chan execute.ThreadParam
-	MasterMix          <-chan execute.ThreadParam
-	OutPlate           <-chan execute.ThreadParam
-	OutputLocation     <-chan execute.ThreadParam
-	OutputPlateNum     <-chan execute.ThreadParam
-	OutputReactionName <-chan execute.ThreadParam
-	PartNames          <-chan execute.ThreadParam
-	PartVols           <-chan execute.ThreadParam
-	Parts              <-chan execute.ThreadParam
-	ReactionTemp       <-chan execute.ThreadParam
-	ReactionTime       <-chan execute.ThreadParam
-	ReactionVolume     <-chan execute.ThreadParam
-	Water              <-chan execute.ThreadParam
-	Reaction           chan<- execute.ThreadParam
+type Element_ struct {
+	inject.CheckedRunner
 }
 
-type TypeIISConstructAssemblyMMXParamBlock struct {
-	ID                 execute.ThreadID
-	BlockID            execute.BlockID
-	Error              bool
+type Input_ struct {
+	InPlate            *wtype.LHPlate
 	InactivationTemp   wunit.Temperature
 	InactivationTime   wunit.Time
 	MMXVol             wunit.Volume
 	MasterMix          *wtype.LHComponent
 	OutPlate           *wtype.LHPlate
-	OutputLocation     string
-	OutputPlateNum     string
 	OutputReactionName string
 	PartNames          []string
 	PartVols           []wunit.Volume
@@ -568,80 +114,11 @@ type TypeIISConstructAssemblyMMXParamBlock struct {
 	ReactionTemp       wunit.Temperature
 	ReactionTime       wunit.Time
 	ReactionVolume     wunit.Volume
+	Vector             *wtype.LHComponent
+	VectorVol          wunit.Volume
 	Water              *wtype.LHComponent
 }
 
-type TypeIISConstructAssemblyMMXConfig struct {
-	ID                 execute.ThreadID
-	BlockID            execute.BlockID
-	Error              bool
-	InactivationTemp   wunit.Temperature
-	InactivationTime   wunit.Time
-	MMXVol             wunit.Volume
-	MasterMix          wtype.FromFactory
-	OutPlate           wtype.FromFactory
-	OutputLocation     string
-	OutputPlateNum     string
-	OutputReactionName string
-	PartNames          []string
-	PartVols           []wunit.Volume
-	Parts              []wtype.FromFactory
-	ReactionTemp       wunit.Temperature
-	ReactionTime       wunit.Time
-	ReactionVolume     wunit.Volume
-	Water              wtype.FromFactory
-}
-
-type TypeIISConstructAssemblyMMXResultBlock struct {
-	ID       execute.ThreadID
-	BlockID  execute.BlockID
-	Error    bool
+type Output_ struct {
 	Reaction *wtype.LHSolution
-}
-
-type TypeIISConstructAssemblyMMXJSONBlock struct {
-	ID                 *execute.ThreadID
-	BlockID            *execute.BlockID
-	Error              *bool
-	InactivationTemp   *wunit.Temperature
-	InactivationTime   *wunit.Time
-	MMXVol             *wunit.Volume
-	MasterMix          **wtype.LHComponent
-	OutPlate           **wtype.LHPlate
-	OutputLocation     *string
-	OutputPlateNum     *string
-	OutputReactionName *string
-	PartNames          *[]string
-	PartVols           *[]wunit.Volume
-	Parts              *[]*wtype.LHComponent
-	ReactionTemp       *wunit.Temperature
-	ReactionTime       *wunit.Time
-	ReactionVolume     *wunit.Volume
-	Water              **wtype.LHComponent
-	Reaction           **wtype.LHSolution
-}
-
-func (c *TypeIISConstructAssemblyMMX) ComponentInfo() *execute.ComponentInfo {
-	inp := make([]execute.PortInfo, 0)
-	outp := make([]execute.PortInfo, 0)
-	inp = append(inp, *execute.NewPortInfo("InactivationTemp", "wunit.Temperature", "InactivationTemp", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("InactivationTime", "wunit.Time", "InactivationTime", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("MMXVol", "wunit.Volume", "MMXVol", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("MasterMix", "*wtype.LHComponent", "MasterMix", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("OutPlate", "*wtype.LHPlate", "OutPlate", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("OutputLocation", "string", "OutputLocation", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("OutputPlateNum", "string", "OutputPlateNum", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("OutputReactionName", "string", "OutputReactionName", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("PartNames", "[]string", "PartNames", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("PartVols", "[]wunit.Volume", "PartVols", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Parts", "[]*wtype.LHComponent", "Parts", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("ReactionTemp", "wunit.Temperature", "ReactionTemp", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("ReactionTime", "wunit.Time", "ReactionTime", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("ReactionVolume", "wunit.Volume", "ReactionVolume", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Water", "*wtype.LHComponent", "Water", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Reaction", "*wtype.LHSolution", "Reaction", true, true, nil, nil))
-
-	ci := execute.NewComponentInfo("TypeIISConstructAssemblyMMX", "TypeIISConstructAssemblyMMX", "", false, inp, outp)
-
-	return ci
 }

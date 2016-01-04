@@ -72,13 +72,12 @@ func SetupParams(cnsts [][]string) ConstructAssemblyParams {
 
 	//lets create an assembly params object
 	cap := ConstructAssemblyParams{}
-	cap.Vector = "component:standard_cloning_vector_mark_1"
-	cap.RestrictionEnzyme = "component:SapI"
-	cap.Buffer = "component:CutsmartBuffer"
-	cap.Ligase = "component:T4Ligase"
-	cap.Atp = "component:ATP"
-	cap.Outplate = "plate:pcrplate_with_cooler"
-	cap.TipType = "tipbox:Gilson50"
+	cap.Vector = "standard_cloning_vector_mark_1"
+	cap.RestrictionEnzyme = "SapI"
+	cap.Buffer = "CutsmartBuffer"
+	cap.Ligase = "T4Ligase"
+	cap.Atp = "ATP"
+	cap.Outplate = "pcrplate_with_cooler"
 	cap.ReactionVolume = "20ul"
 	cap.PartConc = "0.0001g/l"
 	cap.VectorConc = "0.001g/l"

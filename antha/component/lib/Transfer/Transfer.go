@@ -1,15 +1,12 @@
 package Transfer
 
 import (
-	"encoding/json"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/antha/execute"
-	"github.com/antha-lang/antha/flow"
-	"github.com/antha-lang/antha/microArch/execution"
-	"runtime/debug"
-	"sync"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/execute"
+	"github.com/antha-lang/antha/inject"
 )
 
 // Input parameters for this protocol (data)
@@ -20,281 +17,80 @@ import (
 
 // Physical outputs from this protocol with types
 
-func (e *Transfer) requirements() {
-	_ = wunit.Make_units
+func _requirements() {
 
 }
 
 // Conditions to run on startup
-func (e *Transfer) setup(p TransferParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
+func _setup(_ctx context.Context, _input *Input_) {
 
 }
 
 // The core process for this protocol, with the steps to be performed
 // for every input
-func (e *Transfer) steps(p TransferParamBlock, r *TransferResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
+func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 
-	sample := mixer.Sample(p.Startingsolution, p.LiquidVolume)
-	r.FinalSolution = _wrapper.MixInto(p.OutPlate, sample)
+	sample := mixer.Sample(_input.Startingsolution, _input.LiquidVolume)
+	_output.FinalSolution = execute.MixInto(_ctx,
 
-	r.Status = p.LiquidVolume.ToString() + " of " + p.Liquidname + " was mixed into " + p.OutPlate.Type
-	_ = _wrapper.WaitToEnd()
+		_input.OutPlate, sample)
+
+	_output.Status = _input.LiquidVolume.ToString() + " of " + _input.Liquidname + " was mixed into " + _input.OutPlate.Type
 
 }
 
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
-func (e *Transfer) analysis(p TransferParamBlock, r *TransferResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
+func _analysis(_ctx context.Context, _input *Input_, _output *Output_) {
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
-func (e *Transfer) validation(p TransferParamBlock, r *TransferResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
+func _validation(_ctx context.Context, _input *Input_, _output *Output_) {
 
 }
 
-// AsyncBag functions
-func (e *Transfer) Complete(params interface{}) {
-	p := params.(TransferParamBlock)
-	if p.Error {
-		e.FinalSolution <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		e.Status <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		return
+func _run(_ctx context.Context, value inject.Value) (inject.Value, error) {
+	input := &Input_{}
+	output := &Output_{}
+	if err := inject.Assign(value, input); err != nil {
+		return nil, err
 	}
-	r := new(TransferResultBlock)
-	defer func() {
-		if res := recover(); res != nil {
-			e.FinalSolution <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			e.Status <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			execute.AddError(&execute.RuntimeError{BaseError: res, Stack: debug.Stack()})
-			return
-		}
-	}()
-	e.startup.Do(func() { e.setup(p) })
-	e.steps(p, r)
-
-	e.FinalSolution <- execute.ThreadParam{Value: r.FinalSolution, ID: p.ID, Error: false}
-
-	e.Status <- execute.ThreadParam{Value: r.Status, ID: p.ID, Error: false}
-
-	e.analysis(p, r)
-
-	e.validation(p, r)
-
+	_setup(_ctx, input)
+	_steps(_ctx, input, output)
+	_analysis(_ctx, input, output)
+	_validation(_ctx, input, output)
+	return inject.MakeValue(output), nil
 }
 
-// init function, read characterization info from seperate file to validate ranges?
-func (e *Transfer) init() {
-	e.params = make(map[execute.ThreadID]*execute.AsyncBag)
-}
+var (
+	_ = execute.MixInto
+	_ = wunit.Make_units
+)
 
-func (e *Transfer) NewConfig() interface{} {
-	return &TransferConfig{}
-}
-
-func (e *Transfer) NewParamBlock() interface{} {
-	return &TransferParamBlock{}
-}
-
-func NewTransfer() interface{} { //*Transfer {
-	e := new(Transfer)
-	e.init()
-	return e
-}
-
-// Mapper function
-func (e *Transfer) Map(m map[string]interface{}) interface{} {
-	var res TransferParamBlock
-	res.Error = false || m["LiquidVolume"].(execute.ThreadParam).Error || m["Liquidname"].(execute.ThreadParam).Error || m["OutPlate"].(execute.ThreadParam).Error || m["Startingsolution"].(execute.ThreadParam).Error
-
-	vLiquidVolume, is := m["LiquidVolume"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TransferJSONBlock
-		json.Unmarshal([]byte(vLiquidVolume.JSONString), &temp)
-		res.LiquidVolume = *temp.LiquidVolume
-	} else {
-		res.LiquidVolume = m["LiquidVolume"].(execute.ThreadParam).Value.(wunit.Volume)
-	}
-
-	vLiquidname, is := m["Liquidname"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TransferJSONBlock
-		json.Unmarshal([]byte(vLiquidname.JSONString), &temp)
-		res.Liquidname = *temp.Liquidname
-	} else {
-		res.Liquidname = m["Liquidname"].(execute.ThreadParam).Value.(string)
-	}
-
-	vOutPlate, is := m["OutPlate"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TransferJSONBlock
-		json.Unmarshal([]byte(vOutPlate.JSONString), &temp)
-		res.OutPlate = *temp.OutPlate
-	} else {
-		res.OutPlate = m["OutPlate"].(execute.ThreadParam).Value.(*wtype.LHPlate)
-	}
-
-	vStartingsolution, is := m["Startingsolution"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp TransferJSONBlock
-		json.Unmarshal([]byte(vStartingsolution.JSONString), &temp)
-		res.Startingsolution = *temp.Startingsolution
-	} else {
-		res.Startingsolution = m["Startingsolution"].(execute.ThreadParam).Value.(*wtype.LHComponent)
-	}
-
-	res.ID = m["LiquidVolume"].(execute.ThreadParam).ID
-	res.BlockID = m["LiquidVolume"].(execute.ThreadParam).BlockID
-
-	return res
-}
-
-func (e *Transfer) OnLiquidVolume(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(4, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("LiquidVolume", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Transfer) OnLiquidname(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(4, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Liquidname", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Transfer) OnOutPlate(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(4, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("OutPlate", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Transfer) OnStartingsolution(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(4, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Startingsolution", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
+func New() interface{} {
+	return &Element_{
+		inject.CheckedRunner{
+			RunFunc: _run,
+			In:      &Input_{},
+			Out:     &Output_{},
+		},
 	}
 }
 
-type Transfer struct {
-	flow.Component   // component "superclass" embedded
-	lock             sync.Mutex
-	startup          sync.Once
-	params           map[execute.ThreadID]*execute.AsyncBag
-	LiquidVolume     <-chan execute.ThreadParam
-	Liquidname       <-chan execute.ThreadParam
-	OutPlate         <-chan execute.ThreadParam
-	Startingsolution <-chan execute.ThreadParam
-	FinalSolution    chan<- execute.ThreadParam
-	Status           chan<- execute.ThreadParam
+type Element_ struct {
+	inject.CheckedRunner
 }
 
-type TransferParamBlock struct {
-	ID               execute.ThreadID
-	BlockID          execute.BlockID
-	Error            bool
+type Input_ struct {
 	LiquidVolume     wunit.Volume
 	Liquidname       string
 	OutPlate         *wtype.LHPlate
 	Startingsolution *wtype.LHComponent
 }
 
-type TransferConfig struct {
-	ID               execute.ThreadID
-	BlockID          execute.BlockID
-	Error            bool
-	LiquidVolume     wunit.Volume
-	Liquidname       string
-	OutPlate         wtype.FromFactory
-	Startingsolution wtype.FromFactory
-}
-
-type TransferResultBlock struct {
-	ID            execute.ThreadID
-	BlockID       execute.BlockID
-	Error         bool
+type Output_ struct {
 	FinalSolution *wtype.LHSolution
 	Status        string
-}
-
-type TransferJSONBlock struct {
-	ID               *execute.ThreadID
-	BlockID          *execute.BlockID
-	Error            *bool
-	LiquidVolume     *wunit.Volume
-	Liquidname       *string
-	OutPlate         **wtype.LHPlate
-	Startingsolution **wtype.LHComponent
-	FinalSolution    **wtype.LHSolution
-	Status           *string
-}
-
-func (c *Transfer) ComponentInfo() *execute.ComponentInfo {
-	inp := make([]execute.PortInfo, 0)
-	outp := make([]execute.PortInfo, 0)
-	inp = append(inp, *execute.NewPortInfo("LiquidVolume", "wunit.Volume", "LiquidVolume", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Liquidname", "string", "Liquidname", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("OutPlate", "*wtype.LHPlate", "OutPlate", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Startingsolution", "*wtype.LHComponent", "Startingsolution", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("FinalSolution", "*wtype.LHSolution", "FinalSolution", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Status", "string", "Status", true, true, nil, nil))
-
-	ci := execute.NewComponentInfo("Transfer", "Transfer", "", false, inp, outp)
-
-	return ci
 }

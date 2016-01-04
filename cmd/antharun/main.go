@@ -25,13 +25,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/antha-lang/antha/antha/component/lib"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/execute"
+	"github.com/antha-lang/antha/inject"
 	"io/ioutil"
 	"log"
 	"os"
-	"sync"
-
-	"github.com/antha-lang/antha/antha/component/lib"
-	"github.com/antha-lang/antha/antha/execute/util"
 )
 
 var (
@@ -40,47 +40,27 @@ var (
 	workflowFile   string
 	driverURI      string
 	list           bool
-	inputPlateFile string
+	inputPlateFile string // TODO: Forward to execution
 )
 
+func makeContext() (context.Context, error) {
+	ctx := inject.NewContext(context.Background())
+	for _, desc := range lib.GetComponents() {
+		obj := desc.Constructor()
+		runner, ok := obj.(inject.Runner)
+		if !ok {
+			return nil, fmt.Errorf("component %q has unexpected type %T", desc.Name, obj)
+		}
+		if err := inject.Add(ctx, inject.Name{Repo: desc.Name}, runner); err != nil {
+			return nil, err
+		}
+	}
+	return ctx, nil
+}
+
 func run() error {
-	wfData, err := ioutil.ReadFile(workflowFile)
-	if err != nil {
-		return err
-	}
-
-	wf, err := util.NewWorkflow(wfData)
-	if err != nil {
-		return err
-	}
-
-	cfData, err := ioutil.ReadFile(parametersFile)
-	if err != nil {
-		return err
-	}
-
-	/*
-		var ipData []byte
-
-		if inputPlateFile != "" {
-			ipData, err = ioutil.ReadFile(inputPlateFile)
-		}
-
-		if err != nil {
-			return err
-		}
-	*/
-	cf, err := util.NewConfig(cfData, wf)
-	if err != nil {
-		return err
-	}
-	if _, ok := cf.Config["JOBID"]; !ok {
-		cf.Config["JOBID"] = "default"
-	}
-
-	var fe *Frontend
 	if driverURI != "" {
-		fe, err = NewRemoteFrontend(driverURI)
+		fe, err := NewRemoteFrontend(driverURI)
 		if err != nil {
 			return err
 		}
@@ -92,40 +72,39 @@ func run() error {
 			return err
 		}
 
-		fe, err = NewCUIFrontend()
+		fe, err := NewCUIFrontend()
 		if err != nil {
 			return err
 		}
 		defer fe.Shutdown()
 	}
 
-	wr, err := wf.Run(cf)
+	wdata, err := ioutil.ReadFile(workflowFile)
 	if err != nil {
 		return err
 	}
 
-	sg := sync.WaitGroup{}
+	pdata, err := ioutil.ReadFile(parametersFile)
+	if err != nil {
+		return err
+	}
 
-	sg.Add(1)
-	sg.Add(1)
-	go func() {
-		defer sg.Done()
-		for m := range wr.Messages {
-			fe.SendAlert(fmt.Sprintf("%v", m))
-		}
-	}()
+	ctx, err := makeContext()
+	if err != nil {
+		return err
+	}
 
-	go func() {
-		defer sg.Done()
-		for e := range wr.Errors {
-			fe.SendAlert(fmt.Sprintf("%v", e))
-		}
-	}()
+	w, err := execute.Run(ctx, execute.Options{
+		WorkflowData: wdata,
+		ParamData:    pdata,
+	})
+	if err != nil {
+		return err
+	}
 
-	<-wr.Done
-	sg.Wait()
-
-	fe.SendAlert("Execution finished")
+	for k, v := range w.Outputs {
+		fmt.Printf("%s: %s\n", k, v)
+	}
 
 	return nil
 }
