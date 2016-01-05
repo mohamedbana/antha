@@ -1,16 +1,16 @@
 {
   "Parameters": {
     "Paintmix1": {
-      "Colour1": "Yellow",
-      "Colour2": "Blue",
+      "Colour1": "yellow",
+      "Colour2": "blue",
       "OutPlate": "pcrplate_with_cooler",
       "Colour1vol": "10ul",
       "Colour2vol": "10ul",
       "Numberofcopies":8
     },
     "Paintmix2": {
-      "Colour1": "Yellow",
-      "Colour2": "Blue",
+      "Colour1": "yellow",
+      "Colour2": "blue",
       "OutPlate": "pcrplate_with_cooler",
       "Colour1vol": "10ul",
       "Colour2vol": "10ul",
@@ -25,64 +25,64 @@
       "Numberofcopies":8
     },
     "Paintmix4": {
-      "Colour1": "Yellow",
-      "Colour2": "Blue",
+      "Colour1": "yellow",
+      "Colour2": "blue",
       "OutPlate": "pcrplate_with_cooler",
       "Colour1vol": "10ul",
       "Colour2vol": "10ul",
       "Numberofcopies":8
     },
     "Paintmix5": {
-      "Colour1": "Yellow",
-      "Colour2": "Blue",
+      "Colour1": "yellow",
+      "Colour2": "blue",
       "OutPlate": "pcrplate_with_cooler",
       "Colour1vol": "10ul",
       "Colour2vol": "10ul",
       "Numberofcopies":8
     },
     "Paintmix6": {
-      "Colour1": "Yellow",
-      "Colour2": "Blue",
+      "Colour1": "yellow",
+      "Colour2": "blue",
       "OutPlate": "pcrplate_with_cooler",
       "Colour1vol": "10ul",
       "Colour2vol": "10ul",
       "Numberofcopies":8
     },
     "Paintmix7": {
-      "Colour1": "Yellow",
-      "Colour2": "Blue",
+      "Colour1": "yellow",
+      "Colour2": "blue",
       "OutPlate": "pcrplate_with_cooler",
       "Colour1vol": "10ul",
       "Colour2vol": "10ul",
       "Numberofcopies":8
     },
     "Paintmix8": {
-      "Colour1": "Yellow",
-      "Colour2": "Blue",
+      "Colour1": "yellow",
+      "Colour2": "blue",
       "OutPlate": "pcrplate_with_cooler",
       "Colour1vol": "10ul",
       "Colour2vol": "10ul",
       "Numberofcopies":8
     },
     "Paintmix9": {
-      "Colour1": "Yellow",
-      "Colour2": "Blue",
+      "Colour1": "yellow",
+      "Colour2": "blue",
       "OutPlate": "pcrplate_with_cooler",
       "Colour1vol": "10ul",
       "Colour2vol": "10ul",
       "Numberofcopies":8
     },
     "Paintmix10": {
-      "Colour1": "Yellow",
-      "Colour2": "Blue",
+      "Colour1": "yellow",
+      "Colour2": "blue",
       "OutPlate": "pcrplate_with_cooler",
       "Colour1vol": "10ul",
       "Colour2vol": "10ul",
       "Numberofcopies":8
     },
     "Paintmix11": {
-      "Colour1": "Yellow",
-      "Colour2": "Blue",
+      "Colour1": "yellow",
+      "Colour2": "blue",
       "OutPlate": "pcrplate_with_cooler",
       "Colour1vol": "10ul",
       "Colour2vol": "10ul",
