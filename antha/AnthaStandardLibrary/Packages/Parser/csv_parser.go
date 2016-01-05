@@ -24,9 +24,7 @@
 package parser
 
 import (
-	"bytes"
 	"encoding/csv"
-	"encoding/json"
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
@@ -34,66 +32,6 @@ import (
 	"os"
 	"strings"
 )
-
-type ConstructAssemblyParams struct {
-	//parts is an array of array of strings.
-	// each string is the name of a part, they are grouped into arrays for the ones that form a construct
-	// each construct (which is an array of part names) is an entry of the uppermost array. Ex:
-	// { {"part1", "part2", "part3"}, //construct 1 instance 1
-	//   {"part1", "part2", "part3"}, //construct 1 instance 2
-	//   {"part3, "part4"}, //construct 2 instance 1
-	//   {"part3, "part4"}, //construct 2 instance 2
-	//   {"part3, "part4"}, //construct 2 instance 3
-	//   {"part3, "part4"}, //construct 2 instance 4
-	// }
-	// each array entry is translated into 1 construct, for a construct to be executed more than once, it must
-	// be included as many times as desired inside the construct array
-	Parts             [][]string
-	Vector            string
-	RestrictionEnzyme string
-	Buffer            string
-	Ligase            string
-	Atp               string
-	Outplate          string
-	TipType           string
-	ReactionVolume    string
-	PartConc          string
-	VectorConc        string
-	AtpVol            string
-	ReVol             string
-	LigVol            string
-	ReactionTemp      string
-	ReactionTime      string
-	InactivationTemp  string
-	InactivationTime  string
-}
-
-func SetupParams(cnsts [][]string) ConstructAssemblyParams {
-
-	//lets create an assembly params object
-	cap := ConstructAssemblyParams{}
-	cap.Vector = "standard_cloning_vector_mark_1"
-	cap.RestrictionEnzyme = "SapI"
-	cap.Buffer = "CutsmartBuffer"
-	cap.Ligase = "T4Ligase"
-	cap.Atp = "ATP"
-	cap.Outplate = "pcrplate_with_cooler"
-	cap.ReactionVolume = "20ul"
-	cap.PartConc = "0.0001g/l"
-	cap.VectorConc = "0.001g/l"
-	cap.AtpVol = "1ul"
-	cap.ReVol = "1ul"
-	cap.LigVol = "1ul"
-	cap.ReactionTemp = "25C"
-	cap.ReactionTime = "1800s"
-	cap.InactivationTemp = "40C"
-	cap.InactivationTime = "60s"
-	//Now the PARTS!
-	cap.Parts = cnsts
-
-	return cap
-
-}
 
 func ReadDesign(filename string) [][]string {
 
@@ -255,21 +193,6 @@ func Assemblyfromcsv(designfile string, partsfile string) (assemblyparameters []
 
 		assemblyparameters = append(assemblyparameters, newassemblyparameters)
 
-	}
-	params := SetupParams(designedconstructs)
-
-	print := 0
-
-	if print == 1 {
-		jsn, err := json.Marshal(params)
-		if err != nil {
-			panic(err)
-		}
-		var prettyJSON bytes.Buffer
-		err = json.Indent(&prettyJSON, jsn, "", "\t")
-		if err != nil {
-			panic(err)
-		}
 	}
 
 	return assemblyparameters

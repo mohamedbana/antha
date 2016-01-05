@@ -24,7 +24,6 @@ package enzymes
 
 import (
 	"fmt"
-	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/REBASE"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -260,84 +259,63 @@ func Assemblysimulator(assemblyparameters Assemblyparameters) (s string, success
 	return s, successfulassemblies, sites, newDNASequence, err
 }
 
-//MultipleAssemblies will perform simulated assemblies on multiple constructs and return a description of whether each was successful and how many are expected to work
-func MultipleAssemblies(parameters []Assemblyparameters) (s string, successfulassemblies int, errorDescription map[string]string, err error) {
-	allOK := true
-	errorDescription = make(map[string]string)
-
-	successfulassemblies = 0
-	// for each construct
+// MultipleAssemblies will perform simulated assemblies on multiple constructs
+// and return a description of whether each was successful and how many are
+// expected to work
+func MultipleAssemblies(parameters []Assemblyparameters) (s string, successfulassemblies int, errors map[string]string) {
 	for _, construct := range parameters {
-
 		output, _, _, _, err := Assemblysimulator(construct)
-		s = "Oh no, not all assemblies seem to work out"
 
-		if err != nil {
-			allOK = false
+		if err == nil {
+			successfulassemblies += 1
+			continue
+		}
 
-			if strings.Contains(err.Error(), "Failure Joining fragments after digestion") == true {
-				//sitesstring := ""
-				sitesperpart := make([]Restrictionsites, 0)
-				constructsitesstring := make([]string, 0)
-				constructsitesstring = append(constructsitesstring, output)
-				sitestring := ""
-				//for i := 0; i < len(plasmidproductsfromXprimaryseq); i++ {
-				//enzyme := TypeIIsEnzymeproperties[strings.ToUpper(construct.Enzymename)]
-				enzyme := lookup.EnzymeLookup(construct.Enzymename)
-				/*if err != nil {
-					constructsitesstring = append(constructsitesstring, enzerr.Error())
-				}*/
-				//enzyme := SapI
-				sitesperpart = Restrictionsitefinder(construct.Vector, []wtype.RestrictionEnzyme{enzyme})
+		if strings.Contains(err.Error(), "Failure Joining fragments after digestion") {
+			sitesperpart := make([]Restrictionsites, 0)
+			constructsitesstring := make([]string, 0)
+			constructsitesstring = append(constructsitesstring, output)
+			sitestring := ""
+			enzyme := lookup.EnzymeLookup(construct.Enzymename)
+			sitesperpart = Restrictionsitefinder(construct.Vector, []wtype.RestrictionEnzyme{enzyme})
+
+			if sitesperpart[0].Numberofsites != 2 {
+				// need to loop through sitesperpart
+
+				sitepositions := SitepositionString(sitesperpart[0])
+				sitestring = "For " + construct.Vector.Nm + ": " + strconv.Itoa(sitesperpart[0].Numberofsites) + " sites found at positions: " + sitepositions
+				constructsitesstring = append(constructsitesstring, sitestring)
+			}
+
+			for _, part := range construct.Partsinorder {
+				sitesperpart = Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enzyme})
 				if sitesperpart[0].Numberofsites != 2 {
-					// need to loop through sitesperpart
-
 					sitepositions := SitepositionString(sitesperpart[0])
-					sitestring = "For " + construct.Vector.Nm + ": " + strconv.Itoa(sitesperpart[0].Numberofsites) + " sites found at positions: " + sitepositions
+					positions := ""
+					if sitesperpart[0].Numberofsites != 0 {
+						positions = fmt.Sprint("at positions:", sitepositions)
+					}
+					sitestring = fmt.Sprint("For ", part.Nm, ": ", strconv.Itoa(sitesperpart[0].Numberofsites), " sites were found ", positions)
 					constructsitesstring = append(constructsitesstring, sitestring)
 				}
 
-				for _, part := range construct.Partsinorder {
-					sitesperpart = Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enzyme})
-					if sitesperpart[0].Numberofsites != 2 {
-						sitepositions := SitepositionString(sitesperpart[0])
-						positions := ""
-						if sitesperpart[0].Numberofsites != 0 {
-							positions = fmt.Sprint("at positions:", sitepositions)
-						}
-						sitestring = fmt.Sprint("For ", part.Nm, ": ", strconv.Itoa(sitesperpart[0].Numberofsites), " sites were found ", positions)
-						constructsitesstring = append(constructsitesstring, sitestring)
-					}
-
-				}
-				if len(constructsitesstring) != 1 {
-					message := strings.Join(constructsitesstring, "; ")
-					errorDescription[construct.Constructname] = message
-					err = fmt.Errorf(message)
-				}
 			}
-
-			s = fmt.Sprint(construct.Constructname, ": ", err.Error())
-
-			errorDescription[construct.Constructname] = s
+			if len(constructsitesstring) != 1 {
+				message := strings.Join(constructsitesstring, "; ")
+				err = fmt.Errorf(message)
+			}
 		}
 
-		if output == "Yay! this should work" {
-			successfulassemblies = successfulassemblies + 1
-		}
+		s = err.Error()
 
-		/*if err != nil {
-			message := fmt.Sprint("not all assemblies seem to work out",": ",construct.Constructname,": ",err.Error())
-			errorDescription[construct.Constructname] = message
-		}*/
-		if successfulassemblies == len(parameters) {
-			s = "success, all assemblies seem to work"
+		if errors == nil {
+			errors = make(map[string]string)
 		}
+		errors[construct.Constructname] = s
 	}
-	if !allOK {
 
-		err = fmt.Errorf(s)
-		//s = err.Error()
+	if successfulassemblies == len(parameters) {
+		s = "success, all assemblies seem to work"
 	}
-	return s, successfulassemblies, errorDescription, err
+	return
 }

@@ -26,10 +26,8 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/csv"
-	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 )
@@ -108,23 +106,18 @@ func FastaParse(fastaFh io.Reader) chan Fasta {
 	return outputChannel
 }
 
-func Fastatocsv(inputfilename string, outputfileprefix string) (csvfile *os.File, status string) {
-
-	status = "incomplete"
-
+func Fastatocsv(inputfilename string, outputfileprefix string) (csvfile *os.File, err error) {
 	fastaFh, err := os.Open(inputfilename)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	defer fastaFh.Close()
 
 	//csvfile, err := os.Create(outputfilename)
 	csvfile, err = ioutil.TempFile(os.TempDir(), "csv")
 	if err != nil {
-		fmt.Println("Error:", err)
 		return
 	}
-	defer csvfile.Close()
 
 	records := make([][]string, 0)
 	seq := make([]string, 0)
@@ -152,14 +145,12 @@ func Fastatocsv(inputfilename string, outputfileprefix string) (csvfile *os.File
 
 	writer := csv.NewWriter(csvfile)
 	for _, record := range records {
-		err := writer.Write(record)
+		err = writer.Write(record)
 		if err != nil {
-			fmt.Println("Error:", err)
 			return
 		}
 	}
 
-	status = "complete"
 	writer.Flush()
-	return csvfile, status
+	return
 }
