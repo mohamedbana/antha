@@ -1,0 +1,31 @@
+{
+  "Parameters": [{
+    "Plotdataparams": {
+      "Filename": "plotinumdata.xlsx",
+	  "Sheet": 0,
+      "Xminmax": [
+	"a4",
+	"a16"
+	],
+      "Yminmaxarray": [
+	[
+	"a4",
+	"a16"
+	],
+	[
+	"d4",
+	"d16"
+	],
+	[
+	"c4",
+	"c16"
+	],
+	],
+	"Exportedfilename":"anthaplot.png"
+    }
+  }
+],
+  "Config": {
+    "OUTPUT_COUNT": 1
+  }
+}
