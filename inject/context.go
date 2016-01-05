@@ -11,7 +11,7 @@ type injectKey int
 const theInjectKey injectKey = 0
 
 var noRegistry = errors.New("no registry found")
-var funcNotFound = errors.New("already added")
+var funcNotFound = errors.New("not found")
 
 // Create a new inject context
 func NewContext(parent context.Context) context.Context {
