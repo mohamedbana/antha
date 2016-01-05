@@ -20,7 +20,7 @@
 		"yellow",
 		"black"
 		],
-      "Outplate": "plate:greiner384",
+      "Outplate": "plate:greiner384_riser",
       "TipType": "tipbox:Gilson20",
       "VolumePerWell": "10ul"
     }

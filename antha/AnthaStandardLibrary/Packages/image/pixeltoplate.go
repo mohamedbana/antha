@@ -73,7 +73,7 @@ func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolour
 		colourarray := make([]color.Color, 0)
 		wellpositiontocolourmap = make(map[string]color.Color, 0)
 		// need to extend for 1536 plates
-		alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZAABBCCDDEEFF"
 
 		// Find out colour at each position:
 		for y := 0; y < plateimage.Bounds().Dy(); y++ {

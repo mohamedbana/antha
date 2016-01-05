@@ -13,12 +13,7 @@
 	  "Imagefilename": "mario.png",
 		"Palettename":"Palette1",
 		"AvailableColours":[
-		"red",
-		"white",
-		"blue",
 		"green",
-		"yellow",
-		"black"
 		],
       "Outplate": "plate:greiner384_riser",
       "TipType": "tipbox:Gilson20",
