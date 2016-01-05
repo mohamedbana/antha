@@ -24,8 +24,9 @@
 package eng
 
 import (
-	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"math"
+
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 )
 
 //Equations from Islam et al:
@@ -53,6 +54,7 @@ func Shakerspeed(TargetRE float64, ro float64, mu float64, dv float64) (rate wun
 	rps := (TargetRE * mu / (ro * dv * 2))
 	rate, _ = wunit.NewRate(rps, "/s")
 	//rate = rpm
+
 	return rate
 }
 

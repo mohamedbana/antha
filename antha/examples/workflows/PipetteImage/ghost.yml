@@ -1,0 +1,34 @@
+{
+  "Parameters": [{
+    "PipetteImage": {
+      "Colourcomponents": [
+	"component:red",
+	"component:white",
+	"component:blue",
+	"component:green",
+	"component:yellow",
+	"component:black"
+	],
+	"OnlythisColour":"green",
+	  "Imagefilename": "ghost.jpg",
+		"Palettename":"Palette1",
+		"AvailableColours":[
+		"red",
+		"white",
+		"blue",
+		"green",
+		"yellow",
+		"black"
+		],
+      "Outplate": "plate:greiner384",
+      "TipType": "tipbox:Gilson20",
+      "VolumePerWell": "10ul"
+    }
+  }],
+  "Config": {
+    "OUTPUT_COUNT": 144
+  }
+}
+
+
+

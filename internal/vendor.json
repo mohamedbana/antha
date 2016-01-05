@@ -98,6 +98,11 @@
 			"revisionTime": "2015-10-27T08:49:08+10:30"
 		},
 		{
+			"path": "github.com/disintegration/imaging",
+			"revision": "546cb3c5137b3f1232e123a26aa033aade6b3066",
+			"revisionTime": "2015-10-03T04:44:24+03:00"
+		},
+		{
 			"path": "github.com/kylelemons/godebug/diff",
 			"revision": "21cb3784d9bda523911b96719efba02b7e983256",
 			"revisionTime": "2015-05-19T08:45:55-07:00"
@@ -136,6 +141,21 @@
 			"path": "golang.org/x/net/context",
 			"revision": "042ba42fa6633b34205efc66ba5719cd3afd8d38",
 			"revisionTime": "2015-11-08T11:16:06+01:00"
+		},
+		{
+			"path": "golang.org/x/image/bmp",
+			"revision": "baddd3465a05d84a6d8d3507547a91cb188c81ea",
+			"revisionTime": "2015-09-11T13:43:18+10:00"
+		},
+		{
+			"path": "golang.org/x/image/tiff",
+			"revision": "baddd3465a05d84a6d8d3507547a91cb188c81ea",
+			"revisionTime": "2015-09-11T13:43:18+10:00"
+		},
+		{
+			"path": "golang.org/x/image/tiff/lzw",
+			"revision": "baddd3465a05d84a6d8d3507547a91cb188c81ea",
+			"revisionTime": "2015-09-11T13:43:18+10:00"
 		},
 		{
 			"path": "golang.org/x/net/html",

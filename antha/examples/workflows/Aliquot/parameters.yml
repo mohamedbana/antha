@@ -3,7 +3,7 @@
     "AliquotParams1": {
       "Solution": "PrimerFw",
       "InPlate": "pcrplate_with_cooler",
-      "OutPlate": "greiner384",
+      "OutPlate": "greiner384_riser",
       "SolutionVolume": "3100ul",
       "VolumePerAliquot": "10ul",
       "NumberofAliquots": 300
