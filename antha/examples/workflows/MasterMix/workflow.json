@@ -1,13 +1,7 @@
 {
-    "properties": {
-        "name": "main"
-    },
     "processes": {
         "Mastermix": {
-            "component": "Mastermix",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "Mastermix"
         }
     },
     "connections": [ ]

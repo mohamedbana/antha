@@ -1,8 +1,8 @@
 {
-    "Parameters": [{
+    "Parameters": {
         "MakeMedia":{
             "Name": "Custom_mediaRecipe",
-            "Water": "component:water",
+            "Water": "water",
             "TotalVolume": "100ul",
             "LiqComponentVolumes": [
 			"10ul",
@@ -17,21 +17,17 @@
 			"1000kg/m^3"
 			],
             "LiqComponents":[
-			"component:10x_M9Salts",
-			"component:100x_MEMVitamins"
+			"10x_M9Salts",
+			"100x_MEMVitamins"
 			],
 			"SolidComponents":[
-			"component:Yeast extract",
-			"component:Tryptone"
+			"Yeast extract",
+			"Tryptone"
 			],
 			"PH_setPoint": 7.2,
 			"PH_tolerance":0.2,
 			"PH_setPointTemp": "25C",
-            "Vessel": "plate:1L_DuranBottle",
-            "TipType": "tipbox:Gilson20"
+            "Vessel": "1L_DuranBottle"
         }
-    }],
-    "Config": {
-        "OUTPUT_COUNT": 1
     }
 }

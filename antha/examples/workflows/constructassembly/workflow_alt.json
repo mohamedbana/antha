@@ -1,0 +1,8 @@
+{
+    "processes": {
+        "ConstructAssembly": {
+            "component": "TypeIISConstructAssembly"
+        }
+    },
+    "connections": [ ]
+}

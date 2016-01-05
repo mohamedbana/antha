@@ -1,35 +1,31 @@
 {
-    "Parameters": [
+    "Parameters": 
         {
             "Standarddigestparams":{
                 "ReactionVolume": "20ul",
                 "DNAVol": "1ul",
 				"DNAName":"vector1",
                 "EnzymeNames" : [
-                    "Nco1",
+                    "Nco1"
                 ],
-                "Water": "component:water",
-                "DNASolution": "component:DNAsolution",
-				"BSAoptional": "component:DNAsolution",
+                "Water": "water",
+                "DNASolution": "DNAsolution",
+				"BSAoptional": "DNAsolution",
                 "BSAvol": "0ul",
-                "Buffer": "component:CutsmartBuffer",
+                "Buffer": "CutsmartBuffer",
                 "BufferVol": "2ul",
                 "EnzVolumestoadd":[
-				 "1ul",
+				 "1ul"
 				],
 				"EnzSolutions":[
-				"component:restrictionenzyme",
+				"restrictionenzyme"
 				],
-                "OutPlate": "plate:pcrplate_with_cooler",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20",
+                "OutPlate": "pcrplate_with_cooler",
+                "InPlate": "pcrplate_with_cooler",
                 "ReactionTemp": "37C",
                 "ReactionTime": "3600s",
                 "InactivationTemp": "65C",
                 "InactivationTime": "10s"
             }
-    }],
-    "Config": {
-        "OUTPUT_COUNT": 1
     }
 }

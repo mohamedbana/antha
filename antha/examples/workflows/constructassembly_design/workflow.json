@@ -1,13 +1,7 @@
 {
-    "properties": {
-        "name": "main"
-    },
     "processes": {
         "TypeIISAssembly_design": {
-            "component": "TypeIISAssembly_design",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "TypeIISAssembly_design"
         }
     },
     "connections": [ ]

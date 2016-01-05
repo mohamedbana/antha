@@ -1,13 +1,7 @@
 {
-    "properties": {
-        "name": "main"
-    },
     "processes": {
         "PlateOut": {
-            "component": "PlateOut",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "PlateOut"
         }
     },
     "connections": [ ]

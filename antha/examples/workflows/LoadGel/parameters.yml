@@ -1,162 +1,125 @@
 {
-"Parameters":[
+"Parameters":
 	{
-        "LoadGel":{
+        "LoadGel1":{
                 "SampleName": "Marker",
                 "LoadVolume": "10ul",
-                "Protein": "component:Load",
+                "Protein": "Load",
                 "WaterName": "dH2O",
-                "Water": "component:water",
+                "Water": "water",
                 "WaterVolume": "10ul",
-		            "GelPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20"
-        	}
+		            "GelPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler"
 	},
-	{
-	"LoadGel":{
+	"LoadGel2":{
                 "SampleName": "Lysate",
                 "LoadVolume": "10ul",
-                "Protein": "component:Load",
+                "Protein": "Load",
                 "WaterName": "dH2O",
-                "Water": "component:water",
+                "Water": "water",
                 "WaterVolume": "10ul",
-		            "GelPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20"
-        	}	
+		            "GelPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler"
 	}, 
-	{"LoadGel":{
+	"LoadGel3":{
                 "SampleName": "Flowthrough",
                 "LoadVolume": "10ul",
-                "Protein": "component:Load",
+                "Protein": "Load",
                 "WaterName": "dH2O",
-                "Water": "component:water",
+                "Water": "water",
                 "WaterVolume": "10ul",
-		            "GelPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20"
-        	}
+		            "GelPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler"
 	},
-	{
-	"LoadGel":{
+	"LoadGel4":{
                 "SampleName": "Wash1",
                 "LoadVolume": "10ul",
-                "Protein": "component:Load",
+                "Protein": "Load",
                 "WaterName": "dH2O",
-                "Water": "component:water",
+                "Water": "water",
                 "WaterVolume": "10ul",
-		            "GelPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20"
-	        }
+		            "GelPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler"
 	},
-        {
-	"LoadGel":{
+	"LoadGel5":{
                 "SampleName": "Wash2",
                 "LoadVolume": "10ul",
-                "Protein": "component:Load",
+                "Protein": "Load",
                 "WaterName": "dH2O",
-                "Water": "component:water",
+                "Water": "water",
                 "WaterVolume": "10ul",
-		            "GelPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20"
-        	}
+		            "GelPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler"
 	},
-        {
-        "LoadGel":{
+        "LoadGel6":{
                 "SampleName": "Wash3",
                 "LoadVolume": "10ul",
-                "Protein": "component:Load",
+                "Protein": "Load",
                 "WaterName": "dH2O",
-                "Water": "component:water",
+                "Water": "water",
                 "WaterVolume": "10ul",
-		            "GelPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20"
-                }
+		            "GelPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler"
         },
-        {
-        "LoadGel":{
+        "LoadGel7":{
                 "SampleName": "Elution1",
                 "LoadVolume": "10ul",
-                "Protein": "component:Load",
+                "Protein": "Load",
                 "WaterName": "dH2O",
-                "Water": "component:water",
+                "Water": "water",
                 "WaterVolume": "10ul",
-		            "GelPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20"
-                }
+		            "GelPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler"
         },
-        {
-        "LoadGel":{
+        "LoadGel8":{
                 "SampleName": "Elution2",
                 "LoadVolume": "10ul",
-                "Protein": "component:Load",
+                "Protein": "Load",
                 "WaterName": "dH2O",
-                "Water": "component:water",
+                "Water": "water",
                 "WaterVolume": "10ul",
-		            "GelPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20"
-                }
+		            "GelPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler"
         },
-        {
-        "LoadGel":{
+        "LoadGel9":{
                 "SampleName": "Elution3",
                 "LoadVolume": "10ul",
-                "Protein": "component:Load",
+                "Protein": "Load",
                 "WaterName": "dH2O",
-                "Water": "component:water",
+                "Water": "water",
                 "WaterVolume": "10ul",
-		            "GelPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20"
-                }
+		            "GelPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler"
         },
-        {
-        "LoadGel":{
+        "LoadGel10":{
                 "SampleName": "Elution4",
                 "LoadVolume": "10ul",
-                "Protein": "component:Load",
+                "Protein": "Load",
                 "WaterName": "dH2O",
-                "Water": "component:water",
+                "Water": "water",
                 "WaterVolume": "10ul",
-		            "GelPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20"
-                }
+		            "GelPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler"
         },
-        {
-        "LoadGel":{
+        "LoadGel11":{
                 "SampleName": "Elution5",
                 "LoadVolume": "10ul",
-                "Protein": "component:Load",
+                "Protein": "Load",
                 "WaterName": "dH2O",
-                "Water": "component:water",
+                "Water": "water",
                 "WaterVolume": "10ul",
-		            "GelPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20"
-                }
+		            "GelPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler"
         },
-        {
-        "LoadGel":{
+        "LoadGel12":{
                 "SampleName": "Elution6",
                 "LoadVolume": "10ul",
-                "Protein": "component:Load",
+                "Protein": "Load",
                 "WaterName": "dH2O",
-                "Water": "component:water",
+                "Water": "water",
                 "WaterVolume": "10ul",
-		            "GelPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20"
-                }
+		            "GelPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler"
         }	 	
-   ],
-    "Config": {
-        "OUTPUT_COUNT": 12
-    }
+}
 }

@@ -1,13 +1,7 @@
 {
-    "properties": {
-        "name": "main"
-    },
     "processes": {
         "Evaporationrate": {
-            "component": "Evaporationrate",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "Evaporationrate"
         }
     },
     "connections": [ ]

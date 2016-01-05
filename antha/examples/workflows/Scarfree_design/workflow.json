@@ -1,13 +1,7 @@
 {
-    "properties": {
-        "name": "main"
-    },
     "processes": {
         "Scarfree_design": {
-            "component": "Scarfree_design",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "Scarfree_design"
         }
     },
     "connections": [ ]

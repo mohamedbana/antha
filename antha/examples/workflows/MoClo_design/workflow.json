@@ -1,13 +1,7 @@
 {
-    "properties": {
-        "name": "main"
-    },
     "processes": {
         "MoClo_design": {
-            "component": "MoClo_design",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "MoClo_design"
         }
     },
     "connections": [ ]

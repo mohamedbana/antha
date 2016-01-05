@@ -1,13 +1,7 @@
 {
-    "properties": {
-        "name": "main"
-    },
     "processes": {
         "RemoveRestrictionSites": {
-            "component": "RemoveRestrictionSites",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "RemoveRestrictionSites"
         }
     },
     "connections": [ ]

@@ -1,13 +1,7 @@
 {
-    "properties": {
-        "name": "main"
-    },
     "processes": {
         "Kla": {
-            "component": "Kla",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "Kla"
         }
     },
     "connections": [ ]

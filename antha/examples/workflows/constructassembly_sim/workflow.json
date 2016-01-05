@@ -1,13 +1,7 @@
 {
-    "properties": {
-        "name": "main"
-    },
     "processes": {
         "ConstructAssembly_sim": {
-            "component": "TypeIISConstructAssembly_sim",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "TypeIISConstructAssembly_sim"
         }
     },
     "connections": [ ]

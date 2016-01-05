@@ -1,13 +1,19 @@
 {
-"properties": {
-        "name": "main"
-    },
     "processes": {
-        "SDSprep": {
-            "component": "SDSprep",
-            "metadata": {
-                "label": "CS"
-            }
+        "SDSprep1": {
+            "component": "SDSprep"
+        },
+        "SDSprep2": {
+            "component": "SDSprep"
+        },
+        "SDSprep3": {
+            "component": "SDSprep"
+        },
+        "SDSprep4": {
+            "component": "SDSprep"
+        },
+        "SDSprep5": {
+            "component": "SDSprep"
         }
     },
     "connections": [ ]

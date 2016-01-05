@@ -1,13 +1,7 @@
 {
-    "properties": {
-        "name": "main"
-    },
     "processes": {
         "Thawtime": {
-            "component": "Thawtime",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "Thawtime"
         }
     },
     "connections": [ ]

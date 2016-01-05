@@ -1,7 +1,4 @@
 {
-    "properties": {
-        "name": "main"
-    },
     "processes": {
         "ConstructAssembly1": {
             "component": "TypeIISConstructAssembly"

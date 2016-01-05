@@ -1,7 +1,7 @@
 {
-"Parameters":[
+"Parameters":
 	{
-        "SDSprep":{
+        "SDSprep1":{
                 "SampleName":"Marker",
                 "SampleVolume": "40ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -9,17 +9,14 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:ProteinMarker",
-                "Buffer": "component:SDSbuffer",                
-		"OutPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20",                
+                "Protein": "ProteinMarker",
+                "Buffer": "SDSbuffer",                
+		"OutPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler",
 		            "DenatureTemp": "0C",
                 "DenatureTime": "0s"
-        	}
 	},
-	{
-	"SDSprep":{
+	"SDSprep2":{
                 "SampleName":"Lysate",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -27,16 +24,14 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:EColiLysate",
-                "Buffer": "component:SDSbuffer",
-                "OutPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20",
+                "Protein": "EColiLysate",
+                "Buffer": "SDSbuffer",
+                "OutPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler",
                 "DenatureTemp": "95C",
                 "DenatureTime": "300s"
-        	}	
 	}, 
-	{"SDSprep":{
+	"SDSprep3":{
                 "SampleName":"Flowthrough",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -44,17 +39,14 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:ProteinFraction",
-                "Buffer": "component:SDSbuffer",
-                "OutPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20",
+                "Protein": "ProteinFraction",
+                "Buffer": "SDSbuffer",
+                "OutPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler",
                 "DenatureTemp": "95C",
                 "DenatureTime": "300s"
-        	}
 	},
-	{
-	"SDSprep":{
+	"SDSprep4":{
                 "SampleName":"Wash1",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -62,17 +54,14 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:ProteinFraction",
-                "Buffer": "component:SDSbuffer",
-                "OutPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20",
+                "Protein": "ProteinFraction",
+                "Buffer": "SDSbuffer",
+                "OutPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler",
                 "DenatureTemp": "95C",
                 "DenatureTime": "300s"
-		}
 	},
-        {
-	"SDSprep":{
+	"SDSprep5":{
                 "SampleName":"Wash2",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -80,17 +69,14 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:ProteinFraction",
-                "Buffer": "component:SDSbuffer",
-                "OutPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20",
+                "Protein": "ProteinFraction",
+                "Buffer": "SDSbuffer",
+                "OutPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler",
                 "DenatureTemp": "95C",
                 "DenatureTime": "300s"
-        	}
 	},
-        {
-        "SDSprep":{
+        "SDSprep6":{
                 "SampleName":"Wash3",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -98,17 +84,14 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:ProteinFraction",
-                "Buffer": "component:SDSbuffer",
-                "OutPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20",
+                "Protein": "ProteinFraction",
+                "Buffer": "SDSbuffer",
+                "OutPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler",
                 "DenatureTemp": "95C",
                 "DenatureTime": "300s"
-                }
         },
-        {
-        "SDSprep":{
+        "SDSprep7":{
                 "SampleName":"Elution1",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -116,17 +99,14 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:ProteinFraction",
-                "Buffer": "component:SDSbuffer",
-                "OutPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20",
+                "Protein": "ProteinFraction",
+                "Buffer": "SDSbuffer",
+                "OutPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler",
                 "DenatureTemp": "95C",
                 "DenatureTime": "300s"
-                }
         },
-        {
-        "SDSprep":{
+        "SDSprep8":{
                 "SampleName":"Elution2",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -134,17 +114,14 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:ProteinFraction",
-                "Buffer": "component:SDSbuffer",
-                "OutPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20",
+                "Protein": "ProteinFraction",
+                "Buffer": "SDSbuffer",
+                "OutPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler",
                 "DenatureTemp": "95C",
                 "DenatureTime": "300s"
-                }
         },
-        {
-        "SDSprep":{
+        "SDSprep9":{
                 "SampleName":"Elution3",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -152,17 +129,14 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:ProteinFraction",
-                "Buffer": "component:SDSbuffer",
-                "OutPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20",
+                "Protein": "ProteinFraction",
+                "Buffer": "SDSbuffer",
+                "OutPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler",
                 "DenatureTemp": "95C",
                 "DenatureTime": "300s"
-                }
         },
-        {
-        "SDSprep":{
+        "SDSprep10":{
                 "SampleName":"Elution4",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -170,17 +144,14 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:ProteinFraction",
-                "Buffer": "component:SDSbuffer",
-                "OutPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20",
+                "Protein": "ProteinFraction",
+                "Buffer": "SDSbuffer",
+                "OutPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler",
                 "DenatureTemp": "95C",
                 "DenatureTime": "300s"
-                }
         },
-        {
-        "SDSprep":{
+        "SDSprep11":{
                 "SampleName":"Elution5",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -188,17 +159,14 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:ProteinFraction",
-                "Buffer": "component:SDSbuffer",
-                "OutPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20",
+                "Protein": "ProteinFraction",
+                "Buffer": "SDSbuffer",
+                "OutPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler",
                 "DenatureTemp": "95C",
                 "DenatureTime": "300s"
-                }
         },
-        {
-        "SDSprep":{
+        "SDSprep12":{
                 "SampleName":"Elution6",
                 "SampleVolume": "30ul",
                 "BufferName": "5x SDS-PAGE Sample Buffer",
@@ -206,17 +174,13 @@
                 "BufferStockConc": "100g/l",
                 "FinalConcentration": "25g/l",
                 "ReactionVolume": "40ul",
-                "Protein": "component:ProteinFraction",
-                "Buffer": "component:SDSbuffer",
-                "OutPlate": "plate:EPAGE48",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20",
+                "Protein": "ProteinFraction",
+                "Buffer": "SDSbuffer",
+                "OutPlate": "EPAGE48",
+                "InPlate": "pcrplate_with_cooler",
                 "DenatureTemp": "95C",
                 "DenatureTime": "300s"
-                }
         }	 	
-   ],
-    "Config": {
-        "OUTPUT_COUNT": 12
-    }
+   
+}
 }

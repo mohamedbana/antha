@@ -1,16 +1,15 @@
 {
-  "Parameters": [{
+  "Parameters": {
     "Mastermix_reaction": {
-      "TopUpBuffer": "component:water",
+      "TopUpBuffer": "water",
 	"Components": [
-	"component:CutsmartBuffer",
-	"component:T4Ligase",
-	"component:SapI",
-	"component:ATP"
+	"CutsmartBuffer",
+	"T4Ligase",
+	"SapI",
+	"ATP"
 	],
-	"Inplate":"plate:Kombi2mlEpp",
-      "Outplate": "plate:pcrplate_with_cooler",
-      "TipType": "tipbox:Gilson200",
+	"Inplate":"Kombi2mlEpp",
+      "OutPlate": "pcrplate_with_cooler",
       "TotalVolumeperreaction": "20ul",
 	"VolumetoLeaveforDNAperreaction":"5ul",
       "ComponentVolumesperReaction": [
@@ -23,8 +22,5 @@
 	"Reactionspermastermix":10,
 	"AliquotbyRow":false
     }
-  }],
-  "Config": {
-    "OUTPUT_COUNT": 1
   }
 }

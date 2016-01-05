@@ -1,13 +1,7 @@
 {
-    "properties": {
-        "name": "main"
-    },
     "processes": {
         "Transformation": {
-            "component": "Transformation",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "Transformation"
         }
     },
     "connections": [ ]

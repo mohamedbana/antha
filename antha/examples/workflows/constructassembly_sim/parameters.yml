@@ -1,9 +1,9 @@
 {
-    "Parameters": [{
+    "Parameters": {
         "ConstructAssembly_sim":{
             "Parts": [
-                "component:dna_part",
-                "component:dna_part"
+                "dna_part",
+                "dna_part"
             ],
             "ReactionVolume": "20ul",
             "PartVols": [
@@ -20,28 +20,24 @@
             ],
 			"Vectordata":"Vector1",
 			"Constructname": "MyfavouriteConstruct",
-            "Water": "component:water",
-            "Vector": "component:standard_cloning_vector_mark_1",
+            "Water": "water",
+            "Vector": "standard_cloning_vector_mark_1",
             "VectorVol": "3ul",
 			"VectorConcentration": "0.01M/l",
-            "Buffer": "component:CutsmartBuffer",
+            "Buffer": "CutsmartBuffer",
             "BufferVol": "2ul",
-            "Ligase": "component:T4Ligase",
+            "Ligase": "T4Ligase",
             "LigVol": "1ul",
-            "Atp": "component:ATP",
+            "Atp": "ATP",
             "AtpVol": "1ul",
-            "RestrictionEnzyme": "component:SapI",
+            "RestrictionEnzyme": "SapI",
             "ReVol": "1ul",
-            "OutPlate": "plate:pcrplate_with_cooler",
-            "InPlate": "plate:pcrplate_with_cooler",
-            "TipType": "tipbox:Gilson20",
+            "OutPlate": "pcrplate_with_cooler",
+            "InPlate": "pcrplate_with_cooler",
             "ReactionTemp": "25C",
             "ReactionTime": "1800s",
             "InactivationTemp": "40C",
             "InactivationTime": "60s"
         }
-    }],
-    "Config": {
-        "OUTPUT_COUNT": 1
     }
 }

@@ -1,5 +1,5 @@
 {
-  "Parameters": [{
+  "Parameters": {
     "LookUpMolecule": {
       "Compound":"Potassium Acetate",
       "Compoundlist": [
@@ -8,10 +8,7 @@
 	  "Tris Acetate",
 	  "Magnesium Acetate",
 	"Paclitaxel"
-	  ],
+	  ]
     }
-  }],
-    "Config": {
-        "OUTPUT_COUNT": 1
-    }
+}
 }

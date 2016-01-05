@@ -1,16 +1,15 @@
 {
-  "Parameters": [{
+  "Parameters": {
     "Mastermix": {
-      "Buffer": "component:water",
+      "Buffer": "water",
 	"OtherComponents": [
-	"component:CutsmartBuffer",
-	"component:T4Ligase",
-	"component:SapI",
-	"component:ATP"
+	"CutsmartBuffer",
+	"T4Ligase",
+	"SapI",
+	"ATP"
 	],
-	"Inplate":"plate:Kombi2mlEpp",
-      "Outplate": "plate:pcrplate_with_cooler",
-      "TipType": "tipbox:Gilson200",
+	"Inplate":"Kombi2mlEpp",
+      "OutPlate": "pcrplate_with_cooler",
       "TotalVolumeperMastermix": "200ul",
       "OtherComponentVolumes": [
 	"20ul",
@@ -21,8 +20,5 @@
 	"NumberofMastermixes":3,
 	"AliquotbyRow":false
     }
-  }],
-  "Config": {
-    "OUTPUT_COUNT": 3
   }
 }
