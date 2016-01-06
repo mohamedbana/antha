@@ -4,9 +4,7 @@ protocol PipetteImage_CMYK
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
-	//"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
-	//"strconv"
 	"fmt"
 )
 
@@ -54,83 +52,52 @@ Steps {
 	chosencolourpalette := image.AvailablePalettes["WebSafe"]
 	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, chosencolourpalette) 
 	
-//Pixels = image.PipetteImagetoPlate(OutPlate, positiontocolourmap, AvailableColours, Colourcomponents, VolumePerWell)
-
-
-
-	/*componentmap, err := image.MakestringtoComponentMap(AvailableColours, Colourcomponents)
-	if err != nil {
-		panic(err)
-	}*/
-
 	solutions := make([]*wtype.LHSolution, 0)
 
 	counter := 0
 
-
 	//solutions := image.PipetteImagebyBlending(OutPlate, positiontocolourmap,Cyan, Magenta, Yellow,Black, VolumeForFullcolour) 
-
 
 	for locationkey, colour := range positiontocolourmap {
 		counter = counter + 1
 		components := make([]*wtype.LHComponent, 0)
 
 		cmyk := image.ColourtoCMYK(colour)
-
-		cyanvol := wunit.NewVolume((float64(cmyk.C) * VolumeForFullcolour.SIValue()), "l")
-		yellowvol := wunit.NewVolume((float64(cmyk.Y) * VolumeForFullcolour.SIValue()), "l")
-		magentavol := wunit.NewVolume((float64(cmyk.M) * VolumeForFullcolour.SIValue()), "l")
-		blackvol := wunit.NewVolume((float64(cmyk.K) * VolumeForFullcolour.SIValue()), "l")
-
+		
+		var maxuint8 uint8 = 255		
+		
+		if cmyk.C > 0{
+		cyanvol := wunit.NewVolume((float64(cmyk.C/maxuint8) * VolumeForFullcolour.SIValue()), "l")
 		cyanSample := mixer.Sample(Cyan, cyanvol)
 		components = append(components, cyanSample)
+		}
+		
+		if cmyk.Y > 0{
+		yellowvol := wunit.NewVolume((float64(cmyk.Y/maxuint8) * VolumeForFullcolour.SIValue()), "l")
 		yellowSample := mixer.Sample(Yellow, yellowvol)
 		components = append(components, yellowSample)
+		}
+		
+		if cmyk.M > 0{
+		magentavol := wunit.NewVolume((float64(cmyk.M/maxuint8) * VolumeForFullcolour.SIValue()), "l")
 		magentaSample := mixer.Sample(Magenta, magentavol)
 		components = append(components, magentaSample)
+		}
+		
+		if cmyk.K > 0{
+		blackvol := wunit.NewVolume((float64(cmyk.K/maxuint8) * VolumeForFullcolour.SIValue()), "l")
 		blackSample := mixer.Sample(Black, blackvol)
 		components = append(components, blackSample)
+		}
+		
 		solution := MixTo(OutPlate, locationkey, components...)
 		solutions = append(solutions, solution)
 	}
 
-
-/*
-	for locationkey, colour := range positiontocolourmap {
-		
-		component := componentmap[image.Colourcomponentmap[colour]]
-
-		if component.Type == "dna" {
-			component.Type = "DoNotMix"
-		}
-		fmt.Println(image.Colourcomponentmap[colour])
-		
-		if OnlythisColour !="" {
-	
-		if image.Colourcomponentmap[colour] == OnlythisColour{
-			counter = counter + 1
-			fmt.Println("wells",counter)
-		pixelSample := mixer.Sample(component, VolumePerWell)
-		solution := MixTo(OutPlate, locationkey, pixelSample)
-		solutions = append(solutions, solution)
-			}
-			
-		}else{
-			if component.CName !="white"{
-			counter = counter + 1
-			fmt.Println("wells",counter)
-		pixelSample := mixer.Sample(component, VolumePerWell)
-		solution := MixTo(OutPlate, locationkey, pixelSample)
-		solutions = append(solutions, solution)
-		}
-		}
-	}
-*/
 	Pixels = solutions
 	Numberofpixels = len(Pixels)
 	fmt.Println("Pixels =",Numberofpixels)
 
-	
 }
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results

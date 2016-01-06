@@ -2,13 +2,11 @@
 package PipetteImage_CMYK
 
 import (
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	//"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"github.com/antha-lang/antha/antha/anthalib/mixer"
-	//"strconv"
 	"encoding/json"
 	"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
+	"github.com/antha-lang/antha/antha/anthalib/mixer"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/flow"
@@ -49,13 +47,6 @@ func (e *PipetteImage_CMYK) steps(p PipetteImage_CMYKParamBlock, r *PipetteImage
 	chosencolourpalette := image.AvailablePalettes["WebSafe"]
 	positiontocolourmap, _ := image.ImagetoPlatelayout(p.Imagefilename, p.OutPlate, chosencolourpalette)
 
-	//Pixels = image.PipetteImagetoPlate(OutPlate, positiontocolourmap, AvailableColours, Colourcomponents, VolumePerWell)
-
-	/*componentmap, err := image.MakestringtoComponentMap(AvailableColours, Colourcomponents)
-	if err != nil {
-		panic(err)
-	}*/
-
 	solutions := make([]*wtype.LHSolution, 0)
 
 	counter := 0
@@ -68,54 +59,36 @@ func (e *PipetteImage_CMYK) steps(p PipetteImage_CMYKParamBlock, r *PipetteImage
 
 		cmyk := image.ColourtoCMYK(colour)
 
-		cyanvol := wunit.NewVolume((float64(cmyk.C) * p.VolumeForFullcolour.SIValue()), "l")
-		yellowvol := wunit.NewVolume((float64(cmyk.Y) * p.VolumeForFullcolour.SIValue()), "l")
-		magentavol := wunit.NewVolume((float64(cmyk.M) * p.VolumeForFullcolour.SIValue()), "l")
-		blackvol := wunit.NewVolume((float64(cmyk.K) * p.VolumeForFullcolour.SIValue()), "l")
+		var maxuint8 uint8 = 255
 
-		cyanSample := mixer.Sample(p.Cyan, cyanvol)
-		components = append(components, cyanSample)
-		yellowSample := mixer.Sample(p.Yellow, yellowvol)
-		components = append(components, yellowSample)
-		magentaSample := mixer.Sample(p.Magenta, magentavol)
-		components = append(components, magentaSample)
-		blackSample := mixer.Sample(p.Black, blackvol)
-		components = append(components, blackSample)
+		if cmyk.C > 0 {
+			cyanvol := wunit.NewVolume((float64(cmyk.C/maxuint8) * p.VolumeForFullcolour.SIValue()), "l")
+			cyanSample := mixer.Sample(p.Cyan, cyanvol)
+			components = append(components, cyanSample)
+		}
+
+		if cmyk.Y > 0 {
+			yellowvol := wunit.NewVolume((float64(cmyk.Y/maxuint8) * p.VolumeForFullcolour.SIValue()), "l")
+			yellowSample := mixer.Sample(p.Yellow, yellowvol)
+			components = append(components, yellowSample)
+		}
+
+		if cmyk.M > 0 {
+			magentavol := wunit.NewVolume((float64(cmyk.M/maxuint8) * p.VolumeForFullcolour.SIValue()), "l")
+			magentaSample := mixer.Sample(p.Magenta, magentavol)
+			components = append(components, magentaSample)
+		}
+
+		if cmyk.K > 0 {
+			blackvol := wunit.NewVolume((float64(cmyk.K/maxuint8) * p.VolumeForFullcolour.SIValue()), "l")
+			blackSample := mixer.Sample(p.Black, blackvol)
+			components = append(components, blackSample)
+		}
+
 		solution := _wrapper.MixTo(p.OutPlate, locationkey, components...)
 		solutions = append(solutions, solution)
 	}
 
-	/*
-		for locationkey, colour := range positiontocolourmap {
-
-			component := componentmap[image.Colourcomponentmap[colour]]
-
-			if component.Type == "dna" {
-				component.Type = "DoNotMix"
-			}
-			fmt.Println(image.Colourcomponentmap[colour])
-
-			if OnlythisColour !="" {
-
-			if image.Colourcomponentmap[colour] == OnlythisColour{
-				counter = counter + 1
-				fmt.Println("wells",counter)
-			pixelSample := mixer.Sample(component, VolumePerWell)
-			solution := MixTo(OutPlate, locationkey, pixelSample)
-			solutions = append(solutions, solution)
-				}
-
-			}else{
-				if component.CName !="white"{
-				counter = counter + 1
-				fmt.Println("wells",counter)
-			pixelSample := mixer.Sample(component, VolumePerWell)
-			solution := MixTo(OutPlate, locationkey, pixelSample)
-			solutions = append(solutions, solution)
-			}
-			}
-		}
-	*/
 	r.Pixels = solutions
 	r.Numberofpixels = len(r.Pixels)
 	fmt.Println("Pixels =", r.Numberofpixels)
