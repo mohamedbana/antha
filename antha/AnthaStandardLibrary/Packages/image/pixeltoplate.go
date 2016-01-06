@@ -21,7 +21,13 @@ import (
 var AvailablePalettes = map[string]color.Palette{
 	"Palette1": Chosencolourpalette,
 	"WebSafe":  palette.WebSafe, //websafe,
-	"plan9":    palette.Plan9,
+	"Plan9":    palette.Plan9,
+}
+
+func ColourtoCMYK(colour color.Color) (cmyk color.CMYK) {
+	r, g, b, _ := colour.RGBA()
+	cmyk.C, cmyk.M, cmyk.Y, cmyk.K = color.RGBToCMYK(uint8(r), uint8(g), uint8(b))
+	return
 }
 
 var Chosencolourpalette color.Palette = availablecolours //palette.WebSafe
@@ -177,5 +183,37 @@ func MakestringtoComponentMap(keys []string, componentlist []*wtype.LHComponent)
 			}
 		}
 	}
+	return
+}
+
+//  Final function for blending colours to make and image. Uses a given map of position to colour generated from the image processing function  along with lists of available colours, components and plate types
+func PipetteImagebyBlending(OutPlate *wtype.LHPlate, positiontocolourmap map[string]color.Color, cyan *wtype.LHComponent, magenta *wtype.LHComponent, yellow *wtype.LHComponent, black *wtype.LHComponent, volumeperfullcolour wunit.Volume) (finalsolutions []*wtype.LHSolution) {
+
+	solutions := make([]*wtype.LHSolution, 0)
+
+	for locationkey, colour := range positiontocolourmap {
+
+		components := make([]*wtype.LHComponent, 0)
+
+		cmyk := ColourtoCMYK(colour)
+
+		cyanvol := wunit.NewVolume((float64(cmyk.C) * volumeperfullcolour.SIValue()), "l")
+		yellowvol := wunit.NewVolume((float64(cmyk.Y) * volumeperfullcolour.SIValue()), "l")
+		magentavol := wunit.NewVolume((float64(cmyk.M) * volumeperfullcolour.SIValue()), "l")
+		blackvol := wunit.NewVolume((float64(cmyk.K) * volumeperfullcolour.SIValue()), "l")
+
+		cyanSample := mixer.Sample(cyan, cyanvol)
+		components = append(components, cyanSample)
+		yellowSample := mixer.Sample(yellow, yellowvol)
+		components = append(components, yellowSample)
+		magentaSample := mixer.Sample(magenta, magentavol)
+		components = append(components, magentaSample)
+		blackSample := mixer.Sample(black, blackvol)
+		components = append(components, blackSample)
+		solution := mixer.MixTo(OutPlate, locationkey, components...)
+		solutions = append(solutions, solution)
+	}
+
+	finalsolutions = solutions
 	return
 }

@@ -25,6 +25,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/Paintmix"
 	"github.com/antha-lang/antha/antha/component/lib/Phytip_miniprep"
 	"github.com/antha-lang/antha/antha/component/lib/PipetteImage"
+	"github.com/antha-lang/antha/antha/component/lib/PipetteImage_CMYK"
 	"github.com/antha-lang/antha/antha/component/lib/PlateOut"
 	"github.com/antha-lang/antha/antha/component/lib/Plotdata"
 	"github.com/antha-lang/antha/antha/component/lib/Plotdata_spreadsheet"
@@ -407,6 +408,18 @@ func GetComponents() []ComponentDesc {
 	portMap["PipetteImage"]["Numberofpixels"] = false
 	portMap["PipetteImage"]["Pixels"] = false
 
+	portMap["PipetteImage_CMYK"] = make(map[string]bool)
+	portMap["PipetteImage_CMYK"]["Black"] = true
+	portMap["PipetteImage_CMYK"]["Cyan"] = true
+	portMap["PipetteImage_CMYK"]["Imagefilename"] = true
+	portMap["PipetteImage_CMYK"]["Magenta"] = true
+	portMap["PipetteImage_CMYK"]["OutPlate"] = true
+	portMap["PipetteImage_CMYK"]["VolumeForFullcolour"] = true
+	portMap["PipetteImage_CMYK"]["Yellow"] = true
+
+	portMap["PipetteImage_CMYK"]["Numberofpixels"] = false
+	portMap["PipetteImage_CMYK"]["Pixels"] = false
+
 	portMap["PlateOut"] = make(map[string]bool)
 	portMap["PlateOut"]["AgarPlate"] = true
 	portMap["PlateOut"]["Diluent"] = true
@@ -780,6 +793,7 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "Paintmix", Constructor: Paintmix.NewPaintmix})
 	c = append(c, ComponentDesc{Name: "Phytip_miniprep", Constructor: Phytip_miniprep.NewPhytip_miniprep})
 	c = append(c, ComponentDesc{Name: "PipetteImage", Constructor: PipetteImage.NewPipetteImage})
+	c = append(c, ComponentDesc{Name: "PipetteImage_CMYK", Constructor: PipetteImage_CMYK.NewPipetteImage_CMYK})
 	c = append(c, ComponentDesc{Name: "PlateOut", Constructor: PlateOut.NewPlateOut})
 	c = append(c, ComponentDesc{Name: "Plotdata", Constructor: Plotdata.NewPlotdata})
 	c = append(c, ComponentDesc{Name: "Plotdata_spreadsheet", Constructor: Plotdata_spreadsheet.NewPlotdata_spreadsheet})

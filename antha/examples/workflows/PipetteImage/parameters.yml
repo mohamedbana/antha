@@ -10,12 +10,17 @@
 	"component:black"
 	],
 	"OnlythisColour":"",
-	  "Imagefilename": "mario.png",
+	  "Imagefilename": "icon.png",
 		"Palettename":"Palette1",
 		"AvailableColours":[
+		"red",
+		"white",
+		"blue",
 		"green",
+		"yellow",
+		"black"
 		],
-      "Outplate": "plate:greiner384_riser",
+      "Outplate": "plate:nunc1536_riser",
       "TipType": "tipbox:Gilson20",
       "VolumePerWell": "10ul"
     }
@@ -24,6 +29,4 @@
     "OUTPUT_COUNT": 143
   }
 }
-
-
 
