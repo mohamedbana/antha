@@ -48,7 +48,7 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 	warnings := make([]string, 0)
 
 	// first lookup enzyme properties for all enzymes and make a new array
-	enzlist := make([]wtype.LogicalRestrictionEnzyme, 0)
+	enzlist := make([]wtype.RestrictionEnzyme, 0)
 	for _, site := range _input.RestrictionsitetoAvoid {
 		enzsite := lookup.EnzymeLookup(site)
 		enzlist = append(enzlist, enzsite)

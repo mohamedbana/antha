@@ -99,7 +99,7 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 
 		for _, part := range partsinorder {
 			fmt.Println("PARRRTS:", part)
-			info := enzymes.Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+			info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 
 			for _, anysites := range info {
 				if anysites.Sitefound {
@@ -212,7 +212,7 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 	multiple := make([]string, 0)
 	for _, part := range _output.PartswithOverhangs {
 
-		info := enzymes.Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+		info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 
 		sitepositions := enzymes.SitepositionString(info[0])
 

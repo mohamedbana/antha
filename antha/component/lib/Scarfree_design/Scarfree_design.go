@@ -137,7 +137,7 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 	for _, part := range _output.PartswithOverhangs {
 
 		enz := lookup.EnzymeLookup(_input.Enzymename)
-		info := enzymes.Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+		info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 
 		sitepositions := enzymes.SitepositionString(info[0])
 

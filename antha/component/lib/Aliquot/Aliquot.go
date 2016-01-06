@@ -57,9 +57,9 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 func _analysis(_ctx context.Context, _input *Input_, _output *Output_) {
 }
 
-// A block of tests to perform to validate that the sample was processed correctly
-// Optionally, destructive tests can be performed to validate results on a
-// dipstick basis
+// A block of tests to perform to validate that the sample was processed
+//correctly. Optionally, destructive tests can be performed to validate
+//results on a dipstick basis
 func _validation(_ctx context.Context, _input *Input_, _output *Output_) {
 
 }

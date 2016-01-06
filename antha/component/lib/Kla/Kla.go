@@ -55,7 +55,6 @@ func _setup(_ctx context.Context, _input *Input_) {
 func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 	dv := labware.Labwaregeometry[_input.Platetype]["dv"] // microwell vessel diameter, m 0.017 //
 	ai := labware.Labwaregeometry[_input.Platetype]["ai"] // initial specific surface area, /m 96.0
-	//var RE = Reynolds number, (ro * n * dv * 2/mu), dimensionless
 
 	ro := liquidclasses.Liquidclass[_input.Liquid]["ro"] //density, kg 􏰀/ m􏰁3 999.7 // environment dependent
 	mu := liquidclasses.Liquidclass[_input.Liquid]["mu"] //0.001           environment dependent                        //liquidclasses.Liquidclass[liquid]["mu"] viscosity, kg 􏰀/ m􏰁 /􏰀 s
@@ -69,9 +68,10 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 	}
 
 	//n = Rpm / 60 //shaking frequency, s􏰁1
+	//var RE = Reynolds number, (ro * n * dv * 2/mu), dimensionless
 	//const exp = Eulers number, 2.718281828
-
 	//Fr = Froude number = dt(2 * math.Pi * n)^2 /(2 * g), (dimensionless)
+
 	dt := devices.Shaker[_input.Shakertype]["dt"] //0.008                                  //shaking amplitude, m // move to shaker package
 
 	a := labware.Labwaregeometry[_input.Platetype]["a"] //0.88   //
@@ -87,10 +87,11 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 	// Check Ncrit! original paper used this to calculate speed in shallow round well plates... double check paper
 
 	// add loop to use correct formula dependent on Platetype etc...
-	/*Criticalshakerspeed := "error"
-	if labware.Labwaregeometry[Platetype]["numberofwellsides"] == 4.0 {*/
-	_output.Ncrit = eng.Ncrit_srw(Sigma, dv, Vl, ro, dt)
-	//}
+	// currently only one plate type supported
+	//Criticalshakerspeed := "error"
+	if labware.Labwaregeometry[_input.Platetype]["numberofwellsides"] == 4.0 {
+		_output.Ncrit = eng.Ncrit_srw(Sigma, dv, Vl, ro, dt)
+	} /*else{Criticalshakerspeed := "error: kla estimation for this plate type not yet implemented"}
 	/*if i == 4.0 {
 		Criticalshakerspeed := "error"
 	}
@@ -108,12 +109,6 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 	_output.Status = fmt.Sprintln("TargetRE = ", _input.TargetRE, "Calculated Reynolds number = ", Re, "shakerspeedrequired for targetRE= ", _output.Necessaryshakerspeed.ToString() /* *60 */, "Froude number = ", Fr, "kla =", _output.CalculatedKla, "/h", "Ncrit	=", _output.Ncrit.ToString() /*,"/S"*/)
 	//CalculatedKla = setpoints.CalculateKlasquaremicrowell(Platetype, Liquid, Rpm, Shakertype, TargetRE, D)
 
-	/*
-		fmt.Println("shakerspeedrequired= ", stats.Round(Necessaryshakerspeed*60, 3))
-		fmt.Println("Froude number = ", stats.Round(Fr, 3))
-		fmt.Println("kla =", stats.Round(CalculatedKla, 3))
-		fmt.Println("Shaker speed required for turbulence	=", Criticalshakerspeed,"/S")*/
-	//fmt.Println("=", (Criticalshakerspeed*60), 3),"rpm")
 }
 func _analysis(_ctx context.Context, _input *Input_, _output *Output_) {
 

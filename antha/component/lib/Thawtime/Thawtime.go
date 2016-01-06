@@ -1,12 +1,10 @@
 //status = compiles and calculates; need to fill in correct parameters and check units
 //currently using dummy values only so won't be accurate yet!
-// Once working move from floats to antha types and units
 package Thawtime
 
 import (
 	"fmt"                                                                 // we need this go library to print
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/eng" // all of our functions used here are in the Thaw.go file in the eng package which this points to
-	//"github.com/montanaflynn/stats" // a rounding function is used from this third party library
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
@@ -32,8 +30,6 @@ func _setup(_ctx context.Context, _input *Input_) {
 func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 	/*  Step 1. we need a mass for the following equations so we calculate this by looking up
 	the liquid density and multiplying by the fill volume using this function from the engineering library */
-
-	//fillvolume:= Fillvolume.SIValue()
 
 	mass := eng.Massfromvolume(_input.Fillvolume, _input.Liquid)
 

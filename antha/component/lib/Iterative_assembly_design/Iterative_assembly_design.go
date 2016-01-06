@@ -70,7 +70,7 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 
 		for _, part := range partsinorder {
 
-			info := enzymes.Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+			info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 			if len(info) != 0 {
 				if info[0].Sitefound == true {
 					sitefound = true
@@ -92,7 +92,7 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 
 		for _, part := range partsinorder {
 
-			info := enzymes.Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+			info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 			if len(info) != 0 {
 				if info[0].Sitefound == true {
 					sitefound = true
@@ -161,7 +161,7 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 		multiple := make([]string, 0)
 		for _, part := range _output.PartswithOverhangs {
 
-			info := enzymes.Restrictionsitefinder(part, []wtype.LogicalRestrictionEnzyme{enz})
+			info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 
 			sitepositions := enzymes.SitepositionString(info[0])
 
@@ -261,7 +261,7 @@ type Input_ struct {
 
 type Output_ struct {
 	BackupEnzymes      []string
-	EnzymeUsed         wtype.LogicalRestrictionEnzyme
+	EnzymeUsed         wtype.RestrictionEnzyme
 	NewDNASequence     wtype.DNASequence
 	PartswithOverhangs []wtype.DNASequence
 	Simulationpass     bool

@@ -27,14 +27,11 @@ func _setup(_ctx context.Context, _input *Input_) {}
 // for every input
 func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 	samples := make([]*wtype.LHComponent, 0)
-	mmxSample := mixer.Sample(_input.MasterMix, _input.MMXVol)
-	samples = append(samples, mmxSample)
-
 	waterSample := mixer.SampleForTotalVolume(_input.Water, _input.ReactionVolume)
 	samples = append(samples, waterSample)
 
-	vectorSample := mixer.Sample(_input.Vector, _input.VectorVol)
-	samples = append(samples, vectorSample)
+	mmxSample := mixer.Sample(_input.MasterMix, _input.MMXVol)
+	samples = append(samples, mmxSample)
 
 	for k, part := range _input.Parts {
 		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", _input.PartNames[k], " vol ", _input.PartVols[k])
@@ -43,9 +40,9 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 		samples = append(samples, partSample)
 	}
 
-	_output.Reaction = execute.MixInto(_ctx,
+	_output.Reaction = execute.MixTo(_ctx,
 
-		_input.OutPlate, samples...)
+		_input.OutPlate, _input.OutputLocation, samples...)
 
 	// incubate the reaction mixture
 	execute.Incubate(_ctx,
@@ -101,12 +98,13 @@ type Element_ struct {
 }
 
 type Input_ struct {
-	InPlate            *wtype.LHPlate
 	InactivationTemp   wunit.Temperature
 	InactivationTime   wunit.Time
 	MMXVol             wunit.Volume
 	MasterMix          *wtype.LHComponent
 	OutPlate           *wtype.LHPlate
+	OutputLocation     string
+	OutputPlateNum     string
 	OutputReactionName string
 	PartNames          []string
 	PartVols           []wunit.Volume
@@ -114,8 +112,6 @@ type Input_ struct {
 	ReactionTemp       wunit.Temperature
 	ReactionTime       wunit.Time
 	ReactionVolume     wunit.Volume
-	Vector             *wtype.LHComponent
-	VectorVol          wunit.Volume
 	Water              *wtype.LHComponent
 }
 

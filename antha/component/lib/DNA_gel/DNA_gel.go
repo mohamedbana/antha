@@ -8,6 +8,8 @@ import (
 	//"coldplate"
 	//"reagents"
 	//"Devices"
+	//"strconv"
+	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -18,7 +20,7 @@ import (
 
 // Input parameters for this protocol (data)
 
-// or should this be a concentration?
+//DNAladder Volume // or should this be a concentration?
 
 //DNAgelruntime time.Duration
 //DNAgelwellcapacity Volume
@@ -43,6 +45,7 @@ import (
 
 //WaterSolution
 //WaterSolution //Chemspiderlink // not correct link but similar desirable
+
 //Gel
 
 //DNAladder *wtype.LHComponent//NucleicacidSolution
@@ -82,29 +85,52 @@ func _setup(_ctx context.Context, _input *Input_) {
 // for every input
 func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 
-	// load gel
-	var DNAgelloadmix *wtype.LHComponent
-
-	if _input.Loadingdyeinsample == false {
-		DNAgelloadmixsolution := execute.MixInto(_ctx,
-
-			_input.DNAgel,
-			mixer.Sample(_input.Loadingdye, _input.Loadingdyevolume),
-			mixer.SampleForTotalVolume(_input.Sampletotest, _input.DNAgelrunvolume),
-		)
-		DNAgelloadmix = wtype.SolutionToComponent(DNAgelloadmixsolution)
-	} else {
-		DNAgelloadmix = _input.Sampletotest
+	if len(_input.Samplenames) != _input.Samplenumber {
+		panic(fmt.Sprintln("length of sample names:", len(_input.Samplenames), "is not equal to sample number:", _input.Samplenumber))
 	}
 
-	loadedgel := execute.MixInto(_ctx,
+	loadedsamples := make([]*wtype.LHSolution, 0)
 
-		_input.DNAgel,
-		mixer.Sample(DNAgelloadmix, _input.DNAgelrunvolume),
-	)
+	var DNAgelloadmix *wtype.LHComponent
 
-	_output.Loadedgel = loadedgel
+	_input.Water.Type = "loadwater"
 
+	for i := 0; i < _input.Samplenumber; i++ {
+		// ready to add water to well
+		waterSample := mixer.Sample(_input.Water, _input.Watervol)
+
+		// load gel
+		if _input.Loadingdyeinsample == false {
+			DNAgelloadmixsolution := execute.MixInto(_ctx,
+
+				_input.DNAgel,
+				mixer.Sample(_input.Loadingdye, _input.Loadingdyevolume),
+				mixer.SampleForTotalVolume(_input.Sampletotest, _input.DNAgelrunvolume),
+			)
+			DNAgelloadmix = wtype.SolutionToComponent(DNAgelloadmixsolution)
+		} else {
+			DNAgelloadmix = _input.Sampletotest
+		}
+
+		// Ensure  sample will be dispensed appropriately:
+
+		// comment this line out to repeat load of same sample in all wells using first sample name
+		DNAgelloadmix.CName = _input.Samplenames[0] //[i] //originalname + strconv.Itoa(i)
+
+		// replacing following line with temporary hard code whilst developing protocol:
+		DNAgelloadmix.Type = _input.Mixingpolicy
+		//DNAgelloadmix.Type = "loadwater"
+
+		loadedsample := execute.MixInto(_ctx,
+
+			_input.DNAgel,
+			waterSample,
+			mixer.Sample(DNAgelloadmix, _input.DNAgelrunvolume),
+		)
+
+		loadedsamples = append(_output.Loadedsamples, loadedsample)
+	}
+	_output.Loadedsamples = loadedsamples
 	// Then run the gel
 	/* DNAgel := electrophoresis.Run(Loadedgel,Runvoltage,DNAgelruntime)
 
@@ -195,13 +221,18 @@ type Element_ struct {
 type Input_ struct {
 	DNAgel             *wtype.LHPlate
 	DNAgelrunvolume    wunit.Volume
-	DNAladder          wunit.Volume
+	InPlate            *wtype.LHPlate
 	Loadingdye         *wtype.LHComponent
 	Loadingdyeinsample bool
 	Loadingdyevolume   wunit.Volume
+	Mixingpolicy       string
+	Samplenames        []string
+	Samplenumber       int
 	Sampletotest       *wtype.LHComponent
+	Water              *wtype.LHComponent
+	Watervol           wunit.Volume
 }
 
 type Output_ struct {
-	Loadedgel *wtype.LHSolution
+	Loadedsamples []*wtype.LHSolution
 }

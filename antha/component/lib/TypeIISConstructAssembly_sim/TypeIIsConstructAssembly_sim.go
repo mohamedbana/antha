@@ -67,6 +67,7 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 
 	var part_mw float64
 	var part_moles float64
+
 	for i := 0; i < len(_input.Partsinorder); i++ {
 
 		part_mw = sequences.MassDNA(partsinorder[i].Seq, false, true)

@@ -16,9 +16,6 @@ import (
 
 // Input parameters for this protocol
 
-//string //wtype.DNASequence//string
-//Name string
-
 // Data which is returned from this protocol; output data
 
 //AnthaSeq wtype.DNASequence
@@ -62,18 +59,18 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 	*/
 
 	// Convert the sequence to an anthatype
-	//AnthaSeq = wtype.MakeLinearDNASequence(Name, DNA)
+	AnthaSeq := wtype.MakeLinearDNASequence(_input.Name, _input.DNA)
 
 	// look for orfs
-	orf, orftrue := sequences.FindORF(_input.AnthaSeq.Seq)
+	orf, orftrue := sequences.FindORF(AnthaSeq.Seq)
 
-	if orftrue == true && len(orf.DNASeq) == len(_input.AnthaSeq.Seq) {
+	if orftrue == true && len(orf.DNASeq) == len(AnthaSeq.Seq) {
 		// if open reading frame is detected, we'll perform a blastP search'
-		fmt.Println("ORF detected:", "full sequence length: ", len(_input.AnthaSeq.Seq), "ORF length: ", len(orf.DNASeq))
+		fmt.Println("ORF detected:", "full sequence length: ", len(AnthaSeq.Seq), "ORF length: ", len(orf.DNASeq))
 		hits, err = blast.MegaBlastP(orf.ProtSeq)
 	} else {
 		// otherwise we'll blast the nucleotide sequence
-		hits, err = _input.AnthaSeq.Blast()
+		hits, err = AnthaSeq.Blast()
 	}
 	if err != nil {
 		fmt.Println(err.Error())
@@ -83,7 +80,7 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 	_output.Hits = fmt.Sprintln(blast.HitSummary(hits))
 
 	// Rename Sequence with ID of top blast hit
-	_input.AnthaSeq.Nm = hits[0].Id
+	AnthaSeq.Nm = hits[0].Id
 	//}
 
 }
@@ -130,7 +127,8 @@ type Element_ struct {
 }
 
 type Input_ struct {
-	AnthaSeq wtype.DNASequence
+	DNA  string
+	Name string
 }
 
 type Output_ struct {
