@@ -45,9 +45,38 @@ func MakePolicies() map[string]LHPolicy {
 	pols["DoNotMix"] = MakeDefaultPolicy()
 	pols["NeedToMix"] = MakeNeedToMixPolicy()
 	pols["viscous"] = MakeViscousPolicy()
+
+	//      pols["lysate"] = MakeLysatePolicy()
+	pols["protein"] = MakeProteinPolicy()
+	pols["detergent"] = MakeDetergentPolicy()
+	pols["load"] = MakeLoadPolicy()
+	pols["loadlow"] = MakeLoadPolicy()
+	pols["loadwater"] = MakeLoadWaterPolicy()
+	//      pols["lysate"] = MakeLysatePolicy()
+
 	return pols
+
 }
 
+//func MakeLysatePolicy() LHPolicy {
+//        lysatepolicy := make(LHPolicy, 6)
+//        lysatepolicy["ASPSPEED"] = 1.0
+//        lysatepolicy["DSPSPEED"] = 1.0
+//        lysatepolicy["ASP_WAIT"] = 2.0
+//        lysatepolicy["ASP_WAIT"] = 2.0
+//        lysatepolicy["DSP_WAIT"] = 2.0
+//        lysatepolicy["PRE_MIX"] = 5
+//        lysatepolicy["CAN_MSA"]= false
+//        return lysatepolicy
+//}
+//func MakeProteinPolicy() LHPolicy {
+//        proteinpolicy := make(LHPolicy, 4)
+//        proteinpolicy["DSPREFERENCE"] = 2
+//        proteinpolicy["CAN_MULTI"] = true
+//        proteinpolicy["PRE_MIX"] = 3
+//        proteinpolicy["CAN_MSA"] = false
+//        return proteinpolicy
+//}
 func MakeWaterPolicy() LHPolicy {
 	waterpolicy := make(LHPolicy, 6)
 	waterpolicy["DSPREFERENCE"] = 0
@@ -57,7 +86,6 @@ func MakeWaterPolicy() LHPolicy {
 	waterpolicy["DSPZOFFSET"] = 0.5
 	return waterpolicy
 }
-
 func MakeFoamyPolicy() LHPolicy {
 	foamypolicy := make(LHPolicy, 5)
 	foamypolicy["DSPREFERENCE"] = 0
@@ -67,7 +95,6 @@ func MakeFoamyPolicy() LHPolicy {
 	foamypolicy["CAN_SDD"] = true
 	return foamypolicy
 }
-
 func MakeCulturePolicy() LHPolicy {
 	culturepolicy := make(LHPolicy, 10)
 	culturepolicy["ASPSPEED"] = 0.5
@@ -81,7 +108,6 @@ func MakeCulturePolicy() LHPolicy {
 	culturepolicy["NO_AIR_DISPENSE"] = true
 	return culturepolicy
 }
-
 func MakeGlycerolPolicy() LHPolicy {
 	glycerolpolicy := make(LHPolicy, 5)
 	glycerolpolicy["ASP_SPEED"] = 1.5
@@ -112,8 +138,8 @@ func MakeSolventPolicy() LHPolicy {
 
 func MakeDNAPolicy() LHPolicy {
 	dnapolicy := make(LHPolicy, 10)
-	dnapolicy["POST_MIX"] = 3
 	dnapolicy["POST_MIX_VOLUME"] = 50
+	dnapolicy["POST_MIX"] = 3
 	dnapolicy["ASPSPEED"] = 2.0
 	dnapolicy["DSPSPEED"] = 2.0
 	dnapolicy["CAN_MULTI"] = false
@@ -124,6 +150,81 @@ func MakeDNAPolicy() LHPolicy {
 	dnapolicy["TIP_REUSE_LIMIT"] = 0
 	dnapolicy["NO_AIR_DISPENSE"] = true
 	return dnapolicy
+}
+
+func MakeDetergentPolicy() LHPolicy {
+	detergentpolicy := make(LHPolicy, 9)
+	//        detergentpolicy["POST_MIX"] = 3
+	detergentpolicy["ASPSPEED"] = 1.0
+	detergentpolicy["DSPSPEED"] = 1.0
+	detergentpolicy["CAN_MULTI"] = false
+	detergentpolicy["CAN_MSA"] = false
+	detergentpolicy["CAN_SDD"] = false
+	detergentpolicy["DSPREFERENCE"] = 0
+	detergentpolicy["DSPZOFFSET"] = 0.5
+	detergentpolicy["TIP_REUSE_LIMIT"] = 8
+	detergentpolicy["NO_AIR_DISPENSE"] = true
+	return detergentpolicy
+}
+func MakeProteinPolicy() LHPolicy {
+	proteinpolicy := make(LHPolicy, 10)
+	proteinpolicy["POST_MIX"] = 5
+	proteinpolicy["POST_MIX_VOLUME"] = 50
+	proteinpolicy["ASPSPEED"] = 2.0
+	proteinpolicy["DSPSPEED"] = 2.0
+	proteinpolicy["CAN_MULTI"] = false
+	proteinpolicy["CAN_MSA"] = false
+	proteinpolicy["CAN_SDD"] = false
+	proteinpolicy["DSPREFERENCE"] = 0
+	proteinpolicy["DSPZOFFSET"] = 0.5
+	proteinpolicy["TIP_REUSE_LIMIT"] = 0
+	proteinpolicy["NO_AIR_DISPENSE"] = true
+	return proteinpolicy
+}
+func MakeLoadPolicy() LHPolicy {
+
+	loadpolicy := make(LHPolicy)
+	loadpolicy["ASPSPEED"] = 1.0
+	loadpolicy["DSPSPEED"] = 0.1
+	loadpolicy["CAN_MULTI"] = false
+	loadpolicy["CAN_MSA"] = false
+	loadpolicy["CAN_SDD"] = false
+	loadpolicy["TOUCHOFF"] = false
+	loadpolicy["TIP_REUSE_LIMIT"] = 0
+	loadpolicy["NO_AIR_DISPENSE"] = true
+	loadpolicy["TOUCHOFF"] = false
+	return loadpolicy
+}
+
+func MakeLoadWaterPolicy() LHPolicy {
+
+	loadpolicy := make(LHPolicy)
+	loadpolicy["ASPSPEED"] = 1.0
+	loadpolicy["DSPSPEED"] = 0.1
+	loadpolicy["CAN_MULTI"] = false
+	loadpolicy["CAN_MSA"] = false
+	loadpolicy["CAN_SDD"] = false
+	loadpolicy["TOUCHOFF"] = false
+	loadpolicy["NO_AIR_DISPENSE"] = true
+	loadpolicy["TOUCHOFF"] = false
+	loadpolicy["TIP_REUSE_LIMIT"] = 100
+	return loadpolicy
+}
+
+func MakeLoadlowPolicy() LHPolicy {
+
+	loadpolicy := make(LHPolicy)
+	loadpolicy["ASPSPEED"] = 1.0
+	loadpolicy["DSPSPEED"] = 1.0
+	loadpolicy["CAN_MULTI"] = false
+	loadpolicy["CAN_MSA"] = false
+	loadpolicy["CAN_SDD"] = false
+	loadpolicy["TOUCHOFF"] = false
+	loadpolicy["TIP_REUSE_LIMIT"] = 0
+	loadpolicy["DSPZOFFSET"] = 0.5
+	loadpolicy["NO_AIR_DISPENSE"] = true
+	loadpolicy["TOUCHOFF"] = false
+	return loadpolicy
 }
 
 func MakeNeedToMixPolicy() LHPolicy {
@@ -140,6 +241,7 @@ func MakeNeedToMixPolicy() LHPolicy {
 	dnapolicy["TIP_REUSE_LIMIT"] = 0
 	dnapolicy["NO_AIR_DISPENSE"] = true
 	return dnapolicy
+
 }
 
 func MakeDefaultPolicy() LHPolicy {

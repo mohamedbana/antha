@@ -1,4 +1,4 @@
-package Transformation
+package Transformation_complete
 
 import (
 	"encoding/json"
@@ -40,13 +40,13 @@ InactivationTime wunit.Time
 
 // Physical outputs from this protocol with types
 
-func (e *Transformation) requirements() {
+func (e *Transformation_complete) requirements() {
 	_ = wunit.Make_units
 
 }
 
 // Conditions to run on startup
-func (e *Transformation) setup(p TransformationParamBlock) {
+func (e *Transformation_complete) setup(p Transformation_completeParamBlock) {
 	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
@@ -55,7 +55,7 @@ func (e *Transformation) setup(p TransformationParamBlock) {
 
 // The core process for this protocol, with the steps to be performed
 // for every input
-func (e *Transformation) steps(p TransformationParamBlock, r *TransformationResultBlock) {
+func (e *Transformation_complete) steps(p Transformation_completeParamBlock, r *Transformation_completeResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
@@ -138,7 +138,7 @@ func (e *Transformation) steps(p TransformationParamBlock, r *TransformationResu
 
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
-func (e *Transformation) analysis(p TransformationParamBlock, r *TransformationResultBlock) {
+func (e *Transformation_complete) analysis(p Transformation_completeParamBlock, r *Transformation_completeResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
@@ -148,7 +148,7 @@ func (e *Transformation) analysis(p TransformationParamBlock, r *TransformationR
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
-func (e *Transformation) validation(p TransformationParamBlock, r *TransformationResultBlock) {
+func (e *Transformation_complete) validation(p Transformation_completeParamBlock, r *Transformation_completeResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 	_ = _wrapper.WaitToEnd()
@@ -156,13 +156,13 @@ func (e *Transformation) validation(p TransformationParamBlock, r *Transformatio
 }
 
 // AsyncBag functions
-func (e *Transformation) Complete(params interface{}) {
-	p := params.(TransformationParamBlock)
+func (e *Transformation_complete) Complete(params interface{}) {
+	p := params.(Transformation_completeParamBlock)
 	if p.Error {
 		e.Platedculture <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
 		return
 	}
-	r := new(TransformationResultBlock)
+	r := new(Transformation_completeResultBlock)
 	defer func() {
 		if res := recover(); res != nil {
 			e.Platedculture <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
@@ -182,32 +182,32 @@ func (e *Transformation) Complete(params interface{}) {
 }
 
 // init function, read characterization info from seperate file to validate ranges?
-func (e *Transformation) init() {
+func (e *Transformation_complete) init() {
 	e.params = make(map[execute.ThreadID]*execute.AsyncBag)
 }
 
-func (e *Transformation) NewConfig() interface{} {
-	return &TransformationConfig{}
+func (e *Transformation_complete) NewConfig() interface{} {
+	return &Transformation_completeConfig{}
 }
 
-func (e *Transformation) NewParamBlock() interface{} {
-	return &TransformationParamBlock{}
+func (e *Transformation_complete) NewParamBlock() interface{} {
+	return &Transformation_completeParamBlock{}
 }
 
-func NewTransformation() interface{} { //*Transformation {
-	e := new(Transformation)
+func NewTransformation_complete() interface{} { //*Transformation_complete {
+	e := new(Transformation_complete)
 	e.init()
 	return e
 }
 
 // Mapper function
-func (e *Transformation) Map(m map[string]interface{}) interface{} {
-	var res TransformationParamBlock
+func (e *Transformation_complete) Map(m map[string]interface{}) interface{} {
+	var res Transformation_completeParamBlock
 	res.Error = false || m["AgarPlate"].(execute.ThreadParam).Error || m["CompetentCells"].(execute.ThreadParam).Error || m["CompetentCellvolumeperassembly"].(execute.ThreadParam).Error || m["OutPlate"].(execute.ThreadParam).Error || m["Plateoutvolume"].(execute.ThreadParam).Error || m["Postplasmidtemp"].(execute.ThreadParam).Error || m["Postplasmidtime"].(execute.ThreadParam).Error || m["Preplasmidtemp"].(execute.ThreadParam).Error || m["Preplasmidtime"].(execute.ThreadParam).Error || m["Reaction"].(execute.ThreadParam).Error || m["Reactionvolume"].(execute.ThreadParam).Error || m["Recoverymedium"].(execute.ThreadParam).Error || m["Recoverytemp"].(execute.ThreadParam).Error || m["Recoverytime"].(execute.ThreadParam).Error || m["Recoveryvolume"].(execute.ThreadParam).Error
 
 	vAgarPlate, is := m["AgarPlate"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp TransformationJSONBlock
+		var temp Transformation_completeJSONBlock
 		json.Unmarshal([]byte(vAgarPlate.JSONString), &temp)
 		res.AgarPlate = *temp.AgarPlate
 	} else {
@@ -216,7 +216,7 @@ func (e *Transformation) Map(m map[string]interface{}) interface{} {
 
 	vCompetentCells, is := m["CompetentCells"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp TransformationJSONBlock
+		var temp Transformation_completeJSONBlock
 		json.Unmarshal([]byte(vCompetentCells.JSONString), &temp)
 		res.CompetentCells = *temp.CompetentCells
 	} else {
@@ -225,7 +225,7 @@ func (e *Transformation) Map(m map[string]interface{}) interface{} {
 
 	vCompetentCellvolumeperassembly, is := m["CompetentCellvolumeperassembly"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp TransformationJSONBlock
+		var temp Transformation_completeJSONBlock
 		json.Unmarshal([]byte(vCompetentCellvolumeperassembly.JSONString), &temp)
 		res.CompetentCellvolumeperassembly = *temp.CompetentCellvolumeperassembly
 	} else {
@@ -234,7 +234,7 @@ func (e *Transformation) Map(m map[string]interface{}) interface{} {
 
 	vOutPlate, is := m["OutPlate"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp TransformationJSONBlock
+		var temp Transformation_completeJSONBlock
 		json.Unmarshal([]byte(vOutPlate.JSONString), &temp)
 		res.OutPlate = *temp.OutPlate
 	} else {
@@ -243,7 +243,7 @@ func (e *Transformation) Map(m map[string]interface{}) interface{} {
 
 	vPlateoutvolume, is := m["Plateoutvolume"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp TransformationJSONBlock
+		var temp Transformation_completeJSONBlock
 		json.Unmarshal([]byte(vPlateoutvolume.JSONString), &temp)
 		res.Plateoutvolume = *temp.Plateoutvolume
 	} else {
@@ -252,7 +252,7 @@ func (e *Transformation) Map(m map[string]interface{}) interface{} {
 
 	vPostplasmidtemp, is := m["Postplasmidtemp"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp TransformationJSONBlock
+		var temp Transformation_completeJSONBlock
 		json.Unmarshal([]byte(vPostplasmidtemp.JSONString), &temp)
 		res.Postplasmidtemp = *temp.Postplasmidtemp
 	} else {
@@ -261,7 +261,7 @@ func (e *Transformation) Map(m map[string]interface{}) interface{} {
 
 	vPostplasmidtime, is := m["Postplasmidtime"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp TransformationJSONBlock
+		var temp Transformation_completeJSONBlock
 		json.Unmarshal([]byte(vPostplasmidtime.JSONString), &temp)
 		res.Postplasmidtime = *temp.Postplasmidtime
 	} else {
@@ -270,7 +270,7 @@ func (e *Transformation) Map(m map[string]interface{}) interface{} {
 
 	vPreplasmidtemp, is := m["Preplasmidtemp"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp TransformationJSONBlock
+		var temp Transformation_completeJSONBlock
 		json.Unmarshal([]byte(vPreplasmidtemp.JSONString), &temp)
 		res.Preplasmidtemp = *temp.Preplasmidtemp
 	} else {
@@ -279,7 +279,7 @@ func (e *Transformation) Map(m map[string]interface{}) interface{} {
 
 	vPreplasmidtime, is := m["Preplasmidtime"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp TransformationJSONBlock
+		var temp Transformation_completeJSONBlock
 		json.Unmarshal([]byte(vPreplasmidtime.JSONString), &temp)
 		res.Preplasmidtime = *temp.Preplasmidtime
 	} else {
@@ -288,7 +288,7 @@ func (e *Transformation) Map(m map[string]interface{}) interface{} {
 
 	vReaction, is := m["Reaction"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp TransformationJSONBlock
+		var temp Transformation_completeJSONBlock
 		json.Unmarshal([]byte(vReaction.JSONString), &temp)
 		res.Reaction = *temp.Reaction
 	} else {
@@ -297,7 +297,7 @@ func (e *Transformation) Map(m map[string]interface{}) interface{} {
 
 	vReactionvolume, is := m["Reactionvolume"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp TransformationJSONBlock
+		var temp Transformation_completeJSONBlock
 		json.Unmarshal([]byte(vReactionvolume.JSONString), &temp)
 		res.Reactionvolume = *temp.Reactionvolume
 	} else {
@@ -306,7 +306,7 @@ func (e *Transformation) Map(m map[string]interface{}) interface{} {
 
 	vRecoverymedium, is := m["Recoverymedium"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp TransformationJSONBlock
+		var temp Transformation_completeJSONBlock
 		json.Unmarshal([]byte(vRecoverymedium.JSONString), &temp)
 		res.Recoverymedium = *temp.Recoverymedium
 	} else {
@@ -315,7 +315,7 @@ func (e *Transformation) Map(m map[string]interface{}) interface{} {
 
 	vRecoverytemp, is := m["Recoverytemp"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp TransformationJSONBlock
+		var temp Transformation_completeJSONBlock
 		json.Unmarshal([]byte(vRecoverytemp.JSONString), &temp)
 		res.Recoverytemp = *temp.Recoverytemp
 	} else {
@@ -324,7 +324,7 @@ func (e *Transformation) Map(m map[string]interface{}) interface{} {
 
 	vRecoverytime, is := m["Recoverytime"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp TransformationJSONBlock
+		var temp Transformation_completeJSONBlock
 		json.Unmarshal([]byte(vRecoverytime.JSONString), &temp)
 		res.Recoverytime = *temp.Recoverytime
 	} else {
@@ -333,7 +333,7 @@ func (e *Transformation) Map(m map[string]interface{}) interface{} {
 
 	vRecoveryvolume, is := m["Recoveryvolume"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
-		var temp TransformationJSONBlock
+		var temp Transformation_completeJSONBlock
 		json.Unmarshal([]byte(vRecoveryvolume.JSONString), &temp)
 		res.Recoveryvolume = *temp.Recoveryvolume
 	} else {
@@ -346,7 +346,7 @@ func (e *Transformation) Map(m map[string]interface{}) interface{} {
 	return res
 }
 
-func (e *Transformation) OnAgarPlate(param execute.ThreadParam) {
+func (e *Transformation_complete) OnAgarPlate(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -363,7 +363,7 @@ func (e *Transformation) OnAgarPlate(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Transformation) OnCompetentCells(param execute.ThreadParam) {
+func (e *Transformation_complete) OnCompetentCells(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -380,7 +380,7 @@ func (e *Transformation) OnCompetentCells(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Transformation) OnCompetentCellvolumeperassembly(param execute.ThreadParam) {
+func (e *Transformation_complete) OnCompetentCellvolumeperassembly(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -397,7 +397,7 @@ func (e *Transformation) OnCompetentCellvolumeperassembly(param execute.ThreadPa
 		e.lock.Unlock()
 	}
 }
-func (e *Transformation) OnOutPlate(param execute.ThreadParam) {
+func (e *Transformation_complete) OnOutPlate(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -414,7 +414,7 @@ func (e *Transformation) OnOutPlate(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Transformation) OnPlateoutvolume(param execute.ThreadParam) {
+func (e *Transformation_complete) OnPlateoutvolume(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -431,7 +431,7 @@ func (e *Transformation) OnPlateoutvolume(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Transformation) OnPostplasmidtemp(param execute.ThreadParam) {
+func (e *Transformation_complete) OnPostplasmidtemp(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -448,7 +448,7 @@ func (e *Transformation) OnPostplasmidtemp(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Transformation) OnPostplasmidtime(param execute.ThreadParam) {
+func (e *Transformation_complete) OnPostplasmidtime(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -465,7 +465,7 @@ func (e *Transformation) OnPostplasmidtime(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Transformation) OnPreplasmidtemp(param execute.ThreadParam) {
+func (e *Transformation_complete) OnPreplasmidtemp(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -482,7 +482,7 @@ func (e *Transformation) OnPreplasmidtemp(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Transformation) OnPreplasmidtime(param execute.ThreadParam) {
+func (e *Transformation_complete) OnPreplasmidtime(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -499,7 +499,7 @@ func (e *Transformation) OnPreplasmidtime(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Transformation) OnReaction(param execute.ThreadParam) {
+func (e *Transformation_complete) OnReaction(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -516,7 +516,7 @@ func (e *Transformation) OnReaction(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Transformation) OnReactionvolume(param execute.ThreadParam) {
+func (e *Transformation_complete) OnReactionvolume(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -533,7 +533,7 @@ func (e *Transformation) OnReactionvolume(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Transformation) OnRecoverymedium(param execute.ThreadParam) {
+func (e *Transformation_complete) OnRecoverymedium(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -550,7 +550,7 @@ func (e *Transformation) OnRecoverymedium(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Transformation) OnRecoverytemp(param execute.ThreadParam) {
+func (e *Transformation_complete) OnRecoverytemp(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -567,7 +567,7 @@ func (e *Transformation) OnRecoverytemp(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Transformation) OnRecoverytime(param execute.ThreadParam) {
+func (e *Transformation_complete) OnRecoverytime(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -584,7 +584,7 @@ func (e *Transformation) OnRecoverytime(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Transformation) OnRecoveryvolume(param execute.ThreadParam) {
+func (e *Transformation_complete) OnRecoveryvolume(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
@@ -602,7 +602,7 @@ func (e *Transformation) OnRecoveryvolume(param execute.ThreadParam) {
 	}
 }
 
-type Transformation struct {
+type Transformation_complete struct {
 	flow.Component                 // component "superclass" embedded
 	lock                           sync.Mutex
 	startup                        sync.Once
@@ -625,7 +625,7 @@ type Transformation struct {
 	Platedculture                  chan<- execute.ThreadParam
 }
 
-type TransformationParamBlock struct {
+type Transformation_completeParamBlock struct {
 	ID                             execute.ThreadID
 	BlockID                        execute.BlockID
 	Error                          bool
@@ -646,7 +646,7 @@ type TransformationParamBlock struct {
 	Recoveryvolume                 wunit.Volume
 }
 
-type TransformationConfig struct {
+type Transformation_completeConfig struct {
 	ID                             execute.ThreadID
 	BlockID                        execute.BlockID
 	Error                          bool
@@ -667,14 +667,14 @@ type TransformationConfig struct {
 	Recoveryvolume                 wunit.Volume
 }
 
-type TransformationResultBlock struct {
+type Transformation_completeResultBlock struct {
 	ID            execute.ThreadID
 	BlockID       execute.BlockID
 	Error         bool
 	Platedculture *wtype.LHSolution
 }
 
-type TransformationJSONBlock struct {
+type Transformation_completeJSONBlock struct {
 	ID                             *execute.ThreadID
 	BlockID                        *execute.BlockID
 	Error                          *bool
@@ -696,7 +696,7 @@ type TransformationJSONBlock struct {
 	Platedculture                  **wtype.LHSolution
 }
 
-func (c *Transformation) ComponentInfo() *execute.ComponentInfo {
+func (c *Transformation_complete) ComponentInfo() *execute.ComponentInfo {
 	inp := make([]execute.PortInfo, 0)
 	outp := make([]execute.PortInfo, 0)
 	inp = append(inp, *execute.NewPortInfo("AgarPlate", "*wtype.LHPlate", "AgarPlate", true, true, nil, nil))
@@ -716,7 +716,7 @@ func (c *Transformation) ComponentInfo() *execute.ComponentInfo {
 	inp = append(inp, *execute.NewPortInfo("Recoveryvolume", "wunit.Volume", "Recoveryvolume", true, true, nil, nil))
 	outp = append(outp, *execute.NewPortInfo("Platedculture", "*wtype.LHSolution", "Platedculture", true, true, nil, nil))
 
-	ci := execute.NewComponentInfo("Transformation", "Transformation", "", false, inp, outp)
+	ci := execute.NewComponentInfo("Transformation_complete", "Transformation_complete", "", false, inp, outp)
 
 	return ci
 }

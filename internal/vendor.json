@@ -3,18 +3,14 @@
 	"ignore": "",
 	"package": [
 		{
-			"canonical": "code.google.com/p/go-sqlite/go1/sqlite3",
-			"comment": "",
-			"local": "code.google.com/p/go-sqlite/go1/sqlite3",
-			"revision": "6e75c20f8fc4",
-			"revisionTime": "2013-09-15T19:25:44-04:00"
+			"path": "",
+			"revision": "cad5a317cd03372c35d86059dd99344b5542a072",
+			"revisionTime": "2015-05-06T14:43:48+09:30"
 		},
 		{
-			"canonical": "code.google.com/p/go-sqlite/go1/sqlite3/codec",
-			"comment": "",
-			"local": "code.google.com/p/go-sqlite/go1/sqlite3/codec",
-			"revision": "6e75c20f8fc4",
-			"revisionTime": "2013-09-15T19:25:44-04:00"
+			"path": "",
+			"revision": "c3eb24aeea63668ebdac08d2e252f20df8b6b1ae",
+			"revisionTime": "2015-03-27T18:25:44-07:00"
 		},
 		{
 			"path": "",
@@ -67,14 +63,34 @@
 			"revisionTime": "2015-05-06T14:43:48+09:30"
 		},
 		{
-			"path": "",
-			"revision": "cad5a317cd03372c35d86059dd99344b5542a072",
-			"revisionTime": "2015-05-06T14:43:48+09:30"
+			"path": "bitbucket.org/zombiezen/gopdf/pdf",
+			"revision": "1c63dc69751b",
+			"revisionTime": "2015-03-17T16:38:09Z"
 		},
 		{
-			"path": "",
-			"revision": "c3eb24aeea63668ebdac08d2e252f20df8b6b1ae",
-			"revisionTime": "2015-03-27T18:25:44-07:00"
+			"path": "code.google.com/p/draw2d/draw2d",
+			"revision": "eaeb833648ee",
+			"revisionTime": "2015-01-07T14:35:09Z"
+		},
+		{
+			"path": "code.google.com/p/freetype-go/freetype",
+			"revision": "46c3056cafbb",
+			"revisionTime": "2015-03-09T11:32:30+11:00"
+		},
+		{
+			"path": "code.google.com/p/freetype-go/freetype/raster",
+			"revision": "46c3056cafbb",
+			"revisionTime": "2015-03-09T11:32:30+11:00"
+		},
+		{
+			"path": "code.google.com/p/freetype-go/freetype/truetype",
+			"revision": "46c3056cafbb",
+			"revisionTime": "2015-03-09T11:32:30+11:00"
+		},
+		{
+			"path": "code.google.com/p/go-sqlite/go1/sqlite3",
+			"revision": "6e75c20f8fc4",
+			"revisionTime": "2013-09-15T19:25:44-04:00"
 		},
 		{
 			"path": "code.google.com/p/go-sqlite/go1/sqlite3",
@@ -87,9 +103,59 @@
 			"revisionTime": "2013-09-15T19:25:44-04:00"
 		},
 		{
+			"path": "code.google.com/p/go-sqlite/go1/sqlite3/codec",
+			"revision": "6e75c20f8fc4",
+			"revisionTime": "2013-09-15T19:25:44-04:00"
+		},
+		{
+			"path": "code.google.com/p/plotinum/plot",
+			"revision": "6632c5f3e77e",
+			"revisionTime": "2015-01-13T01:15:05-05:00"
+		},
+		{
+			"path": "code.google.com/p/plotinum/plotter",
+			"revision": "6632c5f3e77e",
+			"revisionTime": "2015-01-13T01:15:05-05:00"
+		},
+		{
+			"path": "code.google.com/p/plotinum/plotutil",
+			"revision": "6632c5f3e77e",
+			"revisionTime": "2015-01-13T01:15:05-05:00"
+		},
+		{
+			"path": "code.google.com/p/plotinum/vg",
+			"revision": "6632c5f3e77e",
+			"revisionTime": "2015-01-13T01:15:05-05:00"
+		},
+		{
+			"path": "code.google.com/p/plotinum/vg/vgeps",
+			"revision": "6632c5f3e77e",
+			"revisionTime": "2015-01-13T01:15:05-05:00"
+		},
+		{
+			"path": "code.google.com/p/plotinum/vg/vgimg",
+			"revision": "6632c5f3e77e",
+			"revisionTime": "2015-01-13T01:15:05-05:00"
+		},
+		{
+			"path": "code.google.com/p/plotinum/vg/vgpdf",
+			"revision": "6632c5f3e77e",
+			"revisionTime": "2015-01-13T01:15:05-05:00"
+		},
+		{
+			"path": "code.google.com/p/plotinum/vg/vgsvg",
+			"revision": "6632c5f3e77e",
+			"revisionTime": "2015-01-13T01:15:05-05:00"
+		},
+		{
 			"path": "github.com/Synthace/go-glpk/glpk",
 			"revision": "57b54016c4e11d470e799cbd75b6617f0c12063a",
 			"revisionTime": "2015-07-02T11:42:44-05:00"
+		},
+		{
+			"path": "github.com/ajstarks/svgo",
+			"revision": "6bd3ede812fdffc72aea6026a0d5a14be4e3c5d9",
+			"revisionTime": "2015-05-25T17:13:20-04:00"
 		},
 		{
 			"path": "github.com/biogo/ncbi/blast",
@@ -100,6 +166,11 @@
 			"path": "github.com/biogo/ncbi/ncbi",
 			"revision": "1f2a04055962f693a4fb3d85adc4e0c156b60685",
 			"revisionTime": "2015-10-27T08:49:08+10:30"
+		},
+		{
+			"path": "github.com/disintegration/imaging",
+			"revision": "546cb3c5137b3f1232e123a26aa033aade6b3066",
+			"revisionTime": "2015-10-03T04:44:24+03:00"
 		},
 		{
 			"path": "github.com/kylelemons/godebug/diff",
@@ -135,6 +206,21 @@
 			"path": "github.com/tealeg/xlsx",
 			"revision": "c2885b3e5cb5fb9b241bdab3430ca6e1c1057079",
 			"revisionTime": "2015-07-24T21:09:55+02:00"
+		},
+		{
+			"path": "golang.org/x/image/bmp",
+			"revision": "baddd3465a05d84a6d8d3507547a91cb188c81ea",
+			"revisionTime": "2015-09-11T13:43:18+10:00"
+		},
+		{
+			"path": "golang.org/x/image/tiff",
+			"revision": "baddd3465a05d84a6d8d3507547a91cb188c81ea",
+			"revisionTime": "2015-09-11T13:43:18+10:00"
+		},
+		{
+			"path": "golang.org/x/image/tiff/lzw",
+			"revision": "baddd3465a05d84a6d8d3507547a91cb188c81ea",
+			"revisionTime": "2015-09-11T13:43:18+10:00"
 		},
 		{
 			"path": "golang.org/x/net/html",

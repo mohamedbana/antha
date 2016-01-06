@@ -1,4 +1,4 @@
-protocol Transformation
+protocol Transformation_complete
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"

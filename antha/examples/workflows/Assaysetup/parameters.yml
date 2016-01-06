@@ -5,10 +5,10 @@
 	"Substrate": "component:CutsmartBuffer",
 	"Enzyme": "component:T4Ligase",
       "Outplate": "plate:reservoir",
-      "TipType": "tipbox:Gilson20",
+      "TipType": "tipbox:Gilson200",
       "TotalVolume": "100ul",
-      "SubstrateVolume": "10ul",
-	"EnzymeVolume": "10ul",
+      "SubstrateVolume": "30ul",
+	"EnzymeVolume": "30ul",
 	"NumberofReactions":1
     }
   }],

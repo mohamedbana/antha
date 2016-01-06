@@ -50,6 +50,13 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 
 	A = wtype.NewLHComponent()
 	A.GenericMatter = matter["water"]
+	A.CName = "neb5compcells"
+	A.Type = "culture"
+	A.Smax = 1.0
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
 	A.CName = "10x_M9Salts"
 	A.Type = "water"
 	A.Smax = 9999
@@ -85,22 +92,43 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 
 	A = wtype.NewLHComponent()
 	A.GenericMatter = matter["water"]
-	A.CName = "Yellow"
-	A.Type = "viscous"
+	A.CName = "yellow"
+	A.Type = "water"
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
 	A.GenericMatter = matter["water"]
-	A.CName = "Blue"
-	A.Type = "viscous"
+	A.CName = "blue"
+	A.Type = "water"
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
 	A.GenericMatter = matter["water"]
-	A.CName = "Green"
-	A.Type = "viscous"
+	A.CName = "green"
+	A.Type = "water"
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "red"
+	A.Type = "water"
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "white"
+	A.Type = "water"
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "black"
+	A.Type = "water"
 	A.Smax = 9999
 	cmap[A.CName] = A
 
@@ -112,10 +140,17 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "1kb DNA Ladder"
+	A.Type = "dna"
+	A.Smax = 10.0
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
 	A.GenericMatter = matter["glycerol"]
 	A.CName = "restrictionenzyme"
 	A.Type = "glycerol"
-	A.Smax = 100
+	A.Smax = 1.0
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
@@ -268,6 +303,41 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	A.CName = "DNTPs"
 	A.Type = "water"
 	A.Smax = 1.0 // not sure if this is correct
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "ProteinMarker"
+	A.Type = "protein"
+	A.Smax = 1.0 //not sure if this is correct
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "ProteinFraction"
+	A.Type = "protein"
+	A.Smax = 1.0 //still not sure
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "EColiLysate"
+	A.Type = "protein"
+	A.Smax = 1.0 //not sure what this is!
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "SDSbuffer"
+	A.Type = "detergent"
+	A.Smax = 1.0 //still not sure....
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "Load"
+	A.Type = "load"
+	A.Smax = 1.0 //still not sure....
 	cmap[A.CName] = A
 	return cmap
 }

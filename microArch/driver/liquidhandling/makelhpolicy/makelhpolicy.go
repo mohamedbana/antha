@@ -63,10 +63,28 @@ func MakePolicies() map[string]liquidhandling.LHPolicy {
 	pols["solvent"] = MakeSolventPolicy()
 	pols["default"] = MakeDefaultPolicy()
 	pols["foamy"] = MakeFoamyPolicy()
-
+        pols["lysate"] = MakeLysatePolicy()
+	pols["protein"] = MakeProteinPolicy()
 	return pols
 }
-
+func MakeLysatePolicy() liquidhandling.LHPolicy {
+	lysatepolicy := make(liquidhandling.LHPolicy, 6)
+	lysatepolicy["ASPSPEED"] = 1.0
+	lysatepolicy["DSPSPEED"] = 1.0
+	lysatepolicy["ASP_WAIT"] = 2
+	lysatepolicy["DSP_WAIT"] = 2
+	lysatepolicy["PRE_MIX"] = 5
+	lysatepolicy["CAN_MSA"]= false 
+	return lysatepolicy
+}	
+func MakeProteinPolicy() liquidhandling.LHPolicy {
+	proteinpolicy := make(liquidhandling.LHPolicy, 4)
+	proteinpolicy["DSPREFERENCE"] = 2
+	proteinpolicy["CAN_MULTI"] = true
+	proteinpolicy["PRE_MIX"] = 3
+	proteinpolicy["CAN_MSA"] = false
+	return proteinpolicy
+}
 func MakeWaterPolicy() liquidhandling.LHPolicy {
 	waterpolicy := make(liquidhandling.LHPolicy, 6)
 	waterpolicy["DSPREFERENCE"] = 1

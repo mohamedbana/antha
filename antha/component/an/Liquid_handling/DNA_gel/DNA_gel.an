@@ -7,6 +7,8 @@ import (
 	//"coldplate"
 	//"reagents"
 	//"Devices"
+	//"strconv"
+	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 
@@ -15,9 +17,14 @@ import (
 Parameters (
 	
 	Loadingdyeinsample bool
-	
+	Samplenames []string
+	Samplenumber int
+	Watervol	Volume
 	Loadingdyevolume Volume
 	DNAgelrunvolume Volume
+	
+	
+	Mixingpolicy string
 	
 	//DNAladder Volume // or should this be a concentration?
 
@@ -44,8 +51,10 @@ Data (
 
 // Physical Inputs to this protocol with types
 Inputs (
-    Sampletotest *wtype.LHComponent//WaterSolution
+    Water	*wtype.LHComponent
+	Sampletotest *wtype.LHComponent//WaterSolution
 	Loadingdye *wtype.LHComponent//WaterSolution //Chemspiderlink // not correct link but similar desirable
+	InPlate *wtype.LHPlate
 	DNAgel *wtype.LHPlate //Gel
 
 	//DNAladder *wtype.LHComponent//NucleicacidSolution
@@ -60,7 +69,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Loadedgel *wtype.LHSolution//Gel
+	Loadedsamples []*wtype.LHSolution//Gel
     //
 )
 
@@ -86,9 +95,22 @@ Setup {
 // for every input
 Steps {
 
-	// load gel
+	if len(Samplenames) != Samplenumber{
+		panic(fmt.Sprintln("length of sample names:",len(Samplenames), "is not equal to sample number:",Samplenumber))
+	}
+
+	loadedsamples := make([]*wtype.LHSolution,0)
+	
+	
 	var DNAgelloadmix *wtype.LHComponent
-		
+
+	Water.Type = "loadwater"
+	
+	for i:= 0;i < Samplenumber;i++{
+	// ready to add water to well
+	waterSample := mixer.Sample(Water,Watervol)
+	
+	// load gel
 		if Loadingdyeinsample == false {
 		DNAgelloadmixsolution := MixInto(
 		DNAgel,
@@ -98,13 +120,25 @@ Steps {
 		DNAgelloadmix = wtype.SolutionToComponent(DNAgelloadmixsolution)
 		}else {DNAgelloadmix = Sampletotest}
 
-	loadedgel := MixInto(
+	// Ensure  sample will be dispensed appropriately:
+
+	
+	// comment this line out to repeat load of same sample in all wells using first sample name
+	DNAgelloadmix.CName = Samplenames[0]//[i] //originalname + strconv.Itoa(i)
+	
+	// replacing following line with temporary hard code whilst developing protocol:
+	DNAgelloadmix.Type = Mixingpolicy	
+	//DNAgelloadmix.Type = "loadwater"
+	
+	loadedsample := MixInto(
 	DNAgel,
+	waterSample,
 	mixer.Sample(DNAgelloadmix, DNAgelrunvolume),
 	)
 
-	Loadedgel = loadedgel
-
+	loadedsamples = append(Loadedsamples,loadedsample)
+}
+	Loadedsamples = loadedsamples
 	// Then run the gel
 	/* DNAgel := electrophoresis.Run(Loadedgel,Runvoltage,DNAgelruntime)
 

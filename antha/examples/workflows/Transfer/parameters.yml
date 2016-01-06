@@ -3,7 +3,7 @@
     "newparams": {
       "Startingsolution": "component:water",
 	  "InPlate": "plate:pcrplate_with_cooler",
-      "Outplate": "plate:greiner384",
+      "Outplate": "plate:greiner384_riser",
       "TipType": "tipbox:Gilson20",
       "Liquidname": "Evian",
       "LiquidVolume": "10ul",

@@ -12,7 +12,6 @@ Parameters (
 	BufferConcX					int
 	DNAConc 					Concentration
 	DNAMassperReaction			Mass
-	//DNAVol						Volume
 	DNAName						string
 	EnzymeNames					[]string
 	BSAvol						Volume

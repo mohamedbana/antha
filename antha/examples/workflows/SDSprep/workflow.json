@@ -1,0 +1,15 @@
+{
+"properties": {
+        "name": "main"
+    },
+    "processes": {
+        "SDSprep": {
+            "component": "SDSprep",
+            "metadata": {
+                "label": "CS"
+            }
+        }
+    },
+    "connections": [ ]
+}
+

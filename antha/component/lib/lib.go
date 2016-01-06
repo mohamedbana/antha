@@ -5,32 +5,43 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/AliquotTo"
 	"github.com/antha-lang/antha/antha/component/lib/Assaysetup"
 	"github.com/antha-lang/antha/antha/component/lib/BlastSearch"
+	"github.com/antha-lang/antha/antha/component/lib/Colony_PCR"
 	"github.com/antha-lang/antha/antha/component/lib/DNA_gel"
 	"github.com/antha-lang/antha/antha/component/lib/Datacrunch"
 	"github.com/antha-lang/antha/antha/component/lib/Evaporationrate"
 	"github.com/antha-lang/antha/antha/component/lib/FindPartsthat"
 	"github.com/antha-lang/antha/antha/component/lib/Iterative_assembly_design"
 	"github.com/antha-lang/antha/antha/component/lib/Kla"
+	"github.com/antha-lang/antha/antha/component/lib/LoadGel"
 	"github.com/antha-lang/antha/antha/component/lib/LookUpMolecule"
 	"github.com/antha-lang/antha/antha/component/lib/MakeBuffer"
 	"github.com/antha-lang/antha/antha/component/lib/MakeMedia"
+	"github.com/antha-lang/antha/antha/component/lib/Mastermix"
+	"github.com/antha-lang/antha/antha/component/lib/Mastermix_reactions"
 	"github.com/antha-lang/antha/antha/component/lib/MoClo_design"
 	"github.com/antha-lang/antha/antha/component/lib/NewDNASequence"
 	"github.com/antha-lang/antha/antha/component/lib/OD"
 	"github.com/antha-lang/antha/antha/component/lib/PCR"
 	"github.com/antha-lang/antha/antha/component/lib/Paintmix"
 	"github.com/antha-lang/antha/antha/component/lib/Phytip_miniprep"
+	"github.com/antha-lang/antha/antha/component/lib/PipetteImage"
+	"github.com/antha-lang/antha/antha/component/lib/PlateOut"
+	"github.com/antha-lang/antha/antha/component/lib/Plotdata"
+	"github.com/antha-lang/antha/antha/component/lib/PreIncubation"
 	"github.com/antha-lang/antha/antha/component/lib/Printname"
 	"github.com/antha-lang/antha/antha/component/lib/ProtocolName_from_an_file"
+	"github.com/antha-lang/antha/antha/component/lib/Recovery"
 	"github.com/antha-lang/antha/antha/component/lib/RemoveRestrictionSites"
 	"github.com/antha-lang/antha/antha/component/lib/RestrictionDigestion"
 	"github.com/antha-lang/antha/antha/component/lib/RestrictionDigestion_conc"
+	"github.com/antha-lang/antha/antha/component/lib/SDSprep"
 	"github.com/antha-lang/antha/antha/component/lib/Scarfree_design"
 	"github.com/antha-lang/antha/antha/component/lib/Scarfree_siteremove_orfcheck"
 	"github.com/antha-lang/antha/antha/component/lib/SumVolume"
 	"github.com/antha-lang/antha/antha/component/lib/Thawtime"
 	"github.com/antha-lang/antha/antha/component/lib/Transfer"
 	"github.com/antha-lang/antha/antha/component/lib/Transformation"
+	"github.com/antha-lang/antha/antha/component/lib/Transformation_complete"
 	"github.com/antha-lang/antha/antha/component/lib/TypeIISAssembly_design"
 	"github.com/antha-lang/antha/antha/component/lib/TypeIISConstructAssembly"
 	"github.com/antha-lang/antha/antha/component/lib/TypeIISConstructAssemblyMMX"
@@ -83,15 +94,48 @@ func GetComponents() []ComponentDesc {
 
 	portMap["BlastSearch"]["Hits"] = false
 
+	portMap["Colony_PCR"] = make(map[string]bool)
+	portMap["Colony_PCR"]["Additiveconc"] = true
+	portMap["Colony_PCR"]["Additives"] = true
+	portMap["Colony_PCR"]["AnnealingTemp"] = true
+	portMap["Colony_PCR"]["Annealingtime"] = true
+	portMap["Colony_PCR"]["Buffer"] = true
+	portMap["Colony_PCR"]["DNTPS"] = true
+	portMap["Colony_PCR"]["DNTPconc"] = true
+	portMap["Colony_PCR"]["Denaturationtime"] = true
+	portMap["Colony_PCR"]["Extensiontemp"] = true
+	portMap["Colony_PCR"]["Extensiontime"] = true
+	portMap["Colony_PCR"]["Finalextensiontime"] = true
+	portMap["Colony_PCR"]["FwdPrimer"] = true
+	portMap["Colony_PCR"]["FwdPrimerConc"] = true
+	portMap["Colony_PCR"]["InitDenaturationtime"] = true
+	portMap["Colony_PCR"]["Numberofcycles"] = true
+	portMap["Colony_PCR"]["OutPlate"] = true
+	portMap["Colony_PCR"]["PCRPolymerase"] = true
+	portMap["Colony_PCR"]["ReactionVolume"] = true
+	portMap["Colony_PCR"]["RevPrimer"] = true
+	portMap["Colony_PCR"]["RevPrimerConc"] = true
+	portMap["Colony_PCR"]["TargetpolymeraseConcentration"] = true
+	portMap["Colony_PCR"]["Template"] = true
+	portMap["Colony_PCR"]["Templatevolume"] = true
+
+	portMap["Colony_PCR"]["Reaction"] = false
+
 	portMap["DNA_gel"] = make(map[string]bool)
 	portMap["DNA_gel"]["DNAgel"] = true
 	portMap["DNA_gel"]["DNAgelrunvolume"] = true
+	portMap["DNA_gel"]["InPlate"] = true
 	portMap["DNA_gel"]["Loadingdye"] = true
 	portMap["DNA_gel"]["Loadingdyeinsample"] = true
 	portMap["DNA_gel"]["Loadingdyevolume"] = true
+	portMap["DNA_gel"]["Mixingpolicy"] = true
+	portMap["DNA_gel"]["Samplenames"] = true
+	portMap["DNA_gel"]["Samplenumber"] = true
 	portMap["DNA_gel"]["Sampletotest"] = true
+	portMap["DNA_gel"]["Water"] = true
+	portMap["DNA_gel"]["Watervol"] = true
 
-	portMap["DNA_gel"]["Loadedgel"] = false
+	portMap["DNA_gel"]["Loadedsamples"] = false
 
 	portMap["Datacrunch"] = make(map[string]bool)
 	portMap["Datacrunch"]["DNAConc"] = true
@@ -168,6 +212,19 @@ func GetComponents() []ComponentDesc {
 	portMap["Kla"]["Necessaryshakerspeed"] = false
 	portMap["Kla"]["Status"] = false
 
+	portMap["LoadGel"] = make(map[string]bool)
+	portMap["LoadGel"]["GelPlate"] = true
+	portMap["LoadGel"]["InPlate"] = true
+	portMap["LoadGel"]["LoadVolume"] = true
+	portMap["LoadGel"]["Protein"] = true
+	portMap["LoadGel"]["SampleName"] = true
+	portMap["LoadGel"]["Water"] = true
+	portMap["LoadGel"]["WaterName"] = true
+	portMap["LoadGel"]["WaterVolume"] = true
+
+	portMap["LoadGel"]["RunSolution"] = false
+	portMap["LoadGel"]["Status"] = false
+
 	portMap["LookUpMolecule"] = make(map[string]bool)
 	portMap["LookUpMolecule"]["Compound"] = true
 	portMap["LookUpMolecule"]["Compoundlist"] = true
@@ -209,6 +266,34 @@ func GetComponents() []ComponentDesc {
 
 	portMap["MakeMedia"]["Media"] = false
 	portMap["MakeMedia"]["Status"] = false
+
+	portMap["Mastermix"] = make(map[string]bool)
+	portMap["Mastermix"]["AliquotbyRow"] = true
+	portMap["Mastermix"]["Buffer"] = true
+	portMap["Mastermix"]["Inplate"] = true
+	portMap["Mastermix"]["NumberofMastermixes"] = true
+	portMap["Mastermix"]["OtherComponentVolumes"] = true
+	portMap["Mastermix"]["OtherComponents"] = true
+	portMap["Mastermix"]["OutPlate"] = true
+	portMap["Mastermix"]["TotalVolumeperMastermix"] = true
+
+	portMap["Mastermix"]["Mastermixes"] = false
+	portMap["Mastermix"]["Status"] = false
+
+	portMap["Mastermix_reactions"] = make(map[string]bool)
+	portMap["Mastermix_reactions"]["AliquotbyRow"] = true
+	portMap["Mastermix_reactions"]["ComponentVolumesperReaction"] = true
+	portMap["Mastermix_reactions"]["Components"] = true
+	portMap["Mastermix_reactions"]["Inplate"] = true
+	portMap["Mastermix_reactions"]["NumberofMastermixes"] = true
+	portMap["Mastermix_reactions"]["OutPlate"] = true
+	portMap["Mastermix_reactions"]["Reactionspermastermix"] = true
+	portMap["Mastermix_reactions"]["TopUpBuffer"] = true
+	portMap["Mastermix_reactions"]["TotalVolumeperreaction"] = true
+	portMap["Mastermix_reactions"]["VolumetoLeaveforDNAperreaction"] = true
+
+	portMap["Mastermix_reactions"]["Mastermixes"] = false
+	portMap["Mastermix_reactions"]["Status"] = false
 
 	portMap["MoClo_design"] = make(map[string]bool)
 	portMap["MoClo_design"]["AssemblyStandard"] = true
@@ -309,6 +394,45 @@ func GetComponents() []ComponentDesc {
 
 	portMap["Phytip_miniprep"]["PlasmidDNAsolution"] = false
 
+	portMap["PipetteImage"] = make(map[string]bool)
+	portMap["PipetteImage"]["AvailableColours"] = true
+	portMap["PipetteImage"]["Colourcomponents"] = true
+	portMap["PipetteImage"]["Imagefilename"] = true
+	portMap["PipetteImage"]["OnlythisColour"] = true
+	portMap["PipetteImage"]["OutPlate"] = true
+	portMap["PipetteImage"]["Palettename"] = true
+	portMap["PipetteImage"]["VolumePerWell"] = true
+
+	portMap["PipetteImage"]["Numberofpixels"] = false
+	portMap["PipetteImage"]["Pixels"] = false
+
+	portMap["PlateOut"] = make(map[string]bool)
+	portMap["PlateOut"]["AgarPlate"] = true
+	portMap["PlateOut"]["Diluent"] = true
+	portMap["PlateOut"]["DilutionX"] = true
+	portMap["PlateOut"]["IncubationTemp"] = true
+	portMap["PlateOut"]["IncubationTime"] = true
+	portMap["PlateOut"]["Plateoutvolume"] = true
+	portMap["PlateOut"]["RecoveredCells"] = true
+
+	portMap["PlateOut"]["Platedculture"] = false
+
+	portMap["Plotdata"] = make(map[string]bool)
+	portMap["Plotdata"]["Exportedfilename"] = true
+	portMap["Plotdata"]["Filename"] = true
+	portMap["Plotdata"]["Sheet"] = true
+	portMap["Plotdata"]["Xminmax"] = true
+	portMap["Plotdata"]["Yminmaxarray"] = true
+
+	portMap["PreIncubation"] = make(map[string]bool)
+	portMap["PreIncubation"]["CompetentCells"] = true
+	portMap["PreIncubation"]["CompetentCellvolumeperassembly"] = true
+	portMap["PreIncubation"]["OutPlate"] = true
+	portMap["PreIncubation"]["Preplasmidtemp"] = true
+	portMap["PreIncubation"]["Preplasmidtime"] = true
+
+	portMap["PreIncubation"]["ReadyCompCells"] = false
+
 	portMap["Printname"] = make(map[string]bool)
 	portMap["Printname"]["Name"] = true
 
@@ -323,6 +447,17 @@ func GetComponents() []ComponentDesc {
 
 	portMap["ProtocolName_from_an_file"]["OutputData"] = false
 	portMap["ProtocolName_from_an_file"]["PhysicalOutput"] = false
+
+	portMap["Recovery"] = make(map[string]bool)
+	portMap["Recovery"]["AgarPlate"] = true
+	portMap["Recovery"]["OutPlate"] = true
+	portMap["Recovery"]["Recoverymedium"] = true
+	portMap["Recovery"]["Recoverytemp"] = true
+	portMap["Recovery"]["Recoverytime"] = true
+	portMap["Recovery"]["Recoveryvolume"] = true
+	portMap["Recovery"]["Transformedcells"] = true
+
+	portMap["Recovery"]["RecoveredCells"] = false
 
 	portMap["RemoveRestrictionSites"] = make(map[string]bool)
 	portMap["RemoveRestrictionSites"]["EnzymeforRestrictionmapping"] = true
@@ -382,6 +517,24 @@ func GetComponents() []ComponentDesc {
 	portMap["RestrictionDigestion_conc"]["Water"] = true
 
 	portMap["RestrictionDigestion_conc"]["Reaction"] = false
+
+	portMap["SDSprep"] = make(map[string]bool)
+	portMap["SDSprep"]["Buffer"] = true
+	portMap["SDSprep"]["BufferName"] = true
+	portMap["SDSprep"]["BufferStockConc"] = true
+	portMap["SDSprep"]["BufferVolume"] = true
+	portMap["SDSprep"]["DenatureTemp"] = true
+	portMap["SDSprep"]["DenatureTime"] = true
+	portMap["SDSprep"]["FinalConcentration"] = true
+	portMap["SDSprep"]["InPlate"] = true
+	portMap["SDSprep"]["OutPlate"] = true
+	portMap["SDSprep"]["Protein"] = true
+	portMap["SDSprep"]["ReactionVolume"] = true
+	portMap["SDSprep"]["SampleName"] = true
+	portMap["SDSprep"]["SampleVolume"] = true
+
+	portMap["SDSprep"]["LoadSample"] = false
+	portMap["SDSprep"]["Status"] = false
 
 	portMap["Scarfree_design"] = make(map[string]bool)
 	portMap["Scarfree_design"]["Constructname"] = true
@@ -443,23 +596,34 @@ func GetComponents() []ComponentDesc {
 	portMap["Transfer"]["Status"] = false
 
 	portMap["Transformation"] = make(map[string]bool)
-	portMap["Transformation"]["AgarPlate"] = true
-	portMap["Transformation"]["CompetentCells"] = true
 	portMap["Transformation"]["CompetentCellvolumeperassembly"] = true
 	portMap["Transformation"]["OutPlate"] = true
-	portMap["Transformation"]["Plateoutvolume"] = true
 	portMap["Transformation"]["Postplasmidtemp"] = true
 	portMap["Transformation"]["Postplasmidtime"] = true
-	portMap["Transformation"]["Preplasmidtemp"] = true
-	portMap["Transformation"]["Preplasmidtime"] = true
 	portMap["Transformation"]["Reaction"] = true
 	portMap["Transformation"]["Reactionvolume"] = true
-	portMap["Transformation"]["Recoverymedium"] = true
-	portMap["Transformation"]["Recoverytemp"] = true
-	portMap["Transformation"]["Recoverytime"] = true
-	portMap["Transformation"]["Recoveryvolume"] = true
+	portMap["Transformation"]["ReadyCompCells"] = true
 
-	portMap["Transformation"]["Platedculture"] = false
+	portMap["Transformation"]["Transformedcells"] = false
+
+	portMap["Transformation_complete"] = make(map[string]bool)
+	portMap["Transformation_complete"]["AgarPlate"] = true
+	portMap["Transformation_complete"]["CompetentCells"] = true
+	portMap["Transformation_complete"]["CompetentCellvolumeperassembly"] = true
+	portMap["Transformation_complete"]["OutPlate"] = true
+	portMap["Transformation_complete"]["Plateoutvolume"] = true
+	portMap["Transformation_complete"]["Postplasmidtemp"] = true
+	portMap["Transformation_complete"]["Postplasmidtime"] = true
+	portMap["Transformation_complete"]["Preplasmidtemp"] = true
+	portMap["Transformation_complete"]["Preplasmidtime"] = true
+	portMap["Transformation_complete"]["Reaction"] = true
+	portMap["Transformation_complete"]["Reactionvolume"] = true
+	portMap["Transformation_complete"]["Recoverymedium"] = true
+	portMap["Transformation_complete"]["Recoverytemp"] = true
+	portMap["Transformation_complete"]["Recoverytime"] = true
+	portMap["Transformation_complete"]["Recoveryvolume"] = true
+
+	portMap["Transformation_complete"]["Platedculture"] = false
 
 	portMap["TypeIISAssembly_design"] = make(map[string]bool)
 	portMap["TypeIISAssembly_design"]["AssemblyStandard"] = true
@@ -590,32 +754,43 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "AliquotTo", Constructor: AliquotTo.NewAliquotTo})
 	c = append(c, ComponentDesc{Name: "Assaysetup", Constructor: Assaysetup.NewAssaysetup})
 	c = append(c, ComponentDesc{Name: "BlastSearch", Constructor: BlastSearch.NewBlastSearch})
+	c = append(c, ComponentDesc{Name: "Colony_PCR", Constructor: Colony_PCR.NewColony_PCR})
 	c = append(c, ComponentDesc{Name: "DNA_gel", Constructor: DNA_gel.NewDNA_gel})
 	c = append(c, ComponentDesc{Name: "Datacrunch", Constructor: Datacrunch.NewDatacrunch})
 	c = append(c, ComponentDesc{Name: "Evaporationrate", Constructor: Evaporationrate.NewEvaporationrate})
 	c = append(c, ComponentDesc{Name: "FindPartsthat", Constructor: FindPartsthat.NewFindPartsthat})
 	c = append(c, ComponentDesc{Name: "Iterative_assembly_design", Constructor: Iterative_assembly_design.NewIterative_assembly_design})
 	c = append(c, ComponentDesc{Name: "Kla", Constructor: Kla.NewKla})
+	c = append(c, ComponentDesc{Name: "LoadGel", Constructor: LoadGel.NewLoadGel})
 	c = append(c, ComponentDesc{Name: "LookUpMolecule", Constructor: LookUpMolecule.NewLookUpMolecule})
 	c = append(c, ComponentDesc{Name: "MakeBuffer", Constructor: MakeBuffer.NewMakeBuffer})
 	c = append(c, ComponentDesc{Name: "MakeMedia", Constructor: MakeMedia.NewMakeMedia})
+	c = append(c, ComponentDesc{Name: "Mastermix", Constructor: Mastermix.NewMastermix})
+	c = append(c, ComponentDesc{Name: "Mastermix_reactions", Constructor: Mastermix_reactions.NewMastermix_reactions})
 	c = append(c, ComponentDesc{Name: "MoClo_design", Constructor: MoClo_design.NewMoClo_design})
 	c = append(c, ComponentDesc{Name: "NewDNASequence", Constructor: NewDNASequence.NewNewDNASequence})
 	c = append(c, ComponentDesc{Name: "OD", Constructor: OD.NewOD})
 	c = append(c, ComponentDesc{Name: "PCR", Constructor: PCR.NewPCR})
 	c = append(c, ComponentDesc{Name: "Paintmix", Constructor: Paintmix.NewPaintmix})
 	c = append(c, ComponentDesc{Name: "Phytip_miniprep", Constructor: Phytip_miniprep.NewPhytip_miniprep})
+	c = append(c, ComponentDesc{Name: "PipetteImage", Constructor: PipetteImage.NewPipetteImage})
+	c = append(c, ComponentDesc{Name: "PlateOut", Constructor: PlateOut.NewPlateOut})
+	c = append(c, ComponentDesc{Name: "Plotdata", Constructor: Plotdata.NewPlotdata})
+	c = append(c, ComponentDesc{Name: "PreIncubation", Constructor: PreIncubation.NewPreIncubation})
 	c = append(c, ComponentDesc{Name: "Printname", Constructor: Printname.NewPrintname})
 	c = append(c, ComponentDesc{Name: "ProtocolName_from_an_file", Constructor: ProtocolName_from_an_file.NewProtocolName_from_an_file})
+	c = append(c, ComponentDesc{Name: "Recovery", Constructor: Recovery.NewRecovery})
 	c = append(c, ComponentDesc{Name: "RemoveRestrictionSites", Constructor: RemoveRestrictionSites.NewRemoveRestrictionSites})
 	c = append(c, ComponentDesc{Name: "RestrictionDigestion", Constructor: RestrictionDigestion.NewRestrictionDigestion})
 	c = append(c, ComponentDesc{Name: "RestrictionDigestion_conc", Constructor: RestrictionDigestion_conc.NewRestrictionDigestion_conc})
+	c = append(c, ComponentDesc{Name: "SDSprep", Constructor: SDSprep.NewSDSprep})
 	c = append(c, ComponentDesc{Name: "Scarfree_design", Constructor: Scarfree_design.NewScarfree_design})
 	c = append(c, ComponentDesc{Name: "Scarfree_siteremove_orfcheck", Constructor: Scarfree_siteremove_orfcheck.NewScarfree_siteremove_orfcheck})
 	c = append(c, ComponentDesc{Name: "SumVolume", Constructor: SumVolume.NewSumVolume})
 	c = append(c, ComponentDesc{Name: "Thawtime", Constructor: Thawtime.NewThawtime})
 	c = append(c, ComponentDesc{Name: "Transfer", Constructor: Transfer.NewTransfer})
 	c = append(c, ComponentDesc{Name: "Transformation", Constructor: Transformation.NewTransformation})
+	c = append(c, ComponentDesc{Name: "Transformation_complete", Constructor: Transformation_complete.NewTransformation_complete})
 	c = append(c, ComponentDesc{Name: "TypeIISAssembly_design", Constructor: TypeIISAssembly_design.NewTypeIISAssembly_design})
 	c = append(c, ComponentDesc{Name: "TypeIISConstructAssembly", Constructor: TypeIISConstructAssembly.NewTypeIISConstructAssembly})
 	c = append(c, ComponentDesc{Name: "TypeIISConstructAssemblyMMX", Constructor: TypeIISConstructAssemblyMMX.NewTypeIISConstructAssemblyMMX})
