@@ -1,5 +1,4 @@
-// variant of aliquot.an whereby the low level MixTo command is used to pipette by row
-
+// Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours
 package PipetteImage
 
 import (
@@ -81,7 +80,6 @@ func (e *PipetteImage) steps(p PipetteImageParamBlock, r *PipetteImageResultBloc
 			}
 
 		} else {
-			fmt.Println("component.Type=", component.CName)
 			if component.CName != "white" {
 				counter = counter + 1
 				fmt.Println("wells", counter)
