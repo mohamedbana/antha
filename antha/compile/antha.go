@@ -266,6 +266,9 @@ func (p *compiler) removeParamDecls(src *ast.File) {
 
 // Modify AST
 func (p *compiler) transform(src *ast.File) {
+	p.sugarAST(src.Decls)
+	p.addPreamble(src.Decls)
+	p.removeParamDecls(src)
 	p.addAnthaImports(src,
 		[]string{
 			"github.com/antha-lang/antha/microArch/execution",
@@ -278,9 +281,6 @@ func (p *compiler) transform(src *ast.File) {
 			"encoding/json",
 		},
 	)
-	p.sugarAST(src.Decls)
-	p.addPreamble(src.Decls)
-	p.removeParamDecls(src)
 }
 
 // Print out additional go code for each antha file
@@ -650,18 +650,26 @@ func (p *compiler) addPreamble(decls []ast.Decl) {
 }
 
 // Update AST for antha semantics
-func (p *compiler) sugarAST(d []ast.Decl) {
+func (p *compiler) sugarAST(d []ast.Decl) []string {
+	var m map[string]int
 	for i := range d {
 		switch decl := d[i].(type) {
 		case *ast.GenDecl:
 		case *ast.AnthaDecl:
-			p.sugarForParams(decl.Body)
-			p.sugarForIntrinsics(decl.Body)
-			p.sugarForTypes(decl.Body)
+			p.sugarForParams(decl.Body, m)
+			p.sugarForIntrinsics(decl.Body, m)
+			p.sugarForTypes(decl.Body, m)
 		default:
 			continue
 		}
 	}
+	var ret []string
+
+	for k, _ := range m {
+		ret = append(ret, k)
+	}
+
+	return ret
 }
 
 // Return appropriate nested SelectorExpr for the replacement for Identifier
