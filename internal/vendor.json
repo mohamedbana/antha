@@ -63,6 +63,31 @@
 			"revisionTime": "2015-05-06T14:43:48+09:30"
 		},
 		{
+			"path": "bitbucket.org/zombiezen/gopdf/pdf",
+			"revision": "1c63dc69751b",
+			"revisionTime": "2015-03-17T16:38:09Z"
+		},
+		{
+			"path": "code.google.com/p/draw2d/draw2d",
+			"revision": "eaeb833648ee",
+			"revisionTime": "2015-01-07T14:35:09Z"
+		},
+		{
+			"path": "code.google.com/p/freetype-go/freetype",
+			"revision": "46c3056cafbb",
+			"revisionTime": "2015-03-09T11:32:30+11:00"
+		},
+		{
+			"path": "code.google.com/p/freetype-go/freetype/raster",
+			"revision": "46c3056cafbb",
+			"revisionTime": "2015-03-09T11:32:30+11:00"
+		},
+		{
+			"path": "code.google.com/p/freetype-go/freetype/truetype",
+			"revision": "46c3056cafbb",
+			"revisionTime": "2015-03-09T11:32:30+11:00"
+		},
+		{
 			"path": "code.google.com/p/go-sqlite/go1/sqlite3",
 			"revision": "6e75c20f8fc4",
 			"revisionTime": "2013-09-15T19:25:44-04:00"
@@ -81,11 +106,56 @@
 			"path": "code.google.com/p/go-sqlite/go1/sqlite3/codec",
 			"revision": "6e75c20f8fc4",
 			"revisionTime": "2013-09-15T19:25:44-04:00"
+		},
+		{
+			"path": "code.google.com/p/plotinum/plot",
+			"revision": "6632c5f3e77e",
+			"revisionTime": "2015-01-13T01:15:05-05:00"
+		},
+		{
+			"path": "code.google.com/p/plotinum/plotter",
+			"revision": "6632c5f3e77e",
+			"revisionTime": "2015-01-13T01:15:05-05:00"
+		},
+		{
+			"path": "code.google.com/p/plotinum/plotutil",
+			"revision": "6632c5f3e77e",
+			"revisionTime": "2015-01-13T01:15:05-05:00"
+		},
+		{
+			"path": "code.google.com/p/plotinum/vg",
+			"revision": "6632c5f3e77e",
+			"revisionTime": "2015-01-13T01:15:05-05:00"
+		},
+		{
+			"path": "code.google.com/p/plotinum/vg/vgeps",
+			"revision": "6632c5f3e77e",
+			"revisionTime": "2015-01-13T01:15:05-05:00"
+		},
+		{
+			"path": "code.google.com/p/plotinum/vg/vgimg",
+			"revision": "6632c5f3e77e",
+			"revisionTime": "2015-01-13T01:15:05-05:00"
+		},
+		{
+			"path": "code.google.com/p/plotinum/vg/vgpdf",
+			"revision": "6632c5f3e77e",
+			"revisionTime": "2015-01-13T01:15:05-05:00"
+		},
+		{
+			"path": "code.google.com/p/plotinum/vg/vgsvg",
+			"revision": "6632c5f3e77e",
+			"revisionTime": "2015-01-13T01:15:05-05:00"
 		},
 		{
 			"path": "github.com/Synthace/go-glpk/glpk",
 			"revision": "57b54016c4e11d470e799cbd75b6617f0c12063a",
 			"revisionTime": "2015-07-02T11:42:44-05:00"
+		},
+		{
+			"path": "github.com/ajstarks/svgo",
+			"revision": "6bd3ede812fdffc72aea6026a0d5a14be4e3c5d9",
+			"revisionTime": "2015-05-25T17:13:20-04:00"
 		},
 		{
 			"path": "github.com/biogo/ncbi/blast",

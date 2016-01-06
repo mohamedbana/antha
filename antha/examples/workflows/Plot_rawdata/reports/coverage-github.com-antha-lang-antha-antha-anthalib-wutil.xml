@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-03.dtd">
+<coverage line-rate="0" branch-rate="0" version="" timestamp="1452073442583">
+	<packages>
+		<package name="github.com/antha-lang/antha/antha/anthalib/wutil" line-rate="0" branch-rate="0" complexity="0">
+			<classes>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wutil/parseint.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="ParseInt" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="29" hits="0"></line>
+								<line number="30" hits="0"></line>
+							</lines>
+						</method>
+						<method name="ParseFloat" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="34" hits="0"></line>
+								<line number="35" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="29" hits="0"></line>
+						<line number="30" hits="0"></line>
+						<line number="34" hits="0"></line>
+						<line number="35" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wutil/sortmapkeysby.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="SortMapKeysBy" signature="" line-rate="0" branch-rate="0">
+							<lines></lines>
+						</method>
+					</methods>
+					<lines></lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wutil/round.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="RoundInt" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="32" hits="1"></line>
+								<line number="33" hits="1"></line>
+								<line number="34" hits="1"></line>
+								<line number="37" hits="1"></line>
+							</lines>
+						</method>
+						<method name="RoundDown" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="41" hits="0"></line>
+								<line number="42" hits="0"></line>
+								<line number="43" hits="0"></line>
+								<line number="46" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Roundto" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="50" hits="0"></line>
+								<line number="51" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="32" hits="1"></line>
+						<line number="33" hits="1"></line>
+						<line number="34" hits="1"></line>
+						<line number="37" hits="1"></line>
+						<line number="41" hits="0"></line>
+						<line number="42" hits="0"></line>
+						<line number="43" hits="0"></line>
+						<line number="46" hits="0"></line>
+						<line number="50" hits="0"></line>
+						<line number="51" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wutil/series.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Series" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="26" hits="0"></line>
+								<line number="27" hits="0"></line>
+								<line number="28" hits="0"></line>
+								<line number="29" hits="0"></line>
+								<line number="30" hits="0"></line>
+								<line number="32" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="26" hits="0"></line>
+						<line number="27" hits="0"></line>
+						<line number="28" hits="0"></line>
+						<line number="29" hits="0"></line>
+						<line number="30" hits="0"></line>
+						<line number="32" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wutil/endsWith.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="EndsWith" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="26" hits="0"></line>
+								<line number="27" hits="0"></line>
+								<line number="30" hits="0"></line>
+								<line number="31" hits="0"></line>
+								<line number="33" hits="0"></line>
+								<line number="34" hits="0"></line>
+								<line number="35" hits="0"></line>
+								<line number="38" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="26" hits="0"></line>
+						<line number="27" hits="0"></line>
+						<line number="30" hits="0"></line>
+						<line number="31" hits="0"></line>
+						<line number="33" hits="0"></line>
+						<line number="34" hits="0"></line>
+						<line number="35" hits="0"></line>
+						<line number="38" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wutil/floatarray.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="FMax" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="28" hits="0"></line>
+								<line number="29" hits="0"></line>
+								<line number="31" hits="0"></line>
+								<line number="32" hits="0"></line>
+							</lines>
+						</method>
+						<method name="FMin" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="36" hits="0"></line>
+								<line number="37" hits="0"></line>
+								<line number="39" hits="0"></line>
+								<line number="40" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="28" hits="0"></line>
+						<line number="29" hits="0"></line>
+						<line number="31" hits="0"></line>
+						<line number="32" hits="0"></line>
+						<line number="36" hits="0"></line>
+						<line number="37" hits="0"></line>
+						<line number="39" hits="0"></line>
+						<line number="40" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wutil/numtoalpha.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="NumToAlphaCountFromZero" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="31" hits="0"></line>
+							</lines>
+						</method>
+						<method name="NumToAlpha" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="36" hits="1"></line>
+								<line number="37" hits="1"></line>
+								<line number="39" hits="1"></line>
+								<line number="40" hits="0"></line>
+								<line number="43" hits="1"></line>
+								<line number="45" hits="1"></line>
+								<line number="46" hits="1"></line>
+								<line number="47" hits="1"></line>
+								<line number="48" hits="1"></line>
+								<line number="49" hits="1"></line>
+								<line number="50" hits="1"></line>
+								<line number="51" hits="1"></line>
+								<line number="55" hits="1"></line>
+								<line number="57" hits="1"></line>
+								<line number="58" hits="1"></line>
+								<line number="61" hits="1"></line>
+							</lines>
+						</method>
+						<method name="AlphaToNum" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="65" hits="1"></line>
+								<line number="67" hits="1"></line>
+								<line number="69" hits="1"></line>
+								<line number="70" hits="1"></line>
+								<line number="71" hits="1"></line>
+								<line number="72" hits="1"></line>
+								<line number="75" hits="1"></line>
+							</lines>
+						</method>
+						<method name="DecodeCoords" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="79" hits="0"></line>
+								<line number="80" hits="0"></line>
+								<line number="81" hits="0"></line>
+								<line number="82" hits="0"></line>
+								<line number="83" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="31" hits="0"></line>
+						<line number="36" hits="1"></line>
+						<line number="37" hits="1"></line>
+						<line number="39" hits="1"></line>
+						<line number="40" hits="0"></line>
+						<line number="43" hits="1"></line>
+						<line number="45" hits="1"></line>
+						<line number="46" hits="1"></line>
+						<line number="47" hits="1"></line>
+						<line number="48" hits="1"></line>
+						<line number="49" hits="1"></line>
+						<line number="50" hits="1"></line>
+						<line number="51" hits="1"></line>
+						<line number="55" hits="1"></line>
+						<line number="57" hits="1"></line>
+						<line number="58" hits="1"></line>
+						<line number="61" hits="1"></line>
+						<line number="65" hits="1"></line>
+						<line number="67" hits="1"></line>
+						<line number="69" hits="1"></line>
+						<line number="70" hits="1"></line>
+						<line number="71" hits="1"></line>
+						<line number="72" hits="1"></line>
+						<line number="75" hits="1"></line>
+						<line number="79" hits="0"></line>
+						<line number="80" hits="0"></line>
+						<line number="81" hits="0"></line>
+						<line number="82" hits="0"></line>
+						<line number="83" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wutil/warn.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Warn" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="28" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="28" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wutil/error.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Error" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="28" hits="0"></line>
+								<line number="29" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="28" hits="0"></line>
+						<line number="29" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wutil/intarray.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Max" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="28" hits="0"></line>
+								<line number="29" hits="0"></line>
+								<line number="31" hits="0"></line>
+								<line number="32" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Min" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="36" hits="0"></line>
+								<line number="37" hits="0"></line>
+								<line number="39" hits="0"></line>
+								<line number="40" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="28" hits="0"></line>
+						<line number="29" hits="0"></line>
+						<line number="31" hits="0"></line>
+						<line number="32" hits="0"></line>
+						<line number="36" hits="0"></line>
+						<line number="37" hits="0"></line>
+						<line number="39" hits="0"></line>
+						<line number="40" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wutil/makerankedlist.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="MakeRankedList" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="37" hits="0"></line>
+								<line number="39" hits="0"></line>
+								<line number="40" hits="0"></line>
+								<line number="44" hits="0"></line>
+								<line number="45" hits="0"></line>
+								<line number="50" hits="0"></line>
+								<line number="51" hits="0"></line>
+								<line number="52" hits="0"></line>
+								<line number="54" hits="0"></line>
+								<line number="55" hits="0"></line>
+								<line number="56" hits="0"></line>
+								<line number="57" hits="0"></line>
+								<line number="58" hits="0"></line>
+								<line number="59" hits="0"></line>
+								<line number="62" hits="0"></line>
+								<line number="63" hits="0"></line>
+								<line number="66" hits="0"></line>
+								<line number="67" hits="0"></line>
+								<line number="70" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="37" hits="0"></line>
+						<line number="39" hits="0"></line>
+						<line number="40" hits="0"></line>
+						<line number="44" hits="0"></line>
+						<line number="45" hits="0"></line>
+						<line number="50" hits="0"></line>
+						<line number="51" hits="0"></line>
+						<line number="52" hits="0"></line>
+						<line number="54" hits="0"></line>
+						<line number="55" hits="0"></line>
+						<line number="56" hits="0"></line>
+						<line number="57" hits="0"></line>
+						<line number="58" hits="0"></line>
+						<line number="59" hits="0"></line>
+						<line number="62" hits="0"></line>
+						<line number="63" hits="0"></line>
+						<line number="66" hits="0"></line>
+						<line number="67" hits="0"></line>
+						<line number="70" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wutil/safegetmapparameter.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="GetFloat64FromMap" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="26" hits="0"></line>
+								<line number="29" hits="0"></line>
+								<line number="31" hits="0"></line>
+								<line number="32" hits="0"></line>
+								<line number="35" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetIntFromMap" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="39" hits="0"></line>
+								<line number="41" hits="0"></line>
+								<line number="43" hits="0"></line>
+								<line number="44" hits="0"></line>
+								<line number="47" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetStringFromMap" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="51" hits="0"></line>
+								<line number="53" hits="0"></line>
+								<line number="55" hits="0"></line>
+								<line number="56" hits="0"></line>
+								<line number="59" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetMapFromMap" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="63" hits="0"></line>
+								<line number="65" hits="0"></line>
+								<line number="67" hits="0"></line>
+								<line number="68" hits="0"></line>
+								<line number="71" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="26" hits="0"></line>
+						<line number="29" hits="0"></line>
+						<line number="31" hits="0"></line>
+						<line number="32" hits="0"></line>
+						<line number="35" hits="0"></line>
+						<line number="39" hits="0"></line>
+						<line number="41" hits="0"></line>
+						<line number="43" hits="0"></line>
+						<line number="44" hits="0"></line>
+						<line number="47" hits="0"></line>
+						<line number="51" hits="0"></line>
+						<line number="53" hits="0"></line>
+						<line number="55" hits="0"></line>
+						<line number="56" hits="0"></line>
+						<line number="59" hits="0"></line>
+						<line number="63" hits="0"></line>
+						<line number="65" hits="0"></line>
+						<line number="67" hits="0"></line>
+						<line number="68" hits="0"></line>
+						<line number="71" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wutil/set.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="NewIntSet" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="12" hits="1"></line>
+								<line number="13" hits="1"></line>
+								<line number="14" hits="1"></line>
+								<line number="15" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="12" hits="1"></line>
+						<line number="13" hits="1"></line>
+						<line number="14" hits="1"></line>
+						<line number="15" hits="1"></line>
+					</lines>
+				</class>
+				<class name="IntSet" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wutil/set.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Add" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="19" hits="1"></line>
+								<line number="20" hits="1"></line>
+								<line number="21" hits="1"></line>
+								<line number="22" hits="1"></line>
+								<line number="23" hits="1"></line>
+							</lines>
+						</method>
+						<method name="Remove" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="28" hits="0"></line>
+								<line number="29" hits="0"></line>
+								<line number="30" hits="0"></line>
+								<line number="32" hits="0"></line>
+								<line number="34" hits="0"></line>
+								<line number="35" hits="0"></line>
+								<line number="36" hits="0"></line>
+								<line number="39" hits="0"></line>
+							</lines>
+						</method>
+						<method name="AsSlice" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="44" hits="1"></line>
+								<line number="46" hits="1"></line>
+								<line number="47" hits="1"></line>
+								<line number="49" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="19" hits="1"></line>
+						<line number="20" hits="1"></line>
+						<line number="21" hits="1"></line>
+						<line number="22" hits="1"></line>
+						<line number="23" hits="1"></line>
+						<line number="28" hits="0"></line>
+						<line number="29" hits="0"></line>
+						<line number="30" hits="0"></line>
+						<line number="32" hits="0"></line>
+						<line number="34" hits="0"></line>
+						<line number="35" hits="0"></line>
+						<line number="36" hits="0"></line>
+						<line number="39" hits="0"></line>
+						<line number="44" hits="1"></line>
+						<line number="46" hits="1"></line>
+						<line number="47" hits="1"></line>
+						<line number="49" hits="1"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wutil/biogo_helpers.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="SeqToBioseq" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="36" hits="0"></line>
+								<line number="38" hits="0"></line>
+								<line number="39" hits="0"></line>
+								<line number="42" hits="0"></line>
+							</lines>
+						</method>
+						<method name="ReadFastaSeqs" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="46" hits="0"></line>
+								<line number="48" hits="0"></line>
+								<line number="50" hits="0"></line>
+								<line number="51" hits="0"></line>
+								<line number="52" hits="0"></line>
+								<line number="55" hits="0"></line>
+								<line number="56" hits="0"></line>
+								<line number="58" hits="0"></line>
+								<line number="60" hits="0"></line>
+								<line number="61" hits="0"></line>
+								<line number="62" hits="0"></line>
+								<line number="63" hits="0"></line>
+								<line number="66" hits="0"></line>
+								<line number="69" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="36" hits="0"></line>
+						<line number="38" hits="0"></line>
+						<line number="39" hits="0"></line>
+						<line number="42" hits="0"></line>
+						<line number="46" hits="0"></line>
+						<line number="48" hits="0"></line>
+						<line number="50" hits="0"></line>
+						<line number="51" hits="0"></line>
+						<line number="52" hits="0"></line>
+						<line number="55" hits="0"></line>
+						<line number="56" hits="0"></line>
+						<line number="58" hits="0"></line>
+						<line number="60" hits="0"></line>
+						<line number="61" hits="0"></line>
+						<line number="62" hits="0"></line>
+						<line number="63" hits="0"></line>
+						<line number="66" hits="0"></line>
+						<line number="69" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wutil/displaymap.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="DisplayMap" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="28" hits="0"></line>
+								<line number="29" hits="0"></line>
+								<line number="30" hits="0"></line>
+								<line number="31" hits="0"></line>
+								<line number="33" hits="0"></line>
+								<line number="34" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="28" hits="0"></line>
+						<line number="29" hits="0"></line>
+						<line number="30" hits="0"></line>
+						<line number="31" hits="0"></line>
+						<line number="33" hits="0"></line>
+						<line number="34" hits="0"></line>
+					</lines>
+				</class>
+			</classes>
+		</package>
+	</packages>
+</coverage>

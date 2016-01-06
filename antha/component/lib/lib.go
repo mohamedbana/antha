@@ -26,6 +26,8 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/Phytip_miniprep"
 	"github.com/antha-lang/antha/antha/component/lib/PipetteImage"
 	"github.com/antha-lang/antha/antha/component/lib/PlateOut"
+	"github.com/antha-lang/antha/antha/component/lib/Plotdata"
+	"github.com/antha-lang/antha/antha/component/lib/Plotdata_spreadsheet"
 	"github.com/antha-lang/antha/antha/component/lib/PreIncubation"
 	"github.com/antha-lang/antha/antha/component/lib/Printname"
 	"github.com/antha-lang/antha/antha/component/lib/ProtocolName_from_an_file"
@@ -416,6 +418,18 @@ func GetComponents() []ComponentDesc {
 
 	portMap["PlateOut"]["Platedculture"] = false
 
+	portMap["Plotdata"] = make(map[string]bool)
+	portMap["Plotdata"]["Exportedfilename"] = true
+	portMap["Plotdata"]["Xvalues"] = true
+	portMap["Plotdata"]["Yvaluearray"] = true
+
+	portMap["Plotdata_spreadsheet"] = make(map[string]bool)
+	portMap["Plotdata_spreadsheet"]["Exportedfilename"] = true
+	portMap["Plotdata_spreadsheet"]["Filename"] = true
+	portMap["Plotdata_spreadsheet"]["Sheet"] = true
+	portMap["Plotdata_spreadsheet"]["Xminmax"] = true
+	portMap["Plotdata_spreadsheet"]["Yminmaxarray"] = true
+
 	portMap["PreIncubation"] = make(map[string]bool)
 	portMap["PreIncubation"]["CompetentCells"] = true
 	portMap["PreIncubation"]["CompetentCellvolumeperassembly"] = true
@@ -767,6 +781,8 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "Phytip_miniprep", Constructor: Phytip_miniprep.NewPhytip_miniprep})
 	c = append(c, ComponentDesc{Name: "PipetteImage", Constructor: PipetteImage.NewPipetteImage})
 	c = append(c, ComponentDesc{Name: "PlateOut", Constructor: PlateOut.NewPlateOut})
+	c = append(c, ComponentDesc{Name: "Plotdata", Constructor: Plotdata.NewPlotdata})
+	c = append(c, ComponentDesc{Name: "Plotdata_spreadsheet", Constructor: Plotdata_spreadsheet.NewPlotdata_spreadsheet})
 	c = append(c, ComponentDesc{Name: "PreIncubation", Constructor: PreIncubation.NewPreIncubation})
 	c = append(c, ComponentDesc{Name: "Printname", Constructor: Printname.NewPrintname})
 	c = append(c, ComponentDesc{Name: "ProtocolName_from_an_file", Constructor: ProtocolName_from_an_file.NewProtocolName_from_an_file})
