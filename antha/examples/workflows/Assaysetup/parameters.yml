@@ -1,15 +1,15 @@
 {
-  "Parameters": {
-    "Assaysetup": {
-      "Buffer": "water",
-      "Substrate": "CutsmartBuffer",
-      "Enzyme": "T4Ligase",
-      "OutPlate": "reservoir",
-      "TipType": "Gilson200",
-      "TotalVolume": "100ul",
-      "SubstrateVolume": "30ul",
-      "EnzymeVolume": "30ul",
-      "NumberofReactions": 1
+    "Parameters": {
+        "Assaysetup": {
+            "Buffer": "water",
+            "Enzyme": "T4Ligase",
+            "EnzymeVolume": "30ul",
+            "NumberofReactions": 1,
+            "OutPlate": "reservoir",
+            "Substrate": "CutsmartBuffer",
+            "SubstrateVolume": "30ul",
+            "TipType": "Gilson200",
+            "TotalVolume": "100ul"
+        }
     }
-  }
 }

@@ -1,8 +1,8 @@
 {
+    "connections": [],
     "processes": {
         "Scarfree_design": {
             "component": "Scarfree_design"
         }
-    },
-    "connections": [ ]
+    }
 }

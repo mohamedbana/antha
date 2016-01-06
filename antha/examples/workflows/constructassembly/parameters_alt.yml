@@ -1,39 +1,39 @@
 {
     "Parameters": {
-        "ConstructAssembly":{
-            "Parts": [
-                "dna_part",
-                "dna_part",
-                "dna_part"
+        "ConstructAssembly": {
+            "Atp": "ATP",
+            "AtpVol": "1ul",
+            "Buffer": "CutsmartBuffer",
+            "BufferVol": "2ul",
+            "InPlate": "pcrplate_with_cooler",
+            "InactivationTemp": "40C",
+            "InactivationTime": "60s",
+            "LigVol": "1ul",
+            "Ligase": "T4Ligase",
+            "OutPlate": "pcrplate_with_cooler",
+            "PartNames": [
+                "dna1",
+                "dna2",
+                "dna3"
             ],
-            "ReactionVolume": "20ul",
             "PartVols": [
                 "3ul",
                 "3ul",
                 "3ul"
             ],
-            "PartNames" : [
-                "dna1",
-                "dna2",
-                "dna3"
+            "Parts": [
+                "dna_part",
+                "dna_part",
+                "dna_part"
             ],
-            "Water": "water",
-            "Vector": "standard_cloning_vector_mark_1",
-            "VectorVol": "3ul",
-            "Buffer": "CutsmartBuffer",
-            "BufferVol": "2ul",
-            "Ligase": "T4Ligase",
-            "LigVol": "1ul",
-            "Atp": "ATP",
-            "AtpVol": "1ul",
-            "RestrictionEnzyme": "SapI",
             "ReVol": "1ul",
-            "OutPlate": "pcrplate_with_cooler",
-            "InPlate": "pcrplate_with_cooler",
             "ReactionTemp": "25C",
             "ReactionTime": "1800s",
-            "InactivationTemp": "40C",
-            "InactivationTime": "60s"
+            "ReactionVolume": "20ul",
+            "RestrictionEnzyme": "SapI",
+            "Vector": "standard_cloning_vector_mark_1",
+            "VectorVol": "3ul",
+            "Water": "water"
         }
     }
 }

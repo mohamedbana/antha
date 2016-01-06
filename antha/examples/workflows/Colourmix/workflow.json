@@ -1,6 +1,13 @@
 {
+    "connections": [],
     "processes": {
         "Paintmix1": {
+            "component": "Paintmix"
+        },
+        "Paintmix10": {
+            "component": "Paintmix"
+        },
+        "Paintmix11": {
             "component": "Paintmix"
         },
         "Paintmix2": {
@@ -26,13 +33,6 @@
         },
         "Paintmix9": {
             "component": "Paintmix"
-        },
-        "Paintmix10": {
-            "component": "Paintmix"
-        },
-        "Paintmix11": {
-            "component": "Paintmix"
         }
-    },
-    "connections": [ ]
+    }
 }

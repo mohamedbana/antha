@@ -1,8 +1,8 @@
 {
+    "connections": [],
     "processes": {
         "Printname": {
             "component": "Printname"
         }
-    },
-    "connections": [ ]
+    }
 }

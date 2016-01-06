@@ -1,8 +1,8 @@
 {
+    "connections": [],
     "processes": {
         "MakeBuffer": {
             "component": "MakeBuffer"
         }
-    },
-    "connections": [ ]
+    }
 }

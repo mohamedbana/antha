@@ -1,24 +1,24 @@
 {
-  "Parameters": {
-    "Mastermix": {
-      "Buffer": "water",
-	"OtherComponents": [
-	"CutsmartBuffer",
-	"T4Ligase",
-	"SapI",
-	"ATP"
-	],
-	"Inplate":"Kombi2mlEpp",
-      "OutPlate": "pcrplate_with_cooler",
-      "TotalVolumeperMastermix": "200ul",
-      "OtherComponentVolumes": [
-	"20ul",
-	"10ul",
-	"10ul",
-	"10ul"
-	],
-	"NumberofMastermixes":3,
-	"AliquotbyRow":false
+    "Parameters": {
+        "Mastermix": {
+            "AliquotbyRow": false,
+            "Buffer": "water",
+            "Inplate": "Kombi2mlEpp",
+            "NumberofMastermixes": 3,
+            "OtherComponentVolumes": [
+                "20ul",
+                "10ul",
+                "10ul",
+                "10ul"
+            ],
+            "OtherComponents": [
+                "CutsmartBuffer",
+                "T4Ligase",
+                "SapI",
+                "ATP"
+            ],
+            "OutPlate": "pcrplate_with_cooler",
+            "TotalVolumeperMastermix": "200ul"
+        }
     }
-  }
 }

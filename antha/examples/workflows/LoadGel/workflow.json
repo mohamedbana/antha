@@ -1,6 +1,16 @@
 {
+    "connections": [],
     "processes": {
         "LoadGel1": {
+            "component": "LoadGel"
+        },
+        "LoadGel10": {
+            "component": "LoadGel"
+        },
+        "LoadGel11": {
+            "component": "LoadGel"
+        },
+        "LoadGel12": {
             "component": "LoadGel"
         },
         "LoadGel2": {
@@ -26,17 +36,6 @@
         },
         "LoadGel9": {
             "component": "LoadGel"
-        },
-        "LoadGel10": {
-            "component": "LoadGel"
-        },
-        "LoadGel11": {
-            "component": "LoadGel"
-        },
-        "LoadGel12": {
-            "component": "LoadGel"
         }
-    },
-    "connections": [ ]
+    }
 }
-

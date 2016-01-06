@@ -1,12 +1,12 @@
 {
-  "Parameters": {
-    "AliquotParams": {
-      "Solution": "PrimerFw",
-      "InPlate": "pcrplate_with_cooler",
-      "OutPlate": "pcrplate_with_cooler",
-      "SolutionVolume": "4000ul",
-      "VolumePerAliquot": "10ul",
-      "NumberofAliquots": 50
+    "Parameters": {
+        "AliquotParams": {
+            "InPlate": "pcrplate_with_cooler",
+            "NumberofAliquots": 50,
+            "OutPlate": "pcrplate_with_cooler",
+            "Solution": "PrimerFw",
+            "SolutionVolume": "4000ul",
+            "VolumePerAliquot": "10ul"
+        }
     }
-  }
 }

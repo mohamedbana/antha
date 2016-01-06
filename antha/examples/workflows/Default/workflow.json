@@ -1,4 +1,5 @@
 {
+    "connections": [],
     "processes": {
         "EnterNameForYourParameters1": {
             "component": "ProtocolName_from_an_file"
@@ -6,6 +7,5 @@
         "EnterNameForYourParameters2": {
             "component": "ProtocolName_from_an_file"
         }
-    },
-    "connections": [ ]
+    }
 }

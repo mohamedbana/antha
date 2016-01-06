@@ -1,6 +1,16 @@
 {
+    "connections": [],
     "processes": {
         "SDSprep1": {
+            "component": "SDSprep"
+        },
+        "SDSprep10": {
+            "component": "SDSprep"
+        },
+        "SDSprep11": {
+            "component": "SDSprep"
+        },
+        "SDSprep12": {
             "component": "SDSprep"
         },
         "SDSprep2": {
@@ -26,17 +36,6 @@
         },
         "SDSprep9": {
             "component": "SDSprep"
-        },
-        "SDSprep10": {
-            "component": "SDSprep"
-        },
-        "SDSprep11": {
-            "component": "SDSprep"
-        },
-        "SDSprep12": {
-            "component": "SDSprep"
         }
-    },
-    "connections": [ ]
+    }
 }
-

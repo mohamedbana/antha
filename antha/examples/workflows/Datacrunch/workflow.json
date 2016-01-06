@@ -1,8 +1,8 @@
 {
+    "connections": [],
     "processes": {
         "Datacrunch": {
             "component": "Datacrunch"
         }
-    },
-    "connections": [ ]
+    }
 }

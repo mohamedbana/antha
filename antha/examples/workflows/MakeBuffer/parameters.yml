@@ -1,16 +1,16 @@
 {
     "Parameters": {
-        "MakeBuffer":{
-            "Diluent": "water",
+        "MakeBuffer": {
             "Buffername": "Cutsmart1X",
             "Bufferstock": "CutsmartBuffer",
-            "Bufferstockvolume": "0.2ml",
             "Bufferstockconc": "5M/l",
-            "FinalConcentration":"2mg/l",
+            "Bufferstockvolume": "0.2ml",
+            "Diluent": "water",
             "Diluentvolume": "0.3ml",
+            "FinalConcentration": "2mg/l",
             "FinalVolume": "0.5ml",
-            "OutPlate": "pcrplate_with_cooler",
-            "InPlate": "pcrplate_with_cooler"
+            "InPlate": "pcrplate_with_cooler",
+            "OutPlate": "pcrplate_with_cooler"
         }
     }
 }

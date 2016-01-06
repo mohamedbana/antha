@@ -1,4 +1,5 @@
 {
+    "connections": [],
     "processes": {
         "SDSprep1": {
             "component": "SDSprep"
@@ -15,7 +16,5 @@
         "SDSprep5": {
             "component": "SDSprep"
         }
-    },
-    "connections": [ ]
+    }
 }
-

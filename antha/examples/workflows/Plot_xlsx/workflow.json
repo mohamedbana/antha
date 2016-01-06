@@ -1,14 +1,7 @@
 {
-    "properties": {
-        "name": "main"
-    },
     "processes": {
         "Plotdataparams": {
-            "component": "Plotdata_spreadsheet",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "Plotdata_spreadsheet"
         }
-    },
-    "connections": [ ]
+    }
 }

@@ -1,10 +1,10 @@
 {
-  "Parameters": {
-    "newparams": {
-      "Startingsolution": "water",
-      "OutPlate": "greiner384_riser",
-      "Liquidname": "Evian",
-      "LiquidVolume": "10ul"
+    "Parameters": {
+        "newparams": {
+            "LiquidVolume": "10ul",
+            "Liquidname": "Evian",
+            "OutPlate": "greiner384_riser",
+            "Startingsolution": "water"
+        }
     }
-  }
 }

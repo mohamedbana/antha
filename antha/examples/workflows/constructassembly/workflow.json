@@ -1,4 +1,5 @@
 {
+    "connections": [],
     "processes": {
         "ConstructAssembly1": {
             "component": "TypeIISConstructAssembly"
@@ -6,6 +7,5 @@
         "ConstructAssembly2": {
             "component": "TypeIISConstructAssembly"
         }
-    },
-    "connections": [ ]
+    }
 }

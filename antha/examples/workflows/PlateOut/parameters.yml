@@ -1,13 +1,13 @@
 {
     "Parameters": {
-        "PlateOut":{
-            "RecoveredCells": "neb5compcells",
-			"Diluent": "water",
-			"DilutionX": 1,
-			"IncubationTime": "57600s",
-			"IncubationTemp": "25C",
-			"Plateoutvolume": "100ul",
-			"AgarPlate": "falcon6wellAgar"
+        "PlateOut": {
+            "AgarPlate": "falcon6wellAgar",
+            "Diluent": "water",
+            "DilutionX": 1,
+            "IncubationTemp": "25C",
+            "IncubationTime": "57600s",
+            "Plateoutvolume": "100ul",
+            "RecoveredCells": "neb5compcells"
         }
     }
 }

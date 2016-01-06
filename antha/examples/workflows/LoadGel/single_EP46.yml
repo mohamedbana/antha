@@ -1,25 +1,24 @@
 {
-"Parameters":
-        {
-        "LoadGel1":{
-                "SampleName": "Elution5",
-                "LoadVolume": "10ul",
-                "Protein": "Load",
-                "WaterName": "dH2O",
-                "Water": "Load",
-                "WaterVolume": "10ul",
-		            "GelPlate": "EPAGE48",
-                "InPlate": "pcrplate_with_cooler"
+    "Parameters": {
+        "LoadGel1": {
+            "GelPlate": "EPAGE48",
+            "InPlate": "pcrplate_with_cooler",
+            "LoadVolume": "10ul",
+            "Protein": "Load",
+            "SampleName": "Elution5",
+            "Water": "Load",
+            "WaterName": "dH2O",
+            "WaterVolume": "10ul"
         },
-        "LoadGel2":{
-                "SampleName": "Elution6",
-                "LoadVolume": "10ul",
-                "Protein": "Load",
-                "WaterName": "dH2O",
-                "Water": "Load",
-                "WaterVolume": "10ul",
-		            "GelPlate": "EPAGE48",
-                "InPlate": "pcrplate_with_cooler"
-        }	 	
-  }
+        "LoadGel2": {
+            "GelPlate": "EPAGE48",
+            "InPlate": "pcrplate_with_cooler",
+            "LoadVolume": "10ul",
+            "Protein": "Load",
+            "SampleName": "Elution6",
+            "Water": "Load",
+            "WaterName": "dH2O",
+            "WaterVolume": "10ul"
+        }
+    }
 }
