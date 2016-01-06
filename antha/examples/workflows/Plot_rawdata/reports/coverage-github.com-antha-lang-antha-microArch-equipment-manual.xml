@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-03.dtd">
+<coverage line-rate="0" branch-rate="0" version="" timestamp="1452073457309">
+	<packages>
+		<package name="github.com/antha-lang/antha/microArch/equipment/manual" line-rate="0" branch-rate="0" complexity="0">
+			<classes>
+				<class name="AnthaManualGrpc" filename="/go/src/github.com/antha-lang/antha/microArch/equipment/manual/manual.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="GetID" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="327" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetEquipmentDefinition" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="333" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Do" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="338" hits="0"></line>
+								<line number="340" hits="0"></line>
+								<line number="342" hits="0"></line>
+								<line number="344" hits="0"></line>
+								<line number="346" hits="0"></line>
+								<line number="348" hits="0"></line>
+							</lines>
+						</method>
+						<method name="configRequest" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="352" hits="0"></line>
+								<line number="353" hits="0"></line>
+								<line number="354" hits="0"></line>
+								<line number="356" hits="0"></line>
+								<line number="357" hits="0"></line>
+								<line number="358" hits="0"></line>
+								<line number="359" hits="0"></line>
+								<line number="361" hits="0"></line>
+								<line number="363" hits="0"></line>
+								<line number="364" hits="0"></line>
+								<line number="366" hits="0"></line>
+								<line number="367" hits="0"></line>
+								<line number="368" hits="0"></line>
+								<line number="369" hits="0"></line>
+								<line number="370" hits="0"></line>
+								<line number="372" hits="0"></line>
+								<line number="373" hits="0"></line>
+								<line number="374" hits="0"></line>
+								<line number="375" hits="0"></line>
+								<line number="376" hits="0"></line>
+								<line number="378" hits="0"></line>
+								<line number="382" hits="0"></line>
+								<line number="383" hits="0"></line>
+								<line number="384" hits="0"></line>
+								<line number="390" hits="0"></line>
+								<line number="391" hits="0"></line>
+								<line number="392" hits="0"></line>
+								<line number="395" hits="0"></line>
+							</lines>
+						</method>
+						<method name="sendMix" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="398" hits="0"></line>
+								<line number="399" hits="0"></line>
+								<line number="400" hits="0"></line>
+								<line number="401" hits="0"></line>
+								<line number="404" hits="0"></line>
+								<line number="405" hits="0"></line>
+								<line number="407" hits="0"></line>
+								<line number="408" hits="0"></line>
+								<line number="409" hits="0"></line>
+								<line number="411" hits="0"></line>
+								<line number="412" hits="0"></line>
+								<line number="414" hits="0"></line>
+								<line number="416" hits="0"></line>
+								<line number="418" hits="0"></line>
+								<line number="419" hits="0"></line>
+								<line number="420" hits="0"></line>
+							</lines>
+						</method>
+						<method name="end" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="425" hits="0"></line>
+								<line number="426" hits="0"></line>
+								<line number="427" hits="0"></line>
+								<line number="429" hits="0"></line>
+								<line number="430" hits="0"></line>
+								<line number="431" hits="0"></line>
+								<line number="433" hits="0"></line>
+								<line number="434" hits="0"></line>
+								<line number="436" hits="0"></line>
+								<line number="437" hits="0"></line>
+								<line number="438" hits="0"></line>
+								<line number="441" hits="0"></line>
+								<line number="442" hits="0"></line>
+								<line number="443" hits="0"></line>
+								<line number="446" hits="0"></line>
+								<line number="448" hits="0"></line>
+								<line number="449" hits="0"></line>
+								<line number="450" hits="0"></line>
+								<line number="452" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Can" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="458" hits="0"></line>
+								<line number="459" hits="0"></line>
+								<line number="460" hits="0"></line>
+								<line number="463" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Status" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="468" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Shutdown" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="473" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Init" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="480" hits="0"></line>
+								<line number="481" hits="0"></line>
+								<line number="482" hits="0"></line>
+								<line number="483" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="327" hits="0"></line>
+						<line number="333" hits="0"></line>
+						<line number="338" hits="0"></line>
+						<line number="340" hits="0"></line>
+						<line number="342" hits="0"></line>
+						<line number="344" hits="0"></line>
+						<line number="346" hits="0"></line>
+						<line number="348" hits="0"></line>
+						<line number="352" hits="0"></line>
+						<line number="353" hits="0"></line>
+						<line number="354" hits="0"></line>
+						<line number="356" hits="0"></line>
+						<line number="357" hits="0"></line>
+						<line number="358" hits="0"></line>
+						<line number="359" hits="0"></line>
+						<line number="361" hits="0"></line>
+						<line number="363" hits="0"></line>
+						<line number="364" hits="0"></line>
+						<line number="366" hits="0"></line>
+						<line number="367" hits="0"></line>
+						<line number="368" hits="0"></line>
+						<line number="369" hits="0"></line>
+						<line number="370" hits="0"></line>
+						<line number="372" hits="0"></line>
+						<line number="373" hits="0"></line>
+						<line number="374" hits="0"></line>
+						<line number="375" hits="0"></line>
+						<line number="376" hits="0"></line>
+						<line number="378" hits="0"></line>
+						<line number="382" hits="0"></line>
+						<line number="383" hits="0"></line>
+						<line number="384" hits="0"></line>
+						<line number="390" hits="0"></line>
+						<line number="391" hits="0"></line>
+						<line number="392" hits="0"></line>
+						<line number="395" hits="0"></line>
+						<line number="398" hits="0"></line>
+						<line number="399" hits="0"></line>
+						<line number="400" hits="0"></line>
+						<line number="401" hits="0"></line>
+						<line number="404" hits="0"></line>
+						<line number="405" hits="0"></line>
+						<line number="407" hits="0"></line>
+						<line number="408" hits="0"></line>
+						<line number="409" hits="0"></line>
+						<line number="411" hits="0"></line>
+						<line number="412" hits="0"></line>
+						<line number="414" hits="0"></line>
+						<line number="416" hits="0"></line>
+						<line number="418" hits="0"></line>
+						<line number="419" hits="0"></line>
+						<line number="420" hits="0"></line>
+						<line number="425" hits="0"></line>
+						<line number="426" hits="0"></line>
+						<line number="427" hits="0"></line>
+						<line number="429" hits="0"></line>
+						<line number="430" hits="0"></line>
+						<line number="431" hits="0"></line>
+						<line number="433" hits="0"></line>
+						<line number="434" hits="0"></line>
+						<line number="436" hits="0"></line>
+						<line number="437" hits="0"></line>
+						<line number="438" hits="0"></line>
+						<line number="441" hits="0"></line>
+						<line number="442" hits="0"></line>
+						<line number="443" hits="0"></line>
+						<line number="446" hits="0"></line>
+						<line number="448" hits="0"></line>
+						<line number="449" hits="0"></line>
+						<line number="450" hits="0"></line>
+						<line number="452" hits="0"></line>
+						<line number="458" hits="0"></line>
+						<line number="459" hits="0"></line>
+						<line number="460" hits="0"></line>
+						<line number="463" hits="0"></line>
+						<line number="468" hits="0"></line>
+						<line number="473" hits="0"></line>
+						<line number="480" hits="0"></line>
+						<line number="481" hits="0"></line>
+						<line number="482" hits="0"></line>
+						<line number="483" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/microArch/equipment/manual/manual.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="NewAnthaManualCUI" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="84" hits="1"></line>
+								<line number="85" hits="1"></line>
+								<line number="86" hits="1"></line>
+								<line number="87" hits="1"></line>
+								<line number="88" hits="1"></line>
+								<line number="89" hits="1"></line>
+								<line number="90" hits="1"></line>
+								<line number="91" hits="1"></line>
+								<line number="92" hits="1"></line>
+								<line number="93" hits="1"></line>
+								<line number="94" hits="1"></line>
+								<line number="95" hits="1"></line>
+								<line number="96" hits="1"></line>
+								<line number="97" hits="1"></line>
+								<line number="98" hits="1"></line>
+								<line number="99" hits="1"></line>
+								<line number="100" hits="1"></line>
+								<line number="101" hits="1"></line>
+								<line number="102" hits="1"></line>
+								<line number="103" hits="1"></line>
+								<line number="105" hits="1"></line>
+								<line number="106" hits="1"></line>
+								<line number="107" hits="1"></line>
+								<line number="110" hits="1"></line>
+								<line number="111" hits="1"></line>
+							</lines>
+						</method>
+						<method name="NewAnthaManualSocket" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="189" hits="0"></line>
+								<line number="190" hits="0"></line>
+								<line number="192" hits="0"></line>
+								<line number="193" hits="0"></line>
+								<line number="194" hits="0"></line>
+								<line number="195" hits="0"></line>
+								<line number="196" hits="0"></line>
+								<line number="197" hits="0"></line>
+								<line number="198" hits="0"></line>
+								<line number="199" hits="0"></line>
+								<line number="200" hits="0"></line>
+								<line number="201" hits="0"></line>
+								<line number="202" hits="0"></line>
+								<line number="203" hits="0"></line>
+								<line number="204" hits="0"></line>
+								<line number="205" hits="0"></line>
+								<line number="206" hits="0"></line>
+								<line number="207" hits="0"></line>
+								<line number="208" hits="0"></line>
+								<line number="209" hits="0"></line>
+								<line number="212" hits="0"></line>
+								<line number="213" hits="0"></line>
+								<line number="214" hits="0"></line>
+								<line number="217" hits="0"></line>
+							</lines>
+						</method>
+						<method name="NewAnthaManualGrpc" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="285" hits="0"></line>
+								<line number="288" hits="0"></line>
+								<line number="291" hits="0"></line>
+								<line number="292" hits="0"></line>
+								<line number="293" hits="0"></line>
+								<line number="294" hits="0"></line>
+								<line number="295" hits="0"></line>
+								<line number="296" hits="0"></line>
+								<line number="297" hits="0"></line>
+								<line number="298" hits="0"></line>
+								<line number="299" hits="0"></line>
+								<line number="300" hits="0"></line>
+								<line number="301" hits="0"></line>
+								<line number="302" hits="0"></line>
+								<line number="303" hits="0"></line>
+								<line number="304" hits="0"></line>
+								<line number="305" hits="0"></line>
+								<line number="306" hits="0"></line>
+								<line number="307" hits="0"></line>
+								<line number="308" hits="0"></line>
+								<line number="311" hits="0"></line>
+								<line number="322" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="84" hits="1"></line>
+						<line number="85" hits="1"></line>
+						<line number="86" hits="1"></line>
+						<line number="87" hits="1"></line>
+						<line number="88" hits="1"></line>
+						<line number="89" hits="1"></line>
+						<line number="90" hits="1"></line>
+						<line number="91" hits="1"></line>
+						<line number="92" hits="1"></line>
+						<line number="93" hits="1"></line>
+						<line number="94" hits="1"></line>
+						<line number="95" hits="1"></line>
+						<line number="96" hits="1"></line>
+						<line number="97" hits="1"></line>
+						<line number="98" hits="1"></line>
+						<line number="99" hits="1"></line>
+						<line number="100" hits="1"></line>
+						<line number="101" hits="1"></line>
+						<line number="102" hits="1"></line>
+						<line number="103" hits="1"></line>
+						<line number="105" hits="1"></line>
+						<line number="106" hits="1"></line>
+						<line number="107" hits="1"></line>
+						<line number="110" hits="1"></line>
+						<line number="111" hits="1"></line>
+						<line number="189" hits="0"></line>
+						<line number="190" hits="0"></line>
+						<line number="192" hits="0"></line>
+						<line number="193" hits="0"></line>
+						<line number="194" hits="0"></line>
+						<line number="195" hits="0"></line>
+						<line number="196" hits="0"></line>
+						<line number="197" hits="0"></line>
+						<line number="198" hits="0"></line>
+						<line number="199" hits="0"></line>
+						<line number="200" hits="0"></line>
+						<line number="201" hits="0"></line>
+						<line number="202" hits="0"></line>
+						<line number="203" hits="0"></line>
+						<line number="204" hits="0"></line>
+						<line number="205" hits="0"></line>
+						<line number="206" hits="0"></line>
+						<line number="207" hits="0"></line>
+						<line number="208" hits="0"></line>
+						<line number="209" hits="0"></line>
+						<line number="212" hits="0"></line>
+						<line number="213" hits="0"></line>
+						<line number="214" hits="0"></line>
+						<line number="217" hits="0"></line>
+						<line number="285" hits="0"></line>
+						<line number="288" hits="0"></line>
+						<line number="291" hits="0"></line>
+						<line number="292" hits="0"></line>
+						<line number="293" hits="0"></line>
+						<line number="294" hits="0"></line>
+						<line number="295" hits="0"></line>
+						<line number="296" hits="0"></line>
+						<line number="297" hits="0"></line>
+						<line number="298" hits="0"></line>
+						<line number="299" hits="0"></line>
+						<line number="300" hits="0"></line>
+						<line number="301" hits="0"></line>
+						<line number="302" hits="0"></line>
+						<line number="303" hits="0"></line>
+						<line number="304" hits="0"></line>
+						<line number="305" hits="0"></line>
+						<line number="306" hits="0"></line>
+						<line number="307" hits="0"></line>
+						<line number="308" hits="0"></line>
+						<line number="311" hits="0"></line>
+						<line number="322" hits="0"></line>
+					</lines>
+				</class>
+				<class name="AnthaManualCUI" filename="/go/src/github.com/antha-lang/antha/microArch/equipment/manual/manual.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="GetID" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="116" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetEquipmentDefinition" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="122" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Do" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="127" hits="0"></line>
+								<line number="128" hits="0"></line>
+								<line number="129" hits="0"></line>
+								<line number="130" hits="0"></line>
+								<line number="135" hits="0"></line>
+								<line number="136" hits="0"></line>
+								<line number="137" hits="0"></line>
+								<line number="138" hits="0"></line>
+								<line number="139" hits="0"></line>
+								<line number="141" hits="0"></line>
+								<line number="143" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Can" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="149" hits="1"></line>
+								<line number="150" hits="1"></line>
+								<line number="151" hits="1"></line>
+								<line number="154" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Status" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="159" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Shutdown" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="164" hits="0"></line>
+								<line number="165" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Init" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="170" hits="0"></line>
+								<line number="171" hits="0"></line>
+								<line number="172" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="116" hits="0"></line>
+						<line number="122" hits="0"></line>
+						<line number="127" hits="0"></line>
+						<line number="128" hits="0"></line>
+						<line number="129" hits="0"></line>
+						<line number="130" hits="0"></line>
+						<line number="135" hits="0"></line>
+						<line number="136" hits="0"></line>
+						<line number="137" hits="0"></line>
+						<line number="138" hits="0"></line>
+						<line number="139" hits="0"></line>
+						<line number="141" hits="0"></line>
+						<line number="143" hits="0"></line>
+						<line number="149" hits="1"></line>
+						<line number="150" hits="1"></line>
+						<line number="151" hits="1"></line>
+						<line number="154" hits="0"></line>
+						<line number="159" hits="0"></line>
+						<line number="164" hits="0"></line>
+						<line number="165" hits="0"></line>
+						<line number="170" hits="0"></line>
+						<line number="171" hits="0"></line>
+						<line number="172" hits="0"></line>
+					</lines>
+				</class>
+				<class name="AnthaManualSocket" filename="/go/src/github.com/antha-lang/antha/microArch/equipment/manual/manual.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="GetID" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="222" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetEquipmentDefinition" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="228" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Do" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="233" hits="0"></line>
+								<line number="238" hits="0"></line>
+								<line number="240" hits="0"></line>
+								<line number="243" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Can" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="249" hits="0"></line>
+								<line number="250" hits="0"></line>
+								<line number="251" hits="0"></line>
+								<line number="254" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Status" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="259" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Shutdown" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="264" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Init" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="269" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="222" hits="0"></line>
+						<line number="228" hits="0"></line>
+						<line number="233" hits="0"></line>
+						<line number="238" hits="0"></line>
+						<line number="240" hits="0"></line>
+						<line number="243" hits="0"></line>
+						<line number="249" hits="0"></line>
+						<line number="250" hits="0"></line>
+						<line number="251" hits="0"></line>
+						<line number="254" hits="0"></line>
+						<line number="259" hits="0"></line>
+						<line number="264" hits="0"></line>
+						<line number="269" hits="0"></line>
+					</lines>
+				</class>
+			</classes>
+		</package>
+	</packages>
+</coverage>
