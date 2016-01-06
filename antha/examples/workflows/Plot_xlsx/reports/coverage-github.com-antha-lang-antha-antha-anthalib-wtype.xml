@@ -1,0 +1,2960 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-03.dtd">
+<coverage line-rate="0" branch-rate="0" version="" timestamp="1452073440285">
+	<packages>
+		<package name="github.com/antha-lang/antha/antha/anthalib/wtype" line-rate="0" branch-rate="0" complexity="0">
+			<classes>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/wtype.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="NewAnthaObject" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="128" hits="1"></line>
+								<line number="129" hits="1"></line>
+								<line number="130" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="128" hits="1"></line>
+						<line number="129" hits="1"></line>
+						<line number="130" hits="1"></line>
+					</lines>
+				</class>
+				<class name="Absorbance" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/absorbance.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="BlankCorrect" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="45" hits="0"></line>
+								<line number="48" hits="0"></line>
+								<line number="50" hits="0"></line>
+								<line number="52" hits="0"></line>
+							</lines>
+						</method>
+						<method name="PathlengthCorrect" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="57" hits="0"></line>
+								<line number="59" hits="0"></line>
+								<line number="60" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="45" hits="0"></line>
+						<line number="48" hits="0"></line>
+						<line number="50" hits="0"></line>
+						<line number="52" hits="0"></line>
+						<line number="57" hits="0"></line>
+						<line number="59" hits="0"></line>
+						<line number="60" hits="0"></line>
+					</lines>
+				</class>
+				<class name="ConcreteLocation" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/locations.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Location_ID" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="54" hits="1"></line>
+							</lines>
+						</method>
+						<method name="Location_Name" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="57" hits="1"></line>
+							</lines>
+						</method>
+						<method name="Positions" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="60" hits="1"></line>
+								<line number="61" hits="1"></line>
+								<line number="62" hits="1"></line>
+								<line number="64" hits="1"></line>
+							</lines>
+						</method>
+						<method name="Container" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="67" hits="1"></line>
+							</lines>
+						</method>
+						<method name="Shape" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="70" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="54" hits="1"></line>
+						<line number="57" hits="1"></line>
+						<line number="60" hits="1"></line>
+						<line number="61" hits="1"></line>
+						<line number="62" hits="1"></line>
+						<line number="64" hits="1"></line>
+						<line number="67" hits="1"></line>
+						<line number="70" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/locations.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="NewLocation" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="74" hits="1"></line>
+								<line number="75" hits="1"></line>
+								<line number="76" hits="1"></line>
+								<line number="77" hits="1"></line>
+								<line number="78" hits="1"></line>
+								<line number="79" hits="1"></line>
+								<line number="80" hits="1"></line>
+								<line number="81" hits="1"></line>
+								<line number="84" hits="1"></line>
+							</lines>
+						</method>
+						<method name="SameLocation" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="91" hits="1"></line>
+								<line number="92" hits="0"></line>
+								<line number="93" hits="0"></line>
+								<line number="94" hits="1"></line>
+								<line number="95" hits="1"></line>
+								<line number="96" hits="1"></line>
+								<line number="98" hits="1"></line>
+								<line number="102" hits="1"></line>
+								<line number="103" hits="1"></line>
+								<line number="104" hits="1"></line>
+								<line number="105" hits="1"></line>
+								<line number="106" hits="1"></line>
+								<line number="110" hits="0"></line>
+							</lines>
+						</method>
+						<method name="buildContainerMap" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="114" hits="1"></line>
+								<line number="115" hits="1"></line>
+								<line number="116" hits="1"></line>
+								<line number="117" hits="1"></line>
+								<line number="118" hits="1"></line>
+								<line number="119" hits="1"></line>
+								<line number="121" hits="1"></line>
+								<line number="123" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="74" hits="1"></line>
+						<line number="75" hits="1"></line>
+						<line number="76" hits="1"></line>
+						<line number="77" hits="1"></line>
+						<line number="78" hits="1"></line>
+						<line number="79" hits="1"></line>
+						<line number="80" hits="1"></line>
+						<line number="81" hits="1"></line>
+						<line number="84" hits="1"></line>
+						<line number="91" hits="1"></line>
+						<line number="92" hits="0"></line>
+						<line number="93" hits="0"></line>
+						<line number="94" hits="1"></line>
+						<line number="95" hits="1"></line>
+						<line number="96" hits="1"></line>
+						<line number="98" hits="1"></line>
+						<line number="102" hits="1"></line>
+						<line number="103" hits="1"></line>
+						<line number="104" hits="1"></line>
+						<line number="105" hits="1"></line>
+						<line number="106" hits="1"></line>
+						<line number="110" hits="0"></line>
+						<line number="114" hits="1"></line>
+						<line number="115" hits="1"></line>
+						<line number="116" hits="1"></line>
+						<line number="117" hits="1"></line>
+						<line number="118" hits="1"></line>
+						<line number="119" hits="1"></line>
+						<line number="121" hits="1"></line>
+						<line number="123" hits="1"></line>
+					</lines>
+				</class>
+				<class name="GenericSolid" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/genericsolid.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Shape" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="32" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="32" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/genericsolid.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="NewGenericSolid" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="39" hits="1"></line>
+								<line number="40" hits="1"></line>
+								<line number="41" hits="1"></line>
+								<line number="42" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="39" hits="1"></line>
+						<line number="40" hits="1"></line>
+						<line number="41" hits="1"></line>
+						<line number="42" hits="1"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/interface.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="MatterByName" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="38" hits="1"></line>
+								<line number="39" hits="1"></line>
+								<line number="42" hits="1"></line>
+							</lines>
+						</method>
+						<method name="GetMatterLib" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="47" hits="0"></line>
+								<line number="49" hits="0"></line>
+								<line number="50" hits="0"></line>
+								<line number="53" hits="0"></line>
+								<line number="54" hits="0"></line>
+								<line number="56" hits="0"></line>
+								<line number="57" hits="0"></line>
+								<line number="58" hits="0"></line>
+								<line number="60" hits="0"></line>
+							</lines>
+						</method>
+						<method name="check" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="65" hits="0"></line>
+								<line number="66" hits="0"></line>
+								<line number="67" hits="0"></line>
+							</lines>
+						</method>
+						<method name="MakeMatterLib" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="73" hits="1"></line>
+								<line number="74" hits="1"></line>
+								<line number="75" hits="1"></line>
+								<line number="76" hits="1"></line>
+								<line number="78" hits="1"></line>
+								<line number="81" hits="1"></line>
+								<line number="83" hits="1"></line>
+								<line number="84" hits="1"></line>
+								<line number="85" hits="1"></line>
+								<line number="86" hits="1"></line>
+								<line number="87" hits="1"></line>
+								<line number="88" hits="1"></line>
+								<line number="91" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="38" hits="1"></line>
+						<line number="39" hits="1"></line>
+						<line number="42" hits="1"></line>
+						<line number="47" hits="0"></line>
+						<line number="49" hits="0"></line>
+						<line number="50" hits="0"></line>
+						<line number="53" hits="0"></line>
+						<line number="54" hits="0"></line>
+						<line number="56" hits="0"></line>
+						<line number="57" hits="0"></line>
+						<line number="58" hits="0"></line>
+						<line number="60" hits="0"></line>
+						<line number="65" hits="0"></line>
+						<line number="66" hits="0"></line>
+						<line number="67" hits="0"></line>
+						<line number="73" hits="1"></line>
+						<line number="74" hits="1"></line>
+						<line number="75" hits="1"></line>
+						<line number="76" hits="1"></line>
+						<line number="78" hits="1"></line>
+						<line number="81" hits="1"></line>
+						<line number="83" hits="1"></line>
+						<line number="84" hits="1"></line>
+						<line number="85" hits="1"></line>
+						<line number="86" hits="1"></line>
+						<line number="87" hits="1"></line>
+						<line number="88" hits="1"></line>
+						<line number="91" hits="1"></line>
+					</lines>
+				</class>
+				<class name="SLHPlate" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/serialize.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="FillPlate" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="99" hits="0"></line>
+								<line number="100" hits="0"></line>
+								<line number="101" hits="0"></line>
+								<line number="102" hits="0"></line>
+								<line number="103" hits="0"></line>
+								<line number="104" hits="0"></line>
+								<line number="105" hits="0"></line>
+								<line number="106" hits="0"></line>
+								<line number="107" hits="0"></line>
+								<line number="108" hits="0"></line>
+								<line number="109" hits="0"></line>
+								<line number="110" hits="0"></line>
+								<line number="111" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="99" hits="0"></line>
+						<line number="100" hits="0"></line>
+						<line number="101" hits="0"></line>
+						<line number="102" hits="0"></line>
+						<line number="103" hits="0"></line>
+						<line number="104" hits="0"></line>
+						<line number="105" hits="0"></line>
+						<line number="106" hits="0"></line>
+						<line number="107" hits="0"></line>
+						<line number="108" hits="0"></line>
+						<line number="109" hits="0"></line>
+						<line number="110" hits="0"></line>
+						<line number="111" hits="0"></line>
+					</lines>
+				</class>
+				<class name="LHWell" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/serialize.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="AddDimensions" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="130" hits="0"></line>
+								<line number="131" hits="0"></line>
+								<line number="132" hits="0"></line>
+								<line number="133" hits="0"></line>
+								<line number="134" hits="0"></line>
+								<line number="135" hits="0"></line>
+								<line number="136" hits="0"></line>
+								<line number="137" hits="0"></line>
+								<line number="138" hits="0"></line>
+								<line number="139" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="130" hits="0"></line>
+						<line number="131" hits="0"></line>
+						<line number="132" hits="0"></line>
+						<line number="133" hits="0"></line>
+						<line number="134" hits="0"></line>
+						<line number="135" hits="0"></line>
+						<line number="136" hits="0"></line>
+						<line number="137" hits="0"></line>
+						<line number="138" hits="0"></line>
+						<line number="139" hits="0"></line>
+					</lines>
+				</class>
+				<class name="LHPlate" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/serialize.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Welldimensions" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="143" hits="0"></line>
+								<line number="144" hits="0"></line>
+								<line number="145" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="143" hits="0"></line>
+						<line number="144" hits="0"></line>
+						<line number="145" hits="0"></line>
+					</lines>
+				</class>
+				<class name="SLHWell" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/serialize.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="FillWell" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="218" hits="0"></line>
+								<line number="219" hits="0"></line>
+								<line number="220" hits="0"></line>
+								<line number="221" hits="0"></line>
+								<line number="222" hits="0"></line>
+								<line number="223" hits="0"></line>
+								<line number="224" hits="0"></line>
+								<line number="225" hits="0"></line>
+								<line number="226" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="218" hits="0"></line>
+						<line number="219" hits="0"></line>
+						<line number="220" hits="0"></line>
+						<line number="221" hits="0"></line>
+						<line number="222" hits="0"></line>
+						<line number="223" hits="0"></line>
+						<line number="224" hits="0"></line>
+						<line number="225" hits="0"></line>
+						<line number="226" hits="0"></line>
+					</lines>
+				</class>
+				<class name="FromFactory" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/serialize.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="MarshalJSON" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="253" hits="0"></line>
+								<line number="254" hits="0"></line>
+							</lines>
+						</method>
+						<method name="UnmarshalJSON" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="258" hits="0"></line>
+								<line number="259" hits="0"></line>
+								<line number="260" hits="0"></line>
+								<line number="262" hits="0"></line>
+								<line number="263" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="253" hits="0"></line>
+						<line number="254" hits="0"></line>
+						<line number="258" hits="0"></line>
+						<line number="259" hits="0"></line>
+						<line number="260" hits="0"></line>
+						<line number="262" hits="0"></line>
+						<line number="263" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/biotree.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Load_TOL" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="45" hits="0"></line>
+								<line number="47" hits="0"></line>
+								<line number="48" hits="0"></line>
+								<line number="49" hits="0"></line>
+								<line number="54" hits="0"></line>
+								<line number="56" hits="0"></line>
+								<line number="58" hits="0"></line>
+								<line number="60" hits="0"></line>
+								<line number="61" hits="0"></line>
+								<line number="62" hits="0"></line>
+								<line number="64" hits="0"></line>
+								<line number="66" hits="0"></line>
+								<line number="67" hits="0"></line>
+								<line number="70" hits="0"></line>
+								<line number="71" hits="0"></line>
+								<line number="72" hits="0"></line>
+								<line number="73" hits="0"></line>
+								<line number="75" hits="0"></line>
+								<line number="77" hits="0"></line>
+								<line number="78" hits="0"></line>
+								<line number="80" hits="0"></line>
+								<line number="82" hits="0"></line>
+								<line number="83" hits="0"></line>
+								<line number="86" hits="0"></line>
+								<line number="88" hits="0"></line>
+								<line number="89" hits="0"></line>
+								<line number="90" hits="0"></line>
+								<line number="92" hits="0"></line>
+								<line number="95" hits="0"></line>
+							</lines>
+						</method>
+						<method name="parse_out_taxid" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="100" hits="0"></line>
+								<line number="102" hits="0"></line>
+								<line number="104" hits="0"></line>
+								<line number="105" hits="0"></line>
+								<line number="106" hits="0"></line>
+								<line number="107" hits="0"></line>
+								<line number="108" hits="0"></line>
+								<line number="109" hits="0"></line>
+								<line number="112" hits="0"></line>
+							</lines>
+						</method>
+						<method name="IndexOfString" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="165" hits="0"></line>
+								<line number="166" hits="0"></line>
+								<line number="167" hits="0"></line>
+								<line number="171" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="45" hits="0"></line>
+						<line number="47" hits="0"></line>
+						<line number="48" hits="0"></line>
+						<line number="49" hits="0"></line>
+						<line number="54" hits="0"></line>
+						<line number="56" hits="0"></line>
+						<line number="58" hits="0"></line>
+						<line number="60" hits="0"></line>
+						<line number="61" hits="0"></line>
+						<line number="62" hits="0"></line>
+						<line number="64" hits="0"></line>
+						<line number="66" hits="0"></line>
+						<line number="67" hits="0"></line>
+						<line number="70" hits="0"></line>
+						<line number="71" hits="0"></line>
+						<line number="72" hits="0"></line>
+						<line number="73" hits="0"></line>
+						<line number="75" hits="0"></line>
+						<line number="77" hits="0"></line>
+						<line number="78" hits="0"></line>
+						<line number="80" hits="0"></line>
+						<line number="82" hits="0"></line>
+						<line number="83" hits="0"></line>
+						<line number="86" hits="0"></line>
+						<line number="88" hits="0"></line>
+						<line number="89" hits="0"></line>
+						<line number="90" hits="0"></line>
+						<line number="92" hits="0"></line>
+						<line number="95" hits="0"></line>
+						<line number="100" hits="0"></line>
+						<line number="102" hits="0"></line>
+						<line number="104" hits="0"></line>
+						<line number="105" hits="0"></line>
+						<line number="106" hits="0"></line>
+						<line number="107" hits="0"></line>
+						<line number="108" hits="0"></line>
+						<line number="109" hits="0"></line>
+						<line number="112" hits="0"></line>
+						<line number="165" hits="0"></line>
+						<line number="166" hits="0"></line>
+						<line number="167" hits="0"></line>
+						<line number="171" hits="0"></line>
+					</lines>
+				</class>
+				<class name="TOL" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/biotree.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="IsAncestorOf" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="117" hits="0"></line>
+								<line number="119" hits="0"></line>
+								<line number="122" hits="0"></line>
+								<line number="124" hits="0"></line>
+								<line number="126" hits="0"></line>
+								<line number="128" hits="0"></line>
+								<line number="129" hits="0"></line>
+								<line number="131" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Get_taxonomy" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="139" hits="0"></line>
+								<line number="140" hits="0"></line>
+								<line number="141" hits="0"></line>
+								<line number="143" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Find_string" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="148" hits="0"></line>
+								<line number="149" hits="0"></line>
+								<line number="150" hits="0"></line>
+								<line number="151" hits="0"></line>
+								<line number="153" hits="0"></line>
+								<line number="154" hits="0"></line>
+								<line number="155" hits="0"></line>
+								<line number="156" hits="0"></line>
+								<line number="160" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="117" hits="0"></line>
+						<line number="119" hits="0"></line>
+						<line number="122" hits="0"></line>
+						<line number="124" hits="0"></line>
+						<line number="126" hits="0"></line>
+						<line number="128" hits="0"></line>
+						<line number="129" hits="0"></line>
+						<line number="131" hits="0"></line>
+						<line number="139" hits="0"></line>
+						<line number="140" hits="0"></line>
+						<line number="141" hits="0"></line>
+						<line number="143" hits="0"></line>
+						<line number="148" hits="0"></line>
+						<line number="149" hits="0"></line>
+						<line number="150" hits="0"></line>
+						<line number="151" hits="0"></line>
+						<line number="153" hits="0"></line>
+						<line number="154" hits="0"></line>
+						<line number="155" hits="0"></line>
+						<line number="156" hits="0"></line>
+						<line number="160" hits="0"></line>
+					</lines>
+				</class>
+				<class name="GenericDevice" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/genericdevice.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Manufacturer" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="35" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Type" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="39" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Ready" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="43" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="35" hits="0"></line>
+						<line number="39" hits="0"></line>
+						<line number="43" hits="0"></line>
+					</lines>
+				</class>
+				<class name="CompositeDevice" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/genericdevice.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Manufacturer" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="55" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Type" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="59" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Ready" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="68" hits="0"></line>
+								<line number="70" hits="0"></line>
+								<line number="71" hits="0"></line>
+								<line number="72" hits="0"></line>
+								<line number="73" hits="0"></line>
+								<line number="76" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="55" hits="0"></line>
+						<line number="59" hits="0"></line>
+						<line number="68" hits="0"></line>
+						<line number="70" hits="0"></line>
+						<line number="71" hits="0"></line>
+						<line number="72" hits="0"></line>
+						<line number="73" hits="0"></line>
+						<line number="76" hits="0"></line>
+					</lines>
+				</class>
+				<class name="GenericEntity" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/genericentity.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Location" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="34" hits="0"></line>
+							</lines>
+						</method>
+						<method name="SetLocation" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="38" hits="0"></line>
+								<line number="39" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="34" hits="0"></line>
+						<line number="38" hits="0"></line>
+						<line number="39" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/genericentity.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="NewGenericEntity" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="43" hits="0"></line>
+								<line number="44" hits="0"></line>
+								<line number="45" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="43" hits="0"></line>
+						<line number="44" hits="0"></line>
+						<line number="45" hits="0"></line>
+					</lines>
+				</class>
+				<class name="GenericMatter" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/genericmatter.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Clone" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="38" hits="0"></line>
+							</lines>
+						</method>
+						<method name="MatterType" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="42" hits="0"></line>
+							</lines>
+						</method>
+						<method name="MeltingPoint" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="46" hits="0"></line>
+							</lines>
+						</method>
+						<method name="BoilingPoint" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="49" hits="0"></line>
+							</lines>
+						</method>
+						<method name="SpecificHeatCapacity" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="53" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="38" hits="0"></line>
+						<line number="42" hits="0"></line>
+						<line number="46" hits="0"></line>
+						<line number="49" hits="0"></line>
+						<line number="53" hits="0"></line>
+					</lines>
+				</class>
+				<class name="Shape" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/geometry.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Height" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="56" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Width" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="59" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Depth" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="62" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Dup" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="66" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="56" hits="0"></line>
+						<line number="59" hits="0"></line>
+						<line number="62" hits="0"></line>
+						<line number="66" hits="1"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/geometry.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="NewShape" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="70" hits="1"></line>
+								<line number="71" hits="1"></line>
+							</lines>
+						</method>
+						<method name="MakeWellCoordsA1" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="83" hits="1"></line>
+							</lines>
+						</method>
+						<method name="MakeWellCoords1A" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="89" hits="0"></line>
+							</lines>
+						</method>
+						<method name="MakeWellCoordsXYsep" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="94" hits="1"></line>
+							</lines>
+						</method>
+						<method name="MakeWellCoordsXY" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="98" hits="1"></line>
+								<line number="99" hits="1"></line>
+								<line number="100" hits="1"></line>
+								<line number="101" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="70" hits="1"></line>
+						<line number="71" hits="1"></line>
+						<line number="83" hits="1"></line>
+						<line number="89" hits="0"></line>
+						<line number="94" hits="1"></line>
+						<line number="98" hits="1"></line>
+						<line number="99" hits="1"></line>
+						<line number="100" hits="1"></line>
+						<line number="101" hits="1"></line>
+					</lines>
+				</class>
+				<class name="WellCoords" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/geometry.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="FormatXY" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="106" hits="1"></line>
+							</lines>
+						</method>
+						<method name="Format1A" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="109" hits="1"></line>
+							</lines>
+						</method>
+						<method name="FormatA1" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="112" hits="1"></line>
+							</lines>
+						</method>
+						<method name="WellNumber" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="115" hits="0"></line>
+							</lines>
+						</method>
+						<method name="ColNumString" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="119" hits="0"></line>
+							</lines>
+						</method>
+						<method name="RowLettString" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="122" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="106" hits="1"></line>
+						<line number="109" hits="1"></line>
+						<line number="112" hits="1"></line>
+						<line number="115" hits="0"></line>
+						<line number="119" hits="0"></line>
+						<line number="122" hits="0"></line>
+					</lines>
+				</class>
+				<class name="LHSolution" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/lhtypes.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="GetComponentVolume" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="231" hits="0"></line>
+								<line number="233" hits="0"></line>
+								<line number="234" hits="0"></line>
+								<line number="235" hits="0"></line>
+								<line number="239" hits="0"></line>
+							</lines>
+						</method>
+						<method name="String" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="243" hits="0"></line>
+								<line number="251" hits="0"></line>
+								<line number="252" hits="0"></line>
+								<line number="254" hits="0"></line>
+								<line number="265" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="231" hits="0"></line>
+						<line number="233" hits="0"></line>
+						<line number="234" hits="0"></line>
+						<line number="235" hits="0"></line>
+						<line number="239" hits="0"></line>
+						<line number="243" hits="0"></line>
+						<line number="251" hits="0"></line>
+						<line number="252" hits="0"></line>
+						<line number="254" hits="0"></line>
+						<line number="265" hits="0"></line>
+					</lines>
+				</class>
+				<class name="LHPlate" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/lhtypes.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Name" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="497" hits="0"></line>
+							</lines>
+						</method>
+						<method name="String" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="501" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetName" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="552" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Location_ID" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="558" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Location_Name" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="562" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Positions" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="566" hits="0"></line>
+								<line number="567" hits="0"></line>
+								<line number="568" hits="0"></line>
+								<line number="569" hits="0"></line>
+								<line number="570" hits="0"></line>
+								<line number="571" hits="0"></line>
+								<line number="574" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Container" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="578" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Wells" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="583" hits="0"></line>
+								<line number="584" hits="0"></line>
+								<line number="585" hits="0"></line>
+								<line number="586" hits="0"></line>
+								<line number="587" hits="0"></line>
+								<line number="590" hits="0"></line>
+							</lines>
+						</method>
+						<method name="WellAt" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="594" hits="0"></line>
+							</lines>
+						</method>
+						<method name="WellsX" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="598" hits="0"></line>
+							</lines>
+						</method>
+						<method name="WellsY" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="602" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Dup" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="662" hits="0"></line>
+								<line number="664" hits="0"></line>
+								<line number="666" hits="0"></line>
+								<line number="667" hits="0"></line>
+								<line number="668" hits="0"></line>
+								<line number="669" hits="0"></line>
+								<line number="670" hits="0"></line>
+								<line number="671" hits="0"></line>
+								<line number="675" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="497" hits="0"></line>
+						<line number="501" hits="0"></line>
+						<line number="552" hits="0"></line>
+						<line number="558" hits="0"></line>
+						<line number="562" hits="0"></line>
+						<line number="566" hits="0"></line>
+						<line number="567" hits="0"></line>
+						<line number="568" hits="0"></line>
+						<line number="569" hits="0"></line>
+						<line number="570" hits="0"></line>
+						<line number="571" hits="0"></line>
+						<line number="574" hits="0"></line>
+						<line number="578" hits="0"></line>
+						<line number="583" hits="0"></line>
+						<line number="584" hits="0"></line>
+						<line number="585" hits="0"></line>
+						<line number="586" hits="0"></line>
+						<line number="587" hits="0"></line>
+						<line number="590" hits="0"></line>
+						<line number="594" hits="0"></line>
+						<line number="598" hits="0"></line>
+						<line number="602" hits="0"></line>
+						<line number="662" hits="0"></line>
+						<line number="664" hits="0"></line>
+						<line number="666" hits="0"></line>
+						<line number="667" hits="0"></line>
+						<line number="668" hits="0"></line>
+						<line number="669" hits="0"></line>
+						<line number="670" hits="0"></line>
+						<line number="671" hits="0"></line>
+						<line number="675" hits="0"></line>
+					</lines>
+				</class>
+				<class name="LHTipbox" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/lhtypes.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="String" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1079" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Dup" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1118" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetName" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1124" hits="0"></line>
+							</lines>
+						</method>
+						<method name="N_clean_tips" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1128" hits="0"></line>
+								<line number="1129" hits="0"></line>
+								<line number="1130" hits="0"></line>
+								<line number="1131" hits="0"></line>
+								<line number="1132" hits="0"></line>
+								<line number="1136" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetTips" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1144" hits="0"></line>
+								<line number="1145" hits="0"></line>
+								<line number="1146" hits="0"></line>
+								<line number="1147" hits="0"></line>
+								<line number="1148" hits="0"></line>
+								<line number="1149" hits="0"></line>
+								<line number="1150" hits="0"></line>
+								<line number="1151" hits="0"></line>
+								<line number="1152" hits="0"></line>
+								<line number="1153" hits="0"></line>
+								<line number="1158" hits="0"></line>
+								<line number="1159" hits="0"></line>
+								<line number="1160" hits="0"></line>
+								<line number="1161" hits="0"></line>
+								<line number="1162" hits="0"></line>
+								<line number="1163" hits="0"></line>
+								<line number="1165" hits="0"></line>
+								<line number="1169" hits="0"></line>
+								<line number="1170" hits="0"></line>
+								<line number="1171" hits="0"></line>
+								<line number="1172" hits="0"></line>
+								<line number="1173" hits="0"></line>
+								<line number="1174" hits="0"></line>
+								<line number="1175" hits="0"></line>
+								<line number="1176" hits="0"></line>
+								<line number="1177" hits="0"></line>
+								<line number="1182" hits="0"></line>
+								<line number="1183" hits="0"></line>
+								<line number="1185" hits="0"></line>
+								<line number="1186" hits="0"></line>
+								<line number="1187" hits="0"></line>
+								<line number="1188" hits="0"></line>
+								<line number="1190" hits="0"></line>
+								<line number="1196" hits="0"></line>
+								<line number="1197" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="1079" hits="0"></line>
+						<line number="1118" hits="0"></line>
+						<line number="1124" hits="0"></line>
+						<line number="1128" hits="0"></line>
+						<line number="1129" hits="0"></line>
+						<line number="1130" hits="0"></line>
+						<line number="1131" hits="0"></line>
+						<line number="1132" hits="0"></line>
+						<line number="1136" hits="0"></line>
+						<line number="1144" hits="0"></line>
+						<line number="1145" hits="0"></line>
+						<line number="1146" hits="0"></line>
+						<line number="1147" hits="0"></line>
+						<line number="1148" hits="0"></line>
+						<line number="1149" hits="0"></line>
+						<line number="1150" hits="0"></line>
+						<line number="1151" hits="0"></line>
+						<line number="1152" hits="0"></line>
+						<line number="1153" hits="0"></line>
+						<line number="1158" hits="0"></line>
+						<line number="1159" hits="0"></line>
+						<line number="1160" hits="0"></line>
+						<line number="1161" hits="0"></line>
+						<line number="1162" hits="0"></line>
+						<line number="1163" hits="0"></line>
+						<line number="1165" hits="0"></line>
+						<line number="1169" hits="0"></line>
+						<line number="1170" hits="0"></line>
+						<line number="1171" hits="0"></line>
+						<line number="1172" hits="0"></line>
+						<line number="1173" hits="0"></line>
+						<line number="1174" hits="0"></line>
+						<line number="1175" hits="0"></line>
+						<line number="1176" hits="0"></line>
+						<line number="1177" hits="0"></line>
+						<line number="1182" hits="0"></line>
+						<line number="1183" hits="0"></line>
+						<line number="1185" hits="0"></line>
+						<line number="1186" hits="0"></line>
+						<line number="1187" hits="0"></line>
+						<line number="1188" hits="0"></line>
+						<line number="1190" hits="0"></line>
+						<line number="1196" hits="0"></line>
+						<line number="1197" hits="0"></line>
+					</lines>
+				</class>
+				<class name="LHHead" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/lhtypes.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Dup" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1339" hits="0"></line>
+								<line number="1340" hits="0"></line>
+								<line number="1341" hits="0"></line>
+								<line number="1344" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetParams" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1348" hits="0"></line>
+								<line number="1349" hits="0"></line>
+								<line number="1351" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="1339" hits="0"></line>
+						<line number="1340" hits="0"></line>
+						<line number="1341" hits="0"></line>
+						<line number="1344" hits="0"></line>
+						<line number="1348" hits="0"></line>
+						<line number="1349" hits="0"></line>
+						<line number="1351" hits="0"></line>
+					</lines>
+				</class>
+				<class name="LHChannelParameter" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/lhtypes.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="MarshalJSON" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="58" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Dup" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="84" hits="0"></line>
+								<line number="86" hits="0"></line>
+							</lines>
+						</method>
+						<method name="MergeWithTip" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="105" hits="0"></line>
+								<line number="106" hits="0"></line>
+								<line number="107" hits="0"></line>
+								<line number="110" hits="0"></line>
+								<line number="111" hits="0"></line>
+								<line number="114" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="58" hits="0"></line>
+						<line number="84" hits="0"></line>
+						<line number="86" hits="0"></line>
+						<line number="105" hits="0"></line>
+						<line number="106" hits="0"></line>
+						<line number="107" hits="0"></line>
+						<line number="110" hits="0"></line>
+						<line number="111" hits="0"></line>
+						<line number="114" hits="0"></line>
+					</lines>
+				</class>
+				<class name="LHDevice" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/lhtypes.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Dup" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="135" hits="0"></line>
+								<line number="136" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="135" hits="0"></line>
+						<line number="136" hits="0"></line>
+					</lines>
+				</class>
+				<class name="LHPosition" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/lhtypes.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Location_ID" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="163" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Location_Name" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="167" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Container" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="171" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Positions" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="175" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Shape" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="179" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="163" hits="0"></line>
+						<line number="167" hits="0"></line>
+						<line number="171" hits="0"></line>
+						<line number="175" hits="0"></line>
+						<line number="179" hits="0"></line>
+					</lines>
+				</class>
+				<class name="LHComponent" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/lhtypes.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Dup" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="327" hits="0"></line>
+								<line number="328" hits="0"></line>
+								<line number="329" hits="0"></line>
+								<line number="330" hits="0"></line>
+								<line number="331" hits="0"></line>
+								<line number="332" hits="0"></line>
+								<line number="333" hits="0"></line>
+								<line number="334" hits="0"></line>
+								<line number="335" hits="0"></line>
+								<line number="336" hits="0"></line>
+								<line number="337" hits="0"></line>
+								<line number="338" hits="0"></line>
+								<line number="339" hits="0"></line>
+								<line number="340" hits="0"></line>
+								<line number="341" hits="0"></line>
+								<line number="342" hits="0"></line>
+								<line number="343" hits="0"></line>
+								<line number="344" hits="0"></line>
+								<line number="346" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Viscosity" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="352" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Name" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="356" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Container" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="360" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Sample" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="366" hits="0"></line>
+								<line number="370" hits="0"></line>
+								<line number="371" hits="0"></line>
+								<line number="372" hits="0"></line>
+								<line number="373" hits="0"></line>
+								<line number="375" hits="0"></line>
+								<line number="378" hits="0"></line>
+								<line number="379" hits="0"></line>
+								<line number="380" hits="0"></line>
+								<line number="381" hits="0"></line>
+								<line number="382" hits="0"></line>
+							</lines>
+						</method>
+						<method name="SampleSolidtoLiquid" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="388" hits="0"></line>
+								<line number="389" hits="0"></line>
+								<line number="390" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetStockConcentration" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="394" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Add" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="398" hits="0"></line>
+								<line number="399" hits="0"></line>
+								<line number="400" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Volume" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="404" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetSmax" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="408" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetVisc" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="412" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetExtra" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="416" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetConc" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="420" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetCunit" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="424" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Concentration" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="429" hits="0"></line>
+								<line number="430" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetVunit" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="434" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetType" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="438" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="327" hits="0"></line>
+						<line number="328" hits="0"></line>
+						<line number="329" hits="0"></line>
+						<line number="330" hits="0"></line>
+						<line number="331" hits="0"></line>
+						<line number="332" hits="0"></line>
+						<line number="333" hits="0"></line>
+						<line number="334" hits="0"></line>
+						<line number="335" hits="0"></line>
+						<line number="336" hits="0"></line>
+						<line number="337" hits="0"></line>
+						<line number="338" hits="0"></line>
+						<line number="339" hits="0"></line>
+						<line number="340" hits="0"></line>
+						<line number="341" hits="0"></line>
+						<line number="342" hits="0"></line>
+						<line number="343" hits="0"></line>
+						<line number="344" hits="0"></line>
+						<line number="346" hits="0"></line>
+						<line number="352" hits="0"></line>
+						<line number="356" hits="0"></line>
+						<line number="360" hits="0"></line>
+						<line number="366" hits="0"></line>
+						<line number="370" hits="0"></line>
+						<line number="371" hits="0"></line>
+						<line number="372" hits="0"></line>
+						<line number="373" hits="0"></line>
+						<line number="375" hits="0"></line>
+						<line number="378" hits="0"></line>
+						<line number="379" hits="0"></line>
+						<line number="380" hits="0"></line>
+						<line number="381" hits="0"></line>
+						<line number="382" hits="0"></line>
+						<line number="388" hits="0"></line>
+						<line number="389" hits="0"></line>
+						<line number="390" hits="0"></line>
+						<line number="394" hits="0"></line>
+						<line number="398" hits="0"></line>
+						<line number="399" hits="0"></line>
+						<line number="400" hits="0"></line>
+						<line number="404" hits="0"></line>
+						<line number="408" hits="0"></line>
+						<line number="412" hits="0"></line>
+						<line number="416" hits="0"></line>
+						<line number="420" hits="0"></line>
+						<line number="424" hits="0"></line>
+						<line number="429" hits="0"></line>
+						<line number="430" hits="0"></line>
+						<line number="434" hits="0"></line>
+						<line number="438" hits="0"></line>
+					</lines>
+				</class>
+				<class name="LHWell" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/lhtypes.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="String" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="703" hits="0"></line>
+							</lines>
+						</method>
+						<method name="WorkingVolume" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="750" hits="0"></line>
+								<line number="751" hits="0"></line>
+								<line number="752" hits="0"></line>
+								<line number="753" hits="0"></line>
+							</lines>
+						</method>
+						<method name="updateVolume" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="757" hits="0"></line>
+								<line number="758" hits="0"></line>
+								<line number="759" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Location_ID" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="766" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Location_Name" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="770" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Positions" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="774" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Container" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="778" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Shape" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="782" hits="0"></line>
+							</lines>
+						</method>
+						<method name="WellTypeName" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="787" hits="0"></line>
+							</lines>
+						</method>
+						<method name="ResidualVolume" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="791" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Coords" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="795" hits="0"></line>
+							</lines>
+						</method>
+						<method name="ContainerVolume" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="799" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Contents" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="803" hits="0"></line>
+								<line number="804" hits="0"></line>
+								<line number="805" hits="0"></line>
+								<line number="807" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Add" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="811" hits="0"></line>
+								<line number="813" hits="0"></line>
+								<line number="817" hits="0"></line>
+								<line number="819" hits="0"></line>
+								<line number="820" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Remove" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="828" hits="0"></line>
+								<line number="829" hits="0"></line>
+								<line number="831" hits="0"></line>
+								<line number="832" hits="0"></line>
+								<line number="833" hits="0"></line>
+								<line number="835" hits="0"></line>
+								<line number="837" hits="0"></line>
+							</lines>
+						</method>
+						<method name="ContainerType" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="841" hits="0"></line>
+							</lines>
+						</method>
+						<method name="PartOf" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="845" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Empty" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="849" hits="0"></line>
+								<line number="850" hits="0"></line>
+								<line number="852" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Dup" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="857" hits="1"></line>
+								<line number="859" hits="1"></line>
+								<line number="861" hits="1"></line>
+								<line number="862" hits="0"></line>
+								<line number="865" hits="1"></line>
+								<line number="866" hits="0"></line>
+								<line number="869" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="703" hits="0"></line>
+						<line number="750" hits="0"></line>
+						<line number="751" hits="0"></line>
+						<line number="752" hits="0"></line>
+						<line number="753" hits="0"></line>
+						<line number="757" hits="0"></line>
+						<line number="758" hits="0"></line>
+						<line number="759" hits="0"></line>
+						<line number="766" hits="0"></line>
+						<line number="770" hits="0"></line>
+						<line number="774" hits="0"></line>
+						<line number="778" hits="0"></line>
+						<line number="782" hits="0"></line>
+						<line number="787" hits="0"></line>
+						<line number="791" hits="0"></line>
+						<line number="795" hits="0"></line>
+						<line number="799" hits="0"></line>
+						<line number="803" hits="0"></line>
+						<line number="804" hits="0"></line>
+						<line number="805" hits="0"></line>
+						<line number="807" hits="0"></line>
+						<line number="811" hits="0"></line>
+						<line number="813" hits="0"></line>
+						<line number="817" hits="0"></line>
+						<line number="819" hits="0"></line>
+						<line number="820" hits="0"></line>
+						<line number="828" hits="0"></line>
+						<line number="829" hits="0"></line>
+						<line number="831" hits="0"></line>
+						<line number="832" hits="0"></line>
+						<line number="833" hits="0"></line>
+						<line number="835" hits="0"></line>
+						<line number="837" hits="0"></line>
+						<line number="841" hits="0"></line>
+						<line number="845" hits="0"></line>
+						<line number="849" hits="0"></line>
+						<line number="850" hits="0"></line>
+						<line number="852" hits="0"></line>
+						<line number="857" hits="1"></line>
+						<line number="859" hits="1"></line>
+						<line number="861" hits="1"></line>
+						<line number="862" hits="0"></line>
+						<line number="865" hits="1"></line>
+						<line number="866" hits="0"></line>
+						<line number="869" hits="1"></line>
+					</lines>
+				</class>
+				<class name="LHTip" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/lhtypes.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Dup" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1222" hits="0"></line>
+								<line number="1223" hits="0"></line>
+								<line number="1224" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="1222" hits="0"></line>
+						<line number="1223" hits="0"></line>
+						<line number="1224" hits="0"></line>
+					</lines>
+				</class>
+				<class name="LHTipwaste" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/lhtypes.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="String" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1259" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Dup" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1287" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetName" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1291" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Empty" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1309" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Dispose" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1313" hits="0"></line>
+								<line number="1314" hits="0"></line>
+								<line number="1317" hits="0"></line>
+								<line number="1318" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="1259" hits="0"></line>
+						<line number="1287" hits="0"></line>
+						<line number="1291" hits="0"></line>
+						<line number="1309" hits="0"></line>
+						<line number="1313" hits="0"></line>
+						<line number="1314" hits="0"></line>
+						<line number="1317" hits="0"></line>
+						<line number="1318" hits="0"></line>
+					</lines>
+				</class>
+				<class name="LHAdaptor" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/lhtypes.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Dup" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1375" hits="0"></line>
+								<line number="1376" hits="0"></line>
+								<line number="1377" hits="0"></line>
+								<line number="1378" hits="0"></line>
+								<line number="1381" hits="0"></line>
+							</lines>
+						</method>
+						<method name="LoadTips" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1385" hits="0"></line>
+								<line number="1386" hits="0"></line>
+								<line number="1389" hits="0"></line>
+								<line number="1390" hits="0"></line>
+								<line number="1391" hits="0"></line>
+							</lines>
+						</method>
+						<method name="UnloadTips" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1395" hits="0"></line>
+								<line number="1396" hits="0"></line>
+								<line number="1399" hits="0"></line>
+								<line number="1400" hits="0"></line>
+								<line number="1402" hits="0"></line>
+							</lines>
+						</method>
+						<method name="GetParams" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1406" hits="0"></line>
+								<line number="1407" hits="0"></line>
+								<line number="1409" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="1375" hits="0"></line>
+						<line number="1376" hits="0"></line>
+						<line number="1377" hits="0"></line>
+						<line number="1378" hits="0"></line>
+						<line number="1381" hits="0"></line>
+						<line number="1385" hits="0"></line>
+						<line number="1386" hits="0"></line>
+						<line number="1389" hits="0"></line>
+						<line number="1390" hits="0"></line>
+						<line number="1391" hits="0"></line>
+						<line number="1395" hits="0"></line>
+						<line number="1396" hits="0"></line>
+						<line number="1399" hits="0"></line>
+						<line number="1400" hits="0"></line>
+						<line number="1402" hits="0"></line>
+						<line number="1406" hits="0"></line>
+						<line number="1407" hits="0"></line>
+						<line number="1409" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/lhtypes.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="NewLHChannelParameter" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="90" hits="0"></line>
+								<line number="91" hits="0"></line>
+								<line number="92" hits="0"></line>
+								<line number="93" hits="0"></line>
+								<line number="94" hits="0"></line>
+								<line number="95" hits="0"></line>
+								<line number="96" hits="0"></line>
+								<line number="97" hits="0"></line>
+								<line number="98" hits="0"></line>
+								<line number="99" hits="0"></line>
+								<line number="100" hits="0"></line>
+								<line number="101" hits="0"></line>
+							</lines>
+						</method>
+						<method name="NewLHDevice" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="127" hits="0"></line>
+								<line number="128" hits="0"></line>
+								<line number="129" hits="0"></line>
+								<line number="130" hits="0"></line>
+								<line number="131" hits="0"></line>
+							</lines>
+						</method>
+						<method name="NewLHPosition" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="149" hits="0"></line>
+								<line number="150" hits="0"></line>
+								<line number="151" hits="0"></line>
+								<line number="152" hits="0"></line>
+								<line number="153" hits="0"></line>
+								<line number="154" hits="0"></line>
+								<line number="155" hits="0"></line>
+							</lines>
+						</method>
+						<method name="NewLHSolution" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="221" hits="0"></line>
+								<line number="222" hits="0"></line>
+								<line number="223" hits="0"></line>
+								<line number="224" hits="0"></line>
+								<line number="225" hits="0"></line>
+								<line number="226" hits="0"></line>
+								<line number="227" hits="0"></line>
+							</lines>
+						</method>
+						<method name="SolutionToComponent" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="270" hits="0"></line>
+								<line number="300" hits="0"></line>
+							</lines>
+						</method>
+						<method name="NewLHComponent" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="442" hits="0"></line>
+								<line number="443" hits="0"></line>
+								<line number="444" hits="0"></line>
+								<line number="445" hits="0"></line>
+								<line number="446" hits="0"></line>
+							</lines>
+						</method>
+						<method name="CopyLHComponent" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="450" hits="0"></line>
+								<line number="451" hits="0"></line>
+								<line number="452" hits="0"></line>
+								<line number="453" hits="0"></line>
+								<line number="454" hits="0"></line>
+								<line number="455" hits="0"></line>
+								<line number="458" hits="0"></line>
+							</lines>
+						</method>
+						<method name="NewLHSetup" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="466" hits="0"></line>
+							</lines>
+						</method>
+						<method name="NewLHPlate" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="606" hits="1"></line>
+								<line number="607" hits="1"></line>
+								<line number="608" hits="1"></line>
+								<line number="609" hits="1"></line>
+								<line number="610" hits="1"></line>
+								<line number="611" hits="1"></line>
+								<line number="612" hits="1"></line>
+								<line number="613" hits="1"></line>
+								<line number="614" hits="1"></line>
+								<line number="615" hits="1"></line>
+								<line number="616" hits="1"></line>
+								<line number="617" hits="1"></line>
+								<line number="618" hits="1"></line>
+								<line number="619" hits="1"></line>
+								<line number="620" hits="1"></line>
+								<line number="622" hits="1"></line>
+								<line number="625" hits="1"></line>
+								<line number="626" hits="1"></line>
+								<line number="627" hits="1"></line>
+								<line number="628" hits="1"></line>
+								<line number="630" hits="1"></line>
+								<line number="631" hits="1"></line>
+								<line number="632" hits="1"></line>
+								<line number="633" hits="1"></line>
+								<line number="634" hits="1"></line>
+								<line number="635" hits="1"></line>
+								<line number="637" hits="1"></line>
+								<line number="639" hits="1"></line>
+								<line number="640" hits="1"></line>
+								<line number="641" hits="1"></line>
+								<line number="642" hits="1"></line>
+								<line number="643" hits="1"></line>
+								<line number="644" hits="1"></line>
+								<line number="645" hits="1"></line>
+								<line number="646" hits="1"></line>
+								<line number="647" hits="1"></line>
+								<line number="648" hits="1"></line>
+								<line number="649" hits="1"></line>
+								<line number="653" hits="1"></line>
+								<line number="654" hits="1"></line>
+								<line number="655" hits="1"></line>
+								<line number="656" hits="1"></line>
+								<line number="658" hits="1"></line>
+							</lines>
+						</method>
+						<method name="NewLHWell" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="874" hits="1"></line>
+								<line number="876" hits="1"></line>
+								<line number="877" hits="1"></line>
+								<line number="878" hits="1"></line>
+								<line number="879" hits="1"></line>
+								<line number="880" hits="1"></line>
+								<line number="881" hits="1"></line>
+								<line number="882" hits="1"></line>
+								<line number="883" hits="1"></line>
+								<line number="884" hits="1"></line>
+								<line number="885" hits="1"></line>
+								<line number="886" hits="1"></line>
+								<line number="887" hits="1"></line>
+								<line number="888" hits="1"></line>
+								<line number="889" hits="1"></line>
+								<line number="890" hits="1"></line>
+								<line number="891" hits="1"></line>
+								<line number="892" hits="1"></line>
+								<line number="893" hits="1"></line>
+							</lines>
+						</method>
+						<method name="Get_Next_Well" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="897" hits="0"></line>
+								<line number="899" hits="0"></line>
+								<line number="901" hits="0"></line>
+								<line number="903" hits="0"></line>
+								<line number="905" hits="0"></line>
+								<line number="907" hits="0"></line>
+								<line number="912" hits="0"></line>
+								<line number="914" hits="0"></line>
+								<line number="916" hits="0"></line>
+								<line number="917" hits="0"></line>
+								<line number="920" hits="0"></line>
+								<line number="921" hits="0"></line>
+								<line number="923" hits="0"></line>
+								<line number="925" hits="0"></line>
+								<line number="926" hits="0"></line>
+								<line number="928" hits="0"></line>
+								<line number="929" hits="0"></line>
+								<line number="931" hits="0"></line>
+								<line number="933" hits="0"></line>
+								<line number="935" hits="0"></line>
+								<line number="937" hits="0"></line>
+								<line number="938" hits="0"></line>
+								<line number="941" hits="0"></line>
+								<line number="942" hits="0"></line>
+								<line number="943" hits="0"></line>
+								<line number="946" hits="0"></line>
+								<line number="948" hits="0"></line>
+								<line number="949" hits="0"></line>
+								<line number="953" hits="0"></line>
+							</lines>
+						</method>
+						<method name="get_vol_left" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="957" hits="0"></line>
+								<line number="962" hits="0"></line>
+								<line number="963" hits="0"></line>
+								<line number="964" hits="0"></line>
+								<line number="965" hits="0"></line>
+								<line number="966" hits="0"></line>
+								<line number="967" hits="0"></line>
+							</lines>
+						</method>
+						<method name="next_well_to_try" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="973" hits="0"></line>
+								<line number="974" hits="0"></line>
+								<line number="978" hits="0"></line>
+								<line number="979" hits="0"></line>
+								<line number="980" hits="0"></line>
+								<line number="981" hits="0"></line>
+								<line number="984" hits="0"></line>
+								<line number="985" hits="0"></line>
+								<line number="991" hits="0"></line>
+							</lines>
+						</method>
+						<method name="New_Component" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="995" hits="0"></line>
+								<line number="996" hits="0"></line>
+								<line number="997" hits="0"></line>
+								<line number="998" hits="0"></line>
+								<line number="999" hits="0"></line>
+								<line number="1000" hits="0"></line>
+							</lines>
+						</method>
+						<method name="New_Solution" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1004" hits="0"></line>
+								<line number="1005" hits="0"></line>
+								<line number="1006" hits="0"></line>
+								<line number="1007" hits="0"></line>
+							</lines>
+						</method>
+						<method name="New_Plate" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1011" hits="0"></line>
+								<line number="1012" hits="0"></line>
+								<line number="1013" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Initialize_Wells" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1017" hits="0"></line>
+								<line number="1018" hits="0"></line>
+								<line number="1019" hits="0"></line>
+								<line number="1020" hits="0"></line>
+								<line number="1021" hits="0"></line>
+								<line number="1022" hits="0"></line>
+								<line number="1023" hits="0"></line>
+								<line number="1024" hits="0"></line>
+								<line number="1025" hits="0"></line>
+								<line number="1026" hits="0"></line>
+								<line number="1028" hits="0"></line>
+								<line number="1029" hits="0"></line>
+							</lines>
+						</method>
+						<method name="NewLHTipbox" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1055" hits="0"></line>
+								<line number="1056" hits="0"></line>
+								<line number="1057" hits="0"></line>
+								<line number="1058" hits="0"></line>
+								<line number="1059" hits="0"></line>
+								<line number="1060" hits="0"></line>
+								<line number="1061" hits="0"></line>
+								<line number="1062" hits="0"></line>
+								<line number="1063" hits="0"></line>
+								<line number="1064" hits="0"></line>
+								<line number="1065" hits="0"></line>
+								<line number="1066" hits="0"></line>
+								<line number="1067" hits="0"></line>
+								<line number="1068" hits="0"></line>
+								<line number="1070" hits="0"></line>
+								<line number="1071" hits="0"></line>
+								<line number="1072" hits="0"></line>
+								<line number="1073" hits="0"></line>
+								<line number="1074" hits="0"></line>
+								<line number="1075" hits="0"></line>
+							</lines>
+						</method>
+						<method name="initialize_tips" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1201" hits="0"></line>
+								<line number="1202" hits="0"></line>
+								<line number="1203" hits="0"></line>
+								<line number="1204" hits="0"></line>
+								<line number="1205" hits="0"></line>
+								<line number="1208" hits="0"></line>
+								<line number="1209" hits="0"></line>
+							</lines>
+						</method>
+						<method name="NewLHTip" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1228" hits="0"></line>
+								<line number="1229" hits="0"></line>
+								<line number="1230" hits="0"></line>
+								<line number="1231" hits="0"></line>
+								<line number="1232" hits="0"></line>
+								<line number="1233" hits="0"></line>
+								<line number="1234" hits="0"></line>
+								<line number="1235" hits="0"></line>
+								<line number="1236" hits="0"></line>
+							</lines>
+						</method>
+						<method name="CopyTip" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1240" hits="0"></line>
+							</lines>
+						</method>
+						<method name="NewLHTipwaste" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1295" hits="0"></line>
+								<line number="1296" hits="0"></line>
+								<line number="1297" hits="0"></line>
+								<line number="1298" hits="0"></line>
+								<line number="1299" hits="0"></line>
+								<line number="1300" hits="0"></line>
+								<line number="1301" hits="0"></line>
+								<line number="1302" hits="0"></line>
+								<line number="1303" hits="0"></line>
+								<line number="1304" hits="0"></line>
+								<line number="1305" hits="0"></line>
+							</lines>
+						</method>
+						<method name="NewLHHead" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1331" hits="0"></line>
+								<line number="1332" hits="0"></line>
+								<line number="1333" hits="0"></line>
+								<line number="1334" hits="0"></line>
+								<line number="1335" hits="0"></line>
+							</lines>
+						</method>
+						<method name="NewLHAdaptor" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="1367" hits="0"></line>
+								<line number="1368" hits="0"></line>
+								<line number="1369" hits="0"></line>
+								<line number="1370" hits="0"></line>
+								<line number="1371" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="90" hits="0"></line>
+						<line number="91" hits="0"></line>
+						<line number="92" hits="0"></line>
+						<line number="93" hits="0"></line>
+						<line number="94" hits="0"></line>
+						<line number="95" hits="0"></line>
+						<line number="96" hits="0"></line>
+						<line number="97" hits="0"></line>
+						<line number="98" hits="0"></line>
+						<line number="99" hits="0"></line>
+						<line number="100" hits="0"></line>
+						<line number="101" hits="0"></line>
+						<line number="127" hits="0"></line>
+						<line number="128" hits="0"></line>
+						<line number="129" hits="0"></line>
+						<line number="130" hits="0"></line>
+						<line number="131" hits="0"></line>
+						<line number="149" hits="0"></line>
+						<line number="150" hits="0"></line>
+						<line number="151" hits="0"></line>
+						<line number="152" hits="0"></line>
+						<line number="153" hits="0"></line>
+						<line number="154" hits="0"></line>
+						<line number="155" hits="0"></line>
+						<line number="221" hits="0"></line>
+						<line number="222" hits="0"></line>
+						<line number="223" hits="0"></line>
+						<line number="224" hits="0"></line>
+						<line number="225" hits="0"></line>
+						<line number="226" hits="0"></line>
+						<line number="227" hits="0"></line>
+						<line number="270" hits="0"></line>
+						<line number="300" hits="0"></line>
+						<line number="442" hits="0"></line>
+						<line number="443" hits="0"></line>
+						<line number="444" hits="0"></line>
+						<line number="445" hits="0"></line>
+						<line number="446" hits="0"></line>
+						<line number="450" hits="0"></line>
+						<line number="451" hits="0"></line>
+						<line number="452" hits="0"></line>
+						<line number="453" hits="0"></line>
+						<line number="454" hits="0"></line>
+						<line number="455" hits="0"></line>
+						<line number="458" hits="0"></line>
+						<line number="466" hits="0"></line>
+						<line number="606" hits="1"></line>
+						<line number="607" hits="1"></line>
+						<line number="608" hits="1"></line>
+						<line number="609" hits="1"></line>
+						<line number="610" hits="1"></line>
+						<line number="611" hits="1"></line>
+						<line number="612" hits="1"></line>
+						<line number="613" hits="1"></line>
+						<line number="614" hits="1"></line>
+						<line number="615" hits="1"></line>
+						<line number="616" hits="1"></line>
+						<line number="617" hits="1"></line>
+						<line number="618" hits="1"></line>
+						<line number="619" hits="1"></line>
+						<line number="620" hits="1"></line>
+						<line number="622" hits="1"></line>
+						<line number="625" hits="1"></line>
+						<line number="626" hits="1"></line>
+						<line number="627" hits="1"></line>
+						<line number="628" hits="1"></line>
+						<line number="630" hits="1"></line>
+						<line number="631" hits="1"></line>
+						<line number="632" hits="1"></line>
+						<line number="633" hits="1"></line>
+						<line number="634" hits="1"></line>
+						<line number="635" hits="1"></line>
+						<line number="637" hits="1"></line>
+						<line number="639" hits="1"></line>
+						<line number="640" hits="1"></line>
+						<line number="641" hits="1"></line>
+						<line number="642" hits="1"></line>
+						<line number="643" hits="1"></line>
+						<line number="644" hits="1"></line>
+						<line number="645" hits="1"></line>
+						<line number="646" hits="1"></line>
+						<line number="647" hits="1"></line>
+						<line number="648" hits="1"></line>
+						<line number="649" hits="1"></line>
+						<line number="653" hits="1"></line>
+						<line number="654" hits="1"></line>
+						<line number="655" hits="1"></line>
+						<line number="656" hits="1"></line>
+						<line number="658" hits="1"></line>
+						<line number="874" hits="1"></line>
+						<line number="876" hits="1"></line>
+						<line number="877" hits="1"></line>
+						<line number="878" hits="1"></line>
+						<line number="879" hits="1"></line>
+						<line number="880" hits="1"></line>
+						<line number="881" hits="1"></line>
+						<line number="882" hits="1"></line>
+						<line number="883" hits="1"></line>
+						<line number="884" hits="1"></line>
+						<line number="885" hits="1"></line>
+						<line number="886" hits="1"></line>
+						<line number="887" hits="1"></line>
+						<line number="888" hits="1"></line>
+						<line number="889" hits="1"></line>
+						<line number="890" hits="1"></line>
+						<line number="891" hits="1"></line>
+						<line number="892" hits="1"></line>
+						<line number="893" hits="1"></line>
+						<line number="897" hits="0"></line>
+						<line number="899" hits="0"></line>
+						<line number="901" hits="0"></line>
+						<line number="903" hits="0"></line>
+						<line number="905" hits="0"></line>
+						<line number="907" hits="0"></line>
+						<line number="912" hits="0"></line>
+						<line number="914" hits="0"></line>
+						<line number="916" hits="0"></line>
+						<line number="917" hits="0"></line>
+						<line number="920" hits="0"></line>
+						<line number="921" hits="0"></line>
+						<line number="923" hits="0"></line>
+						<line number="925" hits="0"></line>
+						<line number="926" hits="0"></line>
+						<line number="928" hits="0"></line>
+						<line number="929" hits="0"></line>
+						<line number="931" hits="0"></line>
+						<line number="933" hits="0"></line>
+						<line number="935" hits="0"></line>
+						<line number="937" hits="0"></line>
+						<line number="938" hits="0"></line>
+						<line number="941" hits="0"></line>
+						<line number="942" hits="0"></line>
+						<line number="943" hits="0"></line>
+						<line number="946" hits="0"></line>
+						<line number="948" hits="0"></line>
+						<line number="949" hits="0"></line>
+						<line number="953" hits="0"></line>
+						<line number="957" hits="0"></line>
+						<line number="962" hits="0"></line>
+						<line number="963" hits="0"></line>
+						<line number="964" hits="0"></line>
+						<line number="965" hits="0"></line>
+						<line number="966" hits="0"></line>
+						<line number="967" hits="0"></line>
+						<line number="973" hits="0"></line>
+						<line number="974" hits="0"></line>
+						<line number="978" hits="0"></line>
+						<line number="979" hits="0"></line>
+						<line number="980" hits="0"></line>
+						<line number="981" hits="0"></line>
+						<line number="984" hits="0"></line>
+						<line number="985" hits="0"></line>
+						<line number="991" hits="0"></line>
+						<line number="995" hits="0"></line>
+						<line number="996" hits="0"></line>
+						<line number="997" hits="0"></line>
+						<line number="998" hits="0"></line>
+						<line number="999" hits="0"></line>
+						<line number="1000" hits="0"></line>
+						<line number="1004" hits="0"></line>
+						<line number="1005" hits="0"></line>
+						<line number="1006" hits="0"></line>
+						<line number="1007" hits="0"></line>
+						<line number="1011" hits="0"></line>
+						<line number="1012" hits="0"></line>
+						<line number="1013" hits="0"></line>
+						<line number="1017" hits="0"></line>
+						<line number="1018" hits="0"></line>
+						<line number="1019" hits="0"></line>
+						<line number="1020" hits="0"></line>
+						<line number="1021" hits="0"></line>
+						<line number="1022" hits="0"></line>
+						<line number="1023" hits="0"></line>
+						<line number="1024" hits="0"></line>
+						<line number="1025" hits="0"></line>
+						<line number="1026" hits="0"></line>
+						<line number="1028" hits="0"></line>
+						<line number="1029" hits="0"></line>
+						<line number="1055" hits="0"></line>
+						<line number="1056" hits="0"></line>
+						<line number="1057" hits="0"></line>
+						<line number="1058" hits="0"></line>
+						<line number="1059" hits="0"></line>
+						<line number="1060" hits="0"></line>
+						<line number="1061" hits="0"></line>
+						<line number="1062" hits="0"></line>
+						<line number="1063" hits="0"></line>
+						<line number="1064" hits="0"></line>
+						<line number="1065" hits="0"></line>
+						<line number="1066" hits="0"></line>
+						<line number="1067" hits="0"></line>
+						<line number="1068" hits="0"></line>
+						<line number="1070" hits="0"></line>
+						<line number="1071" hits="0"></line>
+						<line number="1072" hits="0"></line>
+						<line number="1073" hits="0"></line>
+						<line number="1074" hits="0"></line>
+						<line number="1075" hits="0"></line>
+						<line number="1201" hits="0"></line>
+						<line number="1202" hits="0"></line>
+						<line number="1203" hits="0"></line>
+						<line number="1204" hits="0"></line>
+						<line number="1205" hits="0"></line>
+						<line number="1208" hits="0"></line>
+						<line number="1209" hits="0"></line>
+						<line number="1228" hits="0"></line>
+						<line number="1229" hits="0"></line>
+						<line number="1230" hits="0"></line>
+						<line number="1231" hits="0"></line>
+						<line number="1232" hits="0"></line>
+						<line number="1233" hits="0"></line>
+						<line number="1234" hits="0"></line>
+						<line number="1235" hits="0"></line>
+						<line number="1236" hits="0"></line>
+						<line number="1240" hits="0"></line>
+						<line number="1295" hits="0"></line>
+						<line number="1296" hits="0"></line>
+						<line number="1297" hits="0"></line>
+						<line number="1298" hits="0"></line>
+						<line number="1299" hits="0"></line>
+						<line number="1300" hits="0"></line>
+						<line number="1301" hits="0"></line>
+						<line number="1302" hits="0"></line>
+						<line number="1303" hits="0"></line>
+						<line number="1304" hits="0"></line>
+						<line number="1305" hits="0"></line>
+						<line number="1331" hits="0"></line>
+						<line number="1332" hits="0"></line>
+						<line number="1333" hits="0"></line>
+						<line number="1334" hits="0"></line>
+						<line number="1335" hits="0"></line>
+						<line number="1367" hits="0"></line>
+						<line number="1368" hits="0"></line>
+						<line number="1369" hits="0"></line>
+						<line number="1370" hits="0"></line>
+						<line number="1371" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/numtoalpha.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="NumToAlpha" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="31" hits="1"></line>
+								<line number="32" hits="1"></line>
+								<line number="34" hits="1"></line>
+								<line number="35" hits="0"></line>
+								<line number="38" hits="1"></line>
+								<line number="40" hits="1"></line>
+								<line number="41" hits="1"></line>
+								<line number="42" hits="1"></line>
+								<line number="43" hits="1"></line>
+								<line number="44" hits="1"></line>
+								<line number="45" hits="1"></line>
+								<line number="46" hits="1"></line>
+								<line number="50" hits="1"></line>
+								<line number="52" hits="1"></line>
+								<line number="53" hits="1"></line>
+								<line number="56" hits="1"></line>
+							</lines>
+						</method>
+						<method name="AlphaToNum" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="60" hits="1"></line>
+								<line number="62" hits="1"></line>
+								<line number="64" hits="1"></line>
+								<line number="65" hits="1"></line>
+								<line number="66" hits="1"></line>
+								<line number="67" hits="1"></line>
+								<line number="70" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="31" hits="1"></line>
+						<line number="32" hits="1"></line>
+						<line number="34" hits="1"></line>
+						<line number="35" hits="0"></line>
+						<line number="38" hits="1"></line>
+						<line number="40" hits="1"></line>
+						<line number="41" hits="1"></line>
+						<line number="42" hits="1"></line>
+						<line number="43" hits="1"></line>
+						<line number="44" hits="1"></line>
+						<line number="45" hits="1"></line>
+						<line number="46" hits="1"></line>
+						<line number="50" hits="1"></line>
+						<line number="52" hits="1"></line>
+						<line number="53" hits="1"></line>
+						<line number="56" hits="1"></line>
+						<line number="60" hits="1"></line>
+						<line number="62" hits="1"></line>
+						<line number="64" hits="1"></line>
+						<line number="65" hits="1"></line>
+						<line number="66" hits="1"></line>
+						<line number="67" hits="1"></line>
+						<line number="70" hits="1"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/bioinformatics.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="NewBlastResults" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="56" hits="0"></line>
+							</lines>
+						</method>
+						<method name="NewBlastHit" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="69" hits="0"></line>
+							</lines>
+						</method>
+						<method name="NewAlignedSequence" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="87" hits="0"></line>
+							</lines>
+						</method>
+						<method name="DefaultBLASTSearchParameters" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="104" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Makeseq" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="109" hits="0"></line>
+								<line number="110" hits="0"></line>
+								<line number="111" hits="0"></line>
+								<line number="112" hits="0"></line>
+								<line number="115" hits="0"></line>
+								<line number="117" hits="0"></line>
+								<line number="119" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="56" hits="0"></line>
+						<line number="69" hits="0"></line>
+						<line number="87" hits="0"></line>
+						<line number="104" hits="0"></line>
+						<line number="109" hits="0"></line>
+						<line number="110" hits="0"></line>
+						<line number="111" hits="0"></line>
+						<line number="112" hits="0"></line>
+						<line number="115" hits="0"></line>
+						<line number="117" hits="0"></line>
+						<line number="119" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/biology.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="ToTypeIIs" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="68" hits="0"></line>
+								<line number="69" hits="0"></line>
+								<line number="71" hits="0"></line>
+								<line number="73" hits="0"></line>
+								<line number="77" hits="0"></line>
+								<line number="80" hits="0"></line>
+							</lines>
+						</method>
+						<method name="MakeDNASequence" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="127" hits="0"></line>
+								<line number="128" hits="0"></line>
+								<line number="129" hits="0"></line>
+								<line number="130" hits="0"></line>
+								<line number="132" hits="0"></line>
+								<line number="133" hits="0"></line>
+								<line number="136" hits="0"></line>
+								<line number="137" hits="0"></line>
+								<line number="138" hits="0"></line>
+								<line number="140" hits="0"></line>
+								<line number="141" hits="0"></line>
+								<line number="142" hits="0"></line>
+								<line number="152" hits="0"></line>
+							</lines>
+						</method>
+						<method name="MakeLinearDNASequence" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="155" hits="0"></line>
+								<line number="156" hits="0"></line>
+								<line number="158" hits="0"></line>
+							</lines>
+						</method>
+						<method name="MakePlasmidDNASequence" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="161" hits="0"></line>
+								<line number="162" hits="0"></line>
+								<line number="163" hits="0"></line>
+								<line number="164" hits="0"></line>
+							</lines>
+						</method>
+						<method name="MakeSingleStrandedDNASequence" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="167" hits="0"></line>
+								<line number="168" hits="0"></line>
+								<line number="169" hits="0"></line>
+								<line number="170" hits="0"></line>
+							</lines>
+						</method>
+						<method name="MakeOverhang" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="175" hits="0"></line>
+								<line number="176" hits="0"></line>
+								<line number="177" hits="0"></line>
+								<line number="179" hits="0"></line>
+								<line number="180" hits="0"></line>
+								<line number="181" hits="0"></line>
+								<line number="183" hits="0"></line>
+								<line number="184" hits="0"></line>
+								<line number="185" hits="0"></line>
+								<line number="188" hits="0"></line>
+								<line number="189" hits="0"></line>
+								<line number="191" hits="0"></line>
+								<line number="192" hits="0"></line>
+								<line number="194" hits="0"></line>
+								<line number="195" hits="0"></line>
+								<line number="196" hits="0"></line>
+								<line number="198" hits="0"></line>
+								<line number="199" hits="0"></line>
+								<line number="200" hits="0"></line>
+								<line number="202" hits="0"></line>
+								<line number="203" hits="0"></line>
+								<line number="204" hits="0"></line>
+								<line number="206" hits="0"></line>
+								<line number="207" hits="0"></line>
+								<line number="208" hits="0"></line>
+								<line number="210" hits="0"></line>
+								<line number="211" hits="0"></line>
+								<line number="212" hits="0"></line>
+								<line number="214" hits="0"></line>
+								<line number="215" hits="0"></line>
+								<line number="216" hits="0"></line>
+								<line number="218" hits="0"></line>
+								<line number="219" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Phosphorylate" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="223" hits="0"></line>
+								<line number="224" hits="0"></line>
+								<line number="225" hits="0"></line>
+								<line number="226" hits="0"></line>
+								<line number="228" hits="0"></line>
+								<line number="229" hits="0"></line>
+								<line number="231" hits="0"></line>
+								<line number="232" hits="0"></line>
+								<line number="234" hits="0"></line>
+								<line number="235" hits="0"></line>
+								<line number="236" hits="0"></line>
+								<line number="238" hits="0"></line>
+							</lines>
+						</method>
+						<method name="random_dna_seq" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="439" hits="0"></line>
+								<line number="440" hits="0"></line>
+								<line number="441" hits="0"></line>
+								<line number="443" hits="0"></line>
+							</lines>
+						</method>
+						<method name="random_char" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="447" hits="0"></line>
+							</lines>
+						</method>
+						<method name="makeABunchaRandomSeqs" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="451" hits="0"></line>
+								<line number="453" hits="0"></line>
+								<line number="455" hits="0"></line>
+								<line number="456" hits="0"></line>
+								<line number="457" hits="0"></line>
+								<line number="458" hits="0"></line>
+								<line number="461" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Prefix" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="464" hits="0"></line>
+								<line number="465" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Suffix" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="468" hits="0"></line>
+								<line number="469" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Rev" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="472" hits="0"></line>
+								<line number="474" hits="0"></line>
+								<line number="475" hits="0"></line>
+								<line number="478" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Comp" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="481" hits="0"></line>
+								<line number="483" hits="0"></line>
+								<line number="503" hits="0"></line>
+								<line number="504" hits="0"></line>
+								<line number="507" hits="0"></line>
+							</lines>
+						</method>
+						<method name="RevComp" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="512" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="68" hits="0"></line>
+						<line number="69" hits="0"></line>
+						<line number="71" hits="0"></line>
+						<line number="73" hits="0"></line>
+						<line number="77" hits="0"></line>
+						<line number="80" hits="0"></line>
+						<line number="127" hits="0"></line>
+						<line number="128" hits="0"></line>
+						<line number="129" hits="0"></line>
+						<line number="130" hits="0"></line>
+						<line number="132" hits="0"></line>
+						<line number="133" hits="0"></line>
+						<line number="136" hits="0"></line>
+						<line number="137" hits="0"></line>
+						<line number="138" hits="0"></line>
+						<line number="140" hits="0"></line>
+						<line number="141" hits="0"></line>
+						<line number="142" hits="0"></line>
+						<line number="152" hits="0"></line>
+						<line number="155" hits="0"></line>
+						<line number="156" hits="0"></line>
+						<line number="158" hits="0"></line>
+						<line number="161" hits="0"></line>
+						<line number="162" hits="0"></line>
+						<line number="163" hits="0"></line>
+						<line number="164" hits="0"></line>
+						<line number="167" hits="0"></line>
+						<line number="168" hits="0"></line>
+						<line number="169" hits="0"></line>
+						<line number="170" hits="0"></line>
+						<line number="175" hits="0"></line>
+						<line number="176" hits="0"></line>
+						<line number="177" hits="0"></line>
+						<line number="179" hits="0"></line>
+						<line number="180" hits="0"></line>
+						<line number="181" hits="0"></line>
+						<line number="183" hits="0"></line>
+						<line number="184" hits="0"></line>
+						<line number="185" hits="0"></line>
+						<line number="188" hits="0"></line>
+						<line number="189" hits="0"></line>
+						<line number="191" hits="0"></line>
+						<line number="192" hits="0"></line>
+						<line number="194" hits="0"></line>
+						<line number="195" hits="0"></line>
+						<line number="196" hits="0"></line>
+						<line number="198" hits="0"></line>
+						<line number="199" hits="0"></line>
+						<line number="200" hits="0"></line>
+						<line number="202" hits="0"></line>
+						<line number="203" hits="0"></line>
+						<line number="204" hits="0"></line>
+						<line number="206" hits="0"></line>
+						<line number="207" hits="0"></line>
+						<line number="208" hits="0"></line>
+						<line number="210" hits="0"></line>
+						<line number="211" hits="0"></line>
+						<line number="212" hits="0"></line>
+						<line number="214" hits="0"></line>
+						<line number="215" hits="0"></line>
+						<line number="216" hits="0"></line>
+						<line number="218" hits="0"></line>
+						<line number="219" hits="0"></line>
+						<line number="223" hits="0"></line>
+						<line number="224" hits="0"></line>
+						<line number="225" hits="0"></line>
+						<line number="226" hits="0"></line>
+						<line number="228" hits="0"></line>
+						<line number="229" hits="0"></line>
+						<line number="231" hits="0"></line>
+						<line number="232" hits="0"></line>
+						<line number="234" hits="0"></line>
+						<line number="235" hits="0"></line>
+						<line number="236" hits="0"></line>
+						<line number="238" hits="0"></line>
+						<line number="439" hits="0"></line>
+						<line number="440" hits="0"></line>
+						<line number="441" hits="0"></line>
+						<line number="443" hits="0"></line>
+						<line number="447" hits="0"></line>
+						<line number="451" hits="0"></line>
+						<line number="453" hits="0"></line>
+						<line number="455" hits="0"></line>
+						<line number="456" hits="0"></line>
+						<line number="457" hits="0"></line>
+						<line number="458" hits="0"></line>
+						<line number="461" hits="0"></line>
+						<line number="464" hits="0"></line>
+						<line number="465" hits="0"></line>
+						<line number="468" hits="0"></line>
+						<line number="469" hits="0"></line>
+						<line number="472" hits="0"></line>
+						<line number="474" hits="0"></line>
+						<line number="475" hits="0"></line>
+						<line number="478" hits="0"></line>
+						<line number="481" hits="0"></line>
+						<line number="483" hits="0"></line>
+						<line number="503" hits="0"></line>
+						<line number="504" hits="0"></line>
+						<line number="507" hits="0"></line>
+						<line number="512" hits="0"></line>
+					</lines>
+				</class>
+				<class name="DNASequence" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/biology.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Sequence" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="270" hits="1"></line>
+							</lines>
+						</method>
+						<method name="Name" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="273" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Append" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="277" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Prepend" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="281" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Blast" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="284" hits="0"></line>
+								<line number="285" hits="0"></line>
+							</lines>
+						</method>
+						<method name="MolecularWeight" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="305" hits="0"></line>
+								<line number="306" hits="0"></line>
+								<line number="307" hits="0"></line>
+								<line number="308" hits="0"></line>
+								<line number="310" hits="0"></line>
+								<line number="311" hits="0"></line>
+								<line number="312" hits="0"></line>
+								<line number="313" hits="0"></line>
+								<line number="314" hits="0"></line>
+								<line number="315" hits="0"></line>
+								<line number="316" hits="0"></line>
+								<line number="317" hits="0"></line>
+								<line number="318" hits="0"></line>
+								<line number="319" hits="0"></line>
+								<line number="320" hits="0"></line>
+								<line number="322" hits="0"></line>
+								<line number="323" hits="0"></line>
+								<line number="325" hits="0"></line>
+								<line number="326" hits="0"></line>
+								<line number="328" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="270" hits="1"></line>
+						<line number="273" hits="0"></line>
+						<line number="277" hits="0"></line>
+						<line number="281" hits="0"></line>
+						<line number="284" hits="0"></line>
+						<line number="285" hits="0"></line>
+						<line number="305" hits="0"></line>
+						<line number="306" hits="0"></line>
+						<line number="307" hits="0"></line>
+						<line number="308" hits="0"></line>
+						<line number="310" hits="0"></line>
+						<line number="311" hits="0"></line>
+						<line number="312" hits="0"></line>
+						<line number="313" hits="0"></line>
+						<line number="314" hits="0"></line>
+						<line number="315" hits="0"></line>
+						<line number="316" hits="0"></line>
+						<line number="317" hits="0"></line>
+						<line number="318" hits="0"></line>
+						<line number="319" hits="0"></line>
+						<line number="320" hits="0"></line>
+						<line number="322" hits="0"></line>
+						<line number="323" hits="0"></line>
+						<line number="325" hits="0"></line>
+						<line number="326" hits="0"></line>
+						<line number="328" hits="0"></line>
+					</lines>
+				</class>
+				<class name="RNASequence" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/biology.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Sequence" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="344" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Name" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="348" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Append" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="352" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Prepend" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="356" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Blast" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="359" hits="0"></line>
+								<line number="360" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="344" hits="0"></line>
+						<line number="348" hits="0"></line>
+						<line number="352" hits="0"></line>
+						<line number="356" hits="0"></line>
+						<line number="359" hits="0"></line>
+						<line number="360" hits="0"></line>
+					</lines>
+				</class>
+				<class name="ProteinSequence" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/biology.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Sequence" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="377" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Name" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="381" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Append" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="385" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Prepend" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="389" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Blast" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="393" hits="0"></line>
+								<line number="394" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Molecularweight" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="399" hits="0"></line>
+								<line number="400" hits="0"></line>
+								<line number="401" hits="0"></line>
+								<line number="402" hits="0"></line>
+								<line number="404" hits="0"></line>
+								<line number="405" hits="0"></line>
+								<line number="406" hits="0"></line>
+								<line number="408" hits="0"></line>
+								<line number="410" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="377" hits="0"></line>
+						<line number="381" hits="0"></line>
+						<line number="385" hits="0"></line>
+						<line number="389" hits="0"></line>
+						<line number="393" hits="0"></line>
+						<line number="394" hits="0"></line>
+						<line number="399" hits="0"></line>
+						<line number="400" hits="0"></line>
+						<line number="401" hits="0"></line>
+						<line number="402" hits="0"></line>
+						<line number="404" hits="0"></line>
+						<line number="405" hits="0"></line>
+						<line number="406" hits="0"></line>
+						<line number="408" hits="0"></line>
+						<line number="410" hits="0"></line>
+					</lines>
+				</class>
+				<class name="GenericPhysical" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/genericphysical.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="Name" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="42" hits="0"></line>
+							</lines>
+						</method>
+						<method name="SetName" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="46" hits="0"></line>
+								<line number="47" hits="0"></line>
+								<line number="48" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Clone" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="57" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Mass" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="61" hits="0"></line>
+							</lines>
+						</method>
+						<method name="SetMass" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="65" hits="0"></line>
+								<line number="66" hits="0"></line>
+								<line number="67" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Volume" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="71" hits="0"></line>
+							</lines>
+						</method>
+						<method name="SetVolume" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="75" hits="0"></line>
+								<line number="76" hits="0"></line>
+								<line number="77" hits="0"></line>
+							</lines>
+						</method>
+						<method name="State" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="82" hits="0"></line>
+								<line number="83" hits="0"></line>
+								<line number="85" hits="0"></line>
+								<line number="86" hits="0"></line>
+								<line number="88" hits="0"></line>
+								<line number="89" hits="0"></line>
+								<line number="92" hits="0"></line>
+								<line number="93" hits="0"></line>
+								<line number="94" hits="0"></line>
+								<line number="96" hits="0"></line>
+								<line number="97" hits="0"></line>
+								<line number="98" hits="0"></line>
+								<line number="99" hits="0"></line>
+								<line number="100" hits="0"></line>
+								<line number="101" hits="0"></line>
+								<line number="102" hits="0"></line>
+								<line number="103" hits="0"></line>
+								<line number="104" hits="0"></line>
+								<line number="105" hits="0"></line>
+								<line number="106" hits="0"></line>
+								<line number="107" hits="0"></line>
+								<line number="109" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Temperature" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="123" hits="0"></line>
+							</lines>
+						</method>
+						<method name="SetTemperature" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="127" hits="0"></line>
+							</lines>
+						</method>
+						<method name="Density" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="131" hits="0"></line>
+								<line number="132" hits="0"></line>
+								<line number="133" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="42" hits="0"></line>
+						<line number="46" hits="0"></line>
+						<line number="47" hits="0"></line>
+						<line number="48" hits="0"></line>
+						<line number="57" hits="0"></line>
+						<line number="61" hits="0"></line>
+						<line number="65" hits="0"></line>
+						<line number="66" hits="0"></line>
+						<line number="67" hits="0"></line>
+						<line number="71" hits="0"></line>
+						<line number="75" hits="0"></line>
+						<line number="76" hits="0"></line>
+						<line number="77" hits="0"></line>
+						<line number="82" hits="0"></line>
+						<line number="83" hits="0"></line>
+						<line number="85" hits="0"></line>
+						<line number="86" hits="0"></line>
+						<line number="88" hits="0"></line>
+						<line number="89" hits="0"></line>
+						<line number="92" hits="0"></line>
+						<line number="93" hits="0"></line>
+						<line number="94" hits="0"></line>
+						<line number="96" hits="0"></line>
+						<line number="97" hits="0"></line>
+						<line number="98" hits="0"></line>
+						<line number="99" hits="0"></line>
+						<line number="100" hits="0"></line>
+						<line number="101" hits="0"></line>
+						<line number="102" hits="0"></line>
+						<line number="103" hits="0"></line>
+						<line number="104" hits="0"></line>
+						<line number="105" hits="0"></line>
+						<line number="106" hits="0"></line>
+						<line number="107" hits="0"></line>
+						<line number="109" hits="0"></line>
+						<line number="123" hits="0"></line>
+						<line number="127" hits="0"></line>
+						<line number="131" hits="0"></line>
+						<line number="132" hits="0"></line>
+						<line number="133" hits="0"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/genericphysical.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="NewGenericPhysical" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="52" hits="1"></line>
+								<line number="53" hits="1"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="52" hits="1"></line>
+						<line number="53" hits="1"></line>
+					</lines>
+				</class>
+				<class name="-" filename="/go/src/github.com/antha-lang/antha/antha/anthalib/wtype/uuid.go" line-rate="0" branch-rate="0" complexity="0">
+					<methods>
+						<method name="GetUUID" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="32" hits="1"></line>
+							</lines>
+						</method>
+						<method name="NewUUID" signature="" line-rate="0" branch-rate="0">
+							<lines>
+								<line number="35" hits="0"></line>
+							</lines>
+						</method>
+					</methods>
+					<lines>
+						<line number="32" hits="1"></line>
+						<line number="35" hits="0"></line>
+					</lines>
+				</class>
+			</classes>
+		</package>
+	</packages>
+</coverage>

@@ -2,21 +2,16 @@ protocol Plotdata
 
 	
 import (
-	"fmt"
-	//"math/rand"
-	//"github.com/antha-lang/antha/internal/github.com/montanaflynn/stats"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
+
 	graph "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/plot"
 )
 
 // Input parameters for this protocol (data)
-Parameters  (
-	Filename             string   //                                                                         = "plotinumdata.xlsx"
-	Sheet                int       //                                                                        = 0
-	Xminmax/*datarange*/ []string      //  = []string{"a4", "a16"}                                                           // row in A1 format i.e string{A,E} would indicate all data between those points
-	Yminmaxarray/*datarange*/ [][]string //= [][]string{[]string{"b4", "b16"}, []string{"c4", "c16"}, []string{"d4", "d16"}} // column in A1 format i.e string{1,12} would indicate all data between those points
-	Exportedfilename string //= "Excelfile.jpg"
-//	HeaderRange []string // if Bycolumn == true, format would be e.g. string{A1,E1} else e.g. string{A1,A12}
+Parameters  (                                      
+	Xvalues/*datarange*/ []float64                                                             
+	Yvaluearray/*datarange*/ [][]float64 
+	Exportedfilename string 
+//	HeaderRange []string 
 )
 
 // Data which is returned from this protocol, and data types
@@ -49,39 +44,13 @@ Setup {
 // for every input
 Steps {
 
-	// Get some data.
-
-	file, err := spreadsheet.OpenFile(Filename)
-
-	sheet := file.Sheets[Sheet]
-	
-	Xdatarange, err := spreadsheet.ConvertMinMaxtoArray(Xminmax)
-	if err != nil {
-		fmt.Println(Xminmax, Xdatarange)
-		panic(err)
-	}
-	fmt.Println(Xdatarange)
-
-	Ydatarangearray := make([][]string, 0)
-	for i, Yminmax := range Yminmaxarray {
-		Ydatarange, err := spreadsheet.ConvertMinMaxtoArray(Yminmax)
-		if err != nil {
-			panic(err)
-		}
-		if len(Xdatarange) != len(Ydatarange) {
-			panicmessage := fmt.Errorf("for index", i, "of array", "len(Xdatarange) != len(Ydatarange)")
-			panic(panicmessage.Error())
-		}
-		Ydatarangearray = append(Ydatarangearray, Ydatarange)
-		fmt.Println(Ydatarange)
-	}
-
 	// now plot the graph
 
 	// the data points
 	
+	plot := graph.Plot(Xvalues, Yvaluearray)
 	
-	graph.PlotfromMinMaxpairs(sheet, Xminmax, Yminmaxarray, Exportedfilename)
+	graph.Export(plot,Exportedfilename)
 	
 
 }

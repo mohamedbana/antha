@@ -23,9 +23,7 @@
 // Utility package providing functions useful for searches
 package search
 
-import (
 //"strings"
-)
 
 func InSlice(slice string, list []string) bool {
 	for _, b := range list {
@@ -34,6 +32,15 @@ func InSlice(slice string, list []string) bool {
 		}
 	}
 	return false
+}
+
+func Position(slice []string, value string) int {
+	for p, v := range slice {
+		if v == value {
+			return p
+		}
+	}
+	return -1
 }
 
 func RemoveDuplicates(elements []string) []string {

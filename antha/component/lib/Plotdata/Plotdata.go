@@ -1,12 +1,8 @@
 package Plotdata
 
 import (
-	"fmt"
-	//"math/rand"
-	//"github.com/antha-lang/antha/internal/github.com/montanaflynn/stats"
 	"encoding/json"
 	graph "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/plot"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/flow"
@@ -17,12 +13,10 @@ import (
 
 // Input parameters for this protocol (data)
 
-//                                                                         = "plotinumdata.xlsx"
-//                                                                        = 0
-/*datarange*/ //  = []string{"a4", "a16"}                                                           // row in A1 format i.e string{A,E} would indicate all data between those points
-/*datarange*/ //= [][]string{[]string{"b4", "b16"}, []string{"c4", "c16"}, []string{"d4", "d16"}} // column in A1 format i.e string{1,12} would indicate all data between those points
-//= "Excelfile.jpg"
-//	HeaderRange []string // if Bycolumn == true, format would be e.g. string{A1,E1} else e.g. string{A1,A12}
+/*datarange*/
+/*datarange*/
+
+//	HeaderRange []string
 
 // Data which is returned from this protocol, and data types
 
@@ -51,38 +45,13 @@ func (e *Plotdata) steps(p PlotdataParamBlock, r *PlotdataResultBlock) {
 	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
 	_ = _wrapper
 
-	// Get some data.
-
-	file, err := spreadsheet.OpenFile(p.Filename)
-
-	sheet := file.Sheets[p.Sheet]
-
-	Xdatarange, err := spreadsheet.ConvertMinMaxtoArray(p.Xminmax)
-	if err != nil {
-		fmt.Println(p.Xminmax, Xdatarange)
-		panic(err)
-	}
-	fmt.Println(Xdatarange)
-
-	Ydatarangearray := make([][]string, 0)
-	for i, Yminmax := range p.Yminmaxarray {
-		Ydatarange, err := spreadsheet.ConvertMinMaxtoArray(Yminmax)
-		if err != nil {
-			panic(err)
-		}
-		if len(Xdatarange) != len(Ydatarange) {
-			panicmessage := fmt.Errorf("for index", i, "of array", "len(Xdatarange) != len(Ydatarange)")
-			panic(panicmessage.Error())
-		}
-		Ydatarangearray = append(Ydatarangearray, Ydatarange)
-		fmt.Println(Ydatarange)
-	}
-
 	// now plot the graph
 
 	// the data points
 
-	graph.PlotfromMinMaxpairs(sheet, p.Xminmax, p.Yminmaxarray, p.Exportedfilename)
+	plot := graph.Plot(p.Xvalues, p.Yvaluearray)
+
+	graph.Export(plot, p.Exportedfilename)
 	_ = _wrapper.WaitToEnd()
 
 }
@@ -150,7 +119,7 @@ func NewPlotdata() interface{} { //*Plotdata {
 // Mapper function
 func (e *Plotdata) Map(m map[string]interface{}) interface{} {
 	var res PlotdataParamBlock
-	res.Error = false || m["Exportedfilename"].(execute.ThreadParam).Error || m["Filename"].(execute.ThreadParam).Error || m["Sheet"].(execute.ThreadParam).Error || m["Xminmax"].(execute.ThreadParam).Error || m["Yminmaxarray"].(execute.ThreadParam).Error
+	res.Error = false || m["Exportedfilename"].(execute.ThreadParam).Error || m["Xvalues"].(execute.ThreadParam).Error || m["Yvaluearray"].(execute.ThreadParam).Error
 
 	vExportedfilename, is := m["Exportedfilename"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
@@ -161,40 +130,22 @@ func (e *Plotdata) Map(m map[string]interface{}) interface{} {
 		res.Exportedfilename = m["Exportedfilename"].(execute.ThreadParam).Value.(string)
 	}
 
-	vFilename, is := m["Filename"].(execute.ThreadParam).Value.(execute.JSONValue)
+	vXvalues, is := m["Xvalues"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
 		var temp PlotdataJSONBlock
-		json.Unmarshal([]byte(vFilename.JSONString), &temp)
-		res.Filename = *temp.Filename
+		json.Unmarshal([]byte(vXvalues.JSONString), &temp)
+		res.Xvalues = *temp.Xvalues
 	} else {
-		res.Filename = m["Filename"].(execute.ThreadParam).Value.(string)
+		res.Xvalues = m["Xvalues"].(execute.ThreadParam).Value.([]float64)
 	}
 
-	vSheet, is := m["Sheet"].(execute.ThreadParam).Value.(execute.JSONValue)
+	vYvaluearray, is := m["Yvaluearray"].(execute.ThreadParam).Value.(execute.JSONValue)
 	if is {
 		var temp PlotdataJSONBlock
-		json.Unmarshal([]byte(vSheet.JSONString), &temp)
-		res.Sheet = *temp.Sheet
+		json.Unmarshal([]byte(vYvaluearray.JSONString), &temp)
+		res.Yvaluearray = *temp.Yvaluearray
 	} else {
-		res.Sheet = m["Sheet"].(execute.ThreadParam).Value.(int)
-	}
-
-	vXminmax, is := m["Xminmax"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp PlotdataJSONBlock
-		json.Unmarshal([]byte(vXminmax.JSONString), &temp)
-		res.Xminmax = *temp.Xminmax
-	} else {
-		res.Xminmax = m["Xminmax"].(execute.ThreadParam).Value.([]string)
-	}
-
-	vYminmaxarray, is := m["Yminmaxarray"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp PlotdataJSONBlock
-		json.Unmarshal([]byte(vYminmaxarray.JSONString), &temp)
-		res.Yminmaxarray = *temp.Yminmaxarray
-	} else {
-		res.Yminmaxarray = m["Yminmaxarray"].(execute.ThreadParam).Value.([][]string)
+		res.Yvaluearray = m["Yvaluearray"].(execute.ThreadParam).Value.([][]float64)
 	}
 
 	res.ID = m["Exportedfilename"].(execute.ThreadParam).ID
@@ -208,7 +159,7 @@ func (e *Plotdata) OnExportedfilename(param execute.ThreadParam) {
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
+		bag.Init(3, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
@@ -220,68 +171,34 @@ func (e *Plotdata) OnExportedfilename(param execute.ThreadParam) {
 		e.lock.Unlock()
 	}
 }
-func (e *Plotdata) OnFilename(param execute.ThreadParam) {
+func (e *Plotdata) OnXvalues(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
+		bag.Init(3, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
 
-	fired := bag.AddValue("Filename", param)
+	fired := bag.AddValue("Xvalues", param)
 	if fired {
 		e.lock.Lock()
 		delete(e.params, param.ID)
 		e.lock.Unlock()
 	}
 }
-func (e *Plotdata) OnSheet(param execute.ThreadParam) {
+func (e *Plotdata) OnYvaluearray(param execute.ThreadParam) {
 	e.lock.Lock()
 	var bag *execute.AsyncBag = e.params[param.ID]
 	if bag == nil {
 		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
+		bag.Init(3, e, e)
 		e.params[param.ID] = bag
 	}
 	e.lock.Unlock()
 
-	fired := bag.AddValue("Sheet", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Plotdata) OnXminmax(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Xminmax", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Plotdata) OnYminmaxarray(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Yminmaxarray", param)
+	fired := bag.AddValue("Yvaluearray", param)
 	if fired {
 		e.lock.Lock()
 		delete(e.params, param.ID)
@@ -295,10 +212,8 @@ type Plotdata struct {
 	startup          sync.Once
 	params           map[execute.ThreadID]*execute.AsyncBag
 	Exportedfilename <-chan execute.ThreadParam
-	Filename         <-chan execute.ThreadParam
-	Sheet            <-chan execute.ThreadParam
-	Xminmax          <-chan execute.ThreadParam
-	Yminmaxarray     <-chan execute.ThreadParam
+	Xvalues          <-chan execute.ThreadParam
+	Yvaluearray      <-chan execute.ThreadParam
 }
 
 type PlotdataParamBlock struct {
@@ -306,10 +221,8 @@ type PlotdataParamBlock struct {
 	BlockID          execute.BlockID
 	Error            bool
 	Exportedfilename string
-	Filename         string
-	Sheet            int
-	Xminmax          []string
-	Yminmaxarray     [][]string
+	Xvalues          []float64
+	Yvaluearray      [][]float64
 }
 
 type PlotdataConfig struct {
@@ -317,10 +230,8 @@ type PlotdataConfig struct {
 	BlockID          execute.BlockID
 	Error            bool
 	Exportedfilename string
-	Filename         string
-	Sheet            int
-	Xminmax          []string
-	Yminmaxarray     [][]string
+	Xvalues          []float64
+	Yvaluearray      [][]float64
 }
 
 type PlotdataResultBlock struct {
@@ -334,20 +245,16 @@ type PlotdataJSONBlock struct {
 	BlockID          *execute.BlockID
 	Error            *bool
 	Exportedfilename *string
-	Filename         *string
-	Sheet            *int
-	Xminmax          *[]string
-	Yminmaxarray     *[][]string
+	Xvalues          *[]float64
+	Yvaluearray      *[][]float64
 }
 
 func (c *Plotdata) ComponentInfo() *execute.ComponentInfo {
 	inp := make([]execute.PortInfo, 0)
 	outp := make([]execute.PortInfo, 0)
 	inp = append(inp, *execute.NewPortInfo("Exportedfilename", "string", "Exportedfilename", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Filename", "string", "Filename", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Sheet", "int", "Sheet", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Xminmax", "[]string", "Xminmax", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Yminmaxarray", "[][]string", "Yminmaxarray", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Xvalues", "[]float64", "Xvalues", true, true, nil, nil))
+	inp = append(inp, *execute.NewPortInfo("Yvaluearray", "[][]float64", "Yvaluearray", true, true, nil, nil))
 
 	ci := execute.NewComponentInfo("Plotdata", "Plotdata", "", false, inp, outp)
 
