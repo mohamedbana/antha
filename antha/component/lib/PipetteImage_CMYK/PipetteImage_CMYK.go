@@ -54,48 +54,50 @@ func (e *PipetteImage_CMYK) steps(p PipetteImage_CMYKParamBlock, r *PipetteImage
 	//solutions := image.PipetteImagebyBlending(OutPlate, positiontocolourmap,Cyan, Magenta, Yellow,Black, VolumeForFullcolour)
 
 	for locationkey, colour := range positiontocolourmap {
-		counter = counter + 1
+
 		components := make([]*wtype.LHComponent, 0)
 
 		cmyk := image.ColourtoCMYK(colour)
 
 		var maxuint8 uint8 = 255
 
-		if cmyk.C > 0 {
+		if cmyk.C == 0 && cmyk.Y == 0 && cmyk.M == 0 && cmyk.K == 0 {
 
-			cyanvol := wunit.NewVolume(((float64(cmyk.C) / float64(maxuint8)) * p.VolumeForFullcolour.RawValue()), p.VolumeForFullcolour.Unit().PrefixedSymbol())
-			//cyanvol := VolumeForFullcolour
-			cyanSample := mixer.Sample(p.Cyan, cyanvol)
-			components = append(components, cyanSample)
-			fmt.Println("YoH!!!!", p.VolumeForFullcolour.ToString(), cyanvol.ToString(), cmyk.C, float64(cmyk.C)/float64(maxuint8), float64(cmyk.Y)/float64(maxuint8), float64(cmyk.M)/float64(maxuint8), float64(cmyk.K)/float64(maxuint8), cmyk.C/maxuint8, cmyk.M/maxuint8, cmyk.Y/maxuint8, cmyk.K/maxuint8, cmyk)
+			continue
+
+		} else {
+
+			counter = counter + 1
+
+			if cmyk.C > 0 {
+
+				cyanvol := wunit.NewVolume(((float64(cmyk.C) / float64(maxuint8)) * p.VolumeForFullcolour.RawValue()), p.VolumeForFullcolour.Unit().PrefixedSymbol())
+				cyanSample := mixer.Sample(p.Cyan, cyanvol)
+				components = append(components, cyanSample)
+			}
+
+			if cmyk.Y > 0 {
+				yellowvol := wunit.NewVolume(((float64(cmyk.Y) / float64(maxuint8)) * p.VolumeForFullcolour.RawValue()), p.VolumeForFullcolour.Unit().PrefixedSymbol())
+				yellowSample := mixer.Sample(p.Yellow, yellowvol)
+				components = append(components, yellowSample)
+			}
+
+			if cmyk.M > 0 {
+				magentavol := wunit.NewVolume(((float64(cmyk.M) / float64(maxuint8)) * p.VolumeForFullcolour.RawValue()), p.VolumeForFullcolour.Unit().PrefixedSymbol())
+				magentaSample := mixer.Sample(p.Magenta, magentavol)
+				components = append(components, magentaSample)
+			}
+
+			if cmyk.K > 0 {
+				blackvol := wunit.NewVolume(((float64(cmyk.K) / float64(maxuint8)) * p.VolumeForFullcolour.RawValue()), p.VolumeForFullcolour.Unit().PrefixedSymbol())
+				blackSample := mixer.Sample(p.Black, blackvol)
+				components = append(components, blackSample)
+			}
+
+			solution := _wrapper.MixTo(p.OutPlate, locationkey, components...)
+			solutions = append(solutions, solution)
+
 		}
-
-		if cmyk.Y > 0 {
-			yellowvol := wunit.NewVolume(((float64(cmyk.Y) / float64(maxuint8)) * p.VolumeForFullcolour.RawValue()), p.VolumeForFullcolour.Unit().PrefixedSymbol())
-			//yellowvol := VolumeForFullcolour
-			yellowSample := mixer.Sample(p.Yellow, yellowvol)
-			components = append(components, yellowSample)
-			fmt.Println("SHOWWW MUCH!!!!", p.VolumeForFullcolour.ToString(), yellowvol.ToString(), float64(cmyk.Y/maxuint8))
-		}
-
-		if cmyk.M > 0 {
-			magentavol := wunit.NewVolume(((float64(cmyk.M) / float64(maxuint8)) * p.VolumeForFullcolour.RawValue()), p.VolumeForFullcolour.Unit().PrefixedSymbol())
-			//magentavol := VolumeForFullcolour
-			magentaSample := mixer.Sample(p.Magenta, magentavol)
-			components = append(components, magentaSample)
-			fmt.Println("SHOWWW MUCH!!!!", p.VolumeForFullcolour.ToString(), magentavol.ToString(), float64(cmyk.M/maxuint8))
-		}
-
-		if cmyk.K > 0 {
-			blackvol := wunit.NewVolume(((float64(cmyk.K) / float64(maxuint8)) * p.VolumeForFullcolour.RawValue()), p.VolumeForFullcolour.Unit().PrefixedSymbol())
-			//blackvol := VolumeForFullcolour
-			blackSample := mixer.Sample(p.Black, blackvol)
-			components = append(components, blackSample)
-			fmt.Println("SHOWWW MUCH!!!!", p.VolumeForFullcolour.ToString(), blackvol.ToString(), float64(cmyk.K/maxuint8))
-		}
-
-		solution := _wrapper.MixTo(p.OutPlate, locationkey, components...)
-		solutions = append(solutions, solution)
 	}
 
 	r.Pixels = solutions

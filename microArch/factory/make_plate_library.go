@@ -50,6 +50,12 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	plate = wtype.NewLHPlate("DWST12", "Unknown", 1, 12, 44.1, "mm", welltype, 9, 9, 0, 0, 0.0)
 	plates[plate.Type] = plate
 
+	// deep well strip trough 12 on riser
+	stshp = wtype.NewShape("box", "mm", 8.2, 72, 41.3)
+	welltype = wtype.NewLHWell("DWST12", "", "", "ul", 15000, 1000, stshp, 3, 8.2, 72, 41.3, 4.7, "mm")
+	plate = wtype.NewLHPlate("DWST12_riser", "Unknown", 1, 12, 44.1, "mm", welltype, 9, 9, 0, 0, 41.0)
+	plates[plate.Type] = plate
+
 	// deep well strip trough 8
 	stshp = wtype.NewShape("box", "mm", 115.0, 8.2, 41.3)
 	welltype = wtype.NewLHWell("DWST8", "", "", "ul", 24000, 1000, stshp, 3, 115, 8.2, 41.3, 4.7, "mm")

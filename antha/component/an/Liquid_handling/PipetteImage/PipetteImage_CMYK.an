@@ -59,15 +59,22 @@ Steps {
 	//solutions := image.PipetteImagebyBlending(OutPlate, positiontocolourmap,Cyan, Magenta, Yellow,Black, VolumeForFullcolour) 
 
 	for locationkey, colour := range positiontocolourmap {
-		counter = counter + 1
+		
 		components := make([]*wtype.LHComponent, 0)
 
 		cmyk := image.ColourtoCMYK(colour)
 		
 		var maxuint8 uint8 = 255		
 		
-		if cmyk.C > 0{
+		if cmyk.C ==0 && cmyk.Y == 0 && cmyk.M == 0 && cmyk.K == 0 {
+		
+		continue
 			
+			}else{
+			
+		counter = counter + 1
+		
+		if cmyk.C > 0{
 			
 		cyanvol := wunit.NewVolume(((float64(cmyk.C)/float64(maxuint8)) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
 		cyanSample := mixer.Sample(Cyan, cyanvol)
@@ -94,6 +101,8 @@ Steps {
 		
 		solution := MixTo(OutPlate, locationkey, components...)
 		solutions = append(solutions, solution)
+		
+		}
 	}
 
 	Pixels = solutions

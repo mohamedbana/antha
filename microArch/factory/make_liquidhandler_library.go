@@ -260,15 +260,17 @@ func makeGilson() *liquidhandling.LHProperties {
 	SetUpTipsFor(lhp)
 
 	//lhp.Tip_preferences = []string{"position_2", "position_3", "position_6", "position_9", "position_8", "position_5", "position_4", "position_7"}
+	//lhp.Tip_preferences = []string{"position_2", "position_3", "position_6", "position_9", "position_8", "position_5", "position_7"}
+
 	lhp.Tip_preferences = []string{"position_2", "position_3", "position_6", "position_9", "position_8"} //jmanart i cut it down to 5, as it was hardcoded in the liquidhandler getInputs call before
 
 	// original preferences
-	//lhp.Input_preferences = []string{"position_4", "position_5", "position_6", "position_9", "position_8", "position_3"}
-	//lhp.Output_preferences = []string{"position_7", "position_8", "position_9", "position_6", "position_5", "position_3"}
+	lhp.Input_preferences = []string{"position_4", "position_5", "position_6", "position_9", "position_8", "position_3"}
+	lhp.Output_preferences = []string{"position_7", "position_8", "position_9", "position_6", "position_5", "position_3"}
 
 	// use these new preferences for gel loading: this is needed because outplate overlaps inplate otherwise so move inplate to position 5 rather than 4 (pos 4 deleted)
-	lhp.Input_preferences = []string{"position_5", "position_6", "position_9", "position_8", "position_3"}
-	lhp.Output_preferences = []string{"position_9", "position_8", "position_7", "position_6", "position_5", "position_3"}
+	//lhp.Input_preferences = []string{"position_5", "position_6", "position_9", "position_8", "position_3"}
+	//lhp.Output_preferences = []string{"position_9", "position_8", "position_7", "position_6", "position_5", "position_3"}
 
 	lhp.Wash_preferences = []string{"position_8"}
 	lhp.Tipwaste_preferences = []string{"position_1"}

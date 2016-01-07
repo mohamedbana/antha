@@ -1,18 +1,18 @@
 {
   "Parameters": [{
     "PipetteImage": {
-		"Imagefilename":"riemann_zeta.png",
+		"Imagefilename":"rainbow1.png",
       "Cyan": "component:Cyan",
 	"Magenta": "component:Magenta",
 	"Yellow": "component:Yellow_ink",
 	"Black": "component:Black",
-      "Outplate": "plate:nunc1536_riser",
+      "Outplate": "plate:greiner384_riser",
       "TipType": "tipbox:Gilson20",
       "VolumeForFullcolour": "20ul"
     }
   }],
   "Config": {
-    "OUTPUT_COUNT": 1056
+    "OUTPUT_COUNT": 128
   }
 }
 

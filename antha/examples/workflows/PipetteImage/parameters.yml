@@ -10,7 +10,7 @@
 	"component:black"
 	],
 	"OnlythisColour":"",
-	  "Imagefilename": "icon.png",
+	  "Imagefilename": "jesus.jpg",
 		"Palettename":"Palette1",
 		"AvailableColours":[
 		"red",
@@ -20,13 +20,13 @@
 		"yellow",
 		"black"
 		],
-      "Outplate": "plate:nunc1536_riser",
+      "Outplate": "plate:greiner384_riser",
       "TipType": "tipbox:Gilson20",
       "VolumePerWell": "10ul"
     }
   }],
   "Config": {
-    "OUTPUT_COUNT": 143
+    "OUTPUT_COUNT": 59
   }
 }
 
