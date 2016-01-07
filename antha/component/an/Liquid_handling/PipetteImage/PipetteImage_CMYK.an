@@ -33,7 +33,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	 Pixels[]*wtype.LHSolution
+	Pixels[]*wtype.LHSolution
 )
 
 Requirements {
@@ -67,25 +67,27 @@ Steps {
 		var maxuint8 uint8 = 255		
 		
 		if cmyk.C > 0{
-		cyanvol := wunit.NewVolume((float64(cmyk.C/maxuint8) * VolumeForFullcolour.SIValue()), "l")
+			
+			
+		cyanvol := wunit.NewVolume(((float64(cmyk.C)/float64(maxuint8)) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
 		cyanSample := mixer.Sample(Cyan, cyanvol)
 		components = append(components, cyanSample)
 		}
 		
 		if cmyk.Y > 0{
-		yellowvol := wunit.NewVolume((float64(cmyk.Y/maxuint8) * VolumeForFullcolour.SIValue()), "l")
+		yellowvol := wunit.NewVolume(((float64(cmyk.Y)/float64(maxuint8)) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
 		yellowSample := mixer.Sample(Yellow, yellowvol)
 		components = append(components, yellowSample)
 		}
 		
 		if cmyk.M > 0{
-		magentavol := wunit.NewVolume((float64(cmyk.M/maxuint8) * VolumeForFullcolour.SIValue()), "l")
+		magentavol := wunit.NewVolume(((float64(cmyk.M)/float64(maxuint8)) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
 		magentaSample := mixer.Sample(Magenta, magentavol)
 		components = append(components, magentaSample)
 		}
 		
 		if cmyk.K > 0{
-		blackvol := wunit.NewVolume((float64(cmyk.K/maxuint8) * VolumeForFullcolour.SIValue()), "l")
+		blackvol := wunit.NewVolume(((float64(cmyk.K)/float64(maxuint8)) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
 		blackSample := mixer.Sample(Black, blackvol)
 		components = append(components, blackSample)
 		}

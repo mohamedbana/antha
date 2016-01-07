@@ -62,27 +62,36 @@ func (e *PipetteImage_CMYK) steps(p PipetteImage_CMYKParamBlock, r *PipetteImage
 		var maxuint8 uint8 = 255
 
 		if cmyk.C > 0 {
-			cyanvol := wunit.NewVolume((float64(cmyk.C/maxuint8) * p.VolumeForFullcolour.SIValue()), "l")
+
+			cyanvol := wunit.NewVolume(((float64(cmyk.C) / float64(maxuint8)) * p.VolumeForFullcolour.RawValue()), p.VolumeForFullcolour.Unit().PrefixedSymbol())
+			//cyanvol := VolumeForFullcolour
 			cyanSample := mixer.Sample(p.Cyan, cyanvol)
 			components = append(components, cyanSample)
+			fmt.Println("YoH!!!!", p.VolumeForFullcolour.ToString(), cyanvol.ToString(), cmyk.C, float64(cmyk.C)/float64(maxuint8), float64(cmyk.Y)/float64(maxuint8), float64(cmyk.M)/float64(maxuint8), float64(cmyk.K)/float64(maxuint8), cmyk.C/maxuint8, cmyk.M/maxuint8, cmyk.Y/maxuint8, cmyk.K/maxuint8, cmyk)
 		}
 
 		if cmyk.Y > 0 {
-			yellowvol := wunit.NewVolume((float64(cmyk.Y/maxuint8) * p.VolumeForFullcolour.SIValue()), "l")
+			yellowvol := wunit.NewVolume(((float64(cmyk.Y) / float64(maxuint8)) * p.VolumeForFullcolour.RawValue()), p.VolumeForFullcolour.Unit().PrefixedSymbol())
+			//yellowvol := VolumeForFullcolour
 			yellowSample := mixer.Sample(p.Yellow, yellowvol)
 			components = append(components, yellowSample)
+			fmt.Println("SHOWWW MUCH!!!!", p.VolumeForFullcolour.ToString(), yellowvol.ToString(), float64(cmyk.Y/maxuint8))
 		}
 
 		if cmyk.M > 0 {
-			magentavol := wunit.NewVolume((float64(cmyk.M/maxuint8) * p.VolumeForFullcolour.SIValue()), "l")
+			magentavol := wunit.NewVolume(((float64(cmyk.M) / float64(maxuint8)) * p.VolumeForFullcolour.RawValue()), p.VolumeForFullcolour.Unit().PrefixedSymbol())
+			//magentavol := VolumeForFullcolour
 			magentaSample := mixer.Sample(p.Magenta, magentavol)
 			components = append(components, magentaSample)
+			fmt.Println("SHOWWW MUCH!!!!", p.VolumeForFullcolour.ToString(), magentavol.ToString(), float64(cmyk.M/maxuint8))
 		}
 
 		if cmyk.K > 0 {
-			blackvol := wunit.NewVolume((float64(cmyk.K/maxuint8) * p.VolumeForFullcolour.SIValue()), "l")
+			blackvol := wunit.NewVolume(((float64(cmyk.K) / float64(maxuint8)) * p.VolumeForFullcolour.RawValue()), p.VolumeForFullcolour.Unit().PrefixedSymbol())
+			//blackvol := VolumeForFullcolour
 			blackSample := mixer.Sample(p.Black, blackvol)
 			components = append(components, blackSample)
+			fmt.Println("SHOWWW MUCH!!!!", p.VolumeForFullcolour.ToString(), blackvol.ToString(), float64(cmyk.K/maxuint8))
 		}
 
 		solution := _wrapper.MixTo(p.OutPlate, locationkey, components...)
