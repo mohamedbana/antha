@@ -27,12 +27,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
-	"strings"
-
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"github.com/antha-lang/antha/antha/execute"
+	"strconv"
+	"strings"
 )
 
 const (
@@ -195,11 +193,12 @@ func PartOf() Entity {
 
 }
 */
+
 // structure describing a solution: a combination of liquid components
 type LHSolution struct {
 	*GenericPhysical
 	ID               string
-	BlockID          execute.BlockID
+	BlockID          BlockID
 	Inst             string
 	SName            string
 	Order            int

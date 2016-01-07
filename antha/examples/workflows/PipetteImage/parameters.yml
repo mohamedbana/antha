@@ -1,16 +1,16 @@
 {
-  "Parameters": [{
+  "Parameters": {
     "PipetteImage": {
       "Colourcomponents": [
-	"component:red",
-	"component:white",
-	"component:blue",
-	"component:green",
-	"component:yellow",
-	"component:black"
+	"red",
+	"white",
+	"blue",
+	"green",
+	"yellow",
+	"black"
 	],
 	"OnlythisColour":"",
-	  "Imagefilename": "jesus.jpg",
+	  "Imagefilename": "synthacelogo.png",
 		"Palettename":"Palette1",
 		"AvailableColours":[
 		"red",
@@ -20,13 +20,10 @@
 		"yellow",
 		"black"
 		],
-      "Outplate": "plate:greiner384_riser",
-      "TipType": "tipbox:Gilson20",
-      "VolumePerWell": "10ul"
+      "OutPlate": "SRWFB96_riser",
+      "VolumePerWell": "80ul"
     }
-  }],
-  "Config": {
-    "OUTPUT_COUNT": 59
   }
 }
+
 

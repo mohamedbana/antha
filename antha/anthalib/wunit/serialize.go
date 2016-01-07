@@ -49,15 +49,12 @@ func unmarshal(b []byte) (value float64, unit string, err error) {
 	} else if s == nil {
 		return
 	}
-	if _, err = fmt.Fscanf(strings.NewReader(*s), "%e%s", &value, &unit); err != nil {
-		if err == io.EOF {
-			err = nil
-			unit = ""
-			if _, err = fmt.Fscanf(strings.NewReader(*s), "%e", &value); err != nil {
-				return
-			}
+	if _, err = fmt.Fscanf(strings.NewReader(*s), "%e%s", &value, &unit); err != nil && err == io.EOF {
+		err = nil
+		unit = ""
+		if _, err = fmt.Fscanf(strings.NewReader(*s), "%e", &value); err != nil {
+			return
 		}
-		return
 	}
 	return
 }
@@ -114,9 +111,9 @@ func (m *Time) UnmarshalJSON(b []byte) error {
 	}
 	return nil
 }
+
 func (m *Density) MarshalJSON() ([]byte, error) {
 	return marshal(m)
-
 }
 
 func (m *Density) UnmarshalJSON(b []byte) error {
@@ -127,6 +124,7 @@ func (m *Density) UnmarshalJSON(b []byte) error {
 	}
 	return nil
 }
+
 func (m *Mass) MarshalJSON() ([]byte, error) {
 	return marshal(m)
 
@@ -222,9 +220,9 @@ func (m *Angle) UnmarshalJSON(b []byte) error {
 	}
 	return nil
 }
+
 func (m *Energy) MarshalJSON() ([]byte, error) {
 	return marshal(m)
-
 }
 
 func (m *Energy) UnmarshalJSON(b []byte) error {
@@ -235,9 +233,9 @@ func (m *Energy) UnmarshalJSON(b []byte) error {
 	}
 	return nil
 }
+
 func (m *Force) MarshalJSON() ([]byte, error) {
 	return marshal(m)
-
 }
 
 func (m *Force) UnmarshalJSON(b []byte) error {
@@ -251,7 +249,6 @@ func (m *Force) UnmarshalJSON(b []byte) error {
 
 func (m *Velocity) MarshalJSON() ([]byte, error) {
 	return marshal(m)
-
 }
 
 func (m *Velocity) UnmarshalJSON(b []byte) error {
@@ -265,7 +262,6 @@ func (m *Velocity) UnmarshalJSON(b []byte) error {
 
 func (m *Rate) MarshalJSON() ([]byte, error) {
 	return marshal(m)
-
 }
 
 func (m *Rate) UnmarshalJSON(b []byte) error {
@@ -279,21 +275,3 @@ func (m *Rate) UnmarshalJSON(b []byte) error {
 	}
 	return nil
 }
-
-/*
-func (m *Rate) MarshalJSON() ([]byte, error) {
-	return marshal(m)
-
-}
-
-func (m *Rate) UnmarshalJSON(b []byte) (err error) {
-	if value, unit, err := unmarshal(b); err != nil {
-		return err
-	} else if unit != "" {
-		if string(unit[0]) == `/` {
-			*m, err = NewRate(value, string(unit[0]), unit[1:])
-		}
-	}
-	return err
-}
-*/

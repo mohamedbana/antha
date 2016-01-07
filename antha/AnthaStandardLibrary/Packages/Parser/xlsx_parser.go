@@ -3,7 +3,6 @@ package parser
 import (
 	"errors"
 	"fmt"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
 	"io/ioutil"
 	"os"
@@ -64,32 +63,16 @@ func generateCSVFromspecificXLSXsheet(excelFileName string, sheetname string, ou
 	return nil
 }
 
-func Xlsxparser(filename string, sheetIndex int, outputprefix string) (f *os.File, status string) {
-	status = "complete"
-	f, err := ioutil.TempFile(os.TempDir(), outputprefix)
-
-	defer f.Close()
-
+func Xlsxparser(filename string, sheetIndex int, outputprefix string) (f *os.File, err error) {
+	f, err = ioutil.TempFile("", outputprefix)
 	if err != nil {
-		panic(err)
-		status = "error"
+		return
 	}
+
 	printer := func(s string) {
 		_, _ = f.WriteString(s)
-
 	}
-	if err := generateCSVFromXLSXsheet(filename, sheetIndex, printer); err != nil {
-		status = "error"
 
-	}
-	return f, status
-}
-
-func Assemblyfromxlsx(designandpartsfile string) (Assemblies []enzymes.Assemblyparameters) {
-	parts, _ := Xlsxparser(designandpartsfile, 0, "PartsTemp")
-	design, _ := Xlsxparser(designandpartsfile, 1, "DesignTemp")
-
-	Assemblies = Assemblyfromcsv(design.Name(), parts.Name())
-
-	return Assemblies
+	err = generateCSVFromXLSXsheet(filename, sheetIndex, printer)
+	return
 }

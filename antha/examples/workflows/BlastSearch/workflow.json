@@ -1,14 +1,14 @@
 {
-    "properties": {
-        "name": "main"
-    },
+    "connections": [],
     "processes": {
-        "BlastSearch": {
-            "component": "BlastSearch",
-            "metadata": {
-                "label": "CS"
-            }
+        "BlastSearch1": {
+            "component": "BlastSearch"
+        },
+        "BlastSearch2": {
+            "component": "BlastSearch"
+        },
+        "BlastSearch3": {
+            "component": "BlastSearch"
         }
-    },
-    "connections": [ ]
+    }
 }

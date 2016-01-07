@@ -1,29 +1,22 @@
 {
-    "Parameters": [{
-        "MoClo_design":{
-            "Constructname": "Moflo2Assemblyproduct", 				
-            "Partsinorder": [
-            "BBa_I14018",
-            "Rbs",
-            "BBa_E0020", 
-            "Term"
-            ],
-            "PartMoClotypesinorder": [
-            "Pro",
-            "5U + NT1",
-            "CDS1",
-            "3U + Ter"
-            ],
-			"RestrictionsitetoAvoid":[
-			"EcoRI",
-			"PvuII"
-			],
-			"Vector":"pAGM1311_M",
+    "Parameters": {
+        "MoClo_design": {
             "AssemblyStandard": "MoClo",
-            "Level": "Level0"
+            "Constructname": "Moflo2Assemblyproduct",
+            "Level": "Level0",
+            "PartMoClotypesinorder": [
+                "Pro",
+                "5U + NT1",
+                "CDS1",
+                "3U + Ter"
+            ],
+            "Partsinorder": [
+                "BBa_I14018",
+                "Rbs",
+                "BBa_E0020",
+                "Term"
+            ],
+            "Vector": "pAGM1311_M"
         }
-    }],
-    "Config": {
-        "OUTPUT_COUNT": 1
     }
 }

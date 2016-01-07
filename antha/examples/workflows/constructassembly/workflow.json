@@ -1,14 +1,11 @@
 {
-    "properties": {
-        "name": "main"
-    },
+    "connections": [],
     "processes": {
-        "ConstructAssembly": {
-            "component": "TypeIISConstructAssembly",
-            "metadata": {
-                "label": "CS"
-            }
+        "ConstructAssembly1": {
+            "component": "TypeIISConstructAssembly"
+        },
+        "ConstructAssembly2": {
+            "component": "TypeIISConstructAssembly"
         }
-    },
-    "connections": [ ]
+    }
 }

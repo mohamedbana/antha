@@ -1,13 +1,13 @@
 {
-  "Parameters": [{
+  "Parameters": {
     "PipetteImage": {
       "Colourcomponents": [
-	"component:red",
-	"component:white",
-	"component:blue",
-	"component:green",
-	"component:yellow",
-	"component:black"
+	"red",
+	"white",
+	"blue",
+	"green",
+	"yellow",
+	"black"
 	],
 	"OnlythisColour":"",
 	  "Imagefilename": "apple.jpg",
@@ -20,13 +20,9 @@
 		"yellow",
 		"black"
 		],
-      "Outplate": "plate:nunc1536_riser",
-      "TipType": "tipbox:Gilson20",
+      "Outplate": "nunc1536_riser",
       "VolumePerWell": "10ul"
     }
-  }],
-  "Config": {
-    "OUTPUT_COUNT":399
   }
 }
 

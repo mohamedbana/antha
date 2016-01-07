@@ -1,14 +1,8 @@
 {
-    "properties": {
-        "name": "main"
-    },
+    "connections": [],
     "processes": {
         "Iterative_assembly_design": {
-            "component": "Iterative_assembly_design",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "Iterative_assembly_design"
         }
-    },
-    "connections": [ ]
+    }
 }

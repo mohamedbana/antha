@@ -1,14 +1,8 @@
 {
-    "properties": {
-        "name": "main"
-    },
+    "connections": [],
     "processes": {
         "Datacrunch": {
-            "component": "Datacrunch",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "Datacrunch"
         }
-    },
-    "connections": [ ]
+    }
 }

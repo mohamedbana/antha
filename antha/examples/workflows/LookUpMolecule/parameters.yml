@@ -1,17 +1,14 @@
 {
-  "Parameters": [{
-    "LookUpMolecule": {
-      "Compound":"Potassium Acetate",
-      "Compoundlist": [
-      "Water",
-	  "Potassium Acetate",
-	  "Tris Acetate",
-	  "Magnesium Acetate",
-	"Paclitaxel"
-	  ],
-    }
-  }],
-    "Config": {
-        "OUTPUT_COUNT": 1
+    "Parameters": {
+        "LookUpMolecule": {
+            "Compound": "Potassium Acetate",
+            "Compoundlist": [
+                "Water",
+                "Potassium Acetate",
+                "Tris Acetate",
+                "Magnesium Acetate",
+                "Paclitaxel"
+            ]
+        }
     }
 }

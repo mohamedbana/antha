@@ -1,14 +1,8 @@
 {
-    "properties": {
-        "name": "main"
-    },
+    "connections": [],
     "processes": {
         "PCR": {
-            "component": "PCR",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "PCR"
         }
-    },
-    "connections": [ ]
+    }
 }

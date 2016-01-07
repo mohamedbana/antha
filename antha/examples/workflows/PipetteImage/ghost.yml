@@ -1,34 +1,30 @@
 {
-  "Parameters": [{
-    "PipetteImage": {
-      "Colourcomponents": [
-	"component:red",
-	"component:white",
-	"component:blue",
-	"component:green",
-	"component:yellow",
-	"component:black"
-	],
-	"OnlythisColour":"green",
-	  "Imagefilename": "ghost.jpg",
-		"Palettename":"Palette1",
-		"AvailableColours":[
-		"red",
-		"white",
-		"blue",
-		"green",
-		"yellow",
-		"black"
-		],
-      "Outplate": "plate:greiner384_riser",
-      "TipType": "tipbox:Gilson20",
-      "VolumePerWell": "10ul"
+    "Parameters": {
+        "PipetteImage": {
+            "AvailableColours": [
+                "red",
+                "white",
+                "blue",
+                "green",
+                "yellow",
+                "black"
+            ],
+            "Colourcomponents": [
+                "red",
+                "white",
+                "blue",
+                "green",
+                "yellow",
+                "black"
+            ],
+            "Imagefilename": "ghost.jpg",
+            "OnlythisColour": "green",
+            "OutPlate": "greiner384",
+            "Palettename": "Palette1",
+            "VolumePerWell": "10ul"
+        }
+
     }
-  }],
-  "Config": {
-    "OUTPUT_COUNT": 144
-  }
+
 }
-
-
 

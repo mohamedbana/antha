@@ -1,15 +1,12 @@
 package PlateOut
 
 import (
-	"encoding/json"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/antha/execute"
-	"github.com/antha-lang/antha/flow"
-	"github.com/antha-lang/antha/microArch/execution"
-	"runtime/debug"
-	"sync"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/execute"
+	"github.com/antha-lang/antha/inject"
 )
 
 // Input parameters for this protocol (data)
@@ -20,319 +17,81 @@ import (
 
 // Physical outputs from this protocol with types
 
-func (e *PlateOut) requirements() {
-	_ = wunit.Make_units
-
+func _requirements() {
 }
 
 // Conditions to run on startup
-func (e *PlateOut) setup(p PlateOutParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
+func _setup(_ctx context.Context, _input *Input_) {
 }
 
 // The core process for this protocol, with the steps to be performed
 // for every input
-func (e *PlateOut) steps(p PlateOutParamBlock, r *PlateOutResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
+func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 
 	plateout := make([]*wtype.LHComponent, 0)
 
-	if p.Diluent != nil && p.DilutionX > 1 {
-		diluentsample := mixer.SampleForTotalVolume(p.Diluent, p.Plateoutvolume)
+	if _input.Diluent != nil && _input.DilutionX > 1 {
+		diluentsample := mixer.SampleForTotalVolume(_input.Diluent, _input.Plateoutvolume)
 		plateout = append(plateout, diluentsample)
 		// redeclare Plateoutvolume for adjusted volume to add of recovery mixture based on dilution ratio
-		p.Plateoutvolume = wunit.NewVolume(p.Plateoutvolume.SIValue()/float64(p.DilutionX), "l")
+		_input.Plateoutvolume = wunit.NewVolume(_input.Plateoutvolume.SIValue()/float64(_input.DilutionX), "l")
 	}
-	plateoutsample := mixer.Sample(p.RecoveredCells, p.Plateoutvolume)
+	plateoutsample := mixer.Sample(_input.RecoveredCells, _input.Plateoutvolume)
 	plateout = append(plateout, plateoutsample)
-	platedculture := _wrapper.MixInto(p.AgarPlate, plateout...)
-	_wrapper.Incubate(platedculture, p.IncubationTemp, p.IncubationTime, false)
-	r.Platedculture = platedculture
-	_ = _wrapper.WaitToEnd()
+	platedculture := execute.MixInto(_ctx,
+
+		_input.AgarPlate, plateout...)
+	execute.Incubate(_ctx,
+
+		platedculture, _input.IncubationTemp, _input.IncubationTime, false)
+	_output.Platedculture = platedculture
 
 }
 
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
-func (e *PlateOut) analysis(p PlateOutParamBlock, r *PlateOutResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
+func _analysis(_ctx context.Context, _input *Input_, _output *Output_) {
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
-func (e *PlateOut) validation(p PlateOutParamBlock, r *PlateOutResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
+func _validation(_ctx context.Context, _input *Input_, _output *Output_) {
 }
 
-// AsyncBag functions
-func (e *PlateOut) Complete(params interface{}) {
-	p := params.(PlateOutParamBlock)
-	if p.Error {
-		e.Platedculture <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		return
+func _run(_ctx context.Context, value inject.Value) (inject.Value, error) {
+	input := &Input_{}
+	output := &Output_{}
+	if err := inject.Assign(value, input); err != nil {
+		return nil, err
 	}
-	r := new(PlateOutResultBlock)
-	defer func() {
-		if res := recover(); res != nil {
-			e.Platedculture <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			execute.AddError(&execute.RuntimeError{BaseError: res, Stack: debug.Stack()})
-			return
-		}
-	}()
-	e.startup.Do(func() { e.setup(p) })
-	e.steps(p, r)
-
-	e.Platedculture <- execute.ThreadParam{Value: r.Platedculture, ID: p.ID, Error: false}
-
-	e.analysis(p, r)
-
-	e.validation(p, r)
-
+	_setup(_ctx, input)
+	_steps(_ctx, input, output)
+	_analysis(_ctx, input, output)
+	_validation(_ctx, input, output)
+	return inject.MakeValue(output), nil
 }
 
-// init function, read characterization info from seperate file to validate ranges?
-func (e *PlateOut) init() {
-	e.params = make(map[execute.ThreadID]*execute.AsyncBag)
-}
+var (
+	_ = execute.MixInto
+	_ = wunit.Make_units
+)
 
-func (e *PlateOut) NewConfig() interface{} {
-	return &PlateOutConfig{}
-}
-
-func (e *PlateOut) NewParamBlock() interface{} {
-	return &PlateOutParamBlock{}
-}
-
-func NewPlateOut() interface{} { //*PlateOut {
-	e := new(PlateOut)
-	e.init()
-	return e
-}
-
-// Mapper function
-func (e *PlateOut) Map(m map[string]interface{}) interface{} {
-	var res PlateOutParamBlock
-	res.Error = false || m["AgarPlate"].(execute.ThreadParam).Error || m["Diluent"].(execute.ThreadParam).Error || m["DilutionX"].(execute.ThreadParam).Error || m["IncubationTemp"].(execute.ThreadParam).Error || m["IncubationTime"].(execute.ThreadParam).Error || m["Plateoutvolume"].(execute.ThreadParam).Error || m["RecoveredCells"].(execute.ThreadParam).Error
-
-	vAgarPlate, is := m["AgarPlate"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp PlateOutJSONBlock
-		json.Unmarshal([]byte(vAgarPlate.JSONString), &temp)
-		res.AgarPlate = *temp.AgarPlate
-	} else {
-		res.AgarPlate = m["AgarPlate"].(execute.ThreadParam).Value.(*wtype.LHPlate)
-	}
-
-	vDiluent, is := m["Diluent"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp PlateOutJSONBlock
-		json.Unmarshal([]byte(vDiluent.JSONString), &temp)
-		res.Diluent = *temp.Diluent
-	} else {
-		res.Diluent = m["Diluent"].(execute.ThreadParam).Value.(*wtype.LHComponent)
-	}
-
-	vDilutionX, is := m["DilutionX"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp PlateOutJSONBlock
-		json.Unmarshal([]byte(vDilutionX.JSONString), &temp)
-		res.DilutionX = *temp.DilutionX
-	} else {
-		res.DilutionX = m["DilutionX"].(execute.ThreadParam).Value.(int)
-	}
-
-	vIncubationTemp, is := m["IncubationTemp"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp PlateOutJSONBlock
-		json.Unmarshal([]byte(vIncubationTemp.JSONString), &temp)
-		res.IncubationTemp = *temp.IncubationTemp
-	} else {
-		res.IncubationTemp = m["IncubationTemp"].(execute.ThreadParam).Value.(wunit.Temperature)
-	}
-
-	vIncubationTime, is := m["IncubationTime"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp PlateOutJSONBlock
-		json.Unmarshal([]byte(vIncubationTime.JSONString), &temp)
-		res.IncubationTime = *temp.IncubationTime
-	} else {
-		res.IncubationTime = m["IncubationTime"].(execute.ThreadParam).Value.(wunit.Time)
-	}
-
-	vPlateoutvolume, is := m["Plateoutvolume"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp PlateOutJSONBlock
-		json.Unmarshal([]byte(vPlateoutvolume.JSONString), &temp)
-		res.Plateoutvolume = *temp.Plateoutvolume
-	} else {
-		res.Plateoutvolume = m["Plateoutvolume"].(execute.ThreadParam).Value.(wunit.Volume)
-	}
-
-	vRecoveredCells, is := m["RecoveredCells"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp PlateOutJSONBlock
-		json.Unmarshal([]byte(vRecoveredCells.JSONString), &temp)
-		res.RecoveredCells = *temp.RecoveredCells
-	} else {
-		res.RecoveredCells = m["RecoveredCells"].(execute.ThreadParam).Value.(*wtype.LHComponent)
-	}
-
-	res.ID = m["AgarPlate"].(execute.ThreadParam).ID
-	res.BlockID = m["AgarPlate"].(execute.ThreadParam).BlockID
-
-	return res
-}
-
-func (e *PlateOut) OnAgarPlate(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("AgarPlate", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *PlateOut) OnDiluent(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Diluent", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *PlateOut) OnDilutionX(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("DilutionX", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *PlateOut) OnIncubationTemp(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("IncubationTemp", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *PlateOut) OnIncubationTime(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("IncubationTime", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *PlateOut) OnPlateoutvolume(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Plateoutvolume", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *PlateOut) OnRecoveredCells(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(7, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("RecoveredCells", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
+func New() interface{} {
+	return &Element_{
+		inject.CheckedRunner{
+			RunFunc: _run,
+			In:      &Input_{},
+			Out:     &Output_{},
+		},
 	}
 }
 
-type PlateOut struct {
-	flow.Component // component "superclass" embedded
-	lock           sync.Mutex
-	startup        sync.Once
-	params         map[execute.ThreadID]*execute.AsyncBag
-	AgarPlate      <-chan execute.ThreadParam
-	Diluent        <-chan execute.ThreadParam
-	DilutionX      <-chan execute.ThreadParam
-	IncubationTemp <-chan execute.ThreadParam
-	IncubationTime <-chan execute.ThreadParam
-	Plateoutvolume <-chan execute.ThreadParam
-	RecoveredCells <-chan execute.ThreadParam
-	Platedculture  chan<- execute.ThreadParam
+type Element_ struct {
+	inject.CheckedRunner
 }
 
-type PlateOutParamBlock struct {
-	ID             execute.ThreadID
-	BlockID        execute.BlockID
-	Error          bool
+type Input_ struct {
 	AgarPlate      *wtype.LHPlate
 	Diluent        *wtype.LHComponent
 	DilutionX      int
@@ -342,53 +101,6 @@ type PlateOutParamBlock struct {
 	RecoveredCells *wtype.LHComponent
 }
 
-type PlateOutConfig struct {
-	ID             execute.ThreadID
-	BlockID        execute.BlockID
-	Error          bool
-	AgarPlate      wtype.FromFactory
-	Diluent        wtype.FromFactory
-	DilutionX      int
-	IncubationTemp wunit.Temperature
-	IncubationTime wunit.Time
-	Plateoutvolume wunit.Volume
-	RecoveredCells wtype.FromFactory
-}
-
-type PlateOutResultBlock struct {
-	ID            execute.ThreadID
-	BlockID       execute.BlockID
-	Error         bool
+type Output_ struct {
 	Platedculture *wtype.LHSolution
-}
-
-type PlateOutJSONBlock struct {
-	ID             *execute.ThreadID
-	BlockID        *execute.BlockID
-	Error          *bool
-	AgarPlate      **wtype.LHPlate
-	Diluent        **wtype.LHComponent
-	DilutionX      *int
-	IncubationTemp *wunit.Temperature
-	IncubationTime *wunit.Time
-	Plateoutvolume *wunit.Volume
-	RecoveredCells **wtype.LHComponent
-	Platedculture  **wtype.LHSolution
-}
-
-func (c *PlateOut) ComponentInfo() *execute.ComponentInfo {
-	inp := make([]execute.PortInfo, 0)
-	outp := make([]execute.PortInfo, 0)
-	inp = append(inp, *execute.NewPortInfo("AgarPlate", "*wtype.LHPlate", "AgarPlate", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Diluent", "*wtype.LHComponent", "Diluent", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("DilutionX", "int", "DilutionX", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("IncubationTemp", "wunit.Temperature", "IncubationTemp", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("IncubationTime", "wunit.Time", "IncubationTime", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Plateoutvolume", "wunit.Volume", "Plateoutvolume", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("RecoveredCells", "*wtype.LHComponent", "RecoveredCells", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Platedculture", "*wtype.LHSolution", "Platedculture", true, true, nil, nil))
-
-	ci := execute.NewComponentInfo("PlateOut", "PlateOut", "", false, inp, outp)
-
-	return ci
 }

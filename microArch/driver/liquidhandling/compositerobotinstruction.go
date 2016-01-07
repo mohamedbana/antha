@@ -25,13 +25,14 @@ package liquidhandling
 import (
 	"errors"
 	"fmt"
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/microArch/logger"
 	"math"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/microArch/logger"
 )
 
 type TransferParams struct {

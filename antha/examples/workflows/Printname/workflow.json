@@ -1,14 +1,8 @@
 {
-    "properties": {
-        "name": "main"
-    },
+    "connections": [],
     "processes": {
         "Printname": {
-            "component": "Printname",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "Printname"
         }
-    },
-    "connections": [ ]
+    }
 }

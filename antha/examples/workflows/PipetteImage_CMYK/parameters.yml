@@ -1,18 +1,14 @@
 {
-  "Parameters": [{
+  "Parameters": {
     "PipetteImage": {
 		"Imagefilename":"rainbow1.png",
-      "Cyan": "component:Cyan",
-	"Magenta": "component:Magenta",
-	"Yellow": "component:Yellow_ink",
-	"Black": "component:Black",
-      "Outplate": "plate:greiner384_riser",
-      "TipType": "tipbox:Gilson20",
+      "Cyan": "Cyan",
+	"Magenta": "Magenta",
+	"Yellow": "Yellow_ink",
+	"Black": "Black",
+      "OutPlate": "greiner384_riser",
       "VolumeForFullcolour": "20ul"
     }
-  }],
-  "Config": {
-    "OUTPUT_COUNT": 128
   }
 }
 

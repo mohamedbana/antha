@@ -1,26 +1,13 @@
 {
-    "Parameters": [{
-        "Transformation":{
-            "Reaction": "component:dna_part",
-            "CompetentCells": "component:water",
-			"Recoverymedium": "component:water",
+    "Parameters": {
+        "Transformation": {
             "CompetentCellvolumeperassembly": "50ul",
+            "OutPlate": "pcrplate_with_cooler",
+            "Postplasmidtemp": "2C",
+            "Postplasmidtime": "300s",
+            "Reaction": "dna_part",
             "Reactionvolume": "10ul",
-            "Preplasmidtime":  "300s",
-			"Preplasmidtemp": "2C",
-			"Postplasmidtime": "300s",
-			"Postplasmidtemp": "2C",
-			"Recoveryvolume": "150ul",
-			"Recoverytime": "7200s",
-			"Recoverytemp": "25C",
-			"Plateoutvolume": "100ul",
-            "OutPlate": "plate:pcrplate_with_cooler",
-            "InPlate": "plate:pcrplate_with_cooler",
-			"AgarPlate": "plate:pcrplate_with_cooler",
-            "TipType": "tipbox:Gilson20"
+            "ReadyCompCells": "neb5compcells"
         }
-    }],
-    "Config": {
-        "OUTPUT_COUNT": 1
     }
 }

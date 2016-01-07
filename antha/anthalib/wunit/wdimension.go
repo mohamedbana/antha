@@ -24,7 +24,6 @@ package wunit
 
 import (
 	"fmt"
-	"github.com/antha-lang/antha/microArch/logger"
 	"strings"
 )
 
@@ -44,7 +43,6 @@ func NewLength(v float64, unit string) Length {
 	// check
 
 	if l.Unit().RawSymbol() != "m" {
-		logger.Fatal("Base unit for lengths must be meters")
 		panic("Base unit for lengths must be meters")
 	}
 
@@ -59,7 +57,6 @@ type Area struct {
 // make an area unit
 func NewArea(v float64, unit string) Area {
 	if unit != "m^2" {
-		logger.Fatal("Can't make areas which aren't square metres")
 		panic("Can't make areas which aren't square metres")
 	}
 
@@ -75,7 +72,6 @@ type Volume struct {
 // make a volume
 func NewVolume(v float64, unit string) (o Volume) {
 	if len(strings.TrimSpace(unit)) == 0 {
-		logger.Fatal("Can't make Volumes without unit")
 		panic("Can't make Volumes without unit")
 	}
 	if len(strings.TrimSpace(unit)) == 1 {
@@ -111,11 +107,13 @@ type Temperature struct {
 
 // make a temperature
 func NewTemperature(v float64, unit string) Temperature {
-	if unit != "˚C" && unit != "C" {
-		logger.Fatal("Can't make temperatures which aren't in degrees C")
+	if unit != "˚C" && // RING ABOVE, LATIN CAPITAL LETTER C
+		unit != "C" && // LATIN CAPITAL LETTER C
+		unit != "℃" && // DEGREE CELSIUS
+		unit != "°C" { // DEGREE, LATIN CAPITAL LETTER C
 		panic("Can't make temperatures which aren't in degrees C")
 	}
-	t := Temperature{NewMeasurement(v, "", unit)}
+	t := Temperature{NewMeasurement(v, "", "℃")}
 	return t
 }
 
@@ -127,7 +125,6 @@ type Time struct {
 // make a time unit
 func NewTime(v float64, unit string) Time {
 	if unit != "s" {
-		logger.Fatal("Can't make temperatures which aren't in seconds")
 		panic("Can't make temperatures which aren't in seconds")
 	}
 
@@ -144,7 +141,6 @@ type Mass struct {
 
 func NewMass(v float64, unit string) (o Mass) {
 	if len(strings.TrimSpace(unit)) == 0 {
-		logger.Fatal("Can't make masses without unit")
 		panic("Can't make masses without unit")
 	}
 	if len(strings.TrimSpace(unit)) == 1 {
@@ -187,7 +183,6 @@ type Moles struct {
 // generate a new Amount in moles
 func NewAmount(v float64, unit string) Moles {
 	if unit != "M" {
-		logger.Fatal("Can't make amounts which aren't in moles")
 		panic("Can't make amounts which aren't in moles")
 	}
 
@@ -208,7 +203,6 @@ type Angle struct {
 // generate a new angle unit
 func NewAngle(v float64, unit string) Angle {
 	if unit != "radians" {
-		logger.Fatal("Can't make angles which aren't in radians")
 		panic("Can't make angles which aren't in radians")
 	}
 
@@ -224,7 +218,6 @@ type Energy struct {
 // make a new energy unit
 func NewEnergy(v float64, unit string) Energy {
 	if unit != "J" {
-		logger.Fatal("Can't make energies which aren't in Joules")
 		panic("Can't make energies which aren't in Joules")
 	}
 
@@ -240,7 +233,6 @@ type Force struct {
 // a new force in Newtons
 func NewForce(v float64, unit string) Force {
 	if unit != "N" {
-		logger.Fatal("Can't make forces which aren't in Newtons")
 		panic("Can't make forces which aren't in Newtons")
 	}
 
@@ -256,7 +248,6 @@ type Pressure struct {
 // make a new pressure in Pascals
 func NewPressure(v float64, unit string) Pressure {
 	if unit != "Pa" {
-		logger.Fatal("Can't make pressures which aren't in Pascals")
 		panic("Can't make pressures which aren't in Pascals")
 	}
 
@@ -292,7 +283,6 @@ func NewConcentration(v float64, unit string) (o Concentration) {
 	}
 
 	if len(strings.TrimSpace(unit)) == 0 {
-		logger.Fatal("Can't make concentration without unit")
 		panic("Can't make concentration without unit")
 	}
 	if len(strings.TrimSpace(unit)) == 3 {
@@ -339,7 +329,6 @@ type SpecificHeatCapacity struct {
 // make a new specific heat capacity structure in SI units
 func NewSpecificHeatCapacity(v float64, unit string) SpecificHeatCapacity {
 	if unit != "J/kg" {
-		logger.Fatal("Can't make specific heat capacities which aren't in J/kg")
 		panic("Can't make specific heat capacities which aren't in J/kg")
 	}
 
@@ -355,7 +344,6 @@ type Density struct {
 // make a new density structure in SI units
 func NewDensity(v float64, unit string) Density {
 	if unit != "kg/m^3" {
-		logger.Fatal("Can't make densities which aren't in kg/m^3")
 		panic("Can't make densities which aren't in kg/m^3")
 	}
 
@@ -371,7 +359,6 @@ type FlowRate struct {
 
 func NewFlowRate(v float64, unit string) FlowRate {
 	if unit != "ml/min" {
-		logger.Fatal("Can't make flow rate which aren't in ml/min")
 		panic("Can't make flow rate which aren't in ml/min")
 	}
 	fr := FlowRate{NewMeasurement(v, "", unit)}
@@ -388,7 +375,6 @@ type Velocity struct {
 func NewVelocity(v float64, unit string) Velocity {
 
 	if unit != "m/s" {
-		logger.Fatal("Can't make flow rate which aren't in m/s")
 		panic("Can't make flow rate which aren't in m/s")
 	}
 	fr := Velocity{NewMeasurement(v, "", unit)}
@@ -403,7 +389,6 @@ type Rate struct {
 func NewRate(v float64, unit string) (r Rate, err error) {
 	if unit != `/min` && unit != `/s` {
 		err = fmt.Errorf("Can't make flow rate which aren't in /min or per /s ")
-		logger.Fatal(err.Error())
 		panic(err.Error())
 	}
 
@@ -433,7 +418,6 @@ func (cm *Rate) ToString() string {
 func NewRate(v float64, unit string, timeunit string) (r Rate, err error) {
 	if unit != `/` {
 		err = fmt.Errorf("Can't make flow rate which aren't in per")
-		logger.Fatal(err.Error())
 		panic(err.Error())
 	}
 	concrete := NewMeasurement(v, "", unit)

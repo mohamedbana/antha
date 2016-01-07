@@ -3,16 +3,13 @@ package NewDNASequence
 import (
 	"fmt"
 	//"math"
-	"encoding/json"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/antha/execute"
-	"github.com/antha-lang/antha/flow"
-	"github.com/antha-lang/antha/microArch/execution"
-	"runtime/debug"
-	"sync"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/execute"
+	"github.com/antha-lang/antha/inject"
 )
 
 // Input parameters for this protocol
@@ -23,280 +20,85 @@ import (
 
 // Physical outputs from this protocol
 
-func (e *NewDNASequence) requirements() {
-	_ = wunit.Make_units
+func _requirements() {
 
 }
 
 // Actions to perform before protocol itself
-func (e *NewDNASequence) setup(p NewDNASequenceParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
+func _setup(_ctx context.Context, _input *Input_) {
 
 }
 
 // Core process of the protocol: steps to be performed for each input
-func (e *NewDNASequence) steps(p NewDNASequenceParamBlock, r *NewDNASequenceResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-
+func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 	fmt.Println("In steps!")
-	if p.Plasmid != p.Linear {
-		if p.Plasmid {
-			r.DNA = wtype.MakePlasmidDNASequence(p.Gene_name, p.DNA_seq)
-		} else if p.Linear {
-			r.DNA = wtype.MakeLinearDNASequence(p.Gene_name, p.DNA_seq)
-		} else if p.SingleStranded {
-			r.DNA = wtype.MakeSingleStrandedDNASequence(p.Gene_name, p.DNA_seq)
+	if _input.Plasmid != _input.Linear {
+		if _input.Plasmid {
+			_output.DNA = wtype.MakePlasmidDNASequence(_input.Gene_name, _input.DNA_seq)
+		} else if _input.Linear {
+			_output.DNA = wtype.MakeLinearDNASequence(_input.Gene_name, _input.DNA_seq)
+		} else if _input.SingleStranded {
+			_output.DNA = wtype.MakeSingleStrandedDNASequence(_input.Gene_name, _input.DNA_seq)
 		}
 
-		orfs := sequences.FindallORFs(r.DNA.Seq)
+		orfs := sequences.FindallORFs(_output.DNA.Seq)
 		features := sequences.ORFs2Features(orfs)
 
-		r.DNAwithORFs = sequences.Annotate(r.DNA, features)
+		_output.DNAwithORFs = sequences.Annotate(_output.DNA, features)
 
-		r.Status = fmt.Sprintln(
-			text.Print("DNA_Seq: ", p.DNA_seq),
-			text.Print("ORFs: ", r.DNAwithORFs.Features),
+		_output.Status = fmt.Sprintln(
+			text.Print("DNA_Seq: ", _input.DNA_seq),
+			text.Print("ORFs: ", _output.DNAwithORFs.Features),
 		)
 
 	} else {
-		r.Status = fmt.Sprintln("correct conditions not met")
+		_output.Status = fmt.Sprintln("correct conditions not met")
 	}
-	_ = _wrapper.WaitToEnd()
 
 }
 
 // Actions to perform after steps block to analyze data
-func (e *NewDNASequence) analysis(p NewDNASequenceParamBlock, r *NewDNASequenceResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
+func _analysis(_ctx context.Context, _input *Input_, _output *Output_) {
 
 }
 
-func (e *NewDNASequence) validation(p NewDNASequenceParamBlock, r *NewDNASequenceResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
+func _validation(_ctx context.Context, _input *Input_, _output *Output_) {
 
 }
 
-// AsyncBag functions
-func (e *NewDNASequence) Complete(params interface{}) {
-	p := params.(NewDNASequenceParamBlock)
-	if p.Error {
-		e.DNA <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		e.DNAwithORFs <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		e.Status <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		return
+func _run(_ctx context.Context, value inject.Value) (inject.Value, error) {
+	input := &Input_{}
+	output := &Output_{}
+	if err := inject.Assign(value, input); err != nil {
+		return nil, err
 	}
-	r := new(NewDNASequenceResultBlock)
-	defer func() {
-		if res := recover(); res != nil {
-			e.DNA <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			e.DNAwithORFs <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			e.Status <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			execute.AddError(&execute.RuntimeError{BaseError: res, Stack: debug.Stack()})
-			return
-		}
-	}()
-	e.startup.Do(func() { e.setup(p) })
-	e.steps(p, r)
-
-	e.DNA <- execute.ThreadParam{Value: r.DNA, ID: p.ID, Error: false}
-
-	e.DNAwithORFs <- execute.ThreadParam{Value: r.DNAwithORFs, ID: p.ID, Error: false}
-
-	e.Status <- execute.ThreadParam{Value: r.Status, ID: p.ID, Error: false}
-
-	e.analysis(p, r)
-
-	e.validation(p, r)
-
+	_setup(_ctx, input)
+	_steps(_ctx, input, output)
+	_analysis(_ctx, input, output)
+	_validation(_ctx, input, output)
+	return inject.MakeValue(output), nil
 }
 
-// init function, read characterization info from seperate file to validate ranges?
-func (e *NewDNASequence) init() {
-	e.params = make(map[execute.ThreadID]*execute.AsyncBag)
-}
+var (
+	_ = execute.MixInto
+	_ = wunit.Make_units
+)
 
-func (e *NewDNASequence) NewConfig() interface{} {
-	return &NewDNASequenceConfig{}
-}
-
-func (e *NewDNASequence) NewParamBlock() interface{} {
-	return &NewDNASequenceParamBlock{}
-}
-
-func NewNewDNASequence() interface{} { //*NewDNASequence {
-	e := new(NewDNASequence)
-	e.init()
-	return e
-}
-
-// Mapper function
-func (e *NewDNASequence) Map(m map[string]interface{}) interface{} {
-	var res NewDNASequenceParamBlock
-	res.Error = false || m["DNA_seq"].(execute.ThreadParam).Error || m["Gene_name"].(execute.ThreadParam).Error || m["Linear"].(execute.ThreadParam).Error || m["Plasmid"].(execute.ThreadParam).Error || m["SingleStranded"].(execute.ThreadParam).Error
-
-	vDNA_seq, is := m["DNA_seq"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp NewDNASequenceJSONBlock
-		json.Unmarshal([]byte(vDNA_seq.JSONString), &temp)
-		res.DNA_seq = *temp.DNA_seq
-	} else {
-		res.DNA_seq = m["DNA_seq"].(execute.ThreadParam).Value.(string)
-	}
-
-	vGene_name, is := m["Gene_name"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp NewDNASequenceJSONBlock
-		json.Unmarshal([]byte(vGene_name.JSONString), &temp)
-		res.Gene_name = *temp.Gene_name
-	} else {
-		res.Gene_name = m["Gene_name"].(execute.ThreadParam).Value.(string)
-	}
-
-	vLinear, is := m["Linear"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp NewDNASequenceJSONBlock
-		json.Unmarshal([]byte(vLinear.JSONString), &temp)
-		res.Linear = *temp.Linear
-	} else {
-		res.Linear = m["Linear"].(execute.ThreadParam).Value.(bool)
-	}
-
-	vPlasmid, is := m["Plasmid"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp NewDNASequenceJSONBlock
-		json.Unmarshal([]byte(vPlasmid.JSONString), &temp)
-		res.Plasmid = *temp.Plasmid
-	} else {
-		res.Plasmid = m["Plasmid"].(execute.ThreadParam).Value.(bool)
-	}
-
-	vSingleStranded, is := m["SingleStranded"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp NewDNASequenceJSONBlock
-		json.Unmarshal([]byte(vSingleStranded.JSONString), &temp)
-		res.SingleStranded = *temp.SingleStranded
-	} else {
-		res.SingleStranded = m["SingleStranded"].(execute.ThreadParam).Value.(bool)
-	}
-
-	res.ID = m["DNA_seq"].(execute.ThreadParam).ID
-	res.BlockID = m["DNA_seq"].(execute.ThreadParam).BlockID
-
-	return res
-}
-
-func (e *NewDNASequence) OnDNA_seq(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("DNA_seq", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *NewDNASequence) OnGene_name(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Gene_name", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *NewDNASequence) OnLinear(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Linear", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *NewDNASequence) OnPlasmid(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Plasmid", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *NewDNASequence) OnSingleStranded(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("SingleStranded", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
+func New() interface{} {
+	return &Element_{
+		inject.CheckedRunner{
+			RunFunc: _run,
+			In:      &Input_{},
+			Out:     &Output_{},
+		},
 	}
 }
 
-type NewDNASequence struct {
-	flow.Component // component "superclass" embedded
-	lock           sync.Mutex
-	startup        sync.Once
-	params         map[execute.ThreadID]*execute.AsyncBag
-	DNA_seq        <-chan execute.ThreadParam
-	Gene_name      <-chan execute.ThreadParam
-	Linear         <-chan execute.ThreadParam
-	Plasmid        <-chan execute.ThreadParam
-	SingleStranded <-chan execute.ThreadParam
-	DNA            chan<- execute.ThreadParam
-	DNAwithORFs    chan<- execute.ThreadParam
-	Status         chan<- execute.ThreadParam
+type Element_ struct {
+	inject.CheckedRunner
 }
 
-type NewDNASequenceParamBlock struct {
-	ID             execute.ThreadID
-	BlockID        execute.BlockID
-	Error          bool
+type Input_ struct {
 	DNA_seq        string
 	Gene_name      string
 	Linear         bool
@@ -304,53 +106,8 @@ type NewDNASequenceParamBlock struct {
 	SingleStranded bool
 }
 
-type NewDNASequenceConfig struct {
-	ID             execute.ThreadID
-	BlockID        execute.BlockID
-	Error          bool
-	DNA_seq        string
-	Gene_name      string
-	Linear         bool
-	Plasmid        bool
-	SingleStranded bool
-}
-
-type NewDNASequenceResultBlock struct {
-	ID          execute.ThreadID
-	BlockID     execute.BlockID
-	Error       bool
+type Output_ struct {
 	DNA         wtype.DNASequence
 	DNAwithORFs sequences.AnnotatedSeq
 	Status      string
-}
-
-type NewDNASequenceJSONBlock struct {
-	ID             *execute.ThreadID
-	BlockID        *execute.BlockID
-	Error          *bool
-	DNA_seq        *string
-	Gene_name      *string
-	Linear         *bool
-	Plasmid        *bool
-	SingleStranded *bool
-	DNA            *wtype.DNASequence
-	DNAwithORFs    *sequences.AnnotatedSeq
-	Status         *string
-}
-
-func (c *NewDNASequence) ComponentInfo() *execute.ComponentInfo {
-	inp := make([]execute.PortInfo, 0)
-	outp := make([]execute.PortInfo, 0)
-	inp = append(inp, *execute.NewPortInfo("DNA_seq", "string", "DNA_seq", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Gene_name", "string", "Gene_name", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Linear", "bool", "Linear", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Plasmid", "bool", "Plasmid", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("SingleStranded", "bool", "SingleStranded", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("DNA", "wtype.DNASequence", "DNA", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("DNAwithORFs", "sequences.AnnotatedSeq", "DNAwithORFs", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Status", "string", "Status", true, true, nil, nil))
-
-	ci := execute.NewComponentInfo("NewDNASequence", "NewDNASequence", "", false, inp, outp)
-
-	return ci
 }

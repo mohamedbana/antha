@@ -1,14 +1,11 @@
 {
-    "properties": {
-        "name": "main"
-    },
+    "connections": [],
     "processes": {
-        "AliquotParams": {
-            "component": "Aliquot",
-            "metadata": {
-                "label": "CS"
-            }
+        "AliquotParams1": {
+            "component": "Aliquot"
+        },
+        "AliquotParams2": {
+            "component": "Aliquot"
         }
-    },
-    "connections": [ ]
+    }
 }

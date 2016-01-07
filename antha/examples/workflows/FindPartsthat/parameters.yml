@@ -1,19 +1,14 @@
 {
-    "Parameters": [{
-        "FindPartsthat":{ 				
-           "Parttypes": [
-            "Terminator",
-            
+    "Parameters": {
+        "FindPartsthat": {
+            "OnlyreturnAvailableParts": true,
+            "OnlyreturnWorkingparts": true,
+            "Partdescriptions": [
+                "Double"
             ],
-		 "Partdescriptions": [
-            "Double",
-            ],
-			"OnlyreturnAvailableParts":true,
-			"OnlyreturnWorkingparts":true,
+            "Parttypes": [
+                "Terminator"
+            ]
         }
-    }],
-    "Config": {
-        "OUTPUT_COUNT": 1
     }
 }
-
