@@ -25,10 +25,11 @@ package liquidhandling
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/internal/github.com/ghodss/yaml"
 	"io/ioutil"
 	"os"
+
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/internal/github.com/ghodss/yaml"
 )
 
 func MakePolicies() map[string]LHPolicy {
