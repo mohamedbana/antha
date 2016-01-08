@@ -10,7 +10,7 @@ func TestFuncRunner(t *testing.T) {
 	var result int
 	if err := Add(ctx, Name{Repo: "noop"}, &FuncRunner{
 		RunFunc: func(context.Context, Value) (Value, error) {
-			return map[string]interface{}{"Result": &result}, nil
+			return Value{"Result": &result}, nil
 		},
 	}); err != nil {
 		t.Fatal(err)

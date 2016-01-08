@@ -1,3 +1,5 @@
+// Package execute connects Antha elements to the trace execution
+// infrastructure.
 package execute
 
 import (
