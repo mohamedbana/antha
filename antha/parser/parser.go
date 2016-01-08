@@ -574,6 +574,17 @@ func (p *parser) parseIdent() *ast.Ident {
 	return &ast.Ident{NamePos: pos, Name: name}
 }
 
+func (p *parser) parseToken(tok token.Token) *ast.Ident {
+	pos := p.pos
+	name := "_"
+	if p.tok == tok {
+		p.next()
+	} else {
+		p.expect(tok) // use expect() error handling
+	}
+	return &ast.Ident{NamePos: pos, Name: name}
+}
+
 func (p *parser) parseIdentList() (list []*ast.Ident) {
 	if p.trace {
 		defer un(trace(p, "IdentList"))
@@ -1165,6 +1176,12 @@ func (p *parser) parseOperand(lhs bool) ast.Expr {
 	switch p.tok {
 	case token.IDENT:
 		x := p.parseIdent()
+		if !lhs {
+			p.resolve(x)
+		}
+		return x
+	case token.PARAMETERS, token.INPUTS:
+		x := p.parseToken(p.tok)
 		if !lhs {
 			p.resolve(x)
 		}
