@@ -425,8 +425,8 @@ func (p *compiler) sugarAST(d []ast.Decl) {
 		switch decl := d[i].(type) {
 		case *ast.GenDecl:
 		case *ast.AnthaDecl:
-			p.sugarForParams(decl.Body)
-			p.sugarForIntrinsics(decl.Body)
+			ast.Inspect(decl.Body, p.inspectForParams)
+			ast.Inspect(decl.Body, p.inspectForIntrinsics)
 			p.sugarForTypes(decl.Body)
 		default:
 			continue
@@ -516,60 +516,65 @@ func (p *compiler) sugarForTypes(root ast.Node) ast.Node {
 }
 
 // Replace bare antha identifiers with go qualified names
-func (p *compiler) sugarForParams(body *ast.BlockStmt) {
-	// TODO(ddn): merge with sugarForTypes or clone and adopt a similar strategy to
-	// restrict replacements to unqualified variable use. Right now, the code below
-	// can rewrite field accesses, etc.
-	for _, node := range body.List {
-		ast.Inspect(node, func(n ast.Node) bool {
-			switch node := n.(type) {
-			case nil:
-				return false
-			case *ast.Ident:
-				// sugar the name if it is a known param
-				if _, ok := p.paramTypes[node.Name]; ok {
-					node.Name = "_input." + node.Name
-				} else if _, ok := p.resultTypes[node.Name]; ok {
-					node.Name = "_output." + node.Name
-				}
-				// test if the left hand side of an assignment is to a results variable
-				// if so, sugar it by replacing the = with a channel operation
-			case *ast.AssignStmt:
-				// test if a result is being assigned to.
-				for j := range node.Lhs {
-					if ident, ok := node.Lhs[j].(*ast.Ident); ok {
-						isUpper := ident.Name[0:1] == strings.ToUpper(ident.Name[0:1])
-						if _, fixme := p.resultTypes[ident.Name]; fixme && isUpper {
-							ident.Name = "_output." + ident.Name
-						}
-					}
-				}
-			default:
-			}
-			return true
-		})
+func (p *compiler) inspectForParams(node ast.Node) bool {
+	// sugar if it is a known param
+	rewriteIdent := func(node *ast.Ident) {
+		if _, ok := p.paramTypes[node.Name]; ok {
+			node.Name = "_input." + node.Name
+		} else if _, ok := p.resultTypes[node.Name]; ok {
+			node.Name = "_output." + node.Name
+		}
 	}
+
+	rewriteAssignLhs := func(node *ast.AssignStmt) {
+		for j := range node.Lhs {
+			if ident, ok := node.Lhs[j].(*ast.Ident); ok {
+				isUpper := ident.Name[0:1] == strings.ToUpper(ident.Name[0:1])
+				if _, fixme := p.resultTypes[ident.Name]; fixme && isUpper {
+					ident.Name = "_output." + ident.Name
+				}
+			}
+		}
+	}
+
+	switch n := node.(type) {
+	case nil:
+		return false
+	case *ast.AssignStmt:
+		rewriteAssignLhs(n)
+	case *ast.KeyValueExpr:
+		if _, identKey := n.Key.(*ast.Ident); identKey {
+			// Skip identifiers that are keys
+			ast.Inspect(n.Value, p.inspectForParams)
+			return false
+		}
+	case *ast.Ident:
+		rewriteIdent(n)
+	case *ast.SelectorExpr:
+		// Skip identifiers that are field accesses
+		ast.Inspect(n.X, p.inspectForParams)
+		return false
+	}
+	return true
 }
 
 // Replace bare antha function names with go qualified names
-func (p *compiler) sugarForIntrinsics(body *ast.BlockStmt) {
-	ast.Inspect(body, func(node ast.Node) bool {
-		switch n := node.(type) {
-		case nil:
-		case *ast.CallExpr:
-			if ident, direct := n.Fun.(*ast.Ident); !direct {
-				break
-			} else if sugar, ok := p.intrinsics[ident.Name]; !ok {
-				break
-			} else {
-				ident.Name = sugar
-				expr, _ := parser.ParseExpr("_ctx")
-				n.Args = append([]ast.Expr{expr}, n.Args...)
-			}
-		default:
+func (p *compiler) inspectForIntrinsics(node ast.Node) bool {
+	switch n := node.(type) {
+	case nil:
+	case *ast.CallExpr:
+		if ident, direct := n.Fun.(*ast.Ident); !direct {
+			break
+		} else if sugar, ok := p.intrinsics[ident.Name]; !ok {
+			break
+		} else {
+			ident.Name = sugar
+			expr, _ := parser.ParseExpr("_ctx")
+			n.Args = append([]ast.Expr{expr}, n.Args...)
 		}
-		return true
-	})
+	default:
+	}
+	return true
 }
 
 // Return qualified reference to antha parameter
