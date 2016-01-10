@@ -25,6 +25,7 @@ package factory
 import (
 	"fmt"
 
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/microArch/logger"
 )
@@ -367,6 +368,19 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	A.Type = "load"
 	A.Smax = 1.0 //still not sure....
 	cmap[A.CName] = A
+
+	// protein paintbox
+
+	for _, value := range image.ProteinPaintboxmap {
+		A = wtype.NewLHComponent()
+		A.GenericMatter = matter["water"]
+		A.CName = value
+		A.Type = "culture"
+		A.Smax = 1.0
+		cmap[A.CName] = A
+
+	}
+
 	return cmap
 }
 

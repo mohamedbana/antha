@@ -26,6 +26,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/Phytip_miniprep"
 	"github.com/antha-lang/antha/antha/component/lib/PipetteImage"
 	"github.com/antha-lang/antha/antha/component/lib/PipetteImage_CMYK"
+	"github.com/antha-lang/antha/antha/component/lib/PipetteImage_living"
 	"github.com/antha-lang/antha/antha/component/lib/PlateOut"
 	"github.com/antha-lang/antha/antha/component/lib/Plotdata"
 	"github.com/antha-lang/antha/antha/component/lib/Plotdata_spreadsheet"
@@ -89,6 +90,7 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "Phytip_miniprep", Constructor: Phytip_miniprep.New})
 	c = append(c, ComponentDesc{Name: "PipetteImage", Constructor: PipetteImage.New})
 	c = append(c, ComponentDesc{Name: "PipetteImage_CMYK", Constructor: PipetteImage_CMYK.New})
+	c = append(c, ComponentDesc{Name: "PipetteImage_living", Constructor: PipetteImage_living.New})
 	c = append(c, ComponentDesc{Name: "RestrictionDigestion_conc", Constructor: RestrictionDigestion_conc.New})
 	c = append(c, ComponentDesc{Name: "RestrictionDigestion", Constructor: RestrictionDigestion.New})
 	c = append(c, ComponentDesc{Name: "SDSprep", Constructor: SDSprep.New})

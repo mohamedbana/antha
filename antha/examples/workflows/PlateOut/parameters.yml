@@ -6,7 +6,7 @@
             "DilutionX": 1,
             "IncubationTemp": "25C",
             "IncubationTime": "57600s",
-            "Plateoutvolume": "100ul",
+            "Plateoutvolume": "1000ul",
             "RecoveredCells": "neb5compcells"
         }
     }

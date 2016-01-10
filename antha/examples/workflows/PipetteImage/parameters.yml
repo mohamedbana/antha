@@ -10,7 +10,7 @@
 	"black"
 	],
 	"OnlythisColour":"",
-	  "Imagefilename": "synthacelogo.png",
+	  "Imagefilename": "nyancat2.jpg",
 		"Palettename":"Palette1",
 		"AvailableColours":[
 		"red",
@@ -20,8 +20,8 @@
 		"yellow",
 		"black"
 		],
-      "OutPlate": "SRWFB96_riser",
-      "VolumePerWell": "80ul"
+      "OutPlate": "nunc1536_riser",
+      "VolumePerWell": "5ul"
     }
   }
 }

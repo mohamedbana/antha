@@ -1,0 +1,13 @@
+{
+  "Parameters": {
+    "PipetteImage": {
+	"OnlythisColour":"",
+	  "Imagefilename": "nyancat2.jpg",
+		"Palettename":"ProteinPaintboxVisible",
+      "OutPlate": "greiner384_riser",
+      "VolumePerWell": "50ul"
+    }
+  }
+}
+
+
