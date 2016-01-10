@@ -371,16 +371,25 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 
 	// protein paintbox
 
-	for _, value := range image.ProteinPaintboxmap {
-		A = wtype.NewLHComponent()
-		A.GenericMatter = matter["water"]
-		A.CName = value
-		A.Type = "culture"
-		A.Smax = 1.0
-		cmap[A.CName] = A
+	for key, value := range image.ProteinPaintboxmap {
 
+		_, ok := cmap[value]
+		if ok == true {
+			alreadyinthere := cmap[value]
+
+			err := fmt.Errorf("attempt to add value", key, "for key", value, "to component factory", cmap, "failed due to duplicate entry", alreadyinthere)
+			panic(err)
+		} else {
+
+			A = wtype.NewLHComponent()
+			A.GenericMatter = matter["water"]
+			A.CName = value
+			A.Type = "culture"
+			A.Smax = 1.0
+			cmap[A.CName] = A
+
+		}
 	}
-
 	return cmap
 }
 

@@ -69,6 +69,7 @@ func palettefromMap(colourmap map[color.Color]string) (palette color.Palette) {
 	array := make([]color.Color, 0)
 
 	for key, _ := range colourmap {
+
 		array = append(array, key)
 	}
 
@@ -77,12 +78,20 @@ func palettefromMap(colourmap map[color.Color]string) (palette color.Palette) {
 
 }
 
-func reversepalettemap(colourmap map[color.Color]string) (stringmap map[string]color.Color) {
+func reversepalettemap(colourmap map[color.Color]string) (stringmap map[string]color.Color, err error) {
 
 	stringmap = make(map[string]color.Color, len(colourmap))
 
 	for key, value := range colourmap {
-		stringmap[value] = key
+
+		_, ok := stringmap[value]
+		if ok == true {
+			alreadyinthere := stringmap[value]
+
+			err = fmt.Errorf("attempt to add value", key, "for key", value, "to stringmap", stringmap, "failed due to duplicate entry", alreadyinthere)
+		} else {
+			stringmap[value] = key
+		}
 		fmt.Println("key:", key, "value", value)
 	}
 	return
@@ -139,10 +148,10 @@ var ProteinPaintboxmap = map[color.Color]string{
 	color.RGBA{R: uint8(196), G: uint8(183), B: uint8(137), A: uint8(255)}: "E.coli",
 
 	// lacZ expresser (e.g. pUC19) grown on S gal
-	color.RGBA{R: uint8(0), G: uint8(0), B: uint8(0), A: uint8(255)}: "black",
+	color.RGBA{R: uint8(0), G: uint8(0), B: uint8(0), A: uint8(255)}: "veryblack",
 
 	// plus white as a blank (or comment out to use EiraCFP)
-	color.RGBA{R: uint8(242), G: uint8(243), B: uint8(242), A: uint8(255)}: "white",
+	color.RGBA{R: uint8(242), G: uint8(243), B: uint8(242), A: uint8(255)}: "verywhite",
 }
 
 var UVProteinPaintboxmap = map[color.Color]string{
@@ -313,7 +322,10 @@ func PrintFPImagePreview(imagefile string, plate *wtype.LHPlate, visiblemap, uvm
 			colourstring := uvmap[rgba]
 			fmt.Println("colourstring", colourstring)
 			// change colour to colour of same cell + fluorescent protein under visible light
-			stringkeymap := reversepalettemap(visiblemap)
+			stringkeymap, err := reversepalettemap(visiblemap)
+			if err != nil {
+				panic(err)
+			}
 			fmt.Println("stringkeymap", stringkeymap)
 			viscolour, ok := stringkeymap[colourstring]
 			if ok != true {
