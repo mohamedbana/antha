@@ -3,13 +3,14 @@
 package image
 
 import (
-	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
-	//	"image"
 	"fmt"
+	goimage "image"
 	"image/color"
 	"image/color/palette"
 	"strconv"
 	"strings"
+
+	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
 
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -30,6 +31,10 @@ var AvailableComponentmaps = map[string]map[color.Color]string{
 	"Palette1":               Colourcomponentmap, //Chosencolourpalette,
 	"ProteinPaintboxVisible": ProteinPaintboxmap,
 	"ProteinPaintboxUV":      UVProteinPaintboxmap,
+}
+
+var Visibleequivalentmaps = map[string]map[color.Color]string{
+	"ProteinPaintboxUV": ProteinPaintboxmap,
 }
 
 func ColourtoCMYK(colour color.Color) (cmyk color.CMYK) {
@@ -72,6 +77,17 @@ func palettefromMap(colourmap map[color.Color]string) (palette color.Palette) {
 
 }
 
+func reversepalettemap(colourmap map[color.Color]string) (stringmap map[string]color.Color) {
+
+	stringmap = make(map[string]color.Color, len(colourmap))
+
+	for key, value := range colourmap {
+		stringmap[value] = key
+		fmt.Println("key:", key, "value", value)
+	}
+	return
+}
+
 var ProteinPaintboxmap = map[color.Color]string{
 	// under visible light
 
@@ -91,12 +107,16 @@ var ProteinPaintboxmap = map[color.Color]string{
 	// fluorescent proteins
 
 	//	color.RGBA{R: uint8(224), G: uint8(120), B: uint8(240), A: uint8(255)}:  "CindylouCFP",
-	color.RGBA{R: uint8(224), G: uint8(120), B: uint8(240), A: uint8(255)}: "FrostyCFP",
-	color.RGBA{R: uint8(196), G: uint8(183), B: uint8(137), A: uint8(255)}: "TwinkleCFP",
-	color.RGBA{R: uint8(251), G: uint8(176), B: uint8(0), A: uint8(255)}:   "YetiYFP",
-	color.RGBA{R: uint8(250), G: uint8(210), B: uint8(0), A: uint8(255)}:   "MarleyYFP",
-	color.RGBA{R: uint8(255), G: uint8(194), B: uint8(0), A: uint8(255)}:   "CratchitYFP",
-	color.RGBA{R: uint8(231), G: uint8(173), B: uint8(0), A: uint8(255)}:   "KringleYFP",
+	color.RGBA{R: uint8(224), G: uint8(120), B: uint8(140), A: uint8(255)}: "FrostyCFP",
+
+	// for twinkle B should = uint8(137) but inexplicably this results in an error where twinkle can no longer be added to the component library
+	color.RGBA{R: uint8(196), G: uint8(183), B: uint8(138), A: uint8(255)}: "TwinkleCFP",
+	//color.RGBA{R: uint8(196), G: uint8(183), B: uint8(137), A: uint8(255)}: "TwinkleCFP",
+	//color.RGBA{R: uint8(196), G: uint8(183), B: uint8(137), A: uint8(255)}: "TwinkleCFP",
+	color.RGBA{R: uint8(251), G: uint8(176), B: uint8(0), A: uint8(255)}: "YetiYFP",
+	color.RGBA{R: uint8(250), G: uint8(210), B: uint8(0), A: uint8(255)}: "MarleyYFP",
+	color.RGBA{R: uint8(255), G: uint8(194), B: uint8(0), A: uint8(255)}: "CratchitYFP",
+	color.RGBA{R: uint8(231), G: uint8(173), B: uint8(0), A: uint8(255)}: "KringleYFP",
 	//color.RGBA{R: uint8(222), G: uint8(221), B: uint8(68), A: uint8(255)}:     "CometGFP",
 	color.RGBA{R: uint8(209), G: uint8(214), B: uint8(0), A: uint8(255)}:   "DasherGFP",
 	color.RGBA{R: uint8(225), G: uint8(222), B: uint8(120), A: uint8(255)}: "IvyGFP",
@@ -128,8 +148,10 @@ var ProteinPaintboxmap = map[color.Color]string{
 var UVProteinPaintboxmap = map[color.Color]string{
 	// under UV
 	//	color.RGBA{R: uint8(0), G: uint8(255), B: uint8(255), A: uint8(255)}:  "CindylouCFP",
-	color.RGBA{R: uint8(0), G: uint8(255), B: uint8(255), A: uint8(255)}:  "FrostyCFP",
-	color.RGBA{R: uint8(27), G: uint8(79), B: uint8(146), A: uint8(255)}:  "TwinkleCFP",
+	color.RGBA{R: uint8(0), G: uint8(255), B: uint8(255), A: uint8(255)}: "FrostyCFP",
+	color.RGBA{R: uint8(27), G: uint8(79), B: uint8(146), A: uint8(255)}: "TwinkleCFP",
+	//color.RGBA{R: uint8(27), G: uint8(79), B: uint8(146), A: uint8(255)}: "TwinkleCFP",
+	//color.RGBA{R: uint8(27), G: uint8(79), B: uint8(146), A: uint8(255)}:  "TwinkleCFP",
 	color.RGBA{R: uint8(253), G: uint8(230), B: uint8(39), A: uint8(255)}: "YetiYFP",
 	color.RGBA{R: uint8(236), G: uint8(255), B: uint8(0), A: uint8(255)}:  "MarleyYFP",
 	color.RGBA{R: uint8(240), G: uint8(254), B: uint8(0), A: uint8(255)}:  "CratchitYFP",
@@ -156,9 +178,7 @@ var UVProteinPaintboxmap = map[color.Color]string{
 	color.RGBA{R: uint8(0), G: uint8(0), B: uint8(0), A: uint8(255)}: "E.coli",
 }
 
-// create a map of pixel to plate position from processing a given image with a chosen colour palette.
-// It's recommended to use at least 384 well plate
-func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolourpalette color.Palette) (wellpositiontocolourmap map[string]color.Color, numberofpixels int) {
+func ResizeImagetoPlate(imagefilename string, plate *wtype.LHPlate, algorithm imaging.ResampleFilter) (plateimage *goimage.NRGBA) {
 
 	// input files (just 1 in this case)
 	files := []string{imagefilename}
@@ -168,79 +188,158 @@ func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolour
 
 	//var plateimages []image.Image
 
-	for _, file := range files {
-		img, err := imaging.Open(file)
-		if err != nil {
-			panic(err)
+	img, err := imaging.Open(files[0])
+	if err != nil {
+		panic(err)
+	}
+
+	// have the option of changing the resize algorithm here
+	plateimage = imaging.Resize(img, 0, plate.WlsY, algorithm)
+	//plateimages = append(plateimages,plateimage)
+
+	return
+
+}
+
+// create a map of pixel to plate position from processing a given image with a chosen colour palette.
+// It's recommended to use at least 384 well plate
+func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolourpalette color.Palette) (wellpositiontocolourmap map[string]color.Color, numberofpixels int) {
+
+	plateimage := ResizeImagetoPlate(imagefilename, plate, imaging.CatmullRom)
+
+	// make map of well position to colour: (array for time being)
+
+	wellpositionarray := make([]string, 0)
+	colourarray := make([]color.Color, 0)
+	wellpositiontocolourmap = make(map[string]color.Color, 0)
+	// need to extend for 1536 plates
+	alphabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+		"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
+		"Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"}
+
+	// Find out colour at each position:
+	for y := 0; y < plateimage.Bounds().Dy(); y++ {
+		for x := 0; x < plateimage.Bounds().Dx(); x++ {
+			// colour or pixel in RGB
+			colour := plateimage.At(x, y)
+			colourarray = append(colourarray, colour)
+
+			// change colour to colour from a palette
+			newcolour := chosencolourpalette.Convert(colour)
+
+			plateimage.Set(x, y, newcolour)
+			// equivalent well position
+			wellposition := alphabet[y] + strconv.Itoa(x+1)
+			fmt.Println(wellposition)
+			wellpositionarray = append(wellpositionarray, wellposition)
+			wellpositiontocolourmap[wellposition] = newcolour
 		}
+	}
 
-		// have the option of changing the resize algorithm here
-		plateimage := imaging.Resize(img, 0, plate.WlsY, imaging.CatmullRom)
-		//plateimages = append(plateimages,plateimage)
+	// rename file
+	splitfilename := strings.Split(imagefilename, `.`)
 
-		// make map of well position to colour: (array for time being)
+	newname := splitfilename[0] + "_plateformat" + `.` + splitfilename[1]
+	// save
+	err := imaging.Save(plateimage, newname)
+	if err != nil {
+		panic(err)
+	}
 
-		wellpositionarray := make([]string, 0)
-		colourarray := make([]color.Color, 0)
-		wellpositiontocolourmap = make(map[string]color.Color, 0)
-		// need to extend for 1536 plates
-		alphabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
-			"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
-			"Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"}
+	// choose colour palette from top
 
-		// Find out colour at each position:
-		for y := 0; y < plateimage.Bounds().Dy(); y++ {
-			for x := 0; x < plateimage.Bounds().Dx(); x++ {
-				// colour or pixel in RGB
-				colour := plateimage.At(x, y)
-				colourarray = append(colourarray, colour)
+	//arrayfrompalette := make([]color.Color, 0)
 
-				// change colour to colour from a palette
-				newcolour := chosencolourpalette.Convert(colour)
+	for i, combo := range colourarray {
+		fmt.Println("for well position ", wellpositionarray[i], ":")
+		r, g, b, a := combo.RGBA()
 
-				plateimage.Set(x, y, newcolour)
-				// equivalent well position
-				wellposition := alphabet[y] + strconv.Itoa(x+1)
-				fmt.Println(wellposition)
-				wellpositionarray = append(wellpositionarray, wellposition)
-				wellpositiontocolourmap[wellposition] = newcolour
+		fmt.Println("colour (r,g,b,a)= ", r/256, g/256, b/256, a/256)
+
+		// closest palette colour
+		fmt.Println("palette colour:", chosencolourpalette.Convert(combo))
+		fmt.Println("palette colour number:", chosencolourpalette.Index(combo))
+	}
+
+	numberofpixels = len(colourarray)
+	fmt.Println("numberofpixels:", numberofpixels)
+
+	return
+}
+
+func PrintFPImagePreview(imagefile string, plate *wtype.LHPlate, visiblemap, uvmap map[color.Color]string) {
+
+	plateimage := ResizeImagetoPlate(imagefile, plate, imaging.CatmullRom)
+
+	uvpalette := palettefromMap(uvmap)
+
+	// Find out colour at each position under UV:
+	for y := 0; y < plateimage.Bounds().Dy(); y++ {
+		for x := 0; x < plateimage.Bounds().Dx(); x++ {
+			// colour or pixel in RGB
+			colour := plateimage.At(x, y)
+
+			// change colour to colour from a palette
+			uvcolour := uvpalette.Convert(colour)
+
+			plateimage.Set(x, y, uvcolour)
+
+		}
+	}
+
+	// rename file
+	splitfilename := strings.Split(imagefile, `.`)
+
+	newname := splitfilename[0] + "_plateformat_UV" + `.` + splitfilename[1]
+	// save
+	err := imaging.Save(plateimage, newname)
+	if err != nil {
+		panic(err)
+	}
+
+	// repeat for visible
+
+	// Find out colour at each position under visible light:
+	for y := 0; y < plateimage.Bounds().Dy(); y++ {
+		for x := 0; x < plateimage.Bounds().Dx(); x++ {
+			// colour or pixel in RGB
+
+			colour := plateimage.At(x, y)
+			r, g, b, a := colour.RGBA()
+			rgba := color.RGBA{R: uint8(r), G: uint8(g), B: uint8(b), A: uint8(a)}
+			fmt.Println("colour", colour)
+			fmt.Println("visiblemap", visiblemap)
+			fmt.Println("uvmap", uvmap)
+			colourstring := uvmap[rgba]
+			fmt.Println("colourstring", colourstring)
+			// change colour to colour of same cell + fluorescent protein under visible light
+			stringkeymap := reversepalettemap(visiblemap)
+			fmt.Println("stringkeymap", stringkeymap)
+			viscolour, ok := stringkeymap[colourstring]
+			if ok != true {
+				errmessage := fmt.Sprintln("colourstring", colourstring, "not found in map", stringkeymap, "len", len(stringkeymap))
+				panic(errmessage)
 			}
+			fmt.Println("viscolour", viscolour)
+			plateimage.Set(x, y, viscolour)
+
 		}
+	}
 
-		// rename file
-		splitfilename := strings.Split(file, `.`)
+	// rename file
+	splitfilename = strings.Split(imagefile, `.`)
 
-		newname := splitfilename[0] + "_plateformat" + `.` + splitfilename[1]
-		// save
-		err = imaging.Save(plateimage, newname)
-		if err != nil {
-			panic(err)
-		}
-
-		// choose colour palette from top
-
-		//arrayfrompalette := make([]color.Color, 0)
-
-		for i, combo := range colourarray {
-			fmt.Println("for well position ", wellpositionarray[i], ":")
-			r, g, b, a := combo.RGBA()
-
-			fmt.Println("colour (r,g,b,a)= ", r/256, g/256, b/256, a/256)
-
-			// closest palette colour
-			fmt.Println("palette colour:", chosencolourpalette.Convert(combo))
-			fmt.Println("palette colour number:", chosencolourpalette.Index(combo))
-		}
-
-		numberofpixels = len(colourarray)
-		fmt.Println("numberofpixels:", numberofpixels)
-
+	newname = splitfilename[0] + "_plateformat_vis" + `.` + splitfilename[1]
+	// save
+	err = imaging.Save(plateimage, newname)
+	if err != nil {
+		panic(err)
 	}
 	return
 }
 
 //  Final function for user which uses a given map of position to colour generated from the image processing function  along with lists of available colours, components and plate types
-func PipetteImagetoPlate(OutPlate *wtype.LHPlate, positiontocolourmap map[string]color.Color, availablecolours []string, componentlist []*wtype.LHComponent, volumeperwell wunit.Volume) (finalsolutions []*wtype.LHSolution) {
+/*func PipetteImagetoPlate(OutPlate *wtype.LHPlate, positiontocolourmap map[string]color.Color, availablecolours []string, componentlist []*wtype.LHComponent, volumeperwell wunit.Volume) (finalsolutions []*wtype.LHSolution) {
 
 	componentmap, err := MakestringtoComponentMap(availablecolours, componentlist)
 	if err != nil {
@@ -264,7 +363,7 @@ func PipetteImagetoPlate(OutPlate *wtype.LHPlate, positiontocolourmap map[string
 
 	finalsolutions = solutions
 	return
-}
+}*/
 
 // make a map of which colour description applies to which component assuming all components in factory are available, returns errors if either keys or components cannot be added
 /*

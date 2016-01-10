@@ -2,9 +2,10 @@
   "Parameters": {
     "PipetteImage": {
 	"OnlythisColour":"",
-	  "Imagefilename": "nyancat2.jpg",
-		"Palettename":"ProteinPaintboxVisible",
+	  "Imagefilename": "omg.jpg",
+		"Palettename":"ProteinPaintboxUV",
       "OutPlate": "greiner384_riser",
+		"UVimage":true,
       "VolumePerWell": "50ul"
     }
   }

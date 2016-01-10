@@ -39,6 +39,13 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 	chosencolourpalette := image.AvailablePalettes[_input.Palettename]
 	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, chosencolourpalette)
 
+	if _input.UVimage {
+		uvmap := image.AvailableComponentmaps[_input.Palettename]
+		visiblemap := image.Visibleequivalentmaps[_input.Palettename]
+
+		image.PrintFPImagePreview(_input.Imagefilename, _input.OutPlate, visiblemap, uvmap)
+	}
+
 	// get components from factory
 	componentmap := make(map[string]*wtype.LHComponent, 0)
 
@@ -146,6 +153,7 @@ type Input_ struct {
 	OnlythisColour string
 	OutPlate       *wtype.LHPlate
 	Palettename    string
+	UVimage        bool
 	VolumePerWell  wunit.Volume
 }
 

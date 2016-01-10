@@ -16,6 +16,7 @@ Parameters (
 	Imagefilename string
 	Palettename string
 	OnlythisColour string
+	UVimage bool
 )
 
 // Data which is returned from this protocol, and data types
@@ -50,6 +51,14 @@ Steps {
 	
 	chosencolourpalette := image.AvailablePalettes[Palettename]
 	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, chosencolourpalette) 
+	
+	if UVimage {
+		uvmap := image.AvailableComponentmaps[Palettename]
+		visiblemap := image.Visibleequivalentmaps[Palettename]
+		
+		image.PrintFPImagePreview(Imagefilename,OutPlate, visiblemap, uvmap)
+	}
+	
 	
 
 	// get components from factory
