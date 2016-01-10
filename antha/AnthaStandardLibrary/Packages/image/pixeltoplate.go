@@ -19,9 +19,10 @@ import (
 // Colour palette to use // this would relate to a map of components of these available colours in factor
 
 var AvailablePalettes = map[string]color.Palette{
-	"Palette1": Chosencolourpalette,
-	"WebSafe":  palette.WebSafe, //websafe,
-	"Plan9":    palette.Plan9,
+	"Palette1":        palettefromMap(Colourcomponentmap), //Chosencolourpalette,
+	"WebSafe":         palette.WebSafe,                    //websafe,
+	"Plan9":           palette.Plan9,
+	"ProteinPaintbox": palettefromMap(ProteinPaintboxmap),
 }
 
 func ColourtoCMYK(colour color.Color) (cmyk color.CMYK) {
@@ -49,6 +50,49 @@ var Colourcomponentmap = map[color.Color]string{
 	color.RGBA{R: uint8(75), G: uint8(151), B: uint8(74), A: uint8(255)}:   "green",
 	color.RGBA{R: uint8(196), G: uint8(40), B: uint8(27), A: uint8(255)}:   "red",
 	color.RGBA{R: uint8(0), G: uint8(0), B: uint8(0), A: uint8(0)}:         "black",
+}
+
+func palettefromMap(colourmap map[color.Color]string) (palette color.Palette) {
+
+	array := make([]color.Color, 0)
+
+	for key, _ := range colourmap {
+		array = append(array, key)
+	}
+
+	palette = array
+	return
+
+}
+
+var ProteinPaintboxmap = map[color.Color]string{
+	// Chromogenic proteins
+	color.RGBA{R: uint8(70), G: uint8(105), B: uint8(172), A: uint8(255)}:  "BlitzenBlue",
+	color.RGBA{R: uint8(27), G: uint8(79), B: uint8(146), A: uint8(255)}:   "DreidelTeal",
+	color.RGBA{R: uint8(107), G: uint8(80), B: uint8(140), A: uint8(255)}:  "VirginiaViolet",
+	color.RGBA{R: uint8(120), G: uint8(76), B: uint8(190), A: uint8(255)}:  "VixenPurple",
+	color.RGBA{R: uint8(77), G: uint8(11), B: uint8(137), A: uint8(255)}:   "TinselPurple",
+	color.RGBA{R: uint8(82), G: uint8(35), B: uint8(119), A: uint8(255)}:   "MaccabeePurple",
+	color.RGBA{R: uint8(152), G: uint8(76), B: uint8(128), A: uint8(255)}:  "DonnerMagenta",
+	color.RGBA{R: uint8(159), G: uint8(25), B: uint8(103), A: uint8(255)}:  "CupidPink",
+	color.RGBA{R: uint8(206), G: uint8(89), B: uint8(142), A: uint8(255)}:  "SeraphinaPink",
+	color.RGBA{R: uint8(215), G: uint8(96), B: uint8(86), A: uint8(255)}:   "ScroogeOrange",
+	color.RGBA{R: uint8(228), G: uint8(110), B: uint8(104), A: uint8(255)}: "LeorOrange",
+	// fluorescent proteins
+	//	color.RGBA{R: uint8(0), G: uint8(255), B: uint8(255), A: uint8(255)}:  "CindylouCFP",
+	color.RGBA{R: uint8(0), G: uint8(255), B: uint8(255), A: uint8(255)}:  "FrostyCFP",
+	color.RGBA{R: uint8(27), G: uint8(79), B: uint8(146), A: uint8(255)}:  "TwinkleCFP",
+	color.RGBA{R: uint8(253), G: uint8(230), B: uint8(39), A: uint8(255)}: "YetiYFP",
+	color.RGBA{R: uint8(236), G: uint8(255), B: uint8(0), A: uint8(255)}:  "MarleyYFP",
+	color.RGBA{R: uint8(240), G: uint8(254), B: uint8(0), A: uint8(255)}:  "CratchitYFP",
+	color.RGBA{R: uint8(239), G: uint8(255), B: uint8(0), A: uint8(255)}:  "KringleYFP",
+	//color.RGBA{R: uint8(0), G: uint8(255), B: uint8(0), A: uint8(255)}:     "CometGFP",
+	color.RGBA{R: uint8(0), G: uint8(255), B: uint8(0), A: uint8(255)}:   "DasherGFP",
+	color.RGBA{R: uint8(0), G: uint8(232), B: uint8(216), A: uint8(255)}: "IvyGFP",
+	//color.RGBA{R: uint8(0), G: uint8(255), B: uint8(0), A: uint8(255)}:     "HollyGFP",
+	color.RGBA{R: uint8(254), G: uint8(179), B: uint8(18), A: uint8(255)}: "YukonOFP",
+	color.RGBA{R: uint8(218), G: uint8(92), B: uint8(69), A: uint8(255)}:  "RudolphRFP",
+	color.RGBA{R: uint8(255), G: uint8(0), B: uint8(166), A: uint8(255)}:  "FresnoRFP",
 }
 
 // create a map of pixel to plate position from processing a given image with a chosen colour palette.
