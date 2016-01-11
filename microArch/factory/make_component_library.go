@@ -369,6 +369,41 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	A.Smax = 1.0 //still not sure....
 	cmap[A.CName] = A
 
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "LB"
+	A.Type = "water"
+	A.Smax = 1.0 //still not sure....
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "Kanamycin"
+	A.Type = "water"
+	A.Smax = 1.0 //still not sure....
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "Glucose"
+	A.Type = "water"
+	A.Smax = 1.0 //still not sure....
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "Lactose"
+	A.Type = "water"
+	A.Smax = 1.0 //still not sure....
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "LB_autoinduction_Amp"
+	A.Type = "water"
+	A.Smax = 1.0 //still not sure....
+	cmap[A.CName] = A
+
 	// protein paintbox
 
 	for key, value := range image.ProteinPaintboxmap {

@@ -4,6 +4,8 @@ package PipetteImage_living
 import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -15,11 +17,19 @@ import (
 
 // Input parameters for this protocol (data)
 
+/*AntibioticVolume Volume
+InducerVolume Volume
+RepressorVolume Volume*/
+
 // Data which is returned from this protocol, and data types
 
 // Physical Inputs to this protocol with types
 
 //InPlate *wtype.LHPlate
+//Media *wtype.LHComponent
+/*Antibiotic *wtype.LHComponent
+Inducer *wtype.LHComponent
+Repressor *wtype.LHComponent*/
 
 // Physical outputs from this protocol with types
 
@@ -35,6 +45,8 @@ func _setup(_ctx context.Context, _input *Input_) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
+
+	_output.UniqueComponents = make([]string, 0)
 
 	chosencolourpalette := image.AvailablePalettes[_input.Palettename]
 	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, chosencolourpalette)
@@ -66,6 +78,8 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 
 	for locationkey, colour := range positiontocolourmap {
 
+		components := make([]*wtype.LHComponent, 0)
+
 		component := componentmap[colourtostringmap[colour]]
 
 		if component.Type == "dna" {
@@ -76,23 +90,54 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 		if _input.OnlythisColour != "" {
 
 			if image.Colourcomponentmap[colour] == _input.OnlythisColour {
+
+				_output.UniqueComponents = append(_output.UniqueComponents, component.CName)
+
 				counter = counter + 1
 				fmt.Println("wells", counter)
+				//mediaSample := mixer.SampleForTotalVolume(Media, VolumePerWell)
+				//components = append(components,mediaSample)
+				/*antibioticSample := mixer.Sample(Antibiotic, AntibioticVolume)
+				components = append(components,antibioticSample)
+				repressorSample := mixer.Sample(Repressor, RepressorVolume)
+				components = append(components,repressorSample)
+				inducerSample := mixer.Sample(Inducer, InducerVolume)
+				components = append(components,inducerSample)*/
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
+				components = append(components, pixelSample)
 				solution := execute.MixTo(_ctx,
 
-					_input.OutPlate, locationkey, pixelSample)
+					_input.OutPlate, locationkey, components...)
+				execute.Incubate(_ctx,
+
+					solution, _input.IncTemp, _input.IncTime, true)
 				solutions = append(solutions, solution)
 			}
 
 		} else {
-			if component.CName != "white" {
+			if component.CName != _input.Notthiscolour {
+
+				_output.UniqueComponents = append(_output.UniqueComponents, component.CName)
+
 				counter = counter + 1
 				fmt.Println("wells", counter)
+				//mediaSample := mixer.SampleForTotalVolume(Media, VolumePerWell)
+				//components = append(components,mediaSample)
+				/*antibioticSample := mixer.Sample(Antibiotic, AntibioticVolume)
+				components = append(components,antibioticSample)
+				repressorSample := mixer.Sample(Repressor, RepressorVolume)
+				components = append(components,repressorSample)
+				inducerSample := mixer.Sample(Inducer, InducerVolume)
+				components = append(components,inducerSample)*/
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
+				components = append(components, pixelSample)
 				solution := execute.MixTo(_ctx,
 
-					_input.OutPlate, locationkey, pixelSample)
+					_input.OutPlate, locationkey, components...)
+
+				execute.Incubate(_ctx,
+
+					solution, _input.IncTemp, _input.IncTime, true)
 				solutions = append(solutions, solution)
 			}
 		}
@@ -100,6 +145,10 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 
 	_output.Numberofpixels = len(_output.Pixels)
 	fmt.Println("Pixels =", _output.Numberofpixels)
+
+	_output.UniqueComponents = search.RemoveDuplicates(_output.UniqueComponents)
+	text.Print("Unique Components:", _output.UniqueComponents)
+	fmt.Println("number of unique components", len(_output.UniqueComponents))
 	_output.Pixels = solutions
 
 }
@@ -149,15 +198,20 @@ type Element_ struct {
 }
 
 type Input_ struct {
-	Imagefilename  string
-	OnlythisColour string
-	OutPlate       *wtype.LHPlate
-	Palettename    string
-	UVimage        bool
-	VolumePerWell  wunit.Volume
+	Imagefilename     string
+	IncTemp           wunit.Temperature
+	IncTime           wunit.Time
+	InoculationVolume wunit.Volume
+	Notthiscolour     string
+	OnlythisColour    string
+	OutPlate          *wtype.LHPlate
+	Palettename       string
+	UVimage           bool
+	VolumePerWell     wunit.Volume
 }
 
 type Output_ struct {
-	Numberofpixels int
-	Pixels         []*wtype.LHSolution
+	Numberofpixels   int
+	Pixels           []*wtype.LHSolution
+	UniqueComponents []string
 }
