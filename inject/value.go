@@ -130,7 +130,7 @@ func nilable(v reflect.Value) bool {
 	return false
 }
 
-func assign(from, to interface{}, set bool) error {
+func assign(from, to interface{}, set, ignoreMissing bool) error {
 	toValue := reflect.ValueOf(to)
 	toFields, err := makeFields(toValue)
 	if err != nil {
@@ -150,7 +150,9 @@ func assign(from, to interface{}, set bool) error {
 		// from: interface{}, to: error), but it is always okay to set "to" to
 		// nil
 		toNil := nilable(v) && v.IsNil()
-		if !ok {
+		if !ok && ignoreMissing {
+			continue
+		} else if !ok {
 			return fmt.Errorf("missing field %q", name)
 		} else if fromT, toT := v.Type(), toV.Type(); !fromT.AssignableTo(toT) && !toNil {
 			return fmt.Errorf("field %q of type %s not assignable to type %s", name, fromT, toT)
@@ -179,11 +181,17 @@ func assign(from, to interface{}, set bool) error {
 // src field must be golang assignable to the dst field, and (3) the dst fields
 // must be golang settable (i.e., have an address).
 func AssignableTo(src, dst interface{}) error {
-	return assign(src, dst, false)
+	return assign(src, dst, false, false)
 }
 
 // Assign values from Value or struct to Value or struct. If src is not
 // AssignableTo dst, return an error.
 func Assign(src, dst interface{}) error {
-	return assign(src, dst, true)
+	return assign(src, dst, true, false)
+}
+
+// Assign some values from Value or struct to Value or struct. Like Assign
+// but ignore fields in src that are not present in dst.
+func AssignSome(src, dst interface{}) error {
+	return assign(src, dst, true, true)
 }

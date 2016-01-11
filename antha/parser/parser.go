@@ -576,7 +576,7 @@ func (p *parser) parseIdent() *ast.Ident {
 
 func (p *parser) parseToken(tok token.Token) *ast.Ident {
 	pos := p.pos
-	name := "_"
+	name := tok.String()
 	if p.tok == tok {
 		p.next()
 	} else {
@@ -1180,7 +1180,7 @@ func (p *parser) parseOperand(lhs bool) ast.Expr {
 			p.resolve(x)
 		}
 		return x
-	case token.PARAMETERS, token.INPUTS:
+	case token.PARAMETERS, token.INPUTS, token.OUTPUTS, token.DATA:
 		x := p.parseToken(p.tok)
 		if !lhs {
 			p.resolve(x)
@@ -1224,7 +1224,13 @@ func (p *parser) parseSelector(x ast.Expr) ast.Expr {
 		defer un(trace(p, "Selector"))
 	}
 
-	sel := p.parseIdent()
+	var sel *ast.Ident
+	switch p.tok {
+	case token.OUTPUTS, token.DATA:
+		sel = p.parseToken(p.tok)
+	default:
+		sel = p.parseIdent()
+	}
 
 	return &ast.SelectorExpr{X: x, Sel: sel}
 }
@@ -1508,7 +1514,7 @@ L:
 				p.resolve(x)
 			}
 			switch p.tok {
-			case token.IDENT:
+			case token.IDENT, token.DATA, token.OUTPUTS:
 				x = p.parseSelector(p.checkExprOrType(x))
 			case token.LPAREN:
 				x = p.parseTypeAssertion(p.checkExpr(x))
