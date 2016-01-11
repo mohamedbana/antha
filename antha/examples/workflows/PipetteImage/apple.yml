@@ -10,6 +10,7 @@
 	"black"
 	],
 	"OnlythisColour":"",
+	"NotthisColour":"white",
 	  "Imagefilename": "apple.jpg",
 		"Palettename":"Palette1",
 		"AvailableColours":[

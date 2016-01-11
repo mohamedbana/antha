@@ -71,7 +71,7 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 			}
 
 		} else {
-			if component.CName != "white" {
+			if component.CName != _input.NotthisColour {
 				counter = counter + 1
 				fmt.Println("wells", counter)
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
@@ -137,6 +137,7 @@ type Input_ struct {
 	AvailableColours []string
 	Colourcomponents []*wtype.LHComponent
 	Imagefilename    string
+	NotthisColour    string
 	OnlythisColour   string
 	OutPlate         *wtype.LHPlate
 	Palettename      string

@@ -16,6 +16,7 @@ Parameters (
 	Palettename string
 	AvailableColours []string
 	OnlythisColour string
+	NotthisColour string
 )
 
 // Data which is returned from this protocol, and data types
@@ -83,7 +84,7 @@ Steps {
 			}
 			
 		}else{
-			if component.CName !="white"{
+			if component.CName != NotthisColour{
 			counter = counter + 1
 			fmt.Println("wells",counter)
 		pixelSample := mixer.Sample(component, VolumePerWell)

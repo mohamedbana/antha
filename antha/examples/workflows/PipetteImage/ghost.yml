@@ -19,6 +19,7 @@
             ],
             "Imagefilename": "ghost.jpg",
             "OnlythisColour": "green",
+			"NotthisColour":"white",
             "OutPlate": "greiner384",
             "Palettename": "Palette1",
             "VolumePerWell": "10ul"

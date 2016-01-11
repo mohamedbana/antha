@@ -10,7 +10,8 @@
 	"black"
 	],
 	"OnlythisColour":"",
-	  "Imagefilename": "nyancat2.jpg",
+	"NotthisColour":"white",
+	  "Imagefilename": "apple.jpg",
 		"Palettename":"Palette1",
 		"AvailableColours":[
 		"red",
