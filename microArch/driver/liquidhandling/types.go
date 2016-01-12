@@ -302,7 +302,9 @@ func NewLHProperties(num_positions int, model, manufacturer, lhtype, tiptype str
 
 func (lhp *LHProperties) AddTipBox(tipbox *wtype.LHTipbox) {
 
-	for _, pref := range lhp.Tip_preferences {
+	//for _, pref := range lhp.Tip_preferences {
+	for i := len(lhp.Tip_preferences) - 1; i >= 0; i-- {
+		pref := lhp.Tip_preferences[i]
 		if lhp.PosLookup[pref] != "" {
 
 			//fmt.Println(pref, " ", lhp.PlateLookup[lhp.PosLookup[pref]])
@@ -454,13 +456,16 @@ func (lhp *LHProperties) GetCleanTips(tiptype string, channel *wtype.LHChannelPa
 		n_tips_left += bx.N_clean_tips()
 	}
 
-	logger.Debug(fmt.Sprintf("There are %d clean tips of type %s left", n_tips_left, tiptype))
+	//	logger.Debug(fmt.Sprintf("There are %d clean tips of type %s left", n_tips_left, tiptype))
 
 	foundit := false
 
-	for _, pos := range lhp.Tip_preferences {
-		bx := lhp.Tipboxes[pos]
-		if bx.Tiptype.Type != tiptype {
+	// reverse order
+	//	for _, pos := range lhp.Tip_preferences {
+	for i := len(lhp.Tip_preferences) - 1; i >= 0; i-- {
+		pos := lhp.Tip_preferences[i]
+		bx, ok := lhp.Tipboxes[pos]
+		if !ok || bx.Tiptype.Type != tiptype {
 			continue
 		}
 		wells = bx.GetTips(mirror, multi, channel.Orientation)

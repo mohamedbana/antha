@@ -673,7 +673,7 @@ func (p *compiler) sugarAST(d []ast.Decl) []string {
 }
 
 // Return appropriate nested SelectorExpr for the replacement for Identifier
-func (p *compiler) sugarForIdent(t *ast.Ident) ast.Expr {
+func (p *compiler) sugarForIdent(t *ast.Ident, m map[string]int) ast.Expr {
 	if v, ok := p.types[t.Name]; ok {
 		cs := strings.Split(v, ".")
 		var base ast.Expr = &ast.Ident{NamePos: t.NamePos, Name: cs[0]}
@@ -687,29 +687,29 @@ func (p *compiler) sugarForIdent(t *ast.Ident) ast.Expr {
 }
 
 // Return appropriate go type for an antha (type) expr
-func (p *compiler) sugarForType(t ast.Expr) ast.Expr {
+func (p *compiler) sugarForType(t ast.Expr, m map[string]int) ast.Expr {
 	switch t := t.(type) {
 	case nil:
 	case *ast.Ident:
-		return p.sugarForIdent(t)
+		return p.sugarForIdent(t, m)
 	case *ast.ParenExpr:
-		return &ast.ParenExpr{Lparen: t.Lparen, X: p.sugarForType(t.X), Rparen: t.Rparen}
+		return &ast.ParenExpr{Lparen: t.Lparen, X: p.sugarForType(t.X, m), Rparen: t.Rparen}
 	case *ast.SelectorExpr:
 		return t
 	case *ast.StarExpr:
-		return &ast.StarExpr{Star: t.Star, X: p.sugarForType(t.X)}
+		return &ast.StarExpr{Star: t.Star, X: p.sugarForType(t.X, m)}
 	case *ast.ArrayType:
-		return &ast.ArrayType{Lbrack: t.Lbrack, Len: t.Len, Elt: p.sugarForType(t.Elt)}
+		return &ast.ArrayType{Lbrack: t.Lbrack, Len: t.Len, Elt: p.sugarForType(t.Elt, m)}
 	case *ast.StructType:
-		return &ast.StructType{Struct: t.Struct, Fields: p.sugarForFieldList(t.Fields), Incomplete: t.Incomplete}
+		return &ast.StructType{Struct: t.Struct, Fields: p.sugarForFieldList(t.Fields, m), Incomplete: t.Incomplete}
 	case *ast.FuncType:
-		return &ast.FuncType{Func: t.Func, Params: p.sugarForFieldList(t.Params), Results: p.sugarForFieldList(t.Results)}
+		return &ast.FuncType{Func: t.Func, Params: p.sugarForFieldList(t.Params, m), Results: p.sugarForFieldList(t.Results, m)}
 	case *ast.InterfaceType:
-		return &ast.InterfaceType{Interface: t.Interface, Methods: p.sugarForFieldList(t.Methods), Incomplete: t.Incomplete}
+		return &ast.InterfaceType{Interface: t.Interface, Methods: p.sugarForFieldList(t.Methods, m), Incomplete: t.Incomplete}
 	case *ast.MapType:
-		return &ast.MapType{Map: t.Map, Key: p.sugarForType(t.Key), Value: p.sugarForType(t.Value)}
+		return &ast.MapType{Map: t.Map, Key: p.sugarForType(t.Key, m), Value: p.sugarForType(t.Value, m)}
 	case *ast.ChanType:
-		return &ast.ChanType{Begin: t.Begin, Arrow: t.Arrow, Dir: t.Dir, Value: p.sugarForType(t.Value)}
+		return &ast.ChanType{Begin: t.Begin, Arrow: t.Arrow, Dir: t.Dir, Value: p.sugarForType(t.Value, m)}
 	default:
 		log.Panicf("unexpected expression %s of type %s", t, reflect.TypeOf(t))
 	}
@@ -717,34 +717,34 @@ func (p *compiler) sugarForType(t ast.Expr) ast.Expr {
 	return t
 }
 
-func (p *compiler) sugarForFieldList(t *ast.FieldList) *ast.FieldList {
+func (p *compiler) sugarForFieldList(t *ast.FieldList, m map[string]int) *ast.FieldList {
 	if t == nil {
 		return nil
 	}
 	var fields []*ast.Field
 	for _, f := range t.List {
-		fields = append(fields, &ast.Field{Doc: f.Doc, Names: f.Names, Type: p.sugarForType(f.Type), Tag: f.Tag, Comment: f.Comment})
+		fields = append(fields, &ast.Field{Doc: f.Doc, Names: f.Names, Type: p.sugarForType(f.Type, m), Tag: f.Tag, Comment: f.Comment})
 	}
 	return &ast.FieldList{Opening: t.Opening, List: fields, Closing: t.Closing}
 }
 
 // Replace bare antha types with go qualified names
-func (p *compiler) sugarForTypes(root ast.Node) ast.Node {
+func (p *compiler) sugarForTypes(root ast.Node, m map[string]int) ast.Node {
 	ast.Inspect(root, func(n ast.Node) bool {
 		switch n := n.(type) {
 		case nil:
 			return false
 		case *ast.FuncLit:
-			n.Type = p.sugarForType(n.Type).(*ast.FuncType)
+			n.Type = p.sugarForType(n.Type, m).(*ast.FuncType)
 			return false
 		case *ast.CompositeLit:
-			n.Type = p.sugarForType(n.Type)
+			n.Type = p.sugarForType(n.Type, m)
 			return false
 		case *ast.TypeAssertExpr:
-			n.Type = p.sugarForType(n.Type)
+			n.Type = p.sugarForType(n.Type, m)
 			return false
 		case *ast.ValueSpec:
-			n.Type = p.sugarForType(n.Type)
+			n.Type = p.sugarForType(n.Type, m)
 			return false
 		default:
 			return true
@@ -754,7 +754,7 @@ func (p *compiler) sugarForTypes(root ast.Node) ast.Node {
 }
 
 // Replace bare antha identifiers with go qualified names
-func (p *compiler) sugarForParams(body *ast.BlockStmt) {
+func (p *compiler) sugarForParams(body *ast.BlockStmt, m map[string]int) {
 	// TODO(ddn): merge with sugarForTypes or clone and adopt a similar strategy to
 	// restrict replacements to unqualified variable use. Right now, the code below
 	// can rewrite field accesses, etc.
@@ -802,7 +802,7 @@ func (p *compiler) sugarForParams(body *ast.BlockStmt) {
 }
 
 // Replace bare antha function names with go qualified names
-func (p *compiler) sugarForIntrinsics(root ast.Node) {
+func (p *compiler) sugarForIntrinsics(root ast.Node, m map[string]int) {
 	// TODO(ddn): merge with sugarForTypes or clone and adopt a similar strategy to
 	// restrict replacements to unqualified variable use. Right now, the code below
 	// can rewrite field accesses, etc.
