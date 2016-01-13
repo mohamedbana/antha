@@ -111,7 +111,7 @@ func _SDSprepRun(_ctx context.Context, input *SDSprepInput) *SDSprepOutput {
 	return output
 }
 
-func SDSprepRun(_ctx context.Context, input *SDSprepInput) *SDSprepSOutput {
+func SDSprepRunSteps(_ctx context.Context, input *SDSprepInput) *SDSprepSOutput {
 	soutput := &SDSprepSOutput{}
 	output := _SDSprepRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -180,24 +180,28 @@ type SDSprepSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "SDSprep", Constructor: SDSprepNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "Buffer", Desc: "", Kind: "Inputs"},
-		{Name: "BufferName", Desc: "SDSBuffer\n", Kind: "Parameters"},
-		{Name: "BufferStockConc", Desc: "100g/L\n", Kind: "Parameters"},
-		{Name: "BufferVolume", Desc: "10ul\n", Kind: "Parameters"},
-		{Name: "DenatureTemp", Desc: "95oC\n", Kind: "Parameters"},
-		{Name: "DenatureTime", Desc: "5min\n", Kind: "Parameters"},
-		{Name: "FinalConcentration", Desc: "25g/L\n", Kind: "Parameters"},
-		{Name: "InPlate", Desc: "Contains protein and buffer\n", Kind: "Inputs"},
-		{Name: "OutPlate", Desc: "Final plate with mixed components\n", Kind: "Inputs"},
-		{Name: "Protein", Desc: "Purified protein or cell lysate...\n", Kind: "Inputs"},
-		{Name: "ReactionVolume", Desc: "40uL\n", Kind: "Parameters"},
-		{Name: "SampleName", Desc: "ProteinX\n", Kind: "Parameters"},
-		{Name: "SampleVolume", Desc: "30uL\n", Kind: "Parameters"},
-		{Name: "LoadSample", Desc: "Biologicals\n", Kind: "Outputs"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "SDSprep",
+		Constructor: SDSprepNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/SDSprep/SDSprep.an",
+			Params: []ParamDesc{
+				{Name: "Buffer", Desc: "", Kind: "Inputs"},
+				{Name: "BufferName", Desc: "SDSBuffer\n", Kind: "Parameters"},
+				{Name: "BufferStockConc", Desc: "100g/L\n", Kind: "Parameters"},
+				{Name: "BufferVolume", Desc: "10ul\n", Kind: "Parameters"},
+				{Name: "DenatureTemp", Desc: "95oC\n", Kind: "Parameters"},
+				{Name: "DenatureTime", Desc: "5min\n", Kind: "Parameters"},
+				{Name: "FinalConcentration", Desc: "25g/L\n", Kind: "Parameters"},
+				{Name: "InPlate", Desc: "Contains protein and buffer\n", Kind: "Inputs"},
+				{Name: "OutPlate", Desc: "Final plate with mixed components\n", Kind: "Inputs"},
+				{Name: "Protein", Desc: "Purified protein or cell lysate...\n", Kind: "Inputs"},
+				{Name: "ReactionVolume", Desc: "40uL\n", Kind: "Parameters"},
+				{Name: "SampleName", Desc: "ProteinX\n", Kind: "Parameters"},
+				{Name: "SampleVolume", Desc: "30uL\n", Kind: "Parameters"},
+				{Name: "LoadSample", Desc: "Biologicals\n", Kind: "Outputs"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

@@ -51,7 +51,7 @@ func _PrintnameRun(_ctx context.Context, input *PrintnameInput) *PrintnameOutput
 	return output
 }
 
-func PrintnameRun(_ctx context.Context, input *PrintnameInput) *PrintnameSOutput {
+func PrintnameRunSteps(_ctx context.Context, input *PrintnameInput) *PrintnameSOutput {
 	soutput := &PrintnameSOutput{}
 	output := _PrintnameRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -106,11 +106,15 @@ type PrintnameSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Printname", Constructor: PrintnameNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "Name", Desc: "", Kind: "Parameters"},
-		{Name: "Fullname", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Printname",
+		Constructor: PrintnameNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Data/Printname/Printname.an",
+			Params: []ParamDesc{
+				{Name: "Name", Desc: "", Kind: "Parameters"},
+				{Name: "Fullname", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

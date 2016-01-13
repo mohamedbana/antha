@@ -284,7 +284,7 @@ func _Scarfree_siteremove_orfcheckRun(_ctx context.Context, input *Scarfree_site
 	return output
 }
 
-func Scarfree_siteremove_orfcheckRun(_ctx context.Context, input *Scarfree_siteremove_orfcheckInput) *Scarfree_siteremove_orfcheckSOutput {
+func Scarfree_siteremove_orfcheckRunSteps(_ctx context.Context, input *Scarfree_siteremove_orfcheckInput) *Scarfree_siteremove_orfcheckSOutput {
 	soutput := &Scarfree_siteremove_orfcheckSOutput{}
 	output := _Scarfree_siteremove_orfcheckRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -354,21 +354,25 @@ type Scarfree_siteremove_orfcheckSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Scarfree_siteremove_orfcheck", Constructor: Scarfree_siteremove_orfcheckNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "Constructname", Desc: "", Kind: "Parameters"},
-		{Name: "Enzymename", Desc: "", Kind: "Parameters"},
-		{Name: "ORFstoConfirm", Desc: "enter each as amino acid sequence\n", Kind: "Parameters"},
-		{Name: "RemoveproblemRestrictionSites", Desc: "", Kind: "Parameters"},
-		{Name: "Seqsinorder", Desc: "", Kind: "Parameters"},
-		{Name: "Vector", Desc: "", Kind: "Parameters"},
-		{Name: "NewDNASequence", Desc: "desired sequence to end up with after assembly\n", Kind: "Data"},
-		{Name: "ORFmissing", Desc: "", Kind: "Data"},
-		{Name: "PartswithOverhangs", Desc: "parts to order\n", Kind: "Data"},
-		{Name: "Simulationpass", Desc: "", Kind: "Data"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-		{Name: "Warnings", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Scarfree_siteremove_orfcheck",
+		Constructor: Scarfree_siteremove_orfcheckNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/Scarfree_removesites_checkorfs.an",
+			Params: []ParamDesc{
+				{Name: "Constructname", Desc: "", Kind: "Parameters"},
+				{Name: "Enzymename", Desc: "", Kind: "Parameters"},
+				{Name: "ORFstoConfirm", Desc: "enter each as amino acid sequence\n", Kind: "Parameters"},
+				{Name: "RemoveproblemRestrictionSites", Desc: "", Kind: "Parameters"},
+				{Name: "Seqsinorder", Desc: "", Kind: "Parameters"},
+				{Name: "Vector", Desc: "", Kind: "Parameters"},
+				{Name: "NewDNASequence", Desc: "desired sequence to end up with after assembly\n", Kind: "Data"},
+				{Name: "ORFmissing", Desc: "", Kind: "Data"},
+				{Name: "PartswithOverhangs", Desc: "parts to order\n", Kind: "Data"},
+				{Name: "Simulationpass", Desc: "", Kind: "Data"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+				{Name: "Warnings", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

@@ -102,7 +102,7 @@ func _BlastSearchRun(_ctx context.Context, input *BlastSearchInput) *BlastSearch
 	return output
 }
 
-func BlastSearchRun(_ctx context.Context, input *BlastSearchInput) *BlastSearchSOutput {
+func BlastSearchRunSteps(_ctx context.Context, input *BlastSearchInput) *BlastSearchSOutput {
 	soutput := &BlastSearchSOutput{}
 	output := _BlastSearchRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -158,12 +158,16 @@ type BlastSearchSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "BlastSearch", Constructor: BlastSearchNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "DNA", Desc: "", Kind: "Parameters"},
-		{Name: "Name", Desc: "", Kind: "Parameters"},
-		{Name: "Hits", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "BlastSearch",
+		Constructor: BlastSearchNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Data/DNA/BlastSearch/BlastSearch.an",
+			Params: []ParamDesc{
+				{Name: "DNA", Desc: "", Kind: "Parameters"},
+				{Name: "Name", Desc: "", Kind: "Parameters"},
+				{Name: "Hits", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

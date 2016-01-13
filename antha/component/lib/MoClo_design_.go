@@ -179,7 +179,7 @@ func _MoClo_designRun(_ctx context.Context, input *MoClo_designInput) *MoClo_des
 	return output
 }
 
-func MoClo_designRun(_ctx context.Context, input *MoClo_designInput) *MoClo_designSOutput {
+func MoClo_designRunSteps(_ctx context.Context, input *MoClo_designInput) *MoClo_designSOutput {
 	soutput := &MoClo_designSOutput{}
 	output := _MoClo_designRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -247,20 +247,24 @@ type MoClo_designSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "MoClo_design", Constructor: MoClo_designNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "AssemblyStandard", Desc: "MoClo\n", Kind: "Parameters"},
-		{Name: "Constructname", Desc: "", Kind: "Parameters"},
-		{Name: "Level", Desc: "of assembly standard\n", Kind: "Parameters"},
-		{Name: "PartMoClotypesinorder", Desc: "labels e.g. pro = promoter\n", Kind: "Parameters"},
-		{Name: "Partsinorder", Desc: "", Kind: "Parameters"},
-		{Name: "Vector", Desc: "", Kind: "Parameters"},
-		{Name: "NewDNASequence", Desc: "desired sequence to end up with after assembly\n", Kind: "Data"},
-		{Name: "PartswithOverhangs", Desc: "parts to order\n", Kind: "Data"},
-		{Name: "Simulationpass", Desc: "", Kind: "Data"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-		{Name: "Warnings", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "MoClo_design",
+		Constructor: MoClo_designNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/MoClo_design.an",
+			Params: []ParamDesc{
+				{Name: "AssemblyStandard", Desc: "MoClo\n", Kind: "Parameters"},
+				{Name: "Constructname", Desc: "", Kind: "Parameters"},
+				{Name: "Level", Desc: "of assembly standard\n", Kind: "Parameters"},
+				{Name: "PartMoClotypesinorder", Desc: "labels e.g. pro = promoter\n", Kind: "Parameters"},
+				{Name: "Partsinorder", Desc: "", Kind: "Parameters"},
+				{Name: "Vector", Desc: "", Kind: "Parameters"},
+				{Name: "NewDNASequence", Desc: "desired sequence to end up with after assembly\n", Kind: "Data"},
+				{Name: "PartswithOverhangs", Desc: "parts to order\n", Kind: "Data"},
+				{Name: "Simulationpass", Desc: "", Kind: "Data"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+				{Name: "Warnings", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

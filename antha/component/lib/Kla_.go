@@ -127,7 +127,7 @@ func _KlaRun(_ctx context.Context, input *KlaInput) *KlaOutput {
 	return output
 }
 
-func KlaRun(_ctx context.Context, input *KlaInput) *KlaSOutput {
+func KlaRunSteps(_ctx context.Context, input *KlaInput) *KlaSOutput {
 	soutput := &KlaSOutput{}
 	output := _KlaRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -196,21 +196,25 @@ type KlaSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Kla", Constructor: KlaNew}
-	c.Desc.Desc = " Islam, R. S., Tisi, D., Levy, M. S. & Lye, G. J. Scale-up of Escherichia coli growth and recombinant protein expression conditions from microwell to laboratory and pilot scale based on matched kLa. Biotechnol. Bioeng. 99, 1128–1139 (2008).\n\nequation (6)\n\nfunc kLa_squaremicrowell = (3.94 x 10E-4) * (D/dv)* ai * RE^1.91 * exp ^ (a * Fr^b) // a little unclear whether exp is e to (afr^b) from paper but assumed this is the case\n\nkla = dimensionless\n\tvar D = diffusion coefficient, m2 \U0010fc00 s\U0010fc011\n\tvar dv = microwell vessel diameter, m\n\tvar ai = initial specific surface area, m\U0010fc011\n\tvar RE = Reynolds number, (ro * n * dv * 2/mu), dimensionless\n\t\tvar\tro\t= density, kg \U0010fc00/ m\U0010fc013\n\t\tvar\tn \t= shaking frequency, s\U0010fc011\n\t\tvar\tmu\t= viscosity, kg \U0010fc00/ m\U0010fc01 /\U0010fc00 s\n\tconst exp = Eulers number, 2.718281828\n\n\tvar Fr = Froude number = dt(2 * math.Pi * n)^2 /(2 * g), (dimensionless)\n\t\tvar dt = shaking amplitude, m\n\t\tconst g = acceleration due to gravity, m \U0010fc00/ s\U0010fc012\n\tconst\ta = constant\n\tconst\tb = constant\n\nmake type /time and units of /hour and per second\ncheck accuracy against literature and experimental values\n"
-	c.Desc.Params = []ParamDesc{
-		{Name: "D", Desc: "diffusion coefficient, m2 \U0010fc00 s\U0010fc011 // from wikipedia: Oxygen (dis) - Water (l) \t@25 degrees C \t2.10x10−5 cm2/s // should call from elsewhere really\n", Kind: "Parameters"},
-		{Name: "Fillvolume", Desc: "", Kind: "Parameters"},
-		{Name: "Liquid", Desc: "", Kind: "Parameters"},
-		{Name: "Platetype", Desc: "", Kind: "Parameters"},
-		{Name: "Rpm", Desc: "float64\n", Kind: "Parameters"},
-		{Name: "Shakertype", Desc: "", Kind: "Parameters"},
-		{Name: "TargetRE", Desc: "", Kind: "Parameters"},
-		{Name: "CalculatedKla", Desc: "", Kind: "Data"},
-		{Name: "Flowstate", Desc: "", Kind: "Data"},
-		{Name: "Ncrit", Desc: "float64\n", Kind: "Data"},
-		{Name: "Necessaryshakerspeed", Desc: "float64\n", Kind: "Data"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Kla",
+		Constructor: KlaNew,
+		Desc: ComponentDesc{
+			Desc: " Islam, R. S., Tisi, D., Levy, M. S. & Lye, G. J. Scale-up of Escherichia coli growth and recombinant protein expression conditions from microwell to laboratory and pilot scale based on matched kLa. Biotechnol. Bioeng. 99, 1128–1139 (2008).\n\nequation (6)\n\nfunc kLa_squaremicrowell = (3.94 x 10E-4) * (D/dv)* ai * RE^1.91 * exp ^ (a * Fr^b) // a little unclear whether exp is e to (afr^b) from paper but assumed this is the case\n\nkla = dimensionless\n\tvar D = diffusion coefficient, m2 \U0010fc00 s\U0010fc011\n\tvar dv = microwell vessel diameter, m\n\tvar ai = initial specific surface area, m\U0010fc011\n\tvar RE = Reynolds number, (ro * n * dv * 2/mu), dimensionless\n\t\tvar\tro\t= density, kg \U0010fc00/ m\U0010fc013\n\t\tvar\tn \t= shaking frequency, s\U0010fc011\n\t\tvar\tmu\t= viscosity, kg \U0010fc00/ m\U0010fc01 /\U0010fc00 s\n\tconst exp = Eulers number, 2.718281828\n\n\tvar Fr = Froude number = dt(2 * math.Pi * n)^2 /(2 * g), (dimensionless)\n\t\tvar dt = shaking amplitude, m\n\t\tconst g = acceleration due to gravity, m \U0010fc00/ s\U0010fc012\n\tconst\ta = constant\n\tconst\tb = constant\n\nmake type /time and units of /hour and per second\ncheck accuracy against literature and experimental values\n",
+			Path: "antha/component/an/eng/Kla/Kla.an",
+			Params: []ParamDesc{
+				{Name: "D", Desc: "diffusion coefficient, m2 \U0010fc00 s\U0010fc011 // from wikipedia: Oxygen (dis) - Water (l) \t@25 degrees C \t2.10x10−5 cm2/s // should call from elsewhere really\n", Kind: "Parameters"},
+				{Name: "Fillvolume", Desc: "", Kind: "Parameters"},
+				{Name: "Liquid", Desc: "", Kind: "Parameters"},
+				{Name: "Platetype", Desc: "", Kind: "Parameters"},
+				{Name: "Rpm", Desc: "float64\n", Kind: "Parameters"},
+				{Name: "Shakertype", Desc: "", Kind: "Parameters"},
+				{Name: "TargetRE", Desc: "", Kind: "Parameters"},
+				{Name: "CalculatedKla", Desc: "", Kind: "Data"},
+				{Name: "Flowstate", Desc: "", Kind: "Data"},
+				{Name: "Ncrit", Desc: "float64\n", Kind: "Data"},
+				{Name: "Necessaryshakerspeed", Desc: "float64\n", Kind: "Data"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

@@ -228,7 +228,7 @@ func _Iterative_assembly_designRun(_ctx context.Context, input *Iterative_assemb
 	return output
 }
 
-func Iterative_assembly_designRun(_ctx context.Context, input *Iterative_assembly_designInput) *Iterative_assembly_designSOutput {
+func Iterative_assembly_designRunSteps(_ctx context.Context, input *Iterative_assembly_designInput) *Iterative_assembly_designSOutput {
 	soutput := &Iterative_assembly_designSOutput{}
 	output := _Iterative_assembly_designRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -298,20 +298,24 @@ type Iterative_assembly_designSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Iterative_assembly_design", Constructor: Iterative_assembly_designNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "ApprovedEnzymes", Desc: "", Kind: "Parameters"},
-		{Name: "Constructname", Desc: "", Kind: "Parameters"},
-		{Name: "Seqsinorder", Desc: "", Kind: "Parameters"},
-		{Name: "Vector", Desc: "", Kind: "Parameters"},
-		{Name: "BackupEnzymes", Desc: "", Kind: "Data"},
-		{Name: "EnzymeUsed", Desc: "", Kind: "Data"},
-		{Name: "NewDNASequence", Desc: "desired sequence to end up with after assembly\n", Kind: "Data"},
-		{Name: "PartswithOverhangs", Desc: "parts to order\n", Kind: "Data"},
-		{Name: "Simulationpass", Desc: "", Kind: "Data"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-		{Name: "Warnings", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Iterative_assembly_design",
+		Constructor: Iterative_assembly_designNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/Iterative_assembly_design.an",
+			Params: []ParamDesc{
+				{Name: "ApprovedEnzymes", Desc: "", Kind: "Parameters"},
+				{Name: "Constructname", Desc: "", Kind: "Parameters"},
+				{Name: "Seqsinorder", Desc: "", Kind: "Parameters"},
+				{Name: "Vector", Desc: "", Kind: "Parameters"},
+				{Name: "BackupEnzymes", Desc: "", Kind: "Data"},
+				{Name: "EnzymeUsed", Desc: "", Kind: "Data"},
+				{Name: "NewDNASequence", Desc: "desired sequence to end up with after assembly\n", Kind: "Data"},
+				{Name: "PartswithOverhangs", Desc: "parts to order\n", Kind: "Data"},
+				{Name: "Simulationpass", Desc: "", Kind: "Data"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+				{Name: "Warnings", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

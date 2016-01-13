@@ -88,7 +88,7 @@ func _MastermixRun(_ctx context.Context, input *MastermixInput) *MastermixOutput
 	return output
 }
 
-func MastermixRun(_ctx context.Context, input *MastermixInput) *MastermixSOutput {
+func MastermixRunSteps(_ctx context.Context, input *MastermixInput) *MastermixSOutput {
 	soutput := &MastermixSOutput{}
 	output := _MastermixRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -152,19 +152,23 @@ type MastermixSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Mastermix", Constructor: MastermixNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "AliquotbyRow", Desc: "", Kind: "Parameters"},
-		{Name: "Buffer", Desc: "optional if nil this is ignored\n", Kind: "Inputs"},
-		{Name: "Inplate", Desc: "", Kind: "Inputs"},
-		{Name: "NumberofMastermixes", Desc: "", Kind: "Parameters"},
-		{Name: "OtherComponentVolumes", Desc: "ComponentNames []string\n", Kind: "Parameters"},
-		{Name: "OtherComponents", Desc: "", Kind: "Inputs"},
-		{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-		{Name: "TotalVolumeperMastermix", Desc: "if buffer is being added\n", Kind: "Parameters"},
-		{Name: "Mastermixes", Desc: "", Kind: "Outputs"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Mastermix",
+		Constructor: MastermixNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/MakeMastermix/Mastermix.an",
+			Params: []ParamDesc{
+				{Name: "AliquotbyRow", Desc: "", Kind: "Parameters"},
+				{Name: "Buffer", Desc: "optional if nil this is ignored\n", Kind: "Inputs"},
+				{Name: "Inplate", Desc: "", Kind: "Inputs"},
+				{Name: "NumberofMastermixes", Desc: "", Kind: "Parameters"},
+				{Name: "OtherComponentVolumes", Desc: "ComponentNames []string\n", Kind: "Parameters"},
+				{Name: "OtherComponents", Desc: "", Kind: "Inputs"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "TotalVolumeperMastermix", Desc: "if buffer is being added\n", Kind: "Parameters"},
+				{Name: "Mastermixes", Desc: "", Kind: "Outputs"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

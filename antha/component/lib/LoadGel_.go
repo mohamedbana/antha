@@ -52,7 +52,7 @@ func _LoadGelRun(_ctx context.Context, input *LoadGelInput) *LoadGelOutput {
 	return output
 }
 
-func LoadGelRun(_ctx context.Context, input *LoadGelInput) *LoadGelSOutput {
+func LoadGelRunSteps(_ctx context.Context, input *LoadGelInput) *LoadGelSOutput {
 	soutput := &LoadGelSOutput{}
 	output := _LoadGelRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -116,19 +116,23 @@ type LoadGelSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "LoadGel", Constructor: LoadGelNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "GelPlate", Desc: "Gel to load ie OutPlate\n", Kind: "Inputs"},
-		{Name: "InPlate", Desc: "96 well plate with water, marker and samples\n", Kind: "Inputs"},
-		{Name: "LoadVolume", Desc: "", Kind: "Parameters"},
-		{Name: "Protein", Desc: "protein samples for running\n", Kind: "Inputs"},
-		{Name: "SampleName", Desc: "", Kind: "Parameters"},
-		{Name: "Water", Desc: "preload well with 10uL of water\n", Kind: "Inputs"},
-		{Name: "WaterName", Desc: "", Kind: "Parameters"},
-		{Name: "WaterVolume", Desc: "", Kind: "Parameters"},
-		{Name: "RunSolution", Desc: "", Kind: "Outputs"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "LoadGel",
+		Constructor: LoadGelNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/LoadGel/LoadGel.an",
+			Params: []ParamDesc{
+				{Name: "GelPlate", Desc: "Gel to load ie OutPlate\n", Kind: "Inputs"},
+				{Name: "InPlate", Desc: "96 well plate with water, marker and samples\n", Kind: "Inputs"},
+				{Name: "LoadVolume", Desc: "", Kind: "Parameters"},
+				{Name: "Protein", Desc: "protein samples for running\n", Kind: "Inputs"},
+				{Name: "SampleName", Desc: "", Kind: "Parameters"},
+				{Name: "Water", Desc: "preload well with 10uL of water\n", Kind: "Inputs"},
+				{Name: "WaterName", Desc: "", Kind: "Parameters"},
+				{Name: "WaterVolume", Desc: "", Kind: "Parameters"},
+				{Name: "RunSolution", Desc: "", Kind: "Outputs"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

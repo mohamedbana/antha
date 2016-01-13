@@ -64,7 +64,7 @@ func _RecoveryRun(_ctx context.Context, input *RecoveryInput) *RecoveryOutput {
 	return output
 }
 
-func RecoveryRun(_ctx context.Context, input *RecoveryInput) *RecoverySOutput {
+func RecoveryRunSteps(_ctx context.Context, input *RecoveryInput) *RecoverySOutput {
 	soutput := &RecoverySOutput{}
 	output := _RecoveryRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -125,17 +125,21 @@ type RecoverySOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Recovery", Constructor: RecoveryNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "AgarPlate", Desc: "", Kind: "Inputs"},
-		{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-		{Name: "Recoverymedium", Desc: "", Kind: "Inputs"},
-		{Name: "Recoverytemp", Desc: "", Kind: "Parameters"},
-		{Name: "Recoverytime", Desc: "= 2 (hours)\n", Kind: "Parameters"},
-		{Name: "Recoveryvolume", Desc: "", Kind: "Parameters"},
-		{Name: "Transformedcells", Desc: "", Kind: "Inputs"},
-		{Name: "RecoveredCells", Desc: "", Kind: "Outputs"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Recovery",
+		Constructor: RecoveryNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/Transformation/Recovery.an",
+			Params: []ParamDesc{
+				{Name: "AgarPlate", Desc: "", Kind: "Inputs"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "Recoverymedium", Desc: "", Kind: "Inputs"},
+				{Name: "Recoverytemp", Desc: "", Kind: "Parameters"},
+				{Name: "Recoverytime", Desc: "= 2 (hours)\n", Kind: "Parameters"},
+				{Name: "Recoveryvolume", Desc: "", Kind: "Parameters"},
+				{Name: "Transformedcells", Desc: "", Kind: "Inputs"},
+				{Name: "RecoveredCells", Desc: "", Kind: "Outputs"},
+			},
+		},
+	})
 }

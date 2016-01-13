@@ -105,7 +105,7 @@ func _PipetteImageRun(_ctx context.Context, input *PipetteImageInput) *PipetteIm
 	return output
 }
 
-func PipetteImageRun(_ctx context.Context, input *PipetteImageInput) *PipetteImageSOutput {
+func PipetteImageRunSteps(_ctx context.Context, input *PipetteImageInput) *PipetteImageSOutput {
 	soutput := &PipetteImageSOutput{}
 	output := _PipetteImageRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -169,19 +169,23 @@ type PipetteImageSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "PipetteImage", Constructor: PipetteImageNew}
-	c.Desc.Desc = "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours\n"
-	c.Desc.Params = []ParamDesc{
-		{Name: "AvailableColours", Desc: "", Kind: "Parameters"},
-		{Name: "Colourcomponents", Desc: "", Kind: "Inputs"},
-		{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
-		{Name: "NotthisColour", Desc: "", Kind: "Parameters"},
-		{Name: "OnlythisColour", Desc: "", Kind: "Parameters"},
-		{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\n", Kind: "Inputs"},
-		{Name: "Palettename", Desc: "", Kind: "Parameters"},
-		{Name: "VolumePerWell", Desc: "", Kind: "Parameters"},
-		{Name: "Numberofpixels", Desc: "", Kind: "Data"},
-		{Name: "Pixels", Desc: "", Kind: "Outputs"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "PipetteImage",
+		Constructor: PipetteImageNew,
+		Desc: ComponentDesc{
+			Desc: "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours\n",
+			Path: "antha/component/an/Liquid_handling/PipetteImage/PipetteImage.an",
+			Params: []ParamDesc{
+				{Name: "AvailableColours", Desc: "", Kind: "Parameters"},
+				{Name: "Colourcomponents", Desc: "", Kind: "Inputs"},
+				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
+				{Name: "NotthisColour", Desc: "", Kind: "Parameters"},
+				{Name: "OnlythisColour", Desc: "", Kind: "Parameters"},
+				{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\n", Kind: "Inputs"},
+				{Name: "Palettename", Desc: "", Kind: "Parameters"},
+				{Name: "VolumePerWell", Desc: "", Kind: "Parameters"},
+				{Name: "Numberofpixels", Desc: "", Kind: "Data"},
+				{Name: "Pixels", Desc: "", Kind: "Outputs"},
+			},
+		},
+	})
 }

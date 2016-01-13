@@ -202,7 +202,7 @@ func _TypeIISAssembly_designRun(_ctx context.Context, input *TypeIISAssembly_des
 	return output
 }
 
-func TypeIISAssembly_designRun(_ctx context.Context, input *TypeIISAssembly_designInput) *TypeIISAssembly_designSOutput {
+func TypeIISAssembly_designRunSteps(_ctx context.Context, input *TypeIISAssembly_designInput) *TypeIISAssembly_designSOutput {
 	soutput := &TypeIISAssembly_designSOutput{}
 	output := _TypeIISAssembly_designRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -275,23 +275,27 @@ type TypeIISAssembly_designSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "TypeIISAssembly_design", Constructor: TypeIISAssembly_designNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "AssemblyStandard", Desc: "", Kind: "Parameters"},
-		{Name: "Constructname", Desc: "", Kind: "Parameters"},
-		{Name: "Level", Desc: "", Kind: "Parameters"},
-		{Name: "PartMoClotypesinorder", Desc: "", Kind: "Parameters"},
-		{Name: "Partsinorder", Desc: "", Kind: "Parameters"},
-		{Name: "RestrictionsitetoAvoid", Desc: "", Kind: "Parameters"},
-		{Name: "Vector", Desc: "", Kind: "Parameters"},
-		{Name: "BackupParts", Desc: "", Kind: "Data"},
-		{Name: "NewDNASequence", Desc: "", Kind: "Data"},
-		{Name: "PartswithOverhangs", Desc: "i.e. parts to order\n", Kind: "Data"},
-		{Name: "Simulationpass", Desc: "", Kind: "Data"},
-		{Name: "Sitesfound", Desc: "", Kind: "Data"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-		{Name: "Warnings", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "TypeIISAssembly_design",
+		Constructor: TypeIISAssembly_designNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/TypeIISAssembly_design.an",
+			Params: []ParamDesc{
+				{Name: "AssemblyStandard", Desc: "", Kind: "Parameters"},
+				{Name: "Constructname", Desc: "", Kind: "Parameters"},
+				{Name: "Level", Desc: "", Kind: "Parameters"},
+				{Name: "PartMoClotypesinorder", Desc: "", Kind: "Parameters"},
+				{Name: "Partsinorder", Desc: "", Kind: "Parameters"},
+				{Name: "RestrictionsitetoAvoid", Desc: "", Kind: "Parameters"},
+				{Name: "Vector", Desc: "", Kind: "Parameters"},
+				{Name: "BackupParts", Desc: "", Kind: "Data"},
+				{Name: "NewDNASequence", Desc: "", Kind: "Data"},
+				{Name: "PartswithOverhangs", Desc: "i.e. parts to order\n", Kind: "Data"},
+				{Name: "Simulationpass", Desc: "", Kind: "Data"},
+				{Name: "Sitesfound", Desc: "", Kind: "Data"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+				{Name: "Warnings", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

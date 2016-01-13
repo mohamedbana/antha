@@ -68,7 +68,7 @@ func _SumVolumeRun(_ctx context.Context, input *SumVolumeInput) *SumVolumeOutput
 	return output
 }
 
-func SumVolumeRun(_ctx context.Context, input *SumVolumeInput) *SumVolumeSOutput {
+func SumVolumeRunSteps(_ctx context.Context, input *SumVolumeInput) *SumVolumeSOutput {
 	soutput := &SumVolumeSOutput{}
 	output := _SumVolumeRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -127,14 +127,18 @@ type SumVolumeSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "SumVolume", Constructor: SumVolumeNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "A", Desc: "", Kind: "Parameters"},
-		{Name: "B", Desc: "", Kind: "Parameters"},
-		{Name: "C", Desc: "", Kind: "Parameters"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-		{Name: "Sum", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "SumVolume",
+		Constructor: SumVolumeNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Data/sumVolume/Sum.an",
+			Params: []ParamDesc{
+				{Name: "A", Desc: "", Kind: "Parameters"},
+				{Name: "B", Desc: "", Kind: "Parameters"},
+				{Name: "C", Desc: "", Kind: "Parameters"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+				{Name: "Sum", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

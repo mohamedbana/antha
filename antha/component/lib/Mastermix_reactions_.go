@@ -99,7 +99,7 @@ func _Mastermix_reactionsRun(_ctx context.Context, input *Mastermix_reactionsInp
 	return output
 }
 
-func Mastermix_reactionsRun(_ctx context.Context, input *Mastermix_reactionsInput) *Mastermix_reactionsSOutput {
+func Mastermix_reactionsRunSteps(_ctx context.Context, input *Mastermix_reactionsInput) *Mastermix_reactionsSOutput {
 	soutput := &Mastermix_reactionsSOutput{}
 	output := _Mastermix_reactionsRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -165,21 +165,25 @@ type Mastermix_reactionsSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Mastermix_reactions", Constructor: Mastermix_reactionsNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "AliquotbyRow", Desc: "", Kind: "Parameters"},
-		{Name: "ComponentVolumesperReaction", Desc: "", Kind: "Parameters"},
-		{Name: "Components", Desc: "", Kind: "Inputs"},
-		{Name: "Inplate", Desc: "", Kind: "Inputs"},
-		{Name: "NumberofMastermixes", Desc: "add as many as possible option\n", Kind: "Parameters"},
-		{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-		{Name: "Reactionspermastermix", Desc: "", Kind: "Parameters"},
-		{Name: "TopUpBuffer", Desc: "optional if nil this is ignored\n", Kind: "Inputs"},
-		{Name: "TotalVolumeperreaction", Desc: "if buffer is being added\n", Kind: "Parameters"},
-		{Name: "VolumetoLeaveforDNAperreaction", Desc: "", Kind: "Parameters"},
-		{Name: "Mastermixes", Desc: "", Kind: "Outputs"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Mastermix_reactions",
+		Constructor: Mastermix_reactionsNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/MakeMastermix/Mastermix_reactions.an",
+			Params: []ParamDesc{
+				{Name: "AliquotbyRow", Desc: "", Kind: "Parameters"},
+				{Name: "ComponentVolumesperReaction", Desc: "", Kind: "Parameters"},
+				{Name: "Components", Desc: "", Kind: "Inputs"},
+				{Name: "Inplate", Desc: "", Kind: "Inputs"},
+				{Name: "NumberofMastermixes", Desc: "add as many as possible option\n", Kind: "Parameters"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "Reactionspermastermix", Desc: "", Kind: "Parameters"},
+				{Name: "TopUpBuffer", Desc: "optional if nil this is ignored\n", Kind: "Inputs"},
+				{Name: "TotalVolumeperreaction", Desc: "if buffer is being added\n", Kind: "Parameters"},
+				{Name: "VolumetoLeaveforDNAperreaction", Desc: "", Kind: "Parameters"},
+				{Name: "Mastermixes", Desc: "", Kind: "Outputs"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

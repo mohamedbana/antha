@@ -97,7 +97,7 @@ func _Plotdata_spreadsheetRun(_ctx context.Context, input *Plotdata_spreadsheetI
 	return output
 }
 
-func Plotdata_spreadsheetRun(_ctx context.Context, input *Plotdata_spreadsheetInput) *Plotdata_spreadsheetSOutput {
+func Plotdata_spreadsheetRunSteps(_ctx context.Context, input *Plotdata_spreadsheetInput) *Plotdata_spreadsheetSOutput {
 	soutput := &Plotdata_spreadsheetSOutput{}
 	output := _Plotdata_spreadsheetRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -154,14 +154,18 @@ type Plotdata_spreadsheetSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Plotdata_spreadsheet", Constructor: Plotdata_spreadsheetNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "Exportedfilename", Desc: "= \"Excelfile.jpg\"\n", Kind: "Parameters"},
-		{Name: "Filename", Desc: "                                                                        = \"plotinumdata.xlsx\"\n", Kind: "Parameters"},
-		{Name: "Sheet", Desc: "                                                                       = 0\n", Kind: "Parameters"},
-		{Name: "Xminmax", Desc: " = []string{\"a4\", \"a16\"}                                                           // row in A1 format i.e string{A,E} would indicate all data between those points\n", Kind: "Parameters"},
-		{Name: "Yminmaxarray", Desc: "= [][]string{[]string{\"b4\", \"b16\"}, []string{\"c4\", \"c16\"}, []string{\"d4\", \"d16\"}} // column in A1 format i.e string{1,12} would indicate all data between those points\n", Kind: "Parameters"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Plotdata_spreadsheet",
+		Constructor: Plotdata_spreadsheetNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Data/plotdata/Plotdata_fromxlsx.an",
+			Params: []ParamDesc{
+				{Name: "Exportedfilename", Desc: "= \"Excelfile.jpg\"\n", Kind: "Parameters"},
+				{Name: "Filename", Desc: "                                                                        = \"plotinumdata.xlsx\"\n", Kind: "Parameters"},
+				{Name: "Sheet", Desc: "                                                                       = 0\n", Kind: "Parameters"},
+				{Name: "Xminmax", Desc: " = []string{\"a4\", \"a16\"}                                                           // row in A1 format i.e string{A,E} would indicate all data between those points\n", Kind: "Parameters"},
+				{Name: "Yminmaxarray", Desc: "= [][]string{[]string{\"b4\", \"b16\"}, []string{\"c4\", \"c16\"}, []string{\"d4\", \"d16\"}} // column in A1 format i.e string{1,12} would indicate all data between those points\n", Kind: "Parameters"},
+			},
+		},
+	})
 }

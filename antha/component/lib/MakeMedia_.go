@@ -135,7 +135,7 @@ func _MakeMediaRun(_ctx context.Context, input *MakeMediaInput) *MakeMediaOutput
 	return output
 }
 
-func MakeMediaRun(_ctx context.Context, input *MakeMediaInput) *MakeMediaSOutput {
+func MakeMediaRunSteps(_ctx context.Context, input *MakeMediaInput) *MakeMediaSOutput {
 	soutput := &MakeMediaSOutput{}
 	output := _MakeMediaRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -203,25 +203,29 @@ type MakeMediaSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "MakeMedia", Constructor: MakeMediaNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "LiqComponentVolumes", Desc: "", Kind: "Parameters"},
-		{Name: "LiqComponents", Desc: "", Kind: "Inputs"},
-		{Name: "Name", Desc: "", Kind: "Parameters"},
-		{Name: "PH_setPoint", Desc: "", Kind: "Parameters"},
-		{Name: "PH_setPointTemp", Desc: "", Kind: "Parameters"},
-		{Name: "PH_tolerance", Desc: " +/- x  e.g. 7.0 +/- 0.2\n", Kind: "Parameters"},
-		{Name: "SolidComponentDensities", Desc: "", Kind: "Parameters"},
-		{Name: "SolidComponentMasses", Desc: "Volume //Mass // Should be Mass\n", Kind: "Parameters"},
-		{Name: "SolidComponents", Desc: "should be new type or field indicating solid and mass\n", Kind: "Inputs"},
-		{Name: "TotalVolume", Desc: "", Kind: "Parameters"},
-		{Name: "Vessel", Desc: "", Kind: "Inputs"},
-		{Name: "Water", Desc: "", Kind: "Inputs"},
-		{Name: "Media", Desc: "", Kind: "Outputs"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "MakeMedia",
+		Constructor: MakeMediaNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/MakeMedia/MakeMedia.an",
+			Params: []ParamDesc{
+				{Name: "LiqComponentVolumes", Desc: "", Kind: "Parameters"},
+				{Name: "LiqComponents", Desc: "", Kind: "Inputs"},
+				{Name: "Name", Desc: "", Kind: "Parameters"},
+				{Name: "PH_setPoint", Desc: "", Kind: "Parameters"},
+				{Name: "PH_setPointTemp", Desc: "", Kind: "Parameters"},
+				{Name: "PH_tolerance", Desc: " +/- x  e.g. 7.0 +/- 0.2\n", Kind: "Parameters"},
+				{Name: "SolidComponentDensities", Desc: "", Kind: "Parameters"},
+				{Name: "SolidComponentMasses", Desc: "Volume //Mass // Should be Mass\n", Kind: "Parameters"},
+				{Name: "SolidComponents", Desc: "should be new type or field indicating solid and mass\n", Kind: "Inputs"},
+				{Name: "TotalVolume", Desc: "", Kind: "Parameters"},
+				{Name: "Vessel", Desc: "", Kind: "Inputs"},
+				{Name: "Water", Desc: "", Kind: "Inputs"},
+				{Name: "Media", Desc: "", Kind: "Outputs"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }
 
 /*

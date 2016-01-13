@@ -89,7 +89,7 @@ func _RestrictionDigestionRun(_ctx context.Context, input *RestrictionDigestionI
 	return output
 }
 
-func RestrictionDigestionRun(_ctx context.Context, input *RestrictionDigestionInput) *RestrictionDigestionSOutput {
+func RestrictionDigestionRunSteps(_ctx context.Context, input *RestrictionDigestionInput) *RestrictionDigestionSOutput {
 	soutput := &RestrictionDigestionSOutput{}
 	output := _RestrictionDigestionRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -161,28 +161,32 @@ type RestrictionDigestionSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "RestrictionDigestion", Constructor: RestrictionDigestionNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "BSAoptional", Desc: "", Kind: "Inputs"},
-		{Name: "BSAvol", Desc: "", Kind: "Parameters"},
-		{Name: "Buffer", Desc: "", Kind: "Inputs"},
-		{Name: "BufferVol", Desc: "", Kind: "Parameters"},
-		{Name: "DNAName", Desc: "", Kind: "Parameters"},
-		{Name: "DNASolution", Desc: "", Kind: "Inputs"},
-		{Name: "DNAVol", Desc: "", Kind: "Parameters"},
-		{Name: "EnzSolutions", Desc: "", Kind: "Inputs"},
-		{Name: "EnzVolumestoadd", Desc: "\tStockReConcinUperml \t\t[]int\n\tDesiredConcinUperml\t \t\t[]int\n", Kind: "Parameters"},
-		{Name: "EnzymeNames", Desc: "", Kind: "Parameters"},
-		{Name: "InPlate", Desc: "", Kind: "Inputs"},
-		{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
-		{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
-		{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-		{Name: "ReactionTemp", Desc: "", Kind: "Parameters"},
-		{Name: "ReactionTime", Desc: "", Kind: "Parameters"},
-		{Name: "ReactionVolume", Desc: "", Kind: "Parameters"},
-		{Name: "Water", Desc: "", Kind: "Inputs"},
-		{Name: "Reaction", Desc: "", Kind: "Outputs"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "RestrictionDigestion",
+		Constructor: RestrictionDigestionNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/RestrictionDigestion/set_volumes/RestrictionDigestion.an",
+			Params: []ParamDesc{
+				{Name: "BSAoptional", Desc: "", Kind: "Inputs"},
+				{Name: "BSAvol", Desc: "", Kind: "Parameters"},
+				{Name: "Buffer", Desc: "", Kind: "Inputs"},
+				{Name: "BufferVol", Desc: "", Kind: "Parameters"},
+				{Name: "DNAName", Desc: "", Kind: "Parameters"},
+				{Name: "DNASolution", Desc: "", Kind: "Inputs"},
+				{Name: "DNAVol", Desc: "", Kind: "Parameters"},
+				{Name: "EnzSolutions", Desc: "", Kind: "Inputs"},
+				{Name: "EnzVolumestoadd", Desc: "\tStockReConcinUperml \t\t[]int\n\tDesiredConcinUperml\t \t\t[]int\n", Kind: "Parameters"},
+				{Name: "EnzymeNames", Desc: "", Kind: "Parameters"},
+				{Name: "InPlate", Desc: "", Kind: "Inputs"},
+				{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
+				{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "ReactionTemp", Desc: "", Kind: "Parameters"},
+				{Name: "ReactionTime", Desc: "", Kind: "Parameters"},
+				{Name: "ReactionVolume", Desc: "", Kind: "Parameters"},
+				{Name: "Water", Desc: "", Kind: "Inputs"},
+				{Name: "Reaction", Desc: "", Kind: "Outputs"},
+			},
+		},
+	})
 }

@@ -63,7 +63,7 @@ func _PlateOutRun(_ctx context.Context, input *PlateOutInput) *PlateOutOutput {
 	return output
 }
 
-func PlateOutRun(_ctx context.Context, input *PlateOutInput) *PlateOutSOutput {
+func PlateOutRunSteps(_ctx context.Context, input *PlateOutInput) *PlateOutSOutput {
 	soutput := &PlateOutSOutput{}
 	output := _PlateOutRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -124,17 +124,21 @@ type PlateOutSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "PlateOut", Constructor: PlateOutNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "AgarPlate", Desc: "", Kind: "Inputs"},
-		{Name: "Diluent", Desc: "", Kind: "Inputs"},
-		{Name: "DilutionX", Desc: "", Kind: "Parameters"},
-		{Name: "IncubationTemp", Desc: "", Kind: "Parameters"},
-		{Name: "IncubationTime", Desc: "", Kind: "Parameters"},
-		{Name: "Plateoutvolume", Desc: "", Kind: "Parameters"},
-		{Name: "RecoveredCells", Desc: "", Kind: "Inputs"},
-		{Name: "Platedculture", Desc: "", Kind: "Outputs"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "PlateOut",
+		Constructor: PlateOutNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/Transformation/Plateout.an",
+			Params: []ParamDesc{
+				{Name: "AgarPlate", Desc: "", Kind: "Inputs"},
+				{Name: "Diluent", Desc: "", Kind: "Inputs"},
+				{Name: "DilutionX", Desc: "", Kind: "Parameters"},
+				{Name: "IncubationTemp", Desc: "", Kind: "Parameters"},
+				{Name: "IncubationTime", Desc: "", Kind: "Parameters"},
+				{Name: "Plateoutvolume", Desc: "", Kind: "Parameters"},
+				{Name: "RecoveredCells", Desc: "", Kind: "Inputs"},
+				{Name: "Platedculture", Desc: "", Kind: "Outputs"},
+			},
+		},
+	})
 }

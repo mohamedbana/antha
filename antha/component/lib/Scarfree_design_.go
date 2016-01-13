@@ -204,7 +204,7 @@ func _Scarfree_designRun(_ctx context.Context, input *Scarfree_designInput) *Sca
 	return output
 }
 
-func Scarfree_designRun(_ctx context.Context, input *Scarfree_designInput) *Scarfree_designSOutput {
+func Scarfree_designRunSteps(_ctx context.Context, input *Scarfree_designInput) *Scarfree_designSOutput {
 	soutput := &Scarfree_designSOutput{}
 	output := _Scarfree_designRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -273,20 +273,24 @@ type Scarfree_designSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Scarfree_design", Constructor: Scarfree_designNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "Constructname", Desc: "", Kind: "Parameters"},
-		{Name: "Enzymename", Desc: "", Kind: "Parameters"},
-		{Name: "ORFstoConfirm", Desc: "enter each as amino acid sequence\n", Kind: "Parameters"},
-		{Name: "Seqsinorder", Desc: "", Kind: "Parameters"},
-		{Name: "Vector", Desc: "", Kind: "Parameters"},
-		{Name: "NewDNASequence", Desc: "desired sequence to end up with after assembly\n", Kind: "Data"},
-		{Name: "ORFmissing", Desc: "", Kind: "Data"},
-		{Name: "PartswithOverhangs", Desc: "parts to order\n", Kind: "Data"},
-		{Name: "Simulationpass", Desc: "", Kind: "Data"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-		{Name: "Warnings", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Scarfree_design",
+		Constructor: Scarfree_designNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/Scarfree_design.an",
+			Params: []ParamDesc{
+				{Name: "Constructname", Desc: "", Kind: "Parameters"},
+				{Name: "Enzymename", Desc: "", Kind: "Parameters"},
+				{Name: "ORFstoConfirm", Desc: "enter each as amino acid sequence\n", Kind: "Parameters"},
+				{Name: "Seqsinorder", Desc: "", Kind: "Parameters"},
+				{Name: "Vector", Desc: "", Kind: "Parameters"},
+				{Name: "NewDNASequence", Desc: "desired sequence to end up with after assembly\n", Kind: "Data"},
+				{Name: "ORFmissing", Desc: "", Kind: "Data"},
+				{Name: "PartswithOverhangs", Desc: "parts to order\n", Kind: "Data"},
+				{Name: "Simulationpass", Desc: "", Kind: "Data"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+				{Name: "Warnings", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

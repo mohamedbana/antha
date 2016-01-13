@@ -70,7 +70,7 @@ func _AliquotRun(_ctx context.Context, input *AliquotInput) *AliquotOutput {
 	return output
 }
 
-func AliquotRun(_ctx context.Context, input *AliquotInput) *AliquotSOutput {
+func AliquotRunSteps(_ctx context.Context, input *AliquotInput) *AliquotSOutput {
 	soutput := &AliquotSOutput{}
 	output := _AliquotRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -130,16 +130,20 @@ type AliquotSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Aliquot", Constructor: AliquotNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "InPlate", Desc: "", Kind: "Inputs"},
-		{Name: "NumberofAliquots", Desc: "", Kind: "Parameters"},
-		{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-		{Name: "Solution", Desc: "", Kind: "Inputs"},
-		{Name: "SolutionVolume", Desc: "", Kind: "Parameters"},
-		{Name: "VolumePerAliquot", Desc: "", Kind: "Parameters"},
-		{Name: "Aliquots", Desc: "", Kind: "Outputs"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Aliquot",
+		Constructor: AliquotNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/Aliquot/Aliquot.an",
+			Params: []ParamDesc{
+				{Name: "InPlate", Desc: "", Kind: "Inputs"},
+				{Name: "NumberofAliquots", Desc: "", Kind: "Parameters"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "Solution", Desc: "", Kind: "Inputs"},
+				{Name: "SolutionVolume", Desc: "", Kind: "Parameters"},
+				{Name: "VolumePerAliquot", Desc: "", Kind: "Parameters"},
+				{Name: "Aliquots", Desc: "", Kind: "Outputs"},
+			},
+		},
+	})
 }

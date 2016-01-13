@@ -1,5 +1,5 @@
-// variant of aliquot.an whereby the low level MixTo command is used to pipette by row
-
+// Variant of Aliquot where the low level MixTo command is used to pipette by
+// row
 package lib
 
 import (
@@ -88,7 +88,7 @@ func _AliquotToRun(_ctx context.Context, input *AliquotToInput) *AliquotToOutput
 	return output
 }
 
-func AliquotToRun(_ctx context.Context, input *AliquotToInput) *AliquotToSOutput {
+func AliquotToRunSteps(_ctx context.Context, input *AliquotToInput) *AliquotToSOutput {
 	soutput := &AliquotToSOutput{}
 	output := _AliquotToRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -148,16 +148,20 @@ type AliquotToSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "AliquotTo", Constructor: AliquotToNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "InPlate", Desc: "", Kind: "Inputs"},
-		{Name: "NumberofAliquots", Desc: "", Kind: "Parameters"},
-		{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-		{Name: "Solution", Desc: "", Kind: "Inputs"},
-		{Name: "SolutionVolume", Desc: "", Kind: "Parameters"},
-		{Name: "VolumePerAliquot", Desc: "", Kind: "Parameters"},
-		{Name: "Aliquots", Desc: "", Kind: "Outputs"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "AliquotTo",
+		Constructor: AliquotToNew,
+		Desc: ComponentDesc{
+			Desc: "Variant of Aliquot where the low level MixTo command is used to pipette by\nrow\n",
+			Path: "antha/component/an/Liquid_handling/Aliquot/AliquotTo.an",
+			Params: []ParamDesc{
+				{Name: "InPlate", Desc: "", Kind: "Inputs"},
+				{Name: "NumberofAliquots", Desc: "", Kind: "Parameters"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "Solution", Desc: "", Kind: "Inputs"},
+				{Name: "SolutionVolume", Desc: "", Kind: "Parameters"},
+				{Name: "VolumePerAliquot", Desc: "", Kind: "Parameters"},
+				{Name: "Aliquots", Desc: "", Kind: "Outputs"},
+			},
+		},
+	})
 }

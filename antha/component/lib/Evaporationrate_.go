@@ -96,7 +96,7 @@ func _EvaporationrateRun(_ctx context.Context, input *EvaporationrateInput) *Eva
 	return output
 }
 
-func EvaporationrateRun(_ctx context.Context, input *EvaporationrateInput) *EvaporationrateSOutput {
+func EvaporationrateRunSteps(_ctx context.Context, input *EvaporationrateInput) *EvaporationrateSOutput {
 	soutput := &EvaporationrateSOutput{}
 	output := _EvaporationrateRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -164,23 +164,27 @@ type EvaporationrateSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Evaporationrate", Constructor: EvaporationrateNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "Airvelocity", Desc: "// velocity of air above water in m/s ; could be calculated or measured\n", Kind: "Parameters"},
-		{Name: "Executiontime", Desc: "time\n", Kind: "Parameters"},
-		{Name: "Liquid", Desc: "", Kind: "Parameters"},
-		{Name: "Pa", Desc: "cubesensor streams:\n\nin pascals atmospheric pressure of moist air (Pa) 100mBar = 1 pa. Not yet built in unit so we import it from wunit.\n", Kind: "Parameters"},
-		{Name: "Platetype", Desc: "", Kind: "Parameters"},
-		{Name: "Relativehumidity", Desc: "Percentage // density water vapor (kg/m3)\n", Kind: "Parameters"},
-		{Name: "Temp", Desc: "input in deg C will be converted to Kelvin\n", Kind: "Parameters"},
-		{Name: "Volumeperwell", Desc: "ul\n", Kind: "Parameters"},
-		{Name: "Estimatedevaporationtime", Desc: "", Kind: "Data"},
-		{Name: "Evaporatedliquid", Desc: "ul\n", Kind: "Data"},
-		{Name: "Evaporationrateestimate", Desc: "ul/h\n", Kind: "Data"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Evaporationrate",
+		Constructor: EvaporationrateNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/eng/Evaporationrate/Evaporationrate.an",
+			Params: []ParamDesc{
+				{Name: "Airvelocity", Desc: "// velocity of air above water in m/s ; could be calculated or measured\n", Kind: "Parameters"},
+				{Name: "Executiontime", Desc: "time\n", Kind: "Parameters"},
+				{Name: "Liquid", Desc: "", Kind: "Parameters"},
+				{Name: "Pa", Desc: "cubesensor streams:\n\nin pascals atmospheric pressure of moist air (Pa) 100mBar = 1 pa. Not yet built in unit so we import it from wunit.\n", Kind: "Parameters"},
+				{Name: "Platetype", Desc: "", Kind: "Parameters"},
+				{Name: "Relativehumidity", Desc: "Percentage // density water vapor (kg/m3)\n", Kind: "Parameters"},
+				{Name: "Temp", Desc: "input in deg C will be converted to Kelvin\n", Kind: "Parameters"},
+				{Name: "Volumeperwell", Desc: "ul\n", Kind: "Parameters"},
+				{Name: "Estimatedevaporationtime", Desc: "", Kind: "Data"},
+				{Name: "Evaporatedliquid", Desc: "ul\n", Kind: "Data"},
+				{Name: "Evaporationrateestimate", Desc: "ul/h\n", Kind: "Data"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }
 
 // Go helper functions:

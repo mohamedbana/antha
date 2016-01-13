@@ -68,7 +68,7 @@ func _TypeIISConstructAssemblyMMXRun(_ctx context.Context, input *TypeIISConstru
 	return output
 }
 
-func TypeIISConstructAssemblyMMXRun(_ctx context.Context, input *TypeIISConstructAssemblyMMXInput) *TypeIISConstructAssemblyMMXSOutput {
+func TypeIISConstructAssemblyMMXRunSteps(_ctx context.Context, input *TypeIISConstructAssemblyMMXInput) *TypeIISConstructAssemblyMMXSOutput {
 	soutput := &TypeIISConstructAssemblyMMXSOutput{}
 	output := _TypeIISConstructAssemblyMMXRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -137,25 +137,29 @@ type TypeIISConstructAssemblyMMXSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "TypeIISConstructAssemblyMMX", Constructor: TypeIISConstructAssemblyMMXNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
-		{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
-		{Name: "MMXVol", Desc: "", Kind: "Parameters"},
-		{Name: "MasterMix", Desc: "", Kind: "Inputs"},
-		{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-		{Name: "OutputLocation", Desc: "", Kind: "Parameters"},
-		{Name: "OutputPlateNum", Desc: "", Kind: "Parameters"},
-		{Name: "OutputReactionName", Desc: "", Kind: "Parameters"},
-		{Name: "PartNames", Desc: "", Kind: "Parameters"},
-		{Name: "PartVols", Desc: "", Kind: "Parameters"},
-		{Name: "Parts", Desc: "", Kind: "Inputs"},
-		{Name: "ReactionTemp", Desc: "", Kind: "Parameters"},
-		{Name: "ReactionTime", Desc: "", Kind: "Parameters"},
-		{Name: "ReactionVolume", Desc: "", Kind: "Parameters"},
-		{Name: "Water", Desc: "", Kind: "Inputs"},
-		{Name: "Reaction", Desc: "", Kind: "Outputs"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "TypeIISConstructAssemblyMMX",
+		Constructor: TypeIISConstructAssemblyMMXNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/TypeIIsAssembly/TypeIISConstructAssemblyMMX/TypeIISConstructAssemblyMMX.an",
+			Params: []ParamDesc{
+				{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
+				{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
+				{Name: "MMXVol", Desc: "", Kind: "Parameters"},
+				{Name: "MasterMix", Desc: "", Kind: "Inputs"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "OutputLocation", Desc: "", Kind: "Parameters"},
+				{Name: "OutputPlateNum", Desc: "", Kind: "Parameters"},
+				{Name: "OutputReactionName", Desc: "", Kind: "Parameters"},
+				{Name: "PartNames", Desc: "", Kind: "Parameters"},
+				{Name: "PartVols", Desc: "", Kind: "Parameters"},
+				{Name: "Parts", Desc: "", Kind: "Inputs"},
+				{Name: "ReactionTemp", Desc: "", Kind: "Parameters"},
+				{Name: "ReactionTime", Desc: "", Kind: "Parameters"},
+				{Name: "ReactionVolume", Desc: "", Kind: "Parameters"},
+				{Name: "Water", Desc: "", Kind: "Inputs"},
+				{Name: "Reaction", Desc: "", Kind: "Outputs"},
+			},
+		},
+	})
 }

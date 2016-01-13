@@ -135,7 +135,7 @@ func _PCRRun(_ctx context.Context, input *PCRInput) *PCROutput {
 	return output
 }
 
-func PCRRun(_ctx context.Context, input *PCRInput) *PCRSOutput {
+func PCRRunSteps(_ctx context.Context, input *PCRInput) *PCRSOutput {
 	soutput := &PCRSOutput{}
 	output := _PCRRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -212,33 +212,37 @@ type PCRSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "PCR", Constructor: PCRNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "Additiveconc", Desc: "", Kind: "Parameters"},
-		{Name: "Additives", Desc: "e.g. DMSO\n", Kind: "Inputs"},
-		{Name: "AnnealingTemp", Desc: "Should be calculated from primer and template binding\n", Kind: "Parameters"},
-		{Name: "Annealingtime", Desc: "Denaturationtemp Temperature\n", Kind: "Parameters"},
-		{Name: "Buffer", Desc: "", Kind: "Inputs"},
-		{Name: "DNTPS", Desc: "", Kind: "Inputs"},
-		{Name: "DNTPconc", Desc: "", Kind: "Parameters"},
-		{Name: "Denaturationtime", Desc: "", Kind: "Parameters"},
-		{Name: "Extensiontemp", Desc: "", Kind: "Parameters"},
-		{Name: "Extensiontime", Desc: "should be calculated from template length and polymerase rate\n", Kind: "Parameters"},
-		{Name: "Finalextensiontime", Desc: "", Kind: "Parameters"},
-		{Name: "FwdPrimer", Desc: "", Kind: "Inputs"},
-		{Name: "FwdPrimerConc", Desc: "", Kind: "Parameters"},
-		{Name: "InitDenaturationtime", Desc: "", Kind: "Parameters"},
-		{Name: "Numberofcycles", Desc: "\t// let's be ambitious and try this as part of type polymerase Polymeraseconc Volume\n\n\t//Templatetype string  // e.g. colony, genomic, pure plasmid... will effect efficiency. We could get more sophisticated here later on...\n\t//FullTemplatesequence string // better to use Sid's type system here after proof of concept\n\t//FullTemplatelength int\t// clearly could be calculated from the sequence... Sid will have a method to do this already so check!\n\t//TargetTemplatesequence string // better to use Sid's type system here after proof of concept\n\t//TargetTemplatelengthinBP int\n\nReaction parameters: (could be a entered as thermocycle parameters type possibly?)\n", Kind: "Parameters"},
-		{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-		{Name: "PCRPolymerase", Desc: "", Kind: "Inputs"},
-		{Name: "ReactionVolume", Desc: "PCRprep parameters:\n", Kind: "Parameters"},
-		{Name: "RevPrimer", Desc: "", Kind: "Inputs"},
-		{Name: "RevPrimerConc", Desc: "", Kind: "Parameters"},
-		{Name: "TargetpolymeraseConcentration", Desc: "", Kind: "Parameters"},
-		{Name: "Template", Desc: "", Kind: "Inputs"},
-		{Name: "Templatevolume", Desc: "", Kind: "Parameters"},
-		{Name: "Reaction", Desc: "", Kind: "Outputs"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "PCR",
+		Constructor: PCRNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/PCR/PCR.an",
+			Params: []ParamDesc{
+				{Name: "Additiveconc", Desc: "", Kind: "Parameters"},
+				{Name: "Additives", Desc: "e.g. DMSO\n", Kind: "Inputs"},
+				{Name: "AnnealingTemp", Desc: "Should be calculated from primer and template binding\n", Kind: "Parameters"},
+				{Name: "Annealingtime", Desc: "Denaturationtemp Temperature\n", Kind: "Parameters"},
+				{Name: "Buffer", Desc: "", Kind: "Inputs"},
+				{Name: "DNTPS", Desc: "", Kind: "Inputs"},
+				{Name: "DNTPconc", Desc: "", Kind: "Parameters"},
+				{Name: "Denaturationtime", Desc: "", Kind: "Parameters"},
+				{Name: "Extensiontemp", Desc: "", Kind: "Parameters"},
+				{Name: "Extensiontime", Desc: "should be calculated from template length and polymerase rate\n", Kind: "Parameters"},
+				{Name: "Finalextensiontime", Desc: "", Kind: "Parameters"},
+				{Name: "FwdPrimer", Desc: "", Kind: "Inputs"},
+				{Name: "FwdPrimerConc", Desc: "", Kind: "Parameters"},
+				{Name: "InitDenaturationtime", Desc: "", Kind: "Parameters"},
+				{Name: "Numberofcycles", Desc: "\t// let's be ambitious and try this as part of type polymerase Polymeraseconc Volume\n\n\t//Templatetype string  // e.g. colony, genomic, pure plasmid... will effect efficiency. We could get more sophisticated here later on...\n\t//FullTemplatesequence string // better to use Sid's type system here after proof of concept\n\t//FullTemplatelength int\t// clearly could be calculated from the sequence... Sid will have a method to do this already so check!\n\t//TargetTemplatesequence string // better to use Sid's type system here after proof of concept\n\t//TargetTemplatelengthinBP int\n\nReaction parameters: (could be a entered as thermocycle parameters type possibly?)\n", Kind: "Parameters"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "PCRPolymerase", Desc: "", Kind: "Inputs"},
+				{Name: "ReactionVolume", Desc: "PCRprep parameters:\n", Kind: "Parameters"},
+				{Name: "RevPrimer", Desc: "", Kind: "Inputs"},
+				{Name: "RevPrimerConc", Desc: "", Kind: "Parameters"},
+				{Name: "TargetpolymeraseConcentration", Desc: "", Kind: "Parameters"},
+				{Name: "Template", Desc: "", Kind: "Inputs"},
+				{Name: "Templatevolume", Desc: "", Kind: "Parameters"},
+				{Name: "Reaction", Desc: "", Kind: "Outputs"},
+			},
+		},
+	})
 }

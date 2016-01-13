@@ -149,7 +149,7 @@ func _TypeIISConstructAssembly_simRun(_ctx context.Context, input *TypeIISConstr
 	return output
 }
 
-func TypeIISConstructAssembly_simRun(_ctx context.Context, input *TypeIISConstructAssembly_simInput) *TypeIISConstructAssembly_simSOutput {
+func TypeIISConstructAssembly_simRunSteps(_ctx context.Context, input *TypeIISConstructAssembly_simInput) *TypeIISConstructAssembly_simSOutput {
 	soutput := &TypeIISConstructAssembly_simSOutput{}
 	output := _TypeIISConstructAssembly_simRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -240,43 +240,47 @@ type TypeIISConstructAssembly_simSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "TypeIISConstructAssembly_sim", Constructor: TypeIISConstructAssembly_simNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "Atp", Desc: "", Kind: "Inputs"},
-		{Name: "AtpVol", Desc: "", Kind: "Parameters"},
-		{Name: "Buffer", Desc: "", Kind: "Inputs"},
-		{Name: "BufferVol", Desc: "", Kind: "Parameters"},
-		{Name: "Constructname", Desc: "", Kind: "Parameters"},
-		{Name: "InPlate", Desc: "", Kind: "Inputs"},
-		{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
-		{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
-		{Name: "LigVol", Desc: "", Kind: "Parameters"},
-		{Name: "Ligase", Desc: "", Kind: "Inputs"},
-		{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-		{Name: "PartConcs", Desc: "", Kind: "Parameters"},
-		{Name: "PartVols", Desc: "", Kind: "Parameters"},
-		{Name: "Parts", Desc: "", Kind: "Inputs"},
-		{Name: "Partsinorder", Desc: "", Kind: "Parameters"},
-		{Name: "ReVol", Desc: "", Kind: "Parameters"},
-		{Name: "ReactionTemp", Desc: "", Kind: "Parameters"},
-		{Name: "ReactionTime", Desc: "", Kind: "Parameters"},
-		{Name: "ReactionVolume", Desc: "", Kind: "Parameters"},
-		{Name: "RestrictionEnzyme", Desc: "", Kind: "Inputs"},
-		{Name: "Vector", Desc: "", Kind: "Inputs"},
-		{Name: "VectorConcentration", Desc: "", Kind: "Parameters"},
-		{Name: "VectorVol", Desc: "", Kind: "Parameters"},
-		{Name: "Vectordata", Desc: "", Kind: "Parameters"},
-		{Name: "Water", Desc: "", Kind: "Inputs"},
-		{Name: "MolarratiotoVector", Desc: "", Kind: "Data"},
-		{Name: "Molesperpart", Desc: "", Kind: "Data"},
-		{Name: "NewDNASequence", Desc: "", Kind: "Data"},
-		{Name: "Reaction", Desc: "", Kind: "Outputs"},
-		{Name: "Simulationpass", Desc: "", Kind: "Data"},
-		{Name: "Sitesfound", Desc: "", Kind: "Data"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "TypeIISConstructAssembly_sim",
+		Constructor: TypeIISConstructAssembly_simNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/TypeIIsAssembly/TypeIIsConstructAssembly_sim/TypeIIsConstructAssembly_sim.an",
+			Params: []ParamDesc{
+				{Name: "Atp", Desc: "", Kind: "Inputs"},
+				{Name: "AtpVol", Desc: "", Kind: "Parameters"},
+				{Name: "Buffer", Desc: "", Kind: "Inputs"},
+				{Name: "BufferVol", Desc: "", Kind: "Parameters"},
+				{Name: "Constructname", Desc: "", Kind: "Parameters"},
+				{Name: "InPlate", Desc: "", Kind: "Inputs"},
+				{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
+				{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
+				{Name: "LigVol", Desc: "", Kind: "Parameters"},
+				{Name: "Ligase", Desc: "", Kind: "Inputs"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "PartConcs", Desc: "", Kind: "Parameters"},
+				{Name: "PartVols", Desc: "", Kind: "Parameters"},
+				{Name: "Parts", Desc: "", Kind: "Inputs"},
+				{Name: "Partsinorder", Desc: "", Kind: "Parameters"},
+				{Name: "ReVol", Desc: "", Kind: "Parameters"},
+				{Name: "ReactionTemp", Desc: "", Kind: "Parameters"},
+				{Name: "ReactionTime", Desc: "", Kind: "Parameters"},
+				{Name: "ReactionVolume", Desc: "", Kind: "Parameters"},
+				{Name: "RestrictionEnzyme", Desc: "", Kind: "Inputs"},
+				{Name: "Vector", Desc: "", Kind: "Inputs"},
+				{Name: "VectorConcentration", Desc: "", Kind: "Parameters"},
+				{Name: "VectorVol", Desc: "", Kind: "Parameters"},
+				{Name: "Vectordata", Desc: "", Kind: "Parameters"},
+				{Name: "Water", Desc: "", Kind: "Inputs"},
+				{Name: "MolarratiotoVector", Desc: "", Kind: "Data"},
+				{Name: "Molesperpart", Desc: "", Kind: "Data"},
+				{Name: "NewDNASequence", Desc: "", Kind: "Data"},
+				{Name: "Reaction", Desc: "", Kind: "Outputs"},
+				{Name: "Simulationpass", Desc: "", Kind: "Data"},
+				{Name: "Sitesfound", Desc: "", Kind: "Data"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }
 
 /*

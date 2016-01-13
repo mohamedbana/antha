@@ -188,7 +188,7 @@ func _DNA_gelRun(_ctx context.Context, input *DNA_gelInput) *DNA_gelOutput {
 	return output
 }
 
-func DNA_gelRun(_ctx context.Context, input *DNA_gelInput) *DNA_gelSOutput {
+func DNA_gelRunSteps(_ctx context.Context, input *DNA_gelInput) *DNA_gelSOutput {
 	soutput := &DNA_gelSOutput{}
 	output := _DNA_gelRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -254,24 +254,28 @@ type DNA_gelSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "DNA_gel", Constructor: DNA_gelNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "DNAgel", Desc: "Gel\n", Kind: "Inputs"},
-		{Name: "DNAgelrunvolume", Desc: "", Kind: "Parameters"},
-		{Name: "InPlate", Desc: "", Kind: "Inputs"},
-		{Name: "Loadingdye", Desc: "WaterSolution //Chemspiderlink // not correct link but similar desirable\n", Kind: "Inputs"},
-		{Name: "Loadingdyeinsample", Desc: "", Kind: "Parameters"},
-		{Name: "Loadingdyevolume", Desc: "", Kind: "Parameters"},
-		{Name: "Mixingpolicy", Desc: "", Kind: "Parameters"},
-		{Name: "Samplenames", Desc: "", Kind: "Parameters"},
-		{Name: "Samplenumber", Desc: "", Kind: "Parameters"},
-		{Name: "Sampletotest", Desc: "WaterSolution\n", Kind: "Inputs"},
-		{Name: "Water", Desc: "", Kind: "Inputs"},
-		{Name: "Watervol", Desc: "", Kind: "Parameters"},
-		{Name: "Loadedsamples", Desc: "Gel\n", Kind: "Outputs"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "DNA_gel",
+		Constructor: DNA_gelNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/DNA_gel/DNA_gel.an",
+			Params: []ParamDesc{
+				{Name: "DNAgel", Desc: "Gel\n", Kind: "Inputs"},
+				{Name: "DNAgelrunvolume", Desc: "", Kind: "Parameters"},
+				{Name: "InPlate", Desc: "", Kind: "Inputs"},
+				{Name: "Loadingdye", Desc: "WaterSolution //Chemspiderlink // not correct link but similar desirable\n", Kind: "Inputs"},
+				{Name: "Loadingdyeinsample", Desc: "", Kind: "Parameters"},
+				{Name: "Loadingdyevolume", Desc: "", Kind: "Parameters"},
+				{Name: "Mixingpolicy", Desc: "", Kind: "Parameters"},
+				{Name: "Samplenames", Desc: "", Kind: "Parameters"},
+				{Name: "Samplenumber", Desc: "", Kind: "Parameters"},
+				{Name: "Sampletotest", Desc: "WaterSolution\n", Kind: "Inputs"},
+				{Name: "Water", Desc: "", Kind: "Inputs"},
+				{Name: "Watervol", Desc: "", Kind: "Parameters"},
+				{Name: "Loadedsamples", Desc: "Gel\n", Kind: "Outputs"},
+			},
+		},
+	})
 }
 
 //func cherrypick ()

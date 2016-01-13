@@ -117,7 +117,7 @@ func _PipetteImage_CMYKRun(_ctx context.Context, input *PipetteImage_CMYKInput) 
 	return output
 }
 
-func PipetteImage_CMYKRun(_ctx context.Context, input *PipetteImage_CMYKInput) *PipetteImage_CMYKSOutput {
+func PipetteImage_CMYKRunSteps(_ctx context.Context, input *PipetteImage_CMYKInput) *PipetteImage_CMYKSOutput {
 	soutput := &PipetteImage_CMYKSOutput{}
 	output := _PipetteImage_CMYKRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -180,18 +180,22 @@ type PipetteImage_CMYKSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "PipetteImage_CMYK", Constructor: PipetteImage_CMYKNew}
-	c.Desc.Desc = "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours\n"
-	c.Desc.Params = []ParamDesc{
-		{Name: "Black", Desc: "", Kind: "Inputs"},
-		{Name: "Cyan", Desc: "", Kind: "Inputs"},
-		{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
-		{Name: "Magenta", Desc: "", Kind: "Inputs"},
-		{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\n", Kind: "Inputs"},
-		{Name: "VolumeForFullcolour", Desc: "", Kind: "Parameters"},
-		{Name: "Yellow", Desc: "", Kind: "Inputs"},
-		{Name: "Numberofpixels", Desc: "", Kind: "Data"},
-		{Name: "Pixels", Desc: "", Kind: "Outputs"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "PipetteImage_CMYK",
+		Constructor: PipetteImage_CMYKNew,
+		Desc: ComponentDesc{
+			Desc: "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours\n",
+			Path: "antha/component/an/Liquid_handling/PipetteImage/PipetteImage_CMYK.an",
+			Params: []ParamDesc{
+				{Name: "Black", Desc: "", Kind: "Inputs"},
+				{Name: "Cyan", Desc: "", Kind: "Inputs"},
+				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
+				{Name: "Magenta", Desc: "", Kind: "Inputs"},
+				{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\n", Kind: "Inputs"},
+				{Name: "VolumeForFullcolour", Desc: "", Kind: "Parameters"},
+				{Name: "Yellow", Desc: "", Kind: "Inputs"},
+				{Name: "Numberofpixels", Desc: "", Kind: "Data"},
+				{Name: "Pixels", Desc: "", Kind: "Outputs"},
+			},
+		},
+	})
 }

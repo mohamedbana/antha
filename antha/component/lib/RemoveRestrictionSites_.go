@@ -196,7 +196,7 @@ func _RemoveRestrictionSitesRun(_ctx context.Context, input *RemoveRestrictionSi
 	return output
 }
 
-func RemoveRestrictionSitesRun(_ctx context.Context, input *RemoveRestrictionSitesInput) *RemoveRestrictionSitesSOutput {
+func RemoveRestrictionSitesRunSteps(_ctx context.Context, input *RemoveRestrictionSitesInput) *RemoveRestrictionSitesSOutput {
 	soutput := &RemoveRestrictionSitesSOutput{}
 	output := _RemoveRestrictionSitesRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -263,19 +263,23 @@ type RemoveRestrictionSitesSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "RemoveRestrictionSites", Constructor: RemoveRestrictionSitesNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "EnzymeforRestrictionmapping", Desc: "", Kind: "Parameters"},
-		{Name: "PreserveTranslatedseq", Desc: "", Kind: "Parameters"},
-		{Name: "RemoveifnotinORF", Desc: "", Kind: "Parameters"},
-		{Name: "RestrictionsitetoAvoid", Desc: "", Kind: "Parameters"},
-		{Name: "Sequencekey", Desc: "wtype.DNASequence\n", Kind: "Parameters"},
-		{Name: "FragmentSizesfromRestrictionmapping", Desc: "", Kind: "Data"},
-		{Name: "SiteFreeSequence", Desc: "i.e. parts to order\n", Kind: "Data"},
-		{Name: "Sitesfoundinoriginal", Desc: "", Kind: "Data"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-		{Name: "Warnings", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "RemoveRestrictionSites",
+		Constructor: RemoveRestrictionSitesNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Data/DNA/RestrictionSiteRemover/RemoveRestrictionSites.an",
+			Params: []ParamDesc{
+				{Name: "EnzymeforRestrictionmapping", Desc: "", Kind: "Parameters"},
+				{Name: "PreserveTranslatedseq", Desc: "", Kind: "Parameters"},
+				{Name: "RemoveifnotinORF", Desc: "", Kind: "Parameters"},
+				{Name: "RestrictionsitetoAvoid", Desc: "", Kind: "Parameters"},
+				{Name: "Sequencekey", Desc: "wtype.DNASequence\n", Kind: "Parameters"},
+				{Name: "FragmentSizesfromRestrictionmapping", Desc: "", Kind: "Data"},
+				{Name: "SiteFreeSequence", Desc: "i.e. parts to order\n", Kind: "Data"},
+				{Name: "Sitesfoundinoriginal", Desc: "", Kind: "Data"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+				{Name: "Warnings", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

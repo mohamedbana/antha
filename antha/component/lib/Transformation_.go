@@ -63,7 +63,7 @@ func _TransformationRun(_ctx context.Context, input *TransformationInput) *Trans
 	return output
 }
 
-func TransformationRun(_ctx context.Context, input *TransformationInput) *TransformationSOutput {
+func TransformationRunSteps(_ctx context.Context, input *TransformationInput) *TransformationSOutput {
 	soutput := &TransformationSOutput{}
 	output := _TransformationRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -124,17 +124,21 @@ type TransformationSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Transformation", Constructor: TransformationNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "CompetentCellvolumeperassembly", Desc: "= 50.(uL)\n", Kind: "Parameters"},
-		{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-		{Name: "Postplasmidtemp", Desc: "", Kind: "Parameters"},
-		{Name: "Postplasmidtime", Desc: "", Kind: "Parameters"},
-		{Name: "Reaction", Desc: "", Kind: "Inputs"},
-		{Name: "Reactionvolume", Desc: "", Kind: "Parameters"},
-		{Name: "ReadyCompCells", Desc: "", Kind: "Inputs"},
-		{Name: "Transformedcells", Desc: "", Kind: "Outputs"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Transformation",
+		Constructor: TransformationNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/Transformation/Transformation.an",
+			Params: []ParamDesc{
+				{Name: "CompetentCellvolumeperassembly", Desc: "= 50.(uL)\n", Kind: "Parameters"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "Postplasmidtemp", Desc: "", Kind: "Parameters"},
+				{Name: "Postplasmidtime", Desc: "", Kind: "Parameters"},
+				{Name: "Reaction", Desc: "", Kind: "Inputs"},
+				{Name: "Reactionvolume", Desc: "", Kind: "Parameters"},
+				{Name: "ReadyCompCells", Desc: "", Kind: "Inputs"},
+				{Name: "Transformedcells", Desc: "", Kind: "Outputs"},
+			},
+		},
+	})
 }

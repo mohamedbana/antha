@@ -91,7 +91,7 @@ func _ThawtimeRun(_ctx context.Context, input *ThawtimeInput) *ThawtimeOutput {
 	return output
 }
 
-func ThawtimeRun(_ctx context.Context, input *ThawtimeInput) *ThawtimeSOutput {
+func ThawtimeRunSteps(_ctx context.Context, input *ThawtimeInput) *ThawtimeSOutput {
 	soutput := &ThawtimeSOutput{}
 	output := _ThawtimeRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -156,19 +156,23 @@ type ThawtimeSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Thawtime", Constructor: ThawtimeNew}
-	c.Desc.Desc = "status = compiles and calculates; need to fill in correct parameters and check units\ncurrently using dummy values only so won't be accurate yet!\n"
-	c.Desc.Params = []ParamDesc{
-		{Name: "Airvelocity", Desc: "These should be captured via sensors just prior to execution\n", Kind: "Parameters"},
-		{Name: "BulkTemp", Desc: "This will be monitored via the thermometer in the freezer in which the sample was stored\n", Kind: "Parameters"},
-		{Name: "Fillvolume", Desc: " e.g. the sample volume as frozen by a previous storage protocol;\n\tcould be known or measured via liquid height detection on some liquid handlers\n", Kind: "Parameters"},
-		{Name: "Fudgefactor", Desc: " This will offer another knob to tweak (in addition to the other parameters) as a means to improve\n\tthe correlation over time as we see how accurate the calculator is in practice\n", Kind: "Parameters"},
-		{Name: "Liquid", Desc: "", Kind: "Parameters"},
-		{Name: "Platetype", Desc: "Many of the real parameters required will be looked up via the specific labware (platetype) and liquid type which are being used.\n", Kind: "Parameters"},
-		{Name: "SurfaceTemp", Desc: "", Kind: "Parameters"},
-		{Name: "Estimatedthawtime", Desc: "", Kind: "Data"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-		{Name: "Thawtimeused", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Thawtime",
+		Constructor: ThawtimeNew,
+		Desc: ComponentDesc{
+			Desc: "status = compiles and calculates; need to fill in correct parameters and check units\ncurrently using dummy values only so won't be accurate yet!\n",
+			Path: "antha/component/an/eng/Thawtime/Thawtime.an",
+			Params: []ParamDesc{
+				{Name: "Airvelocity", Desc: "These should be captured via sensors just prior to execution\n", Kind: "Parameters"},
+				{Name: "BulkTemp", Desc: "This will be monitored via the thermometer in the freezer in which the sample was stored\n", Kind: "Parameters"},
+				{Name: "Fillvolume", Desc: " e.g. the sample volume as frozen by a previous storage protocol;\n\tcould be known or measured via liquid height detection on some liquid handlers\n", Kind: "Parameters"},
+				{Name: "Fudgefactor", Desc: " This will offer another knob to tweak (in addition to the other parameters) as a means to improve\n\tthe correlation over time as we see how accurate the calculator is in practice\n", Kind: "Parameters"},
+				{Name: "Liquid", Desc: "", Kind: "Parameters"},
+				{Name: "Platetype", Desc: "Many of the real parameters required will be looked up via the specific labware (platetype) and liquid type which are being used.\n", Kind: "Parameters"},
+				{Name: "SurfaceTemp", Desc: "", Kind: "Parameters"},
+				{Name: "Estimatedthawtime", Desc: "", Kind: "Data"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+				{Name: "Thawtimeused", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

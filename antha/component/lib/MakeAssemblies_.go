@@ -42,7 +42,7 @@ func _MakeAssembliesSetup(_ctx context.Context, _input *MakeAssembliesInput) {}
 
 func _MakeAssembliesSteps(_ctx context.Context, _input *MakeAssembliesInput, _output *MakeAssembliesOutput) {
 	for k := range _input.Parts {
-		result := TypeIISConstructAssemblyRun(_ctx, &TypeIISConstructAssemblyInput{ReactionVolume: _input.ReactionVolume,
+		result := TypeIISConstructAssemblyRunSteps(_ctx, &TypeIISConstructAssemblyInput{ReactionVolume: _input.ReactionVolume,
 			PartVols:           _input.PartVols[k],
 			PartNames:          _input.PartNames[k],
 			VectorVol:          _input.VectorVol,
@@ -82,7 +82,7 @@ func _MakeAssembliesRun(_ctx context.Context, input *MakeAssembliesInput) *MakeA
 	return output
 }
 
-func MakeAssembliesRun(_ctx context.Context, input *MakeAssembliesInput) *MakeAssembliesSOutput {
+func MakeAssembliesRunSteps(_ctx context.Context, input *MakeAssembliesInput) *MakeAssembliesSOutput {
 	soutput := &MakeAssembliesSOutput{}
 	output := _MakeAssembliesRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -158,32 +158,36 @@ type MakeAssembliesSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "MakeAssemblies", Constructor: MakeAssembliesNew}
-	c.Desc.Desc = "Assemble multiple assemblies using TypeIIs construct assembly\n"
-	c.Desc.Params = []ParamDesc{
-		{Name: "Atp", Desc: "ATP to use\n", Kind: "Inputs"},
-		{Name: "AtpVol", Desc: "ATP volume\n", Kind: "Parameters"},
-		{Name: "Buffer", Desc: "Buffer to use\n", Kind: "Inputs"},
-		{Name: "BufferVol", Desc: "Buffer volume\n", Kind: "Parameters"},
-		{Name: "InPlate", Desc: "Input plate\n", Kind: "Inputs"},
-		{Name: "InactivationTemp", Desc: "Inactivation temperature\n", Kind: "Parameters"},
-		{Name: "InactivationTime", Desc: "Inactivation time\n", Kind: "Parameters"},
-		{Name: "LigVol", Desc: "Ligase volume\n", Kind: "Parameters"},
-		{Name: "Ligase", Desc: "Ligase to use\n", Kind: "Inputs"},
-		{Name: "OutPlate", Desc: "Output plate\n", Kind: "Inputs"},
-		{Name: "OutputReactionName", Desc: "Prefix for reaction names\n", Kind: "Parameters"},
-		{Name: "PartNames", Desc: "Names corresonding to input parts\n", Kind: "Parameters"},
-		{Name: "PartVols", Desc: "Volumes corresponding to input parts\n", Kind: "Parameters"},
-		{Name: "Parts", Desc: "Input parts, one per assembly\n", Kind: "Inputs"},
-		{Name: "ReVol", Desc: "Restriction enzyme volume\n", Kind: "Parameters"},
-		{Name: "ReactionTemp", Desc: "Reaction temperature\n", Kind: "Parameters"},
-		{Name: "ReactionTime", Desc: "Reaction time\n", Kind: "Parameters"},
-		{Name: "ReactionVolume", Desc: "Reaction volume\n", Kind: "Parameters"},
-		{Name: "RestrictionEnzyme", Desc: "Restriction enzyme to use\n", Kind: "Inputs"},
-		{Name: "Vector", Desc: "Vector to use\n", Kind: "Inputs"},
-		{Name: "VectorVol", Desc: "Vector volume\n", Kind: "Parameters"},
-		{Name: "Water", Desc: "Water to use\n", Kind: "Inputs"},
-		{Name: "Reactions", Desc: "List of assembled parts\n", Kind: "Outputs"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "MakeAssemblies",
+		Constructor: MakeAssembliesNew,
+		Desc: ComponentDesc{
+			Desc: "Assemble multiple assemblies using TypeIIs construct assembly\n",
+			Path: "antha/component/an/Liquid_handling/TypeIIsAssembly/MakeAssemblies/MakeAssemblies.an",
+			Params: []ParamDesc{
+				{Name: "Atp", Desc: "ATP to use\n", Kind: "Inputs"},
+				{Name: "AtpVol", Desc: "ATP volume\n", Kind: "Parameters"},
+				{Name: "Buffer", Desc: "Buffer to use\n", Kind: "Inputs"},
+				{Name: "BufferVol", Desc: "Buffer volume\n", Kind: "Parameters"},
+				{Name: "InPlate", Desc: "Input plate\n", Kind: "Inputs"},
+				{Name: "InactivationTemp", Desc: "Inactivation temperature\n", Kind: "Parameters"},
+				{Name: "InactivationTime", Desc: "Inactivation time\n", Kind: "Parameters"},
+				{Name: "LigVol", Desc: "Ligase volume\n", Kind: "Parameters"},
+				{Name: "Ligase", Desc: "Ligase to use\n", Kind: "Inputs"},
+				{Name: "OutPlate", Desc: "Output plate\n", Kind: "Inputs"},
+				{Name: "OutputReactionName", Desc: "Prefix for reaction names\n", Kind: "Parameters"},
+				{Name: "PartNames", Desc: "Names corresonding to input parts\n", Kind: "Parameters"},
+				{Name: "PartVols", Desc: "Volumes corresponding to input parts\n", Kind: "Parameters"},
+				{Name: "Parts", Desc: "Input parts, one per assembly\n", Kind: "Inputs"},
+				{Name: "ReVol", Desc: "Restriction enzyme volume\n", Kind: "Parameters"},
+				{Name: "ReactionTemp", Desc: "Reaction temperature\n", Kind: "Parameters"},
+				{Name: "ReactionTime", Desc: "Reaction time\n", Kind: "Parameters"},
+				{Name: "ReactionVolume", Desc: "Reaction volume\n", Kind: "Parameters"},
+				{Name: "RestrictionEnzyme", Desc: "Restriction enzyme to use\n", Kind: "Inputs"},
+				{Name: "Vector", Desc: "Vector to use\n", Kind: "Inputs"},
+				{Name: "VectorVol", Desc: "Vector volume\n", Kind: "Parameters"},
+				{Name: "Water", Desc: "Water to use\n", Kind: "Inputs"},
+				{Name: "Reactions", Desc: "List of assembled parts\n", Kind: "Outputs"},
+			},
+		},
+	})
 }

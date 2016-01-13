@@ -132,7 +132,7 @@ func _DatacrunchRun(_ctx context.Context, input *DatacrunchInput) *DatacrunchOut
 	return output
 }
 
-func DatacrunchRun(_ctx context.Context, input *DatacrunchInput) *DatacrunchSOutput {
+func DatacrunchRunSteps(_ctx context.Context, input *DatacrunchInput) *DatacrunchSOutput {
 	soutput := &DatacrunchSOutput{}
 	output := _DatacrunchRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -204,26 +204,30 @@ type DatacrunchSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Datacrunch", Constructor: DatacrunchNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "DNAConc", Desc: "", Kind: "Parameters"},
-		{Name: "DNA_seq", Desc: "", Kind: "Parameters"},
-		{Name: "Gene_name", Desc: "", Kind: "Parameters"},
-		{Name: "Km", Desc: "Amount\n", Kind: "Parameters"},
-		{Name: "Kmunit", Desc: "i.e. Moles, M\n", Kind: "Parameters"},
-		{Name: "ProteinConc", Desc: "", Kind: "Parameters"},
-		{Name: "S", Desc: "Amount\n", Kind: "Parameters"},
-		{Name: "SubstrateConc", Desc: "", Kind: "Parameters"},
-		{Name: "SubstrateVol", Desc: "", Kind: "Parameters"},
-		{Name: "Substrate_name", Desc: "", Kind: "Parameters"},
-		{Name: "Sunit", Desc: "", Kind: "Parameters"},
-		{Name: "Vmax", Desc: "", Kind: "Parameters"},
-		{Name: "Vmaxunit", Desc: "", Kind: "Parameters"},
-		{Name: "Vunit", Desc: "", Kind: "Parameters"},
-		{Name: "Orftrue", Desc: "", Kind: "Data"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-		{Name: "V", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Datacrunch",
+		Constructor: DatacrunchNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Data/Datacrunch/Datacrunch.an",
+			Params: []ParamDesc{
+				{Name: "DNAConc", Desc: "", Kind: "Parameters"},
+				{Name: "DNA_seq", Desc: "", Kind: "Parameters"},
+				{Name: "Gene_name", Desc: "", Kind: "Parameters"},
+				{Name: "Km", Desc: "Amount\n", Kind: "Parameters"},
+				{Name: "Kmunit", Desc: "i.e. Moles, M\n", Kind: "Parameters"},
+				{Name: "ProteinConc", Desc: "", Kind: "Parameters"},
+				{Name: "S", Desc: "Amount\n", Kind: "Parameters"},
+				{Name: "SubstrateConc", Desc: "", Kind: "Parameters"},
+				{Name: "SubstrateVol", Desc: "", Kind: "Parameters"},
+				{Name: "Substrate_name", Desc: "", Kind: "Parameters"},
+				{Name: "Sunit", Desc: "", Kind: "Parameters"},
+				{Name: "Vmax", Desc: "", Kind: "Parameters"},
+				{Name: "Vmaxunit", Desc: "", Kind: "Parameters"},
+				{Name: "Vunit", Desc: "", Kind: "Parameters"},
+				{Name: "Orftrue", Desc: "", Kind: "Data"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+				{Name: "V", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

@@ -59,7 +59,7 @@ func _LookUpMoleculeRun(_ctx context.Context, input *LookUpMoleculeInput) *LookU
 	return output
 }
 
-func LookUpMoleculeRun(_ctx context.Context, input *LookUpMoleculeInput) *LookUpMoleculeSOutput {
+func LookUpMoleculeRunSteps(_ctx context.Context, input *LookUpMoleculeInput) *LookUpMoleculeSOutput {
 	soutput := &LookUpMoleculeSOutput{}
 	output := _LookUpMoleculeRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -121,15 +121,19 @@ type LookUpMoleculeSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "LookUpMolecule", Constructor: LookUpMoleculeNew}
-	c.Desc.Desc = "example of how to look up molecule properties from pubchem\n"
-	c.Desc.Params = []ParamDesc{
-		{Name: "Compound", Desc: "Name of compound or array of multiple compounds\n", Kind: "Parameters"},
-		{Name: "Compoundlist", Desc: "", Kind: "Parameters"},
-		{Name: "Compoundprops", Desc: "molecule type is returned consisting of name, formula, molecular weight and chemical ID (CID)\n", Kind: "Data"},
-		{Name: "Jsonstring", Desc: "or JSON structure if preferred\n", Kind: "Data"},
-		{Name: "List", Desc: "", Kind: "Data"},
-		{Name: "Status", Desc: "status to be printed out in manual driver console\n", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "LookUpMolecule",
+		Constructor: LookUpMoleculeNew,
+		Desc: ComponentDesc{
+			Desc: "example of how to look up molecule properties from pubchem\n",
+			Path: "antha/component/an/Data/LookUpMolecule/LookUpMolecule.an",
+			Params: []ParamDesc{
+				{Name: "Compound", Desc: "Name of compound or array of multiple compounds\n", Kind: "Parameters"},
+				{Name: "Compoundlist", Desc: "", Kind: "Parameters"},
+				{Name: "Compoundprops", Desc: "molecule type is returned consisting of name, formula, molecular weight and chemical ID (CID)\n", Kind: "Data"},
+				{Name: "Jsonstring", Desc: "or JSON structure if preferred\n", Kind: "Data"},
+				{Name: "List", Desc: "", Kind: "Data"},
+				{Name: "Status", Desc: "status to be printed out in manual driver console\n", Kind: "Data"},
+			},
+		},
+	})
 }

@@ -136,7 +136,7 @@ func _FindPartsthatRun(_ctx context.Context, input *FindPartsthatInput) *FindPar
 	return output
 }
 
-func FindPartsthatRun(_ctx context.Context, input *FindPartsthatInput) *FindPartsthatSOutput {
+func FindPartsthatRunSteps(_ctx context.Context, input *FindPartsthatInput) *FindPartsthatSOutput {
 	soutput := &FindPartsthatSOutput{}
 	output := _FindPartsthatRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -199,17 +199,21 @@ type FindPartsthatSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "FindPartsthat", Constructor: FindPartsthatNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "OnlyreturnAvailableParts", Desc: "", Kind: "Parameters"},
-		{Name: "OnlyreturnWorkingparts", Desc: "", Kind: "Parameters"},
-		{Name: "Partdescriptions", Desc: "e.g. arsenic, reporter, alkane, logic gate\n", Kind: "Parameters"},
-		{Name: "Parts", Desc: "", Kind: "Parameters"},
-		{Name: "Parttypes", Desc: "Constructname \t\t\t\tstring\n\ne.g. promoter\n", Kind: "Parameters"},
-		{Name: "FulllistBackupParts", Desc: "Partsfound\t[]wtype.DNASequence // map[string]wtype.DNASequence\n\nmap[string][]string\n", Kind: "Data"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-		{Name: "Warnings", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "FindPartsthat",
+		Constructor: FindPartsthatNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Data/DNA/FindPartsthat.../Findpartsthat.an",
+			Params: []ParamDesc{
+				{Name: "OnlyreturnAvailableParts", Desc: "", Kind: "Parameters"},
+				{Name: "OnlyreturnWorkingparts", Desc: "", Kind: "Parameters"},
+				{Name: "Partdescriptions", Desc: "e.g. arsenic, reporter, alkane, logic gate\n", Kind: "Parameters"},
+				{Name: "Parts", Desc: "", Kind: "Parameters"},
+				{Name: "Parttypes", Desc: "Constructname \t\t\t\tstring\n\ne.g. promoter\n", Kind: "Parameters"},
+				{Name: "FulllistBackupParts", Desc: "Partsfound\t[]wtype.DNASequence // map[string]wtype.DNASequence\n\nmap[string][]string\n", Kind: "Data"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+				{Name: "Warnings", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

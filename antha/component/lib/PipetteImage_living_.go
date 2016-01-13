@@ -165,7 +165,7 @@ func _PipetteImage_livingRun(_ctx context.Context, input *PipetteImage_livingInp
 	return output
 }
 
-func PipetteImage_livingRun(_ctx context.Context, input *PipetteImage_livingInput) *PipetteImage_livingSOutput {
+func PipetteImage_livingRunSteps(_ctx context.Context, input *PipetteImage_livingInput) *PipetteImage_livingSOutput {
 	soutput := &PipetteImage_livingSOutput{}
 	output := _PipetteImage_livingRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -233,22 +233,26 @@ type PipetteImage_livingSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "PipetteImage_living", Constructor: PipetteImage_livingNew}
-	c.Desc.Desc = "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours\n"
-	c.Desc.Params = []ParamDesc{
-		{Name: "Imagefilename", Desc: "AntibioticVolume Volume\n\tInducerVolume Volume\n\tRepressorVolume Volume\n", Kind: "Parameters"},
-		{Name: "IncTemp", Desc: "", Kind: "Parameters"},
-		{Name: "IncTime", Desc: "", Kind: "Parameters"},
-		{Name: "InoculationVolume", Desc: "", Kind: "Parameters"},
-		{Name: "Notthiscolour", Desc: "", Kind: "Parameters"},
-		{Name: "OnlythisColour", Desc: "", Kind: "Parameters"},
-		{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\nMedia *wtype.LHComponent\nAntibiotic *wtype.LHComponent\n\tInducer *wtype.LHComponent\n\tRepressor *wtype.LHComponent\n", Kind: "Inputs"},
-		{Name: "Palettename", Desc: "", Kind: "Parameters"},
-		{Name: "UVimage", Desc: "", Kind: "Parameters"},
-		{Name: "VolumePerWell", Desc: "", Kind: "Parameters"},
-		{Name: "Numberofpixels", Desc: "", Kind: "Data"},
-		{Name: "Pixels", Desc: "", Kind: "Outputs"},
-		{Name: "UniqueComponents", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "PipetteImage_living",
+		Constructor: PipetteImage_livingNew,
+		Desc: ComponentDesc{
+			Desc: "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours\n",
+			Path: "antha/component/an/Liquid_handling/PipetteImage/PipetteLivingimage.an",
+			Params: []ParamDesc{
+				{Name: "Imagefilename", Desc: "AntibioticVolume Volume\n\tInducerVolume Volume\n\tRepressorVolume Volume\n", Kind: "Parameters"},
+				{Name: "IncTemp", Desc: "", Kind: "Parameters"},
+				{Name: "IncTime", Desc: "", Kind: "Parameters"},
+				{Name: "InoculationVolume", Desc: "", Kind: "Parameters"},
+				{Name: "Notthiscolour", Desc: "", Kind: "Parameters"},
+				{Name: "OnlythisColour", Desc: "", Kind: "Parameters"},
+				{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\nMedia *wtype.LHComponent\nAntibiotic *wtype.LHComponent\n\tInducer *wtype.LHComponent\n\tRepressor *wtype.LHComponent\n", Kind: "Inputs"},
+				{Name: "Palettename", Desc: "", Kind: "Parameters"},
+				{Name: "UVimage", Desc: "", Kind: "Parameters"},
+				{Name: "VolumePerWell", Desc: "", Kind: "Parameters"},
+				{Name: "Numberofpixels", Desc: "", Kind: "Data"},
+				{Name: "Pixels", Desc: "", Kind: "Outputs"},
+				{Name: "UniqueComponents", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

@@ -64,7 +64,7 @@ func _MakeBufferRun(_ctx context.Context, input *MakeBufferInput) *MakeBufferOut
 	return output
 }
 
-func MakeBufferRun(_ctx context.Context, input *MakeBufferInput) *MakeBufferSOutput {
+func MakeBufferRunSteps(_ctx context.Context, input *MakeBufferInput) *MakeBufferSOutput {
 	soutput := &MakeBufferSOutput{}
 	output := _MakeBufferRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -131,24 +131,28 @@ type MakeBufferSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "MakeBuffer", Constructor: MakeBufferNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "Buffername", Desc: "", Kind: "Parameters"},
-		{Name: "Bufferstock", Desc: "", Kind: "Inputs"},
-		{Name: "Bufferstockconc", Desc: "", Kind: "Parameters"},
-		{Name: "Bufferstockvolume", Desc: "", Kind: "Parameters"},
-		{Name: "Diluent", Desc: "", Kind: "Inputs"},
-		{Name: "Diluentname", Desc: "", Kind: "Parameters"},
-		{Name: "Diluentvolume", Desc: "", Kind: "Parameters"},
-		{Name: "FinalConcentration", Desc: "", Kind: "Parameters"},
-		{Name: "FinalVolume", Desc: "", Kind: "Parameters"},
-		{Name: "InPlate", Desc: "", Kind: "Inputs"},
-		{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-		{Name: "Buffer", Desc: "", Kind: "Outputs"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "MakeBuffer",
+		Constructor: MakeBufferNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/MakeBuffer/Makebuffer.an",
+			Params: []ParamDesc{
+				{Name: "Buffername", Desc: "", Kind: "Parameters"},
+				{Name: "Bufferstock", Desc: "", Kind: "Inputs"},
+				{Name: "Bufferstockconc", Desc: "", Kind: "Parameters"},
+				{Name: "Bufferstockvolume", Desc: "", Kind: "Parameters"},
+				{Name: "Diluent", Desc: "", Kind: "Inputs"},
+				{Name: "Diluentname", Desc: "", Kind: "Parameters"},
+				{Name: "Diluentvolume", Desc: "", Kind: "Parameters"},
+				{Name: "FinalConcentration", Desc: "", Kind: "Parameters"},
+				{Name: "FinalVolume", Desc: "", Kind: "Parameters"},
+				{Name: "InPlate", Desc: "", Kind: "Inputs"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "Buffer", Desc: "", Kind: "Outputs"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }
 
 /*

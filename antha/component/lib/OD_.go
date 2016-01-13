@@ -99,7 +99,7 @@ func _ODRun(_ctx context.Context, input *ODInput) *ODOutput {
 	return output
 }
 
-func ODRun(_ctx context.Context, input *ODInput) *ODSOutput {
+func ODRunSteps(_ctx context.Context, input *ODInput) *ODSOutput {
 	soutput := &ODSOutput{}
 	output := _ODRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -168,22 +168,26 @@ type ODSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "OD", Constructor: ODNew}
-	c.Desc.Desc = "Example OD measurement protocol.\nComputes the OD and dry cell weight estimate from absorbance reading\nTODO: implement replicates from parameters\n"
-	c.Desc.Params = []ParamDesc{
-		{Name: "Blank_absorbance", Desc: "WellCrosssectionalArea float64// should be calculated from plate and well type automatically\n", Kind: "Parameters"},
-		{Name: "Diluent", Desc: "", Kind: "Inputs"},
-		{Name: "Diluent_volume", Desc: "= uL(0)\n", Kind: "Parameters"},
-		{Name: "Heightof100ulinm", Desc: "Replicate_count uint32 //= 1 // Note: 1 replicate means experiment is in duplicate, etc.\ncalculate path length? - takes place under plate reader since this will only be necessary for plate reader protocols? labware?\nData which is returned from this protocol, and data types\n\n= 0.0533\n", Kind: "Parameters"},
-		{Name: "ODplate", Desc: "", Kind: "Inputs"},
-		{Name: "ODtoDCWconversionfactor", Desc: "Diluent_type //= (PBS)\n\n= (0.25)\n", Kind: "Parameters"},
-		{Name: "Sample_volume", Desc: "= uL(100)\n", Kind: "Parameters"},
-		{Name: "Sampletotest", Desc: "Culture\n", Kind: "Inputs"},
-		{Name: "Wlength", Desc: "Total_volume Volume//= ul (sample_volume+diluent_volume)\n\nWavelength //= nm(600)\n", Kind: "Parameters"},
-		{Name: "Blankcorrected_absorbance", Desc: "Absorbance\n", Kind: "Data"},
-		{Name: "Estimateddrycellweight_conc", Desc: "", Kind: "Data"},
-		{Name: "OD", Desc: "(pathlength corrected)\n", Kind: "Data"},
-		{Name: "Sample_absorbance", Desc: "Absorbance\n", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "OD",
+		Constructor: ODNew,
+		Desc: ComponentDesc{
+			Desc: "Example OD measurement protocol.\nComputes the OD and dry cell weight estimate from absorbance reading\nTODO: implement replicates from parameters\n",
+			Path: "antha/component/an/Liquid_handling/OD/OD.an",
+			Params: []ParamDesc{
+				{Name: "Blank_absorbance", Desc: "WellCrosssectionalArea float64// should be calculated from plate and well type automatically\n", Kind: "Parameters"},
+				{Name: "Diluent", Desc: "", Kind: "Inputs"},
+				{Name: "Diluent_volume", Desc: "= uL(0)\n", Kind: "Parameters"},
+				{Name: "Heightof100ulinm", Desc: "Replicate_count uint32 //= 1 // Note: 1 replicate means experiment is in duplicate, etc.\ncalculate path length? - takes place under plate reader since this will only be necessary for plate reader protocols? labware?\nData which is returned from this protocol, and data types\n\n= 0.0533\n", Kind: "Parameters"},
+				{Name: "ODplate", Desc: "", Kind: "Inputs"},
+				{Name: "ODtoDCWconversionfactor", Desc: "Diluent_type //= (PBS)\n\n= (0.25)\n", Kind: "Parameters"},
+				{Name: "Sample_volume", Desc: "= uL(100)\n", Kind: "Parameters"},
+				{Name: "Sampletotest", Desc: "Culture\n", Kind: "Inputs"},
+				{Name: "Wlength", Desc: "Total_volume Volume//= ul (sample_volume+diluent_volume)\n\nWavelength //= nm(600)\n", Kind: "Parameters"},
+				{Name: "Blankcorrected_absorbance", Desc: "Absorbance\n", Kind: "Data"},
+				{Name: "Estimateddrycellweight_conc", Desc: "", Kind: "Data"},
+				{Name: "OD", Desc: "(pathlength corrected)\n", Kind: "Data"},
+				{Name: "Sample_absorbance", Desc: "Absorbance\n", Kind: "Data"},
+			},
+		},
+	})
 }

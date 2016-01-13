@@ -153,7 +153,7 @@ func _Phytip_miniprepRun(_ctx context.Context, input *Phytip_miniprepInput) *Phy
 	return output
 }
 
-func Phytip_miniprepRun(_ctx context.Context, input *Phytip_miniprepInput) *Phytip_miniprepSOutput {
+func Phytip_miniprepRunSteps(_ctx context.Context, input *Phytip_miniprepInput) *Phytip_miniprepSOutput {
 	soutput := &Phytip_miniprepSOutput{}
 	output := _Phytip_miniprepRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -223,26 +223,30 @@ type Phytip_miniprepSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Phytip_miniprep", Constructor: Phytip_miniprepNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "Airstep", Desc: "", Kind: "Parameters"},
-		{Name: "Blotcycles", Desc: "", Kind: "Parameters"},
-		{Name: "Blottime", Desc: "", Kind: "Parameters"},
-		{Name: "Capturestep", Desc: "", Kind: "Parameters"},
-		{Name: "Cellpellet", Desc: "UnitOperations.Pellet // wrong type?\n", Kind: "Inputs"},
-		{Name: "Drytime", Desc: "", Kind: "Parameters"},
-		{Name: "Elutionstep", Desc: "", Kind: "Parameters"},
-		{Name: "Equilibrationstep", Desc: "", Kind: "Parameters"},
-		{Name: "Lysisstep", Desc: "", Kind: "Parameters"},
-		{Name: "Phytips", Desc: "", Kind: "Inputs"},
-		{Name: "Precipitationstep", Desc: "", Kind: "Parameters"},
-		{Name: "Resuspensionstep", Desc: "", Kind: "Parameters"},
-		{Name: "Tips", Desc: "wtype.LHTip\n", Kind: "Inputs"},
-		{Name: "Vacuum", Desc: "", Kind: "Parameters"},
-		{Name: "Vacuumstrength", Desc: "Torr\n", Kind: "Parameters"},
-		{Name: "Washsteps", Desc: "", Kind: "Parameters"},
-		{Name: "PlasmidDNAsolution", Desc: "Solution //PlasmidSolution\n", Kind: "Outputs"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Phytip_miniprep",
+		Constructor: Phytip_miniprepNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/Phytip_miniprep/Phytip_miniprep.an",
+			Params: []ParamDesc{
+				{Name: "Airstep", Desc: "", Kind: "Parameters"},
+				{Name: "Blotcycles", Desc: "", Kind: "Parameters"},
+				{Name: "Blottime", Desc: "", Kind: "Parameters"},
+				{Name: "Capturestep", Desc: "", Kind: "Parameters"},
+				{Name: "Cellpellet", Desc: "UnitOperations.Pellet // wrong type?\n", Kind: "Inputs"},
+				{Name: "Drytime", Desc: "", Kind: "Parameters"},
+				{Name: "Elutionstep", Desc: "", Kind: "Parameters"},
+				{Name: "Equilibrationstep", Desc: "", Kind: "Parameters"},
+				{Name: "Lysisstep", Desc: "", Kind: "Parameters"},
+				{Name: "Phytips", Desc: "", Kind: "Inputs"},
+				{Name: "Precipitationstep", Desc: "", Kind: "Parameters"},
+				{Name: "Resuspensionstep", Desc: "", Kind: "Parameters"},
+				{Name: "Tips", Desc: "wtype.LHTip\n", Kind: "Inputs"},
+				{Name: "Vacuum", Desc: "", Kind: "Parameters"},
+				{Name: "Vacuumstrength", Desc: "Torr\n", Kind: "Parameters"},
+				{Name: "Washsteps", Desc: "", Kind: "Parameters"},
+				{Name: "PlasmidDNAsolution", Desc: "Solution //PlasmidSolution\n", Kind: "Outputs"},
+			},
+		},
+	})
 }

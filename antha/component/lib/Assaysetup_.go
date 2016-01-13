@@ -65,7 +65,7 @@ func _AssaysetupRun(_ctx context.Context, input *AssaysetupInput) *AssaysetupOut
 	return output
 }
 
-func AssaysetupRun(_ctx context.Context, input *AssaysetupInput) *AssaysetupSOutput {
+func AssaysetupRunSteps(_ctx context.Context, input *AssaysetupInput) *AssaysetupSOutput {
 	soutput := &AssaysetupSOutput{}
 	output := _AssaysetupRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -129,19 +129,23 @@ type AssaysetupSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Assaysetup", Constructor: AssaysetupNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "Buffer", Desc: "", Kind: "Inputs"},
-		{Name: "Enzyme", Desc: "", Kind: "Inputs"},
-		{Name: "EnzymeVolume", Desc: "", Kind: "Parameters"},
-		{Name: "NumberofReactions", Desc: "", Kind: "Parameters"},
-		{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-		{Name: "Substrate", Desc: "", Kind: "Inputs"},
-		{Name: "SubstrateVolume", Desc: "", Kind: "Parameters"},
-		{Name: "TotalVolume", Desc: "", Kind: "Parameters"},
-		{Name: "Reactions", Desc: "", Kind: "Outputs"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Assaysetup",
+		Constructor: AssaysetupNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/AssaySetUp/Assaysetup.an",
+			Params: []ParamDesc{
+				{Name: "Buffer", Desc: "", Kind: "Inputs"},
+				{Name: "Enzyme", Desc: "", Kind: "Inputs"},
+				{Name: "EnzymeVolume", Desc: "", Kind: "Parameters"},
+				{Name: "NumberofReactions", Desc: "", Kind: "Parameters"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "Substrate", Desc: "", Kind: "Inputs"},
+				{Name: "SubstrateVolume", Desc: "", Kind: "Parameters"},
+				{Name: "TotalVolume", Desc: "", Kind: "Parameters"},
+				{Name: "Reactions", Desc: "", Kind: "Outputs"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

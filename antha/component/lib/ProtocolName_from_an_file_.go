@@ -61,7 +61,7 @@ func _ProtocolName_from_an_fileRun(_ctx context.Context, input *ProtocolName_fro
 	return output
 }
 
-func ProtocolName_from_an_fileRun(_ctx context.Context, input *ProtocolName_from_an_fileInput) *ProtocolName_from_an_fileSOutput {
+func ProtocolName_from_an_fileRunSteps(_ctx context.Context, input *ProtocolName_from_an_fileInput) *ProtocolName_from_an_fileSOutput {
 	soutput := &ProtocolName_from_an_fileSOutput{}
 	output := _ProtocolName_from_an_fileRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -122,16 +122,20 @@ type ProtocolName_from_an_fileSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "ProtocolName_from_an_file", Constructor: ProtocolName_from_an_fileNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "InputVariable", Desc: "", Kind: "Inputs"},
-		{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-		{Name: "ParameterVariableAsValuewithunit", Desc: "", Kind: "Parameters"},
-		{Name: "ParameterVariableAsint", Desc: "", Kind: "Parameters"},
-		{Name: "ParameterVariablestring", Desc: "", Kind: "Parameters"},
-		{Name: "OutputData", Desc: "", Kind: "Data"},
-		{Name: "PhysicalOutput", Desc: "", Kind: "Outputs"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "ProtocolName_from_an_file",
+		Constructor: ProtocolName_from_an_fileNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/default.an",
+			Params: []ParamDesc{
+				{Name: "InputVariable", Desc: "", Kind: "Inputs"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "ParameterVariableAsValuewithunit", Desc: "", Kind: "Parameters"},
+				{Name: "ParameterVariableAsint", Desc: "", Kind: "Parameters"},
+				{Name: "ParameterVariablestring", Desc: "", Kind: "Parameters"},
+				{Name: "OutputData", Desc: "", Kind: "Data"},
+				{Name: "PhysicalOutput", Desc: "", Kind: "Outputs"},
+			},
+		},
+	})
 }

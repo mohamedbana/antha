@@ -66,7 +66,7 @@ func _PlotdataRun(_ctx context.Context, input *PlotdataInput) *PlotdataOutput {
 	return output
 }
 
-func PlotdataRun(_ctx context.Context, input *PlotdataInput) *PlotdataSOutput {
+func PlotdataRunSteps(_ctx context.Context, input *PlotdataInput) *PlotdataSOutput {
 	soutput := &PlotdataSOutput{}
 	output := _PlotdataRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -121,12 +121,16 @@ type PlotdataSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Plotdata", Constructor: PlotdataNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "Exportedfilename", Desc: "", Kind: "Parameters"},
-		{Name: "Xvalues", Desc: "", Kind: "Parameters"},
-		{Name: "Yvaluearray", Desc: "", Kind: "Parameters"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Plotdata",
+		Constructor: PlotdataNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Data/plotdata/Plotdata.an",
+			Params: []ParamDesc{
+				{Name: "Exportedfilename", Desc: "", Kind: "Parameters"},
+				{Name: "Xvalues", Desc: "", Kind: "Parameters"},
+				{Name: "Yvaluearray", Desc: "", Kind: "Parameters"},
+			},
+		},
+	})
 }

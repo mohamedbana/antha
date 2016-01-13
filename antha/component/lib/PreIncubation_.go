@@ -58,7 +58,7 @@ func _PreIncubationRun(_ctx context.Context, input *PreIncubationInput) *PreIncu
 	return output
 }
 
-func PreIncubationRun(_ctx context.Context, input *PreIncubationInput) *PreIncubationSOutput {
+func PreIncubationRunSteps(_ctx context.Context, input *PreIncubationInput) *PreIncubationSOutput {
 	soutput := &PreIncubationSOutput{}
 	output := _PreIncubationRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -117,15 +117,19 @@ type PreIncubationSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "PreIncubation", Constructor: PreIncubationNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "CompetentCells", Desc: "", Kind: "Inputs"},
-		{Name: "CompetentCellvolumeperassembly", Desc: "= 50.(uL)\n", Kind: "Parameters"},
-		{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-		{Name: "Preplasmidtemp", Desc: "", Kind: "Parameters"},
-		{Name: "Preplasmidtime", Desc: "", Kind: "Parameters"},
-		{Name: "ReadyCompCells", Desc: "", Kind: "Outputs"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "PreIncubation",
+		Constructor: PreIncubationNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/Transformation/PreIncubation.an",
+			Params: []ParamDesc{
+				{Name: "CompetentCells", Desc: "", Kind: "Inputs"},
+				{Name: "CompetentCellvolumeperassembly", Desc: "= 50.(uL)\n", Kind: "Parameters"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "Preplasmidtemp", Desc: "", Kind: "Parameters"},
+				{Name: "Preplasmidtime", Desc: "", Kind: "Parameters"},
+				{Name: "ReadyCompCells", Desc: "", Kind: "Outputs"},
+			},
+		},
+	})
 }

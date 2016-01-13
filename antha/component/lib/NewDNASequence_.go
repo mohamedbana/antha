@@ -74,7 +74,7 @@ func _NewDNASequenceRun(_ctx context.Context, input *NewDNASequenceInput) *NewDN
 	return output
 }
 
-func NewDNASequenceRun(_ctx context.Context, input *NewDNASequenceInput) *NewDNASequenceSOutput {
+func NewDNASequenceRunSteps(_ctx context.Context, input *NewDNASequenceInput) *NewDNASequenceSOutput {
 	soutput := &NewDNASequenceSOutput{}
 	output := _NewDNASequenceRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -137,17 +137,21 @@ type NewDNASequenceSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "NewDNASequence", Constructor: NewDNASequenceNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "DNA_seq", Desc: "", Kind: "Parameters"},
-		{Name: "Gene_name", Desc: "", Kind: "Parameters"},
-		{Name: "Linear", Desc: "", Kind: "Parameters"},
-		{Name: "Plasmid", Desc: "", Kind: "Parameters"},
-		{Name: "SingleStranded", Desc: "", Kind: "Parameters"},
-		{Name: "DNA", Desc: "", Kind: "Data"},
-		{Name: "DNAwithORFs", Desc: "", Kind: "Data"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "NewDNASequence",
+		Constructor: NewDNASequenceNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Data/DNA/NewDNASequence/NewDNASequence.an",
+			Params: []ParamDesc{
+				{Name: "DNA_seq", Desc: "", Kind: "Parameters"},
+				{Name: "Gene_name", Desc: "", Kind: "Parameters"},
+				{Name: "Linear", Desc: "", Kind: "Parameters"},
+				{Name: "Plasmid", Desc: "", Kind: "Parameters"},
+				{Name: "SingleStranded", Desc: "", Kind: "Parameters"},
+				{Name: "DNA", Desc: "", Kind: "Data"},
+				{Name: "DNAwithORFs", Desc: "", Kind: "Data"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

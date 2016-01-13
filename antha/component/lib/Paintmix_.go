@@ -63,7 +63,7 @@ func _PaintmixRun(_ctx context.Context, input *PaintmixInput) *PaintmixOutput {
 	return output
 }
 
-func PaintmixRun(_ctx context.Context, input *PaintmixInput) *PaintmixSOutput {
+func PaintmixRunSteps(_ctx context.Context, input *PaintmixInput) *PaintmixSOutput {
 	soutput := &PaintmixSOutput{}
 	output := _PaintmixRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -125,17 +125,21 @@ type PaintmixSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Paintmix", Constructor: PaintmixNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "Colour1", Desc: "", Kind: "Inputs"},
-		{Name: "Colour1vol", Desc: "", Kind: "Parameters"},
-		{Name: "Colour2", Desc: "", Kind: "Inputs"},
-		{Name: "Colour2vol", Desc: "", Kind: "Parameters"},
-		{Name: "Numberofcopies", Desc: "", Kind: "Parameters"},
-		{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-		{Name: "NewColours", Desc: "", Kind: "Outputs"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Paintmix",
+		Constructor: PaintmixNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/Colourmix/Paintmix.an",
+			Params: []ParamDesc{
+				{Name: "Colour1", Desc: "", Kind: "Inputs"},
+				{Name: "Colour1vol", Desc: "", Kind: "Parameters"},
+				{Name: "Colour2", Desc: "", Kind: "Inputs"},
+				{Name: "Colour2vol", Desc: "", Kind: "Parameters"},
+				{Name: "Numberofcopies", Desc: "", Kind: "Parameters"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "NewColours", Desc: "", Kind: "Outputs"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }

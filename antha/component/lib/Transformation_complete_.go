@@ -142,7 +142,7 @@ func _Transformation_completeRun(_ctx context.Context, input *Transformation_com
 	return output
 }
 
-func Transformation_completeRun(_ctx context.Context, input *Transformation_completeInput) *Transformation_completeSOutput {
+func Transformation_completeRunSteps(_ctx context.Context, input *Transformation_completeInput) *Transformation_completeSOutput {
 	soutput := &Transformation_completeSOutput{}
 	output := _Transformation_completeRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -211,25 +211,29 @@ type Transformation_completeSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Transformation_complete", Constructor: Transformation_completeNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "AgarPlate", Desc: "", Kind: "Inputs"},
-		{Name: "CompetentCells", Desc: "", Kind: "Inputs"},
-		{Name: "CompetentCellvolumeperassembly", Desc: "= 50.(uL)\n", Kind: "Parameters"},
-		{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-		{Name: "Plateoutvolume", Desc: "", Kind: "Parameters"},
-		{Name: "Postplasmidtemp", Desc: "", Kind: "Parameters"},
-		{Name: "Postplasmidtime", Desc: "", Kind: "Parameters"},
-		{Name: "Preplasmidtemp", Desc: "", Kind: "Parameters"},
-		{Name: "Preplasmidtime", Desc: "", Kind: "Parameters"},
-		{Name: "Reaction", Desc: "", Kind: "Inputs"},
-		{Name: "Reactionvolume", Desc: "", Kind: "Parameters"},
-		{Name: "Recoverymedium", Desc: "", Kind: "Inputs"},
-		{Name: "Recoverytemp", Desc: "", Kind: "Parameters"},
-		{Name: "Recoverytime", Desc: "= 2 (hours)\n", Kind: "Parameters"},
-		{Name: "Recoveryvolume", Desc: "", Kind: "Parameters"},
-		{Name: "Platedculture", Desc: "", Kind: "Outputs"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Transformation_complete",
+		Constructor: Transformation_completeNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/Transformation/Transformation_almostworking.an",
+			Params: []ParamDesc{
+				{Name: "AgarPlate", Desc: "", Kind: "Inputs"},
+				{Name: "CompetentCells", Desc: "", Kind: "Inputs"},
+				{Name: "CompetentCellvolumeperassembly", Desc: "= 50.(uL)\n", Kind: "Parameters"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "Plateoutvolume", Desc: "", Kind: "Parameters"},
+				{Name: "Postplasmidtemp", Desc: "", Kind: "Parameters"},
+				{Name: "Postplasmidtime", Desc: "", Kind: "Parameters"},
+				{Name: "Preplasmidtemp", Desc: "", Kind: "Parameters"},
+				{Name: "Preplasmidtime", Desc: "", Kind: "Parameters"},
+				{Name: "Reaction", Desc: "", Kind: "Inputs"},
+				{Name: "Reactionvolume", Desc: "", Kind: "Parameters"},
+				{Name: "Recoverymedium", Desc: "", Kind: "Inputs"},
+				{Name: "Recoverytemp", Desc: "", Kind: "Parameters"},
+				{Name: "Recoverytime", Desc: "= 2 (hours)\n", Kind: "Parameters"},
+				{Name: "Recoveryvolume", Desc: "", Kind: "Parameters"},
+				{Name: "Platedculture", Desc: "", Kind: "Outputs"},
+			},
+		},
+	})
 }

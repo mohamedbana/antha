@@ -80,7 +80,7 @@ func _TypeIISConstructAssemblyRun(_ctx context.Context, input *TypeIISConstructA
 	return output
 }
 
-func TypeIISConstructAssemblyRun(_ctx context.Context, input *TypeIISConstructAssemblyInput) *TypeIISConstructAssemblySOutput {
+func TypeIISConstructAssemblyRunSteps(_ctx context.Context, input *TypeIISConstructAssemblyInput) *TypeIISConstructAssemblySOutput {
 	soutput := &TypeIISConstructAssemblySOutput{}
 	output := _TypeIISConstructAssemblyRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -156,32 +156,36 @@ type TypeIISConstructAssemblySOutput struct {
 }
 
 func init() {
-	c := Component{Name: "TypeIISConstructAssembly", Constructor: TypeIISConstructAssemblyNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "Atp", Desc: "", Kind: "Inputs"},
-		{Name: "AtpVol", Desc: "", Kind: "Parameters"},
-		{Name: "Buffer", Desc: "", Kind: "Inputs"},
-		{Name: "BufferVol", Desc: "", Kind: "Parameters"},
-		{Name: "InPlate", Desc: "", Kind: "Inputs"},
-		{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
-		{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
-		{Name: "LigVol", Desc: "", Kind: "Parameters"},
-		{Name: "Ligase", Desc: "", Kind: "Inputs"},
-		{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-		{Name: "OutputReactionName", Desc: "", Kind: "Parameters"},
-		{Name: "PartNames", Desc: "", Kind: "Parameters"},
-		{Name: "PartVols", Desc: "", Kind: "Parameters"},
-		{Name: "Parts", Desc: "", Kind: "Inputs"},
-		{Name: "ReVol", Desc: "", Kind: "Parameters"},
-		{Name: "ReactionTemp", Desc: "", Kind: "Parameters"},
-		{Name: "ReactionTime", Desc: "", Kind: "Parameters"},
-		{Name: "ReactionVolume", Desc: "", Kind: "Parameters"},
-		{Name: "RestrictionEnzyme", Desc: "", Kind: "Inputs"},
-		{Name: "Vector", Desc: "", Kind: "Inputs"},
-		{Name: "VectorVol", Desc: "", Kind: "Parameters"},
-		{Name: "Water", Desc: "", Kind: "Inputs"},
-		{Name: "Reaction", Desc: "", Kind: "Outputs"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "TypeIISConstructAssembly",
+		Constructor: TypeIISConstructAssemblyNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/TypeIIsAssembly/TypeIISConstructAssembly/TypeIISConstructAssembly.an",
+			Params: []ParamDesc{
+				{Name: "Atp", Desc: "", Kind: "Inputs"},
+				{Name: "AtpVol", Desc: "", Kind: "Parameters"},
+				{Name: "Buffer", Desc: "", Kind: "Inputs"},
+				{Name: "BufferVol", Desc: "", Kind: "Parameters"},
+				{Name: "InPlate", Desc: "", Kind: "Inputs"},
+				{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
+				{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
+				{Name: "LigVol", Desc: "", Kind: "Parameters"},
+				{Name: "Ligase", Desc: "", Kind: "Inputs"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "OutputReactionName", Desc: "", Kind: "Parameters"},
+				{Name: "PartNames", Desc: "", Kind: "Parameters"},
+				{Name: "PartVols", Desc: "", Kind: "Parameters"},
+				{Name: "Parts", Desc: "", Kind: "Inputs"},
+				{Name: "ReVol", Desc: "", Kind: "Parameters"},
+				{Name: "ReactionTemp", Desc: "", Kind: "Parameters"},
+				{Name: "ReactionTime", Desc: "", Kind: "Parameters"},
+				{Name: "ReactionVolume", Desc: "", Kind: "Parameters"},
+				{Name: "RestrictionEnzyme", Desc: "", Kind: "Inputs"},
+				{Name: "Vector", Desc: "", Kind: "Inputs"},
+				{Name: "VectorVol", Desc: "", Kind: "Parameters"},
+				{Name: "Water", Desc: "", Kind: "Inputs"},
+				{Name: "Reaction", Desc: "", Kind: "Outputs"},
+			},
+		},
+	})
 }

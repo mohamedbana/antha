@@ -57,7 +57,7 @@ func _TransferRun(_ctx context.Context, input *TransferInput) *TransferOutput {
 	return output
 }
 
-func TransferRun(_ctx context.Context, input *TransferInput) *TransferSOutput {
+func TransferRunSteps(_ctx context.Context, input *TransferInput) *TransferSOutput {
 	soutput := &TransferSOutput{}
 	output := _TransferRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
@@ -117,15 +117,19 @@ type TransferSOutput struct {
 }
 
 func init() {
-	c := Component{Name: "Transfer", Constructor: TransferNew}
-	c.Desc.Desc = ""
-	c.Desc.Params = []ParamDesc{
-		{Name: "LiquidVolume", Desc: "", Kind: "Parameters"},
-		{Name: "Liquidname", Desc: "", Kind: "Parameters"},
-		{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-		{Name: "Startingsolution", Desc: "", Kind: "Inputs"},
-		{Name: "FinalSolution", Desc: "", Kind: "Outputs"},
-		{Name: "Status", Desc: "", Kind: "Data"},
-	}
-	addComponent(c)
+	addComponent(Component{Name: "Transfer",
+		Constructor: TransferNew,
+		Desc: ComponentDesc{
+			Desc: "",
+			Path: "antha/component/an/Liquid_handling/Transfer/Transfer.an",
+			Params: []ParamDesc{
+				{Name: "LiquidVolume", Desc: "", Kind: "Parameters"},
+				{Name: "Liquidname", Desc: "", Kind: "Parameters"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "Startingsolution", Desc: "", Kind: "Inputs"},
+				{Name: "FinalSolution", Desc: "", Kind: "Outputs"},
+				{Name: "Status", Desc: "", Kind: "Data"},
+			},
+		},
+	})
 }
