@@ -31,6 +31,7 @@ import (
 	"github.com/antha-lang/antha/antha/ast"
 	"github.com/antha-lang/antha/antha/token"
 	"log"
+	"path/filepath"
 	"reflect"
 	"sort"
 	"strconv"
@@ -58,6 +59,7 @@ type param struct {
 type antha struct {
 	element     string                          // Element name
 	desc        string                          // Description of this element
+	path        string                          // Normalized path to element
 	inputs      map[string]param                // Inputs of an element
 	inputOrder  []string                        // Canonical order of inputs to ensure deterministic output
 	outputs     map[string]param                // Outputs of an element
@@ -274,6 +276,7 @@ func sortKeys(m map[string]param) []string {
 // Collect information needed in downstream generation passes
 func (p *compiler) analyze(src *ast.File) {
 	p.desc = src.Doc.Text()
+	p.path = filepath.ToSlash(p.fset.File(src.Package).Name())
 	p.element = strings.Title(src.Name.Name)
 
 	p.recordParams(src.Decls)
@@ -437,13 +440,17 @@ type {{.Element}}SOutput struct {
 }
 
 func init() {
-	c := Component{Name: "{{.Element}}", Constructor: {{.Element}}New}
-	c.Desc.Desc = {{.Desc}}
-	c.Desc.Params = []ParamDesc{
-		{{range .PDesc}}ParamDesc{Name: {{.Name}}, Desc: {{.Desc}}, Kind: {{.Kind}}},
-		{{end}}
-	}
-	addComponent(c)
+	addComponent(Component{Name: "{{.Element}}",
+		Constructor: {{.Element}}New, 
+		Desc: ComponentDesc{
+			Desc: {{.Desc}},
+			Path: {{.Path}},
+			Params: []ParamDesc{
+				{{range .PDesc}}ParamDesc{Name: {{.Name}}, Desc: {{.Desc}}, Kind: {{.Kind}}},
+				{{end}}
+			},
+		},
+	})
 }
 `
 
@@ -458,6 +465,7 @@ func init() {
 	params := struct {
 		Element  string
 		Desc     string
+		Path     string
 		Inputs   []field
 		Outputs  []field
 		Data     []field
@@ -466,6 +474,7 @@ func init() {
 	}{
 		Element: p.element,
 		Desc:    strconv.Quote(p.desc),
+		Path:    strconv.Quote(p.path),
 	}
 
 	add := func(param param, name string) error {
