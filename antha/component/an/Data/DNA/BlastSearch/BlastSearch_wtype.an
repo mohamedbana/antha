@@ -1,0 +1,101 @@
+// Example element demonstrating how to perform a BLAST search using the megablast algorithm
+
+protocol BlastSearch_wtype
+
+import (
+	"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/blast"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	biogo "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	
+)
+// Input parameters for this protocol
+Parameters (
+	DNA wtype.DNASequence
+)
+
+// Data which is returned from this protocol; output data
+Data (
+	Hits string
+	AnthaSeq wtype.DNASequence
+)
+
+// Physical inputs to this protocol
+Inputs (
+
+)
+
+// Physical outputs from this protocol
+Outputs (
+)
+
+Requirements {
+
+}
+
+// Actions to perform before protocol itself
+Setup {
+
+}
+
+// Core process of the protocol: steps to be performed for each input
+Steps {
+	
+	
+	var err error
+	var hits []biogo.Hit
+	/*
+	if Querytype == "PROTEIN" {
+	hits, err = blast.MegaBlastP(Query)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	
+	Hits = fmt.Sprintln(blast.HitSummary(hits))
+
+	
+	} else if Querytype == "DNA" {
+	hits, err = blast.MegaBlastN(Query)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	
+	Hits = fmt.Sprintln(blast.HitSummary(hits))
+	} 
+	*/
+	AnthaSeq = DNA
+	
+	// look for orfs
+	orf, orftrue := sequences.FindORF(AnthaSeq.Seq)
+	
+	if orftrue == true && len(orf.DNASeq) == len(AnthaSeq.Seq){
+		// if open reading frame is detected, we'll perform a blastP search'
+		fmt.Println("ORF detected:", "full sequence length: ", len(AnthaSeq.Seq), "ORF length: ", len(orf.DNASeq))
+		hits, err = blast.MegaBlastP(orf.ProtSeq)
+	} else {
+	// otherwise we'll blast the nucleotide sequence
+	hits, err = AnthaSeq.Blast()
+	}
+	if err !=nil {
+		fmt.Println(err.Error())
+	
+	} //else {
+	
+		Hits = fmt.Sprintln(blast.HitSummary(hits))
+		
+		// Rename Sequence with ID of top blast hit
+		AnthaSeq.Nm = hits[0].Id
+	//}
+	
+	
+}
+
+// Actions to perform after steps block to analyze data
+Analysis {
+
+}
+
+Validation {
+
+}
