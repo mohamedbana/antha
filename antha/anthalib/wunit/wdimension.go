@@ -386,25 +386,3 @@ type Voltage struct {
 func NewVoltage(value float64, unit string) (v Voltage, err error) {
 	return Voltage{NewMeasurement(value, "", unit)}, nil
 }
-func NewRate(v float64, unit string, timeunit string) (r Rate, err error) {
-	if unit != `/` {
-		err = fmt.Errorf("Can't make flow rate which aren't in per")
-		panic(err.Error())
-	}
-	concrete := NewMeasurement(v, "", unit)
-
-	approvedtimeunits := []string{"ns", "us", "µs", "ms", "s", "m", "h"}
-	//Mvalue float64
-	// the relevant units
-
-	for _, approvedunit := range approvedtimeunits {
-		if timeunit == approvedunit {
-			r.Mvalue = concrete.Mvalue
-			r.Munit = concrete.Munit
-			r.Timeunit = timeunit
-			return
-		}
-	}
-	err = fmt.Errorf(timeunit, " Not approved time unit. Approved units time are: ", approvedtimeunits)
-	return r, err
-}
