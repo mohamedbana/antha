@@ -5,6 +5,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/AliquotTo"
 	"github.com/antha-lang/antha/antha/component/lib/Assaysetup"
 	"github.com/antha-lang/antha/antha/component/lib/BlastSearch"
+	"github.com/antha-lang/antha/antha/component/lib/BlastSearch_wtype"
 	"github.com/antha-lang/antha/antha/component/lib/Colony_PCR"
 	"github.com/antha-lang/antha/antha/component/lib/DNA_gel"
 	"github.com/antha-lang/antha/antha/component/lib/Datacrunch"
@@ -60,6 +61,7 @@ type ComponentDesc struct {
 func GetComponents() []ComponentDesc {
 	c := make([]ComponentDesc, 0)
 	c = append(c, ComponentDesc{Name: "BlastSearch", Constructor: BlastSearch.New})
+	c = append(c, ComponentDesc{Name: "BlastSearch_wtype", Constructor: BlastSearch_wtype.New})
 	c = append(c, ComponentDesc{Name: "FindPartsthat", Constructor: FindPartsthat.New})
 	c = append(c, ComponentDesc{Name: "NewDNASequence", Constructor: NewDNASequence.New})
 	c = append(c, ComponentDesc{Name: "RemoveRestrictionSites", Constructor: RemoveRestrictionSites.New})
