@@ -32,6 +32,8 @@ import (
 func makePlateLibrary() map[string]*wtype.LHPlate {
 	plates := make(map[string]*wtype.LHPlate)
 
+	riserheightinmm := 40.0
+
 	// deep square well 96
 	swshp := wtype.NewShape("box", "mm", 8.2, 8.2, 41.3)
 	welltype := wtype.NewLHWell("DSW96", "", "", "ul", 2000, 25, swshp, 3, 8.2, 8.2, 41.3, 4.7, "mm")
@@ -42,6 +44,38 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	swshp = wtype.NewShape("box", "mm", 8.2, 8.2, 41.3)
 	welltype = wtype.NewLHWell("DSW96", "", "", "ul", 2000, 25, swshp, 3, 8.2, 8.2, 41.3, 4.7, "mm")
 	plate = wtype.NewLHPlate("DSW96_riser", "Unknown", 8, 12, 44.1, "mm", welltype, 9, 9, 0.0, 0.0, 40.0)
+	plates[plate.Type] = plate
+
+	// 24 well deep square well plate on riser
+
+	bottomtype := 3 // 0 = flat, 3 = v shaped?
+	xdim := 16.8
+	ydim := 16.8
+	zdim := 41.3
+	bottomh := 4.7
+
+	wellcapacityinwelltypeunit := 11000.0
+	welltypeunit := "ul"
+	wellsperrow := 6
+	wellspercolumn := 4
+	residualvol := 50.0 // assume in ul
+
+	wellxoffset := 18.0 // centre of well to centre of neighbouring well in x direction
+	wellyoffset := 18.0 //centre of well to centre of neighbouring well in y direction
+	xstart := 0.0       // distance from top left side of plate to first well
+	ystart := 0.0       // distance from top left side of plate to first well
+	zstart := 0.0       // offset of bottom of deck to bottom of well (this includes agar estimate)
+
+	zstart = zstart + riserheightinmm
+
+	heightinmm := 44.1
+
+	squarewell := wtype.NewShape("cylinder", "mm", xdim, ydim, zdim)
+	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
+	welltype = wtype.NewLHWell("24DSW", "", "", welltypeunit, wellcapacityinwelltypeunit, residualvol, squarewell, bottomtype, xdim, ydim, zdim, bottomh, "mm")
+
+	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
+	plate = wtype.NewLHPlate("DSW24_riser", "Unknown", wellspercolumn, wellsperrow, heightinmm, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
 
 	// shallow round well flat bottom 96
@@ -97,11 +131,11 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	// Block Kombi 2ml
 	eppy := wtype.NewShape("cylinder", "mm", 8.2, 8.2, 45)
 
-	wellxoffset := 18.0 // centre of well to centre of neighbouring well in x direction
-	wellyoffset := 18.0 //centre of well to centre of neighbouring well in y direction
-	xstart := 5.0       // distance from top left side of plate to first well
-	ystart := 5.0       // distance from top left side of plate to first well
-	zstart := 6.0       // offset of bottom of deck to bottom of well
+	wellxoffset = 18.0 // centre of well to centre of neighbouring well in x direction
+	wellyoffset = 18.0 //centre of well to centre of neighbouring well in y direction
+	xstart = 5.0       // distance from top left side of plate to first well
+	ystart = 5.0       // distance from top left side of plate to first well
+	zstart = 6.0       // offset of bottom of deck to bottom of well
 
 	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
 	welltype = wtype.NewLHWell("2mlEpp", "", "", "ul", 2000, 25, eppy, 3, 8.2, 8.2, 45, 4.7, "mm")
@@ -112,11 +146,11 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 
 	// greiner 384 well plate flat bottom
 
-	bottomtype := 0
-	xdim := 4.0
-	ydim := 4.0
-	zdim := 14.0
-	bottomh := 1.0
+	bottomtype = 0
+	xdim = 4.0
+	ydim = 4.0
+	zdim = 14.0
+	bottomh = 1.0
 
 	wellxoffset = 4.5 // centre of well to centre of neighbouring well in x direction
 	wellyoffset = 4.5 //centre of well to centre of neighbouring well in y direction
@@ -248,9 +282,9 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	ystart = 5.0       // distance from top left side of plate to first well
 	zstart = 9.0       // offset of bottom of deck to bottom of well (this includes agar estimate)
 
-	wellsperrow := 3
-	wellspercolumn := 2
-	heightinmm := 20.0
+	wellsperrow = 3
+	wellspercolumn = 2
+	heightinmm = 20.0
 
 	circle := wtype.NewShape("cylinder", "mm", 37, 37, 20)
 	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
