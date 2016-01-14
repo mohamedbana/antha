@@ -58,19 +58,19 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	welltypeunit := "ul"
 	wellsperrow := 6
 	wellspercolumn := 4
-	residualvol := 50.0 // assume in ul
+	residualvol := 650.0 // assume in ul
 
 	wellxoffset := 18.0 // centre of well to centre of neighbouring well in x direction
 	wellyoffset := 18.0 //centre of well to centre of neighbouring well in y direction
-	xstart := 0.0       // distance from top left side of plate to first well
-	ystart := 0.0       // distance from top left side of plate to first well
-	zstart := 0.0       // offset of bottom of deck to bottom of well (this includes agar estimate)
+	xstart := 4.5       // distance from top left side of plate to first well
+	ystart := 4.5       // distance from top left side of plate to first well
+	zstart := -1.0      // offset of bottom of deck to bottom of well (this includes agar estimate)
 
 	zstart = zstart + riserheightinmm
 
 	heightinmm := 44.1
 
-	squarewell := wtype.NewShape("cylinder", "mm", xdim, ydim, zdim)
+	squarewell := wtype.NewShape("box", "mm", xdim, ydim, zdim)
 	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
 	welltype = wtype.NewLHWell("24DSW", "", "", welltypeunit, wellcapacityinwelltypeunit, residualvol, squarewell, bottomtype, xdim, ydim, zdim, bottomh, "mm")
 
