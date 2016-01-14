@@ -1,14 +1,8 @@
 {
-    "properties": {
-        "name": "main"
-    },
+    "connections": [],
     "processes": {
         "Mastermix_reaction": {
-            "component": "Mastermix_reactions",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "Mastermix_reactions"
         }
-    },
-    "connections": [ ]
+    }
 }

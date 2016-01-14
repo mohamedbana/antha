@@ -1,39 +1,34 @@
 {
-    "Parameters": [
-        {
-            "Standarddigest_conc":{
-                "ReactionVolume": "20ul",
-                "DNAConc": "50ng/ul",
-				"DNAMassperReaction": "100ng",
-				"DNAName":"vector2",
-                "EnzymeNames" : [
-                    "Nco1",
-                ],
-                "Water": "component:water",
-                "DNASolution": "component:DNAsolution",
-				"BSAoptional": "component:DNAsolution",
-                "BSAvol": "0ul",
-                "Buffer": "component:CutsmartBuffer",
-                "BufferConcX": 10,
-                "StockReConcinUperml":[
-				 10000,
-				],
-				"DesiredConcinUperml":[
-				 10,
-				],
-				"EnzSolutions":[
-				"component:restrictionenzyme",
-				],
-                "OutPlate": "plate:pcrplate_with_cooler",
-                "InPlate": "plate:pcrplate_with_cooler",
-                "TipType": "tipbox:Gilson20",
-                "ReactionTemp": "37C",
-                "ReactionTime": "3600s",
-                "InactivationTemp": "65C",
-                "InactivationTime": "900s"
-            }
-    }],
-    "Config": {
-        "OUTPUT_COUNT": 1
+    "Parameters": {
+        "Standarddigest_conc": {
+            "BSAoptional": "DNAsolution",
+            "BSAvol": "0ul",
+            "Buffer": "CutsmartBuffer",
+            "BufferConcX": 10,
+            "DNAConc": "50ng/ul",
+            "DNAMassperReaction": "100ng",
+            "DNAName": "vector2",
+            "DNASolution": "DNAsolution",
+            "DesiredConcinUperml": [
+                10
+            ],
+            "EnzSolutions": [
+                "restrictionenzyme"
+            ],
+            "EnzymeNames": [
+                "Nco1"
+            ],
+            "InPlate": "pcrplate_with_cooler",
+            "InactivationTemp": "65C",
+            "InactivationTime": "900s",
+            "OutPlate": "pcrplate_with_cooler",
+            "ReactionTemp": "37C",
+            "ReactionTime": "3600s",
+            "ReactionVolume": "20ul",
+            "StockReConcinUperml": [
+                10000
+            ],
+            "Water": "water"
+        }
     }
 }

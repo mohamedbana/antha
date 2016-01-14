@@ -1,0 +1,124 @@
+// Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours
+protocol PipetteImage_CMYK
+
+import (
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
+	"github.com/antha-lang/antha/antha/anthalib/mixer"
+	"fmt"
+)
+
+
+// Input parameters for this protocol (data)
+Parameters (
+	VolumeForFullcolour  Volume
+	Imagefilename string
+)
+
+// Data which is returned from this protocol, and data types
+Data (
+	Numberofpixels int
+)
+
+
+// Physical Inputs to this protocol with types
+Inputs (
+	Cyan *wtype.LHComponent
+	Yellow *wtype.LHComponent
+	Magenta *wtype.LHComponent
+	Black *wtype.LHComponent
+	//InPlate *wtype.LHPlate
+	OutPlate *wtype.LHPlate
+)
+
+// Physical outputs from this protocol with types
+Outputs (
+	Pixels[]*wtype.LHSolution
+)
+
+Requirements {
+	
+}
+
+// Conditions to run on startup
+Setup {
+	
+}
+
+// The core process for this protocol, with the steps to be performed
+// for every input
+Steps {
+	
+	chosencolourpalette := image.AvailablePalettes["WebSafe"]
+	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, chosencolourpalette) 
+	
+	solutions := make([]*wtype.LHSolution, 0)
+
+	counter := 0
+
+	//solutions := image.PipetteImagebyBlending(OutPlate, positiontocolourmap,Cyan, Magenta, Yellow,Black, VolumeForFullcolour) 
+
+	for locationkey, colour := range positiontocolourmap {
+		
+		components := make([]*wtype.LHComponent, 0)
+
+		cmyk := image.ColourtoCMYK(colour)
+		
+		var maxuint8 uint8 = 255		
+		
+		if cmyk.C ==0 && cmyk.Y == 0 && cmyk.M == 0 && cmyk.K == 0 {
+		
+		continue
+			
+			}else{
+			
+		counter = counter + 1
+		
+		if cmyk.C > 0{
+			
+		cyanvol := wunit.NewVolume(((float64(cmyk.C)/float64(maxuint8)) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
+		cyanSample := mixer.Sample(Cyan, cyanvol)
+		components = append(components, cyanSample)
+		}
+		
+		if cmyk.Y > 0{
+		yellowvol := wunit.NewVolume(((float64(cmyk.Y)/float64(maxuint8)) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
+		yellowSample := mixer.Sample(Yellow, yellowvol)
+		components = append(components, yellowSample)
+		}
+		
+		if cmyk.M > 0{
+		magentavol := wunit.NewVolume(((float64(cmyk.M)/float64(maxuint8)) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
+		magentaSample := mixer.Sample(Magenta, magentavol)
+		components = append(components, magentaSample)
+		}
+		
+		if cmyk.K > 0{
+		blackvol := wunit.NewVolume(((float64(cmyk.K)/float64(maxuint8)) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
+		blackSample := mixer.Sample(Black, blackvol)
+		components = append(components, blackSample)
+		}
+		
+		solution := MixTo(OutPlate, locationkey, components...)
+		solutions = append(solutions, solution)
+		
+		}
+	}
+
+	Pixels = solutions
+	Numberofpixels = len(Pixels)
+	fmt.Println("Pixels =",Numberofpixels)
+
+}
+// Run after controls and a steps block are completed to
+// post process any data and provide downstream results
+Analysis {
+}
+
+// A block of tests to perform to validate that the sample was processed correctly
+// Optionally, destructive tests can be performed to validate results on a
+// dipstick basis
+Validation {
+	
+}
+

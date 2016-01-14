@@ -1,35 +1,29 @@
 {
-  "Parameters": [{
-    "PCR": {
-      "Additives": [
-      ],
-      "FwdPrimer": "component:PrimerFw",
-      "RevPrimer": "component:PrimerRev",
-      "PCRPolymerase": "component:Q5Polymerase",
-	  "DNTPS":"component:DNTPs",
-	  "DNTPconc":"0.0001g/l",
-      "Buffer": "component:HC",
-      "Template": "component:pET_GFP",
-      "Outplate": "plate:pcrplate_with_cooler",
-      "TipType": "tipbox:Gilson20",
-      "ReactionVolume": "20ul",
-      "FwdPrimerConc": "0.0001g/l",
-      "RevPrimerConc": "0.0001g/l",
-      "Templatevolume": "2ul",
-      "Additiveconc": "0.0001g/l",
-      "Numberofcycles": 25,
-      "InitDenaturationtime": "30s",
-      "Denaturationtime": "5s",
-      "Denaturationtemp": "98˚C",
-      "Annealingtime": "10s",
-      "AnnealingTemp": "60˚C",
-      "Extensiontime": "60s",
-      "Extensiontemp": "72˚C",
-      "TargetpolymeraseConcentration": "0.0001g/l",
-      "Finalextensiontime": "600s"
+    "Parameters": {
+        "PCR": {
+            "Additiveconc": "0.0001g/l",
+            "Additives": [],
+            "AnnealingTemp": "60\u02daC",
+            "Annealingtime": "10s",
+            "Buffer": "HC",
+            "DNTPS": "DNTPs",
+            "DNTPconc": "0.0001g/l",
+            "Denaturationtime": "5s",
+            "Extensiontemp": "72\u02daC",
+            "Extensiontime": "60s",
+            "Finalextensiontime": "600s",
+            "FwdPrimer": "PrimerFw",
+            "FwdPrimerConc": "0.0001g/l",
+            "InitDenaturationtime": "30s",
+            "Numberofcycles": 25,
+            "OutPlate": "pcrplate_with_cooler",
+            "PCRPolymerase": "Q5Polymerase",
+            "ReactionVolume": "20ul",
+            "RevPrimer": "PrimerRev",
+            "RevPrimerConc": "0.0001g/l",
+            "TargetpolymeraseConcentration": "0.0001g/l",
+            "Template": "pET_GFP",
+            "Templatevolume": "2ul"
+        }
     }
-  }],
-  "Config": {
-    "OUTPUT_COUNT": 1
-  }
 }

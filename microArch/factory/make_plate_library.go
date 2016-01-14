@@ -44,10 +44,22 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	plate = wtype.NewLHPlate("SRWFB96", "Unknown", 8, 12, 15, "mm", welltype, 9, 9, 0.0, 0.0, 2.0)
 	plates[plate.Type] = plate
 
+	// shallow round well flat bottom 96 on riser
+	rwshp = wtype.NewShape("cylinder", "mm", 8.2, 8.2, 11)
+	welltype = wtype.NewLHWell("SRWFB96", "", "", "ul", 500, 10, rwshp, 0, 8.2, 8.2, 11, 1.0, "mm")
+	plate = wtype.NewLHPlate("SRWFB96_riser", "Unknown", 8, 12, 15, "mm", welltype, 9, 9, 0.0, 0.0, 41.0)
+	plates[plate.Type] = plate
+
 	// deep well strip trough 12
 	stshp := wtype.NewShape("box", "mm", 8.2, 72, 41.3)
 	welltype = wtype.NewLHWell("DWST12", "", "", "ul", 15000, 1000, stshp, 3, 8.2, 72, 41.3, 4.7, "mm")
 	plate = wtype.NewLHPlate("DWST12", "Unknown", 1, 12, 44.1, "mm", welltype, 9, 9, 0, 0, 0.0)
+	plates[plate.Type] = plate
+
+	// deep well strip trough 12 on riser
+	stshp = wtype.NewShape("box", "mm", 8.2, 72, 41.3)
+	welltype = wtype.NewLHWell("DWST12", "", "", "ul", 15000, 1000, stshp, 3, 8.2, 72, 41.3, 4.7, "mm")
+	plate = wtype.NewLHPlate("DWST12_riser", "Unknown", 1, 12, 44.1, "mm", welltype, 9, 9, 0, 0, 41.0)
 	plates[plate.Type] = plate
 
 	// deep well strip trough 8
@@ -139,6 +151,28 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 
 	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
 	plate = wtype.NewLHPlate("greiner384_riser", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+	plates[plate.Type] = plate
+
+	// NUNC 1536 well plate flat bottom on riser
+
+	bottomtype = 0
+	xdim = 2.0 // of well
+	ydim = 2.0
+	zdim = 7.0
+	bottomh = 0.5
+
+	wellxoffset = 2.5 // centre of well to centre of neighbouring well in x direction
+	wellyoffset = 2.5 //centre of well to centre of neighbouring well in y direction
+	xstart = -2.5     // distance from top left side of plate to first well
+	ystart = -2.5     // distance from top left side of plate to first well
+	zstart = 42       // offset of bottom of deck to bottom of well
+
+	square = wtype.NewShape("box", "mm", 2, 2, 7)
+	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
+	welltype = wtype.NewLHWell("1536flat", "", "", "ul", 13, 2, square, bottomtype, xdim, ydim, zdim, bottomh, "mm")
+
+	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
+	plate = wtype.NewLHPlate("nunc1536_riser", "Unknown", 32, 48, 7, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
 
 	// 250ml box reservoir (working vol estimated to be 100ml to prevent spillage on moving decks)

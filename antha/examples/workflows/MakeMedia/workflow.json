@@ -1,14 +1,8 @@
 {
-    "properties": {
-        "name": "main"
-    },
+    "connections": [],
     "processes": {
         "MakeMedia": {
-            "component": "MakeMedia",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "MakeMedia"
         }
-    },
-    "connections": [ ]
+    }
 }

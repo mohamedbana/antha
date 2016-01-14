@@ -1,27 +1,20 @@
 {
-  "Parameters": [{
-    "AliquotParams": {
-      "Solution": "component:PrimerFw",
-	  "InPlate": "plate:pcrplate_with_cooler",
-      "Outplate": "plate:greiner384_riser",
-      "TipType": "tipbox:Gilson20",
-      "SolutionVolume": "3100ul",
-      "VolumePerAliquot": "10ul",
-	"NumberofAliquots":300,
+    "Parameters": {
+        "AliquotParams1": {
+            "InPlate": "pcrplate_with_cooler",
+            "NumberofAliquots": 300,
+            "OutPlate": "greiner384_riser",
+            "Solution": "PrimerFw",
+            "SolutionVolume": "3100ul",
+            "VolumePerAliquot": "10ul"
+        },
+        "AliquotParams2": {
+            "InPlate": "pcrplate_with_cooler",
+            "NumberofAliquots": 2,
+            "OutPlate": "greiner384",
+            "Solution": "PrimerRev",
+            "SolutionVolume": "100ul",
+            "VolumePerAliquot": "20ul"
+        }
     }
-  },
-{
-    "AliquotParams": {
-      "Solution": "component:PrimerRev",
-		"InPlate": "plate:pcrplate_with_cooler",
-      "Outplate": "plate:greiner384",
-      "TipType": "tipbox:Gilson20",
-      "SolutionVolume": "100ul",
-      "VolumePerAliquot": "20ul",
-	"NumberofAliquots":2,
-    }
-  }],
-  "Config": {
-    "OUTPUT_COUNT": 302
-  }
 }

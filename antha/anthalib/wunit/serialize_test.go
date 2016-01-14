@@ -68,12 +68,23 @@ func TestDeserializeConcreteMeasurement(t *testing.T) {
 	}
 }
 
-func TestDeserializeTemperature(t *testing.T) {
-	str := `"0.000 "`
+func TestDeserializeTemperatureC(t *testing.T) {
+	str := `"25C"`
 	var temp Temperature
-	err := json.Unmarshal([]byte(str), &temp)
-	if err != nil {
+	if err := json.Unmarshal([]byte(str), &temp); err != nil {
 		t.Fatal(err)
+	} else if v := temp.SIValue(); v != 25.0 {
+		t.Fatalf("unknown value %v in %v", v, temp)
+	}
+}
+
+func TestDeserializeTemperatureDegreeC(t *testing.T) {
+	str := `"25°C"`
+	var temp Temperature
+	if err := json.Unmarshal([]byte(str), &temp); err != nil {
+		t.Fatal(err)
+	} else if v := temp.SIValue(); v != 25.0 {
+		t.Fatalf("unknown value %v in %v", v, temp)
 	}
 }
 

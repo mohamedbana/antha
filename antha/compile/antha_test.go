@@ -25,7 +25,6 @@ package compile
 import (
 	"bytes"
 	"github.com/antha-lang/antha/antha/ast"
-	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/antha/parser"
 	"github.com/antha-lang/antha/antha/token"
 	"testing"
@@ -57,84 +56,5 @@ func TestTypeSugaring(t *testing.T) {
 	}
 	if !bytes.Equal(buf1.Bytes(), buf2.Bytes()) {
 		t.Errorf("wanted\n'''%s'''\ngot\n'''%s'''\n", buf2.String(), buf1.String())
-	}
-}
-
-func TestTypeSugaring2(t *testing.T) {
-	nodeSizes := make(map[ast.Node]int)
-	cfg := &Config{}
-	compiler := &compiler{}
-	fset := token.NewFileSet()
-	compiler.init(cfg, fset, nodeSizes)
-
-	expr, err := parser.ParseExpr("func(x Component) Tip {}")
-	if err != nil {
-		t.Fatal(err)
-	}
-	desired, err := parser.ParseExpr("func(x wtype.LHComponent) wtype.LHTip {}")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	compiler.sugarForTypes(expr)
-	var buf1, buf2 bytes.Buffer
-	if err := compiler.Fprint(&buf1, fset, expr); err != nil {
-		t.Fatal(err)
-	}
-	if err := compiler.Fprint(&buf2, fset, desired); err != nil {
-		t.Fatal(err)
-	}
-	if !bytes.Equal(buf1.Bytes(), buf2.Bytes()) {
-		t.Errorf("wanted\n'''%s'''\ngot\n'''%s'''\n", buf2.String(), buf1.String())
-	}
-}
-
-// Verify that generation of an empty component produces a valid go file
-func TestGenerateGraphRunnerOfEmptyComponent(t *testing.T) {
-	comp := execute.ComponentInfo{Name: "Test", Description: "", Icon: "", Subgraph: false, InPorts: nil, OutPorts: nil}
-	componentLibrary := []execute.ComponentInfo{comp}
-	var buf bytes.Buffer
-	GenerateGraphRunner(&buf, componentLibrary, "")
-	_, err := parser.ParseFile(fset, "", buf.String(), parser.AllErrors)
-	if err != nil {
-		t.Error(err)
-	}
-}
-
-// Verify that parser does fail sometimes
-func TestBadGenerateGraphRunnerOfEmptyComponent(t *testing.T) {
-	comp := execute.ComponentInfo{Name: "Test", Description: "", Icon: "", Subgraph: false, InPorts: nil, OutPorts: nil}
-	componentLibrary := []execute.ComponentInfo{comp}
-	var buf bytes.Buffer
-	GenerateGraphRunner(&buf, componentLibrary, "")
-	buf.WriteString("invalid tokens at end of program")
-	_, err := parser.ParseFile(fset, "", buf.String(), parser.AllErrors)
-	if err == nil {
-		t.Error("expected illegal program")
-	}
-}
-
-// Verify that generation of an empty component produces a valid go file
-func TestGenerateLibOfEmptyComponent(t *testing.T) {
-	comp := execute.ComponentInfo{Name: "Test", Description: "", Icon: "", Subgraph: false, InPorts: nil, OutPorts: nil}
-	componentLibrary := []execute.ComponentInfo{comp}
-	var buf bytes.Buffer
-	GenerateComponentLib(&buf, componentLibrary, "", "main")
-	_, err := parser.ParseFile(fset, "", buf.String(), parser.AllErrors)
-	if err != nil {
-		t.Error(err)
-	}
-}
-
-// Verify that parser does fail sometimes
-func TestBadGenerateLibOfEmptyComponent(t *testing.T) {
-	comp := execute.ComponentInfo{Name: "Test", Description: "", Icon: "", Subgraph: false, InPorts: nil, OutPorts: nil}
-	componentLibrary := []execute.ComponentInfo{comp}
-	var buf bytes.Buffer
-	GenerateComponentLib(&buf, componentLibrary, "", "main")
-	buf.WriteString("invalid tokens at end of program")
-	_, err := parser.ParseFile(fset, "", buf.String(), parser.AllErrors)
-	if err == nil {
-		t.Error("expected illegal program")
 	}
 }

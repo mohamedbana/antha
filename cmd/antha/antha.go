@@ -26,27 +26,24 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"github.com/antha-lang/antha/antha/ast"
+	"github.com/antha-lang/antha/antha/compile"
+	"github.com/antha-lang/antha/antha/parser"
+	"github.com/antha-lang/antha/antha/scanner"
+	"github.com/antha-lang/antha/antha/token"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/antha-lang/antha/antha/ast"
-	"github.com/antha-lang/antha/antha/compile"
-	"github.com/antha-lang/antha/antha/execute"
-	"github.com/antha-lang/antha/antha/parser"
-	"github.com/antha-lang/antha/antha/scanner"
-	"github.com/antha-lang/antha/antha/token"
 )
 
 // execution variables
 var (
-	exitCode   = 0
-	fileSet    = token.NewFileSet() // per process FileSet
-	parserMode parser.Mode
-
-	componentLibrary = make([]execute.ComponentInfo, 0)
+	exitCode         = 0
+	fileSet          = token.NewFileSet() // per process FileSet
+	parserMode       parser.Mode
+	componentLibrary []string
 )
 
 // parameters to control code formatting
@@ -58,10 +55,9 @@ const (
 // command line parameters
 var (
 	// main operation modes
-	trace           = flag.Bool("trace", false, "show AST trace")
-	allErrors       = flag.Bool("errors", false, "report all errors (not just the first 10 on different lines)")
-	genComponentLib = flag.Bool("componentlib", false, "generate component library (instead of standalone runner)")
-	genOutDir       = flag.String("outdir", "", "output directory for generated files")
+	trace     = flag.Bool("trace", false, "show AST trace")
+	allErrors = flag.Bool("errors", false, "report all errors (not just the first 10 on different lines)")
+	genOutDir = flag.String("outdir", "", "output directory for generated files")
 )
 
 func usage() {
@@ -127,43 +123,35 @@ func removeComponentLib(dir, file string) error {
 
 type output struct {
 	OutDir     string
-	GenLib     bool
 	outName    string
 	importPath string
 }
 
 func (a *output) Init() error {
-	a.outName = "main"
 	r, err := getImportPath(a.OutDir)
 	if err != nil {
 		return err
 	}
 	a.importPath = r
 
-	if a.GenLib {
-		p, err := filepath.Abs(a.OutDir)
-		if err != nil {
-			return err
-		}
-		a.outName = filepath.Base(p)
-		if err := removeComponentLib(p, a.outName+".go"); err != nil {
-			return err
-		}
+	p, err := filepath.Abs(a.OutDir)
+	if err != nil {
+		return err
+	}
+	a.outName = filepath.Base(p)
+	if err := removeComponentLib(p, a.outName+".go"); err != nil {
+		return err
 	}
 	return nil
 }
 
-func (a *output) Write(cs []execute.ComponentInfo) error {
-	if len(cs) == 0 {
+func (a *output) Write(components []string) error {
+	if len(components) == 0 {
 		return nil
 	}
 
 	var buf bytes.Buffer
-	if a.GenLib {
-		compile.GenerateComponentLib(&buf, cs, a.importPath, a.outName)
-	} else {
-		compile.GenerateGraphRunner(&buf, cs, a.importPath)
-	}
+	compile.GenerateComponentLib(&buf, components, a.importPath, a.outName)
 	if err := ioutil.WriteFile(filepath.Join(a.OutDir, a.outName+".go"), buf.Bytes(), 0664); err != nil {
 		return err
 	}
@@ -193,8 +181,7 @@ func anthaMain() error {
 
 	initParserMode()
 
-	genMainRunner := flag.NArg() == 1 && !*genComponentLib
-	o := output{OutDir: *genOutDir, GenLib: *genComponentLib}
+	o := output{OutDir: *genOutDir}
 	if err := o.Init(); err != nil {
 		return err
 	}
@@ -204,10 +191,9 @@ func anthaMain() error {
 		if err := processFile(processFileOptions{
 			Filename:          "-",
 			In:                os.Stdin,
-			NormalizeOutPaths: *genComponentLib,
+			NormalizeOutPaths: true,
 			Stdin:             true,
 			OutDir:            *genOutDir,
-			GenMainRunner:     genMainRunner,
 		}); err != nil {
 			return err
 		}
@@ -227,7 +213,7 @@ func anthaMain() error {
 					// order to establish whether more than one component exist
 					err = processFile(processFileOptions{
 						Filename:          path,
-						NormalizeOutPaths: *genComponentLib,
+						NormalizeOutPaths: true,
 						OutDir:            *genOutDir,
 					})
 					if err != nil {
@@ -239,9 +225,8 @@ func anthaMain() error {
 		default:
 			if err := processFile(processFileOptions{
 				Filename:          path,
-				NormalizeOutPaths: *genComponentLib,
+				NormalizeOutPaths: true,
 				OutDir:            *genOutDir,
-				GenMainRunner:     genMainRunner,
 			}); err != nil {
 				return err
 			}
@@ -279,7 +264,6 @@ type processFileOptions struct {
 	Stdin             bool
 	OutDir            string // empty string means output to same directory as Filename (this is incompatible with NormalizeOutPaths)
 	NormalizeOutPaths bool
-	GenMainRunner     bool
 }
 
 // If in == nil, the source is the contents of the file with the given filename.
@@ -326,38 +310,19 @@ func processFile(opt processFileOptions) error {
 	if err != nil {
 		return err
 	}
-	comp := compiler.GetFileComponentInfo(fileSet, file)
-	componentLibrary = append(componentLibrary, comp)
+
+	compName := compiler.GetComponentName(fileSet, file)
+	componentLibrary = append(componentLibrary, compName)
 
 	outDir := opt.OutDir
 	outRootName := strings.TrimSuffix(filepath.Base(opt.Filename), ".an")
 	if opt.NormalizeOutPaths {
-		outDir = filepath.Join(outDir, comp.Name)
+		outDir = filepath.Join(outDir, compName)
 	}
 	if err := write(opt.Filename, outDir, outRootName+".go", res); err != nil {
 		return err
 	}
 
-	if opt.GenMainRunner {
-		outRootName := filepath.Join(fmt.Sprintf("%s_run", comp.Name), "main.go")
-
-		packagePath, err := getImportPath(filepath.Dir(opt.Filename))
-		if err != nil {
-			return err
-		}
-
-		var buf bytes.Buffer
-		file, adjust, err = parse(fileSet, opt.Filename, src, opt.Stdin)
-		if err != nil {
-			return err
-		}
-		if err := compiler.MainFprint(&buf, fileSet, file, packagePath); err != nil {
-			return err
-		}
-		if err := write(opt.Filename, opt.OutDir, outRootName, buf.Bytes()); err != nil {
-			return err
-		}
-	}
 	return err
 }
 

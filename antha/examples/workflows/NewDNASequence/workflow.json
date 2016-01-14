@@ -1,15 +1,11 @@
 {
-    "properties": {
-        "name": "main"
-    },
+    "connections": [],
     "processes": {
-        "NewDNASequenceandBlast": {
-            "component": "NewDNASequence",
-            "metadata": {
-                "label": "CS"
-            }
-		}
-			
-    },
-    "connections": [ ]
+        "NewDNASequenceandBlast1": {
+            "component": "NewDNASequence"
+        },
+        "NewDNASequenceandBlast2": {
+            "component": "NewDNASequence"
+        }
+    }
 }

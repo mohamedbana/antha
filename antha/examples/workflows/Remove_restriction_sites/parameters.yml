@@ -1,16 +1,13 @@
 {
-    "Parameters": [{
-        "RemoveRestrictionSites":{
-            "SequenceKey": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGGGGGGGGGGGAGCTCGGGGGGGGGGGGGGGGGGGGGGGGG", 				
-            "RestrictionsitetoAvoid": [
-            "SacI",
-            ],
+    "Parameters": {
+        "RemoveRestrictionSites": {
+            "EnzymeforRestrictionmapping": "BsaI",
+            "PreserveTranslatedseq": true,
             "RemoveifnotinORF": true,
-			"PreserveTranslatedseq":true,
-			"EnzymeforRestrictionmapping":"BsaI",
+            "RestrictionsitetoAvoid": [
+                "SacI"
+            ],
+            "Sequencekey": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGGGGGGGGGGGAGCTCGGGGGGGGGGGGGGGGGGGGGGGGG"
         }
-    }],
-    "Config": {
-        "OUTPUT_COUNT": 1
     }
 }

@@ -1,47 +1,43 @@
 {
-    "Parameters": [{
-        "ConstructAssembly_sim":{
-            "Parts": [
-                "component:dna_part",
-                "component:dna_part"
+    "Parameters": {
+        "ConstructAssembly_sim": {
+            "Atp": "ATP",
+            "AtpVol": "1ul",
+            "Buffer": "CutsmartBuffer",
+            "BufferVol": "2ul",
+            "Constructname": "MyfavouriteConstruct",
+            "InPlate": "pcrplate_with_cooler",
+            "InactivationTemp": "40C",
+            "InactivationTime": "60s",
+            "LigVol": "1ul",
+            "Ligase": "T4Ligase",
+            "OutPlate": "pcrplate_with_cooler",
+            "PartConcs": [
+                "0.1g/l",
+                "0.11g/l"
             ],
-            "ReactionVolume": "20ul",
             "PartVols": [
                 "1ul",
                 "1ul"
             ],
-			"PartConcs": [
-			"0.1g/l",
-			"0.11g/l"
-			],
-            "Partsinorder" : [
+            "Parts": [
+                "dna_part",
+                "dna_part"
+            ],
+            "Partsinorder": [
                 "Part1",
                 "Part2"
             ],
-			"Vectordata":"Vector1",
-			"Constructname": "MyfavouriteConstruct",
-            "Water": "component:water",
-            "Vector": "component:standard_cloning_vector_mark_1",
-            "VectorVol": "3ul",
-			"VectorConcentration": "0.01M/l",
-            "Buffer": "component:CutsmartBuffer",
-            "BufferVol": "2ul",
-            "Ligase": "component:T4Ligase",
-            "LigVol": "1ul",
-            "Atp": "component:ATP",
-            "AtpVol": "1ul",
-            "RestrictionEnzyme": "component:SapI",
             "ReVol": "1ul",
-            "OutPlate": "plate:pcrplate_with_cooler",
-            "InPlate": "plate:pcrplate_with_cooler",
-            "TipType": "tipbox:Gilson20",
             "ReactionTemp": "25C",
             "ReactionTime": "1800s",
-            "InactivationTemp": "40C",
-            "InactivationTime": "60s"
+            "ReactionVolume": "20ul",
+            "RestrictionEnzyme": "SapI",
+            "Vector": "standard_cloning_vector_mark_1",
+            "VectorConcentration": "0.01M/l",
+            "VectorVol": "3ul",
+            "Vectordata": "Vector1",
+            "Water": "water"
         }
-    }],
-    "Config": {
-        "OUTPUT_COUNT": 1
     }
 }

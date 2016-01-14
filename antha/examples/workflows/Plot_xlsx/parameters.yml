@@ -1,31 +1,27 @@
 {
-  "Parameters": [{
-    "Plotdataparams": {
-      "Filename": "plotinumdata.xlsx",
-	  "Sheet": 0,
-      "Xminmax": [
-	"a4",
-	"a16"
-	],
-      "Yminmaxarray": [
-	[
-	"a4",
-	"a16"
-	],
-	[
-	"aa4",
-	"aa16"
-	],
-	[
-	"c4",
-	"c16"
-	],
-	],
-	"Exportedfilename":"anthaplot.png"
+    "Parameters": {
+        "Plotdataparams": {
+            "Exportedfilename": "anthaplot.png",
+            "Filename": "plotinumdata.xlsx",
+            "Sheet": 0,
+            "Xminmax": [
+                "a4",
+                "a16"
+            ],
+            "Yminmaxarray": [
+                [
+                    "a4",
+                    "a16"
+                ],
+                [
+                    "aa4",
+                    "aa16"
+                ],
+                [
+                    "c4",
+                    "c16"
+                ]
+            ]
+        }
     }
-  }
-],
-  "Config": {
-    "OUTPUT_COUNT": 1
-  }
 }

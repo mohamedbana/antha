@@ -1,16 +1,17 @@
 {
-  "Parameters": [{
+  "Parameters": {
     "PipetteImage": {
       "Colourcomponents": [
-	"component:red",
-	"component:white",
-	"component:blue",
-	"component:green",
-	"component:yellow",
-	"component:black"
+	"red",
+	"white",
+	"blue",
+	"green",
+	"yellow",
+	"black"
 	],
 	"OnlythisColour":"",
-	  "Imagefilename": "mario.png",
+	"NotthisColour":"white",
+	  "Imagefilename": "apple.jpg",
 		"Palettename":"Palette1",
 		"AvailableColours":[
 		"red",
@@ -20,15 +21,10 @@
 		"yellow",
 		"black"
 		],
-      "Outplate": "plate:greiner384_riser",
-      "TipType": "tipbox:Gilson20",
-      "VolumePerWell": "10ul"
+      "OutPlate": "nunc1536_riser",
+      "VolumePerWell": "5ul"
     }
-  }],
-  "Config": {
-    "OUTPUT_COUNT": 143
   }
 }
-
 
 

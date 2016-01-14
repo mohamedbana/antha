@@ -1,14 +1,8 @@
 {
-    "properties": {
-        "name": "main"
-    },
+    "connections": [],
     "processes": {
         "LookUpMolecule": {
-            "component": "LookUpMolecule",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "LookUpMolecule"
         }
-    },
-    "connections": [ ]
+    }
 }

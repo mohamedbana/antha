@@ -34,7 +34,6 @@ import (
 	"sync"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"github.com/antha-lang/antha/antha/execute"
 	"github.com/antha-lang/antha/internal/github.com/twinj/uuid"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/equipment"
@@ -275,10 +274,9 @@ type AnthaManualGrpc struct {
 	Behaviours []equipment.Behaviour
 	properties *liquidhandling.LHProperties
 	driver     *grpc.Driver
-	queue      map[execute.ThreadID]*schedulerLiquidhandling.LHRequest
+	queue      map[wtype.ThreadID]*schedulerLiquidhandling.LHRequest
 	queueLock  sync.Mutex
-	planner    map[execute.ThreadID]*schedulerLiquidhandling.Liquidhandler
-	wg         map[execute.ThreadID]*sync.WaitGroup
+	planner    map[wtype.ThreadID]*schedulerLiquidhandling.Liquidhandler
 }
 
 func NewAnthaManualGrpc(id string, uri string) *AnthaManualGrpc {
@@ -313,10 +311,9 @@ func NewAnthaManualGrpc(id string, uri string) *AnthaManualGrpc {
 		be,
 		nil,
 		driver,
-		make(map[execute.ThreadID]*schedulerLiquidhandling.LHRequest),
+		make(map[wtype.ThreadID]*schedulerLiquidhandling.LHRequest),
 		sync.Mutex{},
-		make(map[execute.ThreadID]*schedulerLiquidhandling.Liquidhandler),
-		make(map[execute.ThreadID]*sync.WaitGroup),
+		make(map[wtype.ThreadID]*schedulerLiquidhandling.Liquidhandler),
 	}
 
 	return ret
@@ -349,13 +346,10 @@ func (e *AnthaManualGrpc) Do(actionDescription equipment.ActionDescription) erro
 }
 
 func (e *AnthaManualGrpc) configRequest(actionDescription equipment.ActionDescription) error {
-	var data map[string]interface{}
-	if err := json.Unmarshal([]byte(actionDescription.ActionData), &data); err != nil {
-		return err
+	var data struct {
+		BlockID wtype.BlockID
 	}
-	pBlockId, err := execute.StringToBlockID(data["BLOCKID"].(string))
-	blockId := *pBlockId
-	if err != nil {
+	if err := json.Unmarshal([]byte(actionDescription.ActionData), &data); err != nil {
 		return err
 	}
 	var req *schedulerLiquidhandling.LHRequest
@@ -363,17 +357,14 @@ func (e *AnthaManualGrpc) configRequest(actionDescription equipment.ActionDescri
 	e.queueLock.Lock()
 	defer e.queueLock.Unlock()
 
-	if r, ok := e.queue[blockId.ThreadID]; !ok {
+	if r, ok := e.queue[data.BlockID.ThreadID]; !ok {
 		req = schedulerLiquidhandling.NewLHRequest()
-		req.BlockID = blockId
+		req.BlockID = data.BlockID
 		req.Policies = liquidhandling.GetLHPolicyForTest()
 		lhplanner := schedulerLiquidhandling.Init(e.properties)
 
-		e.queue[blockId.ThreadID] = req
-		e.planner[blockId.ThreadID] = lhplanner
-		wg := sync.WaitGroup{}
-		e.wg[blockId.ThreadID] = &wg
-		wg.Add(blockId.OutputCount)
+		e.queue[data.BlockID.ThreadID] = req
+		e.planner[data.BlockID.ThreadID] = lhplanner
 	} else {
 		req = r
 	}
@@ -416,20 +407,11 @@ func (e *AnthaManualGrpc) sendMix(actionDescription equipment.ActionDescription)
 	}
 	req.Output_solutions[sol.ID] = &sol
 
-	wg := e.wg[sol.BlockID.ThreadID]
-	wg.Done()
 	return nil
 }
 
 func (e *AnthaManualGrpc) end(actionDescription equipment.ActionDescription) error {
-
-	blockId, err := execute.StringToBlockID(actionDescription.ActionData)
-	if err != nil {
-		return err
-	}
-	logger.Debug("Waiting for ", blockId)
-	wg := e.wg[blockId.ThreadID]
-	wg.Wait()
+	blockId := wtype.BlockID{ThreadID: wtype.ThreadID(actionDescription.ActionData)}
 
 	e.queueLock.Lock()
 	defer e.queueLock.Unlock()

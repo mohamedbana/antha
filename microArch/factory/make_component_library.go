@@ -25,6 +25,7 @@ package factory
 import (
 	"fmt"
 
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/microArch/logger"
 )
@@ -86,6 +87,34 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	A = wtype.NewLHComponent()
 	A.GenericMatter = matter["water"]
 	A.CName = "tartrazine"
+	A.Type = "water"
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "Yellow_ink"
+	A.Type = "water"
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "Cyan"
+	A.Type = "water"
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "Magenta"
+	A.Type = "water"
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "Black"
 	A.Type = "water"
 	A.Smax = 9999
 	cmap[A.CName] = A
@@ -339,6 +368,63 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	A.Type = "load"
 	A.Smax = 1.0 //still not sure....
 	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "LB"
+	A.Type = "water"
+	A.Smax = 1.0 //still not sure....
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "Kanamycin"
+	A.Type = "water"
+	A.Smax = 1.0 //still not sure....
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "Glucose"
+	A.Type = "water"
+	A.Smax = 1.0 //still not sure....
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "Lactose"
+	A.Type = "water"
+	A.Smax = 1.0 //still not sure....
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.GenericMatter = matter["water"]
+	A.CName = "LB_autoinduction_Amp"
+	A.Type = "water"
+	A.Smax = 1.0 //still not sure....
+	cmap[A.CName] = A
+
+	// protein paintbox
+
+	for key, value := range image.ProteinPaintboxmap {
+
+		_, ok := cmap[value]
+		if ok == true {
+			alreadyinthere := cmap[value]
+
+			err := fmt.Errorf("attempt to add value", key, "for key", value, "to component factory", cmap, "failed due to duplicate entry", alreadyinthere)
+			panic(err)
+		} else {
+
+			A = wtype.NewLHComponent()
+			A.GenericMatter = matter["water"]
+			A.CName = value
+			A.Type = "culture"
+			A.Smax = 1.0
+			cmap[A.CName] = A
+
+		}
+	}
 	return cmap
 }
 

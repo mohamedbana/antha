@@ -36,13 +36,11 @@ func Θ(liquid string, airvelocity wunit.Velocity) float64 {
 
 //Some functions to calculate evaporation
 func Pws(Temp wunit.Temperature) float64 {
-	var tempinKelvin float64
-	if Temp.Unit().RawSymbol() == "K" {
-		tempinKelvin = Temp.RawValue()
-	} else if Temp.Unit().RawSymbol() == "C" || Temp.Unit().RawSymbol() == "˚C" {
-		tempinKelvin = (Temp.SIValue() + 273.15)
+	tempinKelvin := Temp.RawValue()
+	if Temp.Unit().RawSymbol() == "℃" {
+		tempinKelvin = Temp.SIValue() + 273.15
 	}
-	return (math.Pow(math.E, (77.3450+(0.0057*tempinKelvin)-7235/tempinKelvin)) / math.Pow(tempinKelvin, 8.2))
+	return (math.Pow(math.E, (77.3450+(0.0057*tempinKelvin)-7235.0/tempinKelvin)) / math.Pow(tempinKelvin, 8.2))
 }
 
 func Pw(Relativehumidity float64, PWS float64) float64 {

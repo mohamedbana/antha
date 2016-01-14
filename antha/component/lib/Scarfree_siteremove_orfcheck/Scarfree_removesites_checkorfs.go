@@ -8,7 +8,6 @@
 package Scarfree_siteremove_orfcheck
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
@@ -18,13 +17,11 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/antha/execute"
-	"github.com/antha-lang/antha/flow"
-	"github.com/antha-lang/antha/microArch/execution"
-	"runtime/debug"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/execute"
+	"github.com/antha-lang/antha/inject"
 	"strconv"
 	"strings"
-	"sync"
 )
 
 //"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
@@ -43,26 +40,16 @@ import (
 // desired sequence to end up with after assembly
 
 // Input Requirement specification
-func (e *Scarfree_siteremove_orfcheck) requirements() {
-	_ = wunit.Make_units
-
+func _requirements() {
 	// e.g. are MoClo types valid?
 }
 
 // Conditions to run on startup
-func (e *Scarfree_siteremove_orfcheck) setup(p Scarfree_siteremove_orfcheckParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
-}
+func _setup(_ctx context.Context, _input *Input_) {}
 
 // The core process for this protocol, with the steps to be performed
 // for every input
-func (e *Scarfree_siteremove_orfcheck) steps(p Scarfree_siteremove_orfcheckParamBlock, r *Scarfree_siteremove_orfcheckResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-
+func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 	//var msg string
 	// set warnings reported back to user to none initially
 	warnings := make([]string, 0)
@@ -74,8 +61,8 @@ func (e *Scarfree_siteremove_orfcheck) steps(p Scarfree_siteremove_orfcheckParam
 
 	var partDNA wtype.DNASequence
 
-	r.Status = "all parts available"
-	for i, part := range p.Seqsinorder {
+	_output.Status = "all parts available"
+	for i, part := range _input.Seqsinorder {
 		if strings.Contains(part, ".gb") && strings.Contains(part, "Feature:") {
 
 			split := strings.SplitAfter(part, ".gb")
@@ -101,11 +88,11 @@ func (e *Scarfree_siteremove_orfcheck) steps(p Scarfree_siteremove_orfcheckParam
 		partsinorder = append(partsinorder, partDNA)
 	}
 	// check parts for restriction sites first and remove if the user has chosen to
-	enz := lookup.EnzymeLookup(p.Enzymename)
+	enz := lookup.EnzymeLookup(_input.Enzymename)
 
-	warning = text.Print("RemoveproblemRestrictionSites =", p.RemoveproblemRestrictionSites)
+	warning = text.Print("RemoveproblemRestrictionSites =", _input.RemoveproblemRestrictionSites)
 	warnings = append(warnings, warning)
-	if p.RemoveproblemRestrictionSites {
+	if _input.RemoveproblemRestrictionSites {
 		newparts := make([]wtype.DNASequence, 0)
 		warning = "Starting process or removing restrictionsite"
 		warnings = append(warnings, warning)
@@ -172,28 +159,28 @@ func (e *Scarfree_siteremove_orfcheck) steps(p Scarfree_siteremove_orfcheckParam
 		}
 	}
 	// make vector into an antha type DNASequence
-	vectordata := wtype.MakePlasmidDNASequence("Vector", p.Vector)
+	vectordata := wtype.MakePlasmidDNASequence("Vector", _input.Vector)
 
 	//lookup restriction enzyme
-	restrictionenzyme, err := lookup.TypeIIsLookup(p.Enzymename)
+	restrictionenzyme, err := lookup.TypeIIsLookup(_input.Enzymename)
 	if err != nil {
 		warnings = append(warnings, text.Print("Error", err.Error()))
 	}
 
 	//  Add overhangs for scarfree assembly based on part seqeunces only, i.e. no Assembly standard
 	fmt.Println("warnings:", warnings)
-	r.PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
+	_output.PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
 
 	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
-	assembly := enzymes.Assemblyparameters{p.Constructname, restrictionenzyme.Name, vectordata, r.PartswithOverhangs}
+	assembly := enzymes.Assemblyparameters{_input.Constructname, restrictionenzyme.Name, vectordata, _output.PartswithOverhangs}
 	status, numberofassemblies, _, newDNASequence, err := enzymes.Assemblysimulator(assembly)
 
 	endreport := "Endreport only run in the event of assembly simulation failure"
 	//sites := "Restriction mapper only run in the event of assembly simulation failure"
-	r.NewDNASequence = newDNASequence
+	_output.NewDNASequence = newDNASequence
 	if err == nil && numberofassemblies == 1 {
 
-		r.Simulationpass = true
+		_output.Simulationpass = true
 	} else {
 
 		warnings = append(warnings, status)
@@ -208,7 +195,7 @@ func (e *Scarfree_siteremove_orfcheck) steps(p Scarfree_siteremove_orfcheckParam
 		ends = text.Print(vectordata.Nm+" 3 Prime end: ", stickyends3)
 		allends = append(allends, ends)
 
-		for _, part := range r.PartswithOverhangs {
+		for _, part := range _output.PartswithOverhangs {
 			_, stickyends5, stickyends3 := enzymes.TypeIIsdigest(part, restrictionenzyme)
 			ends = text.Print(part.Nm+" 5 Prime end: ", stickyends5)
 			allends = append(allends, ends)
@@ -223,50 +210,50 @@ func (e *Scarfree_siteremove_orfcheck) steps(p Scarfree_siteremove_orfcheckParam
 
 	sites := make([]int, 0)
 	multiple := make([]string, 0)
-	for _, part := range r.PartswithOverhangs {
+	for _, part := range _output.PartswithOverhangs {
 
 		info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 
 		sitepositions := enzymes.SitepositionString(info[0])
 
 		sites = append(sites, info[0].Numberofsites)
-		sitepositions = text.Print(part.Nm+" "+p.Enzymename+" positions:", sitepositions)
+		sitepositions = text.Print(part.Nm+" "+_input.Enzymename+" positions:", sitepositions)
 		multiple = append(multiple, sitepositions)
 	}
 
-	for _, orf := range p.ORFstoConfirm {
-		if sequences.LookforSpecificORF(r.NewDNASequence.Seq, orf) == false {
+	for _, orf := range _input.ORFstoConfirm {
+		if sequences.LookforSpecificORF(_output.NewDNASequence.Seq, orf) == false {
 			warning = text.Print("orf not present: ", orf)
 			warnings = append(warnings, warning)
-			r.ORFmissing = true
+			_output.ORFmissing = true
 		}
 	}
 
 	if len(warnings) == 0 {
 		warnings = append(warnings, "none")
 	}
-	r.Warnings = fmt.Errorf(strings.Join(warnings, ";"))
+	_output.Warnings = fmt.Errorf(strings.Join(warnings, ";"))
 
 	partsummary := make([]string, 0)
-	for _, part := range r.PartswithOverhangs {
+	for _, part := range _output.PartswithOverhangs {
 		partsummary = append(partsummary, text.Print(part.Nm, part.Seq))
 	}
 
 	partstoorder := text.Print("PartswithOverhangs: ", partsummary)
 
 	// Print status
-	if r.Status != "all parts available" {
-		r.Status = fmt.Sprintln(r.Status)
+	if _output.Status != "all parts available" {
+		_output.Status = fmt.Sprintln(_output.Status)
 	} else {
-		r.Status = fmt.Sprintln(
+		_output.Status = fmt.Sprintln(
 			text.Print("simulator status: ", status),
 			text.Print("Endreport after digestion: ", endreport),
-			text.Print("Sites per part for "+p.Enzymename, sites),
+			text.Print("Sites per part for "+_input.Enzymename, sites),
 			text.Print("Positions: ", multiple),
-			text.Print("Warnings:", r.Warnings.Error()),
-			text.Print("Simulationpass=", r.Simulationpass),
-			text.Print("NewDNASequence: ", r.NewDNASequence),
-			text.Print("Any Orfs to confirm missing from new DNA sequence:", r.ORFmissing),
+			text.Print("Warnings:", _output.Warnings.Error()),
+			text.Print("Simulationpass=", _output.Simulationpass),
+			text.Print("NewDNASequence: ", _output.NewDNASequence),
+			text.Print("Any Orfs to confirm missing from new DNA sequence:", _output.ORFmissing),
 			partstoorder,
 		)
 		// export data to file
@@ -274,285 +261,53 @@ func (e *Scarfree_siteremove_orfcheck) steps(p Scarfree_siteremove_orfcheckParam
 		//anthapath.ExportTextFile("Report"+"_"+Constructname+".txt",Status)
 
 	}
-	_ = _wrapper.WaitToEnd()
 
 }
 
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
-func (e *Scarfree_siteremove_orfcheck) analysis(p Scarfree_siteremove_orfcheckParamBlock, r *Scarfree_siteremove_orfcheckResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
+func _analysis(_ctx context.Context, _input *Input_, _output *Output_) {
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
-func (e *Scarfree_siteremove_orfcheck) validation(p Scarfree_siteremove_orfcheckParamBlock, r *Scarfree_siteremove_orfcheckResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
+func _validation(_ctx context.Context, _input *Input_, _output *Output_) {
 }
 
-// AsyncBag functions
-func (e *Scarfree_siteremove_orfcheck) Complete(params interface{}) {
-	p := params.(Scarfree_siteremove_orfcheckParamBlock)
-	if p.Error {
-		e.NewDNASequence <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		e.ORFmissing <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		e.PartswithOverhangs <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		e.Simulationpass <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		e.Status <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		e.Warnings <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		return
+func _run(_ctx context.Context, value inject.Value) (inject.Value, error) {
+	input := &Input_{}
+	output := &Output_{}
+	if err := inject.Assign(value, input); err != nil {
+		return nil, err
 	}
-	r := new(Scarfree_siteremove_orfcheckResultBlock)
-	defer func() {
-		if res := recover(); res != nil {
-			e.NewDNASequence <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			e.ORFmissing <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			e.PartswithOverhangs <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			e.Simulationpass <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			e.Status <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			e.Warnings <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			execute.AddError(&execute.RuntimeError{BaseError: res, Stack: debug.Stack()})
-			return
-		}
-	}()
-	e.startup.Do(func() { e.setup(p) })
-	e.steps(p, r)
-
-	e.NewDNASequence <- execute.ThreadParam{Value: r.NewDNASequence, ID: p.ID, Error: false}
-
-	e.ORFmissing <- execute.ThreadParam{Value: r.ORFmissing, ID: p.ID, Error: false}
-
-	e.PartswithOverhangs <- execute.ThreadParam{Value: r.PartswithOverhangs, ID: p.ID, Error: false}
-
-	e.Simulationpass <- execute.ThreadParam{Value: r.Simulationpass, ID: p.ID, Error: false}
-
-	e.Status <- execute.ThreadParam{Value: r.Status, ID: p.ID, Error: false}
-
-	e.Warnings <- execute.ThreadParam{Value: r.Warnings, ID: p.ID, Error: false}
-
-	e.analysis(p, r)
-
-	e.validation(p, r)
-
+	_setup(_ctx, input)
+	_steps(_ctx, input, output)
+	_analysis(_ctx, input, output)
+	_validation(_ctx, input, output)
+	return inject.MakeValue(output), nil
 }
 
-// init function, read characterization info from seperate file to validate ranges?
-func (e *Scarfree_siteremove_orfcheck) init() {
-	e.params = make(map[execute.ThreadID]*execute.AsyncBag)
-}
+var (
+	_ = execute.MixInto
+	_ = wunit.Make_units
+)
 
-func (e *Scarfree_siteremove_orfcheck) NewConfig() interface{} {
-	return &Scarfree_siteremove_orfcheckConfig{}
-}
-
-func (e *Scarfree_siteremove_orfcheck) NewParamBlock() interface{} {
-	return &Scarfree_siteremove_orfcheckParamBlock{}
-}
-
-func NewScarfree_siteremove_orfcheck() interface{} { //*Scarfree_siteremove_orfcheck {
-	e := new(Scarfree_siteremove_orfcheck)
-	e.init()
-	return e
-}
-
-// Mapper function
-func (e *Scarfree_siteremove_orfcheck) Map(m map[string]interface{}) interface{} {
-	var res Scarfree_siteremove_orfcheckParamBlock
-	res.Error = false || m["Constructname"].(execute.ThreadParam).Error || m["Enzymename"].(execute.ThreadParam).Error || m["ORFstoConfirm"].(execute.ThreadParam).Error || m["RemoveproblemRestrictionSites"].(execute.ThreadParam).Error || m["Seqsinorder"].(execute.ThreadParam).Error || m["Vector"].(execute.ThreadParam).Error
-
-	vConstructname, is := m["Constructname"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp Scarfree_siteremove_orfcheckJSONBlock
-		json.Unmarshal([]byte(vConstructname.JSONString), &temp)
-		res.Constructname = *temp.Constructname
-	} else {
-		res.Constructname = m["Constructname"].(execute.ThreadParam).Value.(string)
-	}
-
-	vEnzymename, is := m["Enzymename"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp Scarfree_siteremove_orfcheckJSONBlock
-		json.Unmarshal([]byte(vEnzymename.JSONString), &temp)
-		res.Enzymename = *temp.Enzymename
-	} else {
-		res.Enzymename = m["Enzymename"].(execute.ThreadParam).Value.(string)
-	}
-
-	vORFstoConfirm, is := m["ORFstoConfirm"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp Scarfree_siteremove_orfcheckJSONBlock
-		json.Unmarshal([]byte(vORFstoConfirm.JSONString), &temp)
-		res.ORFstoConfirm = *temp.ORFstoConfirm
-	} else {
-		res.ORFstoConfirm = m["ORFstoConfirm"].(execute.ThreadParam).Value.([]string)
-	}
-
-	vRemoveproblemRestrictionSites, is := m["RemoveproblemRestrictionSites"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp Scarfree_siteremove_orfcheckJSONBlock
-		json.Unmarshal([]byte(vRemoveproblemRestrictionSites.JSONString), &temp)
-		res.RemoveproblemRestrictionSites = *temp.RemoveproblemRestrictionSites
-	} else {
-		res.RemoveproblemRestrictionSites = m["RemoveproblemRestrictionSites"].(execute.ThreadParam).Value.(bool)
-	}
-
-	vSeqsinorder, is := m["Seqsinorder"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp Scarfree_siteremove_orfcheckJSONBlock
-		json.Unmarshal([]byte(vSeqsinorder.JSONString), &temp)
-		res.Seqsinorder = *temp.Seqsinorder
-	} else {
-		res.Seqsinorder = m["Seqsinorder"].(execute.ThreadParam).Value.([]string)
-	}
-
-	vVector, is := m["Vector"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp Scarfree_siteremove_orfcheckJSONBlock
-		json.Unmarshal([]byte(vVector.JSONString), &temp)
-		res.Vector = *temp.Vector
-	} else {
-		res.Vector = m["Vector"].(execute.ThreadParam).Value.(string)
-	}
-
-	res.ID = m["Constructname"].(execute.ThreadParam).ID
-	res.BlockID = m["Constructname"].(execute.ThreadParam).BlockID
-
-	return res
-}
-
-func (e *Scarfree_siteremove_orfcheck) OnConstructname(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(6, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Constructname", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Scarfree_siteremove_orfcheck) OnEnzymename(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(6, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Enzymename", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Scarfree_siteremove_orfcheck) OnORFstoConfirm(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(6, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("ORFstoConfirm", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Scarfree_siteremove_orfcheck) OnRemoveproblemRestrictionSites(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(6, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("RemoveproblemRestrictionSites", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Scarfree_siteremove_orfcheck) OnSeqsinorder(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(6, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Seqsinorder", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Scarfree_siteremove_orfcheck) OnVector(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(6, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Vector", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
+func New() interface{} {
+	return &Element_{
+		inject.CheckedRunner{
+			RunFunc: _run,
+			In:      &Input_{},
+			Out:     &Output_{},
+		},
 	}
 }
 
-type Scarfree_siteremove_orfcheck struct {
-	flow.Component                // component "superclass" embedded
-	lock                          sync.Mutex
-	startup                       sync.Once
-	params                        map[execute.ThreadID]*execute.AsyncBag
-	Constructname                 <-chan execute.ThreadParam
-	Enzymename                    <-chan execute.ThreadParam
-	ORFstoConfirm                 <-chan execute.ThreadParam
-	RemoveproblemRestrictionSites <-chan execute.ThreadParam
-	Seqsinorder                   <-chan execute.ThreadParam
-	Vector                        <-chan execute.ThreadParam
-	NewDNASequence                chan<- execute.ThreadParam
-	ORFmissing                    chan<- execute.ThreadParam
-	PartswithOverhangs            chan<- execute.ThreadParam
-	Simulationpass                chan<- execute.ThreadParam
-	Status                        chan<- execute.ThreadParam
-	Warnings                      chan<- execute.ThreadParam
+type Element_ struct {
+	inject.CheckedRunner
 }
 
-type Scarfree_siteremove_orfcheckParamBlock struct {
-	ID                            execute.ThreadID
-	BlockID                       execute.BlockID
-	Error                         bool
+type Input_ struct {
 	Constructname                 string
 	Enzymename                    string
 	ORFstoConfirm                 []string
@@ -561,65 +316,11 @@ type Scarfree_siteremove_orfcheckParamBlock struct {
 	Vector                        string
 }
 
-type Scarfree_siteremove_orfcheckConfig struct {
-	ID                            execute.ThreadID
-	BlockID                       execute.BlockID
-	Error                         bool
-	Constructname                 string
-	Enzymename                    string
-	ORFstoConfirm                 []string
-	RemoveproblemRestrictionSites bool
-	Seqsinorder                   []string
-	Vector                        string
-}
-
-type Scarfree_siteremove_orfcheckResultBlock struct {
-	ID                 execute.ThreadID
-	BlockID            execute.BlockID
-	Error              bool
+type Output_ struct {
 	NewDNASequence     wtype.DNASequence
 	ORFmissing         bool
 	PartswithOverhangs []wtype.DNASequence
 	Simulationpass     bool
 	Status             string
 	Warnings           error
-}
-
-type Scarfree_siteremove_orfcheckJSONBlock struct {
-	ID                            *execute.ThreadID
-	BlockID                       *execute.BlockID
-	Error                         *bool
-	Constructname                 *string
-	Enzymename                    *string
-	ORFstoConfirm                 *[]string
-	RemoveproblemRestrictionSites *bool
-	Seqsinorder                   *[]string
-	Vector                        *string
-	NewDNASequence                *wtype.DNASequence
-	ORFmissing                    *bool
-	PartswithOverhangs            *[]wtype.DNASequence
-	Simulationpass                *bool
-	Status                        *string
-	Warnings                      *error
-}
-
-func (c *Scarfree_siteremove_orfcheck) ComponentInfo() *execute.ComponentInfo {
-	inp := make([]execute.PortInfo, 0)
-	outp := make([]execute.PortInfo, 0)
-	inp = append(inp, *execute.NewPortInfo("Constructname", "string", "Constructname", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Enzymename", "string", "Enzymename", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("ORFstoConfirm", "[]string", "ORFstoConfirm", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("RemoveproblemRestrictionSites", "bool", "RemoveproblemRestrictionSites", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Seqsinorder", "[]string", "Seqsinorder", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Vector", "string", "Vector", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("NewDNASequence", "wtype.DNASequence", "NewDNASequence", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("ORFmissing", "bool", "ORFmissing", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("PartswithOverhangs", "[]wtype.DNASequence", "PartswithOverhangs", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Simulationpass", "bool", "Simulationpass", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Status", "string", "Status", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Warnings", "error", "Warnings", true, true, nil, nil))
-
-	ci := execute.NewComponentInfo("Scarfree_siteremove_orfcheck", "Scarfree_siteremove_orfcheck", "", false, inp, outp)
-
-	return ci
 }

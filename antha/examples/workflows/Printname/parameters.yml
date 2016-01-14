@@ -1,10 +1,7 @@
 {
-  "Parameters": [{
-    "Printname": {
-      "Name": "Kanye West",
+    "Parameters": {
+        "Printname": {
+            "Name": "Kanye West"
+        }
     }
-  }],
-  "Config": {
-      "OUTPUT_COUNT": 1
-  }
 }

@@ -1,14 +1,8 @@
 {
-    "properties": {
-        "name": "main"
-    },
+    "connections": [],
     "processes": {
         "SumVolume": {
-            "component": "SumVolume",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "SumVolume"
         }
-    },
-    "connections": [ ]
+    }
 }

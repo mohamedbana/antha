@@ -1,17 +1,14 @@
 {
-  "Parameters": [{
-    "Evaporationrate": {
-      "Airvelocity":0m/s,
-      "Liquid": "water",
-      "Platetype": "96DSW_axygen",
-      "Pa": 101325Pa,
-      "Temp": 25˚C,
-      "Relativehumidity": 0.28,
-      "ExecutionTime": 7200s,
-	  "Volumeperwell" : 5000nl
-    }
-  }],
-    "Config": {
-        "OUTPUT_COUNT": 1
+    "Parameters": {
+        "Evaporationrate": {
+            "Airvelocity": "0m/s",
+            "Executiontime": "7200s",
+            "Liquid": "water",
+            "Pa": "101325Pa",
+            "Platetype": "96DSW_axygen",
+            "Relativehumidity": 0.28,
+            "Temp": "25C",
+            "Volumeperwell": "5000nl"
+        }
     }
 }

@@ -12,15 +12,12 @@ import (
 	//	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
-	"encoding/json"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/antha/execute"
-	"github.com/antha-lang/antha/flow"
-	"github.com/antha-lang/antha/microArch/execution"
-	"runtime/debug"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/execute"
+	"github.com/antha-lang/antha/inject"
 	"strings"
-	"sync"
 )
 
 // Input parameters for this protocol (data)
@@ -41,25 +38,16 @@ import (
 //map[string][]string
 
 // Input Requirement specification
-func (e *FindPartsthat) requirements() {
-	_ = wunit.Make_units
+func _requirements() {
 
 }
 
 // Conditions to run on startup
-func (e *FindPartsthat) setup(p FindPartsthatParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
-}
+func _setup(_ctx context.Context, _input *Input_) {}
 
 // The core process for this protocol, with the steps to be performed
 // for every input
-func (e *FindPartsthat) steps(p FindPartsthatParamBlock, r *FindPartsthatResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-
+func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 	//var msg string
 	// set warnings reported back to user to none initially
 	//	warnings := make([]string,0)
@@ -73,12 +61,12 @@ func (e *FindPartsthat) steps(p FindPartsthatParamBlock, r *FindPartsthatResultB
 
 	partstatus := ""
 
-	if p.OnlyreturnAvailableParts {
+	if _input.OnlyreturnAvailableParts {
 		partstatus = "A"
 	}
 
 	// first we'll parse the igem registry based on the short description contained in the fasta header for each part sequence
-	for _, desc := range p.Parttypes {
+	for _, desc := range _input.Parttypes {
 
 		subparts = igem.FilterRegistry([]string{desc, partstatus})
 		status = text.Print(desc+" :", subparts)
@@ -87,7 +75,7 @@ func (e *FindPartsthat) steps(p FindPartsthatParamBlock, r *FindPartsthatResultB
 	}
 
 	othercriteria := ""
-	if p.OnlyreturnWorkingparts {
+	if _input.OnlyreturnWorkingparts {
 		othercriteria = "WORKS"
 	}
 
@@ -99,12 +87,12 @@ func (e *FindPartsthat) steps(p FindPartsthatParamBlock, r *FindPartsthatResultB
 
 		for _, subpart := range subparts {
 
-			if strings.Contains(partdetails.Description(subpart), p.Partdescriptions[i]) &&
+			if strings.Contains(partdetails.Description(subpart), _input.Partdescriptions[i]) &&
 				strings.Contains(partdetails.Results(subpart), othercriteria) {
 				BackupParts = append(BackupParts, subpart)
 
 			}
-			r.FulllistBackupParts = append(r.FulllistBackupParts, BackupParts)
+			_output.FulllistBackupParts = append(_output.FulllistBackupParts, BackupParts)
 		}
 	}
 	/*
@@ -113,256 +101,66 @@ func (e *FindPartsthat) steps(p FindPartsthatParamBlock, r *FindPartsthatResultB
 		}else{Warnings = nil}
 	*/
 
-	r.FulllistBackupParts = parts
-	r.Status = strings.Join(joinedstatus, " ; ")
+	_output.FulllistBackupParts = parts
+	_output.Status = strings.Join(joinedstatus, " ; ")
 
 	// Print status
-	if r.Status != "all parts available" {
-		r.Status = fmt.Sprintln(r.Status)
+	if _output.Status != "all parts available" {
+		_output.Status = fmt.Sprintln(_output.Status)
 	} else {
-		r.Status = fmt.Sprintln(
-			"Warnings:", r.Warnings.Error(),
-			"Back up parts found (Reported to work!)", p.Parts,
-			"Back up parts found (Reported to work!)", r.FulllistBackupParts,
+		_output.Status = fmt.Sprintln(
+			"Warnings:", _output.Warnings.Error(),
+			"Back up parts found (Reported to work!)", _input.Parts,
+			"Back up parts found (Reported to work!)", _output.FulllistBackupParts,
 		)
 	}
-	_ = _wrapper.WaitToEnd()
 
 }
 
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
-func (e *FindPartsthat) analysis(p FindPartsthatParamBlock, r *FindPartsthatResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
+func _analysis(_ctx context.Context, _input *Input_, _output *Output_) {
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
-func (e *FindPartsthat) validation(p FindPartsthatParamBlock, r *FindPartsthatResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
+func _validation(_ctx context.Context, _input *Input_, _output *Output_) {
 }
 
-// AsyncBag functions
-func (e *FindPartsthat) Complete(params interface{}) {
-	p := params.(FindPartsthatParamBlock)
-	if p.Error {
-		e.FulllistBackupParts <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		e.Status <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		e.Warnings <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		return
+func _run(_ctx context.Context, value inject.Value) (inject.Value, error) {
+	input := &Input_{}
+	output := &Output_{}
+	if err := inject.Assign(value, input); err != nil {
+		return nil, err
 	}
-	r := new(FindPartsthatResultBlock)
-	defer func() {
-		if res := recover(); res != nil {
-			e.FulllistBackupParts <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			e.Status <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			e.Warnings <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			execute.AddError(&execute.RuntimeError{BaseError: res, Stack: debug.Stack()})
-			return
-		}
-	}()
-	e.startup.Do(func() { e.setup(p) })
-	e.steps(p, r)
-
-	e.FulllistBackupParts <- execute.ThreadParam{Value: r.FulllistBackupParts, ID: p.ID, Error: false}
-
-	e.Status <- execute.ThreadParam{Value: r.Status, ID: p.ID, Error: false}
-
-	e.Warnings <- execute.ThreadParam{Value: r.Warnings, ID: p.ID, Error: false}
-
-	e.analysis(p, r)
-
-	e.validation(p, r)
-
+	_setup(_ctx, input)
+	_steps(_ctx, input, output)
+	_analysis(_ctx, input, output)
+	_validation(_ctx, input, output)
+	return inject.MakeValue(output), nil
 }
 
-// init function, read characterization info from seperate file to validate ranges?
-func (e *FindPartsthat) init() {
-	e.params = make(map[execute.ThreadID]*execute.AsyncBag)
-}
+var (
+	_ = execute.MixInto
+	_ = wunit.Make_units
+)
 
-func (e *FindPartsthat) NewConfig() interface{} {
-	return &FindPartsthatConfig{}
-}
-
-func (e *FindPartsthat) NewParamBlock() interface{} {
-	return &FindPartsthatParamBlock{}
-}
-
-func NewFindPartsthat() interface{} { //*FindPartsthat {
-	e := new(FindPartsthat)
-	e.init()
-	return e
-}
-
-// Mapper function
-func (e *FindPartsthat) Map(m map[string]interface{}) interface{} {
-	var res FindPartsthatParamBlock
-	res.Error = false || m["OnlyreturnAvailableParts"].(execute.ThreadParam).Error || m["OnlyreturnWorkingparts"].(execute.ThreadParam).Error || m["Partdescriptions"].(execute.ThreadParam).Error || m["Parts"].(execute.ThreadParam).Error || m["Parttypes"].(execute.ThreadParam).Error
-
-	vOnlyreturnAvailableParts, is := m["OnlyreturnAvailableParts"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp FindPartsthatJSONBlock
-		json.Unmarshal([]byte(vOnlyreturnAvailableParts.JSONString), &temp)
-		res.OnlyreturnAvailableParts = *temp.OnlyreturnAvailableParts
-	} else {
-		res.OnlyreturnAvailableParts = m["OnlyreturnAvailableParts"].(execute.ThreadParam).Value.(bool)
-	}
-
-	vOnlyreturnWorkingparts, is := m["OnlyreturnWorkingparts"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp FindPartsthatJSONBlock
-		json.Unmarshal([]byte(vOnlyreturnWorkingparts.JSONString), &temp)
-		res.OnlyreturnWorkingparts = *temp.OnlyreturnWorkingparts
-	} else {
-		res.OnlyreturnWorkingparts = m["OnlyreturnWorkingparts"].(execute.ThreadParam).Value.(bool)
-	}
-
-	vPartdescriptions, is := m["Partdescriptions"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp FindPartsthatJSONBlock
-		json.Unmarshal([]byte(vPartdescriptions.JSONString), &temp)
-		res.Partdescriptions = *temp.Partdescriptions
-	} else {
-		res.Partdescriptions = m["Partdescriptions"].(execute.ThreadParam).Value.([]string)
-	}
-
-	vParts, is := m["Parts"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp FindPartsthatJSONBlock
-		json.Unmarshal([]byte(vParts.JSONString), &temp)
-		res.Parts = *temp.Parts
-	} else {
-		res.Parts = m["Parts"].(execute.ThreadParam).Value.([][]string)
-	}
-
-	vParttypes, is := m["Parttypes"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp FindPartsthatJSONBlock
-		json.Unmarshal([]byte(vParttypes.JSONString), &temp)
-		res.Parttypes = *temp.Parttypes
-	} else {
-		res.Parttypes = m["Parttypes"].(execute.ThreadParam).Value.([]string)
-	}
-
-	res.ID = m["OnlyreturnAvailableParts"].(execute.ThreadParam).ID
-	res.BlockID = m["OnlyreturnAvailableParts"].(execute.ThreadParam).BlockID
-
-	return res
-}
-
-func (e *FindPartsthat) OnOnlyreturnAvailableParts(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("OnlyreturnAvailableParts", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *FindPartsthat) OnOnlyreturnWorkingparts(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("OnlyreturnWorkingparts", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *FindPartsthat) OnPartdescriptions(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Partdescriptions", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *FindPartsthat) OnParts(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Parts", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *FindPartsthat) OnParttypes(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(5, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Parttypes", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
+func New() interface{} {
+	return &Element_{
+		inject.CheckedRunner{
+			RunFunc: _run,
+			In:      &Input_{},
+			Out:     &Output_{},
+		},
 	}
 }
 
-type FindPartsthat struct {
-	flow.Component           // component "superclass" embedded
-	lock                     sync.Mutex
-	startup                  sync.Once
-	params                   map[execute.ThreadID]*execute.AsyncBag
-	OnlyreturnAvailableParts <-chan execute.ThreadParam
-	OnlyreturnWorkingparts   <-chan execute.ThreadParam
-	Partdescriptions         <-chan execute.ThreadParam
-	Parts                    <-chan execute.ThreadParam
-	Parttypes                <-chan execute.ThreadParam
-	FulllistBackupParts      chan<- execute.ThreadParam
-	Status                   chan<- execute.ThreadParam
-	Warnings                 chan<- execute.ThreadParam
+type Element_ struct {
+	inject.CheckedRunner
 }
 
-type FindPartsthatParamBlock struct {
-	ID                       execute.ThreadID
-	BlockID                  execute.BlockID
-	Error                    bool
+type Input_ struct {
 	OnlyreturnAvailableParts bool
 	OnlyreturnWorkingparts   bool
 	Partdescriptions         []string
@@ -370,53 +168,8 @@ type FindPartsthatParamBlock struct {
 	Parttypes                []string
 }
 
-type FindPartsthatConfig struct {
-	ID                       execute.ThreadID
-	BlockID                  execute.BlockID
-	Error                    bool
-	OnlyreturnAvailableParts bool
-	OnlyreturnWorkingparts   bool
-	Partdescriptions         []string
-	Parts                    [][]string
-	Parttypes                []string
-}
-
-type FindPartsthatResultBlock struct {
-	ID                  execute.ThreadID
-	BlockID             execute.BlockID
-	Error               bool
+type Output_ struct {
 	FulllistBackupParts [][]string
 	Status              string
 	Warnings            error
-}
-
-type FindPartsthatJSONBlock struct {
-	ID                       *execute.ThreadID
-	BlockID                  *execute.BlockID
-	Error                    *bool
-	OnlyreturnAvailableParts *bool
-	OnlyreturnWorkingparts   *bool
-	Partdescriptions         *[]string
-	Parts                    *[][]string
-	Parttypes                *[]string
-	FulllistBackupParts      *[][]string
-	Status                   *string
-	Warnings                 *error
-}
-
-func (c *FindPartsthat) ComponentInfo() *execute.ComponentInfo {
-	inp := make([]execute.PortInfo, 0)
-	outp := make([]execute.PortInfo, 0)
-	inp = append(inp, *execute.NewPortInfo("OnlyreturnAvailableParts", "bool", "OnlyreturnAvailableParts", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("OnlyreturnWorkingparts", "bool", "OnlyreturnWorkingparts", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Partdescriptions", "[]string", "Partdescriptions", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Parts", "[][]string", "Parts", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Parttypes", "[]string", "Parttypes", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("FulllistBackupParts", "[][]string", "FulllistBackupParts", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Status", "string", "Status", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Warnings", "error", "Warnings", true, true, nil, nil))
-
-	ci := execute.NewComponentInfo("FindPartsthat", "FindPartsthat", "", false, inp, outp)
-
-	return ci
 }

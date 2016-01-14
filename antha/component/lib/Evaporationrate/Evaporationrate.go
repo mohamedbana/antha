@@ -28,17 +28,14 @@ x = humidity ratio in the air (kg/kg) (kg H2O in kg Dry Air) */
 package Evaporationrate
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Labware"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Liquidclasses"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/eng"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/antha/execute"
-	"github.com/antha-lang/antha/flow"
-	"github.com/antha-lang/antha/microArch/execution"
-	"runtime/debug"
-	"sync"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/execute"
+	"github.com/antha-lang/antha/inject"
 )
 
 // ul
@@ -55,197 +52,68 @@ import (
 // ul/h
 // ul
 
-func (e *Evaporationrate) requirements() {
-	_ = wunit.Make_units
-
+func _requirements() {
 }
-func (e *Evaporationrate) setup(p EvaporationrateParamBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
+func _setup(_ctx context.Context, _input *Input_) {
 }
-func (e *Evaporationrate) steps(p EvaporationrateParamBlock, r *EvaporationrateResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-	_ = _wrapper.WaitToEnd()
-
+func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 }
-func (e *Evaporationrate) analysis(p EvaporationrateParamBlock, r *EvaporationrateResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
+func _analysis(_ctx context.Context, _input *Input_, _output *Output_) {
 
-	var PWS float64 = eng.Pws(p.Temp)
-	var pw float64 = eng.Pw(p.Relativehumidity, PWS) // vapour partial pressure in Pascals
-	var Gh = (eng.Θ(p.Liquid, p.Airvelocity) *
-		(labware.Labwaregeometry[p.Platetype]["Surfacearea"] *
-			((eng.Xs(PWS, p.Pa)) - (eng.X(pw, p.Pa))))) // Gh is rate of evaporation in kg/h
-	evaporatedliquid := (Gh * (p.Executiontime.SIValue() / 3600))                            // in kg
-	evaporatedliquid = (evaporatedliquid * liquidclasses.Liquidclass[p.Liquid]["ro"]) / 1000 // converted to litres
-	r.Evaporatedliquid = wunit.NewVolume((evaporatedliquid * 1000000), "ul")                 // convert to ul
+	var PWS float64 = eng.Pws(_input.Temp)
+	var pw float64 = eng.Pw(_input.Relativehumidity, PWS) // vapour partial pressure in Pascals
+	var Gh = (eng.Θ(_input.Liquid, _input.Airvelocity) *
+		(labware.Labwaregeometry[_input.Platetype]["Surfacearea"] *
+			((eng.Xs(PWS, _input.Pa)) - (eng.X(pw, _input.Pa))))) // Gh is rate of evaporation in kg/h
+	evaporatedliquid := (Gh * (_input.Executiontime.SIValue() / 3600))                            // in kg
+	evaporatedliquid = (evaporatedliquid * liquidclasses.Liquidclass[_input.Liquid]["ro"]) / 1000 // converted to litres
+	_output.Evaporatedliquid = wunit.NewVolume((evaporatedliquid * 1000000), "ul")                // convert to ul
 
-	r.Evaporationrateestimate = Gh * 1000000 // ul/h if declared in parameters or data it doesn't need declaring again
+	_output.Evaporationrateestimate = Gh * 1000000 // ul/h if declared in parameters or data it doesn't need declaring again
 
-	estimatedevaporationtime := p.Volumeperwell.ConvertTo(wunit.ParsePrefixedUnit("ul")) / r.Evaporationrateestimate
-	r.Estimatedevaporationtime = wunit.NewTime((estimatedevaporationtime * 3600), "s")
+	estimatedevaporationtime := _input.Volumeperwell.ConvertTo(wunit.ParsePrefixedUnit("ul")) / _output.Evaporationrateestimate
+	_output.Estimatedevaporationtime = wunit.NewTime((estimatedevaporationtime * 3600), "s")
 
-	r.Status = fmt.Sprintln("Well Surface Area=",
-		(labware.Labwaregeometry[p.Platetype]["Surfacearea"])*1000000, "mm2",
+	_output.Status = fmt.Sprintln("Well Surface Area=",
+		(labware.Labwaregeometry[_input.Platetype]["Surfacearea"])*1000000, "mm2",
 		"evaporation rate =", Gh*1000000, "ul/h",
-		"total evaporated liquid =", r.Evaporatedliquid.ToString(), "after", p.Executiontime.ToString(),
-		"estimated evaporation time = ", r.Estimatedevaporationtime.ToString())
-	_ = _wrapper.WaitToEnd()
+		"total evaporated liquid =", _output.Evaporatedliquid.ToString(), "after", _input.Executiontime.ToString(),
+		"estimated evaporation time = ", _output.Estimatedevaporationtime.ToString())
 
 } // works in either analysis or steps sections
 
-func (e *Evaporationrate) validation(p EvaporationrateParamBlock, r *EvaporationrateResultBlock) {
-	_wrapper := execution.NewWrapper(p.ID, p.BlockID, p)
-	_ = _wrapper
-
-	if r.Evaporatedliquid.SIValue() > p.Volumeperwell.SIValue() {
+func _validation(_ctx context.Context, _input *Input_, _output *Output_) {
+	if _output.Evaporatedliquid.SIValue() > _input.Volumeperwell.SIValue() {
 		panic("not enough liquid")
 	}
-	_ = _wrapper.WaitToEnd()
-
 }
 
-// AsyncBag functions
-func (e *Evaporationrate) Complete(params interface{}) {
-	p := params.(EvaporationrateParamBlock)
-	if p.Error {
-		e.Estimatedevaporationtime <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		e.Evaporatedliquid <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		e.Evaporationrateestimate <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		e.Status <- execute.ThreadParam{Value: nil, ID: p.ID, Error: true}
-		return
+func _run(_ctx context.Context, value inject.Value) (inject.Value, error) {
+	input := &Input_{}
+	output := &Output_{}
+	if err := inject.Assign(value, input); err != nil {
+		return nil, err
 	}
-	r := new(EvaporationrateResultBlock)
-	defer func() {
-		if res := recover(); res != nil {
-			e.Estimatedevaporationtime <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			e.Evaporatedliquid <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			e.Evaporationrateestimate <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			e.Status <- execute.ThreadParam{Value: res, ID: p.ID, Error: true}
-			execute.AddError(&execute.RuntimeError{BaseError: res, Stack: debug.Stack()})
-			return
-		}
-	}()
-	e.startup.Do(func() { e.setup(p) })
-	e.steps(p, r)
-
-	e.analysis(p, r)
-
-	e.Estimatedevaporationtime <- execute.ThreadParam{Value: r.Estimatedevaporationtime, ID: p.ID, Error: false}
-
-	e.Evaporationrateestimate <- execute.ThreadParam{Value: r.Evaporationrateestimate, ID: p.ID, Error: false}
-
-	e.Status <- execute.ThreadParam{Value: r.Status, ID: p.ID, Error: false}
-
-	e.validation(p, r)
-	e.Evaporatedliquid <- execute.ThreadParam{Value: r.Evaporatedliquid, ID: p.ID, Error: false}
-
+	_setup(_ctx, input)
+	_steps(_ctx, input, output)
+	_analysis(_ctx, input, output)
+	_validation(_ctx, input, output)
+	return inject.MakeValue(output), nil
 }
 
-// init function, read characterization info from seperate file to validate ranges?
-func (e *Evaporationrate) init() {
-	e.params = make(map[execute.ThreadID]*execute.AsyncBag)
-}
+var (
+	_ = execute.MixInto
+	_ = wunit.Make_units
+)
 
-func (e *Evaporationrate) NewConfig() interface{} {
-	return &EvaporationrateConfig{}
-}
-
-func (e *Evaporationrate) NewParamBlock() interface{} {
-	return &EvaporationrateParamBlock{}
-}
-
-func NewEvaporationrate() interface{} { //*Evaporationrate {
-	e := new(Evaporationrate)
-	e.init()
-	return e
-}
-
-// Mapper function
-func (e *Evaporationrate) Map(m map[string]interface{}) interface{} {
-	var res EvaporationrateParamBlock
-	res.Error = false || m["Airvelocity"].(execute.ThreadParam).Error || m["Executiontime"].(execute.ThreadParam).Error || m["Liquid"].(execute.ThreadParam).Error || m["Pa"].(execute.ThreadParam).Error || m["Platetype"].(execute.ThreadParam).Error || m["Relativehumidity"].(execute.ThreadParam).Error || m["Temp"].(execute.ThreadParam).Error || m["Volumeperwell"].(execute.ThreadParam).Error
-
-	vAirvelocity, is := m["Airvelocity"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp EvaporationrateJSONBlock
-		json.Unmarshal([]byte(vAirvelocity.JSONString), &temp)
-		res.Airvelocity = *temp.Airvelocity
-	} else {
-		res.Airvelocity = m["Airvelocity"].(execute.ThreadParam).Value.(wunit.Velocity)
+func New() interface{} {
+	return &Element_{
+		inject.CheckedRunner{
+			RunFunc: _run,
+			In:      &Input_{},
+			Out:     &Output_{},
+		},
 	}
-
-	vExecutiontime, is := m["Executiontime"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp EvaporationrateJSONBlock
-		json.Unmarshal([]byte(vExecutiontime.JSONString), &temp)
-		res.Executiontime = *temp.Executiontime
-	} else {
-		res.Executiontime = m["Executiontime"].(execute.ThreadParam).Value.(wunit.Time)
-	}
-
-	vLiquid, is := m["Liquid"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp EvaporationrateJSONBlock
-		json.Unmarshal([]byte(vLiquid.JSONString), &temp)
-		res.Liquid = *temp.Liquid
-	} else {
-		res.Liquid = m["Liquid"].(execute.ThreadParam).Value.(string)
-	}
-
-	vPa, is := m["Pa"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp EvaporationrateJSONBlock
-		json.Unmarshal([]byte(vPa.JSONString), &temp)
-		res.Pa = *temp.Pa
-	} else {
-		res.Pa = m["Pa"].(execute.ThreadParam).Value.(wunit.Pressure)
-	}
-
-	vPlatetype, is := m["Platetype"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp EvaporationrateJSONBlock
-		json.Unmarshal([]byte(vPlatetype.JSONString), &temp)
-		res.Platetype = *temp.Platetype
-	} else {
-		res.Platetype = m["Platetype"].(execute.ThreadParam).Value.(string)
-	}
-
-	vRelativehumidity, is := m["Relativehumidity"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp EvaporationrateJSONBlock
-		json.Unmarshal([]byte(vRelativehumidity.JSONString), &temp)
-		res.Relativehumidity = *temp.Relativehumidity
-	} else {
-		res.Relativehumidity = m["Relativehumidity"].(execute.ThreadParam).Value.(float64)
-	}
-
-	vTemp, is := m["Temp"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp EvaporationrateJSONBlock
-		json.Unmarshal([]byte(vTemp.JSONString), &temp)
-		res.Temp = *temp.Temp
-	} else {
-		res.Temp = m["Temp"].(execute.ThreadParam).Value.(wunit.Temperature)
-	}
-
-	vVolumeperwell, is := m["Volumeperwell"].(execute.ThreadParam).Value.(execute.JSONValue)
-	if is {
-		var temp EvaporationrateJSONBlock
-		json.Unmarshal([]byte(vVolumeperwell.JSONString), &temp)
-		res.Volumeperwell = *temp.Volumeperwell
-	} else {
-		res.Volumeperwell = m["Volumeperwell"].(execute.ThreadParam).Value.(wunit.Volume)
-	}
-
-	res.ID = m["Airvelocity"].(execute.ThreadParam).ID
-	res.BlockID = m["Airvelocity"].(execute.ThreadParam).BlockID
-
-	return res
 }
 
 // Go helper functions:
@@ -267,166 +135,11 @@ this will be important in a laminar flow cabinet, fume cabinet and when the plat
 /*: 0.62198 * pws / (pa - pws), // humidity ratio in saturated air at the same temperature as the water surface (kg/kg)  (kg H2O in kg Dry Air)
 "x":  0.62198 * pw / (pa - pw), */
 
-func (e *Evaporationrate) OnAirvelocity(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(8, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Airvelocity", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Evaporationrate) OnExecutiontime(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(8, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Executiontime", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Evaporationrate) OnLiquid(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(8, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Liquid", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Evaporationrate) OnPa(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(8, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Pa", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Evaporationrate) OnPlatetype(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(8, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Platetype", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Evaporationrate) OnRelativehumidity(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(8, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Relativehumidity", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Evaporationrate) OnTemp(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(8, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Temp", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
-}
-func (e *Evaporationrate) OnVolumeperwell(param execute.ThreadParam) {
-	e.lock.Lock()
-	var bag *execute.AsyncBag = e.params[param.ID]
-	if bag == nil {
-		bag = new(execute.AsyncBag)
-		bag.Init(8, e, e)
-		e.params[param.ID] = bag
-	}
-	e.lock.Unlock()
-
-	fired := bag.AddValue("Volumeperwell", param)
-	if fired {
-		e.lock.Lock()
-		delete(e.params, param.ID)
-		e.lock.Unlock()
-	}
+type Element_ struct {
+	inject.CheckedRunner
 }
 
-type Evaporationrate struct {
-	flow.Component           // component "superclass" embedded
-	lock                     sync.Mutex
-	startup                  sync.Once
-	params                   map[execute.ThreadID]*execute.AsyncBag
-	Airvelocity              <-chan execute.ThreadParam
-	Executiontime            <-chan execute.ThreadParam
-	Liquid                   <-chan execute.ThreadParam
-	Pa                       <-chan execute.ThreadParam
-	Platetype                <-chan execute.ThreadParam
-	Relativehumidity         <-chan execute.ThreadParam
-	Temp                     <-chan execute.ThreadParam
-	Volumeperwell            <-chan execute.ThreadParam
-	Estimatedevaporationtime chan<- execute.ThreadParam
-	Evaporatedliquid         chan<- execute.ThreadParam
-	Evaporationrateestimate  chan<- execute.ThreadParam
-	Status                   chan<- execute.ThreadParam
-}
-
-type EvaporationrateParamBlock struct {
-	ID               execute.ThreadID
-	BlockID          execute.BlockID
-	Error            bool
+type Input_ struct {
 	Airvelocity      wunit.Velocity
 	Executiontime    wunit.Time
 	Liquid           string
@@ -437,65 +150,9 @@ type EvaporationrateParamBlock struct {
 	Volumeperwell    wunit.Volume
 }
 
-type EvaporationrateConfig struct {
-	ID               execute.ThreadID
-	BlockID          execute.BlockID
-	Error            bool
-	Airvelocity      wunit.Velocity
-	Executiontime    wunit.Time
-	Liquid           string
-	Pa               wunit.Pressure
-	Platetype        string
-	Relativehumidity float64
-	Temp             wunit.Temperature
-	Volumeperwell    wunit.Volume
-}
-
-type EvaporationrateResultBlock struct {
-	ID                       execute.ThreadID
-	BlockID                  execute.BlockID
-	Error                    bool
+type Output_ struct {
 	Estimatedevaporationtime wunit.Time
 	Evaporatedliquid         wunit.Volume
 	Evaporationrateestimate  float64
 	Status                   string
-}
-
-type EvaporationrateJSONBlock struct {
-	ID                       *execute.ThreadID
-	BlockID                  *execute.BlockID
-	Error                    *bool
-	Airvelocity              *wunit.Velocity
-	Executiontime            *wunit.Time
-	Liquid                   *string
-	Pa                       *wunit.Pressure
-	Platetype                *string
-	Relativehumidity         *float64
-	Temp                     *wunit.Temperature
-	Volumeperwell            *wunit.Volume
-	Estimatedevaporationtime *wunit.Time
-	Evaporatedliquid         *wunit.Volume
-	Evaporationrateestimate  *float64
-	Status                   *string
-}
-
-func (c *Evaporationrate) ComponentInfo() *execute.ComponentInfo {
-	inp := make([]execute.PortInfo, 0)
-	outp := make([]execute.PortInfo, 0)
-	inp = append(inp, *execute.NewPortInfo("Airvelocity", "wunit.Velocity", "Airvelocity", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Executiontime", "wunit.Time", "Executiontime", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Liquid", "string", "Liquid", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Pa", "wunit.Pressure", "Pa", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Platetype", "string", "Platetype", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Relativehumidity", "float64", "Relativehumidity", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Temp", "wunit.Temperature", "Temp", true, true, nil, nil))
-	inp = append(inp, *execute.NewPortInfo("Volumeperwell", "wunit.Volume", "Volumeperwell", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Estimatedevaporationtime", "wunit.Time", "Estimatedevaporationtime", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Evaporatedliquid", "wunit.Volume", "Evaporatedliquid", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Evaporationrateestimate", "float64", "Evaporationrateestimate", true, true, nil, nil))
-	outp = append(outp, *execute.NewPortInfo("Status", "string", "Status", true, true, nil, nil))
-
-	ci := execute.NewComponentInfo("Evaporationrate", "Evaporationrate", "", false, inp, outp)
-
-	return ci
 }

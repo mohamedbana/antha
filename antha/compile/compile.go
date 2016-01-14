@@ -1302,17 +1302,6 @@ func (cfg *Config) fprint(output io.Writer, fset *token.FileSet, node interface{
 	return
 }
 
-func (cfg *Config) mainFprint(output io.Writer, fset *token.FileSet, node interface{}, nodeSizes map[ast.Node]int, packageRoute string) (err error) {
-	var p compiler
-	p.init(cfg, fset, nodeSizes)
-	p.printNode(node) // would be cheaper to save it from last execution
-	_, err = output.Write(p.standAlone(node.(*ast.File), packageRoute))
-	if err != nil {
-		panic(err)
-	}
-	return
-}
-
 // A CommentedNode bundles an AST node and corresponding comments.
 // It may be provided as argument to any of the Fprint functions.
 //
@@ -1328,11 +1317,6 @@ type CommentedNode struct {
 //
 func (cfg *Config) Fprint(output io.Writer, fset *token.FileSet, node interface{}) error {
 	return cfg.fprint(output, fset, node, make(map[ast.Node]int))
-}
-
-//MainFprintf prints the contents of a main function for the file given in the buffer given as parameter
-func (cfg *Config) MainFprint(output io.Writer, fset *token.FileSet, node interface{}, packageRoute string) error {
-	return cfg.mainFprint(output, fset, node, make(map[ast.Node]int), packageRoute)
 }
 
 // Fprint "pretty-prints" an AST node to output.

@@ -1,14 +1,8 @@
 {
-    "properties": {
-        "name": "main"
-    },
+    "connections": [],
     "processes": {
         "Plotdataparams": {
-            "component": "Plotdata",
-            "metadata": {
-                "label": "CS"
-            }
+            "component": "Plotdata"
         }
-    },
-    "connections": [ ]
+    }
 }

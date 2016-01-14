@@ -1,14 +1,11 @@
 {
-    "properties": {
-        "name": "main"
-    },
+    "connections": [],
     "processes": {
-        "EnterNameForYourParameters": {
-            "component": "ProtocolName_from_an_file",
-            "metadata": {
-                "label": "CS"
-            }
+        "EnterNameForYourParameters1": {
+            "component": "ProtocolName_from_an_file"
+        },
+        "EnterNameForYourParameters2": {
+            "component": "ProtocolName_from_an_file"
         }
-    },
-    "connections": [ ]
+    }
 }

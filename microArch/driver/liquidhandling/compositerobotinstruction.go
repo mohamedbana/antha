@@ -25,13 +25,14 @@ package liquidhandling
 import (
 	"errors"
 	"fmt"
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/microArch/logger"
 	"math"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/microArch/logger"
 )
 
 type TransferParams struct {
@@ -88,17 +89,42 @@ func ChooseChannel(vol *wunit.Volume, prms *LHProperties) (*wtype.LHChannelParam
 	var headchosen *wtype.LHHead = nil
 
 	minvol := 99999.0
+
 	v := vol.RawValue()
 
+	fmt.Println("HEADSSSSSSSSSSS loaded=", len(prms.HeadsLoaded))
+	fmt.Println("HEADSSSSSSSSSSS options=", prms.HeadsLoaded)
 	for _, head := range prms.HeadsLoaded {
-		mv := head.Params.Minvol.ConvertTo(vol.Unit())
-		d := v - mv
 
-		if d >= 0.0 && mv < minvol {
-			minvol = mv
-			headchosen = head
+		minv := head.Params.Minvol.ConvertTo(vol.Unit())
+		maxv := head.Params.Maxvol.ConvertTo(vol.Unit())
+
+		d := v - minv
+
+		if d >= 0.0 && minv < minvol {
+
+			if headchosen == nil {
+				headchosen = head
+				minvol = minv
+			}
+
+			if v < maxv {
+
+				if head.GetParams().Minvol.SIValue() < headchosen.GetParams().Minvol.SIValue() {
+					headchosen = head
+					minvol = minv
+				}
+			} else {
+				if head.GetParams().Maxvol.SIValue() > headchosen.GetParams().Maxvol.SIValue() {
+					headchosen = head
+					minvol = minv
+				}
+				//minvol = minv
+				//headchosen = head
+			}
 		}
-
+		//headchosen = prms.Heads[0]
+		fmt.Println("HEAD chosen=", headchosen)
 	}
 
 	if headchosen == nil {
