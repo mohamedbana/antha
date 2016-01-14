@@ -139,7 +139,10 @@ func AdvancedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 
 	}
 
-	for _, name := range order {
+	cnt := 1
+	logger.Debug("OUTORDER INFO STARTS HERE")
+	for ordinal, name := range order {
+		logger.Debug(fmt.Sprintf("Component %s EXECUTE OUTORDER %d", name, ordinal+1))
 		for n, g := range minorlayoutgroups {
 			grp := []string(g)
 
@@ -179,6 +182,7 @@ func AdvancedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 
 			for i, solID := range grp {
 
+				logger.Debug(fmt.Sprintf("OUTORDER:%d:%d:%s:%d", cnt, toplatenum, asstx[1], col))
 				sol := output_solutions[solID]
 
 				// we need to get the relevant component out
@@ -245,6 +249,7 @@ func AdvancedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 				sol.Plateaddress = outplate.PlateName
 				sol.PlateID = outplate.ID
 				sol.Welladdress = wellto[i]
+				cnt += 1
 			}
 
 			// if we get here without finding any components of this type in this group we don't make an instruction
@@ -252,13 +257,13 @@ func AdvancedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 			if !compingroup {
 				continue
 			}
-
 			ins := liquidhandling.NewTransferInstruction(whats, pltfrom, pltto, wellfrom, wellto, plttypefrom, plttypeto, vols, fvols, tvols, fpwx, fpwy, tpwx, tpwy)
 
 			instructions.Add(ins)
 		}
 	}
 
+	logger.Debug("OUTORDER info ends here")
 	inx := instructions.Generate(request.Policies, parameters)
 	instrx := make([]liquidhandling.TerminalRobotInstruction, len(inx))
 	for i := 0; i < len(inx); i++ {
