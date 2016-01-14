@@ -179,7 +179,6 @@ func AdvancedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 
 			for i, solID := range grp {
 
-				fmt.Println("Group ", i)
 				sol := output_solutions[solID]
 
 				// we need to get the relevant component out

@@ -92,8 +92,6 @@ func ChooseChannel(vol *wunit.Volume, prms *LHProperties) (*wtype.LHChannelParam
 
 	v := vol.RawValue()
 
-	fmt.Println("HEADSSSSSSSSSSS loaded=", len(prms.HeadsLoaded))
-	fmt.Println("HEADSSSSSSSSSSS options=", prms.HeadsLoaded)
 	for _, head := range prms.HeadsLoaded {
 
 		minv := head.Params.Minvol.ConvertTo(vol.Unit())
@@ -124,7 +122,6 @@ func ChooseChannel(vol *wunit.Volume, prms *LHProperties) (*wtype.LHChannelParam
 			}
 		}
 		//headchosen = prms.Heads[0]
-		fmt.Println("HEAD chosen=", headchosen)
 	}
 
 	if headchosen == nil {
