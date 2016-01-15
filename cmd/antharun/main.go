@@ -30,6 +30,7 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"github.com/antha-lang/antha/microArch/equipmentManager"
 	"io/ioutil"
 	"log"
 	"os"
@@ -102,6 +103,7 @@ func run() error {
 	}
 
 	w, err := execute.Run(ctx, execute.Options{
+		FromEM:       equipmentManager.GetEquipmentManager(),
 		WorkflowData: wdata,
 		ParamData:    pdata,
 	})
