@@ -47,7 +47,7 @@ type AnthaLiquidHandler struct {
 	ID         string
 	Behaviours []equipment.Behaviour
 	Driver     liquidhandling.ExtendedLiquidhandlingDriver
-	properties *liquidhandling.LHProperties
+	Properties *liquidhandling.LHProperties
 	queue      map[wtype.ThreadID]*schedulerLiquidhandling.LHRequest
 	queueLock  sync.Mutex
 	completed  map[wtype.ThreadID]*schedulerLiquidhandling.LHRequest
@@ -80,7 +80,7 @@ func NewAnthaLiquidHandler(id string, d liquidhandling.ExtendedLiquidhandlingDri
 			*equipment.NewBehaviour(action.LH_CONFIG, ""),
 			*equipment.NewBehaviour(action.LH_END, ""),
 		},
-		properties: &prop,
+		Properties: &prop,
 		Driver:     d,
 		queue:      make(map[wtype.ThreadID]*schedulerLiquidhandling.LHRequest),
 		planner:    make(map[wtype.ThreadID]*schedulerLiquidhandling.Liquidhandler),
@@ -143,7 +143,7 @@ func (e *AnthaLiquidHandler) configRequest(actionDescription equipment.ActionDes
 		req = schedulerLiquidhandling.NewLHRequest()
 		req.BlockID = data.BlockID
 		req.Policies = liquidhandling.GetLHPolicyForTest()
-		lhplanner := schedulerLiquidhandling.Init(e.properties)
+		lhplanner := schedulerLiquidhandling.Init(e.Properties)
 
 		e.queue[data.BlockID.ThreadID] = req
 		e.planner[data.BlockID.ThreadID] = lhplanner
