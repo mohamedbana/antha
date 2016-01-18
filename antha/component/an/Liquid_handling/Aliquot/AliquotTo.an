@@ -1,5 +1,5 @@
-// variant of aliquot.an whereby the low level MixTo command is used to pipette by row  
-
+// Variant of Aliquot where the low level MixTo command is used to pipette by
+// row  
 protocol AliquotTo
 
 import (

@@ -8,6 +8,7 @@ import (
 
 var (
 	notStructOrValue = errors.New("not pointer to struct or map[string]interface{}")
+	duplicateField   = errors.New("duplicate field")
 	stringType       = reflect.TypeOf("")
 	zeroValue        reflect.Value
 )
@@ -16,12 +17,28 @@ var (
 // function parameters.
 type Value map[string]interface{}
 
-func makeValue(value reflect.Value) map[string]interface{} {
-	var m map[string]interface{}
+// Concatenate the fields of one value with another. Returns an error if one
+// value shares the same fields as another.
+func (a Value) Concat(b Value) (Value, error) {
+	r := make(Value)
+	for k, v := range a {
+		r[k] = v
+	}
+	for k, v := range b {
+		if _, seen := r[k]; seen {
+			return nil, duplicateField
+		}
+		r[k] = v
+	}
+	return r, nil
+}
+
+func makeValue(value reflect.Value) Value {
+	var m Value
 
 	switch value.Type().Kind() {
 	case reflect.Map:
-		m = make(map[string]interface{})
+		m = make(Value)
 		for _, key := range value.MapKeys() {
 			skey, ok := key.Interface().(string)
 			if ok {
@@ -29,7 +46,7 @@ func makeValue(value reflect.Value) map[string]interface{} {
 			}
 		}
 	case reflect.Struct:
-		m = make(map[string]interface{})
+		m = make(Value)
 		typ := value.Type()
 		for idx, l := 0, value.NumField(); idx < l; idx += 1 {
 			name := typ.Field(idx).Name
@@ -42,7 +59,7 @@ func makeValue(value reflect.Value) map[string]interface{} {
 	return m
 }
 
-func MakeValue(x interface{}) map[string]interface{} {
+func MakeValue(x interface{}) Value {
 	return makeValue(reflect.ValueOf(x))
 }
 
@@ -113,7 +130,7 @@ func nilable(v reflect.Value) bool {
 	return false
 }
 
-func assign(from, to interface{}, set bool) error {
+func assign(from, to interface{}, set, ignoreMissing bool) error {
 	toValue := reflect.ValueOf(to)
 	toFields, err := makeFields(toValue)
 	if err != nil {
@@ -133,7 +150,9 @@ func assign(from, to interface{}, set bool) error {
 		// from: interface{}, to: error), but it is always okay to set "to" to
 		// nil
 		toNil := nilable(v) && v.IsNil()
-		if !ok {
+		if !ok && ignoreMissing {
+			continue
+		} else if !ok {
 			return fmt.Errorf("missing field %q", name)
 		} else if fromT, toT := v.Type(), toV.Type(); !fromT.AssignableTo(toT) && !toNil {
 			return fmt.Errorf("field %q of type %s not assignable to type %s", name, fromT, toT)
@@ -162,11 +181,17 @@ func assign(from, to interface{}, set bool) error {
 // src field must be golang assignable to the dst field, and (3) the dst fields
 // must be golang settable (i.e., have an address).
 func AssignableTo(src, dst interface{}) error {
-	return assign(src, dst, false)
+	return assign(src, dst, false, false)
 }
 
 // Assign values from Value or struct to Value or struct. If src is not
 // AssignableTo dst, return an error.
 func Assign(src, dst interface{}) error {
-	return assign(src, dst, true)
+	return assign(src, dst, true, false)
+}
+
+// Assign some values from Value or struct to Value or struct. Like Assign
+// but ignore fields in src that are not present in dst.
+func AssignSome(src, dst interface{}) error {
+	return assign(src, dst, true, true)
 }

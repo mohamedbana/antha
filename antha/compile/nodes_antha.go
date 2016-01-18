@@ -35,7 +35,7 @@ func (p *compiler) anthaDecl(d *ast.AnthaDecl) {
 	switch d.Tok {
 	case token.STEPS, token.SETUP, token.REQUIREMENTS, token.ANALYSIS, token.VALIDATION:
 		ctx := new(anthaContext)
-		ctx.init(p.pkgName, d.Tok)
+		ctx.init(p.element, d.Tok)
 		p.anthaSig(d, ctx)
 	default:
 		panic("Bad anthaDecl")
@@ -69,11 +69,11 @@ type anthaContext struct {
 //	OUTPUTS
 
 var anthaSigs = map[token.Token]string{
-	token.STEPS:        `func _steps(_ctx context.Context, _input *Input_, _output *Output_)`,
-	token.REQUIREMENTS: `func _requirements()`,
-	token.SETUP:        `func _setup(_ctx context.Context, _input *Input_)`,
-	token.ANALYSIS:     `func _analysis(_ctx context.Context, _input *Input_, _output *Output_)`,
-	token.VALIDATION:   `func _validation(_ctx context.Context, _input *Input_, _output *Output_)`,
+	token.STEPS:        `func _{{.PkgName}}Steps(_ctx context.Context, _input *{{.PkgName}}Input, _output *{{.PkgName}}Output)`,
+	token.REQUIREMENTS: `func _{{.PkgName}}Requirements()`,
+	token.SETUP:        `func _{{.PkgName}}Setup(_ctx context.Context, _input *{{.PkgName}}Input)`,
+	token.ANALYSIS:     `func _{{.PkgName}}Analysis(_ctx context.Context, _input *{{.PkgName}}Input, _output *{{.PkgName}}Output)`,
+	token.VALIDATION:   `func _{{.PkgName}}Validation(_ctx context.Context, _input *{{.PkgName}}Input, _output *{{.PkgName}}Output)`,
 }
 
 // templates for any start lines in block

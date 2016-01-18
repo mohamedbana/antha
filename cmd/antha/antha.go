@@ -40,10 +40,9 @@ import (
 
 // execution variables
 var (
-	exitCode         = 0
-	fileSet          = token.NewFileSet() // per process FileSet
-	parserMode       parser.Mode
-	componentLibrary []string
+	exitCode   = 0
+	fileSet    = token.NewFileSet() // per process FileSet
+	parserMode parser.Mode
 )
 
 // parameters to control code formatting
@@ -99,22 +98,17 @@ func main() {
 	os.Exit(exitCode)
 }
 
-// Remove generated component lib files
-func removeComponentLib(dir, file string) error {
+// Remove files from dir with suffix
+func removeFiles(dir, suffix string) error {
 	fis, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return err
 	}
 	for _, v := range fis {
-		if !v.IsDir() {
+		if !strings.HasSuffix(v.Name(), suffix) {
 			continue
 		}
 		if err := os.RemoveAll(filepath.Join(dir, v.Name())); err != nil {
-			return err
-		}
-	}
-	if _, err := os.Stat(filepath.Join(dir, file)); err == nil {
-		if err := os.Remove(filepath.Join(dir, file)); err != nil {
 			return err
 		}
 	}
@@ -139,20 +133,7 @@ func (a *output) Init() error {
 		return err
 	}
 	a.outName = filepath.Base(p)
-	if err := removeComponentLib(p, a.outName+".go"); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (a *output) Write(components []string) error {
-	if len(components) == 0 {
-		return nil
-	}
-
-	var buf bytes.Buffer
-	compile.GenerateComponentLib(&buf, components, a.importPath, a.outName)
-	if err := ioutil.WriteFile(filepath.Join(a.OutDir, a.outName+".go"), buf.Bytes(), 0664); err != nil {
+	if err := removeFiles(p, "_.go"); err != nil {
 		return err
 	}
 	return nil
@@ -189,11 +170,10 @@ func anthaMain() error {
 	// try to parse standard input if no files or directories were passed in
 	if flag.NArg() == 0 {
 		if err := processFile(processFileOptions{
-			Filename:          "-",
-			In:                os.Stdin,
-			NormalizeOutPaths: true,
-			Stdin:             true,
-			OutDir:            *genOutDir,
+			Filename: "-",
+			In:       os.Stdin,
+			Stdin:    true,
+			OutDir:   *genOutDir,
 		}); err != nil {
 			return err
 		}
@@ -212,9 +192,8 @@ func anthaMain() error {
 					// TODO this might be an issue since we have to analyse the contents in
 					// order to establish whether more than one component exist
 					err = processFile(processFileOptions{
-						Filename:          path,
-						NormalizeOutPaths: true,
-						OutDir:            *genOutDir,
+						Filename: path,
+						OutDir:   *genOutDir,
 					})
 					if err != nil {
 						report(err)
@@ -224,18 +203,14 @@ func anthaMain() error {
 			})
 		default:
 			if err := processFile(processFileOptions{
-				Filename:          path,
-				NormalizeOutPaths: true,
-				OutDir:            *genOutDir,
+				Filename: path,
+				OutDir:   *genOutDir,
 			}); err != nil {
 				return err
 			}
 		}
 	}
 
-	if err := o.Write(componentLibrary); err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -259,11 +234,10 @@ func mkdirp(dir string) error {
 }
 
 type processFileOptions struct {
-	Filename          string
-	In                io.Reader
-	Stdin             bool
-	OutDir            string // empty string means output to same directory as Filename (this is incompatible with NormalizeOutPaths)
-	NormalizeOutPaths bool
+	Filename string
+	In       io.Reader
+	Stdin    bool
+	OutDir   string // empty string means output to same directory as Filename
 }
 
 // If in == nil, the source is the contents of the file with the given filename.
@@ -291,35 +265,21 @@ func processFile(opt processFileOptions) error {
 	if file.Tok != token.PROTOCOL {
 		return fmt.Errorf("%s is not a valid Antha file", opt.Filename)
 	}
+	// Extract protocol name
+	compName := file.Name.Name
 
-	ast.SortImports(fileSet, file)
-
-	// XXX: why do we need to repeat parse?
 	var buf bytes.Buffer
-	compiler := &compile.Config{Mode: printerMode, Tabwidth: tabWidth}
-	//TODO probably here is a good fit for a one compiler.init execution
-	err = compiler.Fprint(&buf, fileSet, file)
-	if err != nil {
+	compiler := &compile.Config{Mode: printerMode, Tabwidth: tabWidth, Package: filepath.Base(opt.OutDir)}
+	if err := compiler.Fprint(&buf, fileSet, file); err != nil {
 		return err
 	}
 	res := buf.Bytes()
 	if adjust != nil {
 		res = adjust(src, res)
 	}
-	file, adjust, err = parse(fileSet, opt.Filename, src, opt.Stdin)
-	if err != nil {
-		return err
-	}
 
-	compName := compiler.GetComponentName(fileSet, file)
-	componentLibrary = append(componentLibrary, compName)
-
-	outDir := opt.OutDir
-	outRootName := strings.TrimSuffix(filepath.Base(opt.Filename), ".an")
-	if opt.NormalizeOutPaths {
-		outDir = filepath.Join(outDir, compName)
-	}
-	if err := write(opt.Filename, outDir, outRootName+".go", res); err != nil {
+	outFile := fmt.Sprintf("%s_.go", compName)
+	if err := write(opt.Filename, opt.OutDir, outFile, res); err != nil {
 		return err
 	}
 
