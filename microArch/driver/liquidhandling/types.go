@@ -460,10 +460,9 @@ func (lhp *LHProperties) GetCleanTips(tiptype string, channel *wtype.LHChannelPa
 
 	foundit := false
 
-	// reverse order
-	//	for _, pos := range lhp.Tip_preferences {
-	for i := len(lhp.Tip_preferences) - 1; i >= 0; i-- {
-		pos := lhp.Tip_preferences[i]
+	for _, pos := range lhp.Tip_preferences {
+		//	for i := len(lhp.Tip_preferences) - 1; i >= 0; i-- {
+		//		pos := lhp.Tip_preferences[i]
 		bx, ok := lhp.Tipboxes[pos]
 		if !ok || bx.Tiptype.Type != tiptype {
 			continue
