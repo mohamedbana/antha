@@ -42,6 +42,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/Scarfree_design"
 	"github.com/antha-lang/antha/antha/component/lib/Scarfree_siteremove_orfcheck"
 	"github.com/antha-lang/antha/antha/component/lib/SumVolume"
+	"github.com/antha-lang/antha/antha/component/lib/Test"
 	"github.com/antha-lang/antha/antha/component/lib/Thawtime"
 	"github.com/antha-lang/antha/antha/component/lib/Transfer"
 	"github.com/antha-lang/antha/antha/component/lib/Transformation"
@@ -106,6 +107,7 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "TypeIISConstructAssembly_alt", Constructor: TypeIISConstructAssembly_alt.New})
 	c = append(c, ComponentDesc{Name: "TypeIISConstructAssemblyMMX", Constructor: TypeIISConstructAssemblyMMX.New})
 	c = append(c, ComponentDesc{Name: "TypeIISConstructAssembly_sim", Constructor: TypeIISConstructAssembly_sim.New})
+	c = append(c, ComponentDesc{Name: "Test", Constructor: Test.New})
 	c = append(c, ComponentDesc{Name: "ProtocolName_from_an_file", Constructor: ProtocolName_from_an_file.New})
 	c = append(c, ComponentDesc{Name: "Evaporationrate", Constructor: Evaporationrate.New})
 	c = append(c, ComponentDesc{Name: "Kla", Constructor: Kla.New})

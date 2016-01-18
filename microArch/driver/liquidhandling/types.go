@@ -302,9 +302,9 @@ func NewLHProperties(num_positions int, model, manufacturer, lhtype, tiptype str
 
 func (lhp *LHProperties) AddTipBox(tipbox *wtype.LHTipbox) {
 
-	//for _, pref := range lhp.Tip_preferences {
-	for i := len(lhp.Tip_preferences) - 1; i >= 0; i-- {
-		pref := lhp.Tip_preferences[i]
+	//for i := len(lhp.Tip_preferences) - 1; i >= 0; i-- {
+	//	pref := lhp.Tip_preferences[i]
+	for _, pref := range lhp.Tip_preferences {
 		if lhp.PosLookup[pref] != "" {
 
 			//fmt.Println(pref, " ", lhp.PlateLookup[lhp.PosLookup[pref]])

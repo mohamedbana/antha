@@ -131,8 +131,10 @@ func ChooseChannel(vol *wunit.Volume, prms *LHProperties) (*wtype.LHChannelParam
 
 	// check if we need to change adaptor
 
+	logger.Debug(fmt.Sprintf("want vol %s min vol %s", vol.ToString(), headchosen.Adaptor.Params.Minvol.ToString()))
+
 	if headchosen.Adaptor.Params.Minvol.GreaterThan(vol) {
-		logger.Fatal(fmt.Sprintf("Handling volume %s is possible but an adaptor change is required first. This is not presently implemented. Sorry.", vol.ToString))
+		logger.Fatal(fmt.Sprintf("Handling volume %s is possible but an adaptor change is required first. This is not presently implemented. Sorry.", vol.ToString()))
 		panic("ADAPTOR CHANGE NEEDED BUT NOT IMPLEMENTED")
 	}
 
