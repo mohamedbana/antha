@@ -276,7 +276,9 @@ func sortKeys(m map[string]param) []string {
 // Collect information needed in downstream generation passes
 func (p *compiler) analyze(src *ast.File) {
 	p.desc = src.Doc.Text()
-	p.path = filepath.ToSlash(p.fset.File(src.Package).Name())
+	if f := p.fset.File(src.Package); f != nil {
+		p.path = filepath.ToSlash(f.Name())
+	}
 	p.element = strings.Title(src.Name.Name)
 
 	p.recordParams(src.Decls)
