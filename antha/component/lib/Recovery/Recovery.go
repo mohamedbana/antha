@@ -11,11 +11,14 @@ import (
 
 // Input parameters for this protocol (data)
 
+//Recoveryvolume wunit.Volume
 //= 2 (hours)
 
 // Data which is returned from this protocol, and data types
 
 // Physical Inputs to this protocol with types
+
+// Recoverymedium *wtype.LHComponent
 
 // Physical outputs from this protocol with types
 
@@ -32,11 +35,13 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 
 	recoverymix := make([]*wtype.LHComponent, 0)
 
-	transformedcellsComp := _input.Transformedcells
+	transformedcellsComp := mixer.Sample(_input.Transformedcells, _input.TransformedcellVolume)
 
-	recoverymixture := mixer.Sample(_input.Recoverymedium, _input.Recoveryvolume)
+	//recoverymixture := mixer.Sample(Recoverymedium, Recoveryvolume)
 
-	recoverymix = append(recoverymix, transformedcellsComp, recoverymixture)
+	recoverymix = append(recoverymix, transformedcellsComp)
+	//recoverymix = append(recoverymix,recoverymixture)
+
 	recoverymix2 := execute.MixInto(_ctx,
 
 		_input.OutPlate, recoverymix...)
@@ -93,13 +98,11 @@ type Element_ struct {
 }
 
 type Input_ struct {
-	AgarPlate        *wtype.LHPlate
-	OutPlate         *wtype.LHPlate
-	Recoverymedium   *wtype.LHComponent
-	Recoverytemp     wunit.Temperature
-	Recoverytime     wunit.Time
-	Recoveryvolume   wunit.Volume
-	Transformedcells *wtype.LHComponent
+	OutPlate              *wtype.LHPlate
+	Recoverytemp          wunit.Temperature
+	Recoverytime          wunit.Time
+	TransformedcellVolume wunit.Volume
+	Transformedcells      *wtype.LHComponent
 }
 
 type Output_ struct {

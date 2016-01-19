@@ -36,13 +36,13 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 
 	// deep square well 96
 	swshp := wtype.NewShape("box", "mm", 8.2, 8.2, 41.3)
-	welltype := wtype.NewLHWell("DSW96", "", "", "ul", 2000, 25, swshp, 3, 8.2, 8.2, 41.3, 4.7, "mm")
+	welltype := wtype.NewLHWell("DSW96", "", "", "ul", 1000, 100, swshp, 3, 8.2, 8.2, 41.3, 4.7, "mm")
 	plate := wtype.NewLHPlate("DSW96", "Unknown", 8, 12, 44.1, "mm", welltype, 9, 9, 0.0, 0.0, 0.0)
 	plates[plate.Type] = plate
 
 	// deep square well 96 on riser
 	swshp = wtype.NewShape("box", "mm", 8.2, 8.2, 41.3)
-	welltype = wtype.NewLHWell("DSW96", "", "", "ul", 2000, 25, swshp, 3, 8.2, 8.2, 41.3, 4.7, "mm")
+	welltype = wtype.NewLHWell("DSW96", "", "", "ul", 1000, 100, swshp, 3, 8.2, 8.2, 41.3, 4.7, "mm")
 	plate = wtype.NewLHPlate("DSW96_riser", "Unknown", 8, 12, 44.1, "mm", welltype, 9, 9, 0.0, 0.0, 40.0)
 	plates[plate.Type] = plate
 
