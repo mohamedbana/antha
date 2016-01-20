@@ -2,12 +2,12 @@
 package lib
 
 import (
-	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
-	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
+	"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
+	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
@@ -49,7 +49,8 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 	_output.UniqueComponents = make([]string, 0)
 
 	chosencolourpalette := image.AvailablePalettes[_input.Palettename]
-	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, chosencolourpalette)
+
+	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette)
 
 	if _input.UVimage {
 		uvmap := image.AvailableComponentmaps[_input.Palettename]
@@ -82,9 +83,8 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 
 		component := componentmap[colourtostringmap[colour]]
 
-		if component.Type == "dna" {
-			component.Type = "DoNotMix"
-		}
+		component.Type = "default"
+
 		fmt.Println(image.Colourcomponentmap[colour])
 
 		if _input.OnlythisColour != "" {
@@ -94,7 +94,7 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 				_output.UniqueComponents = append(_output.UniqueComponents, component.CName)
 
 				counter = counter + 1
-				fmt.Println("wells", counter)
+				fmt.Println("wells", _input.OnlythisColour, counter)
 				//mediaSample := mixer.SampleForTotalVolume(Media, VolumePerWell)
 				//components = append(components,mediaSample)
 				/*antibioticSample := mixer.Sample(Antibiotic, AntibioticVolume)
@@ -116,7 +116,7 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 				_output.UniqueComponents = append(_output.UniqueComponents, component.CName)
 
 				counter = counter + 1
-				fmt.Println("wells", counter)
+				fmt.Println("wells not ", _input.Notthiscolour, counter)
 				//mediaSample := mixer.SampleForTotalVolume(Media, VolumePerWell)
 				//components = append(components,mediaSample)
 				/*antibioticSample := mixer.Sample(Antibiotic, AntibioticVolume)
@@ -139,7 +139,7 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 	fmt.Println("Pixels =", _output.Numberofpixels)
 
 	_output.UniqueComponents = search.RemoveDuplicates(_output.UniqueComponents)
-	text.Print("Unique Components:", _output.UniqueComponents)
+	fmt.Println("Unique Components:", _output.UniqueComponents)
 	fmt.Println("number of unique components", len(_output.UniqueComponents))
 	_output.Pixels = solutions
 
