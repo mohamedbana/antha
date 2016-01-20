@@ -276,30 +276,63 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 	// fix some tips in place
 	// TODO this has to be sorted out
 	// SERIOUSLY
+
 	max_n_tipboxes := len(this.Properties.Tip_preferences)
 
 	fmt.Println("MAX N TIPBOXES: ", max_n_tipboxes)
 
+	//lowvolumetipboxes := 0
+	highvolumetipboxes := 0
+
 	for i := 0; i < max_n_tipboxes; i++ {
+
 		//		this.Properties.AddTipBox(request.Tip_Type.Dup())//TODO get this from where it comes, quick hack now!
 		//		this.Properties.AddTipBox(factory.GetTipboxByType("Gilson20"))
 
 		// XXX this needs attention: we shouldn't allow this HARD CODE
 		// in future we need to use the validation mechanism to trap this way earlier
 		// MARKED FOR DELETION --- THIS NOW IS HANDLED ELSEWHERE
+
 		if request.Tip_Type == nil || request.Tip_Type.GenericSolid == nil {
+
 			logger.Debug(fmt.Sprintf("LiquidHandling model is %q", this.Properties.Model))
 			if this.Properties.Model == "Pipetmax" {
-				// original
-				this.Properties.AddTipBox(factory.GetTipboxByType("Gilson20"))
 				this.Properties.Tips = make([]*wtype.LHTip, 1)
-				this.Properties.Tips[0] = factory.GetTipboxByType("Gilson20").Tiptype
+				//	if lowvolumetipboxes == 0 {
+				//		if i == 0 || i%2 == 0 {
+				this.Properties.AddTipBox(factory.GetTipboxByType("Gilson200"))
 
-				// larger vol
+				this.Properties.Tips[0] = factory.GetTipboxByType("Gilson200").Tiptype
+				//		lowvolumetipboxes = lowvolumetipboxes + 1
+				//			} else {
+				//				this.Properties.AddTipBox(factory.GetTipboxByType("Gilson20"))
+
+				//				this.Properties.Tips[0] = factory.GetTipboxByType("Gilson20").Tiptype
+				highvolumetipboxes = highvolumetipboxes + 1
+				//			}
+				//	}
+
+				/*	if highvolumetipboxes == 0 {
+					this.Properties.AddTipBox(factory.GetTipboxByType("Gilson200"))
+					this.Properties.Tips = make([]*wtype.LHTip, 1)
+					this.Properties.Tips[0] = factory.GetTipboxByType("Gilson200").Tiptype
+					highvolumetipboxes = highvolumetipboxes + 1
+				}*/
+				/*
+					// original
+					this.Properties.AddTipBox(factory.GetTipboxByType("Gilson20"))
+					this.Properties.Tips = make([]*wtype.LHTip, 1)
+					this.Properties.Tips[0] = factory.GetTipboxByType("Gilson20").Tiptype
+				*/
 				/*this.Properties.AddTipBox(factory.GetTipboxByType("Gilson200"))
 
-				this.Properties.Tips = make([]*wtype.LHTip, 1)
-				this.Properties.Tips[0] = factory.GetTipboxByType("Gilson200").Tiptype*/
+				this.Properties.Tips[1] = factory.GetTipboxByType("Gilson200").Tiptype*/
+
+				// larger vol
+				//this.Properties.AddTipBox(factory.GetTipboxByType("Gilson200"))
+
+				//this.Properties.Tips = make([]*wtype.LHTip, 1)
+				//this.Properties.Tips[0] = factory.GetTipboxByType("Gilson200").Tiptype
 			} else { //if this.Properties.Model == "GeneTheatre" { //TODO handle general case differently
 				this.Properties.AddTipBox(factory.GetTipboxByType("CyBio50Tipbox"))
 				this.Properties.Tips = make([]*wtype.LHTip, 1)

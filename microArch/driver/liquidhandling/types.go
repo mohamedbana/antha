@@ -29,6 +29,7 @@ import (
 
 	"github.com/antha-lang/antha/antha/anthalib/material"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	//"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
 )
 
@@ -302,6 +303,9 @@ func NewLHProperties(num_positions int, model, manufacturer, lhtype, tiptype str
 
 func (lhp *LHProperties) AddTipBox(tipbox *wtype.LHTipbox) {
 
+	fmt.Println("len(lhp.Tip_preferences)", len(lhp.Tip_preferences))
+
+	//	if len(lhp.Tip_preferences) < 3 {
 	for _, pref := range lhp.Tip_preferences {
 		if lhp.PosLookup[pref] != "" {
 
@@ -313,6 +317,26 @@ func (lhp *LHProperties) AddTipBox(tipbox *wtype.LHTipbox) {
 		lhp.AddTipBoxTo(pref, tipbox)
 		return
 	}
+
+	/*	} else {
+		fmt.Println("in else")
+		for i := len(lhp.Tip_preferences) - 1; i >= 0; i-- {
+			fmt.Println("i = ", i)
+
+			pref := lhp.Tip_preferences[i]
+			fmt.Println("pref = ", pref)
+			if lhp.PosLookup[pref] != "" {
+
+				//fmt.Println(pref, " ", lhp.PlateLookup[lhp.PosLookup[pref]])
+
+				continue
+			}
+
+			lhp.AddTipBoxTo(pref, tipbox)
+			return
+		}
+
+	}*/
 
 	// surely this should not be fatal
 	logger.Fatal("NO TIP SPACES LEFT")
@@ -474,6 +498,28 @@ func (lhp *LHProperties) GetCleanTips(tiptype string, channel *wtype.LHChannelPa
 		}
 	}
 
+	// deal with case of a clean deck here
+	/*
+		for _, pos := range lhp.Tip_preferences {
+			_, ok := lhp.Tipboxes[pos]
+
+			if !ok {
+				// this looks like a good empty slot, make a new tipbox and put it there
+				lhp.Tipboxes[pos] = factory.GetTipboxByType(tiptype)
+
+			}
+
+			bx := lhp.Tipboxes[pos]
+			wells = bx.GetTips(mirror, multi, channel.Orientation)
+			if wells != nil {
+				foundit = true
+				for i := 0; i < multi; i++ {
+					positions[i] = pos
+					boxtypes[i] = bx.Boxname
+				}
+				break
+			}
+		}*/
 	if !foundit {
 		return nil, nil, nil
 	}

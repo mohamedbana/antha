@@ -27,7 +27,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
 
+	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/internal/github.com/ghodss/yaml"
 )
@@ -54,9 +56,88 @@ func MakePolicies() map[string]LHPolicy {
 	pols["loadlow"] = MakeLoadPolicy()
 	pols["loadwater"] = MakeLoadWaterPolicy()
 	//      pols["lysate"] = MakeLysatePolicy()
-
+	policies, names := PolicyMaker(Allpairs, "DOE_run")
+	for i, policy := range policies {
+		pols[names[i]] = policy
+	}
 	return pols
 
+}
+
+var tipuse = DOEPair{"TIP_REUSE_LIMIT", []interface{}{0, 1}}
+var postmix = DOEPair{"POST_MIX", []interface{}{0, 3}}
+var postmixvol = DOEPair{"POST_MIX_VOLUME", []interface{}{50, 100}}
+var airdisp = DOEPair{"NO_AIR_DISPENSE", []interface{}{false, true}}
+var aspwait = DOEPair{"ASP_WAIT", []interface{}{0.0, 1.0}}
+var dspwait = DOEPair{"DSP_WAIT", []interface{}{0.0, 1.0}}
+var premix = DOEPair{"Pre_MIX", []interface{}{0, 3}}
+var asp = DOEPair{"ASP_SPEED", []interface{}{0.5, 2.0}}
+var dsp = DOEPair{"DSP_SPEED", []interface{}{0.5, 2.0}}
+var aspoff = DOEPair{"ASPZOFFSET", []interface{}{0, 0.5}}
+var dspoff = DOEPair{"DSPZOFFSET", []interface{}{0, 0.5}}
+var touch = DOEPair{"TOUCHOFF", []interface{}{false, true}}
+var blowout = DOEPair{"BLOWOUTVOLUME", []interface{}{1, 200}}
+var Allpairs = []DOEPair{ /*tipuse,*/ postmix /*postmixvol,*/, airdisp /*aspwait, dspwait,*/, premix, asp, dsp, aspoff, dspoff, touch, blowout}
+
+//var policies []LHPolicy = PolicyMaker([]string{"ASP_SPEED","DSP_SPEED","TOUCHOFF"},[][]interface{3.0,3.0,true})
+/*
+func PolicyMaker(factordescriptors []string, setpointsetsforeachdecriptorinorder [][]interface{}) (policies []LHPolicy) {
+
+	policies = make([]LHPolicy, 0)
+
+	for _, factor := range factordescriptors {
+		//pols[factor] = levels
+		defaultpolicy := make(LHPolicy, 10)
+		for _, setpoint := range setpointsetsforeachdecriptorinorder {
+			defaultpolicy[factor] = setpoint
+		}
+
+		/*defaultpolicy["DSP_SPEED"] = 3.0
+		defaultpolicy["TOUCHOFF"] = false
+		defaultpolicy["TOUCHOFFSET"] = 0.5
+		defaultpolicy["ASPREFERENCE"] = 0
+		defaultpolicy["ASPZOFFSET"] = 0.5
+		defaultpolicy["DSPREFERENCE"] = 0
+		defaultpolicy["DSPZOFFSET"] = 0.5
+		defaultpolicy["CAN_MULTI"] = false
+		defaultpolicy["CAN_MSA"] = false
+		defaultpolicy["CAN_SDD"] = true
+		defaultpolicy["TIP_REUSE_LIMIT"] = 100
+		defaultpolicy["BLOWOUTREFERENCE"] = 1
+		defaultpolicy["BLOWOUTOFFSET"] = -0.5
+		defaultpolicy["BLOWOUTVOLUME"] = 200.0
+		defaultpolicy["BLOWOUTVOLUMEUNIT"] = "ul"
+		defaultpolicy["PTZREFERENCE"] = 1
+		defaultpolicy["PTZOFFSET"] = -0.5
+		defaultpolicy["NO_AIR_DISPENSE"] = false
+		defaultpolicy["DEFAULTPIPETTESPEED"] = 1.0
+		defaultpolicy["MANUALPTZ"] = false
+		defaultpolicy["JUSTBLOWOUT"] = false
+		defaultpolicy["DONT_BE_DIRTY"] = true
+
+		policies = append(policies, defaultpolicy)
+
+	}
+	return
+}
+*/
+
+func PolicyMaker(factors []DOEPair, nameprepend string) (policies []LHPolicy, names []string) {
+
+	runs := AllCombinations(factors)
+	names = make([]string, 0)
+	policies = make([]LHPolicy, 0)
+
+	policy := make(LHPolicy, 0)
+	for i, run := range runs {
+		for j, desc := range run.Factordescriptors {
+			policy[desc] = run.Setpoints[j]
+		}
+		names = append(names, nameprepend+strconv.Itoa(i))
+		policies = append(policies, policy)
+	}
+
+	return
 }
 
 //func MakeLysatePolicy() LHPolicy {

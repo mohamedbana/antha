@@ -5,11 +5,13 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/AliquotTo"
 	"github.com/antha-lang/antha/antha/component/lib/Assaysetup"
 	"github.com/antha-lang/antha/antha/component/lib/BlastSearch"
+	"github.com/antha-lang/antha/antha/component/lib/BlastSearch_wtype"
 	"github.com/antha-lang/antha/antha/component/lib/Colony_PCR"
 	"github.com/antha-lang/antha/antha/component/lib/DNA_gel"
 	"github.com/antha-lang/antha/antha/component/lib/Datacrunch"
 	"github.com/antha-lang/antha/antha/component/lib/Evaporationrate"
 	"github.com/antha-lang/antha/antha/component/lib/FindPartsthat"
+	"github.com/antha-lang/antha/antha/component/lib/Inoculate"
 	"github.com/antha-lang/antha/antha/component/lib/Iterative_assembly_design"
 	"github.com/antha-lang/antha/antha/component/lib/Kla"
 	"github.com/antha-lang/antha/antha/component/lib/LoadGel"
@@ -26,6 +28,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/Phytip_miniprep"
 	"github.com/antha-lang/antha/antha/component/lib/PipetteImage"
 	"github.com/antha-lang/antha/antha/component/lib/PipetteImage_CMYK"
+	"github.com/antha-lang/antha/antha/component/lib/PipetteImage_Gray"
 	"github.com/antha-lang/antha/antha/component/lib/PipetteImage_living"
 	"github.com/antha-lang/antha/antha/component/lib/PlateOut"
 	"github.com/antha-lang/antha/antha/component/lib/Plotdata"
@@ -40,6 +43,7 @@ import (
 	"github.com/antha-lang/antha/antha/component/lib/SDSprep"
 	"github.com/antha-lang/antha/antha/component/lib/Scarfree_design"
 	"github.com/antha-lang/antha/antha/component/lib/Scarfree_siteremove_orfcheck"
+	"github.com/antha-lang/antha/antha/component/lib/ScreenLHPolicies"
 	"github.com/antha-lang/antha/antha/component/lib/SumVolume"
 	"github.com/antha-lang/antha/antha/component/lib/Thawtime"
 	"github.com/antha-lang/antha/antha/component/lib/Transfer"
@@ -60,6 +64,7 @@ type ComponentDesc struct {
 func GetComponents() []ComponentDesc {
 	c := make([]ComponentDesc, 0)
 	c = append(c, ComponentDesc{Name: "BlastSearch", Constructor: BlastSearch.New})
+	c = append(c, ComponentDesc{Name: "BlastSearch_wtype", Constructor: BlastSearch_wtype.New})
 	c = append(c, ComponentDesc{Name: "FindPartsthat", Constructor: FindPartsthat.New})
 	c = append(c, ComponentDesc{Name: "NewDNASequence", Constructor: NewDNASequence.New})
 	c = append(c, ComponentDesc{Name: "RemoveRestrictionSites", Constructor: RemoveRestrictionSites.New})
@@ -79,6 +84,8 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "Assaysetup", Constructor: Assaysetup.New})
 	c = append(c, ComponentDesc{Name: "Paintmix", Constructor: Paintmix.New})
 	c = append(c, ComponentDesc{Name: "DNA_gel", Constructor: DNA_gel.New})
+	c = append(c, ComponentDesc{Name: "Inoculate", Constructor: Inoculate.New})
+	c = append(c, ComponentDesc{Name: "ScreenLHPolicies", Constructor: ScreenLHPolicies.New})
 	c = append(c, ComponentDesc{Name: "LoadGel", Constructor: LoadGel.New})
 	c = append(c, ComponentDesc{Name: "MakeBuffer", Constructor: MakeBuffer.New})
 	c = append(c, ComponentDesc{Name: "Mastermix", Constructor: Mastermix.New})
@@ -90,6 +97,7 @@ func GetComponents() []ComponentDesc {
 	c = append(c, ComponentDesc{Name: "Phytip_miniprep", Constructor: Phytip_miniprep.New})
 	c = append(c, ComponentDesc{Name: "PipetteImage", Constructor: PipetteImage.New})
 	c = append(c, ComponentDesc{Name: "PipetteImage_CMYK", Constructor: PipetteImage_CMYK.New})
+	c = append(c, ComponentDesc{Name: "PipetteImage_Gray", Constructor: PipetteImage_Gray.New})
 	c = append(c, ComponentDesc{Name: "PipetteImage_living", Constructor: PipetteImage_living.New})
 	c = append(c, ComponentDesc{Name: "RestrictionDigestion_conc", Constructor: RestrictionDigestion_conc.New})
 	c = append(c, ComponentDesc{Name: "RestrictionDigestion", Constructor: RestrictionDigestion.New})

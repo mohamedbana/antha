@@ -752,6 +752,7 @@ func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms
 	pol := policy.GetPolicyFor(ins)
 	ret := make([]RobotInstruction, 0)
 	// get tips
+
 	channel, tiptype := ChooseChannel(ins.Volume[0], prms)
 	ret = append(ret, GetTips(tiptype, prms, channel, 1, false))
 	n_tip_uses := 0
@@ -3120,6 +3121,7 @@ func (mi *MixInstruction) OutputTo(driver LiquidhandlingDriver) {
 // TODO -- implement MESSAGE
 
 func GetTips(tiptype string, params *LHProperties, channel *wtype.LHChannelParameter, multi int, mirror bool) RobotInstruction {
+
 	tipwells, tipboxpositions, tipboxtypes := params.GetCleanTips(tiptype, channel, mirror, multi)
 
 	if tipwells == nil {
