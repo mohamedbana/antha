@@ -35,6 +35,7 @@ import (
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	i_3 "github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	pb "github.com/antha-lang/antha/microArch/equipment/manual/grpc/ExtendedLiquidhandlingDriver"
+	"github.com/antha-lang/antha/microArch/logger"
 )
 
 type Driver struct {

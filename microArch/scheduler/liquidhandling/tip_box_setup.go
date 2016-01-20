@@ -36,7 +36,6 @@ import (
 // INPUT: 	instructions
 //OUTPUT: 	arrays of tip boxes
 func (lh *Liquidhandler) Tip_box_setup(request *LHRequest) *LHRequest {
-	// MIS XXX TODO TODO TODO --- this whole thing needs re-thinking very carefully
 	tip_boxes := (*request).Tips
 	if len(tip_boxes) == 0 {
 		tip_boxes = make([]*wtype.LHTipbox, 0)
@@ -92,7 +91,6 @@ func (lh *Liquidhandler) Tip_box_setup(request *LHRequest) *LHRequest {
 	(*request).Tips = tip_boxes
 
 	// need to fix the tip situation in the properties structure
-
 	lh.Properties.RemoveTipBoxes()
 	for _, tb := range tip_boxes {
 		lh.Properties.AddTipBox(tb)

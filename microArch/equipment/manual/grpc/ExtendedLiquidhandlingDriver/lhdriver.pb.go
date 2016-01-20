@@ -183,8 +183,6 @@ It has these top-level messages:
 package ExtendedLiquidhandlingDriver
 
 import (
-	"fmt"
-
 	proto "github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto"
 )
 
