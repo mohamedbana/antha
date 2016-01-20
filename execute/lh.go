@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	noEquipmentManager = errors.New("no equipment manager configured")
-	cannotConfigLh     = errors.New("cannot configure liquid handler")
+	cannotConfigLh = errors.New("cannot configure liquid handler")
+	noLh           = errors.New("no liquid handler found")
 )
 
 type lhKey int
@@ -25,6 +25,14 @@ func getLh(ctx context.Context) equipment.Equipment {
 		return nil
 	}
 	return v
+}
+
+func getLhFromEm(em equipmentManager.EquipmentManager) (equipment.Equipment, error) {
+	lh := em.GetActionCandidate(*equipment.NewActionDescription(action.LH_MIX, "", nil))
+	if lh == nil {
+		return nil, noLh
+	}
+	return lh, nil
 }
 
 func getNumOrDef(x, def float64) float64 {
@@ -43,16 +51,7 @@ func getStrOrDef(x, def string) string {
 	return x
 }
 
-func newLHContext(parent context.Context, cdata *ConfigData) (context.Context, func(), error) {
-	em := equipmentManager.GetEquipmentManager()
-	if em == nil {
-		return nil, nil, noEquipmentManager
-	}
-	lh := em.GetActionCandidate(*equipment.NewActionDescription(action.LH_MIX, "", nil))
-	if lh == nil {
-		return nil, nil, noEquipmentManager
-	}
-
+func newLHContext(parent context.Context, lh equipment.Equipment, cdata *ConfigData) (context.Context, func(), error) {
 	// We are going to configure the liquid handler for a blockId. BlockId will
 	// give us the framework and state handling so, for a certain BlockId
 	// config options will be aggregated. Liquid Handler will just regenerate

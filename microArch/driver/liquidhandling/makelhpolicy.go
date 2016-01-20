@@ -371,6 +371,7 @@ func MakeLVExtraPolicy() LHPolicy {
 	lvep := make(LHPolicy, 2)
 	lvep["EXTRA_ASP_VOLUME"] = wunit.NewVolume(0.5, "ul")
 	lvep["EXTRA_DISP_VOLUME"] = wunit.NewVolume(0.5, "ul")
+	lvep["BLOWOUTVOLUME"] = 50.0
 	return lvep
 }
 

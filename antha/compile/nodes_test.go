@@ -408,6 +408,7 @@ func (t *t) foo(a, b, c int) int {
 // TextX is a skeleton test that can be filled in for debugging one-off cases.
 // Do not remove.
 func TestX(t *testing.T) {
+	t.Skip()
 	const src = `
 package p
 func _() {}

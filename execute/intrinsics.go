@@ -16,6 +16,18 @@ func Incubate(ctx context.Context, what *wtype.LHSolution, temp wunit.Temperatur
 	logger.Debug(fmt.Sprintln("INCUBATE: ", temp.ToString(), " ", time.ToString(), " shaking? ", shaking))
 }
 
+func Mix(ctx context.Context, components ...*wtype.LHComponent) *wtype.LHSolution {
+	reaction := mixer.Mix(components...)
+	reaction.BlockID = wtype.BlockID{ThreadID: wtype.ThreadID(getId(ctx))}
+	// XXX(ddn): if needed use arguments on params instead
+	//reaction.SName = w.getString("OutputReactionName")
+	if reqReaction, err := json.Marshal(reaction); err != nil {
+		panic(fmt.Sprintf("error coding reaction data, %v", err))
+	} else if err := getLh(ctx).Do(*equipment.NewActionDescription(action.LH_MIX, string(reqReaction), nil)); err != nil {
+		panic(fmt.Sprintf("error running liquid handling request: %s", err))
+	}
+	return reaction
+}
 func MixInto(ctx context.Context, outplate *wtype.LHPlate, components ...*wtype.LHComponent) *wtype.LHSolution {
 	reaction := mixer.MixInto(outplate, components...)
 	reaction.BlockID = wtype.BlockID{ThreadID: wtype.ThreadID(getId(ctx))}

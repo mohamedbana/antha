@@ -1180,26 +1180,41 @@ func (tb *LHTipbox) GetTips(mirror bool, multi, orient int) []string {
 		}
 
 	} else if orient == LHVChannel {
+		// find the first column with a contiguous set of at least multi
 		for i := 0; i < tb.Ncols; i++ {
 			c := 0
 			s := -1
-			for j := 0; j < tb.Nrows; j++ {
-				if tb.Tips[i][j] != nil && !tb.Tips[i][j].Dirty {
+			// if we're picking up < the maxium number of tips we need to be careful
+			// that there are no tips beneath the ones we're picking up
+
+			for j := tb.Nrows - 1; j >= 0; j-- {
+				if tb.Tips[i][j] != nil { // && !tb.Tips[i][j].Dirty
 					c += 1
 					if s == -1 {
 						s = j
+					}
+				} else {
+					if s != -1 {
+						break // we've reached a gap
 					}
 				}
 			}
 
 			if c >= multi {
-				ret = make([]string, multi)
-
-				for j := 0; j < multi; j++ {
-					tb.Tips[i][j+s] = nil
-					wc := WellCoords{i, j + s}
-					ret[j] = wc.FormatA1()
+				ret = make([]string, 0, multi)
+				n := 0
+				for j := s; j >= 0; j-- {
+					tb.Tips[i][j] = nil
+					wc := WellCoords{i, j}
+					fmt.Println(j, "Getting TIP from ", wc.FormatA1())
+					ret = append(ret, wc.FormatA1())
+					n += 1
+					if n >= multi {
+						break
+					}
 				}
+
+				fmt.Println("RET: ", ret)
 				break
 			}
 		}

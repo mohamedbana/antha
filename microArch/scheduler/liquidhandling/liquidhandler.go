@@ -54,6 +54,10 @@ import (
 // it indicates that this item in the request (e.g. a plate, stock etc.) is a specific
 // instance. If this is absent then the GUID will either be created or requested
 //
+
+// NB for flexibility we should not make the properties object part of this but rather
+// send it in as an argument
+
 type Liquidhandler struct {
 	Properties       *liquidhandling.LHProperties
 	SetupAgent       func(*LHRequest, *liquidhandling.LHProperties) *LHRequest
@@ -85,6 +89,10 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) *LHRequest {
 	f := func() {
 		this.Plan(request)
 		this.Execute(request)
+
+		// output some info on the final setup
+
+		OutputSetup(this.Properties)
 	}
 
 	this.Once.Do(f)
@@ -110,7 +118,7 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 	var d time.Duration
 
 	for _, ins := range instructions {
-		logger.Debug(fmt.Sprintln(liquidhandling.InsToString(ins)))
+		//		logger.Debug(fmt.Sprintln(liquidhandling.InsToString(ins)))
 		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(this.Properties.Driver)
 
 		if timer != nil {
@@ -472,4 +480,26 @@ func (this *Liquidhandler) ExecutionPlan(request *LHRequest) *LHRequest {
 	// this is quite involved, we need a strategy to do this
 
 	return this.ExecutionPlanner(request, this.Properties)
+}
+
+func OutputSetup(robot *liquidhandling.LHProperties) {
+	logger.Debug("DECK SETUP INFO")
+	logger.Debug("Tipboxes: ")
+
+	for k, v := range robot.Tipboxes {
+		logger.Debug(fmt.Sprintf("%s %s: %s", k, robot.PlateIDLookup[k], v.Type))
+	}
+
+	logger.Debug("Plates:")
+
+	for k, v := range robot.Plates {
+		logger.Debug(fmt.Sprintf("%s %s: %s", k, robot.PlateIDLookup[k], v.PlateName))
+	}
+
+	logger.Debug("Tipwastes: ")
+
+	for k, v := range robot.Tipwastes {
+		logger.Debug(fmt.Sprintf("%s %s: %s capacity %d", k, robot.PlateIDLookup[k], v.Type, v.Capacity))
+	}
+
 }

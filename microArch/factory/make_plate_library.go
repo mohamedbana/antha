@@ -127,6 +127,11 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 250, 5, cone, 0, 5.5, 5.5, 20.4, 1.4, "mm")
 	plate = wtype.NewLHPlate("pcrplate_with_incubater", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, (15.5 + 44.0))
 	plates[plate.Type] = plate
+	// pcr plate skirted
+	cone = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
+	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 200, 5, cone, 0, 5.5, 5.5, 20.4, 1.4, "mm")
+	plate = wtype.NewLHPlate("pcrplate_skirted", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 37.5)
+	plates[plate.Type] = plate
 
 	// Block Kombi 2ml
 	eppy := wtype.NewShape("cylinder", "mm", 8.2, 8.2, 45)

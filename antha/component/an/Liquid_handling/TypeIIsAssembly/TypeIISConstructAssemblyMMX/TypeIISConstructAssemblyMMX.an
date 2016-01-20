@@ -49,11 +49,6 @@ Steps {
 	samples := make([]*wtype.LHComponent, 0)
 	waterSample := mixer.SampleForTotalVolume(Water, ReactionVolume)
 	samples = append(samples, waterSample)
-
-	mmxSample:=mixer.Sample(MasterMix, MMXVol)
-	samples=append(samples, mmxSample)
-
-
 	for k, part := range Parts {
 		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", PartNames[k], " vol ", PartVols[k])
 		partSample := mixer.Sample(part, PartVols[k])
@@ -61,12 +56,19 @@ Steps {
 		samples = append(samples, partSample)
 	}
 
+	// Do MasterMix at the end ... this change was made to prevent enzymes hanging around with
+	// subsets of parts for any length of time
+
+	mmxSample:=mixer.Sample(MasterMix, MMXVol)
+	samples=append(samples, mmxSample)
+
 	Reaction = MixTo(OutPlate, OutputLocation, samples...)
 
 	// incubate the reaction mixture
-	Incubate(Reaction, ReactionTemp, ReactionTime, false)
+	// commented out pending changes to incubate
+	//Incubate(Reaction, ReactionTemp, ReactionTime, false)
 	// inactivate
-	Incubate(Reaction, InactivationTemp, InactivationTime, false)
+	//Incubate(Reaction, InactivationTemp, InactivationTime, false)
 }
 
 // Run after controls and a steps block are completed to
