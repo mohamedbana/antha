@@ -33,7 +33,7 @@ func _ScreenLHPoliciesSteps(_ctx context.Context, _input *ScreenLHPoliciesInput,
 
 	reactions := make([]*wtype.LHSolution, 0)
 
-	policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run")
+	policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run", false)
 
 	for k := 0; k < len(_input.TestSols); k++ {
 		for j := 0; j < _input.NumberofReplicates; j++ {

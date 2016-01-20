@@ -56,7 +56,7 @@ func MakePolicies() map[string]LHPolicy {
 	pols["loadlow"] = MakeLoadPolicy()
 	pols["loadwater"] = MakeLoadWaterPolicy()
 	//      pols["lysate"] = MakeLysatePolicy()
-	policies, names := PolicyMaker(Allpairs, "DOE_run")
+	policies, names := PolicyMaker(Allpairs, "DOE_run", false)
 	for i, policy := range policies {
 		pols[names[i]] = policy
 	}
@@ -77,7 +77,7 @@ var aspoff = DOEPair{"ASPZOFFSET", []interface{}{0.0, 0.5}}
 var dspoff = DOEPair{"DSPZOFFSET", []interface{}{0.0, 0.5}}
 var touch = DOEPair{"TOUCHOFF", []interface{}{false, true}}
 var blowout = DOEPair{"BLOWOUTVOLUME", []interface{}{1.0, 200.0}}
-var Allpairs = []DOEPair{ /*tipuse,*/ postmix, postmixvol, airdisp /*aspwait, dspwait,*/, premix, asp, dsp, aspoff, dspoff, touch /*blowout*/}
+var Allpairs = []DOEPair{ /*tipuse,*/ postmix, postmixvol, airdisp /*aspwait, dspwait,*/ /*, premix, asp, dsp, aspoff, dspoff, touch /*blowout*/}
 
 //var policies []LHPolicy = PolicyMaker([]string{"ASP_SPEED","DSP_SPEED","TOUCHOFF"},[][]interface{3.0,3.0,true})
 /*
@@ -122,7 +122,7 @@ func PolicyMaker(factordescriptors []string, setpointsetsforeachdecriptorinorder
 }
 */
 
-func PolicyMaker(factors []DOEPair, nameprepend string) (policies []LHPolicy, names []string) {
+func PolicyMaker(factors []DOEPair, nameprepend string, concatfactorlevelsinname bool) (policies []LHPolicy, names []string) {
 
 	runs := AllCombinations(factors)
 	names = make([]string, 0)
@@ -134,8 +134,20 @@ func PolicyMaker(factors []DOEPair, nameprepend string) (policies []LHPolicy, na
 		for j, desc := range run.Factordescriptors {
 			policy[desc] = run.Setpoints[j]
 		}
-		names = append(names, nameprepend+strconv.Itoa(i))
+
+		// raising runtime error when using concat == true
+		if concatfactorlevelsinname {
+			name := nameprepend
+			for key, value := range policy {
+				name = fmt.Sprint(name, "_", key, ":", value)
+
+			}
+			fmt.Println(name)
+		} else {
+			names = append(names, nameprepend+strconv.Itoa(i))
+		}
 		policies = append(policies, policy)
+		fmt.Println("len policy = ", len(policy))
 		policy = MakeDefaultPolicy()
 	}
 

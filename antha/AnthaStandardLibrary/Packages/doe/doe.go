@@ -5,32 +5,24 @@ import (
 	"fmt"
 )
 
-func MakePair(descriptor string, levels []interface{}) (doepair DOEPair) {
-
-	doepair.Factor = descriptor
-	doepair.Levels = levels
-
-	return
+type DOEPair struct {
+	Factor string
+	Levels []interface{}
 }
 
+func (pair DOEPair) LevelCount() (numberoflevels int) {
+	numberoflevels = len(pair.Levels)
+	return
+}
 func Pair(factordescription string, levels []interface{}) (doepair DOEPair) {
 	doepair.Factor = factordescription
 	doepair.Levels = levels
 	return
 }
 
-type DOEPair struct {
-	Factor string
-	Levels []interface{}
-}
 type Run struct {
 	Factordescriptors []string
 	Setpoints         []interface{}
-}
-
-func (pair DOEPair) LevelCount() (numberoflevels int) {
-	numberoflevels = len(pair.Levels)
-	return
 }
 
 func AllComboCount(pairs []DOEPair) (numberofuniquecombos int) {
