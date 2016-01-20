@@ -73,11 +73,11 @@ var dspwait = DOEPair{"DSP_WAIT", []interface{}{0.0, 1.0}}
 var premix = DOEPair{"Pre_MIX", []interface{}{0, 3}}
 var asp = DOEPair{"ASP_SPEED", []interface{}{0.5, 2.0}}
 var dsp = DOEPair{"DSP_SPEED", []interface{}{0.5, 2.0}}
-var aspoff = DOEPair{"ASPZOFFSET", []interface{}{0, 0.5}}
-var dspoff = DOEPair{"DSPZOFFSET", []interface{}{0, 0.5}}
+var aspoff = DOEPair{"ASPZOFFSET", []interface{}{0.0, 0.5}}
+var dspoff = DOEPair{"DSPZOFFSET", []interface{}{0.0, 0.5}}
 var touch = DOEPair{"TOUCHOFF", []interface{}{false, true}}
-var blowout = DOEPair{"BLOWOUTVOLUME", []interface{}{1, 200}}
-var Allpairs = []DOEPair{ /*tipuse,*/ postmix /*postmixvol,*/, airdisp /*aspwait, dspwait,*/, premix, asp, dsp, aspoff, dspoff, touch, blowout}
+var blowout = DOEPair{"BLOWOUTVOLUME", []interface{}{1.0, 200.0}}
+var Allpairs = []DOEPair{ /*tipuse,*/ postmix, postmixvol, airdisp /*aspwait, dspwait,*/, premix, asp, dsp, aspoff, dspoff, touch /*blowout*/}
 
 //var policies []LHPolicy = PolicyMaker([]string{"ASP_SPEED","DSP_SPEED","TOUCHOFF"},[][]interface{3.0,3.0,true})
 /*
@@ -128,13 +128,15 @@ func PolicyMaker(factors []DOEPair, nameprepend string) (policies []LHPolicy, na
 	names = make([]string, 0)
 	policies = make([]LHPolicy, 0)
 
-	policy := make(LHPolicy, 0)
+	//policy := make(LHPolicy, 0)
+	policy := MakeDefaultPolicy()
 	for i, run := range runs {
 		for j, desc := range run.Factordescriptors {
 			policy[desc] = run.Setpoints[j]
 		}
 		names = append(names, nameprepend+strconv.Itoa(i))
 		policies = append(policies, policy)
+		policy = MakeDefaultPolicy()
 	}
 
 	return
@@ -371,7 +373,6 @@ func MakeLVExtraPolicy() LHPolicy {
 	lvep := make(LHPolicy, 2)
 	lvep["EXTRA_ASP_VOLUME"] = wunit.NewVolume(0.5, "ul")
 	lvep["EXTRA_DISP_VOLUME"] = wunit.NewVolume(0.5, "ul")
-	lvep["BLOWOUTVOLUME"] = 50.0
 	return lvep
 }
 
