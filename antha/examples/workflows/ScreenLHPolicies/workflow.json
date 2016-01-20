@@ -1,0 +1,8 @@
+{
+    "connections": [],
+    "processes": {
+        "ScreenLHPolicies": {
+            "component": "ScreenLHPolicies"
+        }
+    }
+}
