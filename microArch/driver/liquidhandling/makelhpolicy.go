@@ -27,8 +27,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strconv"
 
+	antha "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/internal/github.com/ghodss/yaml"
@@ -56,28 +58,39 @@ func MakePolicies() map[string]LHPolicy {
 	pols["loadlow"] = MakeLoadPolicy()
 	pols["loadwater"] = MakeLoadWaterPolicy()
 	//      pols["lysate"] = MakeLysatePolicy()
-	policies, names := PolicyMaker(Allpairs, "DOE_run", false)
+
+	/*policies, names := PolicyMaker(Allpairs, "DOE_run", false)
 	for i, policy := range policies {
 		pols[names[i]] = policy
 	}
+	*/
+	policies, names, err := PolicyMakerfromDesign("LHPolicydesign.xlsx", "DOE_run")
+
+	for i, policy := range policies {
+		pols[names[i]] = policy
+	}
+	if err != nil {
+		panic(err)
+	}
+
 	return pols
 
 }
 
 var tipuse = DOEPair{"TIP_REUSE_LIMIT", []interface{}{0, 1}}
-var postmix = DOEPair{"POST_MIX", []interface{}{0, 3}}
-var postmixvol = DOEPair{"POST_MIX_VOLUME", []interface{}{50, 100}}
+var postmix = DOEPair{"POST_MIX", []interface{}{0, 2, 4}}
+var postmixvol = DOEPair{"POST_MIX_VOLUME", []interface{}{50, 75, 100}}
 var airdisp = DOEPair{"NO_AIR_DISPENSE", []interface{}{false, true}}
-var aspwait = DOEPair{"ASP_WAIT", []interface{}{0.0, 1.0}}
-var dspwait = DOEPair{"DSP_WAIT", []interface{}{0.0, 1.0}}
-var premix = DOEPair{"Pre_MIX", []interface{}{0, 3}}
-var asp = DOEPair{"ASP_SPEED", []interface{}{0.5, 2.0}}
-var dsp = DOEPair{"DSP_SPEED", []interface{}{0.5, 2.0}}
-var aspoff = DOEPair{"ASPZOFFSET", []interface{}{0.0, 0.5}}
-var dspoff = DOEPair{"DSPZOFFSET", []interface{}{0.0, 0.5}}
+var aspwait = DOEPair{"ASP_WAIT", []interface{}{0.0, 0.5, 1.0}}
+var dspwait = DOEPair{"DSP_WAIT", []interface{}{0.0, 0.5, 1.0}}
+var premix = DOEPair{"Pre_MIX", []interface{}{0, 2, 4}}
+var asp = DOEPair{"ASP_SPEED", []interface{}{0.5, 1.25, 2.0}}
+var dsp = DOEPair{"DSP_SPEED", []interface{}{0.5, 1.25, 2.0}}
+var aspoff = DOEPair{"ASPZOFFSET", []interface{}{0.0, 0.25, 0.5}}
+var dspoff = DOEPair{"DSPZOFFSET", []interface{}{0.0, 0.25, 0.5}}
 var touch = DOEPair{"TOUCHOFF", []interface{}{false, true}}
-var blowout = DOEPair{"BLOWOUTVOLUME", []interface{}{1.0, 200.0}}
-var Allpairs = []DOEPair{ /*tipuse,*/ postmix, postmixvol, airdisp /*aspwait, dspwait,*/ /*, premix, asp, dsp, aspoff, dspoff, touch /*blowout*/}
+var blowout = DOEPair{"BLOWOUTVOLUME", []interface{}{1.0, 100.5, 200.0}}
+var Allpairs = []DOEPair{tipuse, postmix, postmixvol, airdisp, aspwait, dspwait, premix, asp, dsp, aspoff, dspoff, touch, blowout}
 
 //var policies []LHPolicy = PolicyMaker([]string{"ASP_SPEED","DSP_SPEED","TOUCHOFF"},[][]interface{3.0,3.0,true})
 /*
@@ -122,9 +135,26 @@ func PolicyMaker(factordescriptors []string, setpointsetsforeachdecriptorinorder
 }
 */
 
+func PolicyMakerfromDesign(dxdesignfilename string, prepend string) (policies []LHPolicy, names []string, err error) {
+	runs, err := RunsFromDXDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), []string{"Pre_MIX", "POST_MIX"})
+	if err != nil {
+		return policies, names, err
+	}
+	policies, names = PolicyMakerfromRuns(runs, prepend, false)
+	return
+}
+
 func PolicyMaker(factors []DOEPair, nameprepend string, concatfactorlevelsinname bool) (policies []LHPolicy, names []string) {
 
 	runs := AllCombinations(factors)
+
+	policies, names = PolicyMakerfromRuns(runs, nameprepend, concatfactorlevelsinname)
+
+	return
+}
+
+func PolicyMakerfromRuns(runs []Run, nameprepend string, concatfactorlevelsinname bool) (policies []LHPolicy, names []string) {
+
 	names = make([]string, 0)
 	policies = make([]LHPolicy, 0)
 

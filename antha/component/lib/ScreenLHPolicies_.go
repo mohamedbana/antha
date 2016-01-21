@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -33,7 +34,13 @@ func _ScreenLHPoliciesSteps(_ctx context.Context, _input *ScreenLHPoliciesInput,
 
 	reactions := make([]*wtype.LHSolution, 0)
 
-	policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run", false)
+	//policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run",false)
+
+	//intfactors := []string{"Pre_MIX","POST_MIX"}
+	policies, names, err := liquidhandling.PolicyMakerfromDesign("LHPolicydesign.xlsx", "DOE_run")
+	if err != nil {
+		panic(err)
+	}
 
 	for k := 0; k < len(_input.TestSols); k++ {
 		for j := 0; j < _input.NumberofReplicates; j++ {
@@ -42,6 +49,7 @@ func _ScreenLHPoliciesSteps(_ctx context.Context, _input *ScreenLHPoliciesInput,
 				eachreaction := make([]*wtype.LHComponent, 0)
 
 				_input.Diluent.Type = names[i]
+				fmt.Println(_input.Diluent.Type)
 
 				bufferSample := mixer.SampleForTotalVolume(_input.Diluent, _input.TotalVolume)
 				eachreaction = append(eachreaction, bufferSample)

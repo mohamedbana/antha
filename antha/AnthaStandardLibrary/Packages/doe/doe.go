@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
 )
 
@@ -66,7 +67,7 @@ func AllCombinations(factors []DOEPair) (runs []Run) {
 	return
 }
 
-func RunsFromDXDesign(xlsx string) (runs []Run, err error) {
+func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) {
 	file, err := spreadsheet.OpenFile(xlsx)
 	if err != nil {
 		return runs, err
@@ -107,12 +108,22 @@ func RunsFromDXDesign(xlsx string) (runs []Run, err error) {
 
 				celltype := cell.Type()
 
-				if celltype == 1 {
-					setpoint, err = cell.Float()
-				} else if celltype == 3 {
-					setpoint = cell.Bool()
+				_, err := cell.Float()
+
+				if err == nil || celltype == 1 {
+					setpoint, _ = cell.Float()
+					if search.InSlice(descriptor, intfactors) {
+						setpoint, err = cell.Int()
+						if err != nil {
+							return runs, err
+						}
+					}
 				} else {
 					setpoint = cell.String()
+				}
+
+				if celltype == 3 {
+					setpoint = cell.Bool()
 				}
 				factordescriptors = append(factordescriptors, factrodescriptor)
 				setpoints = append(setpoints, setpoint)

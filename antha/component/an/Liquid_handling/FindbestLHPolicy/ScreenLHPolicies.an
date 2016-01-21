@@ -4,6 +4,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
+	"fmt"
 	//"strconv"
 )
 
@@ -13,6 +14,7 @@ Parameters (
 	TotalVolume Volume
 	TestSolVolume  Volume
 	NumberofReplicates int
+
 )
 
 // Data which is returned from this protocol, and data types
@@ -46,7 +48,13 @@ Steps {
 	
 	reactions := make([]*wtype.LHSolution,0)
 	
-	policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run",false)
+	//policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run",false)
+	
+	//intfactors := []string{"Pre_MIX","POST_MIX"}
+	policies, names,err := liquidhandling.PolicyMakerfromDesign("LHPolicydesign.xlsx", "DOE_run")
+	if err != nil{
+		panic(err)
+	}
 	
 	for k := 0; k< len(TestSols);k++{
 	for j:= 0; j< NumberofReplicates;j++{
@@ -55,6 +63,7 @@ Steps {
 		eachreaction := make([]*wtype.LHComponent, 0)
 		
 		Diluent.Type = names[i]
+		fmt.Println(Diluent.Type)
 		
 		bufferSample := mixer.SampleForTotalVolume(Diluent, TotalVolume)
 		eachreaction = append(eachreaction,bufferSample)
