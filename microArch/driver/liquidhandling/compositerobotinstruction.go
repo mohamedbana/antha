@@ -139,8 +139,6 @@ func ChooseChannel(vol *wunit.Volume, prms *LHProperties) (*wtype.LHChannelParam
 	}
 
 	// now get the requisite tip
-	// this is just a big bowl of wrong... </JeffGreene>
-	// need to make this more dependent on what's actually there
 	tiptype := ""
 	// get the closest to the min vol
 	d := 99999.0

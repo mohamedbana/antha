@@ -3026,7 +3026,6 @@ func (c *extendedLiquidhandlingDriverClient) GetCapabilities(ctx context.Context
 	out := new(GetCapabilitiesReply)
 	err := grpc.Invoke(ctx, "/ExtendedLiquidhandlingDriver.ExtendedLiquidhandlingDriver/GetCapabilities", in, out, c.cc, opts...)
 	if err != nil {
-		fmt.Println("THERE WAS AN ERROR: ", err)
 		return nil, err
 	}
 	return out, nil

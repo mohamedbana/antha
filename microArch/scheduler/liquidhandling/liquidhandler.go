@@ -199,7 +199,8 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 	request = output_plate_setup(request)
 
 	// next we need to determine the liquid handler setup
-	request = this.Setup(request)
+	// THIS DOES NOTHING --- needs deletion or fixing
+	//request = this.Setup(request)
 
 	// now make instructions
 	request = this.ExecutionPlan(request)
@@ -327,6 +328,7 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 	var waste *wtype.LHTipwaste
 	// again we don't want this to happen
 	// MARKED FOR DELETION... SHOULD BE HANDLED ELSEWHERE
+	// next addition for the list... just add tip wastes as needed
 	if this.Properties.Model == "Pipetmax" {
 		waste = factory.GetTipwasteByType("Gilsontipwaste")
 	} else { //if this.Properties.Model == "GeneTheatre" { //TODO handle general case differently
