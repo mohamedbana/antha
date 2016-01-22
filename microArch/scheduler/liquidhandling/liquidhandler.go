@@ -73,7 +73,7 @@ func Init(properties *liquidhandling.LHProperties) *Liquidhandler {
 	lh := Liquidhandler{}
 	lh.SetupAgent = BasicSetupAgent
 	lh.LayoutAgent = BasicLayoutAgent
-	lh.ExecutionPlanner = AdvancedExecutionPlanner2
+	lh.ExecutionPlanner = AdvancedExecutionPlanner
 	lh.Properties = properties
 	return &lh
 }
