@@ -12,7 +12,11 @@ import (
 
 // Input parameters for this protocol (data)
 
+//MMXVol					Volume
+
 // Physical Inputs to this protocol with types
+
+//	Water			*wtype.LHComponent
 
 // Physical outputs from this protocol with types
 
@@ -28,20 +32,18 @@ func _TypeIISConstructAssemblyMMXSetup(_ctx context.Context, _input *TypeIISCons
 // for every input
 func _TypeIISConstructAssemblyMMXSteps(_ctx context.Context, _input *TypeIISConstructAssemblyMMXInput, _output *TypeIISConstructAssemblyMMXOutput) {
 	samples := make([]*wtype.LHComponent, 0)
-	waterSample := mixer.SampleForTotalVolume(_input.Water, _input.ReactionVolume)
-	samples = append(samples, waterSample)
+	fmt.Println("FIRST")
+	//	waterSample := mixer.SampleForTotalVolume(Water, ReactionVolume)
+	mmxSample := mixer.SampleForTotalVolume(_input.MasterMix, _input.ReactionVolume)
+	samples = append(samples, mmxSample)
+
+	fmt.Println("SECOND")
 	for k, part := range _input.Parts {
 		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", _input.PartNames[k], " vol ", _input.PartVols[k])
 		partSample := mixer.Sample(part, _input.PartVols[k])
 		partSample.CName = _input.PartNames[k]
 		samples = append(samples, partSample)
 	}
-
-	// Do MasterMix at the end ... this change was made to prevent enzymes hanging around with
-	// subsets of parts for any length of time
-
-	mmxSample := mixer.Sample(_input.MasterMix, _input.MMXVol)
-	samples = append(samples, mmxSample)
 
 	_output.Reaction = execute.MixTo(_ctx, _input.OutPlate, _input.OutputLocation, samples...)
 
@@ -112,7 +114,6 @@ type TypeIISConstructAssemblyMMXElement struct {
 type TypeIISConstructAssemblyMMXInput struct {
 	InactivationTemp   wunit.Temperature
 	InactivationTime   wunit.Time
-	MMXVol             wunit.Volume
 	MasterMix          *wtype.LHComponent
 	OutPlate           *wtype.LHPlate
 	OutputLocation     string
@@ -124,7 +125,6 @@ type TypeIISConstructAssemblyMMXInput struct {
 	ReactionTemp       wunit.Temperature
 	ReactionTime       wunit.Time
 	ReactionVolume     wunit.Volume
-	Water              *wtype.LHComponent
 }
 
 type TypeIISConstructAssemblyMMXOutput struct {
@@ -148,8 +148,7 @@ func init() {
 			Params: []ParamDesc{
 				{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
 				{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
-				{Name: "MMXVol", Desc: "", Kind: "Parameters"},
-				{Name: "MasterMix", Desc: "", Kind: "Inputs"},
+				{Name: "MasterMix", Desc: "\tWater\t\t\t*wtype.LHComponent\n", Kind: "Inputs"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "OutputLocation", Desc: "", Kind: "Parameters"},
 				{Name: "OutputPlateNum", Desc: "", Kind: "Parameters"},
@@ -157,10 +156,9 @@ func init() {
 				{Name: "PartNames", Desc: "", Kind: "Parameters"},
 				{Name: "PartVols", Desc: "", Kind: "Parameters"},
 				{Name: "Parts", Desc: "", Kind: "Inputs"},
-				{Name: "ReactionTemp", Desc: "", Kind: "Parameters"},
+				{Name: "ReactionTemp", Desc: "MMXVol\t\t\t\t\tVolume\n", Kind: "Parameters"},
 				{Name: "ReactionTime", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionVolume", Desc: "", Kind: "Parameters"},
-				{Name: "Water", Desc: "", Kind: "Inputs"},
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
 			},
 		},
