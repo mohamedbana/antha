@@ -64,15 +64,16 @@ func MakePolicies() map[string]LHPolicy {
 		pols[names[i]] = policy
 	}
 	*/
-	policies, names, err := PolicyMakerfromDesign("LHPolicydesign.xlsx", "DOE_run")
+	if antha.Anthafileexists("ScreenLHPolicyDOE2.xlsx") {
+		policies, names, err := PolicyMakerfromDesign("ScreenLHPolicyDOE2.xlsx", "DOE_run")
 
-	for i, policy := range policies {
-		pols[names[i]] = policy
+		for i, policy := range policies {
+			pols[names[i]] = policy
+		}
+		if err != nil {
+			panic(err)
+		}
 	}
-	if err != nil {
-		panic(err)
-	}
-
 	return pols
 
 }
@@ -83,7 +84,7 @@ var postmixvol = DOEPair{"POST_MIX_VOLUME", []interface{}{50, 75, 100}}
 var airdisp = DOEPair{"NO_AIR_DISPENSE", []interface{}{false, true}}
 var aspwait = DOEPair{"ASP_WAIT", []interface{}{0.0, 0.5, 1.0}}
 var dspwait = DOEPair{"DSP_WAIT", []interface{}{0.0, 0.5, 1.0}}
-var premix = DOEPair{"Pre_MIX", []interface{}{0, 2, 4}}
+var premix = DOEPair{"PRE_MIX", []interface{}{0, 2, 4}}
 var asp = DOEPair{"ASP_SPEED", []interface{}{0.5, 1.25, 2.0}}
 var dsp = DOEPair{"DSP_SPEED", []interface{}{0.5, 1.25, 2.0}}
 var aspoff = DOEPair{"ASPZOFFSET", []interface{}{0.0, 0.25, 0.5}}
