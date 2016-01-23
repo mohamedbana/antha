@@ -1,0 +1,137 @@
+protocol ScreenLHPolicies_Awesome
+
+import (
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/mixer"
+	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
+
+	"fmt"
+	//"strconv"
+)
+
+
+// Input parameters for this protocol (data)
+Parameters (
+	TotalVolume Volume
+	TestSolVolumes []Volume
+	NumberofReplicates int
+	Imagefilename string
+
+)
+
+// Data which is returned from this protocol, and data types
+Data (
+	Runtowelllocationmap []string
+)
+
+
+// Physical Inputs to this protocol with types
+Inputs (
+	TestSols []*wtype.LHComponent
+	Diluent *wtype.LHComponent
+	OutPlate *wtype.LHPlate
+)
+
+// Physical outputs from this protocol with types
+Outputs (
+	Reactions []*wtype.LHSolution
+)
+
+Requirements {
+}
+
+// Conditions to run on startup
+Setup {
+}
+
+// The core process for this protocol, with the steps to be performed
+// for every input
+Steps {
+	
+	chosencolourpalette := image.AvailablePalettes["Palette1"]
+	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette) 
+	
+	Runtowelllocationmap = make([]string,0)
+	//	Runtowelllocationmap = make(map[string]string,0)
+
+	// work out well coordinates for any plate
+	wellpositionarray := make([]string, 0)
+
+
+	for location, colour := range positiontocolourmap {
+		R,G,B,A := colour.RGBA()
+		if uint8(R) != uint8(242) && uint8(G) !=uint8(243) && uint8(B) != uint8(242) && uint8(A) != uint8(255) {
+			wellpositionarray = append(wellpositionarray,location)
+		}
+	}
+	/*
+	//alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	alphabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+		"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
+		"Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"}
+	//k := 0
+	for j := 0; j < OutPlate.WlsY; j++ {
+		for i := 0; i < OutPlate.WlsX; i++ { //countingfrom1iswhatmakesushuman := j + 1
+			//k = k + 1
+			wellposition := string(alphabet[j]) + strconv.Itoa(i+1)
+			//fmt.Println(wellposition, k)
+			wellpositionarray = append(wellpositionarray, wellposition)
+		}
+
+	}
+	*/
+	reactions := make([]*wtype.LHSolution,0)
+	
+	//policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run",false)
+	
+	//intfactors := []string{"Pre_MIX","POST_MIX"}
+	policies, names,err := liquidhandling.PolicyMakerfromDesign("ScreenLHPolicyDOE2.xlsx", "DOE_run")
+	if err != nil{
+		panic(err)
+	}
+	
+	
+	
+	counter := 0
+	for l := 0; l < len(TestSolVolumes); l++ {
+	for k := 0; k< len(TestSols);k++{
+	for j:= 0; j< NumberofReplicates;j++{
+	for i := 0; i < len(policies); i++ {
+		
+		eachreaction := make([]*wtype.LHComponent, 0)
+		
+		Diluent.Type = names[i]
+		fmt.Println(Diluent.Type)
+		
+		bufferSample := mixer.SampleForTotalVolume(Diluent, TotalVolume)
+		eachreaction = append(eachreaction,bufferSample)
+		testSample := mixer.Sample(TestSols[k], TestSolVolumes[l])
+		
+		TestSols[k].Type = names[i]
+		
+		eachreaction = append(eachreaction,testSample)
+		reaction := MixTo(OutPlate,wellpositionarray[counter], eachreaction...)
+		fmt.Println("where am I?",wellpositionarray[counter])
+		Runtowelllocationmap= append(Runtowelllocationmap,Diluent.Type +":" + wellpositionarray[counter])
+		//Runtowelllocationmap[Diluent.Type]= wellpositionarray[counter]
+		reactions = append(reactions,reaction)
+	counter = counter + 1
+	}
+	}
+	}
+	}
+	Reactions = reactions
+	
+}
+
+// Run after controls and a steps block are completed to
+// post process any data and provide downstream results
+Analysis {
+}
+
+// A block of tests to perform to validate that the sample was processed correctly
+// Optionally, destructive tests can be performed to validate results on a
+// dipstick basis
+Validation {
+}
