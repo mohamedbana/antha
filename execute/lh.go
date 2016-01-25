@@ -8,24 +8,13 @@ import (
 	"github.com/antha-lang/antha/microArch/equipment"
 	"github.com/antha-lang/antha/microArch/equipment/action"
 	"github.com/antha-lang/antha/microArch/equipmentManager"
+	"github.com/antha-lang/antha/target"
 )
 
 var (
 	cannotConfigLh = errors.New("cannot configure liquid handler")
 	noLh           = errors.New("no liquid handler found")
 )
-
-type lhKey int
-
-const theLhKey lhKey = 0
-
-func getLh(ctx context.Context) equipment.Equipment {
-	v, ok := ctx.Value(theLhKey).(equipment.Equipment)
-	if !ok {
-		return nil
-	}
-	return v
-}
 
 func getLhFromEm(em equipmentManager.EquipmentManager) (equipment.Equipment, error) {
 	lh := em.GetActionCandidate(*equipment.NewActionDescription(action.LH_MIX, "", nil))
@@ -58,6 +47,7 @@ func newLHContext(parent context.Context, lh equipment.Equipment, cdata *ConfigD
 	// all state per this aggregation layer and that will allow us to run
 	// multiple protocols.
 	id := getId(parent)
+	// XXX: move to trace/run.go
 	config := make(map[string]interface{})
 	config["BLOCKID"] = wtype.BlockID{ThreadID: wtype.ThreadID(id)}
 	config["MAX_N_PLATES"] = getNumOrDef(cdata.MaxPlates, 4.5)
@@ -74,8 +64,8 @@ func newLHContext(parent context.Context, lh equipment.Equipment, cdata *ConfigD
 		return nil, nil, err
 	}
 
-	return context.WithValue(parent, theLhKey, lh),
-		func() {
-			lh.Do(*equipment.NewActionDescription(action.LH_END, id, nil))
-		}, nil
+	t := &target.Target{}
+	t.AddLiquidHandler(lh)
+
+	return target.WithTarget(parent, t), func() {}, nil
 }

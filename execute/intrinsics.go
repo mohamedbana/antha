@@ -1,55 +1,52 @@
 package execute
 
 import (
-	"encoding/json"
-	"fmt"
-	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
-	"github.com/antha-lang/antha/microArch/equipment"
-	"github.com/antha-lang/antha/microArch/equipment/action"
-	"github.com/antha-lang/antha/microArch/logger"
+	"github.com/antha-lang/antha/trace"
 )
 
-func Incubate(ctx context.Context, what *wtype.LHSolution, temp wunit.Temperature, time wunit.Time, shaking bool) {
-	logger.Debug(fmt.Sprintln("INCUBATE: ", temp.ToString(), " ", time.ToString(), " shaking? ", shaking))
+func Incubate(ctx context.Context, what *wtype.LHSolution, temp wunit.Temperature, time wunit.Time, shaking bool) *wtype.LHSolution {
+	sol := wtype.NewLHSolution()
+	trace.Issue(ctx, trace.MakeIncubate(trace.IncubateOpt{
+		BlockID:   getId(ctx),
+		OutputSol: sol,
+		Temp:      temp,
+		Time:      time,
+	}, trace.MakeValue(ctx, "", what)))
+	return sol
+}
+
+func mix(ctx context.Context, opt trace.MixOpt, components []*wtype.LHComponent) *wtype.LHSolution {
+	var values []trace.Value
+	for _, c := range components {
+		values = append(values, trace.MakeValue(ctx, "", c))
+	}
+
+	sol := wtype.NewLHSolution()
+	sol.BlockID = wtype.BlockID{ThreadID: wtype.ThreadID(getId(ctx))}
+	opt.OutputSol = sol
+
+	trace.Issue(ctx, trace.MakeMix(opt, values))
+
+	return sol
+
 }
 
 func Mix(ctx context.Context, components ...*wtype.LHComponent) *wtype.LHSolution {
-	reaction := mixer.Mix(components...)
-	reaction.BlockID = wtype.BlockID{ThreadID: wtype.ThreadID(getId(ctx))}
-	// XXX(ddn): if needed use arguments on params instead
-	//reaction.SName = w.getString("OutputReactionName")
-	if reqReaction, err := json.Marshal(reaction); err != nil {
-		panic(fmt.Sprintf("error coding reaction data, %v", err))
-	} else if err := getLh(ctx).Do(*equipment.NewActionDescription(action.LH_MIX, string(reqReaction), nil)); err != nil {
-		panic(fmt.Sprintf("error running liquid handling request: %s", err))
-	}
-	return reaction
+	return mix(ctx, trace.MixOpt{}, components)
 }
+
 func MixInto(ctx context.Context, outplate *wtype.LHPlate, components ...*wtype.LHComponent) *wtype.LHSolution {
-	reaction := mixer.MixInto(outplate, components...)
-	reaction.BlockID = wtype.BlockID{ThreadID: wtype.ThreadID(getId(ctx))}
-	// XXX(ddn): if needed use arguments on params instead
-	//reaction.SName = w.getString("OutputReactionName")
-	if reqReaction, err := json.Marshal(reaction); err != nil {
-		panic(fmt.Sprintf("error coding reaction data, %v", err))
-	} else if err := getLh(ctx).Do(*equipment.NewActionDescription(action.LH_MIX, string(reqReaction), nil)); err != nil {
-		panic(fmt.Sprintf("error running liquid handling request: %s", err))
-	}
-	return reaction
+	return mix(ctx, trace.MixOpt{
+		OutPlate: outplate,
+	}, components)
 }
 
 func MixTo(ctx context.Context, outplate *wtype.LHPlate, address string, components ...*wtype.LHComponent) *wtype.LHSolution {
-	reaction := mixer.MixTo(outplate, address, components...)
-	reaction.BlockID = wtype.BlockID{ThreadID: wtype.ThreadID(getId(ctx))}
-	// XXX(ddn): if needed use arguments on params instead
-	//reaction.SName = w.getString("OutputReactionName")
-	if reqReaction, err := json.Marshal(reaction); err != nil {
-		panic(fmt.Sprintf("error coding reaction data, %v", err))
-	} else if err := getLh(ctx).Do(*equipment.NewActionDescription(action.LH_MIX, string(reqReaction), nil)); err != nil {
-		panic(fmt.Sprintf("error running liquid handling request: %s", err))
-	}
-	return reaction
+	return mix(ctx, trace.MixOpt{
+		OutPlate: outplate,
+		Address:  address,
+	}, components)
 }

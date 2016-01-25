@@ -5,13 +5,14 @@
 package trace
 
 import (
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"sync"
 )
 
 type trace struct {
 	lock    sync.Mutex
-	issue   []instr
-	retired [][]instr
+	issue   []instp
+	retired [][]instp
 }
 
 func (a *trace) signal(lockedPool *poolCtx) error {
@@ -21,17 +22,22 @@ func (a *trace) signal(lockedPool *poolCtx) error {
 }
 
 func (a *trace) signalWithLock(lockedPool *poolCtx) error {
-	// XXX don't execute until all active all blocked
+	// Don't execute until all active all blocked
 	if lockedPool.alive == len(lockedPool.blocked) {
-		return a.execute()
+		return a.execute(lockedPool.Context)
 	}
 	return nil
 }
 
-func (a *trace) execute() error {
-	// XXX: Sort instructions
+func (a *trace) execute(ctx context.Context) error {
+	// TODO: Deterministic sort of instructions
+
+	if err := run(ctx, a.issue); err != nil {
+		return err
+	}
 
 	for _, v := range a.issue {
+		// TODO: Update this when clients actually use results of promises
 		v.promise.set(nil)
 		close(v.promise.out)
 	}

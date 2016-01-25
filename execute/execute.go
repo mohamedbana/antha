@@ -23,8 +23,9 @@ func getId(ctx context.Context) string {
 }
 
 type Options struct {
-	WorkflowData  []byte
-	ParamData     []byte
+	WorkflowData []byte
+	ParamData    []byte
+	// XXX: to remove
 	FromEM        em.EquipmentManager // Use equipment handler to find liquid handler
 	FromEquipment eq.Equipment        // Use equipment as liquid handler
 	Id            string
