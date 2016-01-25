@@ -77,7 +77,7 @@ func _BlastSearchSteps(_ctx context.Context, _input *BlastSearchInput, _output *
 
 	} //else {
 
-	_output.Hits = fmt.Sprintln(blast.HitSummary(hits))
+	//Hits = fmt.Sprintln(blast.HitSummary(hits))
 
 	// Rename Sequence with ID of top blast hit
 	AnthaSeq.Nm = hits[0].Id

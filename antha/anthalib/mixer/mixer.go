@@ -56,6 +56,30 @@ func Sample(l wtype.Liquid, v wunit.Volume) *wtype.LHComponent {
 	return ret
 }
 
+// take an array of samples and array of corresponding volumes and sample them all
+func MultiSample(l []wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent {
+	reta := make([]*wtype.LHComponent, 0)
+
+	for i, j := range l {
+		ret := wtype.NewLHComponent()
+		vi := v[i]
+		ret.CName = j.Name()
+		ret.Type = j.GetType()
+		ret.Vol = vi.RawValue()
+		ret.Vunit = vi.Unit().PrefixedSymbol()
+		ret.Extra = j.GetExtra()
+		ret.Smax = j.GetSmax()
+		ret.Visc = j.GetVisc()
+		if j.Container() != nil {
+			ret.LContainer = j.Container().(*wtype.LHWell)
+		}
+
+		reta = append(reta, ret)
+	}
+
+	return reta
+}
+
 // take a sample of this liquid and aim for a particular concentration
 func SampleForConcentration(l wtype.Liquid, c wunit.Concentration) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
@@ -91,14 +115,39 @@ func SampleMass(s wtype.Liquid, m wunit.Mass, d wunit.Density) *wtype.LHComponen
 	return ret
 }
 
-// take a sample of this liquid to be used to make the solution up to
+// take a sample ofs this liquid to be used to make the solution up to
 // a particular total volume
+// edited to take into account the volume of the other solution components
 func SampleForTotalVolume(l wtype.Liquid, v wunit.Volume) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
 	ret.CName = l.Name()
 	ret.Type = l.GetType()
 	ret.Tvol = v.RawValue()
 	ret.Vunit = v.Unit().PrefixedSymbol()
+	ret.LContainer = l.Container().(*wtype.LHWell)
+	ret.CName = l.Name()
+	ret.Extra = l.GetExtra()
+	ret.Smax = l.GetSmax()
+	ret.Visc = l.GetVisc()
+
+	return ret
+}
+
+// take a sample of this liquid to be used to make the solution up to
+// a particular total volume
+// edit of SampleForTotalVolume to take into account the volume of the other solution components
+func TopUpVolume(l wtype.Liquid, current []wunit.Volume, final wunit.Volume) *wtype.LHComponent {
+	tot := 0.0
+	for _, j := range current {
+		tot += j.RawValue()
+	}
+
+	v := final.RawValue() - tot
+	ret := wtype.NewLHComponent()
+	ret.CName = l.Name()
+	ret.Type = l.GetType()
+	ret.Tvol = v
+	ret.Vunit = final.Unit().PrefixedSymbol()
 	ret.LContainer = l.Container().(*wtype.LHWell)
 	ret.CName = l.Name()
 	ret.Extra = l.GetExtra()
