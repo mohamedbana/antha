@@ -131,6 +131,9 @@ func (e *AnthaLiquidHandler) configRequest(actionDescription equipment.ActionDes
 	var data struct {
 		BlockID wtype.BlockID
 	}
+
+	panic("OK SO WE ARE USING THIS... GOOD")
+
 	if err := json.Unmarshal([]byte(actionDescription.ActionData), &data); err != nil {
 		return err
 	}
@@ -161,6 +164,7 @@ func (e *AnthaLiquidHandler) configRequest(actionDescription equipment.ActionDes
 	// oh dear, this code is wronger than I had realised
 	// MIS fix here - only allow a single plate in here
 	if len(req.Input_platetypes) == 0 {
+		logger.Debug("HARD CODE FOR INPUT PLATETYPE ACTIVATED")
 		pwc := factory.GetPlateByType("pcrplate_with_cooler")
 		req.Input_platetypes = append(req.Input_platetypes, pwc)
 	}
@@ -185,6 +189,7 @@ func (e *AnthaLiquidHandler) sendMix(actionDescription equipment.ActionDescripti
 	if sol.Platetype != "" {
 		req.Output_platetype = factory.GetPlateByType(sol.Platetype)
 	} else {
+		logger.Debug("HARD CODE FOR OUTPUT PLATETYPE ACTIVATED")
 		req.Output_platetype = factory.GetPlateByType("pcrplate_with_cooler")
 	}
 	req.Output_solutions[sol.ID] = &sol

@@ -63,13 +63,20 @@ func newLHContext(parent context.Context, lh equipment.Equipment, cdata *ConfigD
 	config["MAX_N_PLATES"] = getNumOrDef(cdata.MaxPlates, 4.5)
 	config["MAX_N_WELLS"] = getNumOrDef(cdata.MaxWells, 278.0)
 	config["RESIDUAL_VOLUME_WEIGHT"] = getNumOrDef(cdata.ResidualVolumeWeight, 1.0)
-	config["INPUT_PLATETYPE"] = getStrOrDef(cdata.InputPlateType, "pcrplate_with_cooler")
-	config["OUTPUT_PLATETYPE"] = getStrOrDef(cdata.OutputPlateType, "pcrplate_with_cooler")
+
+	var ipts, opts []string
+
+	ipts = append(ipts, "pcrplate_skirted")
+	opts = append(opts, "pcrplate_skirted")
+
+	config["INPUT_PLATETYPE"] = ipts
+	config["OUTPUT_PLATETYPE"] = opts
 
 	configString, err := json.Marshal(config)
 	if err != nil {
 		return nil, nil, cannotConfigLh
 	}
+
 	if err := lh.Do(*equipment.NewActionDescription(action.LH_CONFIG, string(configString), nil)); err != nil {
 		return nil, nil, err
 	}

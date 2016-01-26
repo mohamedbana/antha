@@ -28,6 +28,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/microArch/factory"
+	"github.com/antha-lang/antha/microArch/logger"
 )
 
 //  TASK: 	define output plates
@@ -36,8 +37,9 @@ import (
 //		"output_assignments" -- map with arrays of assignment strings, i.e. {tea: [plate1:A:1, plate1:A:2...] }etc.
 func output_plate_setup(request *LHRequest) *LHRequest {
 	//(map[string]*wtype.LHPlate, map[string][]string) {
-	output_platetype := (*request).Output_platetype
-	if output_platetype == nil || output_platetype.ID == "" {
+	output_platetype := (*request).Output_platetypes
+	if output_platetype == nil || len(output_platetype) == 0 {
+		logger.Debug(fmt.Sprint(output_platetype, " ", len(output_platetype)))
 		wutil.Error(errors.New("plate_setup: No output plate type defined"))
 	}
 
@@ -52,13 +54,19 @@ func output_plate_setup(request *LHRequest) *LHRequest {
 		output_plates = make(map[string]*wtype.LHPlate, len(request.Output_major_group_layouts))
 	}
 
+	//
+
 	// just assign based on number of groups
 
 	opl := request.Output_plate_layout
 
 	for i := 0; i < len(request.Output_major_group_layouts); i++ {
 		//p := wtype.New_Plate(request.Output_platetype)
-		p := factory.GetPlateByType(request.Output_platetype.Type)
+		//p := factory.GetPlateByType(request.Output_platetype.Type)
+		mgl := request.Output_major_group_layouts[i]
+		logger.Debug("I: ", i, " MGL: ", mgl)
+		//p := factory.GetPlateByType(output_platetype[mgl])
+		p := factory.GetPlateByType(output_platetype[0].Type)
 		output_plates[p.ID] = p
 		opl[i] = p.ID
 		name := fmt.Sprintf("Output_plate_%d", i+1)

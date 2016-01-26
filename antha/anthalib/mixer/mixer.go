@@ -136,6 +136,9 @@ func SampleForTotalVolume(l wtype.Liquid, v wunit.Volume) *wtype.LHComponent {
 // take a sample of this liquid to be used to make the solution up to
 // a particular total volume
 // edit of SampleForTotalVolume to take into account the volume of the other solution components
+// XXX -- MIS that's precisely what the function above does, if there's an error we need to fix that
+// rather than adding a new function
+// this will be deleted shortly
 func TopUpVolume(l wtype.Liquid, current []wunit.Volume, final wunit.Volume) *wtype.LHComponent {
 	tot := 0.0
 	for _, j := range current {
@@ -228,7 +231,10 @@ func MixInto(destination *wtype.LHPlate, components ...*wtype.LHComponent) *wtyp
 
 	ret.ContainerType = destination.Type
 	ret.Platetype = destination.Type
-
+	// if we have an ID for the plate we fill this in as well
+	if destination.Inst != "" {
+		ret.PlateID = destination.ID
+	}
 	ret.Components = components
 
 	// this translates to the component ordering in the resulting solution
@@ -251,6 +257,9 @@ func MixTo(destination *wtype.LHPlate, address string, components ...*wtype.LHCo
 
 	ret.ContainerType = destination.Type
 	ret.Platetype = destination.Type
+	if destination.Inst != "" {
+		ret.PlateID = destination.ID
+	}
 	ret.Welladdress = address
 	ret.Components = components
 

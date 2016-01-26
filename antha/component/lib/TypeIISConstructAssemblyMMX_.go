@@ -32,12 +32,10 @@ func _TypeIISConstructAssemblyMMXSetup(_ctx context.Context, _input *TypeIISCons
 // for every input
 func _TypeIISConstructAssemblyMMXSteps(_ctx context.Context, _input *TypeIISConstructAssemblyMMXInput, _output *TypeIISConstructAssemblyMMXOutput) {
 	samples := make([]*wtype.LHComponent, 0)
-	fmt.Println("FIRST")
 	//	waterSample := mixer.SampleForTotalVolume(Water, ReactionVolume)
 	mmxSample := mixer.SampleForTotalVolume(_input.MasterMix, _input.ReactionVolume)
 	samples = append(samples, mmxSample)
 
-	fmt.Println("SECOND")
 	for k, part := range _input.Parts {
 		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", _input.PartNames[k], " vol ", _input.PartVols[k])
 		partSample := mixer.Sample(part, _input.PartVols[k])

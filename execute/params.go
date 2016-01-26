@@ -45,8 +45,9 @@ type ConfigData struct {
 	MaxPlates            float64
 	MaxWells             float64
 	ResidualVolumeWeight float64
-	InputPlateType       string
-	OutputPlateType      string
+	InputPlateType       []string
+	OutputPlateType      []string
+	PlanningVersion      int
 }
 
 // Structure of parameter data for unmarshalling

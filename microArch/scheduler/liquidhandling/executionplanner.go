@@ -356,15 +356,10 @@ func sortOutputOrder(minorlayoutgroups [][]string, ass []string, sorttype int) (
 	mlg2 := make([][]string, len(minorlayoutgroups))
 
 	for x, a := range minorlayoutgroups {
-		for _, b := range a {
-			fmt.Println("MLGGGG::: ", b)
-		}
 		mlg2[x] = a
 	}
 
 	for i, v := range ass {
-		tx := strings.Split(v, ":")
-		fmt.Println("TX: ", tx)
 		a2[i] = v
 	}
 

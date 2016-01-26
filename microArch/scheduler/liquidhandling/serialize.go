@@ -57,7 +57,7 @@ type SLHRequest struct {
 	Input_major_group_layouts  map[string][]string
 	Input_minor_group_layouts  [][]string
 	Input_plate_layout         map[string]string
-	Output_platetype           *wtype.LHPlate
+	Output_platetypes          []*wtype.LHPlate
 	Output_major_group_layouts map[string][]string
 	Output_minor_group_layouts [][]string
 	Output_plate_layout        map[string]string
@@ -89,7 +89,7 @@ func (req *LHRequest) MarshalJSON() ([]byte, error) {
 		new_output_plate_layout[strconv.Itoa(k)] = v
 	}
 
-	slhr := SLHRequest{req.ID, req.Output_solutions, req.Input_solutions, req.Plates, req.Tips, req.Locats, req.Setup, req.InstructionSet, req.Instructions, req.Robotfn, req.Input_assignments, req.Output_plates, req.Input_platetypes, new_input_major_layouts, req.Input_minor_group_layouts, new_input_plate_layout, req.Output_platetype, new_output_major_layouts, req.Output_minor_group_layouts, new_output_plate_layout, req.Plate_lookup, req.Stockconcs, req.Policies}
+	slhr := SLHRequest{req.ID, req.Output_solutions, req.Input_solutions, req.Plates, req.Tips, req.Locats, req.Setup, req.InstructionSet, req.Instructions, req.Robotfn, req.Input_assignments, req.Output_plates, req.Input_platetypes, new_input_major_layouts, req.Input_minor_group_layouts, new_input_plate_layout, req.Output_platetypes, new_output_major_layouts, req.Output_minor_group_layouts, new_output_plate_layout, req.Plate_lookup, req.Stockconcs, req.Policies}
 
 	return json.Marshal(slhr)
 }
