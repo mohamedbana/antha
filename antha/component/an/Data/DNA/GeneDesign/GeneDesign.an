@@ -1,0 +1,67 @@
+protocol GeneDesign
+
+import (
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
+	"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/export"
+)
+
+Parameters (
+	Parts []string
+	Vector string
+	RE string
+)
+Data (
+	// input seq
+	Sequence string
+	// output parts with correct overhangs
+	PartsWithOverhangs []wtype.DNASequence
+)
+
+Inputs (
+)
+
+Outputs (
+)
+
+Requirements {
+}
+
+Setup {
+} 
+
+Steps {
+	PartDNA := make([]wtype.DNASequence, 4)
+	
+	// Retrieve part seqs from iGem repository
+	for i, part := range Parts {
+		DNAString := igem.GetSequence(part)
+		PartDNA[i] = wtype.MakeLinearDNASequence(part, DNAString)
+	}
+	
+	// Look up sequence of the desired vector and restriction enzyme
+	VectorSeq := Inventory.Partslist[Vector]
+	EnzymeInf, _ := lookup.TypeIIsLookup(RE)
+	
+	// Add overhangs
+	PartsWithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(PartDNA, VectorSeq, EnzymeInf)
+	
+	// export sequence to fasta
+	export.Makefastaserial2("MarksConstruct", PartsWithOverhangs)
+	
+	}
+	
+Analysis {
+	
+} 
+
+Validation {
+	assembly := enzymes.Assemblyparameters{"MarksConstruct", RE, Inventory.Partslist[Vector], PartsWithOverhangs}
+	Status, _, _, _, _ := enzymes.Assemblysimulator(assembly)
+	fmt.Println(Status)
+}
+
