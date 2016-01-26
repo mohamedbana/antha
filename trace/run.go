@@ -30,7 +30,7 @@ func configMix(inst *MixInst) (*wtype.LHSolution, error) {
 	return r, nil
 }
 
-func runMix(ctx context.Context, blockIds map[string]bool, inst *MixInst) error {
+func runMix(ctx context.Context, blockIds map[wtype.BlockID]bool, inst *MixInst) error {
 	if t, err := target.GetTarget(ctx); err != nil {
 		return err
 	} else if lh, err := t.GetLiquidHandler(); err != nil {
@@ -42,13 +42,13 @@ func runMix(ctx context.Context, blockIds map[string]bool, inst *MixInst) error 
 	} else if err := lh.Do(*equipment.NewActionDescription(action.LH_MIX, string(rbs), nil)); err != nil {
 		return err
 	} else {
-		id := inst.Opt.OutputSol.BlockID.ThreadID.String()
+		id := inst.Opt.OutputSol.BlockID
 		blockIds[id] = true
 		return nil
 	}
 }
 
-func runIn(ctx context.Context, blockIds map[string]bool, in instp) (err error) {
+func runIn(ctx context.Context, blockIds map[wtype.BlockID]bool, in instp) (err error) {
 	switch inst := in.inst.(type) {
 	case nil:
 	case *MixInst:
@@ -62,13 +62,13 @@ func runIn(ctx context.Context, blockIds map[string]bool, in instp) (err error) 
 	return err
 }
 
-func runEnd(ctx context.Context, blockId string) error {
+func runEnd(ctx context.Context, blockId wtype.BlockID) error {
 	if t, err := target.GetTarget(ctx); err != nil {
 		return err
 	} else if lh, err := t.GetLiquidHandler(); err != nil {
 		return err
 	} else {
-		return lh.Do(*equipment.NewActionDescription(action.LH_END, blockId, nil))
+		return lh.Do(*equipment.NewActionDescription(action.LH_END, blockId.String(), nil))
 	}
 }
 
@@ -76,7 +76,7 @@ func runEnd(ctx context.Context, blockId string) error {
 //
 // XXX(ddn): place after code generation.
 func run(ctx context.Context, instps []instp) error {
-	blockIds := make(map[string]bool)
+	blockIds := make(map[wtype.BlockID]bool)
 	for _, in := range instps {
 		if err := runIn(ctx, blockIds, in); err != nil {
 			return err

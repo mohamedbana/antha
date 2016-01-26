@@ -61,7 +61,10 @@ func config(parent context.Context, lh equipment.Equipment, cd *ConfigData) erro
 
 	id := getId(parent)
 	cvalues := []cvalue{
-		cvalue{Key: "BLOCKID", A: wtype.BlockID{ThreadID: wtype.ThreadID(id)}, UseA: true},
+		cvalue{Key: "BLOCKID", A: wtype.NewBlockID(id), UseA: true},
+		// XXX(ddn): The parameters below are not commonly used by equipment,
+		// delete them to reduce confusion. For example, see
+		// github.com/antha-lang/antha/microArch/equipment/liquidHandler/liquidHandler.go#configRequest()
 		cvalue{Key: "MAX_N_PLATES", A: 4.5, B: cd.MaxPlates, UseA: cd.MaxPlates == 0.0},
 		cvalue{Key: "MAX_N_WELLS", A: 278.0, B: cd.MaxWells, UseA: cd.MaxWells == 0.0},
 		cvalue{Key: "RESIDUAL_VOLUME_WEIGHT", A: 1.0, B: cd.ResidualVolumeWeight, UseA: cd.ResidualVolumeWeight == 0.0},

@@ -25,7 +25,7 @@ func mix(ctx context.Context, opt trace.MixOpt, components []*wtype.LHComponent)
 	}
 
 	sol := wtype.NewLHSolution()
-	sol.BlockID = wtype.BlockID{ThreadID: wtype.ThreadID(getId(ctx))}
+	sol.BlockID = wtype.NewBlockID(getId(ctx))
 	opt.OutputSol = sol
 
 	trace.Issue(ctx, trace.MakeMix(opt, values))
