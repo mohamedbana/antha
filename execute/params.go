@@ -48,6 +48,7 @@ type ConfigData struct {
 	InputPlateType       []string
 	OutputPlateType      []string
 	PlanningVersion      int
+	WellByWell           bool
 }
 
 // Structure of parameter data for unmarshalling

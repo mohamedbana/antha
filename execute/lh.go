@@ -51,6 +51,16 @@ func getStrOrDef(x, def string) string {
 	return x
 }
 
+func getBoolOrDef(x, def bool) bool {
+	var defv bool
+
+	if x == defv {
+		return def
+	}
+
+	return x
+}
+
 func newLHContext(parent context.Context, lh equipment.Equipment, cdata *ConfigData) (context.Context, func(), error) {
 	// We are going to configure the liquid handler for a blockId. BlockId will
 	// give us the framework and state handling so, for a certain BlockId
@@ -71,6 +81,8 @@ func newLHContext(parent context.Context, lh equipment.Equipment, cdata *ConfigD
 
 	config["INPUT_PLATETYPE"] = ipts
 	config["OUTPUT_PLATETYPE"] = opts
+
+	config["WELLBYWELL"] = getBoolOrDef(cdata.WellByWell, false)
 
 	configString, err := json.Marshal(config)
 	if err != nil {

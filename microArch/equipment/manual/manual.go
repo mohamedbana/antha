@@ -413,6 +413,12 @@ func (e *AnthaManualGrpc) configRequest(actionDescription equipment.ActionDescri
 		}
 	}
 
+	_, ok = params["WELLBYWELL"]
+
+	if ok {
+		e.planner[data.BlockID.ThreadID].ExecutionPlanner = schedulerLiquidhandling.AdvancedExecutionPlanner2
+	}
+
 	return nil
 }
 func (e *AnthaManualGrpc) sendMix(actionDescription equipment.ActionDescription) error {
