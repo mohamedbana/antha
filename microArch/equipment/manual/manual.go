@@ -460,8 +460,12 @@ func (e *AnthaManualGrpc) Shutdown() error {
 func (e *AnthaManualGrpc) Init() error {
 	//e.properties = factory.GetLiquidhandlerByType("GilsonPipetmax")
 	//e.properties = factory.GetLiquidhandlerByType("CyBioGeneTheatre")
-	p, _ := e.driver.GetCapabilities()
+	p, s := e.driver.GetCapabilities()
 	e.properties = &p
 	e.properties.Driver = e.driver
-	return nil
+	if s.OK {
+		return nil
+	} else {
+		return fmt.Errorf("%d: %s", s.Errorcode, s.Msg)
+	}
 }
