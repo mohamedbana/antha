@@ -30,7 +30,7 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
-	"github.com/antha-lang/antha/microArch/equipmentManager"
+	"github.com/antha-lang/antha/target"
 	"io/ioutil"
 	"log"
 	"os"
@@ -42,12 +42,11 @@ const (
 )
 
 var (
-	logFile        string
 	parametersFile string
 	workflowFile   string
 	driverURI      string
+	frontend       string
 	list           bool
-	inputPlateFile string // TODO: Forward to execution
 	output         int
 )
 
@@ -67,25 +66,20 @@ func makeContext() (context.Context, error) {
 }
 
 func run() error {
-	if driverURI != "" {
-		fe, err := NewRemoteFrontend(driverURI)
-		if err != nil {
-			return err
-		}
-		defer fe.Shutdown()
-	} else {
-		fmt.Println("Press [Enter] to load antha workflow with manual driver...")
-		fmt.Println("Reminder: press [Control-X] to exit the workflow interface")
-		if _, err := fmt.Scanln(); err != nil {
-			return err
-		}
-
-		fe, err := NewCUIFrontend()
-		if err != nil {
-			return err
-		}
-		defer fe.Shutdown()
+	if len(driverURI) > 0 && frontend == DEBUG {
+		frontend = REMOTE
 	}
+
+	t := target.New()
+	fe, err := NewFrontend(Options{
+		Kind:   frontend,
+		Target: t,
+		URI:    driverURI,
+	})
+	if err != nil {
+		return err
+	}
+	defer fe.Shutdown()
 
 	wdata, err := ioutil.ReadFile(workflowFile)
 	if err != nil {
@@ -103,7 +97,7 @@ func run() error {
 	}
 
 	w, err := execute.Run(ctx, execute.Options{
-		FromEM:       equipmentManager.GetEquipmentManager(),
+		Target:       t,
 		WorkflowData: wdata,
 		ParamData:    pdata,
 	})
@@ -194,9 +188,8 @@ func main() {
 	flag.StringVar(&outputStr, "output", "", "output format")
 	flag.StringVar(&parametersFile, "parameters", "parameters.yml", "parameters to workflow")
 	flag.StringVar(&workflowFile, "workflow", "workflow.json", "workflow definition file")
-	flag.StringVar(&logFile, "log", "", "log file")
 	flag.StringVar(&driverURI, "driver", "", "uri where a grpc driver implementation listens")
-	flag.StringVar(&inputPlateFile, "inputFile", "", "filename for an input plate definition")
+	flag.StringVar(&frontend, "frontend", "debug", "kind of frontend one of {debug, cui, remote}")
 	flag.Parse()
 
 	switch outputStr {

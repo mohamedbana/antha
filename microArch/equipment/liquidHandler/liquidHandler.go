@@ -27,13 +27,14 @@ package liquidHandler
 import (
 	"encoding/json"
 	"errors"
+	"sync"
+
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/equipment"
 	"github.com/antha-lang/antha/microArch/equipment/action"
 	"github.com/antha-lang/antha/microArch/factory"
 	schedulerLiquidhandling "github.com/antha-lang/antha/microArch/scheduler/liquidhandling"
-	"sync"
 )
 
 var (
@@ -48,10 +49,10 @@ type AnthaLiquidHandler struct {
 	Behaviours []equipment.Behaviour
 	Driver     liquidhandling.ExtendedLiquidhandlingDriver
 	Properties *liquidhandling.LHProperties
-	queue      map[wtype.ThreadID]*schedulerLiquidhandling.LHRequest
+	queue      map[wtype.BlockID]*schedulerLiquidhandling.LHRequest
 	queueLock  sync.Mutex
-	completed  map[wtype.ThreadID]*schedulerLiquidhandling.LHRequest
-	planner    map[wtype.ThreadID]*schedulerLiquidhandling.Liquidhandler
+	completed  map[wtype.BlockID]*schedulerLiquidhandling.LHRequest
+	planner    map[wtype.BlockID]*schedulerLiquidhandling.Liquidhandler
 }
 
 //NewAnthaLiquidHandler instantiates a LiquidHandler identified by id and supporting the following behaviours:
@@ -82,9 +83,9 @@ func NewAnthaLiquidHandler(id string, d liquidhandling.ExtendedLiquidhandlingDri
 		},
 		Properties: &prop,
 		Driver:     d,
-		queue:      make(map[wtype.ThreadID]*schedulerLiquidhandling.LHRequest),
-		planner:    make(map[wtype.ThreadID]*schedulerLiquidhandling.Liquidhandler),
-		completed:  make(map[wtype.ThreadID]*schedulerLiquidhandling.LHRequest),
+		queue:      make(map[wtype.BlockID]*schedulerLiquidhandling.LHRequest),
+		planner:    make(map[wtype.BlockID]*schedulerLiquidhandling.Liquidhandler),
+		completed:  make(map[wtype.BlockID]*schedulerLiquidhandling.LHRequest),
 	}
 }
 
@@ -94,9 +95,9 @@ func NewAnthaLiquidHandler(id string, d liquidhandling.ExtendedLiquidhandlingDri
 func (e *AnthaLiquidHandler) TakeRequestOutput(id wtype.BlockID) *schedulerLiquidhandling.LHRequest {
 	e.queueLock.Lock()
 	defer e.queueLock.Unlock()
-	r, ok := e.completed[id.ThreadID]
+	r, ok := e.completed[id]
 	if ok {
-		delete(e.completed, id.ThreadID)
+		delete(e.completed, id)
 	}
 	return r
 }
@@ -139,14 +140,14 @@ func (e *AnthaLiquidHandler) configRequest(actionDescription equipment.ActionDes
 	e.queueLock.Lock()
 	defer e.queueLock.Unlock()
 
-	if r, ok := e.queue[data.BlockID.ThreadID]; !ok {
+	if r, ok := e.queue[data.BlockID]; !ok {
 		req = schedulerLiquidhandling.NewLHRequest()
 		req.BlockID = data.BlockID
 		req.Policies = liquidhandling.GetLHPolicyForTest()
 		lhplanner := schedulerLiquidhandling.Init(e.Properties)
 
-		e.queue[data.BlockID.ThreadID] = req
-		e.planner[data.BlockID.ThreadID] = lhplanner
+		e.queue[data.BlockID] = req
+		e.planner[data.BlockID] = lhplanner
 	} else {
 		req = r
 	}
@@ -178,7 +179,7 @@ func (e *AnthaLiquidHandler) sendMix(actionDescription equipment.ActionDescripti
 	e.queueLock.Lock()
 	defer e.queueLock.Unlock()
 
-	req, ok := e.queue[sol.BlockID.ThreadID]
+	req, ok := e.queue[sol.BlockID]
 	if !ok {
 		return requestNotFound
 	}
@@ -193,26 +194,26 @@ func (e *AnthaLiquidHandler) sendMix(actionDescription equipment.ActionDescripti
 }
 
 func (e *AnthaLiquidHandler) end(actionDescription equipment.ActionDescription) error {
-	blockId := wtype.BlockID{ThreadID: wtype.ThreadID(actionDescription.ActionData)}
+	blockId := wtype.NewBlockID(actionDescription.ActionData)
 
 	e.queueLock.Lock()
 	defer e.queueLock.Unlock()
 
-	req, ok := e.queue[blockId.ThreadID]
+	req, ok := e.queue[blockId]
 	if !ok || req == nil {
 		return nil
 	}
 
-	planner, ok := e.planner[blockId.ThreadID]
+	planner, ok := e.planner[blockId]
 	if !ok {
 		return nil
 	}
 
 	planner.MakeSolutions(req)
 
-	e.completed[blockId.ThreadID] = req
-	e.queue[blockId.ThreadID] = nil
-	e.planner[blockId.ThreadID] = nil
+	e.completed[blockId] = req
+	e.queue[blockId] = nil
+	e.planner[blockId] = nil
 
 	return nil
 }

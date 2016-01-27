@@ -1,0 +1,57 @@
+protocol Synthesis
+
+import (
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	//"fmt"
+)
+
+// Input parameters for this protocol (data)
+Parameters (
+	PartsWithOverhangs []wtype.DNASequence
+)
+
+// Physical Inputs to this protocol with types
+Inputs (
+)
+
+
+// Physical outputs from this protocol with types
+Outputs (
+	Components []wtype.LHComponent
+)
+
+// Data which is returned from this protocol, and data types
+Data (
+	
+	
+)
+
+Requirements {}
+
+// Conditions to run on startup
+Setup {}
+
+
+Steps {
+	//made up element which synthesises DNA
+	var dna wtype.LHComponent
+	
+	Components = make([]wtype.LHComponent, 4)
+	
+	for i, _ := range PartsWithOverhangs {
+		Components[i] = dna
+		}
+	
+
+	//Components = components 
+	}
+	
+
+
+
+Analysis {
+}
+
+
+Validation {
+}

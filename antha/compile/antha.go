@@ -28,6 +28,7 @@ package compile
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"github.com/antha-lang/antha/antha/ast"
 	"github.com/antha-lang/antha/antha/token"
 	"log"
@@ -185,18 +186,16 @@ func (p *compiler) getTypeString(e ast.Expr) (res string) {
 		} else {
 			res = t.Name
 		}
-		return
 	case *ast.SelectorExpr:
 		res = p.getTypeString(t.X) + "." + t.Sel.Name
-		return
 	case *ast.ArrayType:
 		// note: array types can use a param as the length, so must be
 		// allocated and treated as a slice since they can be dynamic
 		res = "[]" + p.getTypeString(t.Elt)
-		return
 	case *ast.StarExpr:
 		res = "*" + p.getTypeString(t.X)
-		return
+	case *ast.MapType:
+		res = fmt.Sprintf("map[%s]%s", p.getTypeString(t.Key), p.getTypeString(t.Value))
 	default:
 		log.Panicln("Invalid type spec to get type of: ", reflect.TypeOf(e), t)
 	}
