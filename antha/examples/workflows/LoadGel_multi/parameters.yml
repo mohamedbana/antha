@@ -1,0 +1,19 @@
+{
+    "Parameters": {
+        "LoadGel1": {
+            "GelPlate": "EPAGE48",
+            "InPlate": "pcrplate_with_cooler",
+            "LoadVolume": "10ul",
+            "Protein": "Load",
+            "SampleNames": [
+			"Marker",
+			"sample1",
+			"Sample2",
+			"Marker2"
+			],
+            "Water": "water",
+            "WaterName": "dH2O",
+            "WaterVolume": "10ul"
+        }
+}
+}
