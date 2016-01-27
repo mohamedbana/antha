@@ -199,8 +199,7 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 	request = output_plate_setup(request)
 
 	// next we need to determine the liquid handler setup
-	// THIS DOES NOTHING --- needs deletion or fixing
-	//request = this.Setup(request)
+	request = this.Setup(request)
 
 	// now make instructions
 	request = this.ExecutionPlan(request)
@@ -284,51 +283,12 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 	}
 
 	(*request).Input_solutions = requestinputs
-	/*
-
-		// fix some tips in place
-		// TODO this has to be sorted out
-		// SERIOUSLY
-		max_n_tipboxes := len(this.Properties.Tip_preferences)
-
-			fmt.Println("MAX N TIPBOXES: ", max_n_tipboxes)
-
-			for i := 0; i < max_n_tipboxes; i++ {
-
-				// XXX this needs attention: we shouldn't allow this HARD CODE
-				// in future we need to use the validation mechanism to trap this way earlier
-				// MARKED FOR DELETION --- THIS NOW IS HANDLED ELSEWHERE
-				if request.Tip_Type == nil || request.Tip_Type.GenericSolid == nil {
-					logger.Debug(fmt.Sprintf("LiquidHandling model is %q", this.Properties.Model))
-					if this.Properties.Model == "Pipetmax" {
-						// original
-						this.Properties.AddTipBox(factory.GetTipboxByType("Gilson20"))
-						this.Properties.Tips = make([]*wtype.LHTip, 1)
-						this.Properties.Tips[0] = factory.GetTipboxByType("Gilson20").Tiptype
-
-						// larger vol
-						this.Properties.AddTipBox(factory.GetTipboxByType("Gilson200"))
-
-						this.Properties.Tips = make([]*wtype.LHTip, 1)
-						this.Properties.Tips[0] = factory.GetTipboxByType("Gilson200").Tiptype
-					} else { //if this.Properties.Model == "GeneTheatre" { //TODO handle general case differently
-						this.Properties.AddTipBox(factory.GetTipboxByType("CyBio50Tipbox"))
-						this.Properties.Tips = make([]*wtype.LHTip, 1)
-						this.Properties.Tips[0] = factory.GetTipboxByType("CyBio50Tipbox").Tiptype
-					}
-				} else {
-					//this.Properties.AddTipBox(factory.GetTipboxByType("Gilson200"))
-					this.Properties.AddTipBox(factory.GetTipboxByType(request.Tip_Type.Name()))
-				}
-			}
-	*/
 
 	// finally we have to add a waste
 
 	var waste *wtype.LHTipwaste
-	// again we don't want this to happen
-	// MARKED FOR DELETION... SHOULD BE HANDLED ELSEWHERE
-	// next addition for the list... just add tip wastes as needed
+	// this should be added to the automagic config setup... however it will require adding to the
+	// representation of the liquid handler
 	if this.Properties.Model == "Pipetmax" {
 		waste = factory.GetTipwasteByType("Gilsontipwaste")
 	} else { //if this.Properties.Model == "GeneTheatre" { //TODO handle general case differently

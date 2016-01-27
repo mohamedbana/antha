@@ -412,11 +412,13 @@ func (e *AnthaManualGrpc) configRequest(actionDescription equipment.ActionDescri
 		}
 	}
 
-	_, ok = params["WELLBYWELL"]
+	t, ok := params["WELLBYWELL"]
 
 	if ok {
-		logger.Debug("WELL BY WELL MODE SELECTED")
-		e.planner[data.BlockID].ExecutionPlanner = schedulerLiquidhandling.AdvancedExecutionPlanner2
+		if t.(bool) {
+			logger.Debug("WELL BY WELL MODE SELECTED")
+			e.planner[data.BlockID].ExecutionPlanner = schedulerLiquidhandling.AdvancedExecutionPlanner2
+		}
 	}
 
 	return nil

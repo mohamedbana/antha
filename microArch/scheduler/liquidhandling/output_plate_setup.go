@@ -36,6 +36,7 @@ import (
 //OUTPUT: 	"output_plates"      -- these each have components in wells
 //		"output_assignments" -- map with arrays of assignment strings, i.e. {tea: [plate1:A:1, plate1:A:2...] }etc.
 func output_plate_setup(request *LHRequest) *LHRequest {
+	logger.Debug("in output plate setup")
 	//(map[string]*wtype.LHPlate, map[string][]string) {
 	output_platetype := (*request).Output_platetypes
 	if output_platetype == nil || len(output_platetype) == 0 {
@@ -64,7 +65,6 @@ func output_plate_setup(request *LHRequest) *LHRequest {
 		//p := wtype.New_Plate(request.Output_platetype)
 		//p := factory.GetPlateByType(request.Output_platetype.Type)
 		mgl := request.Output_major_group_layouts[i]
-		logger.Debug("I: ", i, " MGL: ", mgl)
 		//p := factory.GetPlateByType(output_platetype[mgl])
 		p := factory.GetPlateByType(output_platetype[0].Type)
 		output_plates[p.ID] = p
