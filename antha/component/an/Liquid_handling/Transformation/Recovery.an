@@ -48,7 +48,7 @@ Steps {
 	recoverymixture := mixer.Sample(Recoverymedium, Recoveryvolume)
 
 	recoverymix = append(recoverymix,transformedcellsComp,recoverymixture)
-	recoverymix2 := MixInto(OutPlate,recoverymix...)
+	recoverymix2 := MixInto(OutPlate, "", recoverymix...)
 	
 	Incubate (recoverymix2,  Recoverytemp, Recoverytime, true)
 	

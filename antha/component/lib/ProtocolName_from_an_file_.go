@@ -37,7 +37,7 @@ func _ProtocolName_from_an_fileSteps(_ctx context.Context, _input *ProtocolName_
 		_output.OutputData = append(_output.OutputData, output)
 	}
 	sample := mixer.Sample(_input.InputVariable, _input.ParameterVariableAsValuewithunit)
-	_output.PhysicalOutput = execute.MixInto(_ctx, _input.OutPlate, sample)
+	_output.PhysicalOutput = execute.MixInto(_ctx, _input.OutPlate, "", sample)
 
 }
 

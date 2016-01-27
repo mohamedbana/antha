@@ -49,7 +49,7 @@ Steps {
     samples = append(samples, loadSample)
     fmt.Println ("This is a list of samples for loading:", samples)
 
-    RunSolution = MixInto(GelPlate, samples...)
+    RunSolution = MixInto(GelPlate, "", samples...)
 }
 
 Analysis {

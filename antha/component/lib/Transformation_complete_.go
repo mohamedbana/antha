@@ -49,7 +49,7 @@ func _Transformation_completeSetup(_ctx context.Context, _input *Transformation_
 func _Transformation_completeSteps(_ctx context.Context, _input *Transformation_completeInput, _output *Transformation_completeOutput) {
 	competentcells := make([]*wtype.LHComponent, 0)
 	competentcells = append(competentcells, _input.CompetentCells)
-	readycompetentcells := execute.MixInto(_ctx, _input.OutPlate, competentcells...)                 // readycompetentcells IS now a LHSolution
+	readycompetentcells := execute.MixInto(_ctx, _input.OutPlate, "", competentcells...)             // readycompetentcells IS now a LHSolution
 	execute.Incubate(_ctx, readycompetentcells, _input.Preplasmidtemp, _input.Preplasmidtime, false) // we can incubate an LHSolution so this is fine
 
 	readycompetentcellsComp := wtype.SolutionToComponent(readycompetentcells)
@@ -60,7 +60,7 @@ func _Transformation_completeSteps(_ctx context.Context, _input *Transformation_
 	DNAsample := mixer.Sample(_input.Reaction, _input.Reactionvolume)
 	transformationmix = append(transformationmix, DNAsample)
 
-	transformedcells := execute.MixInto(_ctx, _input.OutPlate, transformationmix...)
+	transformedcells := execute.MixInto(_ctx, _input.OutPlate, "", transformationmix...)
 
 	execute.Incubate(_ctx, transformedcells, _input.Postplasmidtemp, _input.Postplasmidtime, false)
 
@@ -71,14 +71,14 @@ func _Transformation_completeSteps(_ctx context.Context, _input *Transformation_
 
 	recoverymix = append(recoverymix, transformedcellsComp) // ERROR! transformedcells is now an LHSolution, not a liquid, so can't be used here
 	recoverymix = append(recoverymix, recoverymixture)
-	recoverymix2 := execute.MixInto(_ctx, _input.OutPlate, recoverymix...)
+	recoverymix2 := execute.MixInto(_ctx, _input.OutPlate, "", recoverymix...)
 
 	execute.Incubate(_ctx, recoverymix2, _input.Recoverytemp, _input.Recoverytime, true)
 
 	recoverymix2Comp := wtype.SolutionToComponent(recoverymix2)
 
 	plateout := mixer.Sample(recoverymix2Comp, _input.Plateoutvolume) // ERROR! recoverymix2 is now an LHSolution, not a liquid, so can't be used here
-	platedculture := execute.MixInto(_ctx, _input.AgarPlate, plateout)
+	platedculture := execute.MixInto(_ctx, _input.AgarPlate, "", plateout)
 
 	_output.Platedculture = platedculture
 

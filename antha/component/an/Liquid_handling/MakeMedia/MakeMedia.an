@@ -124,7 +124,7 @@ Steps {
 	recipestring = append(recipestring,step)
 	}
 	*/
-	Media = MixInto(Vessel,liquids...)
+	Media = MixInto(Vessel, "", liquids...)
 	
 	Status = fmt.Sprintln(recipestring)
 		

@@ -12,11 +12,7 @@ import (
 
 // Input parameters for this protocol (data)
 
-//MMXVol					Volume
-
 // Physical Inputs to this protocol with types
-
-//	Water			*wtype.LHComponent
 
 // Physical outputs from this protocol with types
 
@@ -43,7 +39,7 @@ func _TypeIISConstructAssemblyMMXSteps(_ctx context.Context, _input *TypeIISCons
 		samples = append(samples, partSample)
 	}
 
-	_output.Reaction = execute.MixTo(_ctx, _input.OutPlate, _input.OutputLocation, samples...)
+	_output.Reaction = execute.MixTo(_ctx, _input.OutPlate.Type, _input.OutputLocation, _input.OutputPlateNum, samples...)
 
 	// incubate the reaction mixture
 	// commented out pending changes to incubate
@@ -115,7 +111,7 @@ type TypeIISConstructAssemblyMMXInput struct {
 	MasterMix          *wtype.LHComponent
 	OutPlate           *wtype.LHPlate
 	OutputLocation     string
-	OutputPlateNum     string
+	OutputPlateNum     int
 	OutputReactionName string
 	PartNames          []string
 	PartVols           []wunit.Volume
@@ -146,7 +142,7 @@ func init() {
 			Params: []ParamDesc{
 				{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
 				{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
-				{Name: "MasterMix", Desc: "\tWater\t\t\t*wtype.LHComponent\n", Kind: "Inputs"},
+				{Name: "MasterMix", Desc: "", Kind: "Inputs"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "OutputLocation", Desc: "", Kind: "Parameters"},
 				{Name: "OutputPlateNum", Desc: "", Kind: "Parameters"},
@@ -154,7 +150,7 @@ func init() {
 				{Name: "PartNames", Desc: "", Kind: "Parameters"},
 				{Name: "PartVols", Desc: "", Kind: "Parameters"},
 				{Name: "Parts", Desc: "", Kind: "Inputs"},
-				{Name: "ReactionTemp", Desc: "MMXVol\t\t\t\t\tVolume\n", Kind: "Parameters"},
+				{Name: "ReactionTemp", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionTime", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionVolume", Desc: "", Kind: "Parameters"},
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},

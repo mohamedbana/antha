@@ -51,7 +51,7 @@ Steps {
 	}
 	plateoutsample := mixer.Sample(RecoveredCells, Plateoutvolume) 
 	plateout = append(plateout,plateoutsample)
-	platedculture := MixInto(AgarPlate, plateout...)
+	platedculture := MixInto(AgarPlate, "",  plateout...)
 	Incubate(platedculture,IncubationTemp,IncubationTime,false)
 	Platedculture = platedculture
 	

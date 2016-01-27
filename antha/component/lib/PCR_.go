@@ -81,7 +81,7 @@ func _PCRSteps(_ctx context.Context, _input *PCRInput, _output *PCROutput) {
 
 	polySample := mixer.SampleForConcentration(_input.PCRPolymerase, _input.TargetpolymeraseConcentration)
 	samples = append(samples, polySample)
-	reaction := execute.MixInto(_ctx, _input.OutPlate, samples...)
+	reaction := execute.MixInto(_ctx, _input.OutPlate, "", samples...)
 
 	// thermocycle parameters called from enzyme lookup:
 

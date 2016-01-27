@@ -86,7 +86,7 @@ Steps {
 		samples = append(samples, enzSample)
 	}
 
-	Reaction = MixInto(OutPlate, samples...)
+	Reaction = MixInto(OutPlate, "",samples...)
 
 	// incubate the reaction mixture
 	Incubate(Reaction, ReactionTemp, ReactionTime, false)

@@ -38,7 +38,7 @@ func _AssaysetupSteps(_ctx context.Context, _input *AssaysetupInput, _output *As
 		eachreaction = append(eachreaction, subSample)
 		enzSample := mixer.Sample(_input.Enzyme, _input.EnzymeVolume)
 		eachreaction = append(eachreaction, enzSample)
-		reaction := execute.MixInto(_ctx, _input.OutPlate, eachreaction...)
+		reaction := execute.MixInto(_ctx, _input.OutPlate, "", eachreaction...)
 		reactions = append(reactions, reaction)
 
 	}

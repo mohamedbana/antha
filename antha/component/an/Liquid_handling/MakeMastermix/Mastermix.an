@@ -71,7 +71,7 @@ Steps {
 		eachmastermix = append(eachmastermix,componentSample)
 		}
 		
-		mastermix := MixInto(OutPlate, eachmastermix...)
+		mastermix := MixInto(OutPlate, "", eachmastermix...)
 		mastermixes = append(mastermixes,mastermix)
 		
 	}

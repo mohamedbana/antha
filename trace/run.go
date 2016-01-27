@@ -26,6 +26,8 @@ func configMix(inst *MixInst) (*wtype.LHSolution, error) {
 		Solution:    inst.Opt.OutputSol,
 		Address:     inst.Opt.Address,
 		Destination: inst.Opt.OutPlate,
+		PlateNum:    inst.Opt.PlateNum,
+		PlateType:   inst.Opt.PlateType,
 	})
 	return r, nil
 }

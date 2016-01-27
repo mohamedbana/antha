@@ -443,7 +443,7 @@ func PipetteImagebyBlending(OutPlate *wtype.LHPlate, positiontocolourmap map[str
 		components = append(components, magentaSample)
 		blackSample := mixer.Sample(black, blackvol)
 		components = append(components, blackSample)
-		solution := mixer.MixTo(OutPlate, locationkey, components...)
+		solution := mixer.MixTo(OutPlate.Type, locationkey, 1, components...)
 		solutions = append(solutions, solution)
 	}
 

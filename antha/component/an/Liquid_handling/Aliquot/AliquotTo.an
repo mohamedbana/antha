@@ -79,7 +79,7 @@ Steps {
 		Solution.Type = "DoNotMix"
 		}
 		aliquotSample := mixer.Sample(Solution, VolumePerAliquot)
-		aliquot := MixTo(OutPlate,wellpositionarray[k], aliquotSample)
+		aliquot := MixTo(OutPlate.Type,wellpositionarray[k], 0, aliquotSample)
 		aliquots = append(aliquots,aliquot)
 	}
 	Aliquots = aliquots

@@ -37,7 +37,7 @@ func _RecoverySteps(_ctx context.Context, _input *RecoveryInput, _output *Recove
 	recoverymixture := mixer.Sample(_input.Recoverymedium, _input.Recoveryvolume)
 
 	recoverymix = append(recoverymix, transformedcellsComp, recoverymixture)
-	recoverymix2 := execute.MixInto(_ctx, _input.OutPlate, recoverymix...)
+	recoverymix2 := execute.MixInto(_ctx, _input.OutPlate, "", recoverymix...)
 
 	execute.Incubate(_ctx, recoverymix2, _input.Recoverytemp, _input.Recoverytime, true)
 

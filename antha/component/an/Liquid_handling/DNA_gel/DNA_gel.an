@@ -114,6 +114,7 @@ Steps {
 		if Loadingdyeinsample == false {
 		DNAgelloadmixsolution := MixInto(
 		DNAgel,
+		"",
 		mixer.Sample(Loadingdye,Loadingdyevolume),
 		mixer.SampleForTotalVolume(Sampletotest,DNAgelrunvolume),
 		)
@@ -132,6 +133,7 @@ Steps {
 	
 	loadedsample := MixInto(
 	DNAgel,
+	"",
 	waterSample,
 	mixer.Sample(DNAgelloadmix, DNAgelrunvolume),
 	)

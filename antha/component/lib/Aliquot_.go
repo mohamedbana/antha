@@ -44,7 +44,7 @@ func _AliquotSteps(_ctx context.Context, _input *AliquotInput, _output *AliquotO
 			_input.Solution.Type = "DoNotMix"
 		}
 		aliquotSample := mixer.Sample(_input.Solution, _input.VolumePerAliquot)
-		aliquot := execute.MixInto(_ctx, _input.OutPlate, aliquotSample)
+		aliquot := execute.MixInto(_ctx, _input.OutPlate, "", aliquotSample)
 		aliquots = append(aliquots, aliquot)
 	}
 	_output.Aliquots = aliquots

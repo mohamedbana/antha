@@ -47,7 +47,7 @@ Steps {
 	DNAsample := mixer.Sample(Reaction, Reactionvolume)
 	transformationmix = append(transformationmix, DNAsample)
 	
-	transformedcells := MixInto(OutPlate, transformationmix...)
+	transformedcells := MixInto(OutPlate, "", transformationmix...)
 	
 	Incubate (transformedcells, Postplasmidtemp, Postplasmidtime,false)
 

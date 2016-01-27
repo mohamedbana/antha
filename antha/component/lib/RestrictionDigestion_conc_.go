@@ -74,7 +74,7 @@ func _RestrictionDigestion_concSteps(_ctx context.Context, _input *RestrictionDi
 		samples = append(samples, enzSample)
 	}
 
-	_output.Reaction = execute.MixInto(_ctx, _input.OutPlate, samples...)
+	_output.Reaction = execute.MixInto(_ctx, _input.OutPlate, "", samples...)
 
 	// incubate the reaction mixture
 	execute.Incubate(_ctx, _output.Reaction, _input.ReactionTemp, _input.ReactionTime, false)

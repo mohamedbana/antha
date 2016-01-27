@@ -46,7 +46,9 @@ func (a *MixInst) Args() []Value {
 type MixOpt struct {
 	OutputSol *wtype.LHSolution
 	OutPlate  *wtype.LHPlate
+	PlateType string
 	Address   string
+	PlateNum  int
 }
 
 func MakeMix(opt MixOpt, values []Value) *MixInst {

@@ -35,7 +35,7 @@ func _LoadGelSteps(_ctx context.Context, _input *LoadGelInput, _output *LoadGelO
 	samples = append(samples, loadSample)
 	fmt.Println("This is a list of samples for loading:", samples)
 
-	_output.RunSolution = execute.MixInto(_ctx, _input.GelPlate, samples...)
+	_output.RunSolution = execute.MixInto(_ctx, _input.GelPlate, "", samples...)
 }
 
 func _LoadGelAnalysis(_ctx context.Context, _input *LoadGelInput, _output *LoadGelOutput) {

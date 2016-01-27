@@ -38,7 +38,7 @@ func _PlateOutSteps(_ctx context.Context, _input *PlateOutInput, _output *PlateO
 	}
 	plateoutsample := mixer.Sample(_input.RecoveredCells, _input.Plateoutvolume)
 	plateout = append(plateout, plateoutsample)
-	platedculture := execute.MixInto(_ctx, _input.AgarPlate, plateout...)
+	platedculture := execute.MixInto(_ctx, _input.AgarPlate, "", plateout...)
 	execute.Incubate(_ctx, platedculture, _input.IncubationTemp, _input.IncubationTime, false)
 	_output.Platedculture = platedculture
 

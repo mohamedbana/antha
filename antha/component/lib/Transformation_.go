@@ -36,7 +36,7 @@ func _TransformationSteps(_ctx context.Context, _input *TransformationInput, _ou
 	DNAsample := mixer.Sample(_input.Reaction, _input.Reactionvolume)
 	transformationmix = append(transformationmix, DNAsample)
 
-	transformedcells := execute.MixInto(_ctx, _input.OutPlate, transformationmix...)
+	transformedcells := execute.MixInto(_ctx, _input.OutPlate, "", transformationmix...)
 
 	execute.Incubate(_ctx, transformedcells, _input.Postplasmidtemp, _input.Postplasmidtime, false)
 

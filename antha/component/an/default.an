@@ -50,7 +50,7 @@ Steps {
 	OutputData = append(OutputData,output)
 	}
 	sample := mixer.Sample(InputVariable,ParameterVariableAsValuewithunit) 
-	PhysicalOutput = MixInto(OutPlate,sample)
+	PhysicalOutput = MixInto(OutPlate,"", sample)
 	
 }
 // Run after controls and a steps block are completed to

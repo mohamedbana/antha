@@ -105,7 +105,7 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 				components = append(components,inducerSample)*/
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
 				components = append(components, pixelSample)
-				solution := execute.MixTo(_ctx, _input.OutPlate, locationkey, components...)
+				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 0, components...)
 				execute.Incubate(_ctx, solution, _input.IncTemp, _input.IncTime, true)
 				solutions = append(solutions, solution)
 			}
@@ -127,7 +127,7 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 				components = append(components,inducerSample)*/
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
 				components = append(components, pixelSample)
-				solution := execute.MixTo(_ctx, _input.OutPlate, locationkey, components...)
+				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 0, components...)
 
 				execute.Incubate(_ctx, solution, _input.IncTemp, _input.IncTime, true)
 				solutions = append(solutions, solution)

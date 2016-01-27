@@ -110,7 +110,7 @@ func _MakeMediaSteps(_ctx context.Context, _input *MakeMediaInput, _output *Make
 		recipestring = append(recipestring,step)
 		}
 	*/
-	_output.Media = execute.MixInto(_ctx, _input.Vessel, liquids...)
+	_output.Media = execute.MixInto(_ctx, _input.Vessel, "", liquids...)
 
 	_output.Status = fmt.Sprintln(recipestring)
 

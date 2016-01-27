@@ -79,7 +79,7 @@ Steps {
 			counter = counter + 1
 			fmt.Println("wells",counter)
 		pixelSample := mixer.Sample(component, VolumePerWell)
-		solution := MixTo(OutPlate, locationkey, pixelSample)
+		solution := MixTo(OutPlate.Type, locationkey, 0, pixelSample)
 		solutions = append(solutions, solution)
 			}
 			
@@ -88,7 +88,7 @@ Steps {
 			counter = counter + 1
 			fmt.Println("wells",counter)
 		pixelSample := mixer.Sample(component, VolumePerWell)
-		solution := MixTo(OutPlate, locationkey, pixelSample)
+		solution := MixTo(OutPlate.Type, locationkey, 0, pixelSample)
 		solutions = append(solutions, solution)
 		}
 		}

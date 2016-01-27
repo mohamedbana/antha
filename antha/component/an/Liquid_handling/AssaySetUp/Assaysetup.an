@@ -55,7 +55,7 @@ Steps {
 		eachreaction = append(eachreaction,subSample)
 		enzSample := mixer.Sample(Enzyme, EnzymeVolume)
 		eachreaction = append(eachreaction,enzSample)
-		reaction := MixInto(OutPlate, eachreaction...)
+		reaction := MixInto(OutPlate, "", eachreaction...)
 		reactions = append(reactions,reaction)
 		
 	}

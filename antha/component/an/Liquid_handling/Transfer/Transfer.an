@@ -43,7 +43,7 @@ Setup {
 Steps {
 	
 	sample := mixer.Sample(Startingsolution,LiquidVolume) 
-	FinalSolution = MixInto(OutPlate,sample)
+	FinalSolution = MixInto(OutPlate, "",sample)
 	
 	Status = LiquidVolume.ToString() + " of " + Liquidname + " was mixed into " + OutPlate.Type
 	

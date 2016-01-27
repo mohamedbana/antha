@@ -62,7 +62,7 @@ func _AliquotToSteps(_ctx context.Context, _input *AliquotToInput, _output *Aliq
 			_input.Solution.Type = "DoNotMix"
 		}
 		aliquotSample := mixer.Sample(_input.Solution, _input.VolumePerAliquot)
-		aliquot := execute.MixTo(_ctx, _input.OutPlate, wellpositionarray[k], aliquotSample)
+		aliquot := execute.MixTo(_ctx, _input.OutPlate.Type, wellpositionarray[k], 0, aliquotSample)
 		aliquots = append(aliquots, aliquot)
 	}
 	_output.Aliquots = aliquots

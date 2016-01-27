@@ -62,7 +62,7 @@ func _SDSprepSteps(_ctx context.Context, _input *SDSprepInput, _output *SDSprepO
 	proteinSample.CName = _input.SampleName
 	samples = append(samples, proteinSample)
 	fmt.Println("This is a sample list ", samples)
-	_output.LoadSample = execute.MixInto(_ctx, _input.OutPlate, samples...)
+	_output.LoadSample = execute.MixInto(_ctx, _input.OutPlate, "", samples...)
 
 	//Methods 2.Make a sample of two things creating a list
 	//	Step 1b

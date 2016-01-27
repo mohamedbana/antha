@@ -103,7 +103,7 @@ Steps {
 
 	polySample := mixer.SampleForConcentration(PCRPolymerase, TargetpolymeraseConcentration)
 	samples = append(samples, polySample)
-	reaction := MixInto(OutPlate, samples...)
+	reaction := MixInto(OutPlate, "", samples...)
 
 	// thermocycle parameters called from enzyme lookup:
 

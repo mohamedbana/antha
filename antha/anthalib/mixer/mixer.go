@@ -25,6 +25,7 @@ package mixer
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	//"github.com/antha-lang/antha/microArch/logger"
 )
 
 // mix needs to define the interface with liquid handling
@@ -205,7 +206,9 @@ type MixOptions struct {
 	Components  []*wtype.LHComponent // Components to mix (required)
 	Solution    *wtype.LHSolution    // Configure an existing solution; if nil, create one instead
 	Destination *wtype.LHPlate       // Destination plate; if nil, select one later
+	PlateType   string               // type of destination plate
 	Address     string               // Well in destination to place result; if nil, select one later
+	PlateNum    int                  // which plate to stick these on
 }
 
 func GenericMix(opt MixOptions) *wtype.LHSolution {
@@ -218,10 +221,20 @@ func GenericMix(opt MixOptions) *wtype.LHSolution {
 	if opt.Destination != nil {
 		r.ContainerType = opt.Destination.Type
 		r.Platetype = opt.Destination.Type
+		r.PlateID = opt.Destination.ID
+	}
+
+	if opt.PlateType != "" {
+		r.ContainerType = opt.PlateType
+		r.Platetype = opt.PlateType
 	}
 
 	if len(opt.Address) > 0 {
 		r.Welladdress = opt.Address
+	}
+
+	if opt.PlateNum > 0 {
+		r.Majorlayoutgroup = opt.PlateNum - 1
 	}
 
 	// We must respect the order in which things are mixed. The convention is
@@ -240,21 +253,21 @@ func Mix(components ...*wtype.LHComponent) *wtype.LHSolution {
 	})
 }
 
-// Mix the specified wtype.LHComponents together into the destination specified
-// as the first argument
-func MixInto(destination *wtype.LHPlate, components ...*wtype.LHComponent) *wtype.LHSolution {
-	return GenericMix(MixOptions{
-		Components:  components,
-		Destination: destination,
-	})
-}
-
-// Mix the specified wtype.LHComponents together into the destination specified
-// as the first argument
-func MixTo(destination *wtype.LHPlate, address string, components ...*wtype.LHComponent) *wtype.LHSolution {
+// Mix the specified wtype.LHComponents together into a specific plate
+func MixInto(destination *wtype.LHPlate, address string, components ...*wtype.LHComponent) *wtype.LHSolution {
 	return GenericMix(MixOptions{
 		Components:  components,
 		Destination: destination,
 		Address:     address,
+	})
+}
+
+// Mix the specified wtype.LHComponents together into a plate of a particular type
+func MixTo(platetype string, address string, platenum int, components ...*wtype.LHComponent) *wtype.LHSolution {
+	return GenericMix(MixOptions{
+		Components: components,
+		PlateType:  platetype,
+		Address:    address,
+		PlateNum:   platenum,
 	})
 }

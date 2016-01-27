@@ -38,15 +38,17 @@ func Mix(ctx context.Context, components ...*wtype.LHComponent) *wtype.LHSolutio
 	return mix(ctx, trace.MixOpt{}, components)
 }
 
-func MixInto(ctx context.Context, outplate *wtype.LHPlate, components ...*wtype.LHComponent) *wtype.LHSolution {
-	return mix(ctx, trace.MixOpt{
-		OutPlate: outplate,
-	}, components)
-}
-
-func MixTo(ctx context.Context, outplate *wtype.LHPlate, address string, components ...*wtype.LHComponent) *wtype.LHSolution {
+func MixInto(ctx context.Context, outplate *wtype.LHPlate, address string, components ...*wtype.LHComponent) *wtype.LHSolution {
 	return mix(ctx, trace.MixOpt{
 		OutPlate: outplate,
 		Address:  address,
+	}, components)
+}
+
+func MixTo(ctx context.Context, outplatetype string, address string, platenum int, components ...*wtype.LHComponent) *wtype.LHSolution {
+	return mix(ctx, trace.MixOpt{
+		PlateType: outplatetype,
+		Address:   address,
+		PlateNum:  platenum,
 	}, components)
 }

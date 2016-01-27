@@ -64,7 +64,7 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 				counter = counter + 1
 				fmt.Println("wells", counter)
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
-				solution := execute.MixTo(_ctx, _input.OutPlate, locationkey, pixelSample)
+				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 0, pixelSample)
 				solutions = append(solutions, solution)
 			}
 
@@ -73,7 +73,7 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 				counter = counter + 1
 				fmt.Println("wells", counter)
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
-				solution := execute.MixTo(_ctx, _input.OutPlate, locationkey, pixelSample)
+				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 0, pixelSample)
 				solutions = append(solutions, solution)
 			}
 		}

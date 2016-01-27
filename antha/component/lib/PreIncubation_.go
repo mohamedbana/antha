@@ -32,7 +32,7 @@ func _PreIncubationSteps(_ctx context.Context, _input *PreIncubationInput, _outp
 	competentcells := make([]*wtype.LHComponent, 0)
 	competentcellsample := mixer.Sample(_input.CompetentCells, _input.CompetentCellvolumeperassembly)
 	competentcells = append(competentcells, competentcellsample)
-	readycompetentcells := execute.MixInto(_ctx, _input.OutPlate, competentcells...)
+	readycompetentcells := execute.MixInto(_ctx, _input.OutPlate, "", competentcells...)
 	execute.Incubate(_ctx, readycompetentcells, _input.Preplasmidtemp, _input.Preplasmidtime, false)
 
 	_output.ReadyCompCells = readycompetentcells

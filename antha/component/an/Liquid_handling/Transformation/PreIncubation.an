@@ -41,7 +41,7 @@ Steps {
 	competentcells := make([]*wtype.LHComponent,0)
 	competentcellsample := mixer.Sample(CompetentCells,CompetentCellvolumeperassembly)
 	competentcells = append(competentcells,competentcellsample)
-	readycompetentcells := MixInto(OutPlate, competentcells...)  
+	readycompetentcells := MixInto(OutPlate, "", competentcells...)  
 	Incubate (readycompetentcells,Preplasmidtemp, Preplasmidtime, false) 
 	
 	ReadyCompCells = readycompetentcells

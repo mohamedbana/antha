@@ -70,7 +70,7 @@ func _Mastermix_reactionsSteps(_ctx context.Context, _input *Mastermix_reactions
 				eachmastermix = append(eachmastermix, componentSample)
 			}
 
-			mastermix := execute.MixInto(_ctx, _input.OutPlate, eachmastermix...)
+			mastermix := execute.MixInto(_ctx, _input.OutPlate, "", eachmastermix...)
 			mastermixes = append(mastermixes, mastermix)
 
 		}

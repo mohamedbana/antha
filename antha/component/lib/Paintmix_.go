@@ -36,7 +36,7 @@ func _PaintmixSteps(_ctx context.Context, _input *PaintmixInput, _output *Paintm
 		eachreaction = append(eachreaction, col1Sample)
 		col2Sample := mixer.Sample(_input.Colour2, _input.Colour2vol)
 		eachreaction = append(eachreaction, col2Sample)
-		reaction := execute.MixInto(_ctx, _input.OutPlate, eachreaction...)
+		reaction := execute.MixInto(_ctx, _input.OutPlate, "", eachreaction...)
 		reactions = append(reactions, reaction)
 
 	}

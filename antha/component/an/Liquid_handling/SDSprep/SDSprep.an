@@ -75,7 +75,7 @@ Steps {
     proteinSample.CName = SampleName
     samples = append(samples, proteinSample)
     fmt.Println ("This is a sample list ", samples)
-    LoadSample = MixInto(OutPlate, samples...)
+    LoadSample = MixInto(OutPlate, "", samples...)
 
 
 //Methods 2.Make a sample of two things creating a list

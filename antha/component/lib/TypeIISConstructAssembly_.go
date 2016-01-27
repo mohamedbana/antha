@@ -53,7 +53,7 @@ func _TypeIISConstructAssemblySteps(_ctx context.Context, _input *TypeIISConstru
 	ligSample := mixer.Sample(_input.Ligase, _input.LigVol)
 	samples = append(samples, ligSample)
 
-	_output.Reaction = execute.MixInto(_ctx, _input.OutPlate, samples...)
+	_output.Reaction = execute.MixInto(_ctx, _input.OutPlate, "", samples...)
 
 	// incubate the reaction mixture
 	execute.Incubate(_ctx, _output.Reaction, _input.ReactionTemp, _input.ReactionTime, false)

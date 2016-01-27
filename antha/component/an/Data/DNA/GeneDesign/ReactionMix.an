@@ -69,7 +69,7 @@ Steps {
 	samples = append(samples, VectorS, BufferS, LigaseS, ATPS, RES, WaterS)
 	samples = append(samples, ComponentsS...)
 	
-	Reaction = mixer.MixInto(OutPlate, samples...)
+	Reaction = mixer.MixInto(OutPlate, "", samples...)
 	
 	// Incubate
 	Incubate(Reaction, ReactionTemp, ReactionTime, false)

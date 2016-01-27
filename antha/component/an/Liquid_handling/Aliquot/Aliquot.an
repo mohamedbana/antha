@@ -60,7 +60,7 @@ Steps {
 		Solution.Type = "DoNotMix"
 		}
 		aliquotSample := mixer.Sample(Solution, VolumePerAliquot)
-		aliquot := MixInto(OutPlate, aliquotSample)
+		aliquot := MixInto(OutPlate, "", aliquotSample)
 		aliquots = append(aliquots,aliquot)
 	}
 	Aliquots = aliquots

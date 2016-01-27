@@ -51,7 +51,7 @@ Steps {
 		eachreaction = append(eachreaction,col1Sample)
 		col2Sample := mixer.Sample(Colour2, Colour2vol)
 		eachreaction = append(eachreaction,col2Sample)
-		reaction := MixInto(OutPlate, eachreaction...)
+		reaction := MixInto(OutPlate, "", eachreaction...)
 		reactions = append(reactions,reaction)
 		
 	}

@@ -26,23 +26,24 @@ import (
 	"math"
 	"strconv"
 
+	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
+	"github.com/antha-lang/antha/microArch/logger"
 )
 
-// default layout: requests fill plates in column order
 func BasicLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *LHRequest {
-	// we need to support multiple plate types... initially though
 	plate := request.Output_platetypes[0]
 	solutions := request.Output_solutions
 
 	// get the incoming group IDs
 	// the purpose of this check is to determine whether there
 	// already exist assignments...this is quite tricky
-	MajorLayoutGroupIDs, _ := getLayoutGroups(solutions)
+	MajorLayoutGroupIDs, _ := getLayoutGroupsAndPlates(solutions)
 
 	// check we have enough and assign more if necessary
+	// needs to be done per plate
 	n_plates_required := int(math.Floor(float64(len(solutions))/float64(plate.Nwells))) + 1
 
 	if len(MajorLayoutGroupIDs) < n_plates_required {
@@ -277,9 +278,8 @@ func getLayoutGroups(solutions map[string]*wtype.LHSolution) ([]int, []int) {
 	MinorLayoutGroupIDs := wutil.NewIntSet(4)
 
 	for _, s := range solutions {
+		logger.Debug(fmt.Sprint("SOLUTION: ", s.SName, " PLAATE: ", s.Platetype))
 		Mlg := s.Majorlayoutgroup
-
-		// -1 means 'not assigned'
 
 		if Mlg != -1 {
 			MajorLayoutGroupIDs.Add(Mlg)

@@ -102,6 +102,7 @@ func _DNA_gelSteps(_ctx context.Context, _input *DNA_gelInput, _output *DNA_gelO
 		// load gel
 		if _input.Loadingdyeinsample == false {
 			DNAgelloadmixsolution := execute.MixInto(_ctx, _input.DNAgel,
+				"",
 				mixer.Sample(_input.Loadingdye, _input.Loadingdyevolume),
 				mixer.SampleForTotalVolume(_input.Sampletotest, _input.DNAgelrunvolume),
 			)
@@ -120,6 +121,7 @@ func _DNA_gelSteps(_ctx context.Context, _input *DNA_gelInput, _output *DNA_gelO
 		//DNAgelloadmix.Type = "loadwater"
 
 		loadedsample := execute.MixInto(_ctx, _input.DNAgel,
+			"",
 			waterSample,
 			mixer.Sample(DNAgelloadmix, _input.DNAgelrunvolume),
 		)

@@ -99,7 +99,7 @@ Steps {
 		components = append(components, blackSample)
 		}
 		
-		solution := MixTo(OutPlate, locationkey, components...)
+		solution := MixTo(OutPlate.Type, locationkey,0, components...)
 		solutions = append(solutions, solution)
 		
 		}

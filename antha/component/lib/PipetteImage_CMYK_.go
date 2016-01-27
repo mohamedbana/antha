@@ -85,7 +85,7 @@ func _PipetteImage_CMYKSteps(_ctx context.Context, _input *PipetteImage_CMYKInpu
 				components = append(components, blackSample)
 			}
 
-			solution := execute.MixTo(_ctx, _input.OutPlate, locationkey, components...)
+			solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 0, components...)
 			solutions = append(solutions, solution)
 
 		}

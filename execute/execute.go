@@ -9,6 +9,7 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/microArch/equipment"
 	"github.com/antha-lang/antha/microArch/equipment/action"
+	"github.com/antha-lang/antha/microArch/logger"
 	"github.com/antha-lang/antha/target"
 	"github.com/antha-lang/antha/workflow"
 )
@@ -74,6 +75,13 @@ func config(parent context.Context, lh equipment.Equipment, cd *ConfigData) erro
 	for _, cv := range cvalues {
 		if cv.UseA {
 			config[cv.Key] = cv.A
+
+			if cv.Key == "INPUT_PLATETYPE" {
+				logger.Info(fmt.Sprint("WARNING: No input plate types specified, reverting to default: ", cv.A))
+			} else if cv.Key == "OUTPUT_PLATETYPE" {
+				logger.Info(fmt.Sprint("WARNING: No output plate types specified, reverting to default: ", cv.A))
+			}
+
 		} else {
 			config[cv.Key] = cv.B
 		}
