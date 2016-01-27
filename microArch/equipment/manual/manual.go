@@ -416,7 +416,7 @@ func (e *AnthaManualGrpc) configRequest(actionDescription equipment.ActionDescri
 
 	if ok {
 		logger.Debug("WELL BY WELL MODE SELECTED")
-		e.planner[data.BlockID.ThreadID].ExecutionPlanner = schedulerLiquidhandling.AdvancedExecutionPlanner2
+		e.planner[data.BlockID].ExecutionPlanner = schedulerLiquidhandling.AdvancedExecutionPlanner2
 	}
 
 	return nil

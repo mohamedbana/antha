@@ -62,14 +62,12 @@ func config(parent context.Context, lh equipment.Equipment, cd *ConfigData) erro
 	id := getId(parent)
 	cvalues := []cvalue{
 		cvalue{Key: "BLOCKID", A: wtype.NewBlockID(id), UseA: true},
-		// XXX(ddn): The parameters below are not commonly used by equipment,
-		// delete them to reduce confusion. For example, see
-		// github.com/antha-lang/antha/microArch/equipment/liquidHandler/liquidHandler.go#configRequest()
 		cvalue{Key: "MAX_N_PLATES", A: 4.5, B: cd.MaxPlates, UseA: cd.MaxPlates == 0.0},
 		cvalue{Key: "MAX_N_WELLS", A: 278.0, B: cd.MaxWells, UseA: cd.MaxWells == 0.0},
 		cvalue{Key: "RESIDUAL_VOLUME_WEIGHT", A: 1.0, B: cd.ResidualVolumeWeight, UseA: cd.ResidualVolumeWeight == 0.0},
-		cvalue{Key: "INPUT_PLATETYPE", A: "pcrplate_with_cooler", B: cd.InputPlateType, UseA: len(cd.InputPlateType) == 0},
-		cvalue{Key: "OUTPUT_PLATETYPE", A: "pcrplate_with_cooler", B: cd.OutputPlateType, UseA: len(cd.OutputPlateType) == 0},
+		cvalue{Key: "INPUT_PLATETYPE", A: []string{"pcrplate_skirted"}, B: cd.InputPlateType, UseA: len(cd.InputPlateType) == 0},
+		cvalue{Key: "OUTPUT_PLATETYPE", A: []string{"pcrplate_skirted"}, B: cd.OutputPlateType, UseA: len(cd.OutputPlateType) == 0},
+		cvalue{Key: "WELLBYWELL", A: false, B: cd.WellByWell, UseA: false},
 	}
 
 	config := make(map[string]interface{})
