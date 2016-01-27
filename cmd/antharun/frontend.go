@@ -25,90 +25,67 @@ package main
 import (
 	"fmt"
 
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/internal/github.com/twinj/uuid"
 	"github.com/antha-lang/antha/microArch/equipment"
 	"github.com/antha-lang/antha/microArch/equipment/manual"
-	"github.com/antha-lang/antha/microArch/equipment/manual/cli"
-	"github.com/antha-lang/antha/microArch/equipmentManager"
+	"github.com/antha-lang/antha/microArch/equipment/void"
 	"github.com/antha-lang/antha/microArch/logger"
+	"github.com/antha-lang/antha/target"
 )
 
+const (
+	DEBUG  = "debug"
+	REMOTE = "remote"
+	CUI    = "cui"
+)
+
+type Options struct {
+	Kind   string
+	Target *target.Target
+	URI    string
+}
+
 type Frontend struct {
-	equipmentManager *equipmentManager.AnthaEquipmentManager
-	cui              *cli.CUI
+	shutdowns []func() error
 }
 
-func NewCUIFrontend() (*Frontend, error) {
-	fe := &Frontend{}
-
-	eid := uuid.NewV4()
-	// TODO need to shudown equipmentmanager here on error
-	fe.equipmentManager = equipmentManager.NewAnthaEquipmentManager(eid.String())
-	fee := equipmentManager.EquipmentManager(fe.equipmentManager)
-	equipmentManager.SetEquipmentManager(fee)
-
-	mid := uuid.NewV4()
-	md := manual.NewAnthaManualCUI(mid.String())
-	mdd := equipment.Equipment(md)
-	fe.equipmentManager.RegisterEquipment(mdd)
-
-	//cui logger middleware
-	logger.RegisterMiddleware(md.Cui)
-
-	return fe, nil
+func getEq(opts Options) (equipment.Equipment, error) {
+	id := uuid.NewV4().String()
+	switch opts.Kind {
+	case CUI:
+		eq := manual.NewAnthaManualCUI(id)
+		logger.RegisterMiddleware(eq.Cui)
+		return eq, nil
+	case DEBUG:
+		return void.NewVoidEquipment(id), nil
+	case REMOTE:
+		return manual.NewAnthaManualGrpc(id, opts.URI), nil
+	default:
+		return nil, fmt.Errorf("unknown frontend %q", opts.Kind)
+	}
 }
 
-func NewRemoteFrontend(driverAddress string) (*Frontend, error) {
-	fe := &Frontend{}
-
-	eid := uuid.NewV4()
-	// TODO need to shudown equipmentmanager here on error
-	fe.equipmentManager = equipmentManager.NewAnthaEquipmentManager(eid.String())
-	fee := equipmentManager.EquipmentManager(fe.equipmentManager)
-	equipmentManager.SetEquipmentManager(fee)
-
-	remoteManual := manual.NewAnthaManualGrpc(uuid.NewV4().String(), driverAddress)
-	if err := remoteManual.Init(); err != nil {
+func NewFrontend(opts Options) (*Frontend, error) {
+	t := opts.Target
+	if eq, err := getEq(opts); err != nil {
 		return nil, err
-	}
-
-	err := fe.equipmentManager.RegisterEquipment(remoteManual)
-	return fe, err
-}
-
-func (fe *Frontend) Shutdown() {
-	fe.equipmentManager.Shutdown()
-}
-
-func (fe *Frontend) SendAlert(msg interface{}) error {
-	if fe.cui != nil {
-		var mml cli.MultiLevelMessage
-		switch typedMessage := msg.(type) {
-		case *wtype.LHSolution:
-			mesc := make([]cli.MultiLevelMessage, 0)
-			for _, c := range typedMessage.Components {
-				mesc = append(mesc, *cli.NewMultiLevelMessage(fmt.Sprintf("%s, %g", c.CName, c.Conc), nil))
-			}
-			mesC := *cli.NewMultiLevelMessage("Reagents", mesc)
-			mesc1 := make([]cli.MultiLevelMessage, 0)
-			mesc1 = append(mesc1, mesC)
-			mml = *cli.NewMultiLevelMessage(fmt.Sprintf("%s @ %s", typedMessage.SName, typedMessage.Welladdress), mesc1)
-		default:
-			mml = *cli.NewMultiLevelMessage(fmt.Sprintf("%v", typedMessage), nil)
-		}
-		mesC := make([]cli.MultiLevelMessage, 0)
-		mesC = append(mesC, mml)
-		req := cli.NewCUICommandRequest("Alert", *cli.NewMultiLevelMessage(
-			"Output",
-			mesC,
-		))
-
-		fe.cui.CmdIn <- *req
-		res := <-fe.cui.CmdOut
-		return res.Error
+	} else if err := eq.Init(); err != nil {
+		return nil, err
 	} else {
-		fmt.Println(msg)
+		t.AddLiquidHandler(eq)
+		return &Frontend{
+			shutdowns: []func() error{func() error {
+				return eq.Shutdown()
+			}},
+		}, nil
 	}
-	return nil
+}
+
+func (a *Frontend) Shutdown() (err error) {
+	for _, fn := range a.shutdowns {
+		if e := fn(); e != nil {
+			err = e
+		}
+	}
+	return
 }

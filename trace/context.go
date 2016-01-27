@@ -159,51 +159,6 @@ func getTrace(ctx context.Context) *trace {
 	return t
 }
 
-// Create a value that has no relation to any existing values.
-func MakeValue(ctx context.Context, desc string, v interface{}) Value {
-	return &basicValue{
-		name: getScope(ctx).MakeName(desc),
-		v:    v,
-	}
-}
-
-// Create a value that is a function of some existing values. This information
-// is used to track value dependencies across instructions.
-func MakeValueFrom(ctx context.Context, desc string, v interface{}, from ...Value) Value {
-	return &fromValue{
-		name: getScope(ctx).MakeName(desc),
-		v:    v,
-		from: from,
-	}
-}
-
-// Issue a command to execute in the trace context; return promise for return
-// value.
-func IssueCommand(ctx context.Context, op string, args ...Value) *Promise {
-	result := getScope(ctx).MakeName("")
-	out := make(chan interface{})
-
-	p := &Promise{
-		construct: func(v interface{}) Value {
-			return &promiseValue{
-				name: result,
-				op:   op,
-				from: args,
-				v:    v,
-			}
-		},
-		out: out,
-	}
-
-	t := getTrace(ctx)
-	t.lock.Lock()
-	defer t.lock.Unlock()
-
-	t.issue = append(t.issue, instr{op: op, args: args, promise: p})
-
-	return p
-}
-
 func tryUnblock(tr *trace, pctx *poolCtx) {
 	if err := tr.signal(pctx); err != nil {
 		pctx.cancelWithLock(err)
