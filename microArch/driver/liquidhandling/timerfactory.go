@@ -8,7 +8,7 @@ import (
 func GetTimerFor(model, mnfr string) *LHTimer {
 	timers := makeTimers()
 
-	fmt.Println("Getting itmer for ", model, mnfr)
+	fmt.Println("Getting timer for ", model, mnfr)
 
 	_, ok := timers[model+mnfr]
 	if ok {
