@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/antha-lang/antha/internal/github.com/mattn/go-colorable"
+	"github.com/antha-lang/antha/internal/github.com/mgutz/ansi"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -30,9 +32,10 @@ func spawn(gopackage string, port int) (*spawned, error) {
 	} else if err := exec.Command("go", "build", "-o", f.Name(), gopackage).Run(); err != nil {
 		return nil, err
 	} else {
+		prefix := ansi.Color("server", "red:white") + " "
 		cmd := exec.Command(f.Name(), "-port", strconv.Itoa(port))
-		w1 := NewWriter(os.Stdout, "server ")
-		w2 := NewWriter(os.Stderr, "server ")
+		w1 := NewWriter(colorable.NewColorableStdout(), prefix)
+		w2 := NewWriter(colorable.NewColorableStderr(), prefix)
 		cmd.Stdout = w1
 		cmd.Stderr = w2
 		s := &spawned{
