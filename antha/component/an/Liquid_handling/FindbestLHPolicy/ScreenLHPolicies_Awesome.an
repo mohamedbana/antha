@@ -5,7 +5,8 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
-
+	//"path/filepath"
+	//anthapath "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"fmt"
 	//"strconv"
 )
@@ -23,6 +24,8 @@ Parameters (
 // Data which is returned from this protocol, and data types
 Data (
 	Runtowelllocationmap []string
+	Runcount int
+	Pixelcount int
 )
 
 
@@ -61,8 +64,10 @@ Steps {
 
 	for location, colour := range positiontocolourmap {
 		R,G,B,A := colour.RGBA()
-		if uint8(R) != uint8(242) && uint8(G) !=uint8(243) && uint8(B) != uint8(242) && uint8(A) != uint8(255) {
-			wellpositionarray = append(wellpositionarray,location)
+	
+		if uint8(R) == 242 && uint8(G) ==243 && uint8(B) == 242 && uint8(A) == 255 {
+			continue
+			}else {wellpositionarray = append(wellpositionarray,location)
 		}
 	}
 	/*
@@ -122,6 +127,8 @@ Steps {
 	}
 	}
 	Reactions = reactions
+	Runcount = len(Reactions)
+	Pixelcount = len(wellpositionarray)
 	
 }
 

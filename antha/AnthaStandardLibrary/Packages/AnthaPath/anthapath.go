@@ -127,6 +127,13 @@ func Dirpath() (dirpath string) {
 	return
 }
 
+func AnthaFile(filename string) (anthapathandfilename string) {
+
+	anthapathandfilename = filepath.Join(Dirpath(), filename)
+
+	return
+}
+
 func Anthafileexists(filename string) bool {
 	fullpath := filepath.Join(Dirpath(), filename)
 	if Exists(fullpath) {

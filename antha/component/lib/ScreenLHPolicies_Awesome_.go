@@ -5,7 +5,8 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
-
+	//"path/filepath"
+	//anthapath "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
@@ -45,7 +46,10 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 
 	for location, colour := range positiontocolourmap {
 		R, G, B, A := colour.RGBA()
-		if uint8(R) != uint8(242) && uint8(G) != uint8(243) && uint8(B) != uint8(242) && uint8(A) != uint8(255) {
+
+		if uint8(R) == 242 && uint8(G) == 243 && uint8(B) == 242 && uint8(A) == 255 {
+			continue
+		} else {
 			wellpositionarray = append(wellpositionarray, location)
 		}
 	}
@@ -104,6 +108,8 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 		}
 	}
 	_output.Reactions = reactions
+	_output.Runcount = len(_output.Reactions)
+	_output.Pixelcount = len(wellpositionarray)
 
 }
 
@@ -175,12 +181,16 @@ type ScreenLHPolicies_AwesomeInput struct {
 }
 
 type ScreenLHPolicies_AwesomeOutput struct {
+	Pixelcount           int
 	Reactions            []*wtype.LHSolution
+	Runcount             int
 	Runtowelllocationmap []string
 }
 
 type ScreenLHPolicies_AwesomeSOutput struct {
 	Data struct {
+		Pixelcount           int
+		Runcount             int
 		Runtowelllocationmap []string
 	}
 	Outputs struct {
@@ -202,7 +212,9 @@ func init() {
 				{Name: "TestSolVolumes", Desc: "", Kind: "Parameters"},
 				{Name: "TestSols", Desc: "", Kind: "Inputs"},
 				{Name: "TotalVolume", Desc: "", Kind: "Parameters"},
+				{Name: "Pixelcount", Desc: "", Kind: "Data"},
 				{Name: "Reactions", Desc: "", Kind: "Outputs"},
+				{Name: "Runcount", Desc: "", Kind: "Data"},
 				{Name: "Runtowelllocationmap", Desc: "", Kind: "Data"},
 			},
 		},

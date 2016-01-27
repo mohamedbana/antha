@@ -3,7 +3,7 @@
         "AliquotParams": {
             "InPlate": "pcrplate_with_cooler",
             "NumberofAliquots": 50,
-            "OutPlate": "pcrplate_with_cooler",
+            "OutPlate": "pcrplate_skirted",
             "Solution": "PrimerFw",
             "SolutionVolume": "4000ul",
             "VolumePerAliquot": "10ul"

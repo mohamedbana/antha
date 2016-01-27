@@ -70,6 +70,7 @@ Steps {
 		testSample := mixer.Sample(TestSols[k], TestSolVolume)
 		eachreaction = append(eachreaction,testSample)
 		reaction := MixInto(OutPlate, eachreaction...)
+		//fmt.Println("where am I?",reaction.Welladdress, reaction.Plateaddress, reaction.PlateID)
 		reactions = append(reactions,reaction)
 		
 	}

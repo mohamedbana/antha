@@ -34,4 +34,5 @@ type PlateReadingDriver interface {
 	Run(protocol string) (*PROutput, driver.CommandStatus)
 	Open() driver.CommandStatus
 	Close() driver.CommandStatus
+	ParseOutputfile(string) (map[*wtype.LHSolution]*PROutput, driver.CommandStatus)
 }

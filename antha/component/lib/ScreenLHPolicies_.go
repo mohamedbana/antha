@@ -56,6 +56,7 @@ func _ScreenLHPoliciesSteps(_ctx context.Context, _input *ScreenLHPoliciesInput,
 				testSample := mixer.Sample(_input.TestSols[k], _input.TestSolVolume)
 				eachreaction = append(eachreaction, testSample)
 				reaction := execute.MixInto(_ctx, _input.OutPlate, eachreaction...)
+				//fmt.Println("where am I?",reaction.Welladdress, reaction.Plateaddress, reaction.PlateID)
 				reactions = append(reactions, reaction)
 
 			}
