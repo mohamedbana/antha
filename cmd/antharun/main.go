@@ -23,24 +23,31 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/antha-lang/antha/antha/component/lib"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"github.com/antha-lang/antha/target"
 	"io/ioutil"
 	"log"
 	"os"
 )
 
+const (
+	jsonOutput = iota
+	stringOutput
+)
+
 var (
-	logFile        string
 	parametersFile string
 	workflowFile   string
 	driverURI      string
+	frontend       string
 	list           bool
-	inputPlateFile string // TODO: Forward to execution
+	output         int
 )
 
 func makeContext() (context.Context, error) {
@@ -59,25 +66,20 @@ func makeContext() (context.Context, error) {
 }
 
 func run() error {
-	if driverURI != "" {
-		fe, err := NewRemoteFrontend(driverURI)
-		if err != nil {
-			return err
-		}
-		defer fe.Shutdown()
-	} else {
-		fmt.Println("Press [Enter] to load antha workflow with manual driver...")
-		fmt.Println("Reminder: press [Control-X] to exit the workflow interface")
-		if _, err := fmt.Scanln(); err != nil {
-			return err
-		}
-
-		fe, err := NewCUIFrontend()
-		if err != nil {
-			return err
-		}
-		defer fe.Shutdown()
+	if len(driverURI) > 0 && frontend == DEBUG {
+		frontend = REMOTE
 	}
+
+	t := target.New()
+	fe, err := NewFrontend(Options{
+		Kind:   frontend,
+		Target: t,
+		URI:    driverURI,
+	})
+	if err != nil {
+		return err
+	}
+	defer fe.Shutdown()
 
 	wdata, err := ioutil.ReadFile(workflowFile)
 	if err != nil {
@@ -95,6 +97,7 @@ func run() error {
 	}
 
 	w, err := execute.Run(ctx, execute.Options{
+		Target:       t,
 		WorkflowData: wdata,
 		ParamData:    pdata,
 	})
@@ -109,22 +112,99 @@ func run() error {
 	return nil
 }
 
+type port struct {
+	Name        string `json:"name"`
+	Type        string `json:"type"`
+	Description string `json:"description"`
+	Kind        string `json:"kind"`
+}
+
+type component struct {
+	Id          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Path        string `json:"path"`
+	InPorts     []port `json:"in_ports"`
+	OutPorts    []port `json:"out_ports"`
+}
+
+func getComponents() ([]component, error) {
+	var cs []component
+	for _, v := range lib.GetComponents() {
+		c := component{
+			Id:          v.Name,
+			Name:        v.Name,
+			Description: v.Desc.Desc,
+			Path:        v.Desc.Path,
+		}
+		for _, p := range v.Desc.Params {
+			port := port{
+				Name:        p.Name,
+				Type:        p.Type,
+				Description: p.Desc,
+				Kind:        p.Kind,
+			}
+			switch p.Kind {
+			case "Outputs", "Data":
+				c.OutPorts = append(c.OutPorts, port)
+			case "Inputs", "Parameters":
+				c.InPorts = append(c.InPorts, port)
+			default:
+				return nil, fmt.Errorf("unknown parameter kind %q", p.Kind)
+			}
+		}
+		cs = append(cs, c)
+	}
+	return cs, nil
+}
+
+func printComponents(cs []component) error {
+	switch output {
+	case jsonOutput:
+		bs, err := json.Marshal(cs)
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(bs))
+	default:
+		for _, c := range cs {
+			fmt.Printf("%s:\n", c.Name)
+			fmt.Printf("\tInputs:\n")
+			for _, p := range c.InPorts {
+				fmt.Printf("\t\t%s %s\n", p.Name, p.Type)
+			}
+			fmt.Printf("\tOutputs:\n")
+			for _, p := range c.OutPorts {
+				fmt.Printf("\t\t%s %s\n", p.Name, p.Type)
+			}
+		}
+	}
+	return nil
+}
+
 func main() {
+	var outputStr string
 	flag.BoolVar(&list, "list", false, "list the available components")
+	flag.StringVar(&outputStr, "output", "", "output format")
 	flag.StringVar(&parametersFile, "parameters", "parameters.yml", "parameters to workflow")
 	flag.StringVar(&workflowFile, "workflow", "workflow.json", "workflow definition file")
-	flag.StringVar(&logFile, "log", "", "log file")
 	flag.StringVar(&driverURI, "driver", "", "uri where a grpc driver implementation listens")
-	flag.StringVar(&inputPlateFile, "inputFile", "", "filename for an input plate definition")
+	flag.StringVar(&frontend, "frontend", "debug", "kind of frontend one of {debug, cui, remote}")
 	flag.Parse()
 
+	switch outputStr {
+	default:
+		output = stringOutput
+	case "json":
+		output = jsonOutput
+	}
 	if list {
-		fmt.Println("Available Components")
-		fmt.Println("====================")
-		for _, v := range lib.GetComponents() {
-			fmt.Printf("\t %q.\n", v.Name)
+		if cs, err := getComponents(); err != nil {
+			log.Fatal(err)
+		} else if err := printComponents(cs); err != nil {
+			log.Fatal(err)
 		}
-		fmt.Println("====================")
+		return
 	}
 
 	if len(parametersFile) == 0 || len(workflowFile) == 0 {

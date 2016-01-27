@@ -24,15 +24,16 @@ package export
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"strings"
+
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"log"
-	"os"
-	"strings"
 )
 
 // function to export a standard report of sequence properties to a txt file
@@ -140,6 +141,22 @@ func ExportReport(dir string, seq wtype.BioSequence) string {
 // function to export multiple sequences in fasta format into a single txt file
 // Modify this for the more general case
 func Makefastaserial(dir string, seqs []*wtype.DNASequence) string {
+	anthapath.CreatedotAnthafolder()
+	filename := fmt.Sprintf("%s%c%s.fasta", anthapath.Dirpath(), os.PathSeparator, dir)
+	f, e := os.Create(filename)
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	for _, seq := range seqs {
+		fmt.Fprintf(f, ">%s\n%s\n", seq.Name(), seq.Sequence())
+	}
+
+	f.Close()
+	return filename
+}
+
+func Makefastaserial2(dir string, seqs []wtype.DNASequence) string {
 	anthapath.CreatedotAnthafolder()
 	filename := fmt.Sprintf("%s%c%s.fasta", anthapath.Dirpath(), os.PathSeparator, dir)
 	f, e := os.Create(filename)
