@@ -64,7 +64,7 @@ func output_plate_setup(request *LHRequest) *LHRequest {
 	for i := 0; i < len(request.Output_major_group_layouts); i++ {
 		//p := wtype.New_Plate(request.Output_platetype)
 		//p := factory.GetPlateByType(request.Output_platetype.Type)
-		mgl := request.Output_major_group_layouts[i]
+		//mgl := request.Output_major_group_layouts[i]
 		//p := factory.GetPlateByType(output_platetype[mgl])
 		p := factory.GetPlateByType(output_platetype[0].Type)
 		output_plates[p.ID] = p
