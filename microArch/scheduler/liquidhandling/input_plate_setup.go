@@ -73,6 +73,7 @@ func (is InputSorter) Less(i, j int) bool {
 //OUTPUT: 	"input_plates"      -- these each have components in wells
 //		"input_assignments" -- map with arrays of assignment strings, i.e. {tea: [plate1:A:1, plate1:A:2...] }etc.
 func input_plate_setup(request *LHRequest) *LHRequest {
+	logger.Debug("in input plate setup")
 	input_platetypes := (*request).Input_platetypes
 	if input_platetypes == nil || len(input_platetypes) == 0 {
 		// XXX this is dangerous... until input_plate_linear is replaced we will hit big problems here
