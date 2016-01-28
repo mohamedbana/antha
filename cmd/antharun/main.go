@@ -37,17 +37,9 @@ import (
 )
 
 const (
-	jsonOutput = iota
-	stringOutput
-)
-
-var (
-	parametersFile string
-	workflowFile   string
-	driverURI      string
-	frontend       string
-	list           bool
-	output         int
+	jsonOutput   = "json"
+	stringOutput = "pretty"
+	defaultPort  = 50051
 )
 
 func makeContext() (context.Context, error) {
@@ -65,28 +57,31 @@ func makeContext() (context.Context, error) {
 	return ctx, nil
 }
 
-func run() error {
-	if len(driverURI) > 0 && frontend == DEBUG {
-		frontend = REMOTE
-	}
+type opts struct {
+	Frontend       string
+	DriverURI      string
+	ParametersFile string
+	WorkflowFile   string
+}
 
+func runOne(opts opts) error {
 	t := target.New()
 	fe, err := NewFrontend(Options{
-		Kind:   frontend,
+		Kind:   opts.Frontend,
 		Target: t,
-		URI:    driverURI,
+		URI:    opts.DriverURI,
 	})
 	if err != nil {
 		return err
 	}
 	defer fe.Shutdown()
 
-	wdata, err := ioutil.ReadFile(workflowFile)
+	wdata, err := ioutil.ReadFile(opts.WorkflowFile)
 	if err != nil {
 		return err
 	}
 
-	pdata, err := ioutil.ReadFile(parametersFile)
+	pdata, err := ioutil.ReadFile(opts.ParametersFile)
 	if err != nil {
 		return err
 	}
@@ -158,7 +153,7 @@ func getComponents() ([]component, error) {
 	return cs, nil
 }
 
-func printComponents(cs []component) error {
+func printComponents(output string, cs []component) error {
 	switch output {
 	case jsonOutput:
 		bs, err := json.Marshal(cs)
@@ -182,43 +177,73 @@ func printComponents(cs []component) error {
 	return nil
 }
 
-func main() {
-	var outputStr string
-	flag.BoolVar(&list, "list", false, "list the available components")
-	flag.StringVar(&outputStr, "output", "", "output format")
-	flag.StringVar(&parametersFile, "parameters", "parameters.yml", "parameters to workflow")
-	flag.StringVar(&workflowFile, "workflow", "workflow.json", "workflow definition file")
-	flag.StringVar(&driverURI, "driver", "", "uri where a grpc driver implementation listens")
-	flag.StringVar(&frontend, "frontend", "debug", "kind of frontend one of {debug, cui, remote}")
+func run() error {
+	list := flag.Bool("list", false, "list the available components")
+	output := flag.String("output", "pretty", "output format one of {json, pretty}")
+	parametersFile := flag.String("parameters", "parameters.yml", "parameters to workflow")
+	workflowFile := flag.String("workflow", "workflow.json", "workflow definition file")
+	driver := flag.String("driver", "", "uri where remote grpc driver implementation listens")
+	package_ := flag.String("package", "", "go package to spawn grpc driver from")
+	frontend := flag.String("frontend", "debug", "kind of frontend one of {debug, cui, remote}")
 	flag.Parse()
 
-	switch outputStr {
-	default:
-		output = stringOutput
-	case "json":
-		output = jsonOutput
-	}
-	if list {
+	if *list {
 		if cs, err := getComponents(); err != nil {
 			log.Fatal(err)
-		} else if err := printComponents(cs); err != nil {
+		} else if err := printComponents(*output, cs); err != nil {
 			log.Fatal(err)
 		}
-		return
+		return nil
 	}
 
-	if len(parametersFile) == 0 || len(workflowFile) == 0 {
-		flag.PrintDefaults()
-		os.Exit(1)
-	}
-
-	if driverURI == "" {
-		if envDriver := os.Getenv("DRIVERURI"); len(envDriver) > 0 {
-			driverURI = envDriver
+	if len(*driver) == 0 {
+		if e := os.Getenv("DRIVERURI"); len(e) > 0 {
+			*driver = e
 		}
 	}
 
+	if len(*parametersFile) == 0 || len(*workflowFile) == 0 {
+		return fmt.Errorf("missing parameters and/or workflow command line argument")
+	}
+
+	if len(*driver) > 0 && len(*package_) > 0 {
+		return fmt.Errorf("command line argument driver is not compatible with package")
+	}
+
+	if len(*package_) > 0 {
+		s, err := spawn(*package_, defaultPort)
+		if s != nil {
+			defer s.Close()
+		}
+		if err != nil {
+			return err
+		}
+		if err := s.Command.Start(); err != nil {
+			return err
+		}
+		defer func() {
+			s.Command.Process.Kill()
+		}()
+		*driver = s.URI
+	}
+
+	if len(*driver) > 0 && *frontend == DEBUG {
+		*frontend = REMOTE
+	}
+
+	if err := runOne(opts{
+		Frontend:       *frontend,
+		DriverURI:      *driver,
+		ParametersFile: *parametersFile,
+		WorkflowFile:   *workflowFile,
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func main() {
 	if err := run(); err != nil {
-		log.Fatal(err)
+		fmt.Fprintln(os.Stderr, err)
 	}
 }
