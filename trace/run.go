@@ -9,6 +9,7 @@ import (
 	"github.com/antha-lang/antha/microArch/equipment"
 	"github.com/antha-lang/antha/microArch/equipment/action"
 	"github.com/antha-lang/antha/target"
+	"runtime/debug"
 )
 
 func configMix(inst *MixInst) (*wtype.LHSolution, error) {
@@ -77,18 +78,23 @@ func runEnd(ctx context.Context, blockId wtype.BlockID) error {
 // Run trace instructions.
 //
 // XXX(ddn): place after code generation.
-func run(ctx context.Context, instps []instp) error {
+func run(ctx context.Context, instps []instp) (err error) {
+	defer func() {
+		if res := recover(); res != nil {
+			err = &goError{BaseError: res, Stack: debug.Stack()}
+		}
+	}()
 	blockIds := make(map[wtype.BlockID]bool)
 	for _, in := range instps {
-		if err := runIn(ctx, blockIds, in); err != nil {
-			return err
+		if err = runIn(ctx, blockIds, in); err != nil {
+			return
 		}
 	}
 
 	for id := range blockIds {
-		if err := runEnd(ctx, id); err != nil {
-			return err
+		if err = runEnd(ctx, id); err != nil {
+			return
 		}
 	}
-	return nil
+	return
 }
