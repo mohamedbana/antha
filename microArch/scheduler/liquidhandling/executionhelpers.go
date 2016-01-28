@@ -104,17 +104,6 @@ func copyplates(plts map[string]*wtype.LHPlate) map[string]*wtype.LHPlate {
 	return ret
 }
 
-func sortOutputOrder(minorlayoutgroups [][]string, ass []string, sorttype int) ([][]string, []string) {
-	a2 := make([]string, len(ass))
-	mlg2 := make([][]string, len(minorlayoutgroups))
-
-	for x, a := range minorlayoutgroups {
-		mlg2[x] = a
-	}
-
-	for i, v := range ass {
-		a2[i] = v
-	}
-
-	return mlg2, a2
+func set_output_order(rq *LHRequest) {
+	// this starts off being based on the order solutions were defined in
 }

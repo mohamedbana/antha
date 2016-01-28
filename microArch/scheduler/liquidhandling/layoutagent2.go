@@ -71,7 +71,9 @@ func get_and_complete_assignments(request *LHRequest) []PlateChoice {
 	m := make(map[int]string)
 
 	// inconsistent plate types will be assigned randomly!
-	for k, v := range request.Output_solutions {
+	//	for k, v := range request.Output_solutions {
+	for _, k := range request.Order_solutions_added {
+		v := request.Output_solutions[k]
 		if v.PlateID != "" {
 			i := defined(v.PlateID, s)
 
@@ -246,12 +248,15 @@ func make_plates(request *LHRequest) {
 			remap[v.PlateID] = plate.ID
 			request.Output_solutions[k].PlateID = remap[v.PlateID]
 		}
+
 	}
 }
 
 func make_layouts(request *LHRequest, pc []PlateChoice) {
 	// we need to fill in the platechoice structure then
 	// transfer the info across to the solutions
+
+	opa := request.Output_assignments
 
 	for _, c := range pc {
 		// make a temporary plate to hold info
@@ -261,6 +266,8 @@ func make_layouts(request *LHRequest, pc []PlateChoice) {
 		// make an iterator for it
 
 		it := request.OutputIteratorFactory(plat)
+
+		//seed in the existing assignments
 
 		for _, w := range c.Wells {
 			if w != "" {
@@ -273,6 +280,8 @@ func make_layouts(request *LHRequest, pc []PlateChoice) {
 			sID := c.Assigned[i]
 			well := c.Wells[i]
 
+			var assignment string
+
 			if well == "" {
 				wc := plat.NextEmptyWell(it)
 
@@ -283,8 +292,14 @@ func make_layouts(request *LHRequest, pc []PlateChoice) {
 
 				plat.Cols[wc.X][wc.Y].Currvol += 100.0
 				request.Output_solutions[sID].Welladdress = wc.FormatA1()
+				assignment = c.ID + ":" + wc.FormatA1()
+			} else {
+				assignment = c.ID + ":" + well
 			}
+
+			opa[assignment] = append(opa[assignment], sID)
 		}
 	}
 
+	request.Output_assignments = opa
 }

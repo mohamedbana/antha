@@ -414,12 +414,15 @@ func (e *AnthaManualGrpc) configRequest(actionDescription equipment.ActionDescri
 
 	t, ok := params["WELLBYWELL"]
 
-	if ok {
-		if t.(bool) {
-			logger.Debug("WELL BY WELL MODE SELECTED")
-			e.planner[data.BlockID].ExecutionPlanner = schedulerLiquidhandling.AdvancedExecutionPlanner2
+	/*
+		deprecated before even being used!
+		if ok {
+			if t.(bool) {
+				logger.Debug("WELL BY WELL MODE SELECTED")
+				e.planner[data.BlockID].ExecutionPlanner = schedulerLiquidhandling.AdvancedExecutionPlanner2
+			}
 		}
-	}
+	*/
 
 	return nil
 }
@@ -454,7 +457,8 @@ func (e *AnthaManualGrpc) sendMix(actionDescription equipment.ActionDescription)
 	}
 
 	req.Output_platetypes = opt
-	req.Output_solutions[sol.ID] = &sol
+	//req.Output_solutions[sol.ID] = &sol
+	req.Add_solution(&sol)
 
 	return nil
 }

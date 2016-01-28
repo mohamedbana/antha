@@ -49,6 +49,7 @@ type MixOpt struct {
 	PlateType string
 	Address   string
 	PlateNum  int
+	Caller    string
 }
 
 func MakeMix(opt MixOpt, values []Value) *MixInst {

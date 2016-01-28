@@ -44,47 +44,36 @@ func ImprovedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 	// IT'S THAT HIDEOUS HACK AGAIN
 	volume_correction := 0.5
 
-	// get the layout groups
+	set_output_order(request)
 
-	minorlayoutgroups := request.Output_minor_group_layouts
-	ass := request.Output_assignments
-
-	// sort them, we might want to record the acutal order somewhere... also to allow user configuration of this
-
-	minorlayoutgroups, ass = sortOutputOrder(minorlayoutgroups, ass, COLWISE)
+	output_order := request.Output_order
 
 	inass := request.Input_assignments
 	output_solutions := request.Output_solutions
 	input_plates := copyplates(request.Input_plates)
-	output_plate_layout := request.Output_plate_layout
 	output_plates := copyplates(request.Output_plates)
 	plate_lookup := request.Plate_lookup
 
 	instructions := liquidhandling.NewRobotInstructionSet(nil)
-	order := request.Input_order
 
-	// this whole bit is just to get input well volumes sorted out
+	for _, g := range output_order {
+		grp := []string(g)
+		for _, solID := range grp {
+			sol := output_solutions[solID]
 
-	for _, name := range order {
-		for _, g := range minorlayoutgroups {
-			grp := []string(g)
-			for _, solID := range grp {
-				sol := output_solutions[solID]
+			// we need to get the relevant component out
+			smpl := get_aggregate_component(sol, name)
+			if smpl == nil {
+				continue
+			}
 
-				// we need to get the relevant component out
-				smpl := get_aggregate_component(sol, name)
-				if smpl == nil {
-					continue
-				}
+			// just for the side-effects, eesh
+			inassignmentar := []string(inass[name])
+			vol := smpl.Vol + volume_correction
+			_, _, ok := get_assignment(inassignmentar, &input_plates, vol)
 
-				// just for the side-effects, eesh
-				inassignmentar := []string(inass[name])
-				vol := smpl.Vol + volume_correction
-				_, _, ok := get_assignment(inassignmentar, &input_plates, vol)
-
-				if !ok {
-					wutil.Error(errors.New(fmt.Sprintf("No input assignment for %s with vol %-4.1f", name, smpl.Vol)))
-				}
+			if !ok {
+				wutil.Error(errors.New(fmt.Sprintf("No input assignment for %s with vol %-4.1f", name, smpl.Vol)))
 			}
 		}
 	}

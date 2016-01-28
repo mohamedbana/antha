@@ -45,7 +45,7 @@ type LHRequest struct {
 	Robotfn                    string
 	Outputfn                   string
 	Input_assignments          map[string][]string
-	Output_assignments         map[string]string
+	Output_assignments         map[string][]string
 	Input_plates               map[string]*wtype.LHPlate
 	Output_plates              map[string]*wtype.LHPlate
 	Input_platetypes           []*wtype.LHPlate
@@ -62,6 +62,7 @@ type LHRequest struct {
 	Policies                   *liquidhandling.LHPolicyRuleSet
 	Input_order                []string
 	Output_order               []string
+	Order_solutions_added      []string
 	OutputIteratorFactory      func(*wtype.LHPlate) wtype.PlateIterator
 }
 
@@ -112,7 +113,15 @@ func NewLHRequest() *LHRequest {
 	lhr.Input_order = make([]string, 0)
 	lhr.Output_order = make([]string, 0)
 	lhr.OutputIteratorFactory = wtype.NewOneTimeRowIterator
+	lhr.Output_assignments = make(map[string][]string)
+	lhr.Input_assignments = make(map[string][]string)
+	lhr.Order_solutions_added = make([]string, 0, 1)
 	return &lhr
+}
+
+func (lhr *LHRequest) AddSolution(s *wtype.LHSolution) {
+	lhr.Output_solutions[s.ID] = s
+	lhr.Order_solutions_added = append(lhr.Order_solutions_added, s.ID)
 }
 
 type LHPolicyManager struct {
