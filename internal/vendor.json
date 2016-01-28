@@ -183,6 +183,11 @@
 			"revisionTime": "2015-05-19T08:45:55-07:00"
 		},
 		{
+			"path": "github.com/mattn/go-colorable",
+			"revision": "51a7e7a8b1665b25ca173debdc8d52d493348f15",
+			"revisionTime": "2015-11-10T18:43:35+09:00"
+		},
+		{
 			"path": "github.com/mattn/go-runewidth",
 			"revision": "5890272cd41c5103531cd7b79e428d99c9e97f76",
 			"revisionTime": "2015-05-27T19:19:16+09:00"
@@ -208,11 +213,6 @@
 			"revisionTime": "2015-07-24T21:09:55+02:00"
 		},
 		{
-			"path": "golang.org/x/net/context",
-			"revision": "042ba42fa6633b34205efc66ba5719cd3afd8d38",
-			"revisionTime": "2015-11-08T11:16:06+01:00"
-		},
-		{
 			"path": "golang.org/x/image/bmp",
 			"revision": "baddd3465a05d84a6d8d3507547a91cb188c81ea",
 			"revisionTime": "2015-09-11T13:43:18+10:00"
@@ -226,6 +226,11 @@
 			"path": "golang.org/x/image/tiff/lzw",
 			"revision": "baddd3465a05d84a6d8d3507547a91cb188c81ea",
 			"revisionTime": "2015-09-11T13:43:18+10:00"
+		},
+		{
+			"path": "golang.org/x/net/context",
+			"revision": "042ba42fa6633b34205efc66ba5719cd3afd8d38",
+			"revisionTime": "2015-11-08T11:16:06+01:00"
 		},
 		{
 			"path": "golang.org/x/net/html",

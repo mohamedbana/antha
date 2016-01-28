@@ -203,7 +203,7 @@ func init() {
 		Constructor: FindPartsthatNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/Data/DNA/FindPartsthat.../Findpartsthat.an",
+			Path: "antha/component/an/Data/DNA/FindPartsthat/Findpartsthat.an",
 			Params: []ParamDesc{
 				{Name: "OnlyreturnAvailableParts", Desc: "", Kind: "Parameters"},
 				{Name: "OnlyreturnWorkingparts", Desc: "", Kind: "Parameters"},

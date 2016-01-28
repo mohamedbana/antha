@@ -78,64 +78,6 @@ func MakePolicies() map[string]LHPolicy {
 
 }
 
-var tipuse = DOEPair{"TIP_REUSE_LIMIT", []interface{}{0, 1}}
-var postmix = DOEPair{"POST_MIX", []interface{}{0, 2, 4}}
-var postmixvol = DOEPair{"POST_MIX_VOLUME", []interface{}{50, 75, 100}}
-var airdisp = DOEPair{"NO_AIR_DISPENSE", []interface{}{false, true}}
-var aspwait = DOEPair{"ASP_WAIT", []interface{}{0.0, 0.5, 1.0}}
-var dspwait = DOEPair{"DSP_WAIT", []interface{}{0.0, 0.5, 1.0}}
-var premix = DOEPair{"PRE_MIX", []interface{}{0, 2, 4}}
-var asp = DOEPair{"ASP_SPEED", []interface{}{0.5, 1.25, 2.0}}
-var dsp = DOEPair{"DSP_SPEED", []interface{}{0.5, 1.25, 2.0}}
-var aspoff = DOEPair{"ASPZOFFSET", []interface{}{0.0, 0.25, 0.5}}
-var dspoff = DOEPair{"DSPZOFFSET", []interface{}{0.0, 0.25, 0.5}}
-var touch = DOEPair{"TOUCHOFF", []interface{}{false, true}}
-var blowout = DOEPair{"BLOWOUTVOLUME", []interface{}{1.0, 100.5, 200.0}}
-var Allpairs = []DOEPair{tipuse, postmix, postmixvol, airdisp, aspwait, dspwait, premix, asp, dsp, aspoff, dspoff, touch, blowout}
-
-//var policies []LHPolicy = PolicyMaker([]string{"ASP_SPEED","DSP_SPEED","TOUCHOFF"},[][]interface{3.0,3.0,true})
-/*
-func PolicyMaker(factordescriptors []string, setpointsetsforeachdecriptorinorder [][]interface{}) (policies []LHPolicy) {
-
-	policies = make([]LHPolicy, 0)
-
-	for _, factor := range factordescriptors {
-		//pols[factor] = levels
-		defaultpolicy := make(LHPolicy, 10)
-		for _, setpoint := range setpointsetsforeachdecriptorinorder {
-			defaultpolicy[factor] = setpoint
-		}
-
-		/*defaultpolicy["DSP_SPEED"] = 3.0
-		defaultpolicy["TOUCHOFF"] = false
-		defaultpolicy["TOUCHOFFSET"] = 0.5
-		defaultpolicy["ASPREFERENCE"] = 0
-		defaultpolicy["ASPZOFFSET"] = 0.5
-		defaultpolicy["DSPREFERENCE"] = 0
-		defaultpolicy["DSPZOFFSET"] = 0.5
-		defaultpolicy["CAN_MULTI"] = false
-		defaultpolicy["CAN_MSA"] = false
-		defaultpolicy["CAN_SDD"] = true
-		defaultpolicy["TIP_REUSE_LIMIT"] = 100
-		defaultpolicy["BLOWOUTREFERENCE"] = 1
-		defaultpolicy["BLOWOUTOFFSET"] = -0.5
-		defaultpolicy["BLOWOUTVOLUME"] = 200.0
-		defaultpolicy["BLOWOUTVOLUMEUNIT"] = "ul"
-		defaultpolicy["PTZREFERENCE"] = 1
-		defaultpolicy["PTZOFFSET"] = -0.5
-		defaultpolicy["NO_AIR_DISPENSE"] = false
-		defaultpolicy["DEFAULTPIPETTESPEED"] = 1.0
-		defaultpolicy["MANUALPTZ"] = false
-		defaultpolicy["JUSTBLOWOUT"] = false
-		defaultpolicy["DONT_BE_DIRTY"] = true
-
-		policies = append(policies, defaultpolicy)
-
-	}
-	return
-}
-*/
-
 func PolicyMakerfromDesign(dxdesignfilename string, prepend string) (policies []LHPolicy, names []string, err error) {
 	runs, err := RunsFromDXDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), []string{"Pre_MIX", "POST_MIX"})
 	if err != nil {

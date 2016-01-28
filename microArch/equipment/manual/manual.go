@@ -348,6 +348,7 @@ func (e *AnthaManualGrpc) configRequest(actionDescription equipment.ActionDescri
 	var data struct {
 		BlockID wtype.BlockID
 	}
+
 	if err := json.Unmarshal([]byte(actionDescription.ActionData), &data); err != nil {
 		return err
 	}
@@ -367,24 +368,57 @@ func (e *AnthaManualGrpc) configRequest(actionDescription equipment.ActionDescri
 	} else {
 		req = r
 	}
-	//@jmanart TODO this down needs to come from the configuration step, need to figure out the correct cast
-	// XXX XXX XXX this can cause big issues
-	req.Input_Setup_Weights["MAX_N_PLATES"] = 4.5
-	req.Input_Setup_Weights["MAX_N_WELLS"] = 278.0
-	req.Input_Setup_Weights["RESIDUAL_VOLUME_WEIGHT"] = 1.0
 
-	// MIS MAJOR TODO XXX XXX XXX here: this HARD CODE needs to be removed or we can only use one type of plate!
-	// this stuff needs to come from the database - have to work out user configurability here also
-	// oh dear, this code is wronger than I had realised
-	// MIS fix here - only allow a single plate in here
-	if len(req.Input_platetypes) == 0 {
+	var params map[string]interface{}
+	if err := json.Unmarshal([]byte(actionDescription.ActionData), &params); err != nil {
+		return err
+	}
 
-		//pwc := factory.GetPlateByType("DWST12_riser")
+	// need to pass the config info into the request
 
-		//pwc := factory.GetPlateByType("pcrplate_with_cooler")
-		pwc := factory.GetPlateByType("pcrplate_skirted")
+	mnp, ok := params["MAX_N_PLATES"]
 
-		req.Input_platetypes = append(req.Input_platetypes, pwc)
+	if ok {
+		req.Input_Setup_Weights["MAX_N_PLATES"] = mnp.(float64)
+	} else {
+		logger.Debug("NO MAX N PLATES FOUND")
+	}
+
+	mnw, ok := params["MAX_N_WELLS"]
+
+	if ok {
+		req.Input_Setup_Weights["MAX_N_WELLS"] = mnw.(float64)
+	}
+
+	rvw, ok := params["RESIDUAL_VOLUME_WEIGHT"]
+
+	if ok {
+		req.Input_Setup_Weights["RESIDUAL_VOLUME_WEIGHT"] = rvw.(float64)
+	}
+
+	pt, ok := params["INPUT_PLATETYPE"]
+
+	if ok {
+		for _, v := range pt.([]interface{}) {
+			req.Input_platetypes = append(req.Input_platetypes, factory.GetPlateByType(v.(string)))
+		}
+	}
+
+	opt, ok := params["OUTPUT_PLATETYPE"]
+
+	if ok {
+		for _, v := range opt.([]interface{}) {
+			req.Output_platetypes = append(req.Output_platetypes, factory.GetPlateByType(v.(string)))
+		}
+	}
+
+	t, ok := params["WELLBYWELL"]
+
+	if ok {
+		if t.(bool) {
+			logger.Debug("WELL BY WELL MODE SELECTED")
+			e.planner[data.BlockID].ExecutionPlanner = schedulerLiquidhandling.AdvancedExecutionPlanner2
+		}
 	}
 
 	return nil
@@ -403,14 +437,39 @@ func (e *AnthaManualGrpc) sendMix(actionDescription equipment.ActionDescription)
 	if !ok {
 		return fmt.Errorf("Request for block id %v not found", sol.BlockID)
 	}
+
+	opt := req.Output_platetypes
+
 	if sol.Platetype != "" {
-		req.Output_platetype = factory.GetPlateByType(sol.Platetype)
-	} else {
-		req.Output_platetype = factory.GetPlateByType("pcrplate_with_cooler")
+		typ := sol.Platetype
+		id := sol.PlateID
+
+		there := findPlateWithType_ID(opt, typ, id)
+
+		if !there {
+			plat := factory.GetPlateByType(typ)
+			plat.ID = id
+			opt = append(opt, plat)
+		}
 	}
+
+	req.Output_platetypes = opt
 	req.Output_solutions[sol.ID] = &sol
 
 	return nil
+}
+
+func findPlateWithType_ID(arr []*wtype.LHPlate, typ string, id string) bool {
+	there := false
+	for _, v := range arr {
+		if v.Type == typ {
+			if id == "" || id == v.ID {
+				there = true
+				break
+			}
+		}
+	}
+	return there
 }
 
 func (e *AnthaManualGrpc) end(actionDescription equipment.ActionDescription) error {

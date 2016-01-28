@@ -27,6 +27,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/internal/github.com/Synthace/go-glpk/glpk"
+	//"github.com/antha-lang/antha/microArch/logger"
 )
 
 func choose_plate_assignments(component_volumes map[string]wunit.Volume, plate_types []*wtype.LHPlate, weight_constraint map[string]float64) map[string]map[*wtype.LHPlate]int {
@@ -61,7 +62,6 @@ func choose_plate_assignments(component_volumes map[string]wunit.Volume, plate_t
 		if h[p.Type] {
 			continue
 		}
-
 		ppt = append(ppt, p)
 		h[p.Type] = true
 	}
@@ -200,7 +200,7 @@ func choose_plate_assignments(component_volumes map[string]wunit.Volume, plate_t
 	iocp := glpk.NewIocp()
 	iocp.SetPresolve(true)
 	//debug
-	iocp.SetMsgLev(2)
+	iocp.SetMsgLev(0)
 	lp.Intopt(iocp)
 
 	assignments := make(map[string]map[*wtype.LHPlate]int, len(component_volumes))

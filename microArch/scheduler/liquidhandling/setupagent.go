@@ -44,9 +44,9 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 	// instead we can rely on the preference system I already use
 
 	plate_lookup := make(map[string]string, 5)
-	tip_lookup := make([]*wtype.LHTipbox, 0, 5)
+	//tip_lookup := make([]*wtype.LHTipbox, 0, 5)
 
-	tip_preferences := params.Tip_preferences
+	//	tip_preferences := params.Tip_preferences
 	input_preferences := params.Input_preferences
 	output_preferences := params.Output_preferences
 
@@ -61,7 +61,7 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 	output_plates := request.Output_plates
 
 	// tips
-	tips := request.Tips
+	//	tips := request.Tips
 
 	// we put tips on first
 
@@ -80,22 +80,23 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 
 	}
 
-	for _, tb := range tips {
-		// get the first available position from the preferences
-		position := get_first_available_preference(tip_preferences, setup)
-		if position == "" {
-			RaiseError("No positions left for tipbox")
+	/*
+		for _, tb := range tips {
+			// get the first available position from the preferences
+			position := get_first_available_preference(tip_preferences, setup)
+			if position == "" {
+				RaiseError("No positions left for tipbox")
+			}
+
+			setup[position] = tb
+			plate_lookup[tb.ID] = position
+			tip_lookup = append(tip_lookup, tb)
+
+			logger.Info(fmt.Sprintf("Tip box of type %s in position %s", tb.Type, position))
 		}
 
-		setup[position] = tb
-		plate_lookup[tb.ID] = position
-		tip_lookup = append(tip_lookup, tb)
-
-		logger.Info(fmt.Sprintf("Tip box of type %s in position %s", tb.Type, position))
-	}
-
-	setup["tip_lookup"] = tip_lookup
-
+		setup["tip_lookup"] = tip_lookup
+	*/
 	// this logic may not transfer well but I expect that outputs are more constrained
 	// than inputs for the simple reason that most output takes place to single wells
 	// while input takes place from reservoirs
