@@ -72,7 +72,7 @@ type Liquidhandler struct {
 func Init(properties *liquidhandling.LHProperties) *Liquidhandler {
 	lh := Liquidhandler{}
 	lh.SetupAgent = BasicSetupAgent
-	lh.LayoutAgent = BasicLayoutAgent
+	lh.LayoutAgent = ImprovedLayoutAgent
 	lh.ExecutionPlanner = AdvancedExecutionPlanner
 	lh.Properties = properties
 	return &lh
@@ -188,15 +188,16 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 	request = this.GetInputs(request)
 
 	// define the input plates
+	// should be merged with the above
 
 	request = input_plate_setup(request)
 
 	// set up the mapping of the outputs
-	// this assumes the input plates are set
 	request = this.Layout(request)
 
 	// define the output plates
-	request = output_plate_setup(request)
+	// DEPRECATED, msrked for deletion
+	//request = output_plate_setup(request)
 
 	// next we need to determine the liquid handler setup
 	request = this.Setup(request)
@@ -204,9 +205,7 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 	// now make instructions
 	request = this.ExecutionPlan(request)
 
-	// define the tip boxes - this will depend on the execution plan
-	// this can eventually be removed if we allow state to pass from the execution
-	// planner back outside but for now it works on a copy
+	// fix the deck setup
 
 	request = this.Tip_box_setup(request)
 }

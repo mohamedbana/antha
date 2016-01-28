@@ -40,7 +40,7 @@ func BasicLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *
 	// get the incoming group IDs
 	// the purpose of this check is to determine whether there
 	// already exist assignments...this is quite tricky
-	MajorLayoutGroupIDs, _ := getLayoutGroupsAndPlates(solutions)
+	MajorLayoutGroupIDs, _ := getLayoutGroups(solutions)
 
 	// check we have enough and assign more if necessary
 	// needs to be done per plate
