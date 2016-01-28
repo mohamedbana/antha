@@ -7,9 +7,12 @@
             "Protein": "Load",
             "SampleNames": [
 			"Marker",
-			"sample1",
-			"Sample2",
-			"Marker2"
+			"NegativeControl",
+			"GFP",
+			"RFP",
+			"YFP",
+			"CFP",
+			"OFP"
 			],
             "Water": "water",
             "WaterName": "dH2O",
