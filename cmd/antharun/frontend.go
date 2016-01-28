@@ -72,7 +72,6 @@ func NewFrontend(opts Options) (*Frontend, error) {
 	} else if err := eq.Init(); err != nil {
 		return nil, err
 	} else {
-		fmt.Println("ASDFASDF----")
 		t.AddLiquidHandler(eq)
 		return &Frontend{
 			shutdowns: []func() error{func() error {
