@@ -466,7 +466,6 @@ func NewLHSetup() LHSetup {
 }
 
 // structure describing a microplate
-// this needs to be harmonised with the version
 type LHPlate struct {
 	*GenericEntity
 	ID          string
@@ -1192,7 +1191,6 @@ func (tb *LHTipbox) GetTips(mirror bool, multi, orient int) []string {
 				for j := s; j >= 0; j-- {
 					tb.Tips[i][j] = nil
 					wc := WellCoords{i, j}
-					fmt.Println(j, "Getting TIP from ", wc.FormatA1())
 					ret = append(ret, wc.FormatA1())
 					n += 1
 					if n >= multi {
@@ -1200,7 +1198,6 @@ func (tb *LHTipbox) GetTips(mirror bool, multi, orient int) []string {
 					}
 				}
 
-				fmt.Println("RET: ", ret)
 				break
 			}
 		}

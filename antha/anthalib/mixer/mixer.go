@@ -136,6 +136,9 @@ func SampleForTotalVolume(l wtype.Liquid, v wunit.Volume) *wtype.LHComponent {
 // take a sample of this liquid to be used to make the solution up to
 // a particular total volume
 // edit of SampleForTotalVolume to take into account the volume of the other solution components
+// XXX -- MIS that's precisely what the function above does, if there's an error we need to fix that
+// rather than adding a new function
+// this will be deleted shortly
 func TopUpVolume(l wtype.Liquid, current []wunit.Volume, final wunit.Volume) *wtype.LHComponent {
 	tot := 0.0
 	for _, j := range current {

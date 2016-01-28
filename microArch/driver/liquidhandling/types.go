@@ -29,6 +29,7 @@ import (
 
 	"github.com/antha-lang/antha/antha/anthalib/material"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
 )
 
@@ -300,36 +301,39 @@ func NewLHProperties(num_positions int, model, manufacturer, lhtype, tiptype str
 	return &lhp
 }
 
-func (lhp *LHProperties) AddTipBox(tipbox *wtype.LHTipbox) {
-
-	//for i := len(lhp.Tip_preferences) - 1; i >= 0; i-- {
-	//	pref := lhp.Tip_preferences[i]
+func (lhp *LHProperties) AddTipBox(tipbox *wtype.LHTipbox) bool {
 	for _, pref := range lhp.Tip_preferences {
 		if lhp.PosLookup[pref] != "" {
-
 			//fmt.Println(pref, " ", lhp.PlateLookup[lhp.PosLookup[pref]])
-
 			continue
 		}
 
 		lhp.AddTipBoxTo(pref, tipbox)
-		return
+		return true
 	}
 
-	// surely this should not be fatal
-	logger.Fatal("NO TIP SPACES LEFT")
-	panic("NO TIP SPACES LEFT")
+	logger.Debug("NO TIP SPACES LEFT")
+	return false
 }
-func (lhp *LHProperties) AddTipBoxTo(pos string, tipbox *wtype.LHTipbox) {
-	fmt.Println("Adding tip box of type, ", tipbox.Type, " To position ", pos)
+func (lhp *LHProperties) AddTipBoxTo(pos string, tipbox *wtype.LHTipbox) bool {
+	/*
+		fmt.Println("Adding tip box of type, ", tipbox.Type, " To position ", pos)
+		if lhp.PosLookup[pos] != "" {
+			logger.Fatal("CAN'T ADD TIPBOX TO FULL POSITION")
+			panic("CAN'T ADD TIPBOX TO FULL POSITION")
+		}
+	*/
+
 	if lhp.PosLookup[pos] != "" {
-		logger.Fatal("CAN'T ADD TIPBOX TO FULL POSITION")
-		panic("CAN'T ADD TIPBOX TO FULL POSITION")
+		logger.Debug(fmt.Sprintf("Tried to add tipbox to full position: %s", pos))
+		return false
 	}
 	lhp.Tipboxes[pos] = tipbox
 	lhp.PlateLookup[tipbox.ID] = tipbox
 	lhp.PosLookup[pos] = tipbox.ID
 	lhp.PlateIDLookup[tipbox.ID] = pos
+
+	return true
 }
 
 func (lhp *LHProperties) RemoveTipBoxes() {
@@ -342,7 +346,7 @@ func (lhp *LHProperties) RemoveTipBoxes() {
 	lhp.Tipboxes = make(map[string]*wtype.LHTipbox)
 }
 
-func (lhp *LHProperties) AddTipWaste(tipwaste *wtype.LHTipwaste) {
+func (lhp *LHProperties) AddTipWaste(tipwaste *wtype.LHTipwaste) bool {
 	for _, pref := range lhp.Tipwaste_preferences {
 		if lhp.PosLookup[pref] != "" {
 
@@ -352,37 +356,43 @@ func (lhp *LHProperties) AddTipWaste(tipwaste *wtype.LHTipwaste) {
 		}
 
 		lhp.AddTipWasteTo(pref, tipwaste)
-		return
+		return true
 	}
+	/*
+		logger.Fatal("NO TIPWASTE SPACES LEFT")
+		panic("NO TIPWASTE SPACES LEFT")
+	*/
 
-	logger.Fatal("NO TIPWASTE SPACES LEFT")
-	panic("NO TIPWASTE SPACES LEFT")
+	logger.Debug("NO TIPWASTE SPACES LEFT")
+	return false
 }
 
-func (lhp *LHProperties) AddTipWasteTo(pos string, tipwaste *wtype.LHTipwaste) {
+func (lhp *LHProperties) AddTipWasteTo(pos string, tipwaste *wtype.LHTipwaste) bool {
 	if lhp.PosLookup[pos] != "" {
-		logger.Fatal("CAN'T ADD TIPWASTE TO FULL POSITION")
-		panic("CAN'T ADD TIPWASTE TO FULL POSITION")
+		logger.Debug("CAN'T ADD TIPWASTE TO FULL POSITION")
+		//panic("CAN'T ADD TIPWASTE TO FULL POSITION")
+		return false
 	}
 	lhp.Tipwastes[pos] = tipwaste
 	lhp.PlateLookup[tipwaste.ID] = tipwaste
 	lhp.PosLookup[pos] = tipwaste.ID
 	lhp.PlateIDLookup[tipwaste.ID] = pos
+	return true
 }
 
-func (lhp *LHProperties) AddPlate(pos string, plate *wtype.LHPlate) {
+func (lhp *LHProperties) AddPlate(pos string, plate *wtype.LHPlate) bool {
 	if lhp.PosLookup[pos] != "" {
-		logger.Fatal("CAN'T ADD PLATE TO FULL POSITION")
-		panic("CAN'T ADD PLATE TO FULL POSITION")
+		logger.Debug("CAN'T ADD PLATE TO FULL POSITION")
+		return false
 	}
 	lhp.Plates[pos] = plate
 	lhp.PlateLookup[plate.ID] = plate
 	lhp.PosLookup[pos] = plate.ID
 	lhp.PlateIDLookup[plate.ID] = pos
-
+	return true
 }
 
-func (lhp *LHProperties) addWaste(waste *wtype.LHPlate) {
+func (lhp *LHProperties) addWaste(waste *wtype.LHPlate) bool {
 	for _, pref := range lhp.Waste_preferences {
 		if lhp.PosLookup[pref] != "" {
 
@@ -392,53 +402,51 @@ func (lhp *LHProperties) addWaste(waste *wtype.LHPlate) {
 		}
 
 		lhp.AddWasteTo(pref, waste)
-		return
+		return true
 	}
 
-	logger.Fatal("NO WASTE SPACES LEFT")
-	panic("NO WASTE SPACES LEFT")
+	logger.Debug("NO WASTE SPACES LEFT")
+	return false
 }
 
-func (lhp *LHProperties) AddWasteTo(pos string, waste *wtype.LHPlate) {
+func (lhp *LHProperties) AddWasteTo(pos string, waste *wtype.LHPlate) bool {
 	if lhp.PosLookup[pos] != "" {
-		logger.Fatal("CAN'T ADD WASTE TO FULL POSITION")
-		panic("CAN'T ADD WASTE TO FULL POSITION")
+		logger.Debug("CAN'T ADD WASTE TO FULL POSITION")
+		return false
 	}
 	lhp.Wastes[pos] = waste
 	lhp.PlateLookup[waste.ID] = waste
 	lhp.PosLookup[pos] = waste.ID
 	lhp.PlateIDLookup[waste.ID] = pos
+	return true
 }
 
-func (lhp *LHProperties) AddWash(wash *wtype.LHPlate) {
+func (lhp *LHProperties) AddWash(wash *wtype.LHPlate) bool {
 	for _, pref := range lhp.Wash_preferences {
 		if lhp.PosLookup[pref] != "" {
-
 			//fmt.Println(pref, " ", lhp.PlateLookup[lhp.PosLookup[pref]])
-
 			continue
 		}
 
 		lhp.AddWashTo(pref, wash)
-		return
+		return true
 	}
 
-	logger.Fatal("NO WASH SPACES LEFT")
-	panic("NO WASH SPACES LEFT")
-
+	logger.Debug("NO WASH SPACES LEFT")
+	return false
 }
 
-func (lhp *LHProperties) AddWashTo(pos string, wash *wtype.LHPlate) {
+func (lhp *LHProperties) AddWashTo(pos string, wash *wtype.LHPlate) bool {
 	if lhp.PosLookup[pos] != "" {
 
-		logger.Fatal("CAN'T ADD WASH TO FULL POSITION")
-		panic("CAN'T ADD WASH TO FULL POSITION")
+		logger.Debug("CAN'T ADD WASH TO FULL POSITION")
+		return false
 	}
 	lhp.Washes[pos] = wash
 	lhp.PlateLookup[wash.ID] = wash
 	lhp.PosLookup[pos] = wash.ID
 	lhp.PlateIDLookup[wash.ID] = pos
-
+	return true
 }
 
 func (lhp *LHProperties) GetCleanTips(tiptype string, channel *wtype.LHChannelParameter, mirror bool, multi int) (wells, positions, boxtypes []string) {
@@ -448,8 +456,9 @@ func (lhp *LHProperties) GetCleanTips(tiptype string, channel *wtype.LHChannelPa
 	// hack -- count tips left
 	n_tips_left := 0
 	for _, pos := range lhp.Tip_preferences {
-		bx := lhp.Tipboxes[pos]
-		if bx.Tiptype.Type != tiptype {
+		bx, ok := lhp.Tipboxes[pos]
+
+		if !ok || bx.Tiptype.Type != tiptype {
 			continue
 		}
 
@@ -478,8 +487,28 @@ func (lhp *LHProperties) GetCleanTips(tiptype string, channel *wtype.LHChannelPa
 		}
 	}
 
+	// if you don't find any suitable tips, why just make a
+	// new box full of them!
+	// nothing can possibly go wrong
+	// surely
+
 	if !foundit {
-		return nil, nil, nil
+
+		// try adding a new tip box
+		bx := factory.GetTipboxByType(tiptype)
+
+		if bx == nil {
+			return nil, nil, nil
+		}
+
+		r := lhp.AddTipBox(bx)
+
+		if !r {
+			return nil, nil, nil
+		}
+
+		return lhp.GetCleanTips(tiptype, channel, mirror, multi)
+		//		return nil, nil, nil
 	}
 
 	return

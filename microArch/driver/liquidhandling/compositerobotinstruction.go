@@ -184,7 +184,6 @@ type TransferInstruction struct {
 
 func (ti *TransferInstruction) ToString() string {
 	s := fmt.Sprintf("%s ", Robotinstructionnames[ti.Type])
-
 	for i := 0; i < len(ti.What); i++ {
 		s += ti.ParamSet(i).ToString()
 		s += "\n"
@@ -640,6 +639,12 @@ func (ins *TransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProper
 	for i, _ := range ins.What {
 		if ins.Volume[i] == nil || ins.Volume[i].LessThanFloat(0.001) {
 			continue
+		}
+
+		if i != 0 && ins.What[i] != ins.What[i-1] {
+			ret = append(ret, sci)
+			sci = NewSingleChannelBlockInstruction()
+			sci.Prms = prms.HeadsLoaded[0].Params
 		}
 
 		var tp TransferParams

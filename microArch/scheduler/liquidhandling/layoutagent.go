@@ -33,8 +33,8 @@ import (
 
 // default layout: requests fill plates in column order
 func BasicLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *LHRequest {
-	// we limit this to the case where all outputs go to the same plate type
-	plate := request.Output_platetype
+	// we need to support multiple plate types... initially though
+	plate := request.Output_platetypes[0]
 	solutions := request.Output_solutions
 
 	// get the incoming group IDs
