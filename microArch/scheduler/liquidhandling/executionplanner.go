@@ -29,17 +29,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/logger"
-)
-
-const (
-	COLWISE = iota
-	ROWWISE
-	RANDOM
 )
 
 func AdvancedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHProperties) *LHRequest {
@@ -279,89 +272,4 @@ func AdvancedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 	}
 
 	return request
-}
-
-func roundup(f float64) float64 {
-	return float64(int(f) + 1)
-}
-
-func get_aggregate_component(sol *wtype.LHSolution, name string) *wtype.LHComponent {
-	components := sol.Components
-
-	ret := wtype.NewLHComponent()
-
-	ret.CName = name
-
-	vol := 0.0
-	found := false
-
-	for _, component := range components {
-		nm := component.CName
-
-		if nm == name {
-			ret.Type = component.Type
-			vol += component.Vol
-			ret.Vunit = component.Vunit
-			ret.Loc = component.Loc
-			ret.Order = component.Order
-			found = true
-		}
-	}
-	if !found {
-		return nil
-	}
-	ret.Vol = vol
-	return ret
-}
-
-func get_assignment(assignments []string, plates *map[string]*wtype.LHPlate, vol float64) (string, float64, bool) {
-	assignment := ""
-	ok := false
-	prevol := 0.0
-
-	for _, assignment = range assignments {
-		asstx := strings.Split(assignment, ":")
-		plate := (*plates)[asstx[0]]
-
-		crds := asstx[1] + ":" + asstx[2]
-		wellidlkp := plate.Wellcoords
-		well := wellidlkp[crds]
-
-		currvol := well.Currvol - well.Rvol
-		if currvol >= vol {
-			prevol = well.Currvol
-			well.Currvol -= vol
-			plate.HWells[well.ID] = well
-			(*plates)[asstx[0]] = plate
-			ok = true
-			break
-		}
-	}
-
-	return assignment, prevol, ok
-}
-
-func copyplates(plts map[string]*wtype.LHPlate) map[string]*wtype.LHPlate {
-	ret := make(map[string]*wtype.LHPlate, len(plts))
-
-	for k, v := range plts {
-		ret[k] = v.Dup()
-	}
-
-	return ret
-}
-
-func sortOutputOrder(minorlayoutgroups [][]string, ass []string, sorttype int) ([][]string, []string) {
-	a2 := make([]string, len(ass))
-	mlg2 := make([][]string, len(minorlayoutgroups))
-
-	for x, a := range minorlayoutgroups {
-		mlg2[x] = a
-	}
-
-	for i, v := range ass {
-		a2[i] = v
-	}
-
-	return mlg2, a2
 }
