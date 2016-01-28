@@ -38,7 +38,7 @@ func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties
 
 	// find existing assignments
 
-	plate_choices := get_assignments(request)
+	plate_choices := get_and_complete_assignments(request)
 
 	// now we know what remains unassigned, we assign it
 
@@ -50,10 +50,11 @@ func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties
 
 	make_plates(request)
 
-	// now we have plates of type 1 only -- we just need to
+	// now we have solutions of type 1 only -- we just need to
 	// say where on each plate they will go
 	// this needs to set Output_assignments
-	make_layouts(request)
+	plate_well_choices := get_well_assignments(request)
+	make_layouts(request, plate_well_choices)
 
 	return request
 }
@@ -62,9 +63,10 @@ type PlateChoice struct {
 	Platetype string
 	Assigned  []string
 	ID        string
+	Wells     []string
 }
 
-func get_assignments(request *LHRequest) []PlateChoice {
+func get_and_complete_assignments(request *LHRequest) []PlateChoice {
 	s := make([]PlateChoice, 0, 3)
 	m := make(map[int]string)
 
@@ -74,15 +76,17 @@ func get_assignments(request *LHRequest) []PlateChoice {
 			i := defined(v.PlateID, s)
 
 			if i == -1 {
-				s = append(s, PlateChoice{v.Platetype, []string{v.ID}, v.PlateID})
+				s = append(s, PlateChoice{v.Platetype, []string{v.ID}, v.PlateID}, []string{})
 			} else {
 				s[i].Assigned = append(s[i].Assigned, v.ID)
+				s[i].Wells = append(s[i].Wells, v.Welladdress)
 			}
 		} else if v.Majorlayoutgroup != -1 {
 			id, ok := m[v.Majorlayoutgroup]
 			if !ok {
 				id := wtype.NewUUID()
 				m[v.Majorlayoutgroup] = id
+				//  fix the plate id to this temporary one
 				request.Output_solutions[k].PlateID = id
 			}
 
@@ -92,6 +96,7 @@ func get_assignments(request *LHRequest) []PlateChoice {
 				s = append(s, PlateChoice{v.Platetype, []string{v.ID}, v.PlateID})
 			} else {
 				s[i].Assigned = append(s[i].Assigned, v.ID)
+				s[i].Wells = append(s[i].Wells, v.Welladdress)
 			}
 		}
 	}
@@ -119,8 +124,10 @@ func defined(s string, pc []PlateChoice) int {
 	return r
 }
 
-func choose_plates(request *LHRequest, pc []PlateChoice) {
+func choose_plates(request *LHRequest, pc []PlateChoice) []PlateChoice {
 	for k, v := range request.Output_solutions {
+		// this id may be temporary, only things without it still are not assigned to a
+		// plate, even a virtual one
 		if v.PlateID == "" {
 			pt := v.PlateType
 
@@ -129,7 +136,7 @@ func choose_plates(request *LHRequest, pc []PlateChoice) {
 			if ass == -1 {
 				// make a new plate
 				ass = len(pc)
-				pc = append(pc, PlateChoice{chooseAPlate(request, v), []string{v.ID}, wutil.GetUUID()})
+				pc = append(pc, PlateChoice{chooseAPlate(request, v), []string{v.ID}, wutil.GetUUID(), []string{}})
 			}
 
 			pc[ass].Assigned = append(pc[ass].Assigned, v.ID)
@@ -156,8 +163,10 @@ func choose_plates(request *LHRequest, pc []PlateChoice) {
 			request.Output_solutions[i].Platetype = c.Platetype
 		}
 	}
+	return pc2
 }
 
+// chop the assignments up modulo plate size
 func modpc(choice PlateChoice, nwell int) []PlateChoice {
 	r := make([]Platechoice, 0, 1)
 
@@ -166,7 +175,7 @@ func modpc(choice PlateChoice, nwell int) []PlateChoice {
 		if e > len(choice.Assigned) {
 			e = len(choice.Assigned)
 		}
-		r = append(r, PlateChoice{choice.PlateType, choice.Assigned[s:e], wutil.NewUUID()})
+		r = append(r, PlateChoice{choice.PlateType, choice.Assigned[s:e], wutil.NewUUID(), choice.Wells[s:e]})
 	}
 	return r
 }
@@ -238,13 +247,28 @@ func make_plates(request *LHRequest) {
 	}
 }
 
-func make_assignments(request *LHRequest) {
-	// finally what are the relevant assignments?
-	// TODO
-	// -- major concern: we need to get Output_assignments filled in here
-	//    need to revise the way this is used
-	//    basically this layout might still not be that useful -- different
-	//    planning might be preferred
+func make_assignments(request *LHRequest, pc []PlateChoice) {
+	// we need to fill in the platechoice structure then
+	// transfer the info across to the solutions
 
-	// this is quite a big job potentially. Also possible conflict with the execution plan
+	for _, c := range pc {
+		// make a temporary plate to hold info
+
+		plat := factory.GetPlateByType(c.Platetype)
+
+		for _, w := range c.wells {
+			if w != "" {
+			}
+		}
+
+		for i, _ := range c.Assigned {
+			sID := c.Assigned[i]
+			well := c.Wells[i]
+
+			if well == "" {
+
+			}
+		}
+	}
+
 }

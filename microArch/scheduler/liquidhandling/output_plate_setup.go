@@ -31,6 +31,7 @@ import (
 	"github.com/antha-lang/antha/microArch/logger"
 )
 
+// DEPRECATED --- will be removed
 //  TASK: 	define output plates
 // INPUT: 	"output_platetype", "outputs"
 //OUTPUT: 	"output_plates"      -- these each have components in wells
