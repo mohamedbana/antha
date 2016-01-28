@@ -300,6 +300,10 @@ func SolutionToComponent(s *LHSolution) (c *LHComponent) {
 
 }
 
+func (lhs *LHSolution) GetAssignment() string {
+	return lhs.Plateaddress + ":" + lhs.Welladdress
+}
+
 // structure describing a liquid component and its desired properties
 type LHComponent struct {
 	*GenericPhysical

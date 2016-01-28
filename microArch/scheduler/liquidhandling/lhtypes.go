@@ -45,7 +45,7 @@ type LHRequest struct {
 	Robotfn                    string
 	Outputfn                   string
 	Input_assignments          map[string][]string
-	Output_assignments         []string
+	Output_assignments         map[string]string
 	Input_plates               map[string]*wtype.LHPlate
 	Output_plates              map[string]*wtype.LHPlate
 	Input_platetypes           []*wtype.LHPlate
@@ -61,6 +61,7 @@ type LHRequest struct {
 	Stockconcs                 map[string]float64
 	Policies                   *liquidhandling.LHPolicyRuleSet
 	Input_order                []string
+	Output_order               []string
 	OutputIteratorFactory      func(*wtype.LHPlate) wtype.PlateIterator
 }
 
@@ -109,6 +110,7 @@ func NewLHRequest() *LHRequest {
 	lhr.Plate_lookup = make(map[string]string)
 	lhr.Stockconcs = make(map[string]float64)
 	lhr.Input_order = make([]string, 0)
+	lhr.Output_order = make([]string, 0)
 	lhr.OutputIteratorFactory = wtype.NewOneTimeRowIterator
 	return &lhr
 }

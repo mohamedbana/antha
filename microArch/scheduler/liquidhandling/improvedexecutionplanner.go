@@ -134,14 +134,28 @@ func ImprovedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 
 	cnt := 1
 	logger.Debug("OUTORDER INFO STARTS HERE")
-	for ordinal, name := range order {
-		logger.Debug(fmt.Sprintf("Component %s EXECUTE OUTORDER %d", name, ordinal+1))
-		for n, g := range minorlayoutgroups {
-			grp := []string(g)
+	for n, g := range minorlayoutgroups {
 
-			// get the group assignment string
+		grp := []string(g)
 
-			assignment := ass[n]
+		// get the group assignment string
+		assignment := ass[n]
+		for _, solID := range grp {
+			sol := output_solutions[solID]
+			whats := make([]string, len(sol.Components))
+			pltfrom := make([]string, len(sol.Components))
+			pltto := make([]string, len(sol.Components))
+			plttypefrom := make([]string, len(sol.Components))
+			plttypeto := make([]string, len(sol.Components))
+			wellfrom := make([]string, len(sol.Components))
+			wellto := make([]string, len(sol.Components))
+			vols := make([]*wunit.Volume, len(sol.Components))
+			fvols := make([]*wunit.Volume, len(sol.Components))
+			tvols := make([]*wunit.Volume, len(sol.Components))
+			fpwx := make([]int, len(sol.Components))
+			fpwy := make([]int, len(sol.Components))
+			tpwx := make([]int, len(sol.Components))
+			tpwy := make([]int, len(sol.Components))
 
 			// the assignment has the format plateID:row:column:incrow:inccol
 			// where inc defines how the next one is to be calculated
@@ -155,39 +169,19 @@ func ImprovedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 			col := wutil.ParseInt(asstx[2])
 			incrow := wutil.ParseInt(asstx[3])
 			inccol := wutil.ParseInt(asstx[4])
+			logger.Debug(fmt.Sprintf("OUTORDER:%d:%d:%s:%d", cnt, toplatenum, asstx[1], col))
 
-			whats := make([]string, len(grp))
-			pltfrom := make([]string, len(grp))
-			pltto := make([]string, len(grp))
-			plttypefrom := make([]string, len(grp))
-			plttypeto := make([]string, len(grp))
-			wellfrom := make([]string, len(grp))
-			wellto := make([]string, len(grp))
-			vols := make([]*wunit.Volume, len(grp))
-			fvols := make([]*wunit.Volume, len(grp))
-			tvols := make([]*wunit.Volume, len(grp))
-			fpwx := make([]int, len(grp))
-			fpwy := make([]int, len(grp))
-			tpwx := make([]int, len(grp))
-			tpwy := make([]int, len(grp))
-
-			compingroup := false
-
-			for i, solID := range grp {
-
-				logger.Debug(fmt.Sprintf("OUTORDER:%d:%d:%s:%d", cnt, toplatenum, asstx[1], col))
-				sol := output_solutions[solID]
+			i := 0
+			for ordinal, name := range order {
+				logger.Debug(fmt.Sprintf("Component %s EXECUTE OUTORDER %d", name, ordinal+1))
 
 				// we need to get the relevant component out
 				smpl := get_aggregate_component(sol, name)
 				if smpl == nil {
-					row += incrow
-					col += inccol
+					//	row += incrow
+					//	col += inccol
 					continue
 				}
-				// important: is there at least one component in the group?
-				// yes if we are here
-				compingroup = true
 
 				// we need to know where this component was assigned to
 				inassignmentar := []string(inass[name])
@@ -233,8 +227,6 @@ func ImprovedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 				fpwx[i] = inplate.WellsX()
 				fpwy[i] = inplate.WellsY()
 
-				row += incrow
-				col += inccol
 				outwell.Add(smpl)
 
 				// update the output solution with its location
@@ -243,16 +235,16 @@ func ImprovedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 				sol.PlateID = outplate.ID
 				sol.Welladdress = wellto[i]
 				cnt += 1
-			}
 
-			// if we get here without finding any components of this type in this group we don't make an instruction
+				// if we get here without finding any components of this type in this group we don't make an instruction
 
-			if !compingroup {
-				continue
+				i += 1
 			}
 			ins := liquidhandling.NewTransferInstruction(whats, pltfrom, pltto, wellfrom, wellto, plttypefrom, plttypeto, vols, fvols, tvols, fpwx, fpwy, tpwx, tpwy)
 
 			instructions.Add(ins)
+			row += incrow
+			col += inccol
 		}
 	}
 

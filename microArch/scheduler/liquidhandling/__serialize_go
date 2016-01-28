@@ -33,12 +33,8 @@ import (
 	"github.com/antha-lang/antha/microArch/logger"
 )
 
-// functions to deal with how to serialize / deserialize the relevant objects.
-// Despite the availability of good JSON serialization in Go it is necessary
-// to include this to allow object structure to be sensibly defined for
-// runtime purposes without making the network traffic too heavy
-
 // marshal / unmarshal methods for the top-level lhrequest class
+// not sure this is required
 
 type SLHRequest struct {
 	ID                         string
