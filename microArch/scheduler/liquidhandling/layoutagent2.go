@@ -258,6 +258,8 @@ func make_assignments(request *LHRequest, pc []PlateChoice) {
 
 		for _, w := range c.wells {
 			if w != "" {
+				wc := wtype.MakeWellCoords(w)
+				plat.Cols[wc.X][wc.Y].Currvol += 100.0
 			}
 		}
 
@@ -266,7 +268,7 @@ func make_assignments(request *LHRequest, pc []PlateChoice) {
 			well := c.Wells[i]
 
 			if well == "" {
-
+				wc := plat.NextEmptyWell(it)
 			}
 		}
 	}
