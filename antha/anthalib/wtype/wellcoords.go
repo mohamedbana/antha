@@ -14,6 +14,17 @@ type WellCoords struct {
 	Y int
 }
 
+func ZeroWellCoords() WellCoords {
+	return WellCoords{-1, -1}
+}
+func (wc WellCoords) IsZero() bool {
+	if wc.Equals(ZeroWellCoords()) {
+		return true
+	}
+
+	return false
+}
+
 func MatchString(s1, s2 string) bool {
 	m, _ := regexp.MatchString(s1, s2)
 	return m

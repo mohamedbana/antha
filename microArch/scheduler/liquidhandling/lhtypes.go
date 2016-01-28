@@ -61,6 +61,7 @@ type LHRequest struct {
 	Stockconcs                 map[string]float64
 	Policies                   *liquidhandling.LHPolicyRuleSet
 	Input_order                []string
+	OutputIteratorFactory      func(*wtype.LHPlate) wtype.PlateIterator
 }
 
 // this function checks requests so we can see early on whether or not they
@@ -108,6 +109,7 @@ func NewLHRequest() *LHRequest {
 	lhr.Plate_lookup = make(map[string]string)
 	lhr.Stockconcs = make(map[string]float64)
 	lhr.Input_order = make([]string, 0)
+	lhr.OutputIteratorFactory = wtype.NewOneTimeRowIterator
 	return &lhr
 }
 

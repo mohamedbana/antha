@@ -27,6 +27,7 @@ import (
 	//"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
+	"github.com/antha-lang/antha/microArch/logger"
 	//"github.com/antha-lang/antha/microArch/logger"
 )
 
@@ -42,7 +43,7 @@ func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties
 
 	// now we know what remains unassigned, we assign it
 
-	choose_plates(request, plate_choices)
+	plate_choices = choose_plates(request, plate_choices)
 
 	// now we have plates of type 1 & 2
 
@@ -53,8 +54,7 @@ func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties
 	// now we have solutions of type 1 only -- we just need to
 	// say where on each plate they will go
 	// this needs to set Output_assignments
-	plate_well_choices := get_well_assignments(request)
-	make_layouts(request, plate_well_choices)
+	make_layouts(request, plate_choices)
 
 	return request
 }
@@ -76,7 +76,7 @@ func get_and_complete_assignments(request *LHRequest) []PlateChoice {
 			i := defined(v.PlateID, s)
 
 			if i == -1 {
-				s = append(s, PlateChoice{v.Platetype, []string{v.ID}, v.PlateID}, []string{})
+				s = append(s, PlateChoice{v.Platetype, []string{v.ID}, v.PlateID, []string{}})
 			} else {
 				s[i].Assigned = append(s[i].Assigned, v.ID)
 				s[i].Wells = append(s[i].Wells, v.Welladdress)
@@ -93,7 +93,7 @@ func get_and_complete_assignments(request *LHRequest) []PlateChoice {
 			i := defined(id, s)
 
 			if i == -1 {
-				s = append(s, PlateChoice{v.Platetype, []string{v.ID}, v.PlateID})
+				s = append(s, PlateChoice{v.Platetype, []string{v.ID}, v.PlateID, []string{}})
 			} else {
 				s[i].Assigned = append(s[i].Assigned, v.ID)
 				s[i].Wells = append(s[i].Wells, v.Welladdress)
@@ -125,18 +125,18 @@ func defined(s string, pc []PlateChoice) int {
 }
 
 func choose_plates(request *LHRequest, pc []PlateChoice) []PlateChoice {
-	for k, v := range request.Output_solutions {
+	for _, v := range request.Output_solutions {
 		// this id may be temporary, only things without it still are not assigned to a
 		// plate, even a virtual one
 		if v.PlateID == "" {
-			pt := v.PlateType
+			pt := v.Platetype
 
 			ass := assignmentWithType(pt, pc)
 
 			if ass == -1 {
 				// make a new plate
 				ass = len(pc)
-				pc = append(pc, PlateChoice{chooseAPlate(request, v), []string{v.ID}, wutil.GetUUID(), []string{}})
+				pc = append(pc, PlateChoice{chooseAPlate(request, v), []string{v.ID}, wtype.GetUUID(), []string{}})
 			}
 
 			pc[ass].Assigned = append(pc[ass].Assigned, v.ID)
@@ -147,18 +147,18 @@ func choose_plates(request *LHRequest, pc []PlateChoice) []PlateChoice {
 
 	pc2 := make([]PlateChoice, 0, len(pc))
 
-	for i, v := range pc {
+	for _, v := range pc {
 		plate := factory.GetPlateByType(v.Platetype)
 
 		// chop the assignments up
 
-		pc2 = append(pc2, modpc(v, plate.NWells)...)
+		pc2 = append(pc2, modpc(v, plate.Nwells)...)
 	}
 
 	// copy the choices in
 
 	for _, c := range pc2 {
-		for _, i := range pc.Assigned {
+		for _, i := range c.Assigned {
 			request.Output_solutions[i].PlateID = c.ID
 			request.Output_solutions[i].Platetype = c.Platetype
 		}
@@ -168,14 +168,14 @@ func choose_plates(request *LHRequest, pc []PlateChoice) []PlateChoice {
 
 // chop the assignments up modulo plate size
 func modpc(choice PlateChoice, nwell int) []PlateChoice {
-	r := make([]Platechoice, 0, 1)
+	r := make([]PlateChoice, 0, 1)
 
 	for s := 0; s < len(choice.Assigned); s += nwell {
 		e := s + nwell
 		if e > len(choice.Assigned) {
 			e = len(choice.Assigned)
 		}
-		r = append(r, PlateChoice{choice.PlateType, choice.Assigned[s:e], wutil.NewUUID(), choice.Wells[s:e]})
+		r = append(r, PlateChoice{choice.Platetype, choice.Assigned[s:e], wtype.GetUUID(), choice.Wells[s:e]})
 	}
 	return r
 }
@@ -191,7 +191,7 @@ func assignmentWithType(pt string, pc []PlateChoice) int {
 	}
 
 	for i, v := range pc {
-		if pt == pc.PlateType {
+		if pt == v.Platetype {
 			r = i
 			break
 		}
@@ -202,7 +202,7 @@ func assignmentWithType(pt string, pc []PlateChoice) int {
 
 func chooseAPlate(request *LHRequest, sol *wtype.LHSolution) string {
 	// for now we ignore sol and just choose the First Output Platetype
-	return request.Output_platetype[0]
+	return request.Output_platetypes[0].Type
 }
 func stringinarray(s string, array []string) int {
 	r := -1
@@ -217,7 +217,7 @@ func stringinarray(s string, array []string) int {
 	return r
 }
 
-func plateidarray(arr []*wtype.LHPLate) []string {
+func plateidarray(arr []*wtype.LHPlate) []string {
 	ret := make([]string, 0, 3)
 
 	for _, v := range arr {
@@ -226,28 +226,30 @@ func plateidarray(arr []*wtype.LHPLate) []string {
 	return ret
 }
 
+// we have potentially added extra theoretical plates above
+// now we make real plates and swap them in
+
 func make_plates(request *LHRequest) {
-	pids := plateidarray(request.Output_plates)
 	remap := make(map[string]string)
 	for k, v := range request.Output_solutions {
-		i := stringinarray(v.PlateID, pids)
+		_, skip := remap[v.PlateID]
 
-		if i == -1 {
-			plate := factory.GetPlateByType(v.PlateType)
-			request.Output_plates = append(request.Output_plates, plate)
-			pids = append(pids, v.PlateID)
-			remap[v.PlateID] = plate.ID
+		if skip {
+			request.Output_solutions[k].PlateID = remap[v.PlateID]
+			continue
 		}
+		_, ok := request.Output_plates[v.PlateID]
 
-		rm, ok := remap[v.PlateID]
-
-		if ok {
-			request.Output_Solutions[k].PlateID = remap[v.PlateID]
+		if !ok {
+			plate := factory.GetPlateByType(v.Platetype)
+			request.Output_plates[plate.ID] = plate
+			remap[v.PlateID] = plate.ID
+			request.Output_solutions[k].PlateID = remap[v.PlateID]
 		}
 	}
 }
 
-func make_assignments(request *LHRequest, pc []PlateChoice) {
+func make_layouts(request *LHRequest, pc []PlateChoice) {
 	// we need to fill in the platechoice structure then
 	// transfer the info across to the solutions
 
@@ -256,7 +258,11 @@ func make_assignments(request *LHRequest, pc []PlateChoice) {
 
 		plat := factory.GetPlateByType(c.Platetype)
 
-		for _, w := range c.wells {
+		// make an iterator for it
+
+		it := request.OutputIteratorFactory(plat)
+
+		for _, w := range c.Wells {
 			if w != "" {
 				wc := wtype.MakeWellCoords(w)
 				plat.Cols[wc.X][wc.Y].Currvol += 100.0
@@ -269,6 +275,14 @@ func make_assignments(request *LHRequest, pc []PlateChoice) {
 
 			if well == "" {
 				wc := plat.NextEmptyWell(it)
+
+				if wc.IsZero() {
+					// something very bad has happened
+					logger.Fatal("DIRE WARNING: The unthinkable has happened... output plate has too many assignments!")
+				}
+
+				plat.Cols[wc.X][wc.Y].Currvol += 100.0
+				request.Output_solutions[sID].Welladdress = wc.FormatA1()
 			}
 		}
 	}

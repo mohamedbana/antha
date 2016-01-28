@@ -598,8 +598,24 @@ func (lhp *LHPlate) WellsX() int {
 
 func (lhp *LHPlate) WellsY() int {
 	return lhp.WlsY
-
 }
+
+func (lhp *LHPlate) NextEmptyWell(it PlateIterator) WellCoords {
+	c := 0
+	for wc := it.Curr(); it.Valid(); wc = it.Next() {
+		if c == lhp.Nwells {
+			// prevent iterators from ever making this loop infinitely
+			break
+		}
+
+		if lhp.Cols[wc.X][wc.Y].Empty() {
+			return wc
+		}
+	}
+
+	return ZeroWellCoords()
+}
+
 func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
 	var lhp LHPlate
 	lhp.Type = platetype
