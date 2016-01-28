@@ -36,7 +36,7 @@ func _PipetteImageSetup(_ctx context.Context, _input *PipetteImageInput) {
 func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output *PipetteImageOutput) {
 
 	chosencolourpalette := image.AvailablePalettes[_input.Palettename]
-	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, chosencolourpalette)
+	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette)
 
 	//Pixels = image.PipetteImagetoPlate(OutPlate, positiontocolourmap, AvailableColours, Colourcomponents, VolumePerWell)
 

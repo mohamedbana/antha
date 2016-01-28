@@ -1,0 +1,13 @@
+{
+  "Parameters": {
+    "PipetteImage": {
+		"Imagefilename":"hitler_cat.jpg",
+		"Diluent":"water",
+	"Black": "Black",
+      "OutPlate": "greiner384_riser",
+      "VolumeForFullcolour": "150ul"
+    }
+  }
+}
+
+

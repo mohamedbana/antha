@@ -1,5 +1,5 @@
 // Generates instructions to pipette out a defined image onto a defined plate by blending cyan magenta yellow and black dyes
-package PipetteImage_CMYK
+package PipetteImage_Gray
 
 import (
 	"fmt"
@@ -11,8 +11,6 @@ import (
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 )
-
-//"image/color"
 
 // Input parameters for this protocol (data)
 
@@ -37,25 +35,23 @@ func _setup(_ctx context.Context, _input *Input_) {
 // for every input
 func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 
-	//var chosencolourpalette color.Palette
-	chosencolourpalette := image.AvailablePalettes["Plan9"]
+	chosencolourpalette := image.AvailablePalettes["Gray"]
+
 	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette)
 
 	solutions := make([]*wtype.LHSolution, 0)
 
 	counter := 0
 
-	//solutions := image.PipetteImagebyBlending(OutPlate, positiontocolourmap,Cyan, Magenta, Yellow,Black, VolumeForFullcolour)
-
 	for locationkey, colour := range positiontocolourmap {
 
 		components := make([]*wtype.LHComponent, 0)
 
-		cmyk := image.ColourtoCMYK(colour)
+		gray := image.ColourtoGrayscale(colour)
 
 		var maxuint8 uint8 = 255
 
-		if cmyk.C == 0 && cmyk.Y == 0 && cmyk.M == 0 && cmyk.K == 0 {
+		if gray.Y == 0 {
 
 			continue
 
@@ -63,30 +59,22 @@ func _steps(_ctx context.Context, _input *Input_, _output *Output_) {
 
 			counter = counter + 1
 
-			if cmyk.C > 0 {
-
-				cyanvol := wunit.NewVolume(((float64(cmyk.C) / float64(maxuint8)) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
-				cyanSample := mixer.Sample(_input.Cyan, cyanvol)
-				components = append(components, cyanSample)
+			if gray.Y < maxuint8 {
+				watervol := wunit.NewVolume((float64(maxuint8-gray.Y) / float64(maxuint8) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
+				fmt.Println(watervol)
+				if watervol.RawValue() < 10 && watervol.Unit().PrefixedSymbol() == "ul" {
+					watervol.SetValue(10)
+				}
+				waterSample := mixer.Sample(_input.Diluent, watervol)
+				components = append(components, waterSample)
 			}
-
-			if cmyk.Y > 0 {
-				yellowvol := wunit.NewVolume(((float64(cmyk.Y) / float64(maxuint8)) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
-				yellowSample := mixer.Sample(_input.Yellow, yellowvol)
-				components = append(components, yellowSample)
+			blackvol := wunit.NewVolume((float64(gray.Y/maxuint8) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
+			fmt.Println("blackvol", blackvol)
+			if blackvol.RawValue() < 10 && blackvol.Unit().PrefixedSymbol() == "ul" {
+				blackvol.SetValue(10)
 			}
-
-			if cmyk.M > 0 {
-				magentavol := wunit.NewVolume(((float64(cmyk.M) / float64(maxuint8)) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
-				magentaSample := mixer.Sample(_input.Magenta, magentavol)
-				components = append(components, magentaSample)
-			}
-
-			if cmyk.K > 0 {
-				blackvol := wunit.NewVolume(((float64(cmyk.K) / float64(maxuint8)) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
-				blackSample := mixer.Sample(_input.Black, blackvol)
-				components = append(components, blackSample)
-			}
+			blackSample := mixer.Sample(_input.Black, blackvol)
+			components = append(components, blackSample)
 
 			solution := execute.MixTo(_ctx,
 
@@ -148,12 +136,10 @@ type Element_ struct {
 
 type Input_ struct {
 	Black               *wtype.LHComponent
-	Cyan                *wtype.LHComponent
+	Diluent             *wtype.LHComponent
 	Imagefilename       string
-	Magenta             *wtype.LHComponent
 	OutPlate            *wtype.LHPlate
 	VolumeForFullcolour wunit.Volume
-	Yellow              *wtype.LHComponent
 }
 
 type Output_ struct {

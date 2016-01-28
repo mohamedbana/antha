@@ -9,25 +9,13 @@ import (
 	"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
 )
 
-var (
-	alphabet string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-)
+func OpenFile(filename string) (file *xlsx.File, err error) {
+	file, err = xlsx.OpenFile(filename)
+	return
+}
 
-func Makealphabet(alphabet string) (alphabetarray []string) {
-
-	alphabetarray = make([]string, 0)
-	startercharacter := ""
-
-	for j := 0; j < (len(alphabet)); j++ {
-
-		for i := 0; i < (len(alphabet)); i++ {
-			character := startercharacter + string(alphabet[i])
-
-			alphabetarray = append(alphabetarray, character)
-		}
-		startercharacter = string(alphabet[j])
-
-	}
+func Sheet(file *xlsx.File, sheetnum int) (sheet *xlsx.Sheet) {
+	sheet = file.Sheets[sheetnum]
 	return
 }
 
@@ -57,6 +45,40 @@ func Getdatafromcells(sheet *xlsx.Sheet, cellcoords []string) (cells []*xlsx.Cel
 	}
 
 	return cells, err
+}
+
+func GetdatafromColumn(sheet *xlsx.Sheet, colabcformat rune) (cells []*xlsx.Cell, err error) {
+
+	cellcoords, err := ConvertMinMaxtoArray([]string{(string(colabcformat) + strconv.Itoa(1)), (string(colabcformat) + strconv.Itoa(sheet.MaxRow))})
+	if err != nil {
+		return cells, err
+	}
+	cells, err = Getdatafromcells(sheet, cellcoords)
+
+	return cells, err
+}
+
+func HeaderandDataMap(sheet *xlsx.Sheet, headera1format string, dataminmaxcellcoords []string) (headerdatamap map[string][]*xlsx.Cell, err error) {
+
+	headerdatamap = make(map[string][]*xlsx.Cell)
+
+	header, err := GetdatafromCell(sheet, headera1format)
+	if err != nil {
+		return headerdatamap, err
+	}
+	headerstring := header.String()
+
+	cellcoords, err := ConvertMinMaxtoArray(dataminmaxcellcoords)
+	if err != nil {
+		return headerdatamap, err
+	}
+	cells, err := Getdatafromcells(sheet, cellcoords)
+	if err != nil {
+		return headerdatamap, err
+	}
+	headerdatamap[headerstring] = cells
+
+	return
 }
 
 // Parses an a1 style excel cell coordinate into ints for row and column for use by plotinum library
@@ -150,12 +172,24 @@ func ConvertMinMaxtoArray(minmax []string) (array []string, err error) {
 
 }
 
-func OpenFile(filename string) (file *xlsx.File, err error) {
-	file, err = xlsx.OpenFile(filename)
-	return
-}
+var (
+	alphabet string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+)
 
-func Sheet(file *xlsx.File, sheetnum int) (sheet *xlsx.Sheet) {
-	sheet = file.Sheets[sheetnum]
+func Makealphabet(alphabet string) (alphabetarray []string) {
+
+	alphabetarray = make([]string, 0)
+	startercharacter := ""
+
+	for j := 0; j < (len(alphabet)); j++ {
+
+		for i := 0; i < (len(alphabet)); i++ {
+			character := startercharacter + string(alphabet[i])
+
+			alphabetarray = append(alphabetarray, character)
+		}
+		startercharacter = string(alphabet[j])
+
+	}
 	return
 }

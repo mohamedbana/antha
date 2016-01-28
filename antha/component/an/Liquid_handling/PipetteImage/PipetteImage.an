@@ -50,8 +50,9 @@ Setup {
 // for every input
 Steps {
 	
+	
 	chosencolourpalette := image.AvailablePalettes[Palettename]
-	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, chosencolourpalette) 
+	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette) 
 	
 //Pixels = image.PipetteImagetoPlate(OutPlate, positiontocolourmap, AvailableColours, Colourcomponents, VolumePerWell)
 

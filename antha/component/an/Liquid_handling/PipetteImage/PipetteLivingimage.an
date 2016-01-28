@@ -4,7 +4,7 @@ protocol PipetteImage_living
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/microArch/factory"
@@ -66,7 +66,9 @@ Steps {
 	UniqueComponents = make([]string,0)
 	
 	chosencolourpalette := image.AvailablePalettes[Palettename]
-	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, chosencolourpalette) 
+	
+	
+	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette) 
 	
 	if UVimage {
 		uvmap := image.AvailableComponentmaps[Palettename]
@@ -99,9 +101,8 @@ Steps {
 		
 		component := componentmap[colourtostringmap[colour]]
 
-		if component.Type == "dna" {
-			component.Type = "DoNotMix"
-		}
+		component.Type = "default"
+		
 		fmt.Println(image.Colourcomponentmap[colour])
 		
 		if OnlythisColour !="" {
@@ -111,7 +112,7 @@ Steps {
 			UniqueComponents = append(UniqueComponents,component.CName)
 			
 			counter = counter + 1
-			fmt.Println("wells",counter)
+			fmt.Println("wells",OnlythisColour, counter)
 		//mediaSample := mixer.SampleForTotalVolume(Media, VolumePerWell)
 		//components = append(components,mediaSample)
 		/*antibioticSample := mixer.Sample(Antibiotic, AntibioticVolume)
@@ -133,7 +134,7 @@ Steps {
 			UniqueComponents = append(UniqueComponents,component.CName)
 			
 			counter = counter + 1
-			fmt.Println("wells",counter)
+			fmt.Println("wells not ",Notthiscolour,counter)
 		//mediaSample := mixer.SampleForTotalVolume(Media, VolumePerWell)
 		//components = append(components,mediaSample)
 		/*antibioticSample := mixer.Sample(Antibiotic, AntibioticVolume)
@@ -156,7 +157,7 @@ Steps {
 	fmt.Println("Pixels =",Numberofpixels)
 
 	UniqueComponents = search.RemoveDuplicates(UniqueComponents)
-	text.Print("Unique Components:",UniqueComponents)
+	fmt.Println("Unique Components:",UniqueComponents)
 	fmt.Println("number of unique components",len(UniqueComponents))
 	Pixels = solutions
 	

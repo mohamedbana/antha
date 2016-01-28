@@ -1,0 +1,92 @@
+protocol ScreenLHPolicies
+
+import (
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/mixer"
+	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
+	"fmt"
+	//"strconv"
+)
+
+
+// Input parameters for this protocol (data)
+Parameters (
+	TotalVolume Volume
+	TestSolVolume  Volume
+	NumberofReplicates int
+
+)
+
+// Data which is returned from this protocol, and data types
+Data (
+	Status string
+)
+
+
+// Physical Inputs to this protocol with types
+Inputs (
+	TestSols []*wtype.LHComponent
+	Diluent *wtype.LHComponent
+	OutPlate *wtype.LHPlate
+)
+
+// Physical outputs from this protocol with types
+Outputs (
+	Reactions []*wtype.LHSolution
+)
+
+Requirements {
+}
+
+// Conditions to run on startup
+Setup {
+}
+
+// The core process for this protocol, with the steps to be performed
+// for every input
+Steps {
+	
+	reactions := make([]*wtype.LHSolution,0)
+	
+	//policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run",false)
+	
+	//intfactors := []string{"Pre_MIX","POST_MIX"}
+	policies, names,err := liquidhandling.PolicyMakerfromDesign("LHPolicydesign.xlsx", "DOE_run")
+	if err != nil{
+		panic(err)
+	}
+	
+	for k := 0; k< len(TestSols);k++{
+	for j:= 0; j< NumberofReplicates;j++{
+	for i := 0; i < len(policies); i++ {
+		
+		eachreaction := make([]*wtype.LHComponent, 0)
+		
+		Diluent.Type = names[i]
+		fmt.Println(Diluent.Type)
+		
+		bufferSample := mixer.SampleForTotalVolume(Diluent, TotalVolume)
+		eachreaction = append(eachreaction,bufferSample)
+		testSample := mixer.Sample(TestSols[k], TestSolVolume)
+		eachreaction = append(eachreaction,testSample)
+		reaction := MixInto(OutPlate, eachreaction...)
+		//fmt.Println("where am I?",reaction.Welladdress, reaction.Plateaddress, reaction.PlateID)
+		reactions = append(reactions,reaction)
+		
+	}
+	}
+	}
+	Reactions = reactions
+	
+}
+
+// Run after controls and a steps block are completed to
+// post process any data and provide downstream results
+Analysis {
+}
+
+// A block of tests to perform to validate that the sample was processed correctly
+// Optionally, destructive tests can be performed to validate results on a
+// dipstick basis
+Validation {
+}
