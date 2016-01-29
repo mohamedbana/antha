@@ -18,7 +18,7 @@ Parameters (
 	InactivationTime			Time
 	OutputReactionName			string
 	OutputLocation 				string
-	OutputPlateNum				string
+	OutputPlateNum				int
 )
 
 // Physical Inputs to this protocol with types
