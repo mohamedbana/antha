@@ -82,13 +82,13 @@ func (a Config) Merge(x *Config) Config {
 // Structure of parameter data for unmarshalling
 type RawParams struct {
 	Parameters map[string]map[string]json.RawMessage
-	Config     Config
+	Config     *Config
 }
 
 // Structure of parameter data for marshalling
 type Params struct {
 	Parameters map[string]map[string]interface{}
-	Config     Config
+	Config     *Config
 }
 
 func findConstructor(typ reflect.Type) constructor {
@@ -187,11 +187,7 @@ func setParam(w *workflow.Workflow, process, name string, data []byte, in map[st
 	return w.SetParam(workflow.Port{Process: process, Port: name}, value.Interface())
 }
 
-func setParams(ctx context.Context, data []byte, w *workflow.Workflow) (*Config, error) {
-	var params RawParams
-	if err := json.Unmarshal(data, &params); err != nil {
-		return nil, err
-	}
+func setParams(ctx context.Context, params *RawParams, w *workflow.Workflow) (*Config, error) {
 	for process, params := range params.Parameters {
 		c, err := w.FuncName(process)
 		if err != nil {
@@ -213,5 +209,5 @@ func setParams(ctx context.Context, data []byte, w *workflow.Workflow) (*Config,
 			}
 		}
 	}
-	return &params.Config, nil
+	return params.Config, nil
 }

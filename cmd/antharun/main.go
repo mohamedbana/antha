@@ -86,16 +86,18 @@ func runOne(opts opts) error {
 		return err
 	}
 
+	wdesc, params, err := tryExpand(wdata, pdata)
+
 	ctx, err := makeContext()
 	if err != nil {
 		return err
 	}
 
 	w, err := execute.Run(ctx, execute.Options{
-		Target:       t,
-		WorkflowData: wdata,
-		ParamData:    pdata,
-		Config:       opts.Config,
+		Target:   t,
+		Workflow: wdesc,
+		Params:   params,
+		Config:   opts.Config,
 	})
 	if err != nil {
 		return err

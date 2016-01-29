@@ -32,7 +32,9 @@ var (
 
 type Options struct {
 	WorkflowData []byte         // JSON data describing workflow
+	Workflow     *workflow.Desc // Or workflow directly
 	ParamData    []byte         // JSON data describing parameters
+	Params       *RawParams     // Or parameters directly
 	Target       *target.Target // Target machine configuration
 	Id           string         // Job Id
 	Config       *Config        // Override config data in ParamData
@@ -40,12 +42,21 @@ type Options struct {
 
 // Simple entrypoint for one-shot execution of workflows.
 func Run(parent context.Context, opt Options) (*workflow.Workflow, error) {
-	w, err := workflow.New(workflow.Options{FromBytes: opt.WorkflowData})
+	w, err := workflow.New(workflow.Options{FromBytes: opt.WorkflowData, FromDesc: opt.Workflow})
 	if err != nil {
 		return nil, err
 	}
 
-	cd, err := setParams(parent, opt.ParamData, w)
+	var params *RawParams
+	if opt.Params != nil {
+		params = opt.Params
+	} else if opt.ParamData != nil {
+		if err := json.Unmarshal(opt.ParamData, &params); err != nil {
+			return nil, err
+		}
+	}
+
+	cd, err := setParams(parent, params, w)
 	if err != nil {
 		return nil, err
 	}
