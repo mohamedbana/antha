@@ -267,6 +267,8 @@ func New(opt Options) (*Workflow, error) {
 		if err := json.Unmarshal(opt.FromBytes, &desc); err != nil {
 			return nil, err
 		}
+	} else {
+		desc = &Desc{}
 	}
 
 	for name, process := range desc.Processes {
