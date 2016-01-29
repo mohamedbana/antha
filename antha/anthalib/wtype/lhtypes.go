@@ -194,6 +194,25 @@ func PartOf() Entity {
 }
 */
 
+//  instruction to a liquid handler
+type LHInstruction struct {
+	*GenericPhysical
+	ID            string
+	BlockID       BlockID
+	SName         string
+	Order         int
+	Components    []*LHComponent
+	ContainerType string
+	Welladdress   string
+	Plateaddress  string
+	PlateID       string
+	Platetype     string
+	Vol           float64
+	Type          string
+	Conc          float64
+	Tvol          float64
+}
+
 // structure describing a solution: a combination of liquid components
 type LHSolution struct {
 	*GenericPhysical

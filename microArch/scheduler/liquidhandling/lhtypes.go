@@ -33,17 +33,15 @@ type LHRequest struct {
 	ID                         string
 	BlockID                    wtype.BlockID
 	BlockName                  string
-	Output_solutions           map[string]*wtype.LHSolution
+	Instructions               map[string]*wtype.LHInstruction
 	Input_solutions            map[string][]*wtype.LHComponent
 	Plates                     map[string]*wtype.LHPlate
 	Tips                       []*wtype.LHTipbox
-	Tip_Type                   *wtype.LHTipbox
+	Tip_type                   *wtype.LHTipbox
 	Locats                     []string
 	Setup                      wtype.LHSetup
 	InstructionSet             *liquidhandling.RobotInstructionSet
 	Instructions               []liquidhandling.TerminalRobotInstruction
-	Robotfn                    string
-	Outputfn                   string
 	Input_assignments          map[string][]string
 	Output_assignments         map[string][]string
 	Input_plates               map[string]*wtype.LHPlate
@@ -52,7 +50,7 @@ type LHRequest struct {
 	Input_major_group_layouts  [][]string
 	Input_minor_group_layouts  [][]string
 	Input_plate_layout         []string
-	Input_Setup_Weights        map[string]float64
+	Input_setup_weights        map[string]float64
 	Output_platetypes          []*wtype.LHPlate
 	Output_major_group_layouts [][]string
 	Output_minor_group_layouts [][]string
