@@ -115,7 +115,7 @@ type TypeIISConstructAssemblyMMXInput struct {
 	MasterMix          *wtype.LHComponent
 	OutPlate           *wtype.LHPlate
 	OutputLocation     string
-	OutputPlateNum     string
+	OutputPlateNum     int
 	OutputReactionName string
 	PartNames          []string
 	PartVols           []wunit.Volume
