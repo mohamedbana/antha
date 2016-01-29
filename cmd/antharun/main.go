@@ -32,7 +32,6 @@ import (
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/target"
 	"io/ioutil"
-	"log"
 	"os"
 )
 
@@ -62,6 +61,7 @@ type opts struct {
 	DriverURI      string
 	ParametersFile string
 	WorkflowFile   string
+	Config         *execute.Config
 }
 
 func runOne(opts opts) error {
@@ -95,6 +95,7 @@ func runOne(opts opts) error {
 		Target:       t,
 		WorkflowData: wdata,
 		ParamData:    pdata,
+		Config:       opts.Config,
 	})
 	if err != nil {
 		return err
@@ -185,15 +186,44 @@ func run() error {
 	driver := flag.String("driver", "", "uri where remote grpc driver implementation listens")
 	package_ := flag.String("package", "", "go package to spawn grpc driver from")
 	frontend := flag.String("frontend", "debug", "kind of frontend one of {debug, cui, remote}")
+	maxPlates := flag.String("maxPlates", "", "maximum number of plates")
+	maxWells := flag.String("maxWells", "", "maximum number of wells on a plate")
+	residualVolumeWeight := flag.String("residualVolumeWeight", "", "")
+	wellByWell := flag.String("wellByWell", "", "use well-by-well planner")
+	inputPlateType := flag.String("inputPlateType", "", "default input plate type to use")
+	outputPlateType := flag.String("outputPlateType", "", "default output plate to use")
+
 	flag.Parse()
 
 	if *list {
 		if cs, err := getComponents(); err != nil {
-			log.Fatal(err)
+			return err
 		} else if err := printComponents(*output, cs); err != nil {
-			log.Fatal(err)
+			return err
 		}
 		return nil
+	}
+
+	makeConfig := func() (cd *execute.Config, err error) {
+		defer func() {
+			if res := recover(); res != nil {
+				err = fmt.Errorf("%s", res)
+			}
+		}()
+		cd = &execute.Config{
+			MaxPlates:            parseFloat(maxPlates),
+			MaxWells:             parseFloat(maxWells),
+			ResidualVolumeWeight: parseFloat(residualVolumeWeight),
+			InputPlateType:       parseStringSlice(inputPlateType),
+			OutputPlateType:      parseStringSlice(outputPlateType),
+			WellByWell:           parseBool(wellByWell),
+		}
+		return
+	}
+
+	config, err := makeConfig()
+	if err != nil {
+		return err
 	}
 
 	if len(*driver) == 0 {
@@ -236,6 +266,7 @@ func run() error {
 		DriverURI:      *driver,
 		ParametersFile: *parametersFile,
 		WorkflowFile:   *workflowFile,
+		Config:         config,
 	}); err != nil {
 		return err
 	}
