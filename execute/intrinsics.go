@@ -31,7 +31,6 @@ func mix(ctx context.Context, opt trace.MixOpt, components []*wtype.LHComponent)
 	trace.Issue(ctx, trace.MakeMix(opt, values))
 
 	return sol
-
 }
 
 func Mix(ctx context.Context, components ...*wtype.LHComponent) *wtype.LHSolution {
