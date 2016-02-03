@@ -108,7 +108,6 @@ type BioSequence interface {
 // defines something as physical DNA
 // hence it is physical and has a DNASequence
 type DNA struct {
-	GenericPhysical
 	Seq DNASequence
 }
 
@@ -330,7 +329,6 @@ func (seq *DNASequence) MolecularWeight() float64 {
 
 // RNA sample: physical RNA, has an RNASequence object
 type RNA struct {
-	GenericPhysical
 	Seq RNASequence
 }
 
@@ -363,7 +361,6 @@ func (seq *RNASequence) Blast() (hits []Hit, err error) {
 // physical protein sample
 // has a ProteinSequence
 type Protein struct {
-	GenericPhysical
 	Seq ProteinSequence
 }
 

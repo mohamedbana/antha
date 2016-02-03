@@ -195,7 +195,6 @@ func PartOf() Entity {
 
 //  instruction to a liquid handler
 type LHInstruction struct {
-	*GenericPhysical
 	ID               string
 	BlockID          BlockID
 	SName            string
@@ -215,7 +214,6 @@ type LHInstruction struct {
 
 // structure describing a solution: a combination of liquid components
 type LHSolution struct {
-	*GenericPhysical
 	ID               string
 	BlockID          BlockID
 	Inst             string
@@ -238,8 +236,6 @@ type LHSolution struct {
 func NewLHInstruction() *LHInstruction {
 	var lhi LHInstruction
 	lhi.ID = GetUUID()
-	var gp GenericPhysical
-	lhi.GenericPhysical = &gp
 	lhi.Majorlayoutgroup = -1
 	return &lhi
 }
@@ -247,8 +243,6 @@ func NewLHInstruction() *LHInstruction {
 func NewLHSolution() *LHSolution {
 	var lhs LHSolution
 	lhs.ID = GetUUID()
-	var gp GenericPhysical
-	lhs.GenericPhysical = &gp
 	lhs.Majorlayoutgroup = -1
 	lhs.Minorlayoutgroup = -1
 	return &lhs
@@ -298,7 +292,6 @@ func (lhs *LHSolution) GetAssignment() string {
 
 // structure describing a liquid component and its desired properties
 type LHComponent struct {
-	*GenericPhysical
 	ID                 string
 	Inst               string
 	Order              int
@@ -316,9 +309,12 @@ type LHComponent struct {
 	Extra              map[string]interface{}
 }
 
+func (lhc *LHComponent) Name() string {
+	return lhc.CName
+}
+
 func (lhc *LHComponent) Dup() *LHComponent {
 	c := NewLHComponent()
-	c.GenericPhysical = lhc.GenericPhysical
 	c.Order = lhc.Order
 	c.CName = lhc.CName
 	c.Type = lhc.Type
@@ -384,8 +380,6 @@ func (lhc *LHComponent) GetType() string {
 
 func NewLHComponent() *LHComponent {
 	var lhc LHComponent
-	var gp GenericPhysical
-	lhc.GenericPhysical = &gp
 	lhc.ID = GetUUID()
 	return &lhc
 }
