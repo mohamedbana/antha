@@ -33,7 +33,7 @@ type LHRequest struct {
 	ID                         string
 	BlockID                    wtype.BlockID
 	BlockName                  string
-	Instructions               map[string]*wtype.LHInstruction
+	LHInstructions             map[string]*wtype.LHInstruction
 	Input_solutions            map[string][]*wtype.LHComponent
 	Plates                     map[string]*wtype.LHPlate
 	Tips                       []*wtype.LHTipbox
