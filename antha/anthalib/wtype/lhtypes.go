@@ -878,7 +878,6 @@ func Initialize_Wells(plate *LHPlate) {
 /* tip box */
 
 type LHTipbox struct {
-	*GenericSolid
 	ID         string
 	Boxname    string
 	Type       string
