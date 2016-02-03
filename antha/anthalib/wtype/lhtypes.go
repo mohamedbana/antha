@@ -25,7 +25,6 @@ package wtype
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
@@ -523,20 +522,7 @@ func (lhp *LHPlate) Container() Location {
 }
 
 // @implement Labware
-func (lhp *LHPlate) Wells() [][]Well {
-	ret := make([][]Well, len(lhp.Rows))
-	for i := 0; i < len(lhp.Rows); i++ {
-		ret[i] = make([]Well, len(lhp.Rows[i]))
-		for j := 0; j < len(lhp.Rows[i]); j++ {
-			ret[i][j] = lhp.Rows[i][j]
-		}
-	}
-	return ret
-}
-
-func (lhp *LHPlate) WellAt(crds WellCoords) Well {
-	return lhp.Cols[crds.X][crds.Y]
-}
+// @deprecate Labware
 
 func (lhp *LHPlate) WellsX() int {
 	return lhp.WlsX
@@ -743,59 +729,7 @@ func (lhw *LHWell) Shape() *Shape {
 }
 
 // @implement Well
-func (w *LHWell) WellTypeName() string {
-	return w.Platetype
-}
-
-func (w *LHWell) ResidualVolume() wunit.Volume {
-	return wunit.NewVolume(w.Rvol, w.Vunit)
-}
-
-func (w *LHWell) Coords() WellCoords {
-	return MakeWellCoordsXY(w.Crds)
-}
-
-func (w *LHWell) ContainerVolume() wunit.Volume {
-	return wunit.NewVolume(w.Vol, w.Vunit)
-}
-
-func (w *LHWell) Contents() []Physical {
-	ret := make([]Physical, len(w.WContents))
-	for i := 0; i < len(w.WContents); i++ {
-		ret[i] = Physical(w.WContents[i])
-	}
-	return ret
-}
-
-func (w *LHWell) Add(p Physical) {
-	switch t := p.(type) {
-	default:
-		wutil.Error(errors.New(fmt.Sprintf("LHWell: Cannot add type %T", t)))
-	case *LHSolution:
-		// do something
-	case *LHComponent:
-		w.WContents = append(w.WContents, p.(*LHComponent))
-
-		w.Currvol += p.(*LHComponent).Vol
-		p.(*LHComponent).LContainer = w
-	}
-}
-
-// this is pretty dodgy... we will have to be quite careful here
-// the core problem is how to maintain a list of components and volumes
-// but respect the physical fact that we can't actually unmix things
-func (w *LHWell) Remove(v wunit.Volume) Physical {
-	defer w.updateVolume()
-	ret := w.WContents[0]
-
-	if ret.Vol > v.SIValue() {
-		ret.Vol = v.SIValue()
-		w.WContents[0].Vol -= v.SIValue()
-	} else {
-		w.WContents = w.WContents[1:len(w.WContents)]
-	}
-	return ret
-}
+// @deprecate Well
 
 func (w *LHWell) ContainerType() string {
 	return w.Platetype
@@ -949,15 +883,6 @@ func next_well_to_try(row, col, nrows, ncols int) (int, int) {
 	// and return -1 -1
 
 	return nrow, ncol
-}
-
-func New_Component(name, ctype string, vol float64) *LHComponent {
-	var component LHComponent
-	component.ID = GetUUID()
-	component.CName = name
-	component.Type = ctype
-	component.Vol = vol
-	return &component
 }
 
 func New_Solution() *LHSolution {

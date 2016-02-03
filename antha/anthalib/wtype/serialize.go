@@ -24,7 +24,7 @@ package wtype
 
 import (
 	"encoding/json"
-//	"github.com/antha-lang/antha/antha/anthalib/wutil"
+	//	"github.com/antha-lang/antha/antha/anthalib/wutil"
 )
 
 // functions to deal with how to serialize / deserialize the relevant objects.
@@ -144,6 +144,7 @@ func (plate *LHPlate) Welldimensions() *LHWellType {
 	lhwt := LHWellType{t.Vol, t.Vunit, t.Rvol, t.WShape.ShapeName, t.Bottom, t.Xdim, t.Ydim, t.Zdim, t.Bottomh, t.Dunit}
 	return &lhwt
 }
+
 //
 //func (plate *LHPlate) MarshalJSON() ([]byte, error) {
 //	slp := SLHPlate{plate.ID, plate.Inst, plate.Loc, plate.PlateName, plate.Type, plate.Mnfr, plate.WlsX, plate.WlsY, plate.Nwells, plate.Height, plate.Hunit, plate.Welltype, plate.Wellcoords, plate.Welldimensions()}
@@ -222,9 +223,6 @@ func (slw SLHWell) FillWell(lw *LHWell) {
 	lw.Crds = slw.Coords
 	lw.WContents = slw.Contents
 	lw.Currvol = slw.Currvol
-	for _, c := range lw.WContents {
-		c.LContainer = lw
-	}
 }
 
 //func (well LHWell) MarshalJSON() ([]byte, error) {
