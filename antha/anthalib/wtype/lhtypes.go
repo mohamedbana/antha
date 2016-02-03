@@ -378,30 +378,16 @@ func (lhc *LHComponent) Dup() *LHComponent {
 	return c
 }
 
+func (lhc *LHComponent) Add(cmp2 *LHComponent) {
+	// define logic for adding two components together
+	// basically just merge the names, define whatever
+	// the type should be and add volumes together
+
+	// now, it must have a new ID...
+}
+
 // @implement Liquid
 // @deprecate Liquid
-
-func (lhc *LHComponent) SampleSolidtoLiquid(m wunit.Mass, d wunit.Density) Liquid {
-
-	// calculate volume to add from density
-	v := wunit.MasstoVolume(m, d)
-	ret := lhc.Sample(v)
-	return ret
-}
-
-func (lhc *LHComponent) GetStockConcentration() float64 {
-	return lhc.StockConcentration
-}
-
-func (lhc *LHComponent) Add(v wunit.Volume) {
-	meas := wunit.ConcreteMeasurement{lhc.Vol, wunit.ParsePrefixedUnit(lhc.Vunit)}
-	meas.Add(&v)
-	lhc.Vol = meas.RawValue()
-}
-
-func (lhc *LHComponent) Volume() wunit.Volume {
-	return wunit.NewVolume(lhc.Vol, lhc.Vunit)
-}
 
 func (lhc *LHComponent) GetSmax() float64 {
 	return lhc.Smax

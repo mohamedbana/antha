@@ -33,14 +33,14 @@ import (
 // request structure
 
 // take all of this liquid
-func SampleAll(l wtype.Liquid) *wtype.LHComponent {
+func SampleAll(l wtype.LHComponent) *wtype.LHComponent {
 	return Sample(l, l.Volume())
 }
 
 // below need to account for having locations for liquids specified...
 
 // take a sample of volume v from this liquid
-func Sample(l wtype.Liquid, v wunit.Volume) *wtype.LHComponent {
+func Sample(l wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
 
 	ret.CName = l.Name()
@@ -50,9 +50,6 @@ func Sample(l wtype.Liquid, v wunit.Volume) *wtype.LHComponent {
 	ret.Extra = l.GetExtra()
 	ret.Smax = l.GetSmax()
 	ret.Visc = l.GetVisc()
-	if l.Container() != nil {
-		ret.LContainer = l.Container().(*wtype.LHWell)
-	}
 
 	return ret
 }
@@ -71,10 +68,6 @@ func MultiSample(l []wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent {
 		ret.Extra = j.GetExtra()
 		ret.Smax = j.GetSmax()
 		ret.Visc = j.GetVisc()
-		if j.Container() != nil {
-			ret.LContainer = j.Container().(*wtype.LHWell)
-		}
-
 		reta = append(reta, ret)
 	}
 
@@ -82,7 +75,7 @@ func MultiSample(l []wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent {
 }
 
 // take a sample of this liquid and aim for a particular concentration
-func SampleForConcentration(l wtype.Liquid, c wunit.Concentration) *wtype.LHComponent {
+func SampleForConcentration(l wtype.LHComponent, c wunit.Concentration) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
 	ret.CName = l.Name()
 	ret.Type = l.GetType()
@@ -92,11 +85,10 @@ func SampleForConcentration(l wtype.Liquid, c wunit.Concentration) *wtype.LHComp
 	ret.Extra = l.GetExtra()
 	ret.Smax = l.GetSmax()
 	ret.Visc = l.GetVisc()
-	ret.LContainer = l.Container().(*wtype.LHWell)
 	return ret
 }
 
-func SampleMass(s wtype.Liquid, m wunit.Mass, d wunit.Density) *wtype.LHComponent {
+func SampleMass(s wtype.LHComponent, m wunit.Mass, d wunit.Density) *wtype.LHComponent {
 
 	// calculate volume to add from density
 	v := wunit.MasstoVolume(m, d)
@@ -109,50 +101,18 @@ func SampleMass(s wtype.Liquid, m wunit.Mass, d wunit.Density) *wtype.LHComponen
 	ret.Extra = s.GetExtra()
 	ret.Smax = s.GetSmax()
 	ret.Visc = s.GetVisc()
-	if s.Container() != nil {
-		ret.LContainer = s.Container().(*wtype.LHWell)
-	}
-
 	return ret
 }
 
 // take a sample ofs this liquid to be used to make the solution up to
 // a particular total volume
 // edited to take into account the volume of the other solution components
-func SampleForTotalVolume(l wtype.Liquid, v wunit.Volume) *wtype.LHComponent {
+func SampleForTotalVolume(l wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
 	ret.CName = l.Name()
 	ret.Type = l.GetType()
 	ret.Tvol = v.RawValue()
 	ret.Vunit = v.Unit().PrefixedSymbol()
-	ret.LContainer = l.Container().(*wtype.LHWell)
-	ret.CName = l.Name()
-	ret.Extra = l.GetExtra()
-	ret.Smax = l.GetSmax()
-	ret.Visc = l.GetVisc()
-
-	return ret
-}
-
-// take a sample of this liquid to be used to make the solution up to
-// a particular total volume
-// edit of SampleForTotalVolume to take into account the volume of the other solution components
-// XXX -- MIS that's precisely what the function above does, if there's an error we need to fix that
-// rather than adding a new function
-// this will be deleted shortly
-func TopUpVolume(l wtype.Liquid, current []wunit.Volume, final wunit.Volume) *wtype.LHComponent {
-	tot := 0.0
-	for _, j := range current {
-		tot += j.RawValue()
-	}
-
-	v := final.RawValue() - tot
-	ret := wtype.NewLHComponent()
-	ret.CName = l.Name()
-	ret.Type = l.GetType()
-	ret.Tvol = v
-	ret.Vunit = final.Unit().PrefixedSymbol()
-	ret.LContainer = l.Container().(*wtype.LHWell)
 	ret.CName = l.Name()
 	ret.Extra = l.GetExtra()
 	ret.Smax = l.GetSmax()
@@ -174,9 +134,6 @@ func SampleSolidtoLiquid(s wtype.Powder, m wunit.Mass, d wunit.Density) *wtype.L
 	ret.Extra = s.GetExtra()
 	ret.Smax = s.GetSmax()
 	ret.Visc = s.GetVisc()
-	if s.Container() != nil {
-		ret.LContainer = s.Container().(*wtype.LHWell)
-	}
 
 	return ret
 }
