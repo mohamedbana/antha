@@ -427,7 +427,7 @@ func (e *AnthaManualGrpc) configRequest(actionDescription equipment.ActionDescri
 	return nil
 }
 func (e *AnthaManualGrpc) sendMix(actionDescription equipment.ActionDescription) error {
-	var sol wtype.LHSolution
+	var ins wtype.LHInstruction
 	err := json.Unmarshal([]byte(actionDescription.ActionData), &sol)
 	if err != nil {
 		return err
@@ -436,16 +436,16 @@ func (e *AnthaManualGrpc) sendMix(actionDescription equipment.ActionDescription)
 	e.queueLock.Lock()
 	defer e.queueLock.Unlock()
 
-	req, ok := e.queue[sol.BlockID]
+	req, ok := e.queue[ins.BlockID]
 	if !ok {
-		return fmt.Errorf("Request for block id %v not found", sol.BlockID)
+		return fmt.Errorf("Request for block id %v not found", ins.BlockID)
 	}
 
 	opt := req.Output_platetypes
 
-	if sol.Platetype != "" {
-		typ := sol.Platetype
-		id := sol.PlateID
+	if ins.Platetype != "" {
+		typ := ins.Platetype
+		id := ins.PlateID
 
 		there := findPlateWithType_ID(opt, typ, id)
 
@@ -458,7 +458,7 @@ func (e *AnthaManualGrpc) sendMix(actionDescription equipment.ActionDescription)
 
 	req.Output_platetypes = opt
 	//req.Output_solutions[sol.ID] = &sol
-	req.Add_solution(&sol)
+	req.Add_instruction(&ins)
 
 	return nil
 }

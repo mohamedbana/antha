@@ -44,12 +44,11 @@ func ImprovedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 	// IT'S THAT HIDEOUS HACK AGAIN
 	volume_correction := 0.5
 
+	input_instructions := request.LHInstructions
+
 	set_output_order(request)
-
 	output_order := request.Output_order
-
 	inass := request.Input_assignments
-	output_solutions := request.Output_solutions
 	input_plates := copyplates(request.Input_plates)
 	output_plates := copyplates(request.Output_plates)
 	plate_lookup := request.Plate_lookup

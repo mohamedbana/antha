@@ -30,38 +30,31 @@ import (
 
 // structure for defining a request to the liquid handler
 type LHRequest struct {
-	ID                         string
-	BlockID                    wtype.BlockID
-	BlockName                  string
-	LHInstructions             map[string]*wtype.LHInstruction
-	Input_solutions            map[string][]*wtype.LHComponent
-	Plates                     map[string]*wtype.LHPlate
-	Tips                       []*wtype.LHTipbox
-	Tip_type                   *wtype.LHTipbox
-	Locats                     []string
-	Setup                      wtype.LHSetup
-	InstructionSet             *liquidhandling.RobotInstructionSet
-	Instructions               []liquidhandling.TerminalRobotInstruction
-	Input_assignments          map[string][]string
-	Output_assignments         map[string][]string
-	Input_plates               map[string]*wtype.LHPlate
-	Output_plates              map[string]*wtype.LHPlate
-	Input_platetypes           []*wtype.LHPlate
-	Input_major_group_layouts  [][]string
-	Input_minor_group_layouts  [][]string
-	Input_plate_layout         []string
-	Input_setup_weights        map[string]float64
-	Output_platetypes          []*wtype.LHPlate
-	Output_major_group_layouts [][]string
-	Output_minor_group_layouts [][]string
-	Output_plate_layout        []string
-	Plate_lookup               map[string]string
-	Stockconcs                 map[string]float64
-	Policies                   *liquidhandling.LHPolicyRuleSet
-	Input_order                []string
-	Output_order               []string
-	Order_solutions_added      []string
-	OutputIteratorFactory      func(*wtype.LHPlate) wtype.PlateIterator
+	ID                    string
+	BlockID               wtype.BlockID
+	BlockName             string
+	LHInstructions        map[string]*wtype.LHInstruction
+	Input_solutions       map[string][]*wtype.LHComponent
+	Plates                map[string]*wtype.LHPlate
+	Tips                  []*wtype.LHTipbox
+	InstructionSet        *liquidhandling.RobotInstructionSet
+	Instructions          []liquidhandling.TerminalRobotInstruction
+	Input_assignments     map[string][]string
+	Output_assignments    map[string][]string
+	Input_plates          map[string]*wtype.LHPlate
+	Output_plates         map[string]*wtype.LHPlate
+	Input_platetypes      []*wtype.LHPlate
+	Input_plate_layout    []string
+	Input_setup_weights   map[string]float64
+	Output_platetypes     []*wtype.LHPlate
+	Output_plate_layout   []string
+	Plate_lookup          map[string]string
+	Stockconcs            map[string]float64
+	Policies              *liquidhandling.LHPolicyRuleSet
+	Input_order           []string
+	Output_order          []string
+	Order_solutions_added []string
+	OutputIteratorFactory func(*wtype.LHPlate) wtype.PlateIterator
 }
 
 // this function checks requests so we can see early on whether or not they
@@ -96,7 +89,6 @@ func NewLHRequest() *LHRequest {
 	lhr.Input_solutions = make(map[string][]*wtype.LHComponent)
 	lhr.Plates = make(map[string]*wtype.LHPlate)
 	lhr.Tips = make([]*wtype.LHTipbox, 0, 1)
-	lhr.Locats = make([]string, 0, 1)
 	lhr.Input_plates = make(map[string]*wtype.LHPlate)
 	lhr.Input_platetypes = make([]*wtype.LHPlate, 0, 2)
 	lhr.Input_Setup_Weights = make(map[string]float64)
@@ -113,13 +105,13 @@ func NewLHRequest() *LHRequest {
 	lhr.OutputIteratorFactory = wtype.NewOneTimeRowIterator
 	lhr.Output_assignments = make(map[string][]string)
 	lhr.Input_assignments = make(map[string][]string)
-	lhr.Order_solutions_added = make([]string, 0, 1)
+	lhr.Order_instructions_added = make([]string, 0, 1)
 	return &lhr
 }
 
-func (lhr *LHRequest) AddSolution(s *wtype.LHSolution) {
-	lhr.Output_solutions[s.ID] = s
-	lhr.Order_solutions_added = append(lhr.Order_solutions_added, s.ID)
+func (lhr *LHRequest) Add_instruction(ins *wtype.LHInstruction) {
+	lhr.LHInstructions[ins.ID] = ins
+	lhr.Order_instructions_added = append(lhr.Order_instructions_added, ins.ID)
 }
 
 type LHPolicyManager struct {
