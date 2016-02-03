@@ -71,9 +71,8 @@ func (cl *ConcreteLocation) Shape() *Shape {
 }
 
 func NewLocation(name string, nPositions int, shape *Shape) Location { //TODO only in particular cases should the inner locations be populated
-	nao := NewAnthaObject(name)
 	positions := make([]*ConcreteLocation, nPositions)
-	l := ConcreteLocation{nao.ID, nao.Inst, nao.Name, positions, nil, shape}
+	l := ConcreteLocation{NewUUID(), "", "", positions, nil, shape}
 	l.Cntr = &l
 	if nPositions > 0 {
 		for i := 0; i < nPositions; i++ {

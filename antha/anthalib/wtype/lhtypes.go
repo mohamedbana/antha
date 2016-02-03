@@ -412,7 +412,6 @@ func NewLHSetup() LHSetup {
 
 // structure describing a microplate
 type LHPlate struct {
-	*GenericEntity
 	ID          string
 	Inst        string
 	Loc         string
@@ -493,32 +492,6 @@ func (lhp LHPlate) String() string {
 
 func (lhp *LHPlate) GetName() string {
 	return lhp.PlateName
-}
-
-// @implement Location
-
-func (lhp *LHPlate) Location_ID() string {
-	return lhp.ID
-}
-
-func (lhp *LHPlate) Location_Name() string {
-	return lhp.PlateName
-}
-
-func (lhp *LHPlate) Positions() []Location {
-	ret := make([]Location, lhp.Nwells)
-	x := 0
-	for _, v := range lhp.Cols {
-		for _, w := range v {
-			ret[x] = Location(w)
-			x += 1
-		}
-	}
-	return ret
-}
-
-func (lhp *LHPlate) Container() Location {
-	return lhp
 }
 
 // @implement Labware
@@ -716,14 +689,6 @@ func (lhw *LHWell) Location_Name() string {
 	return lhw.Platetype
 }
 
-func (lhw *LHWell) Positions() []Location {
-	return nil
-}
-
-func (lhw *LHWell) Container() Location {
-	return lhw.Plate
-}
-
 func (lhw *LHWell) Shape() *Shape {
 	return lhw.WShape
 }
@@ -733,10 +698,6 @@ func (lhw *LHWell) Shape() *Shape {
 
 func (w *LHWell) ContainerType() string {
 	return w.Platetype
-}
-
-func (w *LHWell) PartOf() Entity {
-	return w.Plate
 }
 
 func (w *LHWell) Empty() bool {
