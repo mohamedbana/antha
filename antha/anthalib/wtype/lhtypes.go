@@ -293,42 +293,6 @@ func (sol LHSolution) String() string {
 	return one + two
 }
 
-func SolutionToComponent(s *LHSolution) (c *LHComponent) {
-
-	c = New_Component(s.SName, s.Type, s.Vol)
-
-	/*
-		c = NewLHComponent()
-
-		c.ID = s.ID
-		c.Inst = s.Inst
-		//
-
-		c.GenericPhysical = s.GenericPhysical
-		c.Order = s.Order
-		c.CName = s.SName
-		c.Type = s.Type
-		c.Vol = s.Vol
-		c.Conc = s.Conc
-		c.Vunit = s.Vunit
-		c.Tvol = s.TVol
-		c.Loc = s.Loc
-		c.Smax = s.Smax
-		c.Visc = s.Visc
-		c.LContainer = //LHWell.Dup() //NewLHWell(s.Platetype, s.PlateID, crds, vunit string, vol, rvol float64, shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
-		c.Destination = s.Destination
-		c.StockConcentration = s.StockConcentration
-
-	*/
-
-	/*c.Extra = make(map[string]interface{}, len(lhc.Extra))
-	for k, v := range lhc.Extra {
-		c.Extra[k] = v
-	}*/
-	return c
-
-}
-
 func (lhs *LHSolution) GetAssignment() string {
 	return lhs.Plateaddress + ":" + lhs.Welladdress
 }
@@ -340,7 +304,7 @@ type LHComponent struct {
 	Inst               string
 	Order              int
 	CName              string
-	Type               string
+	Type               LiquidType
 	Vol                float64
 	Conc               float64
 	Vunit              string
@@ -350,8 +314,6 @@ type LHComponent struct {
 	Smax               float64
 	Visc               float64
 	StockConcentration float64
-	LContainer         *LHWell `gotopb:"-" json:"-"`
-	Destination        string
 	Extra              map[string]interface{}
 }
 
@@ -368,8 +330,6 @@ func (lhc *LHComponent) Dup() *LHComponent {
 	c.Loc = lhc.Loc
 	c.Smax = lhc.Smax
 	c.Visc = lhc.Visc
-	c.LContainer = lhc.LContainer
-	c.Destination = lhc.Destination
 	c.StockConcentration = lhc.StockConcentration
 	c.Extra = make(map[string]interface{}, len(lhc.Extra))
 	for k, v := range lhc.Extra {
@@ -378,7 +338,7 @@ func (lhc *LHComponent) Dup() *LHComponent {
 	return c
 }
 
-func (lhc *LHComponent) Add(cmp2 *LHComponent) {
+func (lhc *LHComponent) Mix(cmp2 *LHComponent) {
 	// define logic for adding two components together
 	// basically just merge the names, define whatever
 	// the type should be and add volumes together
@@ -420,7 +380,7 @@ func (lhc *LHComponent) GetVunit() string {
 }
 
 func (lhc *LHComponent) GetType() string {
-	return lhc.Type
+	return LiquidTypeName(lhc.Type)
 }
 
 func NewLHComponent() *LHComponent {

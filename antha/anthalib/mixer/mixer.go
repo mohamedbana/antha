@@ -180,7 +180,7 @@ func GenericMix(opt MixOptions) *wtype.LHComponent {
 	// that mix(X,Y) corresponds to "Add Y to X".
 	for idx, comp := range r.Components {
 		comp.Order = idx
-		opt.Result.Add(comp)
+		opt.Result.Mix(comp)
 	}
 
 	return opt.Result
