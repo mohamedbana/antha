@@ -36,12 +36,9 @@ import (
 )
 
 func ImprovedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHProperties) *LHRequest {
-	// in the first instance we assume this is done component-wise
-	// we also need to identify dependencies, i.e. if certain components
-	// are only available after other actions
-	// this will only work if the components to be added are to go in the same ordero
-
-	// IT'S THAT HIDEOUS HACK AGAIN
+	// this volume correction needs to be removed asap
+	// essentially its purpose is to account for extra volume lost
+	// while clinging to outside of tips
 	volume_correction := 0.5
 
 	input_instructions := request.LHInstructions

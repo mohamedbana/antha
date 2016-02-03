@@ -44,7 +44,6 @@ func (a *MixInst) Args() []Value {
 }
 
 type MixOpt struct {
-	OutputSol *wtype.LHSolution
 	OutputIns *wtype.LHInstruction
 	OutPlate  *wtype.LHPlate
 	PlateType string
@@ -67,7 +66,7 @@ func (a *IncubateInst) Args() []Value {
 
 type IncubateOpt struct {
 	BlockID      string
-	OutputSol    *wtype.LHSolution
+	Component    *wtype.LHComponent
 	Temp         wunit.Temperature
 	Time         wunit.Time
 	ShakingForce interface{}

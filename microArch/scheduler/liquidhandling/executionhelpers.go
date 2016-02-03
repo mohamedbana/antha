@@ -105,5 +105,5 @@ func copyplates(plts map[string]*wtype.LHPlate) map[string]*wtype.LHPlate {
 }
 
 func set_output_order(rq *LHRequest) {
-	// this starts off being based on the order solutions were defined in
+
 }

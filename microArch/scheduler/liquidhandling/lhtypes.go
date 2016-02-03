@@ -59,9 +59,6 @@ type LHRequest struct {
 
 // this function checks requests so we can see early on whether or not they
 // are going to cause problems
-// TODO: much of this will need to change as the system evolves;
-// this is something which must be carefully checked whenever changes
-// are made downstream
 func ValidateLHRequest(rq *LHRequest) (bool, string) {
 	if rq.Output_platetypes == nil || len(rq.Output_platetypes) == 0 {
 		return false, "No output plate type specified"

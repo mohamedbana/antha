@@ -197,20 +197,21 @@ func PartOf() Entity {
 //  instruction to a liquid handler
 type LHInstruction struct {
 	*GenericPhysical
-	ID            string
-	BlockID       BlockID
-	SName         string
-	Order         int
-	Components    []*LHComponent
-	ContainerType string
-	Welladdress   string
-	Plateaddress  string
-	PlateID       string
-	Platetype     string
-	Vol           float64
-	Type          string
-	Conc          float64
-	Tvol          float64
+	ID               string
+	BlockID          BlockID
+	SName            string
+	Order            int
+	Components       []*LHComponent
+	ContainerType    string
+	Welladdress      string
+	Plateaddress     string
+	PlateID          string
+	Platetype        string
+	Vol              float64
+	Type             string
+	Conc             float64
+	Tvol             float64
+	Majorlayoutgroup int
 }
 
 // structure describing a solution: a combination of liquid components
@@ -233,6 +234,15 @@ type LHSolution struct {
 	Tvol             float64
 	Majorlayoutgroup int
 	Minorlayoutgroup int
+}
+
+func NewLHInstruction() *LHInstruction {
+	var lhi LHInstruction
+	lhi.ID = GetUUID()
+	var gp GenericPhysical
+	lhi.GenericPhysical = &gp
+	lhi.Majorlayoutgroup = -1
+	return &lhi
 }
 
 func NewLHSolution() *LHSolution {
@@ -369,40 +379,7 @@ func (lhc *LHComponent) Dup() *LHComponent {
 }
 
 // @implement Liquid
-
-func (lhc *LHComponent) Viscosity() float64 {
-	return lhc.Visc
-}
-
-func (lhc *LHComponent) Name() string {
-	return lhc.CName
-}
-
-func (lhc *LHComponent) Container() LiquidContainer {
-	return lhc.LContainer
-}
-
-func (lhc *LHComponent) Sample(v wunit.Volume) Liquid {
-	// need to jig around with units a bit here
-	// Should probably just make Vunit, Cunit etc. wunits anyway
-	meas := wunit.ConcreteMeasurement{lhc.Vol, wunit.ParsePrefixedUnit(lhc.Vunit)}
-
-	// we need some logic potentially
-
-	if v.SIValue() > meas.SIValue() {
-		wutil.Error(errors.New(fmt.Sprintf("LHComponent ID: %s Not enough volume for sample", lhc.ID)))
-	} else if v.SIValue() == meas.SIValue() {
-		return lhc
-	}
-	smp := CopyLHComponent(lhc)
-	// need a convention here
-
-	smp.Vol = v.RawValue()
-	smp.Vunit = v.Unit().PrefixedSymbol()
-	meas.Subtract(&v.ConcreteMeasurement)
-	lhc.Vol = meas.RawValue()
-	return smp
-}
+// @deprecate Liquid
 
 func (lhc *LHComponent) SampleSolidtoLiquid(m wunit.Mass, d wunit.Density) Liquid {
 

@@ -181,40 +181,20 @@ func SampleSolidtoLiquid(s wtype.Powder, m wunit.Mass, d wunit.Density) *wtype.L
 	return ret
 }
 
-// Temp hack to mix solutions
-func MixLiquidstemp(liquids ...*wtype.LHSolution) *wtype.LHSolution {
-	// we must respect the order in which things are mixed.
-	// the convention is that mix(X,Y) corresponds to "Add Y to X"
-
-	ret := wtype.NewLHSolution()
-
-	ret.Components = make([]*wtype.LHComponent, 0)
-	for _, liquid := range liquids {
-		for _, component := range liquid.Components {
-			ret.Components = append(ret.Components, component)
-		}
-	}
-	// this translates to the component ordering in the resulting solution
-	for i, cmp := range liquids {
-		cmp.Order = i
-	}
-
-	return ret
-}
-
 type MixOptions struct {
 	Components  []*wtype.LHComponent // Components to mix (required)
-	Solution    *wtype.LHSolution    // Configure an existing solution; if nil, create one instead
+	Instruction *wtype.LHInstruction // used to be LHSolution
+	Result      *wtype.LHComponent   // the resultant component
 	Destination *wtype.LHPlate       // Destination plate; if nil, select one later
 	PlateType   string               // type of destination plate
 	Address     string               // Well in destination to place result; if nil, select one later
 	PlateNum    int                  // which plate to stick these on
 }
 
-func GenericMix(opt MixOptions) *wtype.LHSolution {
-	r := opt.Solution
+func GenericMix(opt MixOptions) *wtype.LHComponent {
+	r := opt.Instruction
 	if r == nil {
-		r = wtype.NewLHSolution()
+		r = wtype.NewLHInstruction()
 	}
 	r.Components = opt.Components
 
@@ -237,24 +217,27 @@ func GenericMix(opt MixOptions) *wtype.LHSolution {
 		r.Majorlayoutgroup = opt.PlateNum - 1
 	}
 
+	opt.Result = wtype.NewLHComponent()
+
 	// We must respect the order in which things are mixed. The convention is
 	// that mix(X,Y) corresponds to "Add Y to X".
 	for idx, comp := range r.Components {
 		comp.Order = idx
+		opt.Result.Add(comp)
 	}
 
-	return r
+	return opt.Result
 }
 
 // Mix the specified wtype.LHComponents together and leave the destination TBD
-func Mix(components ...*wtype.LHComponent) *wtype.LHSolution {
+func Mix(components ...*wtype.LHComponent) *wtype.LHComponent {
 	return GenericMix(MixOptions{
 		Components: components,
 	})
 }
 
 // Mix the specified wtype.LHComponents together into a specific plate
-func MixInto(destination *wtype.LHPlate, address string, components ...*wtype.LHComponent) *wtype.LHSolution {
+func MixInto(destination *wtype.LHPlate, address string, components ...*wtype.LHComponent) *wtype.LHComponent {
 	return GenericMix(MixOptions{
 		Components:  components,
 		Destination: destination,
@@ -263,7 +246,7 @@ func MixInto(destination *wtype.LHPlate, address string, components ...*wtype.LH
 }
 
 // Mix the specified wtype.LHComponents together into a plate of a particular type
-func MixTo(platetype string, address string, platenum int, components ...*wtype.LHComponent) *wtype.LHSolution {
+func MixTo(platetype string, address string, platenum int, components ...*wtype.LHComponent) *wtype.LHComponent {
 	return GenericMix(MixOptions{
 		Components: components,
 		PlateType:  platetype,
