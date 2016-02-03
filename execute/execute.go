@@ -3,64 +3,72 @@
 package execute
 
 import (
-	"fmt"
+	"encoding/json"
+	"errors"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
-	eq "github.com/antha-lang/antha/microArch/equipment"
-	em "github.com/antha-lang/antha/microArch/equipmentManager"
+	"github.com/antha-lang/antha/microArch/equipment"
+	"github.com/antha-lang/antha/microArch/equipment/action"
+	"github.com/antha-lang/antha/target"
 	"github.com/antha-lang/antha/workflow"
 )
 
-type idKey int
+var (
+	cannotConfigure = errors.New("cannot configure liquid handler")
 
-const theIdKey idKey = 0
-
-func getId(ctx context.Context) string {
-	v, ok := ctx.Value(theIdKey).(string)
-	if !ok {
-		return ""
+	defaultMaxPlates            = 4.5
+	defaultMaxWells             = 278.0
+	defaultResidualVolumeWeight = 1.0
+	defaultWellByWell           = false
+	DefaultConfig               = Config{
+		MaxPlates:            &defaultMaxPlates,
+		MaxWells:             &defaultMaxWells,
+		ResidualVolumeWeight: &defaultResidualVolumeWeight,
+		InputPlateType:       []string{"pcrplate_skirted"},
+		OutputPlateType:      []string{"pcrplate_skirted"},
+		WellByWell:           &defaultWellByWell,
 	}
-	return v
-}
+)
 
 type Options struct {
-	WorkflowData  []byte
-	ParamData     []byte
-	FromEM        em.EquipmentManager // Use equipment handler to find liquid handler
-	FromEquipment eq.Equipment        // Use equipment as liquid handler
-	Id            string
+	WorkflowData []byte         // JSON data describing workflow
+	Workflow     *workflow.Desc // Or workflow directly
+	ParamData    []byte         // JSON data describing parameters
+	Params       *RawParams     // Or parameters directly
+	Target       *target.Target // Target machine configuration
+	Id           string         // Job Id
+	Config       *Config        // Override config data in ParamData
 }
 
+// Simple entrypoint for one-shot execution of workflows.
 func Run(parent context.Context, opt Options) (*workflow.Workflow, error) {
-	w, err := workflow.New(workflow.Options{FromBytes: opt.WorkflowData})
+	w, err := workflow.New(workflow.Options{FromBytes: opt.WorkflowData, FromDesc: opt.Workflow})
 	if err != nil {
 		return nil, err
 	}
 
-	cd, err := setParams(parent, opt.ParamData, w)
-	if err != nil {
-		return nil, fmt.Errorf("cannot set initial parameters: %s", err)
-	}
-
-	var lh eq.Equipment
-	switch {
-	case opt.FromEquipment != nil:
-		lh = opt.FromEquipment
-	case opt.FromEM != nil:
-		if l, err := getLhFromEm(opt.FromEM); err != nil {
+	var params *RawParams
+	if opt.Params != nil {
+		params = opt.Params
+	} else if opt.ParamData != nil {
+		if err := json.Unmarshal(opt.ParamData, &params); err != nil {
 			return nil, err
-		} else {
-			lh = l
 		}
-	case lh == nil:
-		return nil, noLh
 	}
 
-	ctx, done, err := newLHContext(context.WithValue(parent, theIdKey, opt.Id), lh, cd)
-	if done != nil {
-		defer done()
-	}
+	cd, err := setParams(parent, params, w)
 	if err != nil {
-		return nil, fmt.Errorf("cannot initialize liquid handler: %s", err)
+		return nil, err
+	}
+
+	ctx := target.WithTarget(WithId(parent, opt.Id), opt.Target)
+
+	lh, err := opt.Target.GetLiquidHandler()
+	if err != nil {
+		return nil, err
+	}
+	if err := config(ctx, lh, DefaultConfig.Merge(cd).Merge(opt.Config)); err != nil {
+		return nil, err
 	}
 
 	if err := w.Run(ctx); err != nil {
@@ -68,4 +76,26 @@ func Run(parent context.Context, opt Options) (*workflow.Workflow, error) {
 	}
 
 	return w, nil
+}
+
+// XXX Move out when equipment config is done
+func config(parent context.Context, lh equipment.Equipment, cd Config) error {
+	id := getId(parent)
+	config := make(map[string]interface{})
+	config["BLOCKID"] = wtype.NewBlockID(id)
+	config["MAX_N_PLATES"] = *cd.MaxPlates
+	config["MAX_N_WELLS"] = *cd.MaxWells
+	config["RESIDUAL_VOLUME_WEIGHT"] = *cd.ResidualVolumeWeight
+	config["INPUT_PLATETYPE"] = cd.InputPlateType
+	config["OUTPUT_PLATETYPE"] = cd.OutputPlateType
+	config["WELLBYWELL"] = *cd.WellByWell
+
+	configString, err := json.Marshal(config)
+	if err != nil {
+		return cannotConfigure
+	}
+	if err := lh.Do(*equipment.NewActionDescription(action.LH_CONFIG, string(configString), nil)); err != nil {
+		return cannotConfigure
+	}
+	return nil
 }

@@ -11,20 +11,20 @@ Parameters (
 	ReactionVolume				Volume
 	PartVols				[]Volume
 	PartNames				[]string
-	MMXVol					Volume
+	//MMXVol					Volume
 	ReactionTemp				Temperature
 	ReactionTime				Time
 	InactivationTemp			Temperature
 	InactivationTime			Time
 	OutputReactionName			string
 	OutputLocation 				string
-	OutputPlateNum				string
+	OutputPlateNum				int
 )
 
 // Physical Inputs to this protocol with types
 Inputs (
 	Parts			[]*wtype.LHComponent
-	Water			*wtype.LHComponent
+//	Water			*wtype.LHComponent
 	MasterMix		*wtype.LHComponent
 	OutPlate		*wtype.LHPlate
 )
@@ -47,20 +47,16 @@ Setup {}
 // for every input
 Steps {
 	samples := make([]*wtype.LHComponent, 0)
-	waterSample := mixer.SampleForTotalVolume(Water, ReactionVolume)
-	samples = append(samples, waterSample)
+//	waterSample := mixer.SampleForTotalVolume(Water, ReactionVolume)
+	mmxSample:=mixer.SampleForTotalVolume(MasterMix,ReactionVolume)
+	samples = append(samples, mmxSample)
+
 	for k, part := range Parts {
 		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", PartNames[k], " vol ", PartVols[k])
 		partSample := mixer.Sample(part, PartVols[k])
 		partSample.CName = PartNames[k]
 		samples = append(samples, partSample)
 	}
-
-	// Do MasterMix at the end ... this change was made to prevent enzymes hanging around with
-	// subsets of parts for any length of time
-
-	mmxSample:=mixer.Sample(MasterMix, MMXVol)
-	samples=append(samples, mmxSample)
 
 	Reaction = MixTo(OutPlate, OutputLocation, samples...)
 

@@ -58,7 +58,7 @@ func AdvancedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 
 	// sort them, we might want to record the acutal order somewhere... also to allow user configuration of this
 
-	minorlayoutgroups = sortOutputOrder(minorlayoutgroups, ass, COLWISE)
+	minorlayoutgroups, ass = sortOutputOrder(minorlayoutgroups, ass, COLWISE)
 
 	inass := request.Input_assignments
 	output_solutions := request.Output_solutions
@@ -351,10 +351,17 @@ func copyplates(plts map[string]*wtype.LHPlate) map[string]*wtype.LHPlate {
 	return ret
 }
 
-func sortOutputOrder(minorlayoutgroups [][]string, ass []string, sorttype int) [][]string {
-	for k, mlga := range minorlayoutgroups {
-		minorlayoutgroups[k] = mlga
+func sortOutputOrder(minorlayoutgroups [][]string, ass []string, sorttype int) ([][]string, []string) {
+	a2 := make([]string, len(ass))
+	mlg2 := make([][]string, len(minorlayoutgroups))
+
+	for x, a := range minorlayoutgroups {
+		mlg2[x] = a
 	}
 
-	return minorlayoutgroups
+	for i, v := range ass {
+		a2[i] = v
+	}
+
+	return mlg2, a2
 }

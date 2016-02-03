@@ -149,7 +149,7 @@ func solution_setup(request *LHRequest, prms *liquidhandling.LHProperties) (map[
 	//TODO this needs to be migrated elsewhere
 	var vmin wunit.Volume = wunit.NewVolume(1.0, "ul")
 
-	fmt.Println("PRMS: ", prms)
+	//	fmt.Println("PRMS: ", prms)
 
 	if prms.CurrConf != nil {
 		vmin = *(prms.CurrConf.Minvol)

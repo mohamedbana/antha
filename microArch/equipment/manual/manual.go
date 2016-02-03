@@ -27,10 +27,9 @@
 package manual
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
-
-	"encoding/json"
 	"sync"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -274,9 +273,9 @@ type AnthaManualGrpc struct {
 	Behaviours []equipment.Behaviour
 	properties *liquidhandling.LHProperties
 	driver     *grpc.Driver
-	queue      map[wtype.ThreadID]*schedulerLiquidhandling.LHRequest
+	queue      map[wtype.BlockID]*schedulerLiquidhandling.LHRequest
 	queueLock  sync.Mutex
-	planner    map[wtype.ThreadID]*schedulerLiquidhandling.Liquidhandler
+	planner    map[wtype.BlockID]*schedulerLiquidhandling.Liquidhandler
 }
 
 func NewAnthaManualGrpc(id string, uri string) *AnthaManualGrpc {
@@ -311,9 +310,9 @@ func NewAnthaManualGrpc(id string, uri string) *AnthaManualGrpc {
 		be,
 		nil,
 		driver,
-		make(map[wtype.ThreadID]*schedulerLiquidhandling.LHRequest),
+		make(map[wtype.BlockID]*schedulerLiquidhandling.LHRequest),
 		sync.Mutex{},
-		make(map[wtype.ThreadID]*schedulerLiquidhandling.Liquidhandler),
+		make(map[wtype.BlockID]*schedulerLiquidhandling.Liquidhandler),
 	}
 
 	return ret
@@ -349,6 +348,7 @@ func (e *AnthaManualGrpc) configRequest(actionDescription equipment.ActionDescri
 	var data struct {
 		BlockID wtype.BlockID
 	}
+
 	if err := json.Unmarshal([]byte(actionDescription.ActionData), &data); err != nil {
 		return err
 	}
@@ -357,31 +357,68 @@ func (e *AnthaManualGrpc) configRequest(actionDescription equipment.ActionDescri
 	e.queueLock.Lock()
 	defer e.queueLock.Unlock()
 
-	if r, ok := e.queue[data.BlockID.ThreadID]; !ok {
+	if r, ok := e.queue[data.BlockID]; !ok {
 		req = schedulerLiquidhandling.NewLHRequest()
 		req.BlockID = data.BlockID
 		req.Policies = liquidhandling.GetLHPolicyForTest()
 		lhplanner := schedulerLiquidhandling.Init(e.properties)
 
-		e.queue[data.BlockID.ThreadID] = req
-		e.planner[data.BlockID.ThreadID] = lhplanner
+		e.queue[data.BlockID] = req
+		e.planner[data.BlockID] = lhplanner
 	} else {
 		req = r
 	}
-	//@jmanart TODO this down needs to come from the configuration step, need to figure out the correct cast
-	// XXX XXX XXX this can cause big issues
-	req.Input_Setup_Weights["MAX_N_PLATES"] = 4.5
-	req.Input_Setup_Weights["MAX_N_WELLS"] = 278.0
-	req.Input_Setup_Weights["RESIDUAL_VOLUME_WEIGHT"] = 1.0
 
-	// MIS MAJOR TODO XXX XXX XXX here: this HARD CODE needs to be removed or we can only use one type of plate!
-	// this stuff needs to come from the database - have to work out user configurability here also
-	// oh dear, this code is wronger than I had realised
-	// MIS fix here - only allow a single plate in here
-	if len(req.Input_platetypes) == 0 {
-		//pwc := factory.GetPlateByType("pcrplate_with_cooler")
-		pwc := factory.GetPlateByType("pcrplate_skirted")
-		req.Input_platetypes = append(req.Input_platetypes, pwc)
+	var params map[string]interface{}
+	if err := json.Unmarshal([]byte(actionDescription.ActionData), &params); err != nil {
+		return err
+	}
+
+	// need to pass the config info into the request
+
+	mnp, ok := params["MAX_N_PLATES"]
+
+	if ok {
+		req.Input_Setup_Weights["MAX_N_PLATES"] = mnp.(float64)
+	} else {
+		logger.Debug("NO MAX N PLATES FOUND")
+	}
+
+	mnw, ok := params["MAX_N_WELLS"]
+
+	if ok {
+		req.Input_Setup_Weights["MAX_N_WELLS"] = mnw.(float64)
+	}
+
+	rvw, ok := params["RESIDUAL_VOLUME_WEIGHT"]
+
+	if ok {
+		req.Input_Setup_Weights["RESIDUAL_VOLUME_WEIGHT"] = rvw.(float64)
+	}
+
+	pt, ok := params["INPUT_PLATETYPE"]
+
+	if ok {
+		for _, v := range pt.([]interface{}) {
+			req.Input_platetypes = append(req.Input_platetypes, factory.GetPlateByType(v.(string)))
+		}
+	}
+
+	opt, ok := params["OUTPUT_PLATETYPE"]
+
+	if ok {
+		for _, v := range opt.([]interface{}) {
+			req.Output_platetypes = append(req.Output_platetypes, factory.GetPlateByType(v.(string)))
+		}
+	}
+
+	t, ok := params["WELLBYWELL"]
+
+	if ok {
+		if t.(bool) {
+			logger.Debug("WELL BY WELL MODE SELECTED")
+			e.planner[data.BlockID].ExecutionPlanner = schedulerLiquidhandling.AdvancedExecutionPlanner2
+		}
 	}
 
 	return nil
@@ -396,40 +433,65 @@ func (e *AnthaManualGrpc) sendMix(actionDescription equipment.ActionDescription)
 	e.queueLock.Lock()
 	defer e.queueLock.Unlock()
 
-	req, ok := e.queue[sol.BlockID.ThreadID]
+	req, ok := e.queue[sol.BlockID]
 	if !ok {
 		return fmt.Errorf("Request for block id %v not found", sol.BlockID)
 	}
+
+	opt := req.Output_platetypes
+
 	if sol.Platetype != "" {
-		req.Output_platetype = factory.GetPlateByType(sol.Platetype)
-	} else {
-		req.Output_platetype = factory.GetPlateByType("pcrplate_with_cooler")
+		typ := sol.Platetype
+		id := sol.PlateID
+
+		there := findPlateWithType_ID(opt, typ, id)
+
+		if !there {
+			plat := factory.GetPlateByType(typ)
+			plat.ID = id
+			opt = append(opt, plat)
+		}
 	}
+
+	req.Output_platetypes = opt
 	req.Output_solutions[sol.ID] = &sol
 
 	return nil
 }
 
+func findPlateWithType_ID(arr []*wtype.LHPlate, typ string, id string) bool {
+	there := false
+	for _, v := range arr {
+		if v.Type == typ {
+			if id == "" || id == v.ID {
+				there = true
+				break
+			}
+		}
+	}
+	return there
+}
+
 func (e *AnthaManualGrpc) end(actionDescription equipment.ActionDescription) error {
-	blockId := wtype.BlockID{ThreadID: wtype.ThreadID(actionDescription.ActionData)}
+	blockId := wtype.NewBlockID(actionDescription.ActionData)
 
 	e.queueLock.Lock()
 	defer e.queueLock.Unlock()
 
-	req, ok := e.queue[blockId.ThreadID]
+	req, ok := e.queue[blockId]
 	if !ok || req == nil {
 		return nil
 	}
 
-	planner, ok := e.planner[blockId.ThreadID]
+	planner, ok := e.planner[blockId]
 	if !ok {
 		return nil
 	}
 
 	planner.MakeSolutions(req)
 
-	e.queue[blockId.ThreadID] = nil
-	e.planner[blockId.ThreadID] = nil
+	e.queue[blockId] = nil
+	e.planner[blockId] = nil
 	logger.Debug("Request Cleanup Done")
 
 	return nil
@@ -460,8 +522,12 @@ func (e *AnthaManualGrpc) Shutdown() error {
 func (e *AnthaManualGrpc) Init() error {
 	//e.properties = factory.GetLiquidhandlerByType("GilsonPipetmax")
 	//e.properties = factory.GetLiquidhandlerByType("CyBioGeneTheatre")
-	p, _ := e.driver.GetCapabilities()
+	p, s := e.driver.GetCapabilities()
 	e.properties = &p
 	e.properties.Driver = e.driver
-	return nil
+	if s.OK {
+		return nil
+	} else {
+		return fmt.Errorf("%d: %s", s.Errorcode, s.Msg)
+	}
 }

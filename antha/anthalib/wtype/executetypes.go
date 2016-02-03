@@ -1,12 +1,14 @@
 package wtype
 
-type ThreadID string
-
-func (a ThreadID) String() string {
-	return string(a)
+// A block of instructions associated with a particular job, etc.
+type BlockID struct {
+	Value string
 }
 
-type BlockID struct {
-	ThreadID ThreadID
-	_        int
+func NewBlockID(id string) BlockID {
+	return BlockID{Value: id}
+}
+
+func (a BlockID) String() string {
+	return a.Value
 }

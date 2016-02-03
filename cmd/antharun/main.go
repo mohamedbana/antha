@@ -30,25 +30,15 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
-	"github.com/antha-lang/antha/microArch/equipmentManager"
+	"github.com/antha-lang/antha/target"
 	"io/ioutil"
-	"log"
 	"os"
 )
 
 const (
-	jsonOutput = iota
-	stringOutput
-)
-
-var (
-	logFile        string
-	parametersFile string
-	workflowFile   string
-	driverURI      string
-	list           bool
-	inputPlateFile string // TODO: Forward to execution
-	output         int
+	jsonOutput   = "json"
+	stringOutput = "pretty"
+	defaultPort  = 50051
 )
 
 func makeContext() (context.Context, error) {
@@ -66,36 +56,37 @@ func makeContext() (context.Context, error) {
 	return ctx, nil
 }
 
-func run() error {
-	if driverURI != "" {
-		fe, err := NewRemoteFrontend(driverURI)
-		if err != nil {
-			return err
-		}
-		defer fe.Shutdown()
-	} else {
-		fmt.Println("Press [Enter] to load antha workflow with manual driver...")
-		fmt.Println("Reminder: press [Control-X] to exit the workflow interface")
-		if _, err := fmt.Scanln(); err != nil {
-			return err
-		}
+type opts struct {
+	Frontend       string
+	DriverURI      string
+	ParametersFile string
+	WorkflowFile   string
+	Config         *execute.Config
+}
 
-		fe, err := NewCUIFrontend()
-		if err != nil {
-			return err
-		}
-		defer fe.Shutdown()
+func runOne(opts opts) error {
+	t := target.New()
+	fe, err := NewFrontend(Options{
+		Kind:   opts.Frontend,
+		Target: t,
+		URI:    opts.DriverURI,
+	})
+	if err != nil {
+		return err
 	}
+	defer fe.Shutdown()
 
-	wdata, err := ioutil.ReadFile(workflowFile)
+	wdata, err := ioutil.ReadFile(opts.WorkflowFile)
 	if err != nil {
 		return err
 	}
 
-	pdata, err := ioutil.ReadFile(parametersFile)
+	pdata, err := ioutil.ReadFile(opts.ParametersFile)
 	if err != nil {
 		return err
 	}
+
+	wdesc, params, err := tryExpand(wdata, pdata)
 
 	ctx, err := makeContext()
 	if err != nil {
@@ -103,9 +94,10 @@ func run() error {
 	}
 
 	w, err := execute.Run(ctx, execute.Options{
-		FromEM:       equipmentManager.GetEquipmentManager(),
-		WorkflowData: wdata,
-		ParamData:    pdata,
+		Target:   t,
+		Workflow: wdesc,
+		Params:   params,
+		Config:   opts.Config,
 	})
 	if err != nil {
 		return err
@@ -164,7 +156,7 @@ func getComponents() ([]component, error) {
 	return cs, nil
 }
 
-func printComponents(cs []component) error {
+func printComponents(output string, cs []component) error {
 	switch output {
 	case jsonOutput:
 		bs, err := json.Marshal(cs)
@@ -188,44 +180,104 @@ func printComponents(cs []component) error {
 	return nil
 }
 
-func main() {
-	var outputStr string
-	flag.BoolVar(&list, "list", false, "list the available components")
-	flag.StringVar(&outputStr, "output", "", "output format")
-	flag.StringVar(&parametersFile, "parameters", "parameters.yml", "parameters to workflow")
-	flag.StringVar(&workflowFile, "workflow", "workflow.json", "workflow definition file")
-	flag.StringVar(&logFile, "log", "", "log file")
-	flag.StringVar(&driverURI, "driver", "", "uri where a grpc driver implementation listens")
-	flag.StringVar(&inputPlateFile, "inputFile", "", "filename for an input plate definition")
+func run() error {
+	list := flag.Bool("list", false, "list the available components")
+	output := flag.String("output", "pretty", "output format one of {json, pretty}")
+	parametersFile := flag.String("parameters", "parameters.yml", "parameters to workflow")
+	workflowFile := flag.String("workflow", "workflow.json", "workflow definition file")
+	driver := flag.String("driver", "", "uri where remote grpc driver implementation listens")
+	package_ := flag.String("package", "", "go package to spawn grpc driver from")
+	frontend := flag.String("frontend", "debug", "kind of frontend one of {debug, cui, remote}")
+	maxPlates := flag.String("maxPlates", "", "maximum number of plates")
+	maxWells := flag.String("maxWells", "", "maximum number of wells on a plate")
+	residualVolumeWeight := flag.String("residualVolumeWeight", "", "")
+	wellByWell := flag.String("wellByWell", "", "use well-by-well planner")
+	inputPlateType := flag.String("inputPlateType", "", "default input plate type to use")
+	outputPlateType := flag.String("outputPlateType", "", "default output plate to use")
+
 	flag.Parse()
 
-	switch outputStr {
-	default:
-		output = stringOutput
-	case "json":
-		output = jsonOutput
-	}
-	if list {
+	if *list {
 		if cs, err := getComponents(); err != nil {
-			log.Fatal(err)
-		} else if err := printComponents(cs); err != nil {
-			log.Fatal(err)
+			return err
+		} else if err := printComponents(*output, cs); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	makeConfig := func() (cd *execute.Config, err error) {
+		defer func() {
+			if res := recover(); res != nil {
+				err = fmt.Errorf("%s", res)
+			}
+		}()
+		cd = &execute.Config{
+			MaxPlates:            parseFloat(maxPlates),
+			MaxWells:             parseFloat(maxWells),
+			ResidualVolumeWeight: parseFloat(residualVolumeWeight),
+			InputPlateType:       parseStringSlice(inputPlateType),
+			OutputPlateType:      parseStringSlice(outputPlateType),
+			WellByWell:           parseBool(wellByWell),
 		}
 		return
 	}
 
-	if len(parametersFile) == 0 || len(workflowFile) == 0 {
-		flag.PrintDefaults()
-		os.Exit(1)
+	config, err := makeConfig()
+	if err != nil {
+		return err
 	}
 
-	if driverURI == "" {
-		if envDriver := os.Getenv("DRIVERURI"); len(envDriver) > 0 {
-			driverURI = envDriver
+	if len(*driver) == 0 {
+		if e := os.Getenv("DRIVERURI"); len(e) > 0 {
+			*driver = e
 		}
 	}
 
+	if len(*parametersFile) == 0 || len(*workflowFile) == 0 {
+		return fmt.Errorf("missing parameters and/or workflow command line argument")
+	}
+
+	if len(*driver) > 0 && len(*package_) > 0 {
+		return fmt.Errorf("command line argument driver is not compatible with package")
+	}
+
+	if len(*package_) > 0 {
+		s, err := spawn(*package_, defaultPort)
+		if s != nil {
+			defer s.Close()
+		}
+		if err != nil {
+			return err
+		}
+		if err := s.Command.Start(); err != nil {
+			return err
+		}
+		defer func() {
+			s.Command.Process.Kill()
+		}()
+		*driver = s.URI
+	}
+
+	if len(*driver) > 0 && *frontend == DEBUG {
+		*frontend = REMOTE
+	}
+
+	if err := runOne(opts{
+		Frontend:       *frontend,
+		DriverURI:      *driver,
+		ParametersFile: *parametersFile,
+		WorkflowFile:   *workflowFile,
+		Config:         config,
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func main() {
 	if err := run(); err != nil {
-		log.Fatal(err)
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 }

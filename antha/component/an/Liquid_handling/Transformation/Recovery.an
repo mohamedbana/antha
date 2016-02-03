@@ -7,10 +7,12 @@ import (
 
 // Input parameters for this protocol (data)
 Parameters (
-	Recoveryvolume wunit.Volume
+	//Recoveryvolume wunit.Volume
 	Recoverytime wunit.Time //= 2 (hours)
 	Recoverytemp wunit.Temperature
+	TransformedcellVolume wunit.Volume
 )
+
 
 // Data which is returned from this protocol, and data types
 Data (
@@ -20,9 +22,9 @@ Data (
 // Physical Inputs to this protocol with types
 Inputs (
 	Transformedcells *wtype.LHComponent
-    Recoverymedium *wtype.LHComponent
+   // Recoverymedium *wtype.LHComponent
 	OutPlate *wtype.LHPlate
-	AgarPlate *wtype.LHPlate
+
 )
 
 // Physical outputs from this protocol with types
@@ -43,11 +45,13 @@ Steps {
 	
 	recoverymix := make([]*wtype.LHComponent, 0)
 	
-	transformedcellsComp := Transformedcells
+	transformedcellsComp := mixer.Sample(Transformedcells,TransformedcellVolume)
 	
-	recoverymixture := mixer.Sample(Recoverymedium, Recoveryvolume)
+	//recoverymixture := mixer.Sample(Recoverymedium, Recoveryvolume)
 
-	recoverymix = append(recoverymix,transformedcellsComp,recoverymixture)
+	recoverymix = append(recoverymix,transformedcellsComp)
+	//recoverymix = append(recoverymix,recoverymixture)
+
 	recoverymix2 := MixInto(OutPlate,recoverymix...)
 	
 	Incubate (recoverymix2,  Recoverytemp, Recoverytime, true)

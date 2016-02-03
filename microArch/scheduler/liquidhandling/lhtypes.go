@@ -53,7 +53,7 @@ type LHRequest struct {
 	Input_minor_group_layouts  [][]string
 	Input_plate_layout         []string
 	Input_Setup_Weights        map[string]float64
-	Output_platetype           *wtype.LHPlate
+	Output_platetypes          []*wtype.LHPlate
 	Output_major_group_layouts [][]string
 	Output_minor_group_layouts [][]string
 	Output_plate_layout        []string
@@ -69,7 +69,7 @@ type LHRequest struct {
 // this is something which must be carefully checked whenever changes
 // are made downstream
 func ValidateLHRequest(rq *LHRequest) (bool, string) {
-	if rq.Output_platetype == nil {
+	if rq.Output_platetypes == nil || len(rq.Output_platetypes) == 0 {
 		return false, "No output plate type specified"
 	}
 

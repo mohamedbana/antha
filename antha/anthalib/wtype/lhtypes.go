@@ -27,10 +27,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"strconv"
 	"strings"
+
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
 )
 
 const (
@@ -208,7 +209,7 @@ type LHSolution struct {
 	Plateaddress     string
 	PlateID          string
 	Platetype        string
-	Vol              float64
+	Vol              float64 // in S.I units only for now
 	Type             string
 	Conc             float64
 	Tvol             float64
@@ -264,6 +265,19 @@ func (sol LHSolution) String() string {
 	return one + two
 }
 
+/*
+func (lhc *LHSolution) Add(v wunit.Volume) {
+	// fudge ... assumes lhc.Vol is in SI
+
+	//meas := wunit.ConcreteMeasurement{lhc.Vol, wunit.ParsePrefixedUnit(lhc.Vunit)}
+
+	lhc.Vol = lhc.Vol + v.SIValue()
+}
+
+func (lhc *LHSolution) Container() LiquidContainer {
+	return lhc.ContainerType
+}
+*/
 func SolutionToComponent(s *LHSolution) (c *LHComponent) {
 
 	c = New_Component(s.SName, s.Type, s.Vol)
@@ -466,7 +480,6 @@ func NewLHSetup() LHSetup {
 }
 
 // structure describing a microplate
-// this needs to be harmonised with the version
 type LHPlate struct {
 	*GenericEntity
 	ID          string
@@ -1192,7 +1205,6 @@ func (tb *LHTipbox) GetTips(mirror bool, multi, orient int) []string {
 				for j := s; j >= 0; j-- {
 					tb.Tips[i][j] = nil
 					wc := WellCoords{i, j}
-					fmt.Println(j, "Getting TIP from ", wc.FormatA1())
 					ret = append(ret, wc.FormatA1())
 					n += 1
 					if n >= multi {
@@ -1200,7 +1212,6 @@ func (tb *LHTipbox) GetTips(mirror bool, multi, orient int) []string {
 					}
 				}
 
-				fmt.Println("RET: ", ret)
 				break
 			}
 		}

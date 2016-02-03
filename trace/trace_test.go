@@ -4,16 +4,22 @@ import (
 	"errors"
 	"fmt"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	//"github.com/antha-lang/antha/microArch/equipment/void"
+	//"github.com/antha-lang/antha/target"
 	"testing"
 	"time"
 )
 
+func NewTestContext() (context.Context, context.CancelFunc, DoneFunc) {
+	return NewContext(context.Background())
+}
+
 func TestGoOneRead(t *testing.T) {
-	ctx, cancel, allDone := NewContext(context.Background())
+	ctx, cancel, allDone := NewTestContext()
 	defer cancel()
 
 	Go(ctx, func(ctx context.Context) error {
-		p := IssueCommand(ctx, "noop")
+		p := Issue(ctx, MakeDebug("noop", nil))
 		_, err := Read(ctx, p)
 		return err
 	})
@@ -29,12 +35,12 @@ func TestGoOneRead(t *testing.T) {
 }
 
 func TestCommandSequence(t *testing.T) {
-	ctx, cancel, allDone := NewContext(context.Background())
+	ctx, cancel, allDone := NewTestContext()
 	defer cancel()
 
 	Go(ctx, func(ctx context.Context) error {
 		for i := 0; i < 5; i += 1 {
-			p := IssueCommand(ctx, "noop")
+			p := Issue(ctx, MakeDebug("noop", nil))
 			if _, err := Read(ctx, p); err != nil {
 				return err
 			}
@@ -53,7 +59,7 @@ func TestCommandSequence(t *testing.T) {
 }
 
 func TestNestedCommandSequence(t *testing.T) {
-	ctx, cancel, allDone := NewContext(context.Background())
+	ctx, cancel, allDone := NewTestContext()
 	defer cancel()
 
 	Go(ctx, func(ctx context.Context) error {
@@ -61,7 +67,7 @@ func TestNestedCommandSequence(t *testing.T) {
 			pidx := i
 			Go(ctx, func(ctx context.Context) error {
 				for i := 0; i < 10; i += 1 {
-					p := IssueCommand(ctx, fmt.Sprintf("noop.%d.%d", pidx, i))
+					p := Issue(ctx, MakeDebug(fmt.Sprintf("noop.%d.%d", pidx, i), nil))
 					if _, err := Read(ctx, p); err != nil {
 						return err
 					}
@@ -83,7 +89,7 @@ func TestNestedCommandSequence(t *testing.T) {
 }
 
 func TestGoGoReadAll(t *testing.T) {
-	ctx, cancel, allDone := NewContext(context.Background())
+	ctx, cancel, allDone := NewTestContext()
 	defer cancel()
 
 	Go(ctx, func(ctx context.Context) error {
@@ -92,7 +98,8 @@ func TestGoGoReadAll(t *testing.T) {
 			Go(ctx, func(ctx context.Context) error {
 				var promises []*Promise
 				for i := 0; i < 5; i += 1 {
-					promises = append(promises, IssueCommand(ctx, fmt.Sprintf("noop.%d.%d", pidx, i)))
+					p := Issue(ctx, MakeDebug(fmt.Sprintf("noop.%d.%d", pidx, i), nil))
+					promises = append(promises, p)
 				}
 				if _, err := ReadAll(ctx, promises...); err != nil {
 					return err
@@ -113,13 +120,14 @@ func TestGoGoReadAll(t *testing.T) {
 	}
 }
 func TestGoReadAll(t *testing.T) {
-	ctx, cancel, allDone := NewContext(context.Background())
+	ctx, cancel, allDone := NewTestContext()
 	defer cancel()
 
 	Go(ctx, func(ctx context.Context) error {
 		var promises []*Promise
 		for i := 0; i < 5; i += 1 {
-			promises = append(promises, IssueCommand(ctx, fmt.Sprintf("noop.%d", i)))
+			p := Issue(ctx, MakeDebug(fmt.Sprintf("noop.%d", i), nil))
+			promises = append(promises, p)
 		}
 		if _, err := ReadAll(ctx, promises...); err != nil {
 			return err
@@ -138,12 +146,13 @@ func TestGoReadAll(t *testing.T) {
 }
 
 func TestReadAll(t *testing.T) {
-	ctx, cancel, allDone := NewContext(context.Background())
+	ctx, cancel, allDone := NewTestContext()
 	defer cancel()
 
 	var promises []*Promise
 	for i := 0; i < 5; i += 1 {
-		promises = append(promises, IssueCommand(ctx, fmt.Sprintf("noop.%d", i)))
+		p := Issue(ctx, MakeDebug(fmt.Sprintf("noop.%d", i), nil))
+		promises = append(promises, p)
 	}
 	if _, err := ReadAll(ctx, promises...); err != nil {
 		t.Error(err)
@@ -161,11 +170,11 @@ func TestReadAll(t *testing.T) {
 }
 
 func TestIdempotentRead(t *testing.T) {
-	ctx, cancel, allDone := NewContext(context.Background())
+	ctx, cancel, allDone := NewTestContext()
 	defer cancel()
 
 	Go(ctx, func(ctx context.Context) error {
-		p := IssueCommand(ctx, "noop")
+		p := Issue(ctx, MakeDebug("noop", nil))
 		if _, err := Read(ctx, p); err != nil {
 			return err
 		} else if _, err := Read(ctx, p); err != nil {
@@ -185,13 +194,13 @@ func TestIdempotentRead(t *testing.T) {
 }
 
 func TestOneError(t *testing.T) {
-	ctx, cancel, allDone := NewContext(context.Background())
+	ctx, cancel, allDone := NewTestContext()
 	defer cancel()
 
 	myErr := errors.New("myerror")
 
 	Go(ctx, func(ctx context.Context) error {
-		IssueCommand(ctx, "noop")
+		Issue(ctx, MakeDebug("noop", nil))
 		return myErr
 	})
 
@@ -206,7 +215,7 @@ func TestOneError(t *testing.T) {
 }
 
 func TestOneErrorOutOfN(t *testing.T) {
-	ctx, cancel, allDone := NewContext(context.Background())
+	ctx, cancel, allDone := NewTestContext()
 	defer cancel()
 
 	myErr := errors.New("myerror")
@@ -214,7 +223,7 @@ func TestOneErrorOutOfN(t *testing.T) {
 	for idx := 0; idx < 5; idx += 1 {
 		i := idx
 		Go(ctx, func(ctx context.Context) error {
-			IssueCommand(ctx, "noop")
+			Issue(ctx, MakeDebug("noop", nil))
 			if i == 4 {
 				return myErr
 			} else {
@@ -234,7 +243,7 @@ func TestOneErrorOutOfN(t *testing.T) {
 }
 
 func TestCancel(t *testing.T) {
-	ctx, cancel, allDone := NewContext(context.Background())
+	ctx, cancel, allDone := NewTestContext()
 	cancel()
 
 	myErr := context.Canceled

@@ -136,6 +136,9 @@ func SampleForTotalVolume(l wtype.Liquid, v wunit.Volume) *wtype.LHComponent {
 // take a sample of this liquid to be used to make the solution up to
 // a particular total volume
 // edit of SampleForTotalVolume to take into account the volume of the other solution components
+// XXX -- MIS that's precisely what the function above does, if there's an error we need to fix that
+// rather than adding a new function
+// this will be deleted shortly
 func TopUpVolume(l wtype.Liquid, current []wunit.Volume, final wunit.Volume) *wtype.LHComponent {
 	tot := 0.0
 	for _, j := range current {
@@ -198,66 +201,60 @@ func MixLiquidstemp(liquids ...*wtype.LHSolution) *wtype.LHSolution {
 	return ret
 }
 
-// mix the specified wtype.LHComponents together
-// and leave the destination TBD
+type MixOptions struct {
+	Components  []*wtype.LHComponent // Components to mix (required)
+	Solution    *wtype.LHSolution    // Configure an existing solution; if nil, create one instead
+	Destination *wtype.LHPlate       // Destination plate; if nil, select one later
+	Address     string               // Well in destination to place result; if nil, select one later
+}
+
+func GenericMix(opt MixOptions) *wtype.LHSolution {
+	r := opt.Solution
+	if r == nil {
+		r = wtype.NewLHSolution()
+	}
+	r.Components = opt.Components
+
+	if opt.Destination != nil {
+		r.ContainerType = opt.Destination.Type
+		r.Platetype = opt.Destination.Type
+	}
+
+	if len(opt.Address) > 0 {
+		r.Welladdress = opt.Address
+	}
+
+	// We must respect the order in which things are mixed. The convention is
+	// that mix(X,Y) corresponds to "Add Y to X".
+	for idx, comp := range r.Components {
+		comp.Order = idx
+	}
+
+	return r
+}
+
+// Mix the specified wtype.LHComponents together and leave the destination TBD
 func Mix(components ...*wtype.LHComponent) *wtype.LHSolution {
-	// we must respect the order in which things are mixed.
-	// the convention is that mix(X,Y) corresponds to "Add Y to X"
-
-	ret := wtype.NewLHSolution()
-
-	ret.Components = components
-
-	// this translates to the component ordering in the resulting solution
-	for i, cmp := range components {
-		cmp.Order = i
-	}
-
-	return ret
+	return GenericMix(MixOptions{
+		Components: components,
+	})
 }
 
-// mix the specified wtype.LHComponents together into the destination
-// specified as the first argument
+// Mix the specified wtype.LHComponents together into the destination specified
+// as the first argument
 func MixInto(destination *wtype.LHPlate, components ...*wtype.LHComponent) *wtype.LHSolution {
-	// we must respect the order in which things are mixed.
-	// the convention is that mix(X,Y) corresponds to "Add Y to X"
-
-	ret := wtype.NewLHSolution()
-
-	// we use the first argument to specify the destination
-
-	ret.ContainerType = destination.Type
-	ret.Platetype = destination.Type
-
-	ret.Components = components
-
-	// this translates to the component ordering in the resulting solution
-	for i, cmp := range components {
-		cmp.Order = i
-	}
-
-	return ret
+	return GenericMix(MixOptions{
+		Components:  components,
+		Destination: destination,
+	})
 }
 
-// mix the specified wtype.LHComponents together into the destination
-// specified as the first argument
+// Mix the specified wtype.LHComponents together into the destination specified
+// as the first argument
 func MixTo(destination *wtype.LHPlate, address string, components ...*wtype.LHComponent) *wtype.LHSolution {
-	// we must respect the order in which things are mixed.
-	// the convention is that mix(X,Y) corresponds to "Add Y to X"
-
-	ret := wtype.NewLHSolution()
-
-	// we use the first argument to specify the destination
-
-	ret.ContainerType = destination.Type
-	ret.Platetype = destination.Type
-	ret.Welladdress = address
-	ret.Components = components
-
-	// this translates to the component ordering in the resulting solution
-	for i, cmp := range components {
-		cmp.Order = i
-	}
-
-	return ret
+	return GenericMix(MixOptions{
+		Components:  components,
+		Destination: destination,
+		Address:     address,
+	})
 }

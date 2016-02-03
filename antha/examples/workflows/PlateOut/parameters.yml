@@ -3,10 +3,10 @@
         "PlateOut": {
             "AgarPlate": "falcon6wellAgar",
             "Diluent": "water",
-            "DilutionX": 1,
+            "DilutionX": 20,
             "IncubationTemp": "25C",
             "IncubationTime": "57600s",
-            "Plateoutvolume": "1000ul",
+            "Plateoutvolume": "100ul",
             "RecoveredCells": "neb5compcells"
         }
     }

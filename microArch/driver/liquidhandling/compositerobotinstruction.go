@@ -184,7 +184,6 @@ type TransferInstruction struct {
 
 func (ti *TransferInstruction) ToString() string {
 	s := fmt.Sprintf("%s ", Robotinstructionnames[ti.Type])
-
 	for i := 0; i < len(ti.What); i++ {
 		s += ti.ParamSet(i).ToString()
 		s += "\n"
@@ -641,6 +640,13 @@ func (ins *TransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProper
 		if ins.Volume[i] == nil || ins.Volume[i].LessThanFloat(0.001) {
 			continue
 		}
+		if i != 0 && (ins.What[i] != ins.What[i-1]) {
+			if len(sci.Volume) > 0 {
+				ret = append(ret, sci)
+			}
+			sci = NewSingleChannelBlockInstruction()
+			sci.Prms = prms.HeadsLoaded[0].Params
+		}
 
 		var tp TransferParams
 		tp.What = ins.What[i]
@@ -661,7 +667,10 @@ func (ins *TransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProper
 		ins.FVolume[i].Subtract(ins.Volume[i])
 		ins.TVolume[i].Add(ins.Volume[i])
 	}
-	ret = append(ret, sci)
+	if len(sci.Volume) > 0 {
+		ret = append(ret, sci)
+	}
+
 	return ret
 }
 
@@ -3119,6 +3128,7 @@ func (mi *MixInstruction) OutputTo(driver LiquidhandlingDriver) {
 // TODO -- implement MESSAGE
 
 func GetTips(tiptype string, params *LHProperties, channel *wtype.LHChannelParameter, multi int, mirror bool) RobotInstruction {
+
 	tipwells, tipboxpositions, tipboxtypes := params.GetCleanTips(tiptype, channel, mirror, multi)
 
 	if tipwells == nil {

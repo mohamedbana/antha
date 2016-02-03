@@ -27,13 +27,16 @@ package liquidHandler
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"sync"
+
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/equipment"
 	"github.com/antha-lang/antha/microArch/equipment/action"
 	"github.com/antha-lang/antha/microArch/factory"
+	"github.com/antha-lang/antha/microArch/logger"
 	schedulerLiquidhandling "github.com/antha-lang/antha/microArch/scheduler/liquidhandling"
-	"sync"
 )
 
 var (
@@ -48,10 +51,10 @@ type AnthaLiquidHandler struct {
 	Behaviours []equipment.Behaviour
 	Driver     liquidhandling.ExtendedLiquidhandlingDriver
 	Properties *liquidhandling.LHProperties
-	queue      map[wtype.ThreadID]*schedulerLiquidhandling.LHRequest
+	queue      map[wtype.BlockID]*schedulerLiquidhandling.LHRequest
 	queueLock  sync.Mutex
-	completed  map[wtype.ThreadID]*schedulerLiquidhandling.LHRequest
-	planner    map[wtype.ThreadID]*schedulerLiquidhandling.Liquidhandler
+	completed  map[wtype.BlockID]*schedulerLiquidhandling.LHRequest
+	planner    map[wtype.BlockID]*schedulerLiquidhandling.Liquidhandler
 }
 
 //NewAnthaLiquidHandler instantiates a LiquidHandler identified by id and supporting the following behaviours:
@@ -82,9 +85,9 @@ func NewAnthaLiquidHandler(id string, d liquidhandling.ExtendedLiquidhandlingDri
 		},
 		Properties: &prop,
 		Driver:     d,
-		queue:      make(map[wtype.ThreadID]*schedulerLiquidhandling.LHRequest),
-		planner:    make(map[wtype.ThreadID]*schedulerLiquidhandling.Liquidhandler),
-		completed:  make(map[wtype.ThreadID]*schedulerLiquidhandling.LHRequest),
+		queue:      make(map[wtype.BlockID]*schedulerLiquidhandling.LHRequest),
+		planner:    make(map[wtype.BlockID]*schedulerLiquidhandling.Liquidhandler),
+		completed:  make(map[wtype.BlockID]*schedulerLiquidhandling.LHRequest),
 	}
 }
 
@@ -94,9 +97,9 @@ func NewAnthaLiquidHandler(id string, d liquidhandling.ExtendedLiquidhandlingDri
 func (e *AnthaLiquidHandler) TakeRequestOutput(id wtype.BlockID) *schedulerLiquidhandling.LHRequest {
 	e.queueLock.Lock()
 	defer e.queueLock.Unlock()
-	r, ok := e.completed[id.ThreadID]
+	r, ok := e.completed[id]
 	if ok {
-		delete(e.completed, id.ThreadID)
+		delete(e.completed, id)
 	}
 	return r
 }
@@ -131,6 +134,7 @@ func (e *AnthaLiquidHandler) configRequest(actionDescription equipment.ActionDes
 	var data struct {
 		BlockID wtype.BlockID
 	}
+
 	if err := json.Unmarshal([]byte(actionDescription.ActionData), &data); err != nil {
 		return err
 	}
@@ -139,35 +143,70 @@ func (e *AnthaLiquidHandler) configRequest(actionDescription equipment.ActionDes
 	e.queueLock.Lock()
 	defer e.queueLock.Unlock()
 
-	if r, ok := e.queue[data.BlockID.ThreadID]; !ok {
+	if r, ok := e.queue[data.BlockID]; !ok {
 		req = schedulerLiquidhandling.NewLHRequest()
 		req.BlockID = data.BlockID
 		req.Policies = liquidhandling.GetLHPolicyForTest()
 		lhplanner := schedulerLiquidhandling.Init(e.Properties)
 
-		e.queue[data.BlockID.ThreadID] = req
-		e.planner[data.BlockID.ThreadID] = lhplanner
+		e.queue[data.BlockID] = req
+		e.planner[data.BlockID] = lhplanner
 	} else {
 		req = r
 	}
-	//@jmanart TODO this down needs to come from the configuration step, need to figure out the correct cast
-	// XXX XXX XXX this can cause big issues
-	req.Input_Setup_Weights["MAX_N_PLATES"] = 4.5
-	req.Input_Setup_Weights["MAX_N_WELLS"] = 278.0
-	req.Input_Setup_Weights["RESIDUAL_VOLUME_WEIGHT"] = 1.0
 
-	// MIS MAJOR TODO XXX XXX XXX here: this HARD CODE needs to be removed or we can only use one type of plate!
-	// this stuff needs to come from the database - have to work out user configurability here also
-	// oh dear, this code is wronger than I had realised
-	// MIS fix here - only allow a single plate in here
-	if len(req.Input_platetypes) == 0 {
-		pwc := factory.GetPlateByType("pcrplate_with_cooler")
-		req.Input_platetypes = append(req.Input_platetypes, pwc)
+	var params map[string]interface{}
+	if err := json.Unmarshal([]byte(actionDescription.ActionData), &params); err != nil {
+		return err
+	}
+
+	// need to pass the config info into the request
+
+	mnp, ok := params["MAX_N_PLATES"]
+
+	if ok {
+		req.Input_Setup_Weights["MAX_N_PLATES"] = mnp.(float64)
+	} else {
+		logger.Debug("NO MAX N PLATES FOUND")
+	}
+
+	mnw, ok := params["MAX_N_WELLS"]
+
+	if ok {
+		req.Input_Setup_Weights["MAX_N_WELLS"] = mnw.(float64)
+	}
+
+	rvw, ok := params["RESIDUAL_VOLUME_WEIGHT"]
+
+	if ok {
+		req.Input_Setup_Weights["RESIDUAL_VOLUME_WEIGHT"] = rvw.(float64)
+	}
+
+	pt, ok := params["INPUT_PLATETYPE"]
+
+	if ok {
+		for _, v := range pt.([]interface{}) {
+			req.Input_platetypes = append(req.Input_platetypes, factory.GetPlateByType(v.(string)))
+		}
+	}
+
+	opt, ok := params["OUTPUT_PLATETYPE"]
+
+	if ok {
+		for _, v := range opt.([]interface{}) {
+			req.Output_platetypes = append(req.Output_platetypes, factory.GetPlateByType(v.(string)))
+		}
+	}
+
+	_, ok = params["WELLBYWELL"]
+
+	if ok {
+		logger.Debug("WELL BY WELL MODE SELECTED")
+		e.planner[data.BlockID].ExecutionPlanner = schedulerLiquidhandling.AdvancedExecutionPlanner2
 	}
 
 	return nil
 }
-
 func (e *AnthaLiquidHandler) sendMix(actionDescription equipment.ActionDescription) error {
 	var sol wtype.LHSolution
 	err := json.Unmarshal([]byte(actionDescription.ActionData), &sol)
@@ -178,41 +217,65 @@ func (e *AnthaLiquidHandler) sendMix(actionDescription equipment.ActionDescripti
 	e.queueLock.Lock()
 	defer e.queueLock.Unlock()
 
-	req, ok := e.queue[sol.BlockID.ThreadID]
+	req, ok := e.queue[sol.BlockID]
 	if !ok {
-		return requestNotFound
+		return fmt.Errorf("Request for block id %v not found", sol.BlockID)
 	}
+
+	opt := req.Output_platetypes
+
 	if sol.Platetype != "" {
-		req.Output_platetype = factory.GetPlateByType(sol.Platetype)
-	} else {
-		req.Output_platetype = factory.GetPlateByType("pcrplate_with_cooler")
+		typ := sol.Platetype
+		id := sol.PlateID
+
+		there := findPlateWithType_ID(opt, typ, id)
+		if !there {
+			plat := factory.GetPlateByType(typ)
+			plat.ID = id
+			opt = append(opt, plat)
+		}
 	}
+
+	req.Output_platetypes = opt
 	req.Output_solutions[sol.ID] = &sol
 
 	return nil
 }
 
+func findPlateWithType_ID(arr []*wtype.LHPlate, typ string, id string) bool {
+	there := false
+	for _, v := range arr {
+		if v.Type == typ {
+			if id == "" || id == v.ID {
+				there = true
+				break
+			}
+		}
+	}
+	return there
+}
+
 func (e *AnthaLiquidHandler) end(actionDescription equipment.ActionDescription) error {
-	blockId := wtype.BlockID{ThreadID: wtype.ThreadID(actionDescription.ActionData)}
+	blockId := wtype.NewBlockID(actionDescription.ActionData)
 
 	e.queueLock.Lock()
 	defer e.queueLock.Unlock()
 
-	req, ok := e.queue[blockId.ThreadID]
+	req, ok := e.queue[blockId]
 	if !ok || req == nil {
 		return nil
 	}
 
-	planner, ok := e.planner[blockId.ThreadID]
+	planner, ok := e.planner[blockId]
 	if !ok {
 		return nil
 	}
 
 	planner.MakeSolutions(req)
 
-	e.completed[blockId.ThreadID] = req
-	e.queue[blockId.ThreadID] = nil
-	e.planner[blockId.ThreadID] = nil
+	e.completed[blockId] = req
+	e.queue[blockId] = nil
+	e.planner[blockId] = nil
 
 	return nil
 }
