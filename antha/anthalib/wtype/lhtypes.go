@@ -313,6 +313,10 @@ func (lhc *LHComponent) Name() string {
 	return lhc.CName
 }
 
+func (lhc *LHComponent) Volume() wunit.Volume {
+	return wunit.NewVolume(lhc.Vol, lhc.Vunit)
+}
+
 func (lhc *LHComponent) Dup() *LHComponent {
 	c := NewLHComponent()
 	c.Order = lhc.Order

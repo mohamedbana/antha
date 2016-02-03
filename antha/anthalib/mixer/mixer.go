@@ -121,6 +121,7 @@ func SampleForTotalVolume(l wtype.LHComponent, v wunit.Volume) *wtype.LHComponen
 	return ret
 }
 
+/*
 func SampleSolidtoLiquid(s wtype.Powder, m wunit.Mass, d wunit.Density) *wtype.LHComponent {
 
 	// calculate volume to add from density
@@ -137,6 +138,7 @@ func SampleSolidtoLiquid(s wtype.Powder, m wunit.Mass, d wunit.Density) *wtype.L
 
 	return ret
 }
+*/
 
 type MixOptions struct {
 	Components  []*wtype.LHComponent // Components to mix (required)
