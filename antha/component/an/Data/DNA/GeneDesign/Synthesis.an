@@ -33,17 +33,15 @@ Setup {}
 
 
 Steps {
-	//made up element which synthesises DNA
+	// Element with mock synthesises DNA. Converts DNA sequence type to LHComponent.
 	var dna wtype.LHComponent
-	
 	Components = make([]wtype.LHComponent, 4)
 	
-	for i, _ := range PartsWithOverhangs {
+	for i, part := range PartsWithOverhangs {
+		dna.CName = part.Nm
 		Components[i] = dna
 		}
-	
 
-	//Components = components 
 	}
 	
 

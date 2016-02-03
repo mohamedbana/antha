@@ -25,12 +25,13 @@ package enzymes
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"strings"
 )
 
 /*
@@ -98,6 +99,7 @@ func MakeScarfreeCustomTypeIIsassemblyParts(parts []wtype.DNASequence, vector wt
 			desiredstickyend3prime = vector3primestickyend
 		}
 		partwithends = AddCustomEnds(parts[i], enzyme, desiredstickyend5prime, desiredstickyend3prime)
+		partwithends.Nm = parts[i].Nm
 		partswithends = append(partswithends, partwithends)
 
 		desiredstickyend5prime = Suffix(parts[i].Seq, enzyme.RestrictionEnzyme.EndLength)
@@ -118,7 +120,7 @@ func AddStandardStickyEnds(part wtype.DNASequence, assemblystandard string, leve
 			("1st position = 1, not 0")
 		}
 		*/
-		vectorends := Vectorends[assemblystandard][level] // this could also look up Endlinks[assemblystandard][level][numberofparts][0]
+		vectorends := Vectorends[assemblystandard][level] // this could also look up [assemblystandard][level][numberofparts][0]
 
 		enzyme := Enzymelookup[assemblystandard][level]
 

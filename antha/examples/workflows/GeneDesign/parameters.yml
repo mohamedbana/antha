@@ -2,12 +2,12 @@
     "Parameters": {
         "Design1": {
             "Parts": [ 
-				"BBa_R0010",
-				"BBa_B0034",
-				"BBa_J36801",
-				"BBa_J06504" 
+				"BBa_K557010",
+				"BBa_K557010",
+				"BBa_K557010",
+				"BBa_K557010" 
 			],
-			"Vector": "pAGM1311_R",
+			"Vector": "pG9m-2",
 			"RE": "SapI"
 		},
 		"Mix1": {
