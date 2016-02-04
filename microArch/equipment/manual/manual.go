@@ -428,7 +428,7 @@ func (e *AnthaManualGrpc) configRequest(actionDescription equipment.ActionDescri
 }
 func (e *AnthaManualGrpc) sendMix(actionDescription equipment.ActionDescription) error {
 	var ins wtype.LHInstruction
-	err := json.Unmarshal([]byte(actionDescription.ActionData), &sol)
+	err := json.Unmarshal([]byte(actionDescription.ActionData), &ins)
 	if err != nil {
 		return err
 	}
@@ -457,7 +457,6 @@ func (e *AnthaManualGrpc) sendMix(actionDescription equipment.ActionDescription)
 	}
 
 	req.Output_platetypes = opt
-	//req.Output_solutions[sol.ID] = &sol
 	req.Add_instruction(&ins)
 
 	return nil

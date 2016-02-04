@@ -28,7 +28,7 @@ import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"github.com/antha-lang/microArch/logger"
+	"github.com/antha-lang/antha/microArch/logger"
 	"strconv"
 	"strings"
 )
@@ -321,7 +321,7 @@ func (lhc *LHComponent) Dup() *LHComponent {
 }
 
 func (cmp *LHComponent) Mix(cmp2 *LHComponent) {
-	cmp.SMax = mergeSolubilities(cmp2)
+	cmp.Smax = mergeSolubilities(cmp, cmp2)
 	// determine type of final
 	cmp.Type = mergeTypes(cmp, cmp2)
 	// add cmp2 to cmp
