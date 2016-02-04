@@ -345,8 +345,8 @@ func (cmp *LHComponent) Mix(cmp2 *LHComponent) {
 	// track the parent-child relationship
 	// nb the sample mechanism ensures that there will be a 1:1 parent:child
 	// relationship from the POV of the liquid handler
-	cmp2.DaughterID = cmp.ID
-	cmp.ParentID += cmp2.ID
+	cmp2.DaughterID += cmp.ID + "_"
+	cmp.ParentID += cmp2.ID + "_"
 }
 
 // @implement Liquid

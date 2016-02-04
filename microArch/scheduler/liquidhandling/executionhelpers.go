@@ -103,37 +103,57 @@ func copyplates(plts map[string]*wtype.LHPlate) map[string]*wtype.LHPlate {
 	return ret
 }
 
-type ITree struct {
-	Parent   *ITree
-	Children []*ITree
-	Values   []*LHInstruction
+type IChain struct {
+	Parent *IChain
+	Child  IChain
+	Values []*LHInstruction
 }
 
-func NewITree(parent *ITree) *ITree {
-	var it ITree
+func NewIChain(parent *IChain) *IChain {
+	var it IChain
 	it.Parent = parent
-	it.Children = make([]*ITree, 0, 1)
 	it.Values = make([]*LHInstruction, 0, 1)
 	return &it
 }
 
-func (it *ITree) Add() {
-
+func (it *IChain) Add(ins *LHInstruction) {
+	p := it.FindNodeFor(ins)
+	p.Values = append(p.Values, ins)
 }
 
-func (it *ITree) FindParentFor(ins *LHInstruction) {
-
+func (it *IChain) GetChild() *Ichain {
+	if it.Child == nil {
+		it.Child = NewIChain(it)
+		return it.Child
+	}
 }
 
-func (it *ITree) Flatten() []string {
+func (it *IChain) FindNodeFor(ins *LHInstruction) *IChain {
+	if ins.Parent == "" {
+		if it.Parent == nil {
+			return it
+		} else {
+			// should not be here!
+			logger.Fatal("Improper use of IChain")
+		}
+	} else {
+		for _, v := range it.Values {
+			if ins.HasParent(v.ID) {
+				return it.GetChild()
+			}
+		}
+
+		return it.Child.FindNodeFor(ins)
+	}
+}
+
+func (it *IChain) Flatten() []string {
 	var ret []string
 	for _, v := range it.Values {
 		ret = append(ret, v.ID)
 	}
 
-	for _, v := range it.Children {
-		ret = append(ret, v.Flatten())
-	}
+	ret = append(ret, it.Child.Flatten())
 
 	return ret
 }
@@ -142,7 +162,7 @@ func set_output_order(rq *LHRequest) {
 	// gather things into groups with dependency relationships
 	// TODO -- implement time constraints and anything else
 
-	it := NewITree(nil)
+	it := NewIChain(nil)
 
 	for _, v := range rq.Order_solutions_added {
 		it.Add(rq.Output_instructions[v])
