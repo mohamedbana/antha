@@ -278,6 +278,7 @@ func (lhs *LHSolution) GetAssignment() string {
 type LHComponent struct {
 	ID                 string
 	BlockID            BlockID
+	DaughterID         string
 	Inst               string
 	Order              int
 	CName              string
@@ -332,6 +333,10 @@ func (cmp *LHComponent) Mix(cmp2 *LHComponent) {
 	cmp.CName = mergeNames(cmp.CName, cmp2.CName)
 	// allow trace back
 	logger.Track(fmt.Sprintf("MIX %s %s %s", cmp.ID, cmp2.ID, vcmp.ToString()))
+	// track the parent-child relationship
+	// nb the sample mechanism ensures that there will be a 1:1 parent:child
+	// relationship from the POV of the liquid handler
+	cmp2.DaughterID = cmp.ID
 }
 
 // @implement Liquid
