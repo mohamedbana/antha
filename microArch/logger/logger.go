@@ -32,6 +32,13 @@ import (
 )
 
 //Logging Functions
+func Track(message string, extra ...interface{}) {
+	_middlewares_mutex.Lock()
+	defer _middlewares_mutex.Unlock()
+	for _, h := range getMiddlewareList() {
+		h.Log(TRACK, time.Now().Unix(), getSource(), message, extra...)
+	}
+}
 func Info(message string, extra ...interface{}) {
 	_middlewares_mutex.Lock()
 	defer _middlewares_mutex.Unlock()

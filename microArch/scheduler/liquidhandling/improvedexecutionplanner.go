@@ -52,8 +52,7 @@ func ImprovedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 
 	instructions := liquidhandling.NewRobotInstructionSet(nil)
 
-	for _, g := range output_order {
-		grp := []string(g)
+	for _, grp := range output_order {
 		for _, solID := range grp {
 			sol := output_solutions[solID]
 

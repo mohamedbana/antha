@@ -941,48 +941,11 @@ func DecodeArrayOfArrayOfPtrToLHWell(arg *pb.ArrayOfArrayOfPtrToLHWellMessage) [
 	return ret
 }
 func EncodeLHComponent(arg i_1.LHComponent) *pb.LHComponentMessage {
-	ret := pb.LHComponentMessage{
-		(string)(arg.ID),
-		(string)(arg.Inst),
-		int64(arg.Order),
-		(string)(arg.CName),
-		(string)(arg.Type),
-		(float64)(arg.Vol),
-		(float64)(arg.Conc),
-		(string)(arg.Vunit),
-		(string)(arg.Cunit),
-		(float64)(arg.Tvol),
-		(string)(arg.Loc),
-		(float64)(arg.Smax),
-		(float64)(arg.Visc),
-		(float64)(arg.StockConcentration),
-		//EncodePtrToLHWell(arg.LContainer),
-		(string)(arg.Destination),
-		EncodeMapstringinterfaceMessage(arg.Extra),
-	}
+	ret := pb.LHComponentMessage{}
 	return &ret
 }
 func DecodeLHComponent(arg *pb.LHComponentMessage) i_1.LHComponent {
-	ret := i_1.LHComponent{
-		(string)(arg.Arg_2),
-		(string)(arg.Arg_3),
-		(int)(arg.Arg_4),
-		(string)(arg.Arg_5),
-		(string)(arg.Arg_6),
-		(float64)(arg.Arg_7),
-		(float64)(arg.Arg_8),
-		(string)(arg.Arg_9),
-		(string)(arg.Arg_10),
-		(float64)(arg.Arg_11),
-		(string)(arg.Arg_12),
-		(float64)(arg.Arg_13),
-		(float64)(arg.Arg_14),
-		(float64)(arg.Arg_15),
-		//(*i_1.LHWell)(DecodePtrToLHWell(arg.Arg_16)), //@jmanart Fix for the gotopb lib cycle
-		nil,
-		(string)(arg.Arg_16),
-		(map[string]interface{})(DecodeMapstringinterfaceMessage(arg.Arg_17)),
-	}
+	ret := i_1.LHComponent{}
 	return ret
 }
 func EncodePtrToShape(arg *i_1.Shape) *pb.PtrToShapeMessage {

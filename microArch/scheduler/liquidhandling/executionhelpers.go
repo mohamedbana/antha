@@ -105,5 +105,6 @@ func copyplates(plts map[string]*wtype.LHPlate) map[string]*wtype.LHPlate {
 }
 
 func set_output_order(rq *LHRequest) {
-
+	// we know what order things were added in... we reshuffle to keep components together
+	// without violating this
 }

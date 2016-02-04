@@ -303,7 +303,6 @@ type LHComponent struct {
 	Vunit              string
 	Cunit              string
 	Tvol               float64
-	Loc                string
 	Smax               float64
 	Visc               float64
 	StockConcentration float64
@@ -327,7 +326,6 @@ func (lhc *LHComponent) Dup() *LHComponent {
 	c.Conc = lhc.Conc
 	c.Vunit = lhc.Vunit
 	c.Tvol = lhc.Vol
-	c.Loc = lhc.Loc
 	c.Smax = lhc.Smax
 	c.Visc = lhc.Visc
 	c.StockConcentration = lhc.StockConcentration
@@ -338,12 +336,16 @@ func (lhc *LHComponent) Dup() *LHComponent {
 	return c
 }
 
-func (lhc *LHComponent) Mix(cmp2 *LHComponent) {
-	// define logic for adding two components together
-	// basically just merge the names, define whatever
-	// the type should be and add volumes together
-
-	// now, it must have a new ID...
+func (cmp *LHComponent) Mix(cmp2 *LHComponent) {
+	cmp.SMax = mergeSolubilities(cmp2)
+	// determine type of final
+	cmp.Type = mergeTypes(cmp, cmp2)
+	// add cmp2 to cmp
+	vcmp := wunit.NewVolume(cmp.Vol, cmp.Vunit)
+	vcmp2 := wunit.NewVolume(cmp2.Vol, cmp2.Vunit)
+	vcmp.Add(vcmp2)
+	cmp.Vol = vcmp.RawValue() // same units
+	cmp.CName = mergeNames(cmp.CName, cmp2.CName)
 }
 
 // @implement Liquid
