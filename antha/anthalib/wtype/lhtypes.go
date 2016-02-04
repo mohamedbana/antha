@@ -279,6 +279,7 @@ type LHComponent struct {
 	ID                 string
 	BlockID            BlockID
 	DaughterID         string
+	ParentID           string
 	Inst               string
 	Order              int
 	CName              string
@@ -292,6 +293,14 @@ type LHComponent struct {
 	Visc               float64
 	StockConcentration float64
 	Extra              map[string]interface{}
+}
+
+func (lhc *LHComponent) HasParent(s string) bool {
+	return strings.Contains(lhc.ParentID, s)
+}
+
+func (lhc *LHComponent) HasDaughter(s string) bool {
+	return strings.Contains(lhc.DaughterID, s)
 }
 
 func (lhc *LHComponent) Name() string {
@@ -337,6 +346,7 @@ func (cmp *LHComponent) Mix(cmp2 *LHComponent) {
 	// nb the sample mechanism ensures that there will be a 1:1 parent:child
 	// relationship from the POV of the liquid handler
 	cmp2.DaughterID = cmp.ID
+	cmp.ParentID += cmp2.ID
 }
 
 // @implement Liquid
