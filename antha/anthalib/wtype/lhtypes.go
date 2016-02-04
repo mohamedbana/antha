@@ -28,6 +28,7 @@ import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
+	"github.com/antha-lang/microArch/logger"
 	"strconv"
 	"strings"
 )
@@ -175,23 +176,6 @@ func (lhp *LHPosition) Positions() []Location {
 func (lhp *LHPosition) Shape() *Shape {
 	return NewShape("box", "mm", 0.08548, 0.12776, 0.0)
 }
-
-/*
-// question over whether this is necessary
-//@implement SolidContainer
-func (lhp *LHPosition) Contents() []Solid {
-	return nil
-}
-func (lhp *LHPosition) ContainerType() string {
-	return lhp.Name
-}
-func Empty() bool {
-
-}
-func PartOf() Entity {
-
-}
-*/
 
 //  instruction to a liquid handler
 type LHInstruction struct {
@@ -401,14 +385,6 @@ func CopyLHComponent(lhc *LHComponent) *LHComponent {
 		// this needs some thought
 	}
 	return &lhc2
-}
-
-// structure defining a liquid handler setup
-
-type LHSetup map[string]interface{}
-
-func NewLHSetup() LHSetup {
-	return make(LHSetup, 10)
 }
 
 // structure describing a microplate
