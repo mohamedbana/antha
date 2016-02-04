@@ -45,6 +45,7 @@ func (a *MixInst) Args() []Value {
 
 type MixOpt struct {
 	OutputIns *wtype.LHInstruction
+	OutputCmp *wtype.LHComponent
 	OutPlate  *wtype.LHPlate
 	PlateType string
 	Address   string

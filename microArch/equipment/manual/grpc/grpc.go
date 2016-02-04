@@ -334,11 +334,11 @@ func DecodePtrToLHPlate(arg *pb.PtrToLHPlateMessage) *i_1.LHPlate {
 	return &ret
 }
 func EncodeLHTipbox(arg i_1.LHTipbox) *pb.LHTipboxMessage {
-	ret := pb.LHTipboxMessage{EncodePtrToGenericSolid(arg.GenericSolid), (string)(arg.ID), (string)(arg.Boxname), (string)(arg.Type), (string)(arg.Mnfr), int64(arg.Nrows), int64(arg.Ncols), (float64)(arg.Height), EncodePtrToLHTip(arg.Tiptype), EncodePtrToLHWell(arg.AsWell), int64(arg.NTips), EncodeArrayOfArrayOfPtrToLHTip(arg.Tips), (float64)(arg.TipXOffset), (float64)(arg.TipYOffset), (float64)(arg.TipXStart), (float64)(arg.TipYStart), (float64)(arg.TipZStart)}
+	ret := pb.LHTipboxMessage{(string)(arg.ID), (string)(arg.Boxname), (string)(arg.Type), (string)(arg.Mnfr), int64(arg.Nrows), int64(arg.Ncols), (float64)(arg.Height), EncodePtrToLHTip(arg.Tiptype), EncodePtrToLHWell(arg.AsWell), int64(arg.NTips), EncodeArrayOfArrayOfPtrToLHTip(arg.Tips), (float64)(arg.TipXOffset), (float64)(arg.TipYOffset), (float64)(arg.TipXStart), (float64)(arg.TipYStart), (float64)(arg.TipZStart)}
 	return &ret
 }
 func DecodeLHTipbox(arg *pb.LHTipboxMessage) i_1.LHTipbox {
-	ret := i_1.LHTipbox{(*i_1.GenericSolid)(DecodePtrToGenericSolid(arg.Arg_1)), (string)(arg.Arg_2), (string)(arg.Arg_3), (string)(arg.Arg_4), (string)(arg.Arg_5), (int)(arg.Arg_6), (int)(arg.Arg_7), (float64)(arg.Arg_8), (*i_1.LHTip)(DecodePtrToLHTip(arg.Arg_9)), (*i_1.LHWell)(DecodePtrToLHWell(arg.Arg_10)), (int)(arg.Arg_11), ([][]*i_1.LHTip)(DecodeArrayOfArrayOfPtrToLHTip(arg.Arg_12)), (float64)(arg.Arg_13), (float64)(arg.Arg_14), (float64)(arg.Arg_15), (float64)(arg.Arg_16), (float64)(arg.Arg_17)}
+	ret := i_1.LHTipbox{(string)(arg.Arg_2), (string)(arg.Arg_3), (string)(arg.Arg_4), (string)(arg.Arg_5), (int)(arg.Arg_6), (int)(arg.Arg_7), (float64)(arg.Arg_8), (*i_1.LHTip)(DecodePtrToLHTip(arg.Arg_9)), (*i_1.LHWell)(DecodePtrToLHWell(arg.Arg_10)), (int)(arg.Arg_11), ([][]*i_1.LHTip)(DecodeArrayOfArrayOfPtrToLHTip(arg.Arg_12)), (float64)(arg.Arg_13), (float64)(arg.Arg_14), (float64)(arg.Arg_15), (float64)(arg.Arg_16), (float64)(arg.Arg_17)}
 	return ret
 }
 func EncodeLHTipwaste(arg i_1.LHTipwaste) *pb.LHTipwasteMessage {
@@ -452,7 +452,6 @@ func DecodeArrayOfPtrToLHChannelParameter(arg *pb.ArrayOfPtrToLHChannelParameter
 }
 func EncodeLHPlate(arg i_1.LHPlate) *pb.LHPlateMessage {
 	ret := pb.LHPlateMessage{
-		EncodePtrToGenericEntity(arg.GenericEntity),
 		(string)(arg.ID),
 		(string)(arg.Inst),
 		(string)(arg.Loc),
@@ -478,7 +477,7 @@ func EncodeLHPlate(arg i_1.LHPlate) *pb.LHPlateMessage {
 	return &ret
 }
 func DecodeLHPlate(arg *pb.LHPlateMessage) i_1.LHPlate {
-	ret := i_1.LHPlate{(*i_1.GenericEntity)(DecodePtrToGenericEntity(arg.Arg_1)), (string)(arg.Arg_2), (string)(arg.Arg_3), (string)(arg.Arg_4), (string)(arg.Arg_5), (string)(arg.Arg_6), (string)(arg.Arg_7), (int)(arg.Arg_8), (int)(arg.Arg_9), (int)(arg.Arg_10), (map[string]*i_1.LHWell)(DecodeMapstringPtrToLHWellMessage(arg.Arg_11)), (float64)(arg.Arg_12), (string)(arg.Arg_13), ([][]*i_1.LHWell)(DecodeArrayOfArrayOfPtrToLHWell(arg.Arg_14)), ([][]*i_1.LHWell)(DecodeArrayOfArrayOfPtrToLHWell(arg.Arg_15)), (*i_1.LHWell)(DecodePtrToLHWell(arg.Arg_16)), (map[string]*i_1.LHWell)(DecodeMapstringPtrToLHWellMessage(arg.Arg_17)), (float64)(arg.Arg_18), (float64)(arg.Arg_19), (float64)(arg.Arg_20), (float64)(arg.Arg_21), (float64)(arg.Arg_22)}
+	ret := i_1.LHPlate{(string)(arg.Arg_2), (string)(arg.Arg_3), (string)(arg.Arg_4), (string)(arg.Arg_5), (string)(arg.Arg_6), (string)(arg.Arg_7), (int)(arg.Arg_8), (int)(arg.Arg_9), (int)(arg.Arg_10), (map[string]*i_1.LHWell)(DecodeMapstringPtrToLHWellMessage(arg.Arg_11)), (float64)(arg.Arg_12), (string)(arg.Arg_13), ([][]*i_1.LHWell)(DecodeArrayOfArrayOfPtrToLHWell(arg.Arg_14)), ([][]*i_1.LHWell)(DecodeArrayOfArrayOfPtrToLHWell(arg.Arg_15)), (*i_1.LHWell)(DecodePtrToLHWell(arg.Arg_16)), (map[string]*i_1.LHWell)(DecodeMapstringPtrToLHWellMessage(arg.Arg_17)), (float64)(arg.Arg_18), (float64)(arg.Arg_19), (float64)(arg.Arg_20), (float64)(arg.Arg_21), (float64)(arg.Arg_22)}
 	return ret
 }
 func EncodePtrToLHTipwaste(arg *i_1.LHTipwaste) *pb.PtrToLHTipwasteMessage {
@@ -746,17 +745,6 @@ func DecodeArrayOfArrayOfPtrToLHTip(arg *pb.ArrayOfArrayOfPtrToLHTipMessage) [][
 	}
 	return ret
 }
-func EncodeGenericEntity(arg i_1.GenericEntity) *pb.GenericEntityMessage {
-	ret := pb.GenericEntityMessage{
-		EncodePtrToGenericSolid(arg.GenericSolid),
-		EncodePtrToConcreteLocation(arg.Loc),
-	}
-	return &ret
-}
-func DecodeGenericEntity(arg *pb.GenericEntityMessage) i_1.GenericEntity {
-	ret := i_1.GenericEntity{(*i_1.GenericSolid)(DecodePtrToGenericSolid(arg.Arg_1)), (*i_1.ConcreteLocation)(DecodePtrToConcreteLocation(arg.Arg_2))}
-	return ret
-}
 func EncodeArrayOfLHDevice(arg []i_1.LHDevice) *pb.ArrayOfLHDeviceMessage {
 	a := make([]*pb.LHDeviceMessage, len(arg))
 	for i, v := range arg {
@@ -782,19 +770,6 @@ func DecodeVolume(arg *pb.VolumeMessage) i_2.Volume {
 	ret := i_2.Volume{(i_2.ConcreteMeasurement)(DecodeConcreteMeasurement(arg.Arg_1))}
 	return ret
 }
-func EncodePtrToGenericSolid(arg *i_1.GenericSolid) *pb.PtrToGenericSolidMessage {
-	if arg == nil { //@jmanart fix when arg is nil, try to get a pointer
-		return nil
-	}
-	ret := pb.PtrToGenericSolidMessage{
-		EncodeGenericSolid(*arg),
-	}
-	return &ret
-}
-func DecodePtrToGenericSolid(arg *pb.PtrToGenericSolidMessage) *i_1.GenericSolid {
-	ret := DecodeGenericSolid(arg.Arg_1)
-	return &ret
-}
 func EncodePtrToLHWell(arg *i_1.LHWell) *pb.PtrToLHWellMessage {
 	if arg == nil { //@jmanart fix when arg is nil, try to get a pointer
 		return nil
@@ -819,20 +794,6 @@ func EncodePtrToVolume(arg *i_2.Volume) *pb.PtrToVolumeMessage {
 }
 func DecodePtrToVolume(arg *pb.PtrToVolumeMessage) *i_2.Volume {
 	ret := DecodeVolume(arg.Arg_1)
-	return &ret
-}
-func EncodePtrToGenericEntity(arg *i_1.GenericEntity) *pb.PtrToGenericEntityMessage {
-	//@jmanart shortcut fix for gotopb generated code
-	if arg == nil {
-		return nil
-	}
-	ret := pb.PtrToGenericEntityMessage{
-		EncodeGenericEntity(*arg),
-	}
-	return &ret
-}
-func DecodePtrToGenericEntity(arg *pb.PtrToGenericEntityMessage) *i_1.GenericEntity {
-	ret := DecodeGenericEntity(arg.Arg_1)
 	return &ret
 }
 func EncodeLHDevice(arg i_1.LHDevice) *pb.LHDeviceMessage {
@@ -979,17 +940,8 @@ func DecodeArrayOfArrayOfPtrToLHWell(arg *pb.ArrayOfArrayOfPtrToLHWellMessage) [
 	}
 	return ret
 }
-func EncodeGenericSolid(arg i_1.GenericSolid) *pb.GenericSolidMessage {
-	ret := pb.GenericSolidMessage{EncodeGenericPhysical(arg.GenericPhysical), EncodePtrToShape(arg.Myshape)}
-	return &ret
-}
-func DecodeGenericSolid(arg *pb.GenericSolidMessage) i_1.GenericSolid {
-	ret := i_1.GenericSolid{(i_1.GenericPhysical)(DecodeGenericPhysical(arg.Arg_1)), (*i_1.Shape)(DecodePtrToShape(arg.Arg_2))}
-	return ret
-}
 func EncodeLHComponent(arg i_1.LHComponent) *pb.LHComponentMessage {
 	ret := pb.LHComponentMessage{
-		EncodePtrToGenericPhysical(arg.GenericPhysical),
 		(string)(arg.ID),
 		(string)(arg.Inst),
 		int64(arg.Order),
@@ -1012,7 +964,6 @@ func EncodeLHComponent(arg i_1.LHComponent) *pb.LHComponentMessage {
 }
 func DecodeLHComponent(arg *pb.LHComponentMessage) i_1.LHComponent {
 	ret := i_1.LHComponent{
-		(*i_1.GenericPhysical)(DecodePtrToGenericPhysical(arg.Arg_1)),
 		(string)(arg.Arg_2),
 		(string)(arg.Arg_3),
 		(int)(arg.Arg_4),
@@ -1046,14 +997,6 @@ func EncodePtrToShape(arg *i_1.Shape) *pb.PtrToShapeMessage {
 func DecodePtrToShape(arg *pb.PtrToShapeMessage) *i_1.Shape {
 	ret := DecodeShape(arg.Arg_1)
 	return &ret
-}
-func EncodeGenericPhysical(arg i_1.GenericPhysical) *pb.GenericPhysicalMessage {
-	ret := pb.GenericPhysicalMessage{EncodeGenericMatter(arg.GenericMatter), (string)(arg.Myname), EncodeMass(arg.Mymass), EncodeVolume(arg.Myvol), EncodeTemperature(arg.Mytemp)}
-	return &ret
-}
-func DecodeGenericPhysical(arg *pb.GenericPhysicalMessage) i_1.GenericPhysical {
-	ret := i_1.GenericPhysical{(i_1.GenericMatter)(DecodeGenericMatter(arg.Arg_1)), (string)(arg.Arg_2), (i_2.Mass)(DecodeMass(arg.Arg_3)), (i_2.Volume)(DecodeVolume(arg.Arg_4)), (i_2.Temperature)(DecodeTemperature(arg.Arg_5))}
-	return ret
 }
 func EncodePtrToConcreteLocation(arg *i_1.ConcreteLocation) *pb.PtrToConcreteLocationMessage {
 	if arg == nil { //@jmanart fix when arg is nil, try to get a pointer
@@ -1151,14 +1094,6 @@ func DecodePtrToGenericPrefixedUnit(arg *pb.PtrToGenericPrefixedUnitMessage) *i_
 	ret := DecodeGenericPrefixedUnit(arg.Arg_1)
 	return &ret
 }
-func EncodeGenericMatter(arg i_1.GenericMatter) *pb.GenericMatterMessage {
-	ret := pb.GenericMatterMessage{(string)(arg.Iname), EncodeTemperature(arg.Imp), EncodeTemperature(arg.Ibp), EncodeSpecificHeatCapacity(arg.Ishc)}
-	return &ret
-}
-func DecodeGenericMatter(arg *pb.GenericMatterMessage) i_1.GenericMatter {
-	ret := i_1.GenericMatter{(string)(arg.Arg_1), (i_2.Temperature)(DecodeTemperature(arg.Arg_2)), (i_2.Temperature)(DecodeTemperature(arg.Arg_3)), (i_2.SpecificHeatCapacity)(DecodeSpecificHeatCapacity(arg.Arg_4))}
-	return ret
-}
 func EncodeArrayOfPtrToConcreteLocation(arg []*i_1.ConcreteLocation) *pb.ArrayOfPtrToConcreteLocationMessage {
 	a := make([]*pb.PtrToConcreteLocationMessage, len(arg))
 	for i, v := range arg {
@@ -1183,19 +1118,6 @@ func EncodeMass(arg i_2.Mass) *pb.MassMessage {
 func DecodeMass(arg *pb.MassMessage) i_2.Mass {
 	ret := i_2.Mass{(i_2.ConcreteMeasurement)(DecodeConcreteMeasurement(arg.Arg_1))}
 	return ret
-}
-func EncodePtrToGenericPhysical(arg *i_1.GenericPhysical) *pb.PtrToGenericPhysicalMessage {
-	if arg == nil { //@jmanart fix when arg is nil, try to get a pointer
-		return nil
-	}
-	ret := pb.PtrToGenericPhysicalMessage{
-		EncodeGenericPhysical(*arg),
-	}
-	return &ret
-}
-func DecodePtrToGenericPhysical(arg *pb.PtrToGenericPhysicalMessage) *i_1.GenericPhysical {
-	ret := DecodeGenericPhysical(arg.Arg_1)
-	return &ret
 }
 func EncodeGenericUnit(arg i_2.GenericUnit) *pb.GenericUnitMessage {
 	ret := pb.GenericUnitMessage{(string)(arg.StrName), (string)(arg.StrSymbol), (float64)(arg.FltConversionfactor), (string)(arg.StrBaseUnit)}

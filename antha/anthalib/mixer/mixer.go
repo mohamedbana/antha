@@ -33,18 +33,18 @@ import (
 // request structure
 
 // take all of this liquid
-func SampleAll(l wtype.LHComponent) *wtype.LHComponent {
+func SampleAll(l *wtype.LHComponent) *wtype.LHComponent {
 	return Sample(l, l.Volume())
 }
 
 // below need to account for having locations for liquids specified...
 
 // take a sample of volume v from this liquid
-func Sample(l wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
+func Sample(l *wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
 
 	ret.CName = l.Name()
-	ret.Type = l.GetType()
+	ret.Type = l.Type
 	ret.Vol = v.RawValue()
 	ret.Vunit = v.Unit().PrefixedSymbol()
 	ret.Extra = l.GetExtra()
@@ -55,14 +55,14 @@ func Sample(l wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 }
 
 // take an array of samples and array of corresponding volumes and sample them all
-func MultiSample(l []wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent {
+func MultiSample(l []*wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent {
 	reta := make([]*wtype.LHComponent, 0)
 
 	for i, j := range l {
 		ret := wtype.NewLHComponent()
 		vi := v[i]
 		ret.CName = j.Name()
-		ret.Type = j.GetType()
+		ret.Type = j.Type
 		ret.Vol = vi.RawValue()
 		ret.Vunit = vi.Unit().PrefixedSymbol()
 		ret.Extra = j.GetExtra()
@@ -75,10 +75,10 @@ func MultiSample(l []wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent {
 }
 
 // take a sample of this liquid and aim for a particular concentration
-func SampleForConcentration(l wtype.LHComponent, c wunit.Concentration) *wtype.LHComponent {
+func SampleForConcentration(l *wtype.LHComponent, c wunit.Concentration) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
 	ret.CName = l.Name()
-	ret.Type = l.GetType()
+	ret.Type = l.Type
 	ret.Conc = c.RawValue()
 	ret.Cunit = c.Unit().PrefixedSymbol()
 	ret.CName = l.Name()
@@ -88,14 +88,14 @@ func SampleForConcentration(l wtype.LHComponent, c wunit.Concentration) *wtype.L
 	return ret
 }
 
-func SampleMass(s wtype.LHComponent, m wunit.Mass, d wunit.Density) *wtype.LHComponent {
+func SampleMass(s *wtype.LHComponent, m wunit.Mass, d wunit.Density) *wtype.LHComponent {
 
 	// calculate volume to add from density
 	v := wunit.MasstoVolume(m, d)
 
 	ret := wtype.NewLHComponent()
 	ret.CName = s.Name()
-	ret.Type = s.GetType()
+	ret.Type = s.Type
 	ret.Vol = v.RawValue()
 	ret.Vunit = v.Unit().PrefixedSymbol()
 	ret.Extra = s.GetExtra()
@@ -107,10 +107,10 @@ func SampleMass(s wtype.LHComponent, m wunit.Mass, d wunit.Density) *wtype.LHCom
 // take a sample ofs this liquid to be used to make the solution up to
 // a particular total volume
 // edited to take into account the volume of the other solution components
-func SampleForTotalVolume(l wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
+func SampleForTotalVolume(l *wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
 	ret.CName = l.Name()
-	ret.Type = l.GetType()
+	ret.Type = l.Type
 	ret.Tvol = v.RawValue()
 	ret.Vunit = v.Unit().PrefixedSymbol()
 	ret.CName = l.Name()

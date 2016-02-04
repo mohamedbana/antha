@@ -147,21 +147,16 @@ It has these top-level messages:
 	LHWellMessage
 	PtrToVolumeMessage
 	FlowRateMessage
-	GenericEntityMessage
-	GenericSolidMessage
-	PtrToGenericSolidMessage
 	VolumeMessage
 	ArrayOfPtrToLHWellMessage
 	ArrayOfArrayOfPtrToLHTipMessage
 	PtrToLHWellMessage
-	PtrToGenericEntityMessage
 	MapstringPtrToLHWellMessageMessageFieldEntry
 	MapstringPtrToLHWellMessageMessage
 	LHDeviceMessage
 	PtrToFlowRateMessage
 	ArrayOfLHDeviceMessage
 	PtrToConcreteLocationMessage
-	GenericPhysicalMessage
 	PtrToShapeMessage
 	ConcreteLocationMessage
 	LHComponentMessage
@@ -171,9 +166,7 @@ It has these top-level messages:
 	ConcreteMeasurementMessage
 	TemperatureMessage
 	MassMessage
-	PtrToGenericPhysicalMessage
 	GenericPrefixedUnitMessage
-	GenericMatterMessage
 	ArrayOfPtrToConcreteLocationMessage
 	PtrToGenericPrefixedUnitMessage
 	GenericUnitMessage
@@ -1667,7 +1660,6 @@ func (m *CoordinatesMessage) String() string { return proto.CompactTextString(m)
 func (*CoordinatesMessage) ProtoMessage()    {}
 
 type LHTipboxMessage struct {
-	Arg_1  *PtrToGenericSolidMessage        `protobuf:"bytes,1,opt" json:"Arg_1,omitempty"`
 	Arg_2  string                           `protobuf:"bytes,2,opt" json:"Arg_2,omitempty"`
 	Arg_3  string                           `protobuf:"bytes,3,opt" json:"Arg_3,omitempty"`
 	Arg_4  string                           `protobuf:"bytes,4,opt" json:"Arg_4,omitempty"`
@@ -1689,13 +1681,6 @@ type LHTipboxMessage struct {
 func (m *LHTipboxMessage) Reset()         { *m = LHTipboxMessage{} }
 func (m *LHTipboxMessage) String() string { return proto.CompactTextString(m) }
 func (*LHTipboxMessage) ProtoMessage()    {}
-
-func (m *LHTipboxMessage) GetArg_1() *PtrToGenericSolidMessage {
-	if m != nil {
-		return m.Arg_1
-	}
-	return nil
-}
 
 func (m *LHTipboxMessage) GetArg_9() *PtrToLHTipMessage {
 	if m != nil {
@@ -1868,7 +1853,6 @@ func (m *LHChannelParameterMessage) GetArg_6() *PtrToFlowRateMessage {
 }
 
 type LHPlateMessage struct {
-	Arg_1  *PtrToGenericEntityMessage          `protobuf:"bytes,1,opt" json:"Arg_1,omitempty"`
 	Arg_2  string                              `protobuf:"bytes,2,opt" json:"Arg_2,omitempty"`
 	Arg_3  string                              `protobuf:"bytes,3,opt" json:"Arg_3,omitempty"`
 	Arg_4  string                              `protobuf:"bytes,4,opt" json:"Arg_4,omitempty"`
@@ -1895,13 +1879,6 @@ type LHPlateMessage struct {
 func (m *LHPlateMessage) Reset()         { *m = LHPlateMessage{} }
 func (m *LHPlateMessage) String() string { return proto.CompactTextString(m) }
 func (*LHPlateMessage) ProtoMessage()    {}
-
-func (m *LHPlateMessage) GetArg_1() *PtrToGenericEntityMessage {
-	if m != nil {
-		return m.Arg_1
-	}
-	return nil
-}
 
 func (m *LHPlateMessage) GetArg_11() *MapstringPtrToLHWellMessageMessage {
 	if m != nil {
@@ -2352,67 +2329,6 @@ func (m *FlowRateMessage) GetArg_1() *ConcreteMeasurementMessage {
 	return nil
 }
 
-type GenericEntityMessage struct {
-	Arg_1 *PtrToGenericSolidMessage     `protobuf:"bytes,1,opt" json:"Arg_1,omitempty"`
-	Arg_2 *PtrToConcreteLocationMessage `protobuf:"bytes,2,opt" json:"Arg_2,omitempty"`
-}
-
-func (m *GenericEntityMessage) Reset()         { *m = GenericEntityMessage{} }
-func (m *GenericEntityMessage) String() string { return proto.CompactTextString(m) }
-func (*GenericEntityMessage) ProtoMessage()    {}
-
-func (m *GenericEntityMessage) GetArg_1() *PtrToGenericSolidMessage {
-	if m != nil {
-		return m.Arg_1
-	}
-	return nil
-}
-
-func (m *GenericEntityMessage) GetArg_2() *PtrToConcreteLocationMessage {
-	if m != nil {
-		return m.Arg_2
-	}
-	return nil
-}
-
-type GenericSolidMessage struct {
-	Arg_1 *GenericPhysicalMessage `protobuf:"bytes,1,opt" json:"Arg_1,omitempty"`
-	Arg_2 *PtrToShapeMessage      `protobuf:"bytes,2,opt" json:"Arg_2,omitempty"`
-}
-
-func (m *GenericSolidMessage) Reset()         { *m = GenericSolidMessage{} }
-func (m *GenericSolidMessage) String() string { return proto.CompactTextString(m) }
-func (*GenericSolidMessage) ProtoMessage()    {}
-
-func (m *GenericSolidMessage) GetArg_1() *GenericPhysicalMessage {
-	if m != nil {
-		return m.Arg_1
-	}
-	return nil
-}
-
-func (m *GenericSolidMessage) GetArg_2() *PtrToShapeMessage {
-	if m != nil {
-		return m.Arg_2
-	}
-	return nil
-}
-
-type PtrToGenericSolidMessage struct {
-	Arg_1 *GenericSolidMessage `protobuf:"bytes,1,opt,name=arg_1" json:"arg_1,omitempty"`
-}
-
-func (m *PtrToGenericSolidMessage) Reset()         { *m = PtrToGenericSolidMessage{} }
-func (m *PtrToGenericSolidMessage) String() string { return proto.CompactTextString(m) }
-func (*PtrToGenericSolidMessage) ProtoMessage()    {}
-
-func (m *PtrToGenericSolidMessage) GetArg_1() *GenericSolidMessage {
-	if m != nil {
-		return m.Arg_1
-	}
-	return nil
-}
-
 type VolumeMessage struct {
 	Arg_1 *ConcreteMeasurementMessage `protobuf:"bytes,1,opt" json:"Arg_1,omitempty"`
 }
@@ -2467,21 +2383,6 @@ func (m *PtrToLHWellMessage) String() string { return proto.CompactTextString(m)
 func (*PtrToLHWellMessage) ProtoMessage()    {}
 
 func (m *PtrToLHWellMessage) GetArg_1() *LHWellMessage {
-	if m != nil {
-		return m.Arg_1
-	}
-	return nil
-}
-
-type PtrToGenericEntityMessage struct {
-	Arg_1 *GenericEntityMessage `protobuf:"bytes,1,opt,name=arg_1" json:"arg_1,omitempty"`
-}
-
-func (m *PtrToGenericEntityMessage) Reset()         { *m = PtrToGenericEntityMessage{} }
-func (m *PtrToGenericEntityMessage) String() string { return proto.CompactTextString(m) }
-func (*PtrToGenericEntityMessage) ProtoMessage()    {}
-
-func (m *PtrToGenericEntityMessage) GetArg_1() *GenericEntityMessage {
 	if m != nil {
 		return m.Arg_1
 	}
@@ -2578,46 +2479,6 @@ func (m *PtrToConcreteLocationMessage) GetArg_1() *ConcreteLocationMessage {
 	return nil
 }
 
-type GenericPhysicalMessage struct {
-	Arg_1 *GenericMatterMessage `protobuf:"bytes,1,opt" json:"Arg_1,omitempty"`
-	Arg_2 string                `protobuf:"bytes,2,opt" json:"Arg_2,omitempty"`
-	Arg_3 *MassMessage          `protobuf:"bytes,3,opt" json:"Arg_3,omitempty"`
-	Arg_4 *VolumeMessage        `protobuf:"bytes,4,opt" json:"Arg_4,omitempty"`
-	Arg_5 *TemperatureMessage   `protobuf:"bytes,5,opt" json:"Arg_5,omitempty"`
-}
-
-func (m *GenericPhysicalMessage) Reset()         { *m = GenericPhysicalMessage{} }
-func (m *GenericPhysicalMessage) String() string { return proto.CompactTextString(m) }
-func (*GenericPhysicalMessage) ProtoMessage()    {}
-
-func (m *GenericPhysicalMessage) GetArg_1() *GenericMatterMessage {
-	if m != nil {
-		return m.Arg_1
-	}
-	return nil
-}
-
-func (m *GenericPhysicalMessage) GetArg_3() *MassMessage {
-	if m != nil {
-		return m.Arg_3
-	}
-	return nil
-}
-
-func (m *GenericPhysicalMessage) GetArg_4() *VolumeMessage {
-	if m != nil {
-		return m.Arg_4
-	}
-	return nil
-}
-
-func (m *GenericPhysicalMessage) GetArg_5() *TemperatureMessage {
-	if m != nil {
-		return m.Arg_5
-	}
-	return nil
-}
-
 type PtrToShapeMessage struct {
 	Arg_1 *ShapeMessage `protobuf:"bytes,1,opt,name=arg_1" json:"arg_1,omitempty"`
 }
@@ -2668,35 +2529,27 @@ func (m *ConcreteLocationMessage) GetArg_6() *PtrToShapeMessage {
 }
 
 type LHComponentMessage struct {
-	Arg_1  *PtrToGenericPhysicalMessage `protobuf:"bytes,1,opt" json:"Arg_1,omitempty"`
-	Arg_2  string                       `protobuf:"bytes,2,opt" json:"Arg_2,omitempty"`
-	Arg_3  string                       `protobuf:"bytes,3,opt" json:"Arg_3,omitempty"`
-	Arg_4  int64                        `protobuf:"varint,4,opt" json:"Arg_4,omitempty"`
-	Arg_5  string                       `protobuf:"bytes,5,opt" json:"Arg_5,omitempty"`
-	Arg_6  string                       `protobuf:"bytes,6,opt" json:"Arg_6,omitempty"`
-	Arg_7  float64                      `protobuf:"fixed64,7,opt" json:"Arg_7,omitempty"`
-	Arg_8  float64                      `protobuf:"fixed64,8,opt" json:"Arg_8,omitempty"`
-	Arg_9  string                       `protobuf:"bytes,9,opt" json:"Arg_9,omitempty"`
-	Arg_10 string                       `protobuf:"bytes,10,opt" json:"Arg_10,omitempty"`
-	Arg_11 float64                      `protobuf:"fixed64,11,opt" json:"Arg_11,omitempty"`
-	Arg_12 string                       `protobuf:"bytes,12,opt" json:"Arg_12,omitempty"`
-	Arg_13 float64                      `protobuf:"fixed64,13,opt" json:"Arg_13,omitempty"`
-	Arg_14 float64                      `protobuf:"fixed64,14,opt" json:"Arg_14,omitempty"`
-	Arg_15 float64                      `protobuf:"fixed64,15,opt" json:"Arg_15,omitempty"`
-	Arg_16 string                       `protobuf:"bytes,16,opt" json:"Arg_16,omitempty"`
-	Arg_17 *MapstringAnyMessageMessage  `protobuf:"bytes,17,opt" json:"Arg_17,omitempty"`
+	Arg_2  string                      `protobuf:"bytes,2,opt" json:"Arg_2,omitempty"`
+	Arg_3  string                      `protobuf:"bytes,3,opt" json:"Arg_3,omitempty"`
+	Arg_4  int64                       `protobuf:"varint,4,opt" json:"Arg_4,omitempty"`
+	Arg_5  string                      `protobuf:"bytes,5,opt" json:"Arg_5,omitempty"`
+	Arg_6  string                      `protobuf:"bytes,6,opt" json:"Arg_6,omitempty"`
+	Arg_7  float64                     `protobuf:"fixed64,7,opt" json:"Arg_7,omitempty"`
+	Arg_8  float64                     `protobuf:"fixed64,8,opt" json:"Arg_8,omitempty"`
+	Arg_9  string                      `protobuf:"bytes,9,opt" json:"Arg_9,omitempty"`
+	Arg_10 string                      `protobuf:"bytes,10,opt" json:"Arg_10,omitempty"`
+	Arg_11 float64                     `protobuf:"fixed64,11,opt" json:"Arg_11,omitempty"`
+	Arg_12 string                      `protobuf:"bytes,12,opt" json:"Arg_12,omitempty"`
+	Arg_13 float64                     `protobuf:"fixed64,13,opt" json:"Arg_13,omitempty"`
+	Arg_14 float64                     `protobuf:"fixed64,14,opt" json:"Arg_14,omitempty"`
+	Arg_15 float64                     `protobuf:"fixed64,15,opt" json:"Arg_15,omitempty"`
+	Arg_16 string                      `protobuf:"bytes,16,opt" json:"Arg_16,omitempty"`
+	Arg_17 *MapstringAnyMessageMessage `protobuf:"bytes,17,opt" json:"Arg_17,omitempty"`
 }
 
 func (m *LHComponentMessage) Reset()         { *m = LHComponentMessage{} }
 func (m *LHComponentMessage) String() string { return proto.CompactTextString(m) }
 func (*LHComponentMessage) ProtoMessage()    {}
-
-func (m *LHComponentMessage) GetArg_1() *PtrToGenericPhysicalMessage {
-	if m != nil {
-		return m.Arg_1
-	}
-	return nil
-}
 
 func (m *LHComponentMessage) GetArg_17() *MapstringAnyMessageMessage {
 	if m != nil {
@@ -2793,21 +2646,6 @@ func (m *MassMessage) GetArg_1() *ConcreteMeasurementMessage {
 	return nil
 }
 
-type PtrToGenericPhysicalMessage struct {
-	Arg_1 *GenericPhysicalMessage `protobuf:"bytes,1,opt,name=arg_1" json:"arg_1,omitempty"`
-}
-
-func (m *PtrToGenericPhysicalMessage) Reset()         { *m = PtrToGenericPhysicalMessage{} }
-func (m *PtrToGenericPhysicalMessage) String() string { return proto.CompactTextString(m) }
-func (*PtrToGenericPhysicalMessage) ProtoMessage()    {}
-
-func (m *PtrToGenericPhysicalMessage) GetArg_1() *GenericPhysicalMessage {
-	if m != nil {
-		return m.Arg_1
-	}
-	return nil
-}
-
 type GenericPrefixedUnitMessage struct {
 	Arg_1 *GenericUnitMessage `protobuf:"bytes,1,opt" json:"Arg_1,omitempty"`
 	Arg_2 *SIPrefixMessage    `protobuf:"bytes,2,opt" json:"Arg_2,omitempty"`
@@ -2827,38 +2665,6 @@ func (m *GenericPrefixedUnitMessage) GetArg_1() *GenericUnitMessage {
 func (m *GenericPrefixedUnitMessage) GetArg_2() *SIPrefixMessage {
 	if m != nil {
 		return m.Arg_2
-	}
-	return nil
-}
-
-type GenericMatterMessage struct {
-	Arg_1 string                       `protobuf:"bytes,1,opt" json:"Arg_1,omitempty"`
-	Arg_2 *TemperatureMessage          `protobuf:"bytes,2,opt" json:"Arg_2,omitempty"`
-	Arg_3 *TemperatureMessage          `protobuf:"bytes,3,opt" json:"Arg_3,omitempty"`
-	Arg_4 *SpecificHeatCapacityMessage `protobuf:"bytes,4,opt" json:"Arg_4,omitempty"`
-}
-
-func (m *GenericMatterMessage) Reset()         { *m = GenericMatterMessage{} }
-func (m *GenericMatterMessage) String() string { return proto.CompactTextString(m) }
-func (*GenericMatterMessage) ProtoMessage()    {}
-
-func (m *GenericMatterMessage) GetArg_2() *TemperatureMessage {
-	if m != nil {
-		return m.Arg_2
-	}
-	return nil
-}
-
-func (m *GenericMatterMessage) GetArg_3() *TemperatureMessage {
-	if m != nil {
-		return m.Arg_3
-	}
-	return nil
-}
-
-func (m *GenericMatterMessage) GetArg_4() *SpecificHeatCapacityMessage {
-	if m != nil {
-		return m.Arg_4
 	}
 	return nil
 }

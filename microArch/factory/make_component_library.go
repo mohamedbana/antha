@@ -31,376 +31,376 @@ import (
 )
 
 func makeComponentLibrary() map[string]*wtype.LHComponent {
-	matter := wtype.MakeMatterLib()
+	//	matter := wtype.MakeMatterLib()
 
 	cmap := make(map[string]*wtype.LHComponent)
 
 	A := wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "water"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "Some component in factory"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "neb5compcells"
-	A.Type = "culture"
+	A.Type = wtype.LTCulture
 	A.Smax = 1.0
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "10x_M9Salts"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "100x_MEMVitamins"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "Yeast extract"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "Tryptone"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "tartrazine"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "Yellow_ink"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "Cyan"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "Magenta"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "Black"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "yellow"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "blue"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "green"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "red"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "white"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "black"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "DNAsolution"
-	A.Type = "dna"
+	A.Type = wtype.LTDNA
 	A.Smax = 1.0
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "1kb DNA Ladder"
-	A.Type = "dna"
+	A.Type = wtype.LTDNA
 	A.Smax = 10.0
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["glycerol"]
+	//A.GenericMatter = matter["glycerol"]
 	A.CName = "restrictionenzyme"
-	A.Type = "glycerol"
+	A.Type = wtype.LTGlycerol
 	A.Smax = 1.0
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "bsa"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 100
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "dna_part"
-	A.Type = "dna"
+	A.Type = wtype.LTDNA
 	A.Smax = 1.0
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["glycerol"]
+	//A.GenericMatter = matter["glycerol"]
 	A.CName = "SapI"
-	A.Type = "glycerol"
+	A.Type = wtype.LTGlycerol
 	A.Smax = 1.0
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["glycerol"]
+	//A.GenericMatter = matter["glycerol"]
 	A.CName = "T4Ligase"
-	A.Type = "glycerol"
+	A.Type = wtype.LTGlycerol
 	A.Smax = 1.0
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["glycerol"]
+	//A.GenericMatter = matter["glycerol"]
 	A.CName = "EcoRI"
-	A.Type = "glycerol"
+	A.Type = wtype.LTGlycerol
 	A.Smax = 1.0
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["glycerol"]
+	//A.GenericMatter = matter["glycerol"]
 	A.CName = "EnzMastermix: 1/2 SapI; 1/2 T4 Ligase"
-	A.Type = "glycerol"
+	A.Type = wtype.LTGlycerol
 	A.Smax = 1.0
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "TypeIIsbuffer: 2/11 10xCutsmart; 1/11 1mM ATP; 8/11 Water"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "CutsmartBuffer"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 1.0
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "ATP"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 5.0
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	//A.CName = "SapI_Mastermix: 1/5 SapI; 1/5 T4 Ligase; 2/5 Cutsmart; 1/5 1mM ATP"
 	A.CName = "mastermix_sapI"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 1.0
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "standard_cloning_vector_mark_1"
-	A.Type = "dna"
+	A.Type = wtype.LTDNA
 	A.Smax = 1.0
 	cmap[A.CName] = A
 
 	//
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "standard_cloning_vector_mark_1"
-	A.Type = "dna"
+	A.Type = wtype.LTDNA
 	A.Smax = 1.0
 	cmap[A.CName] = A
 
 	// solutions needed for PCR example:
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["glycerol"]
+	//A.GenericMatter = matter["glycerol"]
 	A.CName = "Q5Polymerase"
-	A.Type = "glycerol"
+	A.Type = wtype.LTGlycerol
 	A.Smax = 1.0 // not sure if this is correct
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["glycerol"]
+	//A.GenericMatter = matter["glycerol"]
 	A.CName = "GoTaq_ green 2x mastermix"
-	A.Type = "glycerol"
+	A.Type = wtype.LTGlycerol
 	A.Smax = 9999.0 // not sure if this is correct
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "DMSO"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 1.0 // not sure if this is correct
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "pET_GFP"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 1.0 // not sure if this is correct
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "HC"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 1.0 // not sure if this is correct
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "PrimerFw"
-	A.Type = "dna"
+	A.Type = wtype.LTDNA
 	A.Smax = 1.0 // not sure if this is correct
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "PrimerRev"
-	A.Type = "dna"
+	A.Type = wtype.LTDNA
 	A.Smax = 1.0 // not sure if this is correct
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "template_part"
-	A.Type = "dna"
+	A.Type = wtype.LTDNA
 	A.Smax = 1.0 // not sure if this is correct
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "DNTPs"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 1.0 // not sure if this is correct
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "ProteinMarker"
-	A.Type = "protein"
+	A.Type = wtype.LTProtein
 	A.Smax = 1.0 //not sure if this is correct
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "ProteinFraction"
-	A.Type = "protein"
+	A.Type = wtype.LTProtein
 	A.Smax = 1.0 //still not sure
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "EColiLysate"
-	A.Type = "protein"
+	A.Type = wtype.LTProtein
 	A.Smax = 1.0 //not sure what this is!
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "SDSbuffer"
-	A.Type = "detergent"
+	A.Type = wtype.LTDetergent
 	A.Smax = 1.0 //still not sure....
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "Load"
-	A.Type = "load"
+	A.Type = wtype.LTload
 	A.Smax = 1.0 //still not sure....
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "LB"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 1.0 //still not sure....
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "Kanamycin"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 1.0 //still not sure....
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "Glucose"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 1.0 //still not sure....
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "Lactose"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 1.0 //still not sure....
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	A.GenericMatter = matter["water"]
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "LB_autoinduction_Amp"
-	A.Type = "water"
+	A.Type = wtype.LTWater
 	A.Smax = 1.0 //still not sure....
 	cmap[A.CName] = A
 
@@ -417,9 +417,9 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 		} else {
 
 			A = wtype.NewLHComponent()
-			A.GenericMatter = matter["water"]
+			//A.GenericMatter = matter[wtype.LTWater]
 			A.CName = value
-			A.Type = "culture"
+			A.Type = wtype.LTCulture
 			A.Smax = 1.0
 			cmap[A.CName] = A
 

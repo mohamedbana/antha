@@ -9,7 +9,6 @@ import (
 )
 
 type Pellet struct {
-	wtype.Physical
 }
 
 type Culture struct {
@@ -65,15 +64,22 @@ func Dispense(column Column, mixture *wtype.LHSolution, volume wunit.Volume, asp
 	return
 }
 
+/*
 func PhysicaltoComponent(pellet *wtype.Physical) (component *wtype.LHComponent) {
 	// placeholder
 	return
 }
+*/
 
-func Resuspend(pellet *wtype.Physical, step Chromstep, column Column) (output_c *wtype.LHComponent, processedcolumn Column) {
+func PelletToComponent(p Pellet) *wtype.LHComponent {
+	return wtype.NewLHComponent()
+}
+
+func Resuspend(pellet Pellet, step Chromstep, column Column) (output_c *wtype.LHComponent, processedcolumn Column) {
 
 	var output *wtype.LHSolution
-	input := PhysicaltoComponent(pellet)
+	//input := PhysicaltoComponent(pellet)
+	input := PelletToComponent(pellet)
 	samples := make([]*wtype.LHComponent, 0)
 	samples = append(samples, step.Buffer, input)
 	mixture := mixer.Mix(samples...)

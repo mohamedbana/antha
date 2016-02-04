@@ -293,6 +293,7 @@ func (lhs *LHSolution) GetAssignment() string {
 // structure describing a liquid component and its desired properties
 type LHComponent struct {
 	ID                 string
+	BlockID            BlockID
 	Inst               string
 	Order              int
 	CName              string

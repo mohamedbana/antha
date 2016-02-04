@@ -46,11 +46,11 @@ func (ph *PHMeasurement) TempCompensation(reftemp wunit.Temperature, tempcoeffic
 
 // placeholder
 
-/*func MeasurePH(*wtype.LHSolution) (measurement float64) {
+/*func MeasurePH(*wtype.LHComponent) (measurement float64) {
 	return 7.0
 }*/
 
-func MeasurePH(*wtype.LHSolution) (measured PHMeasurement) {
+func MeasurePH(*wtype.LHComponent) (measured PHMeasurement) {
 	measured = PHMeasurement{nil, nil, 0.0, wunit.NewTemperature(0.0, "C"), nil, nil, nil, nil, nil}
 	return
 }

@@ -369,7 +369,6 @@ message CoordinatesMessage {
 	double Arg_3 = 3;
 }
 message LHTipboxMessage {
-	PtrToGenericSolidMessage Arg_1 = 1;
 	string Arg_2 = 2;
 	string Arg_3 = 3;
 	string Arg_4 = 4;
@@ -423,7 +422,6 @@ message LHChannelParameterMessage {
 	int64 Arg_10 = 10;
 }
 message LHPlateMessage {
-	PtrToGenericEntityMessage Arg_1 = 1;
 	string Arg_2 = 2;
 	string Arg_3 = 3;
 	string Arg_4 = 4;
@@ -557,17 +555,6 @@ message PtrToVolumeMessage{
 message FlowRateMessage {
 	ConcreteMeasurementMessage Arg_1 = 1;
 }
-message GenericEntityMessage {
-	PtrToGenericSolidMessage Arg_1 = 1;
-	PtrToConcreteLocationMessage Arg_2 = 2;
-}
-message GenericSolidMessage {
-	GenericPhysicalMessage Arg_1 = 1;
-	PtrToShapeMessage Arg_2 = 2;
-}
-message PtrToGenericSolidMessage{
-	GenericSolidMessage arg_1=1;
-}
 message VolumeMessage {
 	ConcreteMeasurementMessage Arg_1 = 1;
 }
@@ -579,9 +566,6 @@ message ArrayOfArrayOfPtrToLHTipMessage{
 }
 message PtrToLHWellMessage{
 	LHWellMessage arg_1=1;
-}
-message PtrToGenericEntityMessage{
-	GenericEntityMessage arg_1=1;
 }
 message MapstringPtrToLHWellMessageMessageFieldEntry{
 string key = 1;
@@ -604,13 +588,6 @@ message ArrayOfLHDeviceMessage{
 message PtrToConcreteLocationMessage{
 	ConcreteLocationMessage arg_1=1;
 }
-message GenericPhysicalMessage {
-	GenericMatterMessage Arg_1 = 1;
-	string Arg_2 = 2;
-	MassMessage Arg_3 = 3;
-	VolumeMessage Arg_4 = 4;
-	TemperatureMessage Arg_5 = 5;
-}
 message PtrToShapeMessage{
 	ShapeMessage arg_1=1;
 }
@@ -623,7 +600,6 @@ message ConcreteLocationMessage {
 	PtrToShapeMessage Arg_6 = 6;
 }
 message LHComponentMessage {
-	PtrToGenericPhysicalMessage Arg_1 = 1;
 	string Arg_2 = 2;
 	string Arg_3 = 3;
 	int64 Arg_4 = 4;
@@ -664,18 +640,9 @@ message TemperatureMessage {
 message MassMessage {
 	ConcreteMeasurementMessage Arg_1 = 1;
 }
-message PtrToGenericPhysicalMessage{
-	GenericPhysicalMessage arg_1=1;
-}
 message GenericPrefixedUnitMessage {
 	GenericUnitMessage Arg_1 = 1;
 	SIPrefixMessage Arg_2 = 2;
-}
-message GenericMatterMessage {
-	string Arg_1 = 1;
-	TemperatureMessage Arg_2 = 2;
-	TemperatureMessage Arg_3 = 3;
-	SpecificHeatCapacityMessage Arg_4 = 4;
 }
 message ArrayOfPtrToConcreteLocationMessage{
 	repeated PtrToConcreteLocationMessage arg_1=1;
