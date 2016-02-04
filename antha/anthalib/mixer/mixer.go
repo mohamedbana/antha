@@ -44,7 +44,7 @@ func SampleAll(l *wtype.LHComponent) *wtype.LHComponent {
 // take a sample of volume v from this liquid
 func Sample(l *wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
-
+	ret.ID = l.ID
 	ret.CName = l.Name()
 	ret.Type = l.Type
 	ret.Vol = v.RawValue()
@@ -53,7 +53,7 @@ func Sample(l *wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 	ret.Smax = l.GetSmax()
 	ret.Visc = l.GetVisc()
 
-	logger.Track(fmt.Sprintf("SAMPLE V %s %s %s", l.ID, ret.ID, v.ToString()))
+	//logger.Track(fmt.Sprintf("SAMPLE V %s %s %s", l.ID, ret.ID, v.ToString()))
 
 	return ret
 }
@@ -65,6 +65,7 @@ func MultiSample(l []*wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent 
 	for i, j := range l {
 		ret := wtype.NewLHComponent()
 		vi := v[i]
+		ret.ID = j.ID
 		ret.CName = j.Name()
 		ret.Type = j.Type
 		ret.Vol = vi.RawValue()
@@ -72,7 +73,7 @@ func MultiSample(l []*wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent 
 		ret.Extra = j.GetExtra()
 		ret.Smax = j.GetSmax()
 		ret.Visc = j.GetVisc()
-		logger.Track(fmt.Sprintf("SAMPLE V %s %s %s", j.ID, ret.ID, vi.ToString()))
+		//	logger.Track(fmt.Sprintf("SAMPLE V %s %s %s", j.ID, ret.ID, vi.ToString()))
 		reta = append(reta, ret)
 	}
 
@@ -82,6 +83,7 @@ func MultiSample(l []*wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent 
 // take a sample of this liquid and aim for a particular concentration
 func SampleForConcentration(l *wtype.LHComponent, c wunit.Concentration) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
+	ret.ID = l.ID
 	ret.CName = l.Name()
 	ret.Type = l.Type
 	ret.Conc = c.RawValue()
@@ -100,6 +102,7 @@ func SampleMass(s *wtype.LHComponent, m wunit.Mass, d wunit.Density) *wtype.LHCo
 	v := wunit.MasstoVolume(m, d)
 
 	ret := wtype.NewLHComponent()
+	ret.ID = s.ID
 	ret.CName = s.Name()
 	ret.Type = s.Type
 	ret.Vol = v.RawValue()
@@ -107,7 +110,7 @@ func SampleMass(s *wtype.LHComponent, m wunit.Mass, d wunit.Density) *wtype.LHCo
 	ret.Extra = s.GetExtra()
 	ret.Smax = s.GetSmax()
 	ret.Visc = s.GetVisc()
-	logger.Track(fmt.Sprintf("SAMPLE M %s %s %s %s", s.ID, ret.ID, m.ToString(), d.ToString()))
+	//logger.Track(fmt.Sprintf("SAMPLE M %s %s %s %s", s.ID, ret.ID, m.ToString(), d.ToString()))
 	return ret
 }
 
@@ -116,6 +119,7 @@ func SampleMass(s *wtype.LHComponent, m wunit.Mass, d wunit.Density) *wtype.LHCo
 // edited to take into account the volume of the other solution components
 func SampleForTotalVolume(l *wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
+	ret.ID = l.ID
 	ret.CName = l.Name()
 	ret.Type = l.Type
 	ret.Tvol = v.RawValue()

@@ -103,8 +103,50 @@ func copyplates(plts map[string]*wtype.LHPlate) map[string]*wtype.LHPlate {
 	return ret
 }
 
-func set_output_order(rq *LHRequest) {
-	// we know what order things were added in... we reshuffle to keep components together
-	// without violating this... checking when
+type ITree struct {
+	Parent   *ITree
+	Children []*ITree
+	Values   []*LHInstruction
+}
 
+func NewITree(parent *ITree) *ITree {
+	var it ITree
+	it.Parent = parent
+	it.Children = make([]*ITree, 0, 1)
+	it.Values = make([]*LHInstruction, 0, 1)
+	return &it
+}
+
+func (it *ITree) Add() {
+
+}
+
+func (it *ITree) FindParentFor(ins *LHInstruction) {
+
+}
+
+func (it *ITree) Flatten() []string {
+	var ret []string
+	for _, v := range it.Values {
+		ret = append(ret, v.ID)
+	}
+
+	for _, v := range it.Children {
+		ret = append(ret, v.Flatten())
+	}
+
+	return ret
+}
+
+func set_output_order(rq *LHRequest) {
+	// gather things into groups with dependency relationships
+	// TODO -- implement time constraints and anything else
+
+	it := NewITree(nil)
+
+	for _, v := range rq.Order_solutions_added {
+		it.Add(rq.Output_instructions[v])
+	}
+
+	rq.Output_order = it.Flatten()
 }
