@@ -180,6 +180,7 @@ func (lhp *LHPosition) Shape() *Shape {
 //  instruction to a liquid handler
 type LHInstruction struct {
 	ID               string
+	ProductID        string
 	BlockID          BlockID
 	SName            string
 	Order            int
@@ -194,6 +195,23 @@ type LHInstruction struct {
 	Conc             float64
 	Tvol             float64
 	Majorlayoutgroup int
+}
+
+func (ins *LHInstruction) HasParent(id string) bool {
+	for _, v := range ins.Components {
+		if v.HasParent(id) {
+			return true
+		}
+	}
+	return false
+}
+
+func (ins *LHInstruction) ParentString() string {
+	s := ""
+	for _, v := range ins.Components {
+		s += ins.Components.ParentID + "_"
+	}
+	return s
 }
 
 // structure describing a solution: a combination of liquid components

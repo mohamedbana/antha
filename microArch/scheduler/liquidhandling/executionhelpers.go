@@ -105,31 +105,33 @@ func copyplates(plts map[string]*wtype.LHPlate) map[string]*wtype.LHPlate {
 
 type IChain struct {
 	Parent *IChain
-	Child  IChain
-	Values []*LHInstruction
+	Child  *IChain
+	Values []*wtype.LHInstruction
 }
 
 func NewIChain(parent *IChain) *IChain {
 	var it IChain
 	it.Parent = parent
-	it.Values = make([]*LHInstruction, 0, 1)
+	it.Values = make([]*wtype.LHInstruction, 0, 1)
 	return &it
 }
 
-func (it *IChain) Add(ins *LHInstruction) {
+func (it *IChain) Add(ins *wtype.LHInstruction) {
 	p := it.FindNodeFor(ins)
 	p.Values = append(p.Values, ins)
 }
 
-func (it *IChain) GetChild() *Ichain {
+func (it *IChain) GetChild() *IChain {
 	if it.Child == nil {
 		it.Child = NewIChain(it)
-		return it.Child
 	}
+	return it.Child
 }
 
-func (it *IChain) FindNodeFor(ins *LHInstruction) *IChain {
-	if ins.Parent == "" {
+func (it *IChain) FindNodeFor(ins *wtype.LHInstruction) *IChain {
+	pstr := ins.ParentString()
+
+	if pstr == "" {
 		if it.Parent == nil {
 			return it
 		} else {
@@ -138,7 +140,8 @@ func (it *IChain) FindNodeFor(ins *LHInstruction) *IChain {
 		}
 	} else {
 		for _, v := range it.Values {
-			if ins.HasParent(v.ID) {
+			// true if any component used by ins is *this*
+			if ins.HasParent(v.ProductID) {
 				return it.GetChild()
 			}
 		}
