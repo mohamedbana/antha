@@ -55,7 +55,6 @@ func get_aggregate_component(sol *wtype.LHSolution, name string) *wtype.LHCompon
 			ret.Type = component.Type
 			vol += component.Vol
 			ret.Vunit = component.Vunit
-			ret.Loc = component.Loc
 			ret.Order = component.Order
 			found = true
 		}

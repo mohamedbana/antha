@@ -327,7 +327,7 @@ func (cmp *LHComponent) Mix(cmp2 *LHComponent) {
 	// add cmp2 to cmp
 	vcmp := wunit.NewVolume(cmp.Vol, cmp.Vunit)
 	vcmp2 := wunit.NewVolume(cmp2.Vol, cmp2.Vunit)
-	vcmp.Add(vcmp2)
+	vcmp.Add(&vcmp2)
 	cmp.Vol = vcmp.RawValue() // same units
 	cmp.CName = mergeNames(cmp.CName, cmp2.CName)
 	// allow trace back
