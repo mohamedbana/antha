@@ -65,6 +65,16 @@ type AnnotatedSeq struct {
 	Features []Feature
 }
 
+func (annotated AnnotatedSeq) FeatureNames() (featurenames []string) {
+
+	featurenames = make([]string, 0)
+
+	for _, feature := range annotated.Features {
+		featurenames = append(featurenames, feature.Name)
+	}
+	return
+}
+
 func Annotate(dnaseq wtype.DNASequence, features []Feature) (annotated AnnotatedSeq) {
 	annotated.DNASequence = dnaseq
 	annotated.Features = features
