@@ -179,16 +179,24 @@ func set_output_order(rq *LHRequest) {
 	rq.Output_order = it.Flatten()
 }
 
-func ConvertInstruction(insIn *wtype.LHInstruction) (insOut *driver.TransferInstruction) {
-	wh := make([]string, len(insIn.Components))
-	va := make([]*wunit.Volume, len(insIn.Components))
+func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) (insOut *driver.TransferInstruction) {
+	wh := make([]string, len(insIn.Components))        // component types
+	va := make([]*wunit.Volume, len(insIn.Components)) // volumes
+	pt := make([]string, len(insIn.Components))        // dest plate positions
+	wt := make([]string, len(insIn.Components))        // dest wells
+	ptwx := make([]int, len(insIn.Components))         // dimensions of plate pipetting to (X)
+	ptwy := make([]int, len(insIn.Components))         // dimensions of plate pipetting to (Y)
 
 	for i, v := range insIn.Components {
 		wh[i] = v.TypeName()
 		v2 := wunit.NewVolume(v.Vol, v.Vunit)
 		va[i] = &v2
+		pt[i] = robot.PlateIDLookup[insIn.PlateID]
+		wt[i] = insIn.Welladdress
+		ptwx[i] = robot.Plates[insIn.PlateID].WellsX()
+		ptwy[i] = robot.Plates[insIn.PlateID].WellsY()
 	}
 
-	ti := driver.TransferInstruction{Type: driver.TFR, What: wh, Volume: va}
+	ti := driver.TransferInstruction{Type: driver.TFR, What: wh, Volume: va, PltTo: pt, WellTo: wt, TPlateWX: ptwx, TPlateWY: ptwy}
 	return &ti
 }

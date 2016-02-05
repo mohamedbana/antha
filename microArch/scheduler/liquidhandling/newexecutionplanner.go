@@ -24,7 +24,7 @@ package liquidhandling
 
 import "github.com/antha-lang/antha/microArch/driver/liquidhandling"
 
-func ImprovedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHProperties) *LHRequest {
+func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProperties) *LHRequest {
 	/*
 		// this volume correction needs to be removed asap
 		// essentially its purpose is to account for extra volume lost
@@ -43,7 +43,7 @@ func ImprovedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHP
 	// 3 -- generate top-level instructions
 
 	for _, insID := range request.Output_order {
-		request.InstructionSet.Add(ConvertInstruction(request.LHInstructions[insID]))
+		request.InstructionSet.Add(ConvertInstruction(request.LHInstructions[insID], robot))
 	}
 
 	return request
