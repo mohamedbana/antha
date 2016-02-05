@@ -23,9 +23,9 @@
 package liquidhandling
 
 import (
-	"strings"
-
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	driver "github.com/antha-lang/antha/microArch/driver/liquidhandling"
+	"strings"
 )
 
 const (
@@ -172,4 +172,16 @@ func set_output_order(rq *LHRequest) {
 	}
 
 	rq.Output_order = it.Flatten()
+}
+
+func ConvertInstruction(insIn *wtype.LHInstruction) (insOut *driver.TransferInstruction) {
+	wh := make([]string, len(insIn.Components))
+	va := make([]wunit.Volume, len(insIn.Components))
+
+	for i, v := range insIn.Components {
+		wh[i] = v.Type
+		va[i] = wunit.NewVolume(v.Vol, v.Vunit)
+	}
+
+	return driver.TransferInstruction{Type: driver.TFR, What: wh, Volume: volumes}
 }

@@ -179,8 +179,8 @@ func (this *Liquidhandler) do_setup(rq *LHRequest) {
 
 func (this *Liquidhandler) Plan(request *LHRequest) {
 	// convert requests to volumes and determine required stock concentrations
-	solutions, stockconcs := solution_setup(request, this.Properties)
-	request.Output_solutions = solutions
+	instructions, stockconcs := solution_setup(request, this.Properties)
+	request.Output_instructions = instructions
 	request.Stockconcs = stockconcs
 
 	// looks at components, determines what inputs are required and
@@ -196,7 +196,7 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 	request = this.Layout(request)
 
 	// define the output plates
-	// DEPRECATED, msrked for deletion
+	// DEPRECATED, marked for deletion
 	//request = output_plate_setup(request)
 
 	// next we need to determine the liquid handler setup
@@ -213,7 +213,6 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 // request the inputs which are needed to run the plan, unless they have already
 // been requested
 func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
-
 	if this.Counter > 0 {
 		return request
 	}
@@ -221,7 +220,6 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 
 	solutions := (*request).Output_solutions
 	inputs := make(map[string][]*wtype.LHComponent, 3)
-
 	order := make(map[string]map[string]int, 3)
 
 	for _, solution := range solutions {
