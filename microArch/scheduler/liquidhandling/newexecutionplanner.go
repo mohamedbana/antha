@@ -22,18 +22,7 @@
 
 package liquidhandling
 
-import (
-	"errors"
-	"fmt"
-
-	"strconv"
-	"strings"
-
-	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
-	"github.com/antha-lang/antha/microArch/logger"
-)
+import "github.com/antha-lang/antha/microArch/driver/liquidhandling"
 
 func ImprovedExecutionPlanner(request *LHRequest, parameters *liquidhandling.LHProperties) *LHRequest {
 	/*
