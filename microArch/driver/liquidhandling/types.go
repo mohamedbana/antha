@@ -449,6 +449,16 @@ func (lhp *LHProperties) AddWashTo(pos string, wash *wtype.LHPlate) bool {
 	return true
 }
 
+func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []string) {
+	r1 := make([]string, 0, 1)
+	r2 := make([]string, 0, 1)
+	for _, v := range cmps {
+		// r1 and r2 need to be chosen or updated
+	}
+
+	return r1, r2
+}
+
 func (lhp *LHProperties) GetCleanTips(tiptype string, channel *wtype.LHChannelParameter, mirror bool, multi int) (wells, positions, boxtypes []string) {
 	positions = make([]string, multi)
 	boxtypes = make([]string, multi)

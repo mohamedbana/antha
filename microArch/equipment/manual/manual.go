@@ -379,7 +379,7 @@ func (e *AnthaManualGrpc) configRequest(actionDescription equipment.ActionDescri
 	mnp, ok := params["MAX_N_PLATES"]
 
 	if ok {
-		req.Input_Setup_Weights["MAX_N_PLATES"] = mnp.(float64)
+		req.Input_setup_weights["MAX_N_PLATES"] = mnp.(float64)
 	} else {
 		logger.Debug("NO MAX N PLATES FOUND")
 	}
@@ -387,13 +387,13 @@ func (e *AnthaManualGrpc) configRequest(actionDescription equipment.ActionDescri
 	mnw, ok := params["MAX_N_WELLS"]
 
 	if ok {
-		req.Input_Setup_Weights["MAX_N_WELLS"] = mnw.(float64)
+		req.Input_setup_weights["MAX_N_WELLS"] = mnw.(float64)
 	}
 
 	rvw, ok := params["RESIDUAL_VOLUME_WEIGHT"]
 
 	if ok {
-		req.Input_Setup_Weights["RESIDUAL_VOLUME_WEIGHT"] = rvw.(float64)
+		req.Input_setup_weights["RESIDUAL_VOLUME_WEIGHT"] = rvw.(float64)
 	}
 
 	pt, ok := params["INPUT_PLATETYPE"]
@@ -412,16 +412,16 @@ func (e *AnthaManualGrpc) configRequest(actionDescription equipment.ActionDescri
 		}
 	}
 
-	t, ok := params["WELLBYWELL"]
-
 	/*
-		deprecated before even being used!
-		if ok {
-			if t.(bool) {
-				logger.Debug("WELL BY WELL MODE SELECTED")
-				e.planner[data.BlockID].ExecutionPlanner = schedulerLiquidhandling.AdvancedExecutionPlanner2
+		t, ok := params["WELLBYWELL"]
+
+			deprecated before even being used!
+			if ok {
+				if t.(bool) {
+					logger.Debug("WELL BY WELL MODE SELECTED")
+					e.planner[data.BlockID].ExecutionPlanner = schedulerLiquidhandling.AdvancedExecutionPlanner2
+				}
 			}
-		}
 	*/
 
 	return nil
