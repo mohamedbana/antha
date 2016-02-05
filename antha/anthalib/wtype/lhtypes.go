@@ -209,7 +209,7 @@ func (ins *LHInstruction) HasParent(id string) bool {
 func (ins *LHInstruction) ParentString() string {
 	s := ""
 	for _, v := range ins.Components {
-		s += ins.Components.ParentID + "_"
+		s += v.ParentID + "_"
 	}
 	return s
 }
@@ -323,6 +323,10 @@ func (lhc *LHComponent) HasDaughter(s string) bool {
 
 func (lhc *LHComponent) Name() string {
 	return lhc.CName
+}
+
+func (lhc *LHComponent) TypeName() string {
+	return LiquidTypeName(lhc.Type)
 }
 
 func (lhc *LHComponent) Volume() wunit.Volume {
@@ -689,6 +693,11 @@ func (w *LHWell) updateVolume() {
 	for _, val := range w.WContents {
 		w.Vol += val.Vol
 	}
+}
+
+func (w *LHWell) ResidualVolume() *wunit.Volume {
+	v := wunit.NewVolume(w.Rvol, w.Vunit)
+	return &v
 }
 
 //@implement Location

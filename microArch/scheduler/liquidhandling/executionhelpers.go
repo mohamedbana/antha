@@ -23,9 +23,12 @@
 package liquidhandling
 
 import (
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	driver "github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"strings"
+
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	driver "github.com/antha-lang/antha/microArch/driver/liquidhandling"
+	"github.com/antha-lang/antha/microArch/logger"
 )
 
 const (
@@ -148,6 +151,8 @@ func (it *IChain) FindNodeFor(ins *wtype.LHInstruction) *IChain {
 
 		return it.Child.FindNodeFor(ins)
 	}
+	// unreachable: pstr either is or isn't ""
+	return nil
 }
 
 func (it *IChain) Flatten() []string {
@@ -156,7 +161,7 @@ func (it *IChain) Flatten() []string {
 		ret = append(ret, v.ID)
 	}
 
-	ret = append(ret, it.Child.Flatten())
+	ret = append(ret, it.Child.Flatten()...)
 
 	return ret
 }
@@ -168,7 +173,7 @@ func set_output_order(rq *LHRequest) {
 	it := NewIChain(nil)
 
 	for _, v := range rq.Order_solutions_added {
-		it.Add(rq.Output_instructions[v])
+		it.Add(rq.LHInstructions[v])
 	}
 
 	rq.Output_order = it.Flatten()
@@ -176,12 +181,14 @@ func set_output_order(rq *LHRequest) {
 
 func ConvertInstruction(insIn *wtype.LHInstruction) (insOut *driver.TransferInstruction) {
 	wh := make([]string, len(insIn.Components))
-	va := make([]wunit.Volume, len(insIn.Components))
+	va := make([]*wunit.Volume, len(insIn.Components))
 
 	for i, v := range insIn.Components {
-		wh[i] = v.Type
-		va[i] = wunit.NewVolume(v.Vol, v.Vunit)
+		wh[i] = v.TypeName()
+		v2 := wunit.NewVolume(v.Vol, v.Vunit)
+		va[i] = &v2
 	}
 
-	return driver.TransferInstruction{Type: driver.TFR, What: wh, Volume: volumes}
+	ti := driver.TransferInstruction{Type: driver.TFR, What: wh, Volume: va}
+	return &ti
 }
