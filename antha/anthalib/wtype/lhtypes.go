@@ -335,6 +335,7 @@ func (lhc *LHComponent) Volume() wunit.Volume {
 
 func (lhc *LHComponent) Dup() *LHComponent {
 	c := NewLHComponent()
+	c.ID = lhc.ID
 	c.Order = lhc.Order
 	c.CName = lhc.CName
 	c.Type = lhc.Type
@@ -679,6 +680,10 @@ Plate     : %v,
 		w.Extra,
 		w.Plate,
 	)
+}
+
+func (w *LHWell) Add(c *LHComponent) {
+
 }
 
 func (w *LHWell) WorkingVolume() *wunit.Volume {

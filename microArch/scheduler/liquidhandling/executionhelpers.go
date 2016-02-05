@@ -172,7 +172,7 @@ func set_output_order(rq *LHRequest) {
 
 	it := NewIChain(nil)
 
-	for _, v := range rq.Order_solutions_added {
+	for _, v := range rq.Order_instructions_added {
 		it.Add(rq.LHInstructions[v])
 	}
 

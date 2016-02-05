@@ -71,9 +71,9 @@ func get_and_complete_assignments(request *LHRequest) []PlateChoice {
 	m := make(map[int]string)
 
 	// inconsistent plate types will be assigned randomly!
-	//	for k, v := range request.Output_solutions {
-	for _, k := range request.Order_solutions_added {
-		v := request.Output_solutions[k]
+	//	for k, v := range request.LHInstructions {
+	for _, k := range request.Order_instructions_added {
+		v := request.LHInstructions[k]
 		if v.PlateID != "" {
 			i := defined(v.PlateID, s)
 
@@ -89,7 +89,7 @@ func get_and_complete_assignments(request *LHRequest) []PlateChoice {
 				id := wtype.NewUUID()
 				m[v.Majorlayoutgroup] = id
 				//  fix the plate id to this temporary one
-				request.Output_solutions[k].PlateID = id
+				request.LHInstructions[k].PlateID = id
 			}
 
 			i := defined(id, s)
@@ -127,7 +127,7 @@ func defined(s string, pc []PlateChoice) int {
 }
 
 func choose_plates(request *LHRequest, pc []PlateChoice) []PlateChoice {
-	for _, v := range request.Output_solutions {
+	for _, v := range request.LHInstructions {
 		// this id may be temporary, only things without it still are not assigned to a
 		// plate, even a virtual one
 		if v.PlateID == "" {
@@ -161,8 +161,8 @@ func choose_plates(request *LHRequest, pc []PlateChoice) []PlateChoice {
 
 	for _, c := range pc2 {
 		for _, i := range c.Assigned {
-			request.Output_solutions[i].PlateID = c.ID
-			request.Output_solutions[i].Platetype = c.Platetype
+			request.LHInstructions[i].PlateID = c.ID
+			request.LHInstructions[i].Platetype = c.Platetype
 		}
 	}
 	return pc2
@@ -202,8 +202,8 @@ func assignmentWithType(pt string, pc []PlateChoice) int {
 	return r
 }
 
-func chooseAPlate(request *LHRequest, sol *wtype.LHSolution) string {
-	// for now we ignore sol and just choose the First Output Platetype
+func chooseAPlate(request *LHRequest, ins *wtype.LHInstruction) string {
+	// for now we ignore ins and just choose the First Output Platetype
 	return request.Output_platetypes[0].Type
 }
 func stringinarray(s string, array []string) int {
@@ -233,11 +233,11 @@ func plateidarray(arr []*wtype.LHPlate) []string {
 
 func make_plates(request *LHRequest) {
 	remap := make(map[string]string)
-	for k, v := range request.Output_solutions {
+	for k, v := range request.LHInstructions {
 		_, skip := remap[v.PlateID]
 
 		if skip {
-			request.Output_solutions[k].PlateID = remap[v.PlateID]
+			request.LHInstructions[k].PlateID = remap[v.PlateID]
 			continue
 		}
 		_, ok := request.Output_plates[v.PlateID]
@@ -246,7 +246,7 @@ func make_plates(request *LHRequest) {
 			plate := factory.GetPlateByType(v.Platetype)
 			request.Output_plates[plate.ID] = plate
 			remap[v.PlateID] = plate.ID
-			request.Output_solutions[k].PlateID = remap[v.PlateID]
+			request.LHInstructions[k].PlateID = remap[v.PlateID]
 		}
 
 	}
@@ -291,7 +291,7 @@ func make_layouts(request *LHRequest, pc []PlateChoice) {
 				}
 
 				plat.Cols[wc.X][wc.Y].Currvol += 100.0
-				request.Output_solutions[sID].Welladdress = wc.FormatA1()
+				request.LHInstructions[sID].Welladdress = wc.FormatA1()
 				assignment = c.ID + ":" + wc.FormatA1()
 			} else {
 				assignment = c.ID + ":" + well

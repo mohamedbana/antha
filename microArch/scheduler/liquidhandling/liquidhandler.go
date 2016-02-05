@@ -82,7 +82,7 @@ func Init(properties *liquidhandling.LHProperties) *Liquidhandler {
 // solutions
 func (this *Liquidhandler) MakeSolutions(request *LHRequest) *LHRequest {
 	// the minimal request which is possible defines what solutions are to be made
-	if len(request.Output_solutions) == 0 {
+	if len(request.LHInstructions) == 0 {
 		return request
 	}
 
@@ -180,7 +180,7 @@ func (this *Liquidhandler) do_setup(rq *LHRequest) {
 func (this *Liquidhandler) Plan(request *LHRequest) {
 	// convert requests to volumes and determine required stock concentrations
 	instructions, stockconcs := solution_setup(request, this.Properties)
-	request.Output_instructions = instructions
+	request.LHInstructions = instructions
 	request.Stockconcs = stockconcs
 
 	// looks at components, determines what inputs are required and
@@ -218,17 +218,16 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 	}
 	this.Counter += 1
 
-	solutions := (*request).Output_solutions
+	instructions := (*request).LHInstructions
 	inputs := make(map[string][]*wtype.LHComponent, 3)
 	order := make(map[string]map[string]int, 3)
 
-	for _, solution := range solutions {
+	for _, instruction := range instructions {
 		// components are either other solutions or come in as inputs
 		// this needs solving too
-		components := solution.Components
+		components := instruction.Components
 
 		for _, component := range components {
-			component.Destination = solution.ID
 			cmps, ok := inputs[component.CName]
 			if !ok {
 				cmps = make([]*wtype.LHComponent, 0, 3)

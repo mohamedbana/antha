@@ -132,7 +132,7 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 
 	input_order = isrt.Ordered
 
-	weights_constraints := request.Input_Setup_Weights
+	weights_constraints := request.Input_setup_weights
 
 	// get the assignment
 
@@ -192,7 +192,6 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 
 				newcomponent := component.Dup()
 				newcomponent.Vol = curr_well.Vol
-				newcomponent.Loc = location
 				volume.Subtract(curr_well.WorkingVolume())
 
 				curr_well.Add(newcomponent)
