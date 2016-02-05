@@ -25,7 +25,6 @@ package liquidhandling
 import (
 	"fmt"
 
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/logger"
 )
@@ -62,14 +61,7 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 
 	// tips
 	//	tips := request.Tips
-
-	// we put tips on first
-
-	setup := request.Setup
-
-	if len(setup) == 0 {
-		setup = wtype.NewLHSetup()
-	}
+	setup := make(map[string]interface{})
 	// make sure anything in setup is in synch
 
 	for pos, id := range params.PosLookup {
@@ -125,7 +117,7 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 		logger.Info(fmt.Sprintf("Input plate of type %s in position %s", p.Type, position))
 	}
 
-	request.Setup = setup
+	//request.Setup = setup
 	request.Plate_lookup = plate_lookup
 	return request
 }
