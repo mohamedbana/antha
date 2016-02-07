@@ -81,12 +81,18 @@ func HeaderandDataMap(sheet *xlsx.Sheet, headera1format string, dataminmaxcellco
 	return
 }
 
+func RowIntToCharacter(row int) (character string) {
+	alphabetarray := Makealphabet(alphabet)
+	character = alphabetarray[row]
+	return
+}
+
 // Parses an a1 style excel cell coordinate into ints for row and column for use by plotinum library
 // note that 1 is subtracted from the column number in accordance with the go convention of counting from 0
 func A1formattorowcolumn(a1 string) (row, column int, err error) {
 
 	alphabetarray := Makealphabet(alphabet)
-	fmt.Println("alphabetarray", alphabetarray)
+
 	a1 = strings.ToUpper(a1)
 
 	column, err = strconv.Atoi(a1[1:])
@@ -147,12 +153,10 @@ func ConvertMinMaxtoArray(minmax []string) (array []string, err error) {
 		// fill by column
 		array = make([]string, 0)
 		for i := mincol; i < maxcol+1; i++ {
-			fmt.Println(minrow)
-			fmt.Println(alphabetarray)
-			fmt.Println(alphabetarray[1])
+
 			rowstring := alphabetarray[minrow]
 			colstring := strconv.Itoa(i + 1)
-			fmt.Println("bycolumn: ", rowstring, colstring)
+
 			array = append(array, string(rowstring)+colstring)
 		}
 
@@ -162,7 +166,7 @@ func ConvertMinMaxtoArray(minmax []string) (array []string, err error) {
 		for i := minrow; i < maxrow+1; i++ {
 			colstring := strconv.Itoa(mincol)
 			rowstring := alphabetarray[i]
-			fmt.Println(rowstring, colstring)
+
 			array = append(array, string(rowstring)+colstring)
 		}
 	} else {
