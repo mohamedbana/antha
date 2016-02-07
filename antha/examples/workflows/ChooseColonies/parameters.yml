@@ -1,0 +1,14 @@
+{
+  "Parameters": {
+    "ChooseColonies": {
+      
+	  "Imagefile": "IMG_3755_resized.JPG",
+	  "Setplateperimeterfirst": true,
+	  "Rotate": false,
+	  "NumbertoPick":5
+		
+    }
+  }
+}
+
+
