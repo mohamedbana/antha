@@ -4,7 +4,7 @@
       
 	  "Imagefile": "IMG_3755_resized.JPG",
 	  "Setplateperimeterfirst": true,
-	  "Rotate": false,
+	  "Rotate": true,
 	  "NumbertoPick":5
 		
     }

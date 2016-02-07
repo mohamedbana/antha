@@ -9,16 +9,17 @@ import (
 	"os"
 	//"path"
 	//"runtime"
-	//"image"
+	"image"
 	"image/draw"
 	"math"
 	"strconv"
 	"strings"
 
-	"code.google.com/p/draw2d/draw2d"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
+	//"github.com/antha-lang/antha/internal/code.google.com/p/draw2d/draw2d"
+	"code.google.com/p/draw2d/draw2d"
 	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
-	"github.com/hybridgroup/go-opencv/opencv"
+	"github.com/antha-lang/antha/internal/github.com/hybridgroup/go-opencv/opencv"
 	//"../opencv" // can be used in forks, comment in real application
 )
 
@@ -100,6 +101,7 @@ func Pick(imagefile string, numbertopick int, setplateperimeterfirst bool, rotat
 
 			if rotate && rotated == false {
 				imgtorotate, err := imaging.Open(filename)
+
 				if err != nil {
 					panic(err)
 				}
@@ -110,23 +112,31 @@ func Pick(imagefile string, numbertopick int, setplateperimeterfirst bool, rotat
 				} else if counter == 2 {
 					topright = opencv.Point{x, y}
 					fmt.Println("topright point:", x, y)
-					hypotenuse := float64(topright.Y) - float64(topleft.Y)
+					opposite := float64(topleft.Y) - float64(topright.Y)
 					adjacent := float64(topright.X) - float64(topleft.X)
-					costheta := adjacent / hypotenuse
+					tantheta := opposite / adjacent
 					fmt.Println("adjacent:", adjacent)
-					fmt.Println("hypotenuse:", hypotenuse)
-					fmt.Println("costheta:", costheta)
-					thetainrad := math.Acos(costheta)
+					fmt.Println("opposite:", opposite)
+					fmt.Println("costheta:", tantheta)
+					thetainrad := math.Atan(tantheta)
 					fmt.Println("thetainrad:", thetainrad)
-					degrees := (math.Pi / 180) * thetainrad
+					degrees := (180 / math.Pi) * thetainrad
 					fmt.Println("degrees:", degrees)
 					tr := draw2d.NewRotationMatrix(degrees)
+
+					//
+					ar := imgtorotate.Bounds()
+					w, h, _ := ar.Dx(), ar.Dy(), 30.0
+					rotatedimg = image.NewRGBA(image.Rect(0, 0, w, h))
+					draw.Draw(rotatedimg, ar, imgtorotate, ar.Min, draw.Src)
+
 					draw2d.DrawImage(imgtorotate, rotatedimg, tr, draw.Over, draw2d.LinearFilter)
 
 					// open new window
 					splitfilename := strings.Split(filename, `.`)
 					newname := splitfilename[0] + "_rotated" + `.` + splitfilename[1]
 
+					//err = imaging.Save(rotatedimg, newname)
 					err = imaging.Save(rotatedimg, newname)
 					if err != nil {
 						panic(err)
@@ -192,7 +202,7 @@ func Pick(imagefile string, numbertopick int, setplateperimeterfirst bool, rotat
 
 				win.ShowImage(img)
 
-				if setplateperimeterfirst && counter == numbertopick+2 {
+				if rotate && setplateperimeterfirst && counter == numbertopick+4 {
 					//return
 					splitfilename := strings.Split(filename, `.`)
 
@@ -201,7 +211,16 @@ func Pick(imagefile string, numbertopick int, setplateperimeterfirst bool, rotat
 					os.Exit(0)
 					return
 				}
-				if setplateperimeterfirst == false && counter == numbertopick {
+				if rotate == false && setplateperimeterfirst && counter == numbertopick+2 {
+					//return
+					splitfilename := strings.Split(filename, `.`)
+
+					newname := splitfilename[0] + "_picked" + `.` + splitfilename[1]
+					opencv.SaveImage(newname, img, 0)
+					os.Exit(0)
+					return
+				}
+				if rotate == false && setplateperimeterfirst == false && counter == numbertopick {
 					//return
 					os.Exit(0)
 					return
