@@ -30,6 +30,8 @@ import (
 	//. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"strings"
 
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/entrez"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 )
@@ -249,6 +251,24 @@ func Revarrayorder(array []string) (newarray []string) {
 	return newarray
 }
 
+// utility function to check if item is in list. move elsewhere?
+func isInList(item string, list []string) bool {
+	for _, v := range list {
+		if v == item {
+			return true
+		}
+	}
+	return false
+}
+
+// This searches the entrez database with a query, returning the sequence.
+//func retrieveVector(vector string) {
+//entrez.RetrieveRecords(vector, "nucleotide", 1, "gb", "mark.gb")
+//fasta = fmt.Sprintf("%s%c%s", anthapath.Dirpath(), os.PathSeparator, "mark.fasta")
+//x := parser.FastaParse(fasta)
+//fmt.Println(x)
+//}
+
 // This simulates the sequence assembly reaction to validate if parts will synthesise with intended manufacturer.
 // Does not validate construct assembly so should be used in conjunction with enzymes.Assemblysimulator()
 func ValidateSynthesis(parts []wtype.DNASequence, vector string, manufacturer string) bool {
@@ -258,6 +278,7 @@ func ValidateSynthesis(parts []wtype.DNASequence, vector string, manufacturer st
 	b, _ := SynthesisStandards[manufacturer]["MinOrder"].(int)
 	c, _ := SynthesisStandards[manufacturer]["MinLength"].(int)
 	d, _ := SynthesisStandards[manufacturer]["MaxLength"].(int)
+	vectorR, _ := SynthesisStandards[manufacturer]["Vector"].([]string)
 
 	// min total order. Needs to be before local gc calc
 	total := 0
@@ -270,8 +291,7 @@ func ValidateSynthesis(parts []wtype.DNASequence, vector string, manufacturer st
 	}
 
 	// check if vector is appropriate
-	vectorR := SynthesisStandards[manufacturer][vector]
-	if vectorR != vector {
+	if isInList(vector, vectorR) == false {
 		fmt.Println("Warning: Non-standard vector used for", manufacturer,
 			"synthesis. Please see manufacturer instructions for the standard vector or the use of custom vectors")
 	}
@@ -283,14 +303,14 @@ func ValidateSynthesis(parts []wtype.DNASequence, vector string, manufacturer st
 		// check lengths of seq, repeat content and global gc content of each part
 		if len(part.Seq) < c {
 			fmt.Println("Warning:", part.Nm, "is too short to synthesise")
-			return false
+			//return false
 		} else if len(part.Seq) > d {
 			fmt.Println("Warning:", part.Nm, "is too long to sythesise")
-			return false
+			//return false
 		} else if strings.Contains(strings.ToUpper(part.Seq), strings.Repeat("A", a)) || strings.Contains(strings.ToUpper(part.Seq), strings.Repeat("T", a)) ||
 			strings.Contains(strings.ToUpper(part.Seq), strings.Repeat("C", a)) || strings.Contains(strings.ToUpper(part.Seq), strings.Repeat("A", a)) == true {
 			fmt.Println("Warning:", part.Nm, "is highly repetetive and unsuitable for synthesis")
-			return false
+			//return false
 		} else if GCC > 0.65 || GCC < 0.40 {
 			fmt.Println("Warning: GC content of", part.Nm, "is too high or low for synthesis")
 		}
@@ -299,7 +319,7 @@ func ValidateSynthesis(parts []wtype.DNASequence, vector string, manufacturer st
 		for _, v := range gc {
 			if v < 0.25 || v > 0.80 {
 				fmt.Println("Warning: Local GC content too high or low in", part.Nm)
-				return false
+				//return false
 			}
 		}
 	}
@@ -310,24 +330,24 @@ func ValidateSynthesis(parts []wtype.DNASequence, vector string, manufacturer st
 
 var SynthesisStandards = map[string]map[string]interface{}{
 	"Gen9": map[string]interface{}{
-		"Vector":    "pG9m-2",
+		"Vector":    []string{"pG9m-2"},
 		"MaxLength": 10000,
 		"MinLength": 400,
 		"RepeatMax": 70,
 		"MinOrder":  20000,
 	},
 	"DNA20": map[string]interface{}{
-		"Vector":    "pM265",
+		"Vector":    []string{"pM265", "DSFS"},
 		"MaxLength": 10000,
-		"MinLength": 400,
+		"MinLength": 0,
 		"RepeatMax": 70,
-		"MinOrder":  20000,
+		"MinOrder":  0,
 	},
 	"GenScript": map[string]interface{}{
-		"Vector":    "pUC57",
+		"Vector":    []string{"pUC57", "pJ221", "pJ321", "pJ201"},
 		"MaxLength": 10000,
-		"MinLength": 400,
+		"MinLength": 0,
 		"RepeatMax": 70,
-		"MinOrder":  20000,
+		"MinOrder":  0,
 	},
 }

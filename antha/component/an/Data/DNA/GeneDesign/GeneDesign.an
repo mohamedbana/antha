@@ -5,10 +5,15 @@ import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/export"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
+	"os"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/entrez"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
+	"strings"
 )
 
 Parameters (
@@ -45,16 +50,27 @@ Steps {
 		PartDNA[i] = DNA
 	}
 	
-	// Look up sequence of the desired vector and restriction enzyme
-	VectorSeq := Inventory.Partslist[Vector]
+	// Look up the restriction enzyme
+	//VectorSeq := Inventory.Partslist[Vector]
 	EnzymeInf, _ := lookup.TypeIIsLookup(RE)
+	
+	// look up vector sequence
+	entrez.RetrieveRecords(Vector, "nucleotide", 1, "gb", "mark.gb")
+	file := fmt.Sprintf("%s%c%s", anthapath.Dirpath(), os.PathSeparator, "mark.gb")
+	VectorSeq, _ := parser.GenbanktoDNASequence(file)
+	VectorSeq.Seq = strings.ToUpper(VectorSeq.Seq)
 	
 	// Add overhangs
 	PartsWithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(PartDNA, VectorSeq, EnzymeInf)
+	
+	// validation
+	assembly := enzymes.Assemblyparameters{"MarksConstruct", RE, VectorSeq, PartsWithOverhangs}
+	Status, _, _, _, _ := enzymes.Assemblysimulator(assembly)
+	fmt.Println(Status)
+	//sequences.ValidateSynthesis(PartsWithOverhangs, Vector, "GenScript")
+	
 	// export sequence to fasta
 	export.Makefastaserial2("MarksConstruct", PartsWithOverhangs)
-	
-
 	
 	}
 	
@@ -63,10 +79,6 @@ Analysis {
 } 
 
 Validation {
-	assembly := enzymes.Assemblyparameters{"MarksConstruct", RE, Inventory.Partslist[Vector], PartsWithOverhangs}
-	Status, _, _, _, _ := enzymes.Assemblysimulator(assembly)
-	fmt.Println(Status)
-	sequences.ValidateSynthesis(PartsWithOverhangs, Vector, "Gen9")
-	
+
 }
 
