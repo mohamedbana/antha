@@ -333,6 +333,10 @@ func (lhc *LHComponent) Volume() wunit.Volume {
 	return wunit.NewVolume(lhc.Vol, lhc.Vunit)
 }
 
+func (lhc *LHComponent) Remove(v wunit.Volume) {
+	lhc.Vol -= v.ConvertToString(lhc.Vunit)
+}
+
 func (lhc *LHComponent) Dup() *LHComponent {
 	c := NewLHComponent()
 	c.ID = lhc.ID
@@ -415,6 +419,7 @@ func NewLHComponent() *LHComponent {
 	return &lhc
 }
 
+// XXX -- why is this different from Dup?
 func CopyLHComponent(lhc *LHComponent) *LHComponent {
 	tmp, _ := json.Marshal(lhc)
 	var lhc2 LHComponent
@@ -701,7 +706,7 @@ func (w *LHWell) Currvol() float64 {
 func (w *LHWell) Add(c *LHComponent) {
 	mv := wunit.NewVolume(w.MaxVol, w.Vunit)
 	cv := wunit.NewVolume(c.Vol, c.Vunit)
-	wv := wunit.NewVolume(w.WContents.Vol, w.WContents.Vunit)
+	wv := w.CurrentVolume()
 	cv.Add(wv)
 	if cv.GreaterThan(mv) {
 		// could make this fatal but we don't track state well enough
@@ -714,38 +719,31 @@ func (w *LHWell) Add(c *LHComponent) {
 func (w *LHWell) Remove(v wunit.Volume) *LHComponent {
 	// if the volume is too high we complain
 
-	if v.GreaterThan(w.Volume) {
-		logger.Debug("You ask too much: ", w.WellAddress, v.ToString())
+	if v.GreaterThan(w.CurrentVolume()) {
+		logger.Debug("You ask too much: ", w.Crds, v.ToString())
 		return nil
 	}
 
 	ret := w.WContents.Dup()
-	ret.Volume = v.ConvertTo(ret.Vunit)
-	//w.Currvol -= v.ConvertTo(w.Vunit)
-	w.WContents.Vol -= v.ConvertTo(w.Vunit)
+	ret.Vol = v.ConvertToString(w.Vunit)
+
 	return ret
 }
 
-func (w *LHWell) WorkingVolume() *wunit.Volume {
-	v := wunit.NewVolume(w.Vol, w.Vunit)
+func (w *LHWell) WorkingVolume() wunit.Volume {
+	v := wunit.NewVolume(w.Currvol(), w.Vunit)
 	v2 := wunit.NewVolume(w.Rvol, w.Vunit)
-	v.Subtract(&v2)
-	return &v
+	v.Subtract(v2)
+	return v
 }
 
-// remove this it makes no sense
-/*
-func (w *LHWell) updateVolume() {
-	w.Vol = 0.0
-	for _, val := range w.WContents {
-		w.Vol += val.Vol
-	}
-}
-*/
-
-func (w *LHWell) ResidualVolume() *wunit.Volume {
+func (w *LHWell) ResidualVolume() wunit.Volume {
 	v := wunit.NewVolume(w.Rvol, w.Vunit)
-	return &v
+	return v
+}
+
+func (w *LHWell) CurrentVolume() wunit.Volume {
+	return w.WContents.Volume()
 }
 
 //@implement Location
@@ -770,7 +768,7 @@ func (w *LHWell) ContainerType() string {
 }
 
 func (w *LHWell) Empty() bool {
-	if w.Vol <= 0.000001 {
+	if w.Currvol() <= 0.000001 {
 		return true
 	} else {
 		return false
@@ -778,9 +776,7 @@ func (w *LHWell) Empty() bool {
 }
 
 func (lhw *LHWell) Dup() *LHWell {
-	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.Vol, lhw.Rvol, lhw.WShape.Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, lhw.Dunit)
-
-	cp.Currvol = lhw.Currvol
+	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.Rvol, lhw.WShape.Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, lhw.Dunit)
 
 	for k, v := range lhw.Extra {
 		cp.Extra[k] = v
@@ -798,7 +794,7 @@ func (lhw *LHWell) Dup() *LHWell {
 }
 
 // make a new well structure
-func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
+func NewLHWell(platetype, plateid, crds, vunit string, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
 	var well LHWell
 
 	//well.WContents = make([]*LHComponent, 0, 5)
@@ -807,10 +803,8 @@ func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape 
 	well.Platetype = platetype
 	well.Plateid = plateid
 	well.Crds = crds
-	well.Vol = vol
 	well.Rvol = rvol
 	well.Vunit = vunit
-	well.Currvol = 0.0
 	well.WShape = shape.Dup()
 	well.Bottom = bott
 	well.Xdim = xdim
@@ -886,16 +880,16 @@ func Get_Next_Well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 
 //XXX sloboda? This makes no sense now; need to revise
 func get_vol_left(well *LHWell) float64 {
-	cnts := well.WContents
+	//cnts := well.WContents
 	// this is very odd... I can see how this works as a heuristic
 	// but it doesn't make much sense to me
 	carry_vol := 10.0 // microlitres
 	//	total_carry_vol := float64(len(cnts)) * carry_vol
-	total_carry_vol := 10.0 // yeah right
+	total_carry_vol := carry_vol // yeah right
 	Currvol := well.Currvol
 	rvol := well.Rvol
-	vol := well.Vol
-	return vol - (Currvol + total_carry_vol + rvol)
+	vol := well.MaxVol
+	return vol - (Currvol() + total_carry_vol + rvol)
 }
 
 func next_well_to_try(row, col, nrows, ncols int) (int, int) {
@@ -943,7 +937,6 @@ func Initialize_Wells(plate *LHPlate) {
 	for _, well := range wells {
 		well.ID = GetUUID()
 		well.Plateid = id
-		well.Currvol = 0.0
 		newwells[well.ID] = well
 		wellcrds[well.Crds] = well
 	}

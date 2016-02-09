@@ -220,12 +220,14 @@ func (cm ConcreteMeasurement) ToString() string {
 
 /**********/
 
-func NewPMeasurement(v float64, pu string) ConcreteMeasurement {
-	return ConcreteMeasurement{v, ParsePrefixedUnit(pu)}
+func NewPMeasurement(v float64, pu string) *ConcreteMeasurement {
+	cm := ConcreteMeasurement{v, ParsePrefixedUnit(pu)}
+	return &cm
 }
 
 // helper function for creating a new measurement
-func NewMeasurement(v float64, prefix string, unit string) ConcreteMeasurement {
+func NewMeasurement(v float64, prefix string, unit string) *ConcreteMeasurement {
 	gpu := NewPrefixedUnit(prefix, unit)
-	return ConcreteMeasurement{v, gpu}
+	cm := ConcreteMeasurement{v, gpu}
+	return &cm
 }

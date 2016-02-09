@@ -29,7 +29,7 @@ import (
 
 // length
 type Length struct {
-	ConcreteMeasurement
+	*ConcreteMeasurement
 }
 
 func EZLength(v float64) Length {
@@ -51,7 +51,7 @@ func NewLength(v float64, unit string) Length {
 
 // area
 type Area struct {
-	ConcreteMeasurement
+	*ConcreteMeasurement
 }
 
 // make an area unit
@@ -66,7 +66,7 @@ func NewArea(v float64, unit string) Area {
 
 // volume -- strictly speaking of course this is length^3
 type Volume struct {
-	ConcreteMeasurement
+	*ConcreteMeasurement
 }
 
 // make a volume
@@ -102,7 +102,7 @@ func CopyVolume(v *Volume) *Volume {
 
 // temperature
 type Temperature struct {
-	ConcreteMeasurement
+	*ConcreteMeasurement
 }
 
 // make a temperature
@@ -119,7 +119,7 @@ func NewTemperature(v float64, unit string) Temperature {
 
 // time
 type Time struct {
-	ConcreteMeasurement
+	*ConcreteMeasurement
 }
 
 // make a time unit
@@ -134,7 +134,7 @@ func NewTime(v float64, unit string) Time {
 
 // mass
 type Mass struct {
-	ConcreteMeasurement
+	*ConcreteMeasurement
 }
 
 // make a mass unit
@@ -161,7 +161,7 @@ func (m *Mass) Quantity() Measurement {
 
 // mole
 type Moles struct {
-	ConcreteMeasurement
+	*ConcreteMeasurement
 }
 
 // generate a new Amount in moles
@@ -181,7 +181,7 @@ func (a *Moles) Quantity() Measurement {
 
 // angle
 type Angle struct {
-	ConcreteMeasurement
+	*ConcreteMeasurement
 }
 
 // generate a new angle unit
@@ -196,7 +196,7 @@ func NewAngle(v float64, unit string) Angle {
 
 // this is really Mass(Length/Time)^2
 type Energy struct {
-	ConcreteMeasurement
+	*ConcreteMeasurement
 }
 
 // make a new energy unit
@@ -211,7 +211,7 @@ func NewEnergy(v float64, unit string) Energy {
 
 // a Force
 type Force struct {
-	ConcreteMeasurement
+	*ConcreteMeasurement
 }
 
 // a new force in Newtons
@@ -226,7 +226,7 @@ func NewForce(v float64, unit string) Force {
 
 // a Pressure structure
 type Pressure struct {
-	ConcreteMeasurement
+	*ConcreteMeasurement
 }
 
 // make a new pressure in Pascals
@@ -242,7 +242,7 @@ func NewPressure(v float64, unit string) Pressure {
 
 // defines a concentration unit
 type Concentration struct {
-	ConcreteMeasurement
+	*ConcreteMeasurement
 	//MolecularWeight *float64
 }
 
@@ -296,7 +296,7 @@ func (conc *Concentration) MolPerL(molecularweight float64) (conc_M Concentratio
 
 // a structure which defines a specific heat capacity
 type SpecificHeatCapacity struct {
-	ConcreteMeasurement
+	*ConcreteMeasurement
 }
 
 // make a new specific heat capacity structure in SI units
@@ -311,7 +311,7 @@ func NewSpecificHeatCapacity(v float64, unit string) SpecificHeatCapacity {
 
 // a structure which defines a density
 type Density struct {
-	ConcreteMeasurement
+	*ConcreteMeasurement
 }
 
 // make a new density structure in SI units
@@ -325,7 +325,7 @@ func NewDensity(v float64, unit string) Density {
 }
 
 type FlowRate struct {
-	ConcreteMeasurement
+	*ConcreteMeasurement
 }
 
 // new flow rate in ml/min
@@ -340,7 +340,7 @@ func NewFlowRate(v float64, unit string) FlowRate {
 }
 
 type Velocity struct {
-	ConcreteMeasurement
+	*ConcreteMeasurement
 }
 
 // new velocity in m/s
@@ -356,7 +356,7 @@ func NewVelocity(v float64, unit string) Velocity {
 }
 
 type Rate struct {
-	ConcreteMeasurement
+	*ConcreteMeasurement
 }
 
 func NewRate(v float64, unit string) (r Rate, err error) {
@@ -380,7 +380,7 @@ func NewRate(v float64, unit string) (r Rate, err error) {
 }
 
 type Voltage struct {
-	ConcreteMeasurement
+	*ConcreteMeasurement
 }
 
 func NewVoltage(value float64, unit string) (v Voltage, err error) {
