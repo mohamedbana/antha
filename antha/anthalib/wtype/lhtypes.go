@@ -516,10 +516,24 @@ func (lhp *LHPlate) GetComponent(cmp *LHComponent) ([]WellCoords, bool) {
 	ret := make([]WellCoords, 0, 1)
 
 	it := NewOneTimeColumnWiseIterator(lhp)
+	volGot := wunit.NewVolume(0.0, "ul")
 
 	for wc := it.Curr(); it.Valid(); wc = it.Next() {
 		w := lhp.Wellcoords[wc.FormatA1()]
 
+		if w.WContents.CName == cmp.CName {
+			v := w.WorkingVolume()
+			volGot.Add(v)
+			ret = append(ret, wc)
+
+			if volGot.GreaterThan(cmp.Volume()) {
+				break
+			}
+		}
+	}
+
+	if !volGot.GreaterThan(cmp.Volume()) {
+		return ret, false
 	}
 
 	return ret, true
