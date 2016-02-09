@@ -790,7 +790,7 @@ func (w *LHWell) Empty() bool {
 }
 
 func (lhw *LHWell) Dup() *LHWell {
-	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.Rvol, lhw.WShape.Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, lhw.Dunit)
+	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.MaxVol, lhw.Rvol, lhw.WShape.Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, lhw.Dunit)
 
 	for k, v := range lhw.Extra {
 		cp.Extra[k] = v
@@ -808,7 +808,7 @@ func (lhw *LHWell) Dup() *LHWell {
 }
 
 // make a new well structure
-func NewLHWell(platetype, plateid, crds, vunit string, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
+func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
 	var well LHWell
 
 	//well.WContents = make([]*LHComponent, 0, 5)
@@ -817,6 +817,7 @@ func NewLHWell(platetype, plateid, crds, vunit string, rvol float64, shape *Shap
 	well.Platetype = platetype
 	well.Plateid = plateid
 	well.Crds = crds
+	well.MaxVol = vol
 	well.Rvol = rvol
 	well.Vunit = vunit
 	well.WShape = shape.Dup()

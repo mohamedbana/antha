@@ -453,7 +453,6 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []s
 	r1 := make([]string, len(cmps))
 	r2 := make([]string, len(cmps))
 	for i, v := range cmps {
-		n := v.CName
 		foundIt := false
 		for _, ipref := range lhp.Input_preferences {
 			// check if the plate at position ipref has the
@@ -463,12 +462,20 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []s
 
 			if ok {
 				// whaddya got?
+				// nb this won't work if we need to split a volume across several plates
+				wcarr, ok := p.GetComponent(v)
 
+				if ok {
+					foundIt = true
+					// update r1 and r2
+					r1[i] = p.ID
+					r2[i] = wcarr[0].FormatA1()
+				}
 			}
 		}
 
 		if !foundIt {
-			logger.Fatal("NO SOURCE FOR ", v.CName, " at volume ", v.Vol, " ", v.Vunit)
+			logger.Fatal("NO SOURCE FOR ", v.CName, " at volume ", v.Volume())
 		}
 
 	}
