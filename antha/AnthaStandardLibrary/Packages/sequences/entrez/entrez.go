@@ -27,9 +27,13 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
+
+	"strings"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
-	//"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	biogo "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/entrez"
 )
 
@@ -40,9 +44,8 @@ type Fasta struct {
 }
 
 var (
-	email   = "no-reply@antha-lang.com"
-	tool    = "biogo.example"
-	h       = biogo.History{}
+	email   = "m.greenwood@synthace.com"
+	tool    = "AnthaDev"
 	retries = 5
 )
 
@@ -52,6 +55,8 @@ var (
 // Query can be any string but it is recommended to use GI number if one specific record is requred.
 func RetrieveRecords(query string, database string, Max int, ReturnType string, out string) {
 	// query database
+
+	h := biogo.History{}
 	s, err := biogo.DoSearch(database, query, nil, &h, tool, email)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v", err)
@@ -77,15 +82,16 @@ func RetrieveRecords(query string, database string, Max int, ReturnType string, 
 		buf   = &bytes.Buffer{}
 		p     = &biogo.Parameters{RetMax: Max, RetType: ReturnType, RetMode: "text"}
 		bn, n int64
-		//r     io.ReadCloser
-		//_bn   int64
 	)
 
-	for i := 0; i < p.RetMax; i++ {
+	for p.RetStart = 0; p.RetStart < s.Count; p.RetStart += p.RetMax {
 		fmt.Fprintf(os.Stderr, "Attempting to retrieve %d record(s).\n", p.RetMax)
 		var t int
 		for t = 0; t < retries; t++ {
 			buf.Reset()
+			s := time.Duration(1) * time.Second // limit queries to < 3 per second
+			time.Sleep(s)
+
 			var (
 				r   io.ReadCloser
 				_bn int64
@@ -111,8 +117,6 @@ func RetrieveRecords(query string, database string, Max int, ReturnType string, 
 		}
 
 		fmt.Fprintf(os.Stderr, "Retrieved records with %d retries... writing out.\n", t)
-		//x := buf.String()
-		//y = wtype.MakeLinearDNASequence(query, x)
 		_n, err := io.Copy(of, buf)
 		n += _n
 		if err != nil {
@@ -125,4 +129,13 @@ func RetrieveRecords(query string, database string, Max int, ReturnType string, 
 		fmt.Fprintf(os.Stderr, "Writethrough mismatch: %d != %d\n", bn, n)
 	}
 
+}
+
+func RetrieveSequence(id string, database string) (sequence wtype.DNASequence) {
+	RetrieveRecords(id, database, 1, "gb", "temp.gb")
+	file := fmt.Sprintf("%s%c%s", anthapath.Dirpath(), os.PathSeparator, "temp.gb")
+	seq, _ := parser.GenbanktoDNASequence(file)
+	seq.Seq = strings.ToUpper(seq.Seq)
+
+	return seq
 }

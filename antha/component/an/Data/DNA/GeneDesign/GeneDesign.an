@@ -1,19 +1,13 @@
 protocol GeneDesign
 
 import (
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
-	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/export"
-	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
-	"os"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/entrez"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
-	"strings"
 )
 
 Parameters (
@@ -43,22 +37,17 @@ Setup {
 Steps {
 	PartDNA := make([]wtype.DNASequence, 4)
 	
-	// Retrieve part seqs from iGem repository
+	// Retrieve part seqs from entrez
 	for i, part := range Parts {
-		DNAString := igem.GetSequence(part)
-		DNA := wtype.MakeLinearDNASequence(part, DNAString)
+		DNA := entrez.RetrieveSequence(part, "nucleotide")
 		PartDNA[i] = DNA
 	}
 	
-	// Look up the restriction enzyme
-	//VectorSeq := Inventory.Partslist[Vector]
-	EnzymeInf, _ := lookup.TypeIIsLookup(RE)
-	
 	// look up vector sequence
-	entrez.RetrieveRecords(Vector, "nucleotide", 1, "gb", "mark.gb")
-	file := fmt.Sprintf("%s%c%s", anthapath.Dirpath(), os.PathSeparator, "mark.gb")
-	VectorSeq, _ := parser.GenbanktoDNASequence(file)
-	VectorSeq.Seq = strings.ToUpper(VectorSeq.Seq)
+	VectorSeq := entrez.RetrieveSequence(Vector, "nucleotide")
+
+	// Look up the restriction enzyme
+	EnzymeInf, _ := lookup.TypeIIsLookup(RE)
 	
 	// Add overhangs
 	PartsWithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(PartDNA, VectorSeq, EnzymeInf)
@@ -67,12 +56,14 @@ Steps {
 	assembly := enzymes.Assemblyparameters{"MarksConstruct", RE, VectorSeq, PartsWithOverhangs}
 	Status, _, _, _, _ := enzymes.Assemblysimulator(assembly)
 	fmt.Println(Status)
-	//sequences.ValidateSynthesis(PartsWithOverhangs, Vector, "GenScript")
+	
+	// check if sequence meets requirements for synthesis
+	sequences.ValidateSynthesis(PartsWithOverhangs, Vector, "GenScript")
 	
 	// export sequence to fasta
 	export.Makefastaserial2("MarksConstruct", PartsWithOverhangs)
 	
-	}
+}
 	
 Analysis {
 	

@@ -261,14 +261,6 @@ func isInList(item string, list []string) bool {
 	return false
 }
 
-// This searches the entrez database with a query, returning the sequence.
-//func retrieveVector(vector string) {
-//entrez.RetrieveRecords(vector, "nucleotide", 1, "gb", "mark.gb")
-//fasta = fmt.Sprintf("%s%c%s", anthapath.Dirpath(), os.PathSeparator, "mark.fasta")
-//x := parser.FastaParse(fasta)
-//fmt.Println(x)
-//}
-
 // This simulates the sequence assembly reaction to validate if parts will synthesise with intended manufacturer.
 // Does not validate construct assembly so should be used in conjunction with enzymes.Assemblysimulator()
 func ValidateSynthesis(parts []wtype.DNASequence, vector string, manufacturer string) bool {
@@ -302,24 +294,24 @@ func ValidateSynthesis(parts []wtype.DNASequence, vector string, manufacturer st
 
 		// check lengths of seq, repeat content and global gc content of each part
 		if len(part.Seq) < c {
-			fmt.Println("Warning:", part.Nm, "is too short to synthesise")
-			//return false
+			fmt.Println("Warning:", part.Nm, "is short and may be difficult to synthesise")
+			return false
 		} else if len(part.Seq) > d {
-			fmt.Println("Warning:", part.Nm, "is too long to sythesise")
-			//return false
+			fmt.Println("Warning:", part.Nm, "is long and may be difficult to sythesise")
+			return false
 		} else if strings.Contains(strings.ToUpper(part.Seq), strings.Repeat("A", a)) || strings.Contains(strings.ToUpper(part.Seq), strings.Repeat("T", a)) ||
 			strings.Contains(strings.ToUpper(part.Seq), strings.Repeat("C", a)) || strings.Contains(strings.ToUpper(part.Seq), strings.Repeat("A", a)) == true {
 			fmt.Println("Warning:", part.Nm, "is highly repetetive and unsuitable for synthesis")
-			//return false
+			return false
 		} else if GCC > 0.65 || GCC < 0.40 {
-			fmt.Println("Warning: GC content of", part.Nm, "is too high or low for synthesis")
+			fmt.Println("Warning: GC content of", part.Nm, "is very high or low and may be difficult to synthesise")
 		}
 
 		// check local gc content of each part in 100bp sliding window
 		for _, v := range gc {
 			if v < 0.25 || v > 0.80 {
 				fmt.Println("Warning: Local GC content too high or low in", part.Nm)
-				//return false
+				return false
 			}
 		}
 	}
