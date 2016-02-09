@@ -2,13 +2,15 @@ protocol ScreenLHPolicies_Awesome
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
-	//"path/filepath"
-	//anthapath "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
+	"path/filepath"
+	antha "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"fmt"
-	//"strconv"
+	"strconv"
 )
 
 
@@ -26,6 +28,7 @@ Data (
 	Runtowelllocationmap []string //map[string]string
 	Runcount int
 	Pixelcount int
+	Errors []error
 )
 
 
@@ -56,6 +59,7 @@ Steps {
 	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette) 
 	
 	Runtowelllocationmap = make([]string,0)
+	perconditionuntowelllocationmap := make([]string,0)
 		//Runtowelllocationmap = make(map[string]string)
 
 	// work out well coordinates for any plate
@@ -104,6 +108,8 @@ Steps {
 	for j:= 0; j< NumberofReplicates;j++{
 	for i := 0; i < len(policies); i++ {
 		
+		
+		
 		eachreaction := make([]*wtype.LHComponent, 0)
 		
 		Diluent.Type = names[i]
@@ -119,16 +125,20 @@ Steps {
 		reaction := MixTo(OutPlate,wellpositionarray[counter], eachreaction...)
 		fmt.Println("where am I?",wellpositionarray[counter])
 		Runtowelllocationmap= append(Runtowelllocationmap,Diluent.Type +":" + wellpositionarray[counter])
+		perconditionuntowelllocationmap = Runtowelllocationmap
 		//Runtowelllocationmap[Diluent.Type]= wellpositionarray[counter]
 		reactions = append(reactions,reaction)
 	counter = counter + 1
 	}
+	outputfilename := filepath.Join(antha.Dirpath(),"DOE2"+ "_" + strconv.Itoa(wutil.RoundInt(TestSolVolumes[l].RawValue()))+TestSols[k].CName+strconv.Itoa(j+1)+ ".xlsx")
+	Errors = append(Errors,doe.AddWelllocations(filepath.Join(antha.Dirpath(), "ScreenLHPolicyDOE2.xlsx"),perconditionuntowelllocationmap,"DOE_run",outputfilename,[]string{"Volume","Solution","Replicate"}, []interface{}{TestSolVolumes[l].ToString(),TestSols[k].CName,string(j)}))
 	}
 	}
 	}
 	Reactions = reactions
 	Runcount = len(Reactions)
 	Pixelcount = len(wellpositionarray)
+	
 	
 }
 

@@ -1,20 +1,21 @@
 package lib
 
 import (
+	"fmt"
+	antha "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
-	//"path/filepath"
-	//anthapath "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
-	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
+	"path/filepath"
+	"strconv"
 )
-
-//"strconv"
 
 // Input parameters for this protocol (data)
 
@@ -41,6 +42,7 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette)
 
 	_output.Runtowelllocationmap = make([]string, 0)
+	perconditionuntowelllocationmap := make([]string, 0)
 	//Runtowelllocationmap = make(map[string]string)
 
 	// work out well coordinates for any plate
@@ -102,10 +104,13 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 					reaction := execute.MixTo(_ctx, _input.OutPlate, wellpositionarray[counter], eachreaction...)
 					fmt.Println("where am I?", wellpositionarray[counter])
 					_output.Runtowelllocationmap = append(_output.Runtowelllocationmap, _input.Diluent.Type+":"+wellpositionarray[counter])
+					perconditionuntowelllocationmap = _output.Runtowelllocationmap
 					//Runtowelllocationmap[Diluent.Type]= wellpositionarray[counter]
 					reactions = append(reactions, reaction)
 					counter = counter + 1
 				}
+				outputfilename := filepath.Join(antha.Dirpath(), "DOE2"+"_"+strconv.Itoa(wutil.RoundInt(_input.TestSolVolumes[l].RawValue()))+_input.TestSols[k].CName+strconv.Itoa(j+1)+".xlsx")
+				_output.Errors = append(_output.Errors, doe.AddWelllocations(filepath.Join(antha.Dirpath(), "ScreenLHPolicyDOE2.xlsx"), perconditionuntowelllocationmap, "DOE_run", outputfilename, []string{"Volume", "Solution", "Replicate"}, []interface{}{_input.TestSolVolumes[l].ToString(), _input.TestSols[k].CName, string(j)}))
 			}
 		}
 	}
@@ -183,6 +188,7 @@ type ScreenLHPolicies_AwesomeInput struct {
 }
 
 type ScreenLHPolicies_AwesomeOutput struct {
+	Errors               []error
 	Pixelcount           int
 	Reactions            []*wtype.LHSolution
 	Runcount             int
@@ -191,6 +197,7 @@ type ScreenLHPolicies_AwesomeOutput struct {
 
 type ScreenLHPolicies_AwesomeSOutput struct {
 	Data struct {
+		Errors               []error
 		Pixelcount           int
 		Runcount             int
 		Runtowelllocationmap []string
@@ -214,6 +221,7 @@ func init() {
 				{Name: "TestSolVolumes", Desc: "", Kind: "Parameters"},
 				{Name: "TestSols", Desc: "", Kind: "Inputs"},
 				{Name: "TotalVolume", Desc: "", Kind: "Parameters"},
+				{Name: "Errors", Desc: "", Kind: "Data"},
 				{Name: "Pixelcount", Desc: "", Kind: "Data"},
 				{Name: "Reactions", Desc: "", Kind: "Outputs"},
 				{Name: "Runcount", Desc: "", Kind: "Data"},

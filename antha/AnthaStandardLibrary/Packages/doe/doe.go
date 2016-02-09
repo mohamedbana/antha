@@ -3,10 +3,12 @@ package doe
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
+	"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
 )
 
 type DOEPair struct {
@@ -65,6 +67,105 @@ func AllCombinations(factors []DOEPair) (runs []Run) {
 		}
 	}
 	return
+}
+
+func ParseRunWellPair(pair string, nameappendage string) (runnumber int, well string, err error) {
+	split := strings.Split(pair, ":")
+
+	numberstring := strings.SplitAfter(split[0], nameappendage)
+
+	//numberstring := split[0]
+	fmt.Println("Pair", pair, "SPLIT", split /*string(numberstring[0])*/)
+	fmt.Println("NUMBERSTRING!!", numberstring /*string(numberstring[0])*/)
+	runnumber, err = strconv.Atoi(string(numberstring[1]))
+	if err != nil {
+		err = fmt.Errorf(err.Error(), "+ Failed at", pair, nameappendage)
+	}
+	well = split[1]
+	return
+}
+
+func AddWelllocations(xlsxfile string, runnumbertowellcombos []string, nameappendage string, pathtosave string, extracolumnheaders []string, extracolumnvalues []interface{}) error {
+
+	/*
+
+		    var row *xlsx.Row
+		    var cell *xlsx.Cell
+		    var err error
+
+		    file = xlsx.NewFile()
+		    //sheet, err = file.AddSheet("Sheet1")
+		    if err != nil {
+		        fmt.Printf(err.Error())
+		    }
+		    row = sheet.AddRow()
+		    cell = row.AddCell()
+		    cell.Value = "I am a cell!"
+		    err = file.Save("MyXLSXFile.xlsx")
+		    if err != nil {
+		        fmt.Printf(err.Error())
+		    }
+		}
+
+
+
+	*/
+
+	var xlsxcell *xlsx.Cell
+
+	file, err := spreadsheet.OpenFile(xlsxfile)
+	if err != nil {
+		return err
+	}
+	sheet := spreadsheet.Sheet(file, 0)
+
+	extracolumn := sheet.MaxCol + 1
+
+	// add extra column headers first
+	for _, extracolumnheader := range extracolumnheaders {
+		xlsxcell = sheet.Rows[0].AddCell()
+
+		xlsxcell.Value = "Extra column added"
+		fmt.Println("CEllll added succesfully", sheet.Cell(0, extracolumn).String())
+		xlsxcell = sheet.Rows[1].AddCell()
+		xlsxcell.Value = extracolumnheader
+	}
+
+	// now add well position column
+	xlsxcell = sheet.Rows[0].AddCell()
+
+	xlsxcell.Value = "Location"
+	fmt.Println("CEllll added succesfully", sheet.Cell(0, extracolumn).String())
+	xlsxcell = sheet.Rows[1].AddCell()
+	xlsxcell.Value = "Well ID"
+	//	sheet.Cell(0, extracolumn).SetString("Location")
+	//	sheet.Cell(1, extracolumn).SetString("Well")
+
+	for i := 3; i < sheet.MaxRow; i++ {
+		for _, pair := range runnumbertowellcombos {
+			runnumber, well, err := ParseRunWellPair(pair, nameappendage)
+			if err != nil {
+				return err
+			}
+			xlsxrunmumber, err := sheet.Cell(i, 1).Int()
+			if err != nil {
+				return err
+			}
+			if xlsxrunmumber == runnumber {
+				for _, extracolumnvalue := range extracolumnvalues {
+					xlsxcell = sheet.Rows[i].AddCell()
+					xlsxcell.Value = extracolumnvalue.(string)
+				}
+				xlsxcell = sheet.Rows[i].AddCell()
+				xlsxcell.Value = well
+
+			}
+		}
+	}
+
+	err = file.Save(pathtosave)
+
+	return err
 }
 
 func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) {
