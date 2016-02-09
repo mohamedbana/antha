@@ -104,13 +104,19 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 					reaction := execute.MixTo(_ctx, _input.OutPlate, wellpositionarray[counter], eachreaction...)
 					fmt.Println("where am I?", wellpositionarray[counter])
 					_output.Runtowelllocationmap = append(_output.Runtowelllocationmap, _input.Diluent.Type+":"+wellpositionarray[counter])
-					perconditionuntowelllocationmap = _output.Runtowelllocationmap
+					perconditionuntowelllocationmap = append(perconditionuntowelllocationmap, _input.Diluent.Type+":"+wellpositionarray[counter])
 					//Runtowelllocationmap[Diluent.Type]= wellpositionarray[counter]
 					reactions = append(reactions, reaction)
 					counter = counter + 1
 				}
-				outputfilename := filepath.Join(antha.Dirpath(), "DOE2"+"_"+strconv.Itoa(wutil.RoundInt(_input.TestSolVolumes[l].RawValue()))+_input.TestSols[k].CName+strconv.Itoa(j+1)+".xlsx")
-				_output.Errors = append(_output.Errors, doe.AddWelllocations(filepath.Join(antha.Dirpath(), "ScreenLHPolicyDOE2.xlsx"), perconditionuntowelllocationmap, "DOE_run", outputfilename, []string{"Volume", "Solution", "Replicate"}, []interface{}{_input.TestSolVolumes[l].ToString(), _input.TestSols[k].CName, string(j)}))
+
+				outputsandwich := strconv.Itoa(wutil.RoundInt(_input.TestSolVolumes[l].RawValue())) + _input.TestSols[k].CName + strconv.Itoa(j+1)
+
+				outputfilename := filepath.Join(antha.Dirpath(), "DOE2"+"_"+outputsandwich+".xlsx")
+				_output.Errors = append(_output.Errors, doe.AddWelllocations(filepath.Join(antha.Dirpath(), "ScreenLHPolicyDOE2.xlsx"), 0, perconditionuntowelllocationmap, "DOE_run", outputfilename, []string{"Volume", "Solution", "Replicate"}, []interface{}{_input.TestSolVolumes[l].ToString(), _input.TestSols[k].CName, string(j)}))
+
+				// empty
+				perconditionuntowelllocationmap = make([]string, 0)
 			}
 		}
 	}

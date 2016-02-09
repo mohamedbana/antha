@@ -125,13 +125,19 @@ Steps {
 		reaction := MixTo(OutPlate,wellpositionarray[counter], eachreaction...)
 		fmt.Println("where am I?",wellpositionarray[counter])
 		Runtowelllocationmap= append(Runtowelllocationmap,Diluent.Type +":" + wellpositionarray[counter])
-		perconditionuntowelllocationmap = Runtowelllocationmap
+		perconditionuntowelllocationmap = append(perconditionuntowelllocationmap,Diluent.Type +":" + wellpositionarray[counter])
 		//Runtowelllocationmap[Diluent.Type]= wellpositionarray[counter]
 		reactions = append(reactions,reaction)
 	counter = counter + 1
 	}
-	outputfilename := filepath.Join(antha.Dirpath(),"DOE2"+ "_" + strconv.Itoa(wutil.RoundInt(TestSolVolumes[l].RawValue()))+TestSols[k].CName+strconv.Itoa(j+1)+ ".xlsx")
-	Errors = append(Errors,doe.AddWelllocations(filepath.Join(antha.Dirpath(), "ScreenLHPolicyDOE2.xlsx"),perconditionuntowelllocationmap,"DOE_run",outputfilename,[]string{"Volume","Solution","Replicate"}, []interface{}{TestSolVolumes[l].ToString(),TestSols[k].CName,string(j)}))
+	
+	outputsandwich := strconv.Itoa(wutil.RoundInt(TestSolVolumes[l].RawValue()))+TestSols[k].CName+strconv.Itoa(j+1)
+	
+	outputfilename := filepath.Join(antha.Dirpath(),"DOE2"+ "_" + outputsandwich+ ".xlsx")
+	Errors = append(Errors,doe.AddWelllocations(filepath.Join(antha.Dirpath(), "ScreenLHPolicyDOE2.xlsx"),0,perconditionuntowelllocationmap,"DOE_run",outputfilename,[]string{"Volume","Solution","Replicate"}, []interface{}{TestSolVolumes[l].ToString(),TestSols[k].CName,string(j)}))
+	
+	// empty
+	perconditionuntowelllocationmap = make([]string,0)
 	}
 	}
 	}

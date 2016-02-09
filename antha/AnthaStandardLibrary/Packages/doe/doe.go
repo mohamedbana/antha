@@ -85,7 +85,7 @@ func ParseRunWellPair(pair string, nameappendage string) (runnumber int, well st
 	return
 }
 
-func AddWelllocations(xlsxfile string, runnumbertowellcombos []string, nameappendage string, pathtosave string, extracolumnheaders []string, extracolumnvalues []interface{}) error {
+func AddWelllocations(xlsxfile string, oldsheet int, runnumbertowellcombos []string, nameappendage string, pathtosave string, extracolumnheaders []string, extracolumnvalues []interface{}) error {
 
 	/*
 
@@ -117,8 +117,18 @@ func AddWelllocations(xlsxfile string, runnumbertowellcombos []string, nameappen
 	if err != nil {
 		return err
 	}
-	sheet := spreadsheet.Sheet(file, 0)
 
+	sheet := spreadsheet.Sheet(file, oldsheet)
+
+	_ = file.AddSheet("hello")
+
+	/*
+		for _, row := range sheet.Rows {
+			//newrow := newsheet.AddRow()
+
+			newsheet.Rows = append(newsheet.Rows, row)
+		}
+	*/
 	extracolumn := sheet.MaxCol + 1
 
 	// add extra column headers first
