@@ -1,13 +1,14 @@
 package codegen
 
 import (
+	"github.com/antha-lang/antha/ast"
 	"github.com/antha-lang/antha/graph"
 	"sort"
 )
 
 type counts struct {
 	Counts []int
-	Nodes  []AstNode
+	Nodes  []ast.Node
 }
 
 func (a *counts) Len() int {
@@ -25,7 +26,7 @@ func (a *counts) Swap(i, j int) {
 
 // Prune out root expressions that appear as subexpressions of other
 // expressions.
-func pruneRoots(g *AstGraph, root *BundleExpr) (*BundleExpr, error) {
+func pruneRoots(g *ast.Graph, root *ast.BundleExpr) (*ast.BundleExpr, error) {
 	// For an expression to contain another, it must contain at least as many
 	// nodes. Process roots in descending size order.
 	var c counts
@@ -45,7 +46,7 @@ func pruneRoots(g *AstGraph, root *BundleExpr) (*BundleExpr, error) {
 
 	sort.Sort(sort.Reverse(&c))
 
-	r := &BundleExpr{}
+	r := &ast.BundleExpr{}
 	seen := make(map[graph.Node]bool)
 	for _, n := range c.Nodes {
 		if seen[n] {
@@ -67,15 +68,15 @@ func pruneRoots(g *AstGraph, root *BundleExpr) (*BundleExpr, error) {
 }
 
 // Cleanup client input
-func normalize(root AstNode) (AstNode, error) {
-	g := toGraph(toGraphOpt{
+func normalize(root ast.Node) (ast.Node, error) {
+	g := ast.ToGraph(ast.ToGraphOpt{
 		Root: root,
 	})
-	if r, ok := root.(*BundleExpr); ok {
+	if r, ok := root.(*ast.BundleExpr); ok {
 		return pruneRoots(g, r)
 	} else if err := graph.IsDag(g); err != nil {
 		return nil, err
 	} else {
-		return &BundleExpr{From: []AstNode{root}}, nil
+		return &ast.BundleExpr{From: []ast.Node{root}}, nil
 	}
 }

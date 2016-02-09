@@ -1,4 +1,4 @@
-package codegen
+package ast
 
 import (
 	"fmt"
@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	allDeps = iota
-	dataDeps
+	AllDeps = iota
+	DataDeps
 )
 
 // Input to code generation. An abstract syntax tree generated via execution of
@@ -21,8 +21,9 @@ const (
 // Conveniently, a tree naturally expresses the single-use (i.e., destructive
 // update) aspect of physical things, so the code generation keeps this
 // representation longer than a traditional compiler flow would.
-type AstNode interface {
+type Node interface {
 	graph.Node
+	NodeString() string
 }
 
 // Use an external value
@@ -30,25 +31,53 @@ type UseExpr struct {
 	Desc string // Description only used during pretty printing
 }
 
+func (a *UseExpr) NodeString() string {
+	return fmt.Sprintf("%+v", struct {
+		Desc interface{}
+	}{
+		Desc: a.Desc,
+	})
+}
+
 // Unordered set of nodes
 type BundleExpr struct {
-	From []AstNode
+	From []Node
+}
+
+func (a *BundleExpr) NodeString() string {
+	return ""
 }
 
 // Ordered set of nodes
 type ListExpr struct {
-	From []AstNode
+	From []Node
 }
 
-// Create a BundleExpr of AstNodes with matching Keys subject to dependencies
+func (a *ListExpr) NodeString() string {
+	return ""
+}
+
+// Create a BundleExpr of Nodes with matching Keys subject to dependencies
 type GatherExpr struct {
 	Key  interface{} // If nil, gather maximal subject to Gathers with non-nil keys
-	From AstNode
+	From Node
+}
+
+func (a *GatherExpr) NodeString() string {
+	return fmt.Sprintf("%+v", struct {
+		Key interface{}
+	}{
+		Key: a.Key,
+	})
 }
 
 // Create a new value.
 type NewExpr struct {
-	From AstNode
+	From Node
+}
+
+func (a *NewExpr) NodeString() string {
+	return ""
 }
 
 // Apply some intrinsic function.
@@ -61,28 +90,37 @@ type NewExpr struct {
 //      before any subsequent generations
 type ApplyExpr struct {
 	Opt  interface{} // Function-specific options to pass to code gen
-	From AstNode     // Input value
-	Prev AstNode     // Optional control dependence
-	Near AstNode     // Optional temporal dependence
+	From Node        // Input value
+	Prev Node        // Optional control dependence
+	Near Node        // Optional temporal dependence
 	Func string      // Name of function to call
 	Gen  interface{} // Generation this application belongs to
 }
 
-type AstGraph struct {
-	Nodes     []AstNode
+func (a *ApplyExpr) NodeString() string {
+	return fmt.Sprintf("%+v", struct {
+		Func, Gen interface{}
+	}{
+		Func: a.Func,
+		Gen:  a.Gen,
+	})
+}
+
+type Graph struct {
+	Nodes     []Node
 	whichDeps int
 }
 
-func (a *AstGraph) NumNodes() int {
+func (a *Graph) NumNodes() int {
 	return len(a.Nodes)
 }
 
-func (a *AstGraph) Node(i int) graph.Node {
+func (a *Graph) Node(i int) graph.Node {
 	return a.Nodes[i]
 }
 
 // Return subset of nodes that match the predicate
-func matching(pred func(AstNode) bool, nodes ...AstNode) (r []AstNode) {
+func matching(pred func(Node) bool, nodes ...Node) (r []Node) {
 	for _, n := range nodes {
 		if !pred(n) {
 			continue
@@ -92,11 +130,11 @@ func matching(pred func(AstNode) bool, nodes ...AstNode) (r []AstNode) {
 	return
 }
 
-func notNil(n AstNode) bool {
+func notNil(n Node) bool {
 	return n != nil
 }
 
-func getOut(n AstNode, i, deps int) AstNode {
+func getOut(n Node, i, deps int) Node {
 	switch n := n.(type) {
 	case *UseExpr:
 		return nil
@@ -110,9 +148,9 @@ func getOut(n AstNode, i, deps int) AstNode {
 		return n.From
 	case *ApplyExpr:
 		switch deps {
-		case allDeps:
+		case AllDeps:
 			return matching(notNil, n.From, n.Prev, n.Near)[i]
-		case dataDeps:
+		case DataDeps:
 			return matching(notNil, n.From)[i]
 		default:
 			panic(fmt.Sprintf("codegen.getOut: unknown dep type %d", deps))
@@ -122,7 +160,7 @@ func getOut(n AstNode, i, deps int) AstNode {
 	}
 }
 
-func numOuts(n AstNode, deps int) int {
+func numOuts(n Node, deps int) int {
 	switch n := n.(type) {
 	case *UseExpr:
 		return 0
@@ -136,9 +174,9 @@ func numOuts(n AstNode, deps int) int {
 		return len(matching(notNil, n.From))
 	case *ApplyExpr:
 		switch deps {
-		case allDeps:
+		case AllDeps:
 			return len(matching(notNil, n.From, n.Prev, n.Near))
-		case dataDeps:
+		case DataDeps:
 			return len(matching(notNil, n.From))
 		default:
 			panic(fmt.Sprintf("codegen.numOuts: unknown dep type %d", deps))
@@ -148,21 +186,21 @@ func numOuts(n AstNode, deps int) int {
 	}
 }
 
-func (a *AstGraph) NumOuts(n graph.Node) int {
-	return numOuts(n.(AstNode), a.whichDeps)
+func (a *Graph) NumOuts(n graph.Node) int {
+	return numOuts(n.(Node), a.whichDeps)
 }
 
-func (a *AstGraph) Out(n graph.Node, i int) graph.Node {
-	return getOut(n.(AstNode), i, a.whichDeps)
+func (a *Graph) Out(n graph.Node, i int) graph.Node {
+	return getOut(n.(Node), i, a.whichDeps)
 }
 
-type toGraphOpt struct {
-	Root      AstNode
+type ToGraphOpt struct {
+	Root      Node
 	WhichDeps int
 }
 
-func toGraph(opt toGraphOpt) *AstGraph {
-	g := &AstGraph{
+func ToGraph(opt ToGraphOpt) *Graph {
+	g := &Graph{
 		whichDeps: opt.WhichDeps,
 	}
 
@@ -172,7 +210,7 @@ func toGraph(opt toGraphOpt) *AstGraph {
 	results, _ := graph.Visit(graph.VisitOpt{Graph: g, Root: opt.Root})
 
 	for k := range results.Seen.Range() {
-		g.Nodes = append(g.Nodes, k)
+		g.Nodes = append(g.Nodes, k.(Node))
 	}
 
 	return g

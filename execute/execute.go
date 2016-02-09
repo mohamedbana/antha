@@ -67,7 +67,7 @@ func Run(parent context.Context, opt Options) (*workflow.Workflow, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := config(ctx, lh, DefaultConfig.Merge(cd).Merge(opt.Config)); err != nil {
+	if err := config(opt.Id, lh, DefaultConfig.Merge(cd).Merge(opt.Config)); err != nil {
 		return nil, err
 	}
 
@@ -79,8 +79,7 @@ func Run(parent context.Context, opt Options) (*workflow.Workflow, error) {
 }
 
 // XXX Move out when equipment config is done
-func config(parent context.Context, lh equipment.Equipment, cd Config) error {
-	id := getId(parent)
+func config(id string, lh equipment.Equipment, cd Config) error {
 	config := make(map[string]interface{})
 	config["BLOCKID"] = wtype.NewBlockID(id)
 	config["MAX_N_PLATES"] = *cd.MaxPlates

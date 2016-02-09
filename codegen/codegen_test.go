@@ -1,100 +1,107 @@
 package codegen
 
 import (
+	"github.com/antha-lang/antha/ast"
 	"github.com/antha-lang/antha/target"
 	"testing"
 )
 
-// TODO(ddn): add gathers after mix-sample to make mix-plate
-
-func makeOneSample(masterMix AstNode) (r []AstNode) {
-	cells := &ApplyExpr{
-		Func: "incubate0",
-		From: &GatherExpr{
+func makeOneSample(masterMix ast.Node) (r []ast.Node) {
+	cells := &ast.ApplyExpr{
+		Func: "incubate",
+		From: &ast.GatherExpr{
 			Key:  "CellStart",
-			From: &NewExpr{From: &UseExpr{Desc: "cells"}},
+			From: &ast.NewExpr{From: &ast.UseExpr{Desc: "cells"}},
 		},
 	}
 	r = append(r, cells)
 
-	sample := &ApplyExpr{
+	sample := &ast.ApplyExpr{
 		Func: "mix",
-		From: &ListExpr{
-			From: []AstNode{
-				&NewExpr{From: &UseExpr{Desc: "water"}},
-				masterMix,
-				&NewExpr{From: &UseExpr{Desc: "part1"}},
-				&NewExpr{From: &UseExpr{Desc: "part2"}},
+		From: &ast.GatherExpr{
+			From: &ast.ListExpr{
+				From: []ast.Node{
+					&ast.NewExpr{From: &ast.UseExpr{Desc: "water"}},
+					masterMix,
+					&ast.NewExpr{From: &ast.UseExpr{Desc: "part1"}},
+					&ast.NewExpr{From: &ast.UseExpr{Desc: "part2"}},
+				},
 			},
 		},
 	}
 	r = append(r, sample)
 
-	sample1 := &ApplyExpr{
-		Func: "incubate1",
-		From: &GatherExpr{
+	sample1 := &ast.ApplyExpr{
+		Func: "incubate",
+		From: &ast.GatherExpr{
 			Key:  "SampleStart",
 			From: sample,
 		},
 	}
 	r = append(r, sample1)
 
-	sample2 := &ApplyExpr{
-		Func: "incubate2",
-		From: &GatherExpr{
+	sample2 := &ast.ApplyExpr{
+		Func: "incubate",
+		From: &ast.GatherExpr{
 			Key:  "SampleStop",
 			From: sample1,
 		},
 	}
 	r = append(r, sample2)
 
-	scells := &ApplyExpr{
+	scells := &ast.ApplyExpr{
 		Func: "mix",
 		Near: cells,
-		From: &ListExpr{
-			From: []AstNode{
-				cells,
-				sample2,
+		From: &ast.GatherExpr{
+			From: &ast.ListExpr{
+				From: []ast.Node{
+					cells,
+					sample2,
+				},
 			},
 		},
 	}
 	r = append(r, scells)
 
-	scells1 := &ApplyExpr{
-		Func: "incubate3",
-		From: &GatherExpr{
+	scells1 := &ast.ApplyExpr{
+		Func: "incubate",
+		From: &ast.GatherExpr{
 			Key:  "PostPlasmid",
 			From: scells,
 		},
 	}
 	r = append(r, scells1)
 
-	scells2 := &ApplyExpr{
+	scells2 := &ast.ApplyExpr{
 		Func: "mix",
-		From: &ListExpr{
-			From: []AstNode{
-				scells1,
-				&NewExpr{From: &UseExpr{Desc: "recovery"}},
+		From: &ast.GatherExpr{
+			From: &ast.ListExpr{
+				From: []ast.Node{
+					scells1,
+					&ast.NewExpr{From: &ast.UseExpr{Desc: "recovery"}},
+				},
 			},
 		},
 	}
 	r = append(r, scells2)
 
-	rcells := &ApplyExpr{
-		Func: "incubate4",
-		From: &GatherExpr{
+	rcells := &ast.ApplyExpr{
+		Func: "incubate",
+		From: &ast.GatherExpr{
 			Key:  "Recovery",
 			From: scells2,
 		},
 	}
 	r = append(r, rcells)
 
-	pcells := &ApplyExpr{
+	pcells := &ast.ApplyExpr{
 		Opt:  "agarplate",
 		Func: "mix",
-		From: &ListExpr{
-			From: []AstNode{
-				rcells,
+		From: &ast.GatherExpr{
+			From: &ast.ListExpr{
+				From: []ast.Node{
+					rcells,
+				},
 			},
 		},
 	}
@@ -106,16 +113,18 @@ func TestWellFormed(t *testing.T) {
 	t.Skip("tbd")
 	// Example transformation protocol in AST form
 
-	var nodes []AstNode
+	var nodes []ast.Node
 	for i := 0; i < 4; i += 1 {
 		// Premake master mix
-		mix := &ApplyExpr{
+		mix := &ast.ApplyExpr{
 			Func: "mix",
 			Gen:  0,
-			From: &ListExpr{
-				From: []AstNode{
-					&NewExpr{From: &UseExpr{Desc: "premix1"}},
-					&NewExpr{From: &UseExpr{Desc: "premix2"}},
+			From: &ast.GatherExpr{
+				From: &ast.ListExpr{
+					From: []ast.Node{
+						&ast.NewExpr{From: &ast.UseExpr{Desc: "premix1"}},
+						&ast.NewExpr{From: &ast.UseExpr{Desc: "premix2"}},
+					},
 				},
 			},
 		}
@@ -123,7 +132,7 @@ func TestWellFormed(t *testing.T) {
 		nodes = append(nodes, mix)
 	}
 
-	if _, err := Compile(target.New(), &BundleExpr{From: nodes}); err != nil {
+	if _, err := Compile(target.New(), &ast.BundleExpr{From: nodes}); err != nil {
 		t.Fatal(err)
 	}
 }
