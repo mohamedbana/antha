@@ -450,10 +450,27 @@ func (lhp *LHProperties) AddWashTo(pos string, wash *wtype.LHPlate) bool {
 }
 
 func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []string) {
-	r1 := make([]string, 0, 1)
-	r2 := make([]string, 0, 1)
-	for _, v := range cmps {
-		// r1 and r2 need to be chosen or updated
+	r1 := make([]string, len(cmps))
+	r2 := make([]string, len(cmps))
+	for i, v := range cmps {
+		n := v.CName
+		foundIt := false
+		for _, ipref := range lhp.Input_preferences {
+			// check if the plate at position ipref has the
+			// component we seek
+
+			p, ok := lhp.Plates[ipref]
+
+			if ok {
+				// whaddya got?
+
+			}
+		}
+
+		if !foundIt {
+			logger.Fatal("NO SOURCE FOR ", v.CName, " at volume ", v.Vol, " ", v.Vunit)
+		}
+
 	}
 
 	return r1, r2

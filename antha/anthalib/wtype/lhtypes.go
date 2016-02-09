@@ -505,6 +505,21 @@ func (lhp LHPlate) String() string {
 	)
 }
 
+// convenience method
+
+func (lhp *LHPlate) GetComponent(cmp *LHComponent) ([]WellCoords, bool) {
+	ret := make([]WellCoords, 0, 1)
+
+	it := NewOneTimeColumnWiseIterator(lhp)
+
+	for wc := it.Curr(); it.Valid(); wc = it.Next() {
+		w := lhp.Wellcoords[wc.FormatA1()]
+
+	}
+
+	return ret, true
+}
+
 // @implement named
 
 func (lhp *LHPlate) GetName() string {
@@ -619,11 +634,10 @@ type LHWell struct {
 	Plateid   string
 	Platetype string
 	Crds      string
-	Vol       float64
+	MaxVol    float64
 	Vunit     string
-	WContents []*LHComponent
+	WContents *LHComponent
 	Rvol      float64
-	Currvol   float64
 	WShape    *Shape
 	Bottom    int
 	Xdim      float64
@@ -644,11 +658,10 @@ Plateinst : %s,
 Plateid   : %s,
 Platetype : %s,
 Crds      : %s,
-Vol       : %g,
+MaxVol    : %g,
 Vunit     : %s,
 WContents : %v,
 Rvol      : %g,
-Currvol   : %g,
 WShape    : %v,
 Bottom    : %d,
 Xdim      : %g,
@@ -665,11 +678,10 @@ Plate     : %v,
 		w.Plateid,
 		w.Platetype,
 		w.Crds,
-		w.Vol,
+		w.MaxVol,
 		w.Vunit,
 		w.WContents,
 		w.Rvol,
-		w.Currvol,
 		w.WShape,
 		w.Bottom,
 		w.Xdim,
@@ -682,8 +694,36 @@ Plate     : %v,
 	)
 }
 
-func (w *LHWell) Add(c *LHComponent) {
+func (w *LHWell) Currvol() float64 {
+	return w.WContents.Vol
+}
 
+func (w *LHWell) Add(c *LHComponent) {
+	mv := wunit.NewVolume(w.MaxVol, w.Vunit)
+	cv := wunit.NewVolume(c.Vol, c.Vunit)
+	wv := wunit.NewVolume(w.WContents.Vol, w.WContents.Vunit)
+	cv.Add(wv)
+	if cv.GreaterThan(mv) {
+		// could make this fatal but we don't track state well enough
+		// for that to be worthwhile
+		logger.Debug("WARNING: OVERFULL WELL AT ", w.Crds)
+	}
+	w.WContents.Mix(c)
+}
+
+func (w *LHWell) Remove(v wunit.Volume) *LHComponent {
+	// if the volume is too high we complain
+
+	if v.GreaterThan(w.Volume) {
+		logger.Debug("You ask too much: ", w.WellAddress, v.ToString())
+		return nil
+	}
+
+	ret := w.WContents.Dup()
+	ret.Volume = v.ConvertTo(ret.Vunit)
+	//w.Currvol -= v.ConvertTo(w.Vunit)
+	w.WContents.Vol -= v.ConvertTo(w.Vunit)
+	return ret
 }
 
 func (w *LHWell) WorkingVolume() *wunit.Volume {
@@ -693,12 +733,15 @@ func (w *LHWell) WorkingVolume() *wunit.Volume {
 	return &v
 }
 
+// remove this it makes no sense
+/*
 func (w *LHWell) updateVolume() {
 	w.Vol = 0.0
 	for _, val := range w.WContents {
 		w.Vol += val.Vol
 	}
 }
+*/
 
 func (w *LHWell) ResidualVolume() *wunit.Volume {
 	v := wunit.NewVolume(w.Rvol, w.Vunit)
@@ -743,9 +786,13 @@ func (lhw *LHWell) Dup() *LHWell {
 		cp.Extra[k] = v
 	}
 
-	for _, c := range lhw.WContents {
-		cp.WContents = append(cp.WContents, c.Dup())
-	}
+	/*
+		for _, c := range lhw.WContents {
+			cp.WContents = append(cp.WContents, c.Dup())
+		}
+	*/
+
+	cp.WContents = lhw.WContents.Dup()
 
 	return cp
 }
@@ -754,7 +801,8 @@ func (lhw *LHWell) Dup() *LHWell {
 func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
 	var well LHWell
 
-	well.WContents = make([]*LHComponent, 0, 5)
+	//well.WContents = make([]*LHComponent, 0, 5)
+	well.WContents = NewLHComponent()
 	well.ID = GetUUID()
 	well.Platetype = platetype
 	well.Plateid = plateid
@@ -774,6 +822,8 @@ func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape 
 	return &well
 }
 
+// this function tries to find somewhere to put something... it was written before
+// i had an iterator. fml
 func Get_Next_Well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LHWell, bool) {
 	nrow, ncol := 0, 1
 
@@ -815,11 +865,11 @@ func Get_Next_Well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 
 		cnts := new_well.WContents
 
-		if len(cnts) == 0 {
+		if cnts == nil {
 			break
 		}
 
-		cont := cnts[0].Name()
+		cont := cnts.Name()
 		if cont != component.Name() {
 			continue
 		}
@@ -834,14 +884,14 @@ func Get_Next_Well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 	return new_well, true
 }
 
+//XXX sloboda? This makes no sense now; need to revise
 func get_vol_left(well *LHWell) float64 {
 	cnts := well.WContents
-
-	// in the first instance we have a fixed constant times the number of
-	// transfers... volumes are in microlitres as always
-
+	// this is very odd... I can see how this works as a heuristic
+	// but it doesn't make much sense to me
 	carry_vol := 10.0 // microlitres
-	total_carry_vol := float64(len(cnts)) * carry_vol
+	//	total_carry_vol := float64(len(cnts)) * carry_vol
+	total_carry_vol := 10.0 // yeah right
 	Currvol := well.Currvol
 	rvol := well.Rvol
 	vol := well.Vol

@@ -91,7 +91,7 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 	*/
 	// this logic may not transfer well but I expect that outputs are more constrained
 	// than inputs for the simple reason that most output takes place to single wells
-	// while input takes place from reservoirs
+	// while input (sometimes) takes place from reservoirs
 
 	// outputs
 

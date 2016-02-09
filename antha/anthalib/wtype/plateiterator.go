@@ -39,7 +39,7 @@ func (it *BasicPlateIterator) Next() WellCoords {
 	return it.cur
 }
 
-func NextColumnOnce(wc WellCoords, p *LHPlate) WellCoords {
+func NextInColumnOnce(wc WellCoords, p *LHPlate) WellCoords {
 	wc.X += 1
 	if wc.X >= p.WellsX() {
 		wc.X = 0
@@ -47,7 +47,7 @@ func NextColumnOnce(wc WellCoords, p *LHPlate) WellCoords {
 	}
 	return wc
 }
-func NextColumn(wc WellCoords, p *LHPlate) WellCoords {
+func NextInColumn(wc WellCoords, p *LHPlate) WellCoords {
 	wc.X += 1
 	if wc.X >= p.WellsX() {
 		wc.X = 0
@@ -60,7 +60,7 @@ func NextColumn(wc WellCoords, p *LHPlate) WellCoords {
 	return wc
 }
 
-func NextRow(wc WellCoords, p *LHPlate) WellCoords {
+func NextInRow(wc WellCoords, p *LHPlate) WellCoords {
 	wc.Y += 1
 	if wc.Y >= p.WellsY() {
 		wc.Y = 0
@@ -72,7 +72,7 @@ func NextRow(wc WellCoords, p *LHPlate) WellCoords {
 	}
 	return wc
 }
-func NextRowOnce(wc WellCoords, p *LHPlate) WellCoords {
+func NextInRowOnce(wc WellCoords, p *LHPlate) WellCoords {
 	wc.Y += 1
 	if wc.Y >= p.WellsY() {
 		wc.Y = 0
@@ -81,36 +81,36 @@ func NextRowOnce(wc WellCoords, p *LHPlate) WellCoords {
 	return wc
 }
 
-func NewColumnIterator(p *LHPlate) PlateIterator {
+func NewColumnWiseIterator(p *LHPlate) PlateIterator {
 	var bi BasicPlateIterator
 	bi.fst = WellCoords{0, 0}
 	bi.cur = WellCoords{0, 0}
-	bi.rule = NextColumn
+	bi.rule = NextInColumn
 	bi.p = p
 	return &bi
 }
-func NewOneTimeColumnIterator(p *LHPlate) PlateIterator {
+func NewOneTimeColumnWiseIterator(p *LHPlate) PlateIterator {
 	var bi BasicPlateIterator
 	bi.fst = WellCoords{0, 0}
 	bi.cur = WellCoords{0, 0}
-	bi.rule = NextColumnOnce
+	bi.rule = NextInColumnOnce
 	bi.p = p
 	return &bi
 }
 
-func NewRowIterator(p *LHPlate) PlateIterator {
+func NewRowWiseIterator(p *LHPlate) PlateIterator {
 	var bi BasicPlateIterator
 	bi.fst = WellCoords{0, 0}
 	bi.cur = WellCoords{0, 0}
-	bi.rule = NextRow
+	bi.rule = NextInRow
 	bi.p = p
 	return &bi
 }
-func NewOneTimeRowIterator(p *LHPlate) PlateIterator {
+func NewOneTimeRowWiseIterator(p *LHPlate) PlateIterator {
 	var bi BasicPlateIterator
 	bi.fst = WellCoords{0, 0}
 	bi.cur = WellCoords{0, 0}
-	bi.rule = NextRowOnce
+	bi.rule = NextInRowOnce
 	bi.p = p
 	return &bi
 }
