@@ -20,6 +20,8 @@ import (
 
 // Data which is returned from this protocol, and data types
 
+//map[string]string
+
 // Physical Inputs to this protocol with types
 
 // Physical outputs from this protocol with types
@@ -39,7 +41,7 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette)
 
 	_output.Runtowelllocationmap = make([]string, 0)
-	//	Runtowelllocationmap = make(map[string]string,0)
+	//Runtowelllocationmap = make(map[string]string)
 
 	// work out well coordinates for any plate
 	wellpositionarray := make([]string, 0)
@@ -215,7 +217,7 @@ func init() {
 				{Name: "Pixelcount", Desc: "", Kind: "Data"},
 				{Name: "Reactions", Desc: "", Kind: "Outputs"},
 				{Name: "Runcount", Desc: "", Kind: "Data"},
-				{Name: "Runtowelllocationmap", Desc: "", Kind: "Data"},
+				{Name: "Runtowelllocationmap", Desc: "map[string]string\n", Kind: "Data"},
 			},
 		},
 	})

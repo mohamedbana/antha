@@ -23,7 +23,7 @@ Parameters (
 
 // Data which is returned from this protocol, and data types
 Data (
-	Runtowelllocationmap []string
+	Runtowelllocationmap []string //map[string]string
 	Runcount int
 	Pixelcount int
 )
@@ -56,7 +56,7 @@ Steps {
 	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette) 
 	
 	Runtowelllocationmap = make([]string,0)
-	//	Runtowelllocationmap = make(map[string]string,0)
+		//Runtowelllocationmap = make(map[string]string)
 
 	// work out well coordinates for any plate
 	wellpositionarray := make([]string, 0)

@@ -1,0 +1,19 @@
+{
+    "Parameters": {
+        "ScreenLHPolicies_Awesome": {
+            "Diluent": "water",
+            "TestSols": [
+			"tartrazine"
+			],
+            "NumberofReplicates": 1,
+            "OutPlate": "greiner384_riser",
+            "TestSolVolumes": [
+			"2ul",
+			"4ul"
+			],
+			"Imagefilename": "star1.png",
+            "TotalVolume": "20ul"
+        }
+    }
+}
+
