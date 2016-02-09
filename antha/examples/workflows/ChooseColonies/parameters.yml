@@ -2,9 +2,9 @@
   "Parameters": {
     "ChooseColonies": {
       
-	  "Imagefile": "IMG_3755_resized.JPG",
+	  "Imagefile": "Plate1.png",
 	  "Setplateperimeterfirst": true,
-	  "Rotate": true,
+	  "Rotate": false,
 	  "NumbertoPick":5
 		
     }
