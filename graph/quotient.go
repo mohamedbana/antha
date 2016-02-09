@@ -54,7 +54,7 @@ type MakeQuotientOpt struct {
 	Graph    Graph
 	Colorer  func(Node) interface{}
 	HasColor func(Node) bool
-	Present  func(Node) bool
+	Present  func(Node) bool // Should not be included at all
 }
 
 // Return a quotient graph. Nodes with the same color merged into a single
