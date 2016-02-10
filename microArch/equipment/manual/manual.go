@@ -280,6 +280,9 @@ type AnthaManualGrpc struct {
 
 func NewAnthaManualGrpc(id string, uri string) *AnthaManualGrpc {
 	driver := grpc.NewDriver(uri)
+
+	fmt.Println("Driver initialized: ", driver, " YEAH YEAH ")
+
 	//	driver.Go()
 
 	be := make([]equipment.Behaviour, 0)

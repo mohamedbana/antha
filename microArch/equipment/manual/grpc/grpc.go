@@ -2,6 +2,8 @@ package grpc
 
 import (
 	"encoding/json"
+	"log"
+
 	"github.com/antha-lang/antha/antha/anthalib/material"
 	wtype "github.com/antha-lang/antha/antha/anthalib/wtype"
 	wunit "github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -10,7 +12,6 @@ import (
 	driver "github.com/antha-lang/antha/microArch/driver"
 	liquidhandling "github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	pb "github.com/antha-lang/antha/microArch/equipment/manual/grpc/ExtendedLiquidhandlingDriver"
-	"log"
 )
 
 type Driver struct {
@@ -25,7 +26,9 @@ func NewDriver(address string) *Driver {
 	if err != nil {
 		log.Fatal("Cannot initialize driver")
 	}
+
 	d.C = pb.NewExtendedLiquidhandlingDriverClient(conn)
+
 	return &d
 }
 
@@ -198,6 +201,9 @@ func EncodeLHTip(arg wtype.LHTip) *pb.LHTipMessage {
 	return &ret
 }
 func DecodeLHTip(arg *pb.LHTipMessage) wtype.LHTip {
+	if arg == nil {
+		return wtype.LHTip{}
+	}
 	ret := wtype.LHTip{(string)(arg.Arg_1), (string)(arg.Arg_2), (string)(arg.Arg_3), (bool)(arg.Arg_4), (*wunit.Volume)(DecodePtrToVolume(arg.Arg_5)), (*wunit.Volume)(DecodePtrToVolume(arg.Arg_6))}
 	return ret
 }
@@ -589,6 +595,9 @@ func EncodeLHChannelParameter(arg wtype.LHChannelParameter) *pb.LHChannelParamet
 	return &ret
 }
 func DecodeLHChannelParameter(arg *pb.LHChannelParameterMessage) wtype.LHChannelParameter {
+	if arg == nil {
+		return wtype.LHChannelParameter{}
+	}
 	ret := wtype.LHChannelParameter{(string)(arg.Arg_1), (string)(arg.Arg_2), (*wunit.Volume)(DecodePtrToVolume(arg.Arg_3)), (*wunit.Volume)(DecodePtrToVolume(arg.Arg_4)), (*wunit.FlowRate)(DecodePtrToFlowRate(arg.Arg_5)), (*wunit.FlowRate)(DecodePtrToFlowRate(arg.Arg_6)), (int)(arg.Arg_7), (bool)(arg.Arg_8), (int)(arg.Arg_9), (int)(arg.Arg_10)}
 	return ret
 }
@@ -1090,10 +1099,10 @@ func (d *Driver) GetPositionState(arg_1 string) (string, driver.CommandStatus) {
 	ret, _ := d.C.GetPositionState(context.Background(), &req)
 	return (string)(ret.Ret_1), (driver.CommandStatus)(DecodeCommandStatus(ret.Ret_2))
 }
-func (d *Driver) GetStatus() (map[string]interface{}, driver.CommandStatus) {
+func (d *Driver) GetStatus() (driver.Status, driver.CommandStatus) {
 	req := pb.GetStatusRequest{}
 	ret, _ := d.C.GetStatus(context.Background(), &req)
-	return (map[string]interface{})(DecodeMapstringinterfaceMessage(ret.Ret_1)), (driver.CommandStatus)(DecodeCommandStatus(ret.Ret_2))
+	return (driver.Status)(DecodeMapstringinterfaceMessage(ret.Ret_1)), (driver.CommandStatus)(DecodeCommandStatus(ret.Ret_2))
 }
 func (d *Driver) Go() driver.CommandStatus {
 	req := pb.GoRequest{}
@@ -1230,10 +1239,10 @@ func (d *Driver) SetPipetteSpeed(arg_1 int, arg_2 int, arg_3 float64) driver.Com
 	ret, _ := d.C.SetPipetteSpeed(context.Background(), &req)
 	return (driver.CommandStatus)(DecodeCommandStatus(ret.Ret_1))
 }
-func (d *Driver) SetPositionState(arg_1 string, arg_2 map[string]interface{}) driver.CommandStatus {
+func (d *Driver) SetPositionState(arg_1 string, arg_2 driver.PositionState) driver.CommandStatus {
 	req := pb.SetPositionStateRequest{
 		(string)(arg_1),
-		EncodeMapstringinterfaceMessage(arg_2),
+		(EncodeMapstringinterfaceMessage(arg_2)),
 	}
 	ret, _ := d.C.SetPositionState(context.Background(), &req)
 	return (driver.CommandStatus)(DecodeCommandStatus(ret.Ret_1))
@@ -1282,4 +1291,9 @@ func (d *Driver) Wait(arg_1 float64) driver.CommandStatus {
 	}
 	ret, _ := d.C.Wait(context.Background(), &req)
 	return (driver.CommandStatus)(DecodeCommandStatus(ret.Ret_1))
+}
+func (d *Driver) asExtendedLiquidhandlingDriver() liquidhandling.ExtendedLiquidhandlingDriver {
+	var ret liquidhandling.ExtendedLiquidhandlingDriver
+	ret = d
+	return ret
 }
