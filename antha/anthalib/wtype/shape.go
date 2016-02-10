@@ -54,3 +54,11 @@ func NewShape(name, lengthunit string, h, w, d float64) *Shape {
 	sh := Shape{name, lengthunit, h, w, d}
 	return &sh
 }
+
+func (sh *Shape) IsZero() bool {
+	if sh.ShapeName == "" {
+		return false
+	}
+
+	return true
+}
