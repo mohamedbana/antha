@@ -310,7 +310,7 @@ func ValidateSynthesis(parts []wtype.DNASequence, vector string, manufacturer st
 		// check local gc content of each part in 100bp sliding window
 		for _, v := range gc {
 			if v < 0.25 || v > 0.80 {
-				fmt.Println("Warning: Local GC content too high or low in", part.Nm)
+				fmt.Println("Warning: Local GC content very high or low in", part.Nm)
 				return false
 			}
 		}
@@ -329,17 +329,45 @@ var SynthesisStandards = map[string]map[string]interface{}{
 		"MinOrder":  20000,
 	},
 	"DNA20": map[string]interface{}{
-		"Vector":    []string{"pM265", "DSFS"},
-		"MaxLength": 10000,
-		"MinLength": 0,
+		"Vector":    []string{"pJ341", "pJ221", "pJ321", "pJ201", "pJ344", "pJ224", "pJ324", "pJ204", "pJ347", "pJ227", "pJ327", "pJ207", "pJ348", "pJ228", "pJ328", "pJ208", "pJ349", "pJ229", "pJ329", "pJ209", "pJ351", "pJ231", "pJ331", "pJ211", "J354", "pJ234", "pJ334", "pJ214", "pJ357", "pJ234", "pJ334", "pJ217", "pJ358", "pJ238", "pJ338", "pJ218", "pJ359", "pJ239", "pJ339", "pJ219", "pM265", "pM268", "pM269", "pM275", "pM278", "pM279", "pM269E-19C", "pM269Y-19C", "pM262", "pM263", "pM264", "pM272", "pM273", "pM273", "pM274"},
+		"MaxLength": 3000,
+		"MinLength": 400,
 		"RepeatMax": 70,
 		"MinOrder":  0,
 	},
 	"GenScript": map[string]interface{}{
-		"Vector":    []string{"pUC57", "pJ221", "pJ321", "pJ201"},
-		"MaxLength": 10000,
-		"MinLength": 0,
+		"Vector":    []string{"pUC57", "pUC57-Kan", "pUC57-Simple", "pUC57-mini", "pUC18", "pUC19"},
+		"MaxLength": 8000,
+		"MinLength": 400,
 		"RepeatMax": 70,
-		"MinOrder":  0,
+		"MinOrder":  455,
+	},
+	"GeneWiz": map[string]interface{}{
+		"Vector":    []string{"pUC57"},
+		"MaxLength": 10000,
+		"MinLength": 200,
+		"RepeatMax": 70,
+		"MinOrder":  455,
+	},
+	"OriGene": map[string]interface{}{
+		"Vector":    []string{"pUCAmp", "pUCKan", "pUCAmpMinusMCS", "pUCKanMinusMCS"},
+		"MaxLength": 10000,
+		"MinLength": 200,
+		"RepeatMax": 70,
+		"MinOrder":  455,
+	},
+	"GeneArt": map[string]interface{}{
+		"Vector":    []string{"pUCAmp", "pUCKan", "pUCAmpMinusMCS", "pUCKanMinusMCS"},
+		"MaxLength": 10000,
+		"MinLength": 200,
+		"RepeatMax": 70,
+		"MinOrder":  455,
+	},
+	"EuroFins": map[string]interface{}{
+		"Vector":    []string{"pEX-A2", "pEX-K4"},
+		"MaxLength": 10000,
+		"MinLength": 200,
+		"RepeatMax": 20,
+		"MinOrder":  455,
 	},
 }

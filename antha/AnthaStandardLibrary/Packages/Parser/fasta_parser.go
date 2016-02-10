@@ -26,16 +26,39 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/csv"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 )
 
 type Fasta struct {
 	Id   string
 	Desc string
 	Seq  string
+}
+
+// This will retrieve seq from FASTA file
+func RetrieveSeqFromFASTA(id string, filename string) (sequence wtype.DNASequence) {
+	allparts, err := ioutil.ReadFile(filename)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+	fastaFh := bytes.NewReader(allparts)
+
+	for record := range FastaParse(fastaFh) {
+		if strings.Contains(record.Id, id) {
+			seq := wtype.DNASequence{record.Id, record.Seq, true, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, ""}
+			return seq
+		}
+	}
+
+	seq := wtype.DNASequence{"", "", true, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, ""} // blank seq
+	fmt.Println(id, "record not found in", filename)
+	return seq
 }
 
 func Build_fasta(header string, seq bytes.Buffer) (Record Fasta) {

@@ -27,21 +27,17 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"time"
-
+	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	biogo "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/entrez"
 )
-
-type Fasta struct {
-	Id   string
-	Desc string
-	Seq  string
-}
 
 var (
 	email   = "m.greenwood@synthace.com"
@@ -131,11 +127,23 @@ func RetrieveRecords(query string, database string, Max int, ReturnType string, 
 
 }
 
+// This retrieves sequence of any type from any NCBI sequence database
 func RetrieveSequence(id string, database string) (sequence wtype.DNASequence) {
 	RetrieveRecords(id, database, 1, "gb", "temp.gb")
 	file := fmt.Sprintf("%s%c%s", anthapath.Dirpath(), os.PathSeparator, "temp.gb")
 	seq, _ := parser.GenbanktoDNASequence(file)
 	seq.Seq = strings.ToUpper(seq.Seq)
 
+	return seq
+}
+
+// This will retrieve vector using fasta or db
+func RetrieveVector(id string) (sequence wtype.DNASequence) {
+
+	//first check if vector sequence is in fasta file
+	anthapath.CreatedotAnthafolder()
+	parser.RetrieveSeqFromFASTA(id, filepath.Join(anthapath.Dirpath(), "vectors.txt"))
+
+	seq := RetrieveSequence(id, "nucleotide")
 	return seq
 }
