@@ -27,12 +27,15 @@ func Pair(factordescription string, levels []interface{}) (doepair DOEPair) {
 }
 
 type Run struct {
-	RunNumber           int
-	StdNumber           int
-	Factordescriptors   []string
-	Setpoints           []interface{}
-	Responsedescriptors []string
-	ResponseValues      []interface{}
+	RunNumber            int
+	StdNumber            int
+	Factordescriptors    []string
+	Setpoints            []interface{}
+	Responsedescriptors  []string
+	ResponseValues       []interface{}
+	AdditionalHeaders    []string
+	AdditionalSubheaders []string
+	AdditionalValues     []interface{}
 }
 
 func AllComboCount(pairs []DOEPair) (numberofuniquecombos int) {
