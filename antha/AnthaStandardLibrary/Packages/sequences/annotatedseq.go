@@ -50,6 +50,7 @@ type Feature struct {
 	EndPosition   int
 	DNASeq        string
 	Protseq       string
+	//Status        string
 }
 
 func (feat *Feature) Coordinates() (pair []int) {
