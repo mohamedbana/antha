@@ -34,21 +34,21 @@
 package grpc
 
 import (
+	"bytes"
 	"io"
 	"time"
 
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
-	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/codes"
-	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/metadata"
-	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/transport"
 	"github.com/antha-lang/antha/internal/golang.org/x/net/trace"
+	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/codes"
+	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/transport"
 )
 
 // recvResponse receives and parses an RPC response.
 // On error, it returns the error and indicates whether the call should be retried.
 //
 // TODO(zhaoq): Check whether the received message sequence is valid.
-func recvResponse(codec Codec, t transport.ClientTransport, c *callInfo, stream *transport.Stream, reply interface{}) error {
+func recvResponse(dopts dialOptions, t transport.ClientTransport, c *callInfo, stream *transport.Stream, reply interface{}) error {
 	// Try to acquire header metadata from the server if there is any.
 	var err error
 	c.headerMD, err = stream.Header()
@@ -57,7 +57,7 @@ func recvResponse(codec Codec, t transport.ClientTransport, c *callInfo, stream 
 	}
 	p := &parser{s: stream}
 	for {
-		if err = recv(p, codec, reply); err != nil {
+		if err = recv(p, dopts.codec, stream, dopts.dc, reply); err != nil {
 			if err == io.EOF {
 				break
 			}
@@ -69,7 +69,7 @@ func recvResponse(codec Codec, t transport.ClientTransport, c *callInfo, stream 
 }
 
 // sendRequest writes out various information of an RPC such as Context and Message.
-func sendRequest(ctx context.Context, codec Codec, callHdr *transport.CallHdr, t transport.ClientTransport, args interface{}, opts *transport.Options) (_ *transport.Stream, err error) {
+func sendRequest(ctx context.Context, codec Codec, compressor Compressor, callHdr *transport.CallHdr, t transport.ClientTransport, args interface{}, opts *transport.Options) (_ *transport.Stream, err error) {
 	stream, err := t.NewStream(ctx, callHdr)
 	if err != nil {
 		return nil, err
@@ -81,8 +81,11 @@ func sendRequest(ctx context.Context, codec Codec, callHdr *transport.CallHdr, t
 			}
 		}
 	}()
-	// TODO(zhaoq): Support compression.
-	outBuf, err := encode(codec, args, compressionNone)
+	var cbuf *bytes.Buffer
+	if compressor != nil {
+		cbuf = new(bytes.Buffer)
+	}
+	outBuf, err := encode(codec, args, compressor, cbuf)
 	if err != nil {
 		return nil, transport.StreamErrorf(codes.Internal, "grpc: %v", err)
 	}
@@ -92,14 +95,6 @@ func sendRequest(ctx context.Context, codec Codec, callHdr *transport.CallHdr, t
 	}
 	// Sent successfully.
 	return stream, nil
-}
-
-// callInfo contains all related configuration and information about an RPC.
-type callInfo struct {
-	failFast  bool
-	headerMD  metadata.MD
-	trailerMD metadata.MD
-	traceInfo traceInfo // in trace.go
 }
 
 // Invoke is called by the generated code. It sends the RPC request on the
@@ -116,7 +111,6 @@ func Invoke(ctx context.Context, method string, args, reply interface{}, cc *Cli
 			o.after(&c)
 		}
 	}()
-
 	if EnableTracing {
 		c.traceInfo.tr = trace.New("grpc.Sent."+methodFamily(method), method)
 		defer c.traceInfo.tr.Finish()
@@ -132,10 +126,6 @@ func Invoke(ctx context.Context, method string, args, reply interface{}, cc *Cli
 				c.traceInfo.tr.SetError()
 			}
 		}()
-	}
-	callHdr := &transport.CallHdr{
-		Host:   cc.authority,
-		Method: method,
 	}
 	topts := &transport.Options{
 		Last:  true,
@@ -154,7 +144,14 @@ func Invoke(ctx context.Context, method string, args, reply interface{}, cc *Cli
 		if lastErr != nil && c.failFast {
 			return toRPCErr(lastErr)
 		}
-		t, err = cc.wait(ctx)
+		callHdr := &transport.CallHdr{
+			Host:   cc.authority,
+			Method: method,
+		}
+		if cc.dopts.cp != nil {
+			callHdr.SendCompress = cc.dopts.cp.Type()
+		}
+		t, err = cc.dopts.picker.Pick(ctx)
 		if err != nil {
 			if lastErr != nil {
 				// This was a retry; return the error from the last attempt.
@@ -165,7 +162,7 @@ func Invoke(ctx context.Context, method string, args, reply interface{}, cc *Cli
 		if c.traceInfo.tr != nil {
 			c.traceInfo.tr.LazyLog(&payload{sent: true, msg: args}, true)
 		}
-		stream, err = sendRequest(ctx, cc.dopts.codec, callHdr, t, args, topts)
+		stream, err = sendRequest(ctx, cc.dopts.codec, cc.dopts.cp, callHdr, t, args, topts)
 		if err != nil {
 			if _, ok := err.(transport.ConnectionError); ok {
 				lastErr = err
@@ -177,7 +174,7 @@ func Invoke(ctx context.Context, method string, args, reply interface{}, cc *Cli
 			return toRPCErr(err)
 		}
 		// Receive the response
-		lastErr = recvResponse(cc.dopts.codec, t, &c, stream, reply)
+		lastErr = recvResponse(cc.dopts, t, &c, stream, reply)
 		if _, ok := lastErr.(transport.ConnectionError); ok {
 			continue
 		}

@@ -6,9 +6,9 @@ import (
 	"sync"
 
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
-	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc"
+	"google.golang.org/grpc"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/codes"
-	healthpb "github.com/antha-lang/antha/bvendor/google.golang.org/grpc/health/grpc_health_v1alpha"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1alpha"
 )
 
 type HealthServer struct {
