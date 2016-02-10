@@ -39,10 +39,6 @@ func Decodeinterface(msg *pb.AnyMessage) interface{} {
 	json.Unmarshal([]byte(msg.Arg_1), &v)
 	return v
 }
-func main() {
-	d := NewDriver()
-	d.Go()
-}
 func EncodeCommandStatus(arg driver.CommandStatus) *pb.CommandStatusMessage {
 	ret := pb.CommandStatusMessage{(bool)(arg.OK), int64(arg.Errorcode), (string)(arg.Msg)}
 	return &ret
