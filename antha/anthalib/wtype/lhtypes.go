@@ -174,7 +174,7 @@ func (lhp *LHPosition) Positions() []Location {
 }
 
 func (lhp *LHPosition) Shape() *Shape {
-	return NeWShape("box", "mm", 0.08548, 0.12776, 0.0)
+	return NewShape("box", "mm", 0.08548, 0.12776, 0.0)
 }
 
 //  instruction to a liquid handler

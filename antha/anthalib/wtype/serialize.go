@@ -79,7 +79,7 @@ func (w *LHWell) AddDimensions(lhwt *LHWellType) {
 	w.MaxVol = lhwt.Vol
 	w.Vunit = lhwt.Vunit
 	w.Rvol = lhwt.Rvol
-	w.WShape = NeWShape(lhwt.ShapeName, lhwt.Dunit, lhwt.Xdim, lhwt.Ydim, lhwt.Zdim)
+	w.WShape = NewShape(lhwt.ShapeName, lhwt.Dunit, lhwt.Xdim, lhwt.Ydim, lhwt.Zdim)
 	w.Bottom = lhwt.Bottom
 	w.Xdim = lhwt.Xdim
 	w.Ydim = lhwt.Ydim
