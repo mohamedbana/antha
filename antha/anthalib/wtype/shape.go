@@ -55,6 +55,11 @@ func NewShape(name, lengthunit string, h, w, d float64) *Shape {
 	return &sh
 }
 
+func NewNilShape() *Shape {
+	sh := Shape{"", "", 0.0, 0.0, 0.0}
+	return &sh
+}
+
 func (sh *Shape) IsZero() bool {
 	if sh.ShapeName == "" {
 		return false

@@ -174,7 +174,7 @@ func (lhp *LHPosition) Positions() []Location {
 }
 
 func (lhp *LHPosition) Shape() *Shape {
-	return NewShape("box", "mm", 0.08548, 0.12776, 0.0)
+	return NeWShape("box", "mm", 0.08548, 0.12776, 0.0)
 }
 
 //  instruction to a liquid handler
@@ -656,9 +656,9 @@ type LHWell struct {
 	Crds      string
 	MaxVol    float64
 	Vunit     string
-	wContents *LHComponent
+	WContents *LHComponent
 	Rvol      float64
-	wShape    *Shape
+	WShape    *Shape
 	Bottom    int
 	Xdim      float64
 	Ydim      float64
@@ -700,9 +700,9 @@ Plate     : %v,
 		w.Crds,
 		w.MaxVol,
 		w.Vunit,
-		w.wContents,
+		w.WContents,
 		w.Rvol,
-		w.wShape,
+		w.WShape,
 		w.Bottom,
 		w.Xdim,
 		w.Ydim,
@@ -715,11 +715,11 @@ Plate     : %v,
 }
 
 func (w *LHWell) Contents() *LHComponent {
-	if w.wContents == nil {
+	if w.WContents == nil {
 		return NewLHComponent()
 	}
 
-	return w.wContents
+	return w.WContents
 }
 
 func (w *LHWell) Currvol() float64 {
@@ -787,11 +787,11 @@ func (lhw *LHWell) Location_Name() string {
 }
 
 func (lhw *LHWell) Shape() *Shape {
-	if lhw.wShape == nil {
+	if lhw.WShape == nil {
 		// return the non-shape
-		return NewShape()
+		return NewNilShape()
 	}
-	return lhw.wShape
+	return lhw.WShape
 }
 
 // @implement Well
@@ -816,7 +816,7 @@ func (lhw *LHWell) Dup() *LHWell {
 		cp.Extra[k] = v
 	}
 
-	cp.wContents = lhw.Contents().Dup()
+	cp.WContents = lhw.Contents().Dup()
 
 	return cp
 }
@@ -825,7 +825,7 @@ func (lhw *LHWell) Dup() *LHWell {
 func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
 	var well LHWell
 
-	well.wContents = NewLHComponent()
+	well.WContents = NewLHComponent()
 	well.ID = GetUUID()
 	well.Platetype = platetype
 	well.Plateid = plateid
@@ -833,7 +833,7 @@ func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape 
 	well.MaxVol = vol
 	well.Rvol = rvol
 	well.Vunit = vunit
-	well.wShape = shape.Dup()
+	well.WShape = shape.Dup()
 	well.Bottom = bott
 	well.Xdim = xdim
 	well.Ydim = ydim

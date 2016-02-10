@@ -79,7 +79,7 @@ func (w *LHWell) AddDimensions(lhwt *LHWellType) {
 	w.MaxVol = lhwt.Vol
 	w.Vunit = lhwt.Vunit
 	w.Rvol = lhwt.Rvol
-	w.wShape = NewShape(lhwt.ShapeName, lhwt.Dunit, lhwt.Xdim, lhwt.Ydim, lhwt.Zdim)
+	w.WShape = NeWShape(lhwt.ShapeName, lhwt.Dunit, lhwt.Xdim, lhwt.Ydim, lhwt.Zdim)
 	w.Bottom = lhwt.Bottom
 	w.Xdim = lhwt.Xdim
 	w.Ydim = lhwt.Ydim
@@ -90,7 +90,7 @@ func (w *LHWell) AddDimensions(lhwt *LHWellType) {
 
 func (plate *LHPlate) Welldimensions() *LHWellType {
 	t := plate.Welltype
-	lhwt := LHWellType{t.MaxVol, t.Vunit, t.Rvol, t.wShape.ShapeName, t.Bottom, t.Xdim, t.Ydim, t.Zdim, t.Bottomh, t.Dunit}
+	lhwt := LHWellType{t.MaxVol, t.Vunit, t.Rvol, t.WShape.ShapeName, t.Bottom, t.Xdim, t.Ydim, t.Zdim, t.Bottomh, t.Dunit}
 	return &lhwt
 }
 
@@ -109,7 +109,7 @@ func (slw SLHWell) FillWell(lw *LHWell) {
 	lw.Plateinst = slw.Plateinst
 	lw.Plateid = slw.Plateid
 	lw.Crds = slw.Coords
-	lw.wContents = slw.Contents
+	lw.WContents = slw.Contents
 }
 
 type FromFactory struct {
