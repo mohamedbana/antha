@@ -69,10 +69,10 @@ func get_aggregate_component(sol *wtype.LHSolution, name string) *wtype.LHCompon
 	return ret
 }
 
-func get_assignment(assignments []string, plates *map[string]*wtype.LHPlate, vol float64) (string, float64, bool) {
+func get_assignment(assignments []string, plates *map[string]*wtype.LHPlate, vol wunit.Volume) (string, wunit.Volume, bool) {
 	assignment := ""
 	ok := false
-	prevol := 0.0
+	prevol := wunit.NewVolume(0.0, "ul")
 
 	for _, assignment = range assignments {
 		asstx := strings.Split(assignment, ":")
@@ -82,10 +82,11 @@ func get_assignment(assignments []string, plates *map[string]*wtype.LHPlate, vol
 		wellidlkp := plate.Wellcoords
 		well := wellidlkp[crds]
 
-		currvol := well.Currvol - well.Rvol
-		if currvol >= vol {
-			prevol = well.Currvol
-			well.Currvol -= vol
+		currvol := well.CurrVolume()
+		currvol.Subtract(well.ResidualVolume())
+		if currvol.GreaterThan(vol) || currvol.EqualTo(vol) {
+			prevol = well.CurrVolume()
+			well.Remove(vol)
 			plate.HWells[well.ID] = well
 			(*plates)[asstx[0]] = plate
 			ok = true
@@ -194,7 +195,10 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) 
 
 	fromPlateID, fromWells := robot.GetComponents(insIn.Components)
 
-	pf := make([]string, len(insIn.components))
+	pf := make([]string, len(insIn.Components))
+	wf := make([]string, len(insIn.Components))
+	pfwx := make([]int, len(insIn.Components))
+	pfwy := make([]int, len(insIn.Components))
 
 	for i, v := range insIn.Components {
 		wh[i] = v.TypeName()

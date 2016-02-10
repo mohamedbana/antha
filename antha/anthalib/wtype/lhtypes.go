@@ -334,6 +334,7 @@ func (lhc *LHComponent) Volume() wunit.Volume {
 }
 
 func (lhc *LHComponent) Remove(v wunit.Volume) {
+	///TODO -- catch errors
 	lhc.Vol -= v.ConvertToString(lhc.Vunit)
 }
 
@@ -521,7 +522,7 @@ func (lhp *LHPlate) GetComponent(cmp *LHComponent) ([]WellCoords, bool) {
 	for wc := it.Curr(); it.Valid(); wc = it.Next() {
 		w := lhp.Wellcoords[wc.FormatA1()]
 
-		if w.WContents.CName == cmp.CName {
+		if w.Contents().CName == cmp.CName {
 			v := w.WorkingVolume()
 			volGot.Add(v)
 			ret = append(ret, wc)
@@ -655,9 +656,9 @@ type LHWell struct {
 	Crds      string
 	MaxVol    float64
 	Vunit     string
-	WContents *LHComponent
+	wContents *LHComponent
 	Rvol      float64
-	WShape    *Shape
+	wShape    *Shape
 	Bottom    int
 	Xdim      float64
 	Ydim      float64
@@ -699,9 +700,9 @@ Plate     : %v,
 		w.Crds,
 		w.MaxVol,
 		w.Vunit,
-		w.WContents,
+		w.wContents,
 		w.Rvol,
-		w.WShape,
+		w.wShape,
 		w.Bottom,
 		w.Xdim,
 		w.Ydim,
@@ -713,10 +714,25 @@ Plate     : %v,
 	)
 }
 
-func (w *LHWell) Currvol() float64 {
-	return w.WContents.Vol
+func (w *LHWell) Contents() *LHComponent {
+	if w.wContents == nil {
+		return NewLHComponent()
+	}
+
+	return w.wContents
 }
 
+func (w *LHWell) Currvol() float64 {
+	return w.Contents().Vol
+}
+
+func (w *LHWell) CurrVolume() wunit.Volume {
+	return w.Contents().Volume()
+}
+
+func (w *LHWell) MaxVolume() wunit.Volume {
+	return wunit.NewVolume(w.MaxVol, w.Vunit)
+}
 func (w *LHWell) Add(c *LHComponent) {
 	mv := wunit.NewVolume(w.MaxVol, w.Vunit)
 	cv := wunit.NewVolume(c.Vol, c.Vunit)
@@ -727,7 +743,7 @@ func (w *LHWell) Add(c *LHComponent) {
 		// for that to be worthwhile
 		logger.Debug("WARNING: OVERFULL WELL AT ", w.Crds)
 	}
-	w.WContents.Mix(c)
+	w.Contents().Mix(c)
 }
 
 func (w *LHWell) Remove(v wunit.Volume) *LHComponent {
@@ -738,7 +754,7 @@ func (w *LHWell) Remove(v wunit.Volume) *LHComponent {
 		return nil
 	}
 
-	ret := w.WContents.Dup()
+	ret := w.Contents().Dup()
 	ret.Vol = v.ConvertToString(w.Vunit)
 
 	return ret
@@ -757,7 +773,7 @@ func (w *LHWell) ResidualVolume() wunit.Volume {
 }
 
 func (w *LHWell) CurrentVolume() wunit.Volume {
-	return w.WContents.Volume()
+	return w.Contents().Volume()
 }
 
 //@implement Location
@@ -771,7 +787,11 @@ func (lhw *LHWell) Location_Name() string {
 }
 
 func (lhw *LHWell) Shape() *Shape {
-	return lhw.WShape
+	if lhw.wShape == nil {
+		// return the non-shape
+		return NewShape()
+	}
+	return lhw.wShape
 }
 
 // @implement Well
@@ -790,19 +810,13 @@ func (w *LHWell) Empty() bool {
 }
 
 func (lhw *LHWell) Dup() *LHWell {
-	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.MaxVol, lhw.Rvol, lhw.WShape.Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, lhw.Dunit)
+	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, lhw.Dunit)
 
 	for k, v := range lhw.Extra {
 		cp.Extra[k] = v
 	}
 
-	/*
-		for _, c := range lhw.WContents {
-			cp.WContents = append(cp.WContents, c.Dup())
-		}
-	*/
-
-	cp.WContents = lhw.WContents.Dup()
+	cp.wContents = lhw.Contents().Dup()
 
 	return cp
 }
@@ -811,8 +825,7 @@ func (lhw *LHWell) Dup() *LHWell {
 func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
 	var well LHWell
 
-	//well.WContents = make([]*LHComponent, 0, 5)
-	well.WContents = NewLHComponent()
+	well.wContents = NewLHComponent()
 	well.ID = GetUUID()
 	well.Platetype = platetype
 	well.Plateid = plateid
@@ -820,7 +833,7 @@ func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape 
 	well.MaxVol = vol
 	well.Rvol = rvol
 	well.Vunit = vunit
-	well.WShape = shape.Dup()
+	well.wShape = shape.Dup()
 	well.Bottom = bott
 	well.Xdim = xdim
 	well.Ydim = ydim
@@ -872,7 +885,7 @@ func Get_Next_Well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 
 		new_well = plate.Wellcoords[crds]
 
-		cnts := new_well.WContents
+		cnts := new_well.Contents()
 
 		if cnts == nil {
 			break

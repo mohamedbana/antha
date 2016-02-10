@@ -91,7 +91,7 @@ func NewLHRequest() *LHRequest {
 	lhr.Stockconcs = make(map[string]float64)
 	lhr.Input_order = make([]string, 0)
 	lhr.Output_order = make([]string, 0)
-	lhr.OutputIteratorFactory = wtype.NewOneTimeRowIterator
+	lhr.OutputIteratorFactory = wtype.NewOneTimeRowWiseIterator
 	lhr.Output_assignments = make(map[string][]string)
 	lhr.Input_assignments = make(map[string][]string)
 	lhr.Order_instructions_added = make([]string, 0, 1)

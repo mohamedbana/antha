@@ -1,4 +1,4 @@
-// wtype/geometry.go: Part of the Antha language
+// wtype/shape.go: Part of the Antha language
 // Copyright (C) 2014 the Antha authors. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
@@ -26,15 +26,31 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 )
 
-type Coordinates struct {
-	X float64
-	Y float64
-	Z float64
+type Shape struct {
+	ShapeName  string
+	LengthUnit string
+	H          float64
+	W          float64
+	D          float64
 }
 
-// interface to 3D geometry
-type Geometry interface {
-	Height() wunit.Length
-	Width() wunit.Length
-	Depth() wunit.Length
+// let shape implement geometry
+
+func (sh *Shape) Height() wunit.Length { // y?
+	return wunit.NewLength(sh.H, sh.LengthUnit)
+}
+func (sh *Shape) Width() wunit.Length { // X?
+	return wunit.NewLength(sh.W, sh.LengthUnit)
+}
+func (sh *Shape) Depth() wunit.Length { // Z?
+	return wunit.NewLength(sh.D, sh.LengthUnit)
+}
+
+func (sh *Shape) Dup() *Shape {
+	return &(Shape{sh.ShapeName, sh.LengthUnit, sh.H, sh.W, sh.D})
+}
+
+func NewShape(name, lengthunit string, h, w, d float64) *Shape {
+	sh := Shape{name, lengthunit, h, w, d}
+	return &sh
 }

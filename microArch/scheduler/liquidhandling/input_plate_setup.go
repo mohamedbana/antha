@@ -191,7 +191,7 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 				// make a duplicate of this component to stick in the well
 
 				newcomponent := component.Dup()
-				newcomponent.Vol = curr_well.Vol
+				newcomponent.Vol = curr_well.MaxVol
 				volume.Subtract(curr_well.WorkingVolume())
 
 				curr_well.Add(newcomponent)
