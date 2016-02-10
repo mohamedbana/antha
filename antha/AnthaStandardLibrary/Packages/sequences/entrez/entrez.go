@@ -139,11 +139,14 @@ func RetrieveSequence(id string, database string) (sequence wtype.DNASequence) {
 
 // This will retrieve vector using fasta or db
 func RetrieveVector(id string) (sequence wtype.DNASequence) {
-
 	//first check if vector sequence is in fasta file
 	anthapath.CreatedotAnthafolder()
-	parser.RetrieveSeqFromFASTA(id, filepath.Join(anthapath.Dirpath(), "vectors.txt"))
+	seq := parser.RetrieveSeqFromFASTA(id, filepath.Join(anthapath.Dirpath(), "vectors.txt"))
 
-	seq := RetrieveSequence(id, "nucleotide")
+	// if not in refactor, check db
+	if seq.Seq == "" {
+		seq = RetrieveSequence(id, "nucleotide")
+	}
+
 	return seq
 }

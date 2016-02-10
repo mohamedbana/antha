@@ -44,7 +44,7 @@ Steps {
 	}
 	
 	// look up vector sequence
-	VectorSeq := entrez.RetrieveSequence(Vector, "nucleotide")
+	VectorSeq := entrez.RetrieveVector(Vector)
 
 	// Look up the restriction enzyme
 	EnzymeInf, _ := lookup.TypeIIsLookup(RE)
