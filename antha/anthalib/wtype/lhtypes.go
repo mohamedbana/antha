@@ -313,6 +313,11 @@ type LHComponent struct {
 	Extra              map[string]interface{}
 }
 
+func (lhc *LHComponent) SetVolume(v wunit.Volume) {
+	lhc.Vol = v.RawValue()
+	lhc.Vunit = v.Unit().PrefixedSymbol()
+}
+
 func (lhc *LHComponent) HasParent(s string) bool {
 	return strings.Contains(lhc.ParentID, s)
 }

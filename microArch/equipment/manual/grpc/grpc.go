@@ -13,17 +13,13 @@ import (
 	"log"
 )
 
-const (
-	address = "localhost:50051"
-)
-
 type Driver struct {
 	C pb.ExtendedLiquidhandlingDriverClient
 	// ignore the below: it's just there to ensure we use all imports
 	d liquidhandling.ExtendedLiquidhandlingDriver
 }
 
-func NewDriver() *Driver {
+func NewDriver(address string) *Driver {
 	var d Driver
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
@@ -32,6 +28,7 @@ func NewDriver() *Driver {
 	d.C = pb.NewExtendedLiquidhandlingDriverClient(conn)
 	return &d
 }
+
 func Encodeinterface(arg interface{}) *pb.AnyMessage {
 	s, _ := json.Marshal(arg)
 	ret := pb.AnyMessage{string(s)}

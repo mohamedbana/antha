@@ -24,6 +24,7 @@ package liquidhandling
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	//"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
@@ -272,7 +273,10 @@ func make_layouts(request *LHRequest, pc []PlateChoice) {
 		for _, w := range c.Wells {
 			if w != "" {
 				wc := wtype.MakeWellCoords(w)
-				plat.Cols[wc.X][wc.Y].Currvol += 100.0
+				//plat.Cols[wc.X][wc.Y].Currvol += 100.0
+				dummycmp := wtype.NewLHComponent()
+				dummycmp.SetVolume(wunit.NewVolume(100.0, "ul"))
+				plat.Cols[wc.X][wc.Y].Add(dummycmp)
 			}
 		}
 
@@ -290,7 +294,10 @@ func make_layouts(request *LHRequest, pc []PlateChoice) {
 					logger.Fatal("DIRE WARNING: The unthinkable has happened... output plate has too many assignments!")
 				}
 
-				plat.Cols[wc.X][wc.Y].Currvol += 100.0
+				//plat.Cols[wc.X][wc.Y].Currvol += 100.0
+				dummycmp := wtype.NewLHComponent()
+				dummycmp.SetVolume(wunit.NewVolume(100.0, "ul"))
+				plat.Cols[wc.X][wc.Y].Add(dummycmp)
 				request.LHInstructions[sID].Welladdress = wc.FormatA1()
 				assignment = c.ID + ":" + wc.FormatA1()
 			} else {
