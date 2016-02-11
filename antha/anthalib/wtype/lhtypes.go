@@ -195,6 +195,7 @@ type LHInstruction struct {
 	Conc             float64
 	Tvol             float64
 	Majorlayoutgroup int
+	Loc              string
 }
 
 func (ins *LHInstruction) HasParent(id string) bool {
