@@ -312,6 +312,7 @@ type LHComponent struct {
 	StockConcentration float64
 	Extra              map[string]interface{}
 	Loc                string
+	Destination        string
 }
 
 func (lhc *LHComponent) SetVolume(v wunit.Volume) {
@@ -362,6 +363,7 @@ func (lhc *LHComponent) Dup() *LHComponent {
 		c.Extra[k] = v
 	}
 	c.Loc = lhc.Loc
+	c.Destination = lhc.Destination
 	return c
 }
 
