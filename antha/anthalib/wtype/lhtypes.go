@@ -552,8 +552,9 @@ func (lhp *LHPlate) GetName() string {
 	return lhp.PlateName
 }
 
-// @implement Labware
-// @deprecate Labware
+func (lhp *LHPlate) WellAt(wc WellCoords) *LHWell {
+	return lhp.Wellcoords[wc.FormatA1()]
+}
 
 func (lhp *LHPlate) WellsX() int {
 	return lhp.WlsX

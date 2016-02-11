@@ -45,7 +45,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/golang/protobuf/proto"
+	"github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/codes"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/metadata"
