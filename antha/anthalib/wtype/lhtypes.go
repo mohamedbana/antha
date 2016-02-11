@@ -550,6 +550,10 @@ func (lhp *LHPlate) GetComponent(cmp *LHComponent) ([]WellCoords, bool) {
 	return ret, true
 }
 
+func (lhp *LHPlate) Wells() map[string]*LHWell {
+	return lhp.Wellcoords
+}
+
 // @implement named
 
 func (lhp *LHPlate) GetName() string {
