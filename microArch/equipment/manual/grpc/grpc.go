@@ -941,7 +941,7 @@ func EncodeLHComponent(arg wtype.LHComponent) *pb.LHComponentMessage {
 	return &ret
 }
 func DecodeLHComponent(arg *pb.LHComponentMessage) wtype.LHComponent {
-	ret := wtype.LHComponent{(string)(arg.Arg_1), (wtype.BlockID)(DecodeBlockID(arg.Arg_2)), (string)(arg.Arg_3), (string)(arg.Arg_4), (string)(arg.Arg_5), (int)(arg.Arg_6), (string)(arg.Arg_7), (wtype.LiquidType)(arg.Arg_8), (float64)(arg.Arg_9), (float64)(arg.Arg_10), (string)(arg.Arg_11), (string)(arg.Arg_12), (float64)(arg.Arg_13), (float64)(arg.Arg_14), (float64)(arg.Arg_15), (float64)(arg.Arg_16), (map[string]interface{})(DecodeMapstringinterfaceMessage(arg.Arg_17), "", "")}
+	ret := wtype.LHComponent{(string)(arg.Arg_1), (wtype.BlockID)(DecodeBlockID(arg.Arg_2)), (string)(arg.Arg_3), (string)(arg.Arg_4), (string)(arg.Arg_5), (int)(arg.Arg_6), (string)(arg.Arg_7), (wtype.LiquidType)(arg.Arg_8), (float64)(arg.Arg_9), (float64)(arg.Arg_10), (string)(arg.Arg_11), (string)(arg.Arg_12), (float64)(arg.Arg_13), (float64)(arg.Arg_14), (float64)(arg.Arg_15), (float64)(arg.Arg_16), (map[string]interface{})(DecodeMapstringinterfaceMessage(arg.Arg_17)), "", ""}
 	return ret
 }
 func EncodeConcreteMeasurement(arg wunit.ConcreteMeasurement) *pb.ConcreteMeasurementMessage {
