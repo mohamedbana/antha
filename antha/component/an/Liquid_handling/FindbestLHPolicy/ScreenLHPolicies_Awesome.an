@@ -20,6 +20,7 @@ Parameters (
 	TestSolVolumes []Volume
 	NumberofReplicates int
 	Imagefilename string
+	NumberofBlanks int
 
 )
 
@@ -29,6 +30,8 @@ Data (
 	Runcount int
 	Pixelcount int
 	Errors []error
+	Blankwells []string
+	//NeatSamplewells []string 
 )
 
 
@@ -60,6 +63,7 @@ Steps {
 	
 	Runtowelllocationmap = make([]string,0)
 	perconditionuntowelllocationmap := make([]string,0)
+	Blankwells = make([]string,0)
 		//Runtowelllocationmap = make(map[string]string)
 
 	// work out well coordinates for any plate
@@ -74,6 +78,11 @@ Steps {
 			}else {wellpositionarray = append(wellpositionarray,location)
 		}
 	}
+	
+	alphabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+		"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
+		"Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"}
+	
 	/*
 	//alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	alphabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
@@ -141,6 +150,30 @@ Steps {
 	}
 	}
 	}
+	
+	// add blanks
+	for m := 0; m< NumberofBlanks; m++ {
+	eachreaction := make([]*wtype.LHComponent, 0)
+		
+		// use defualt policy for blank
+		
+		bufferSample := mixer.SampleForTotalVolume(Diluent, TotalVolume)
+		eachreaction = append(eachreaction,bufferSample)
+		
+		
+		// add blanks to last column of plate
+		well := alphabet[OutPlate.WlsY-m]+strconv.Itoa(OutPlate.WlsX+1)
+		
+		reaction := MixTo(OutPlate,well, eachreaction...)
+		fmt.Println("where am I?",wellpositionarray[counter])
+		//Runtowelllocationmap= append(Runtowelllocationmap,"Blank"+ strconv.Itoa(m+1) +":" + well)
+		Blankwells = append(Blankwells,well)
+	
+		reactions = append(reactions,reaction)
+	counter = counter + 1
+	
+	}
+	
 	Reactions = reactions
 	Runcount = len(Reactions)
 	Pixelcount = len(wellpositionarray)

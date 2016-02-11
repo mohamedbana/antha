@@ -1,25 +1,34 @@
 protocol AddPlateReaderresults
 
 import (
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"github.com/antha-lang/antha/antha/anthalib/mixer"
-	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/parser"
+	//"github.com/antha-lang/antha/antha/anthalib/wtype"
+	//"github.com/antha-lang/antha/antha/anthalib/wutil"
+	//"github.com/antha-lang/antha/antha/anthalib/mixer"
+	//"github.com/antha-lang/antha/microArch/driver/liquidhandling"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
-	"path/filepath"
-	antha "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
+	//"path/filepath"
+	//antha "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"fmt"
-	"strconv"
+	//"strconv"
 )
 
 
 // Input parameters for this protocol (data)
 Parameters (
-	MarsResultsFileXLSX string
-	DOEFile string
-	DOEFiletype string
+	MarsResultsFileXLSX           string 
+	DOEFilewithwelllocationsadded string 
+	DOEFiletype                   string 
+	
+	Responsecolumntofill string //= "AbsMV"
+
+	//Wavelength            int    = 440
+	ReadingTypeinMarsFile string // = "Abs Spectrum"
+
+	Blanks []string //= []string{"P9"}
+
+	ManualControls []string //= []string{"P24"}
 	
 )
 
@@ -48,111 +57,70 @@ Setup {
 
 // The core process for this protocol, with the steps to be performed
 // for every input
+
+
+
+
+
 Steps {
 	
 	var marsdata parser.MarsData
-	
-	if DOEFiletype == "DX" ||  DOEFiletype == "Design Expert" {
-		
-		marsdata, err :=  parser.ParseMarsXLSXOutput(MarsResultsFileXLSX)
-		if err!= nil{
+	var err error
+
+	if DOEFiletype == "DX" || DOEFiletype == "Design Expert" {
+
+		marsdata, err = parser.ParseMarsXLSXOutput(MarsResultsFileXLSX)
+		if err != nil {
 			panic(err)
 		}
-		
-		
-		}
-	
-	
-	
-	chosencolourpalette := image.AvailablePalettes["Palette1"]
-	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette) 
-	
-	Runtowelllocationmap = make([]string,0)
-	perconditionuntowelllocationmap := make([]string,0)
-		//Runtowelllocationmap = make(map[string]string)
 
-	// work out well coordinates for any plate
-	wellpositionarray := make([]string, 0)
-
-
-	for location, colour := range positiontocolourmap {
-		R,G,B,A := colour.RGBA()
-	
-		if uint8(R) == 242 && uint8(G) ==243 && uint8(B) == 242 && uint8(A) == 255 {
-			continue
-			}else {wellpositionarray = append(wellpositionarray,location)
-		}
 	}
-	/*
-	//alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	alphabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
-		"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
-		"Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"}
-	//k := 0
-	for j := 0; j < OutPlate.WlsY; j++ {
-		for i := 0; i < OutPlate.WlsX; i++ { //countingfrom1iswhatmakesushuman := j + 1
-			//k = k + 1
-			wellposition := string(alphabet[j]) + strconv.Itoa(i+1)
-			//fmt.Println(wellposition, k)
-			wellpositionarray = append(wellpositionarray, wellposition)
+
+	runs, err := doe.RunsFromDXDesign(DOEFilewithwelllocationsadded, []string{"Pre_MIX", "POST_MIX"})
+
+	// find optimal wavlength from scan of positive control and blank
+	optimalwavelength := marsdata.FindOptimalWavelength(ManualControls[0], Blanks[0], "Raw Data")
+
+	// range through pairing up wells from mars output and doe design
+
+	measuredoptimalwavelengths := make([]int, 0)
+
+	//for i, additional := range AdditionalFactors {
+	for _, run := range runs {
+
+		well, err := run.GetAdditionalInfo("Well ID")
+		if err != nil {
+			panic(err)
 		}
 
+		//if run.CheckAdditionalInfo(additional, AdditionalValues[i]) && additional == Additionalfactortoresponsepair[0] {
+		/*
+			average, err := marsdata.AbsorbanceReading(well.(string), Wavelength, ReadingTypeinMarsFile)
+			if err != nil {
+				panic(err)
+			}
+		*/
+		// check optimal difference for each well
+		meassuredoptwavelength := marsdata.FindOptimalWavelength(well.(string), Blanks[0], "Raw Data")
+		measuredoptimalwavelengths = append(measuredoptimalwavelengths, meassuredoptwavelength)
+		// blank correct
+
+		samples := []string{well.(string)}
+
+		blankcorrected, err := marsdata.BlankCorrect(samples, Blanks, optimalwavelength, ReadingTypeinMarsFile)
+		run.AddResponseValue(Responsecolumntofill, blankcorrected)
+		//	}
 	}
-	*/
-	reactions := make([]*wtype.LHSolution,0)
+	//	}
+
+	//runs, err := doe.RunsFromDXDesign(xlsxwithresultsadded string, []string{"Pre_MIX", "POST_MIX"})
+
+	_ = doe.DXXLSXFilefromRuns(runs, OutputFilename)
+	//OutputFilename = doe.XLfileFromRuns(runs)
+
+	fmt.Println("Optimal wavelength from manual", optimalwavelength)
+	fmt.Println("Optimal wavelength of each sample", measuredoptimalwavelengths)
 	
-	//policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run",false)
-	
-	//intfactors := []string{"Pre_MIX","POST_MIX"}
-	policies, names,err := liquidhandling.PolicyMakerfromDesign("ScreenLHPolicyDOE2.xlsx", "DOE_run")
-	if err != nil{
-		panic(err)
-	}
-	
-	
-	
-	counter := 0
-	for l := 0; l < len(TestSolVolumes); l++ {
-	for k := 0; k< len(TestSols);k++{
-	for j:= 0; j< NumberofReplicates;j++{
-	for i := 0; i < len(policies); i++ {
-		
-		
-		
-		eachreaction := make([]*wtype.LHComponent, 0)
-		
-		Diluent.Type = names[i]
-		fmt.Println(Diluent.Type)
-		
-		bufferSample := mixer.SampleForTotalVolume(Diluent, TotalVolume)
-		eachreaction = append(eachreaction,bufferSample)
-		testSample := mixer.Sample(TestSols[k], TestSolVolumes[l])
-		
-		TestSols[k].Type = names[i]
-		
-		eachreaction = append(eachreaction,testSample)
-		reaction := MixTo(OutPlate,wellpositionarray[counter], eachreaction...)
-		fmt.Println("where am I?",wellpositionarray[counter])
-		Runtowelllocationmap= append(Runtowelllocationmap,Diluent.Type +":" + wellpositionarray[counter])
-		perconditionuntowelllocationmap = append(perconditionuntowelllocationmap,Diluent.Type +":" + wellpositionarray[counter])
-		//Runtowelllocationmap[Diluent.Type]= wellpositionarray[counter]
-		reactions = append(reactions,reaction)
-	counter = counter + 1
-	}
-	
-	outputsandwich := strconv.Itoa(wutil.RoundInt(TestSolVolumes[l].RawValue()))+TestSols[k].CName+strconv.Itoa(j+1)
-	
-	outputfilename := filepath.Join(antha.Dirpath(),"DOE2"+ "_" + outputsandwich+ ".xlsx")
-	Errors = append(Errors,doe.AddWelllocations(filepath.Join(antha.Dirpath(), "ScreenLHPolicyDOE2.xlsx"),0,perconditionuntowelllocationmap,"DOE_run",outputfilename,[]string{"Volume","Solution","Replicate"}, []interface{}{TestSolVolumes[l].ToString(),TestSols[k].CName,string(j)}))
-	
-	// empty
-	perconditionuntowelllocationmap = make([]string,0)
-	}
-	}
-	}
-	Reactions = reactions
-	Runcount = len(Reactions)
-	Pixelcount = len(wellpositionarray)
 	
 	
 }

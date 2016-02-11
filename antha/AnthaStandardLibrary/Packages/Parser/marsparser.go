@@ -10,6 +10,7 @@ import (
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
+	"github.com/antha-lang/antha/internal/github.com/montanaflynn/stats"
 	"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
 )
 
@@ -527,10 +528,60 @@ func (data MarsData) TimeCourse(wellname string, exWavelength int, emWavelength 
 	yaxis = make([]float64, 0)
 	for _, measurement := range data.Dataforeachwell[wellname].Data.Readings[0] {
 
-		if measurement.EWavelength == emWavelength && measurement.RWavelength == exWavelength {
+		if measurement.EWavelength == exWavelength && measurement.RWavelength == emWavelength {
 
 			xaxis = append(xaxis, measurement.Timestamp)
 			yaxis = append(yaxis, measurement.Reading)
+
+		}
+	}
+
+	return
+}
+
+// readingtypekeyword added in case mars used to process data in advance. Example keywords : Raw Data, Em Spectrum, Abs Spectrum, Blank Corrected, Average or "" to capture all
+func (data MarsData) AbsScanData(wellname string, readingtypekeyword string) (wavelengths []int, Readings []float64) {
+	wavelengths = make([]int, 0)
+	Readings = make([]float64, 0)
+	for _, measurement := range data.Dataforeachwell[wellname].Data.Readings[0] {
+
+		if strings.Contains(data.Dataforeachwell[wellname].ReadingType, readingtypekeyword) {
+
+			wavelengths = append(wavelengths, measurement.RWavelength)
+			Readings = append(Readings, measurement.Reading)
+
+		}
+	}
+
+	return
+}
+
+func (data MarsData) EMScanData(wellname string, exWavelength int, readingtypekeyword string) (wavelengths []int, Readings []float64) {
+	wavelengths = make([]int, 0)
+	Readings = make([]float64, 0)
+	for _, measurement := range data.Dataforeachwell[wellname].Data.Readings[0] {
+
+		if measurement.EWavelength == exWavelength && strings.Contains(data.Dataforeachwell[wellname].ReadingType, readingtypekeyword) {
+
+			wavelengths = append(wavelengths, measurement.RWavelength)
+			Readings = append(Readings, measurement.Reading)
+
+		}
+
+	}
+
+	return
+}
+
+func (data MarsData) EXScanData(wellname string, emWavelength int, readingtypekeyword string) (wavelengths []int, Readings []float64) {
+	wavelengths = make([]int, 0)
+	Readings = make([]float64, 0)
+	for _, measurement := range data.Dataforeachwell[wellname].Data.Readings[0] {
+
+		if measurement.RWavelength == emWavelength && strings.Contains(data.Dataforeachwell[wellname].ReadingType, readingtypekeyword) {
+
+			wavelengths = append(wavelengths, measurement.EWavelength)
+			Readings = append(Readings, measurement.Reading)
 
 		}
 	}
@@ -596,6 +647,145 @@ func (data MarsData) ReadingsAsFloats(wellname string, emexortime int, fieldvalu
 			readingtypes = append(readingtypes, data.Dataforeachwell[wellname].ReadingType)
 		}
 	}
+
+	return
+}
+
+func (data MarsData) ReadingsAsAverage(wellname string, emexortime int, fieldvalue interface{}, readingtypekeyword string) (average float64, err error) {
+	readings := make([]float64, 0)
+	readingtypes := make([]string, 0)
+	readingsforaverage := make([]float64, 0)
+	for _, measurement := range data.Dataforeachwell[wellname].Data.Readings[0] {
+
+		if emexortime == 0 {
+			if str, ok := fieldvalue.(string); ok {
+
+				gotime, err := time.ParseDuration(str)
+				if err != nil {
+					return average, err
+				}
+				if measurement.Timestamp == gotime {
+					readings = append(readings, measurement.Reading)
+					readingtypes = append(readingtypes, data.Dataforeachwell[wellname].ReadingType)
+				}
+			}
+		} else if emexortime == 1 && measurement.RWavelength == fieldvalue {
+			readings = append(readings, measurement.Reading)
+			readingtypes = append(readingtypes, data.Dataforeachwell[wellname].ReadingType)
+		} else if emexortime == 2 && measurement.EWavelength == fieldvalue {
+			readings = append(readings, measurement.Reading)
+			readingtypes = append(readingtypes, data.Dataforeachwell[wellname].ReadingType)
+		}
+	}
+
+	for i, readingtype := range readingtypes {
+		if strings.Contains(readingtype, readingtypekeyword) {
+			readingsforaverage = append(readingsforaverage, readings[i])
+		}
+	}
+
+	average, err = stats.Mean(readingsforaverage)
+
+	return
+}
+
+func (data MarsData) AbsorbanceReading(wellname string, wavelength int, readingtypekeyword string) (average float64, err error) {
+	readings := make([]float64, 0)
+	readingtypes := make([]string, 0)
+	readingsforaverage := make([]float64, 0)
+	for _, measurement := range data.Dataforeachwell[wellname].Data.Readings[0] {
+
+		if measurement.RWavelength == wavelength {
+			readings = append(readings, measurement.Reading)
+			readingtypes = append(readingtypes, data.Dataforeachwell[wellname].ReadingType)
+
+		}
+
+		for i, readingtype := range readingtypes {
+			if strings.Contains(readingtype, readingtypekeyword) {
+				readingsforaverage = append(readingsforaverage, readings[i])
+			}
+		}
+	}
+	average, err = stats.Mean(readingsforaverage)
+
+	return
+}
+
+func (data MarsData) FindOptimalWavelength(wellname string, blankname string, readingtypekeyword string) (wavelength int) {
+
+	//differences := make([]float64, 0)
+	biggestdifferenceindex := 0
+	biggestdifference := 0.0
+
+	wavelengths, readings := data.AbsScanData(wellname, readingtypekeyword)
+	blankwavelengths, blankreadings := data.AbsScanData(blankname, readingtypekeyword)
+
+	for i, reading := range readings {
+
+		difference := reading - blankreadings[i]
+
+		if difference > biggestdifference && wavelengths[i] == blankwavelengths[i] {
+			biggestdifferenceindex = i
+		}
+
+	}
+
+	wavelength = wavelengths[biggestdifferenceindex]
+
+	return
+}
+
+func (data MarsData) BlankCorrect(wellnames []string, blanknames []string, wavelength int, readingtypekeyword string) (blankcorrectedaverage float64, err error) {
+	readings := make([]float64, 0)
+	readingtypes := make([]string, 0)
+	readingsforaverage := make([]float64, 0)
+
+	for _, wellname := range blanknames {
+
+		for _, measurement := range data.Dataforeachwell[wellname].Data.Readings[0] {
+
+			if measurement.RWavelength == wavelength {
+				readings = append(readings, measurement.Reading)
+				readingtypes = append(readingtypes, data.Dataforeachwell[wellname].ReadingType)
+
+			}
+
+			for i, readingtype := range readingtypes {
+				if strings.Contains(readingtype, readingtypekeyword) {
+					readingsforaverage = append(readingsforaverage, readings[i])
+				}
+			}
+		}
+	}
+
+	blankaverage, err := stats.Mean(readingsforaverage)
+
+	readings = make([]float64, 0)
+	readingtypes = make([]string, 0)
+	readingsforaverage = make([]float64, 0)
+
+	for _, wellname := range wellnames {
+
+		for _, measurement := range data.Dataforeachwell[wellname].Data.Readings[0] {
+
+			if measurement.RWavelength == wavelength {
+				readings = append(readings, measurement.Reading)
+				readingtypes = append(readingtypes, data.Dataforeachwell[wellname].ReadingType)
+
+			}
+
+			for i, readingtype := range readingtypes {
+				if strings.Contains(readingtype, readingtypekeyword) {
+					readingsforaverage = append(readingsforaverage, readings[i])
+				}
+			}
+		}
+
+	}
+	average, err := stats.Mean(readingsforaverage)
+
+	blankcorrectedaverage = average - blankaverage
 
 	return
 }

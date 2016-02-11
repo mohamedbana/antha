@@ -38,6 +38,38 @@ type Run struct {
 	AdditionalValues     []interface{}
 }
 
+func (run Run) AddResponseValue(responsedescriptor string, responsevalue interface{}) {
+
+	for i, descriptor := range run.Responsedescriptors {
+		if strings.ToUpper(descriptor) == strings.ToUpper(responsedescriptor) {
+			run.ResponseValues[i] = responsevalue
+		}
+	}
+
+}
+
+func (run Run) CheckAdditionalInfo(subheader string, value interface{}) bool {
+
+	for i, header := range run.AdditionalSubheaders {
+		if strings.ToUpper(header) == strings.ToUpper(subheader) && run.AdditionalValues[i] == value {
+			return true
+		}
+	}
+	return false
+}
+
+func (run Run) GetAdditionalInfo(subheader string) (value interface{}, err error) {
+
+	for i, header := range run.AdditionalSubheaders {
+		if strings.ToUpper(header) == strings.ToUpper(subheader) {
+			value = run.AdditionalValues[i]
+			return value, err
+
+		}
+	}
+	return value, fmt.Errorf("header not found")
+}
+
 func AllComboCount(pairs []DOEPair) (numberofuniquecombos int) {
 	fmt.Println("In AllComboCount", "len(pairs)", len(pairs))
 	var movingcount int
@@ -90,30 +122,6 @@ func ParseRunWellPair(pair string, nameappendage string) (runnumber int, well st
 
 func AddWelllocations(xlsxfile string, oldsheet int, runnumbertowellcombos []string, nameappendage string, pathtosave string, extracolumnheaders []string, extracolumnvalues []interface{}) error {
 
-	/*
-
-		    var row *xlsx.Row
-		    var cell *xlsx.Cell
-		    var err error
-
-		    file = xlsx.NewFile()
-		    //sheet, err = file.AddSheet("Sheet1")
-		    if err != nil {
-		        fmt.Printf(err.Error())
-		    }
-		    row = sheet.AddRow()
-		    cell = row.AddCell()
-		    cell.Value = "I am a cell!"
-		    err = file.Save("MyXLSXFile.xlsx")
-		    if err != nil {
-		        fmt.Printf(err.Error())
-		    }
-		}
-
-
-
-	*/
-
 	var xlsxcell *xlsx.Cell
 
 	file, err := spreadsheet.OpenFile(xlsxfile)
@@ -125,13 +133,6 @@ func AddWelllocations(xlsxfile string, oldsheet int, runnumbertowellcombos []str
 
 	_ = file.AddSheet("hello")
 
-	/*
-		for _, row := range sheet.Rows {
-			//newrow := newsheet.AddRow()
-
-			newsheet.Rows = append(newsheet.Rows, row)
-		}
-	*/
 	extracolumn := sheet.MaxCol + 1
 
 	// add extra column headers first
@@ -167,7 +168,7 @@ func AddWelllocations(xlsxfile string, oldsheet int, runnumbertowellcombos []str
 			if xlsxrunmumber == runnumber {
 				for _, extracolumnvalue := range extracolumnvalues {
 					xlsxcell = sheet.Rows[i].AddCell()
-					xlsxcell.Value = extracolumnvalue.(string)
+					xlsxcell.SetValue(extracolumnvalue)
 				}
 				xlsxcell = sheet.Rows[i].AddCell()
 				xlsxcell.Value = well
@@ -199,6 +200,9 @@ func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) 
 		responsedescriptors := make([]string, 0)
 		setpoints := make([]interface{}, 0)
 		responsevalues := make([]interface{}, 0)
+		otherheaders := make([]string, 0)
+		othersubheaders := make([]string, 0)
+		otherresponsevalues := make([]interface{}, 0)
 
 		run.RunNumber, err = sheet.Cell(i, 1).Int()
 		if err != nil {
@@ -211,7 +215,7 @@ func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) 
 
 		for j := 2; j < sheet.MaxCol; j++ {
 			factororresponse := sheet.Cell(0, j).String()
-			fmt.Println(i, j, factororresponse)
+			//fmt.Println(i, j, factororresponse)
 			if strings.Contains(factororresponse, "Factor") {
 				//	maxfactorcol = j
 				descriptor = strings.Split(sheet.Cell(1, j).String(), ":")[1]
@@ -242,37 +246,58 @@ func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) 
 				factordescriptors = append(factordescriptors, factrodescriptor)
 				setpoints = append(setpoints, setpoint)
 
+			} else if strings.Contains(factororresponse, "Response") {
+				descriptor = sheet.Cell(1, j).String()
+				responsedescriptor := descriptor
+				//fmt.Println("response", i, j, descriptor)
+				responsedescriptors = append(responsedescriptors, responsedescriptor)
+
+				cell := sheet.Cell(i, j)
+
+				if cell == nil {
+
+					break
+				}
+
+				celltype := cell.Type()
+
+				if celltype == 1 {
+					responsevalue, err := cell.Float()
+					if err != nil {
+						return runs, err
+					}
+					responsevalues = append(responsevalues, responsevalue)
+				} else {
+					responsevalue := cell.String()
+					responsevalues = append(responsevalues, responsevalue)
+				}
+
 			} else {
-				//run.Factordescriptors = factordescriptors
+				descriptor = sheet.Cell(1, j).String()
+				responsedescriptor := descriptor
+				//fmt.Println("Additional SubHeader", i, j, factororresponse)
+				//fmt.Println("Additional SubHeader", i, j, descriptor)
+				otherheaders = append(otherheaders, factororresponse)
+				othersubheaders = append(othersubheaders, responsedescriptor)
 
-				//for k := maxfactorcol; k < sheet.MaxCol; k++ {
-				//	factororresponse := sheet.Cell(0, maxfactorcol).String()
-				if strings.Contains(factororresponse, "Response") {
-					descriptor = sheet.Cell(1, j).String()
-					responsedescriptor := descriptor
-					fmt.Println("response", i, j, descriptor)
-					responsedescriptors = append(responsedescriptors, responsedescriptor)
+				cell := sheet.Cell(i, j)
 
-					cell := sheet.Cell(i, j)
+				if cell == nil {
 
-					if cell == nil {
+					break
+				}
 
-						break
+				celltype := cell.Type()
+
+				if celltype == 1 {
+					responsevalue, err := cell.Float()
+					if err != nil {
+						return runs, err
 					}
-
-					celltype := cell.Type()
-
-					if celltype == 1 {
-						responsevalue, err := cell.Float()
-						if err != nil {
-							return runs, err
-						}
-						responsevalues = append(responsevalues, responsevalue)
-					} else {
-						responsevalue := cell.String()
-						responsevalues = append(responsevalues, responsevalue)
-					}
-
+					otherresponsevalues = append(otherresponsevalues, responsevalue)
+				} else {
+					responsevalue := cell.String()
+					otherresponsevalues = append(otherresponsevalues, responsevalue)
 				}
 
 			}
@@ -281,11 +306,122 @@ func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) 
 		run.Responsedescriptors = responsedescriptors
 		run.Setpoints = setpoints
 		run.ResponseValues = responsevalues
+		run.AdditionalHeaders = otherheaders
+		run.AdditionalSubheaders = othersubheaders
+		run.AdditionalValues = otherresponsevalues
 
 		runs = append(runs, run)
 		factordescriptors = make([]string, 0)
 		responsedescriptors = make([]string, 0)
+
+		// assuming this is necessary too
+		otherheaders = make([]string, 0)
+		othersubheaders = make([]string, 0)
 	}
 
+	return
+}
+
+func DXXLSXFilefromRuns(runs []Run, outputfilename string) (xlsxfile *xlsx.File) {
+
+	//var file *xlsx.File
+	var sheet *xlsx.Sheet
+	var row *xlsx.Row
+	var cell *xlsx.Cell
+	var err error
+
+	xlsxfile = xlsx.NewFile()
+	sheet = xlsxfile.AddSheet("Sheet1")
+
+	// add headers
+	row = sheet.AddRow()
+
+	// 2 blank cells
+	cell = row.AddCell()
+	cell.Value = ""
+	cell = row.AddCell()
+	cell.Value = ""
+
+	// take factor and run descriptors from first run (assuming they're all the same)
+	for i, _ := range runs[0].Factordescriptors {
+		cell = row.AddCell()
+		cell.Value = "Factor " + strconv.Itoa(i+1)
+
+	}
+	for i, _ := range runs[0].Responsedescriptors {
+		cell = row.AddCell()
+		cell.Value = "Response " + strconv.Itoa(i+1)
+
+	}
+	for _, additionalheader := range runs[0].AdditionalHeaders {
+		cell = row.AddCell()
+		cell.Value = additionalheader
+
+	}
+	// new row
+	row = sheet.AddRow()
+
+	// add Std and Run number headers
+	cell = row.AddCell()
+	cell.Value = "Std"
+	cell = row.AddCell()
+	cell.Value = "Run"
+
+	// then add subheadings and descriptors
+	for _, descriptor := range runs[0].Factordescriptors {
+		cell = row.AddCell()
+		cell.Value = descriptor
+
+	}
+	for _, descriptor := range runs[0].Responsedescriptors {
+		cell = row.AddCell()
+		cell.Value = descriptor
+
+	}
+	for _, descriptor := range runs[0].AdditionalSubheaders {
+		cell = row.AddCell()
+		cell.Value = descriptor
+
+	}
+
+	// add blank row
+
+	row = sheet.AddRow()
+
+	//add data 1 row per run
+	for _, run := range runs {
+
+		row = sheet.AddRow()
+		// Std
+		cell = row.AddCell()
+		cell.SetValue(run.StdNumber)
+
+		// Run
+		cell = row.AddCell()
+		cell.SetValue(run.RunNumber)
+
+		// factors
+		for _, factor := range run.Setpoints {
+			cell = row.AddCell()
+
+			cell.SetValue(factor) //= factor.(string)
+		}
+
+		// responses
+		for _, response := range run.ResponseValues {
+			cell = row.AddCell()
+			cell.SetValue(response)
+		}
+
+		// additional
+		for _, additional := range run.AdditionalValues {
+			cell = row.AddCell()
+			cell.SetValue(additional)
+		}
+	}
+	err = xlsxfile.Save(outputfilename)
+	if err != nil {
+		fmt.Printf(err.Error())
+	}
 	return
 }
