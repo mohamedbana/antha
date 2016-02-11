@@ -50,6 +50,7 @@ func LiquidTypeFromString(s string) LiquidType {
 	default:
 		return LTWater
 	}
+	return LTWater
 }
 
 func LiquidTypeName(lt LiquidType) string {
