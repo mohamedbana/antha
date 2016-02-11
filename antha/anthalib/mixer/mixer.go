@@ -162,7 +162,7 @@ type MixOptions struct {
 	PlateNum    int                  // which plate to stick these on
 }
 
-func GenericMix(opt MixOptions) *wtype.LHComponent {
+func GenericMix(opt MixOptions) *wtype.LHInstruction {
 	r := opt.Instruction
 	if r == nil {
 		r = wtype.NewLHInstruction()
@@ -188,40 +188,44 @@ func GenericMix(opt MixOptions) *wtype.LHComponent {
 		r.Majorlayoutgroup = opt.PlateNum - 1
 	}
 
-	opt.Result = wtype.NewLHComponent()
+	r.Result = wtype.NewLHComponent()
 
 	// We must respect the order in which things are mixed. The convention is
 	// that mix(X,Y) corresponds to "Add Y to X".
 	for idx, comp := range r.Components {
 		comp.Order = idx
-		opt.Result.Mix(comp)
+		r.Result.Mix(comp)
 	}
 
-	return opt.Result
+	return r
 }
 
 // Mix the specified wtype.LHComponents together and leave the destination TBD
 func Mix(components ...*wtype.LHComponent) *wtype.LHComponent {
-	return GenericMix(MixOptions{
+	r := GenericMix(MixOptions{
 		Components: components,
 	})
+	return r.Result
 }
 
 // Mix the specified wtype.LHComponents together into a specific plate
 func MixInto(destination *wtype.LHPlate, address string, components ...*wtype.LHComponent) *wtype.LHComponent {
-	return GenericMix(MixOptions{
+	r := GenericMix(MixOptions{
 		Components:  components,
 		Destination: destination,
 		Address:     address,
 	})
+
+	return r.Result
 }
 
 // Mix the specified wtype.LHComponents together into a plate of a particular type
 func MixTo(platetype string, address string, platenum int, components ...*wtype.LHComponent) *wtype.LHComponent {
-	return GenericMix(MixOptions{
+	r := GenericMix(MixOptions{
 		Components: components,
 		PlateType:  platetype,
 		Address:    address,
 		PlateNum:   platenum,
 	})
+	return r.Result
 }

@@ -12,7 +12,7 @@ import (
 	"runtime/debug"
 )
 
-func configMix(inst *MixInst) (*wtype.LHComponent, error) {
+func configMix(inst *MixInst) (*wtype.LHInstruction, error) {
 	var comps []*wtype.LHComponent
 	for _, arg := range inst.Values {
 		v := arg.Get()
@@ -24,7 +24,6 @@ func configMix(inst *MixInst) (*wtype.LHComponent, error) {
 	}
 	r := mixer.GenericMix(mixer.MixOptions{
 		Components:  comps,
-		Instruction: inst.Opt.OutputIns,
 		Address:     inst.Opt.Address,
 		Destination: inst.Opt.OutPlate,
 		PlateNum:    inst.Opt.PlateNum,
@@ -45,7 +44,7 @@ func runMix(ctx context.Context, blockIds map[wtype.BlockID]bool, inst *MixInst)
 	} else if err := lh.Do(*equipment.NewActionDescription(action.LH_MIX, string(rbs), nil)); err != nil {
 		return err
 	} else {
-		id := inst.Opt.OutputIns.BlockID
+		id := inst.Opt.OutputCmp.BlockID
 		blockIds[id] = true
 		return nil
 	}
