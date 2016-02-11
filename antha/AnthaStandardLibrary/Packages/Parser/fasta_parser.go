@@ -26,6 +26,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -42,23 +43,29 @@ type Fasta struct {
 }
 
 // This will retrieve seq from FASTA file
-func RetrieveSeqFromFASTA(id string, filename string) (sequence wtype.DNASequence) {
+func RetrieveSeqFromFASTA(id string, filename string) (seq wtype.DNASequence, err error) {
 	allparts, err := ioutil.ReadFile(filename)
 	if err != nil {
 		fmt.Println("error:", err)
+		return
 	}
+
 	fastaFh := bytes.NewReader(allparts)
 
+	// then retrieve the particular record
 	for record := range FastaParse(fastaFh) {
 		if strings.Contains(record.Id, id) {
-			seq := wtype.DNASequence{record.Id, record.Seq, true, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, ""}
-			return seq
+			seq = wtype.DNASequence{record.Id, record.Seq, true, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, ""}
+			return
 		}
 	}
 
-	seq := wtype.DNASequence{"", "", true, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, ""} // blank seq
-	fmt.Println(id, "record not found in", filename)
-	return seq
+	seq = wtype.DNASequence{"", "", true, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, ""} // blank seq
+	if seq.Seq == "" {
+		err = errors.New("Record not found in file")
+		return
+	}
+	return
 }
 
 func Build_fasta(header string, seq bytes.Buffer) (Record Fasta) {
