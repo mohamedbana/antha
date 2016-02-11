@@ -24,11 +24,12 @@ package liquidhandling
 
 import (
 	"fmt"
+	"sort"
+
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
-	"sort"
 )
 
 type InputSorter struct {

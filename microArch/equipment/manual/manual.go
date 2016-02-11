@@ -378,6 +378,11 @@ func (e *AnthaManualGrpc) configRequest(actionDescription equipment.ActionDescri
 
 	mnp, ok := params["MAX_N_PLATES"]
 
+	//pwc := factory.GetPlateByType("DWST12_riser")
+
+	//pwc := factory.GetPlateByType("pcrplate_with_cooler")
+	//pwc := factory.GetPlateByType("pcrplate_skirted")
+
 	if ok {
 		req.Input_Setup_Weights["MAX_N_PLATES"] = mnp.(float64)
 	} else {
