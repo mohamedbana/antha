@@ -195,7 +195,6 @@ type LHInstruction struct {
 	Conc             float64
 	Tvol             float64
 	Majorlayoutgroup int
-	Loc              string
 }
 
 func (ins *LHInstruction) HasParent(id string) bool {
@@ -312,6 +311,7 @@ type LHComponent struct {
 	Visc               float64
 	StockConcentration float64
 	Extra              map[string]interface{}
+	Loc                string
 }
 
 func (lhc *LHComponent) SetVolume(v wunit.Volume) {
@@ -361,6 +361,7 @@ func (lhc *LHComponent) Dup() *LHComponent {
 	for k, v := range lhc.Extra {
 		c.Extra[k] = v
 	}
+	c.Loc = lhc.Loc
 	return c
 }
 
