@@ -99,8 +99,9 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 
 					eachreaction := make([]*wtype.LHComponent, 0)
 
-					_input.Diluent.Type = names[i]
-					fmt.Println(_input.Diluent.Type)
+					// keep default policy for diluent
+					//Diluent.Type = names[i]
+					//fmt.Println(Diluent.Type)
 
 					bufferSample := mixer.SampleForTotalVolume(_input.Diluent, _input.TotalVolume)
 					eachreaction = append(eachreaction, bufferSample)
@@ -111,8 +112,8 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 					eachreaction = append(eachreaction, testSample)
 					reaction := execute.MixTo(_ctx, _input.OutPlate, wellpositionarray[counter], eachreaction...)
 					fmt.Println("where am I?", wellpositionarray[counter])
-					_output.Runtowelllocationmap = append(_output.Runtowelllocationmap, _input.Diluent.Type+":"+wellpositionarray[counter])
-					perconditionuntowelllocationmap = append(perconditionuntowelllocationmap, _input.Diluent.Type+":"+wellpositionarray[counter])
+					_output.Runtowelllocationmap = append(_output.Runtowelllocationmap, _input.TestSols[k].Type+":"+wellpositionarray[counter])
+					perconditionuntowelllocationmap = append(perconditionuntowelllocationmap, _input.TestSols[k].Type+":"+wellpositionarray[counter])
 					//Runtowelllocationmap[Diluent.Type]= wellpositionarray[counter]
 					reactions = append(reactions, reaction)
 					counter = counter + 1
@@ -139,10 +140,10 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 		eachreaction = append(eachreaction, bufferSample)
 
 		// add blanks to last column of plate
-		well := alphabet[_input.OutPlate.WlsY-m] + strconv.Itoa(_input.OutPlate.WlsX+1)
-
+		well := alphabet[_input.OutPlate.WlsY-1-m] + strconv.Itoa(_input.OutPlate.WlsX)
+		fmt.Println("blankwell", well)
 		reaction := execute.MixTo(_ctx, _input.OutPlate, well, eachreaction...)
-		fmt.Println("where am I?", wellpositionarray[counter])
+		//fmt.Println("where am I?",wellpositionarray[counter])
 		//Runtowelllocationmap= append(Runtowelllocationmap,"Blank"+ strconv.Itoa(m+1) +":" + well)
 		_output.Blankwells = append(_output.Blankwells, well)
 

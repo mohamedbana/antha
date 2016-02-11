@@ -121,8 +121,9 @@ Steps {
 		
 		eachreaction := make([]*wtype.LHComponent, 0)
 		
-		Diluent.Type = names[i]
-		fmt.Println(Diluent.Type)
+		// keep default policy for diluent
+		//Diluent.Type = names[i]
+		//fmt.Println(Diluent.Type)
 		
 		bufferSample := mixer.SampleForTotalVolume(Diluent, TotalVolume)
 		eachreaction = append(eachreaction,bufferSample)
@@ -133,8 +134,8 @@ Steps {
 		eachreaction = append(eachreaction,testSample)
 		reaction := MixTo(OutPlate,wellpositionarray[counter], eachreaction...)
 		fmt.Println("where am I?",wellpositionarray[counter])
-		Runtowelllocationmap= append(Runtowelllocationmap,Diluent.Type +":" + wellpositionarray[counter])
-		perconditionuntowelllocationmap = append(perconditionuntowelllocationmap,Diluent.Type +":" + wellpositionarray[counter])
+		Runtowelllocationmap= append(Runtowelllocationmap,TestSols[k].Type +":" + wellpositionarray[counter])
+		perconditionuntowelllocationmap = append(perconditionuntowelllocationmap,TestSols[k].Type +":" + wellpositionarray[counter])
 		//Runtowelllocationmap[Diluent.Type]= wellpositionarray[counter]
 		reactions = append(reactions,reaction)
 	counter = counter + 1
@@ -162,10 +163,10 @@ Steps {
 		
 		
 		// add blanks to last column of plate
-		well := alphabet[OutPlate.WlsY-m]+strconv.Itoa(OutPlate.WlsX+1)
-		
+		well := alphabet[OutPlate.WlsY-1-m]+strconv.Itoa(OutPlate.WlsX)
+		fmt.Println("blankwell", well)
 		reaction := MixTo(OutPlate,well, eachreaction...)
-		fmt.Println("where am I?",wellpositionarray[counter])
+		//fmt.Println("where am I?",wellpositionarray[counter])
 		//Runtowelllocationmap= append(Runtowelllocationmap,"Blank"+ strconv.Itoa(m+1) +":" + well)
 		Blankwells = append(Blankwells,well)
 	
