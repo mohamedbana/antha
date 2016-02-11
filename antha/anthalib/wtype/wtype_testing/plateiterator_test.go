@@ -9,7 +9,7 @@ import (
 
 func TestColumniterator_96(t *testing.T) {
 	p := factory.GetPlateByType("pcrplate_skirted")
-	it := NewColumnIterator(p)
+	it := NewColumnWiseIterator(p)
 
 	for i := 0; i < 96; i++ {
 
@@ -32,7 +32,7 @@ func TestColumniterator_96(t *testing.T) {
 }
 func TestColumniterator_384(t *testing.T) {
 	p := factory.GetPlateByType("greiner384")
-	it := NewColumnIterator(p)
+	it := NewColumnWiseIterator(p)
 	for i := 0; i < 384; i++ {
 
 		if i == 24 {
@@ -55,7 +55,7 @@ func TestColumniterator_384(t *testing.T) {
 }
 func TestColumniterator_1536(t *testing.T) {
 	p := factory.GetPlateByType("nunc1536_riser")
-	it := NewColumnIterator(p)
+	it := NewColumnWiseIterator(p)
 	for i := 0; i < 1536; i++ {
 
 		if i == 48 {
@@ -79,7 +79,7 @@ func TestColumniterator_1536(t *testing.T) {
 
 func TestRowiterator_96(t *testing.T) {
 	p := factory.GetPlateByType("pcrplate_skirted")
-	it := NewRowIterator(p)
+	it := NewRowWiseIterator(p)
 
 	for i := 0; i < 96; i++ {
 
@@ -103,7 +103,7 @@ func TestRowiterator_96(t *testing.T) {
 }
 func TestRowiterator_384(t *testing.T) {
 	p := factory.GetPlateByType("greiner384")
-	it := NewRowIterator(p)
+	it := NewRowWiseIterator(p)
 	for i := 0; i < 384; i++ {
 
 		if i == 16 {
@@ -126,7 +126,7 @@ func TestRowiterator_384(t *testing.T) {
 }
 func TestRowiterator_1536(t *testing.T) {
 	p := factory.GetPlateByType("nunc1536_riser")
-	it := NewRowIterator(p)
+	it := NewRowWiseIterator(p)
 	for i := 0; i < 1536; i++ {
 
 		if i == 32 {
