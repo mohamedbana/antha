@@ -106,7 +106,7 @@ func ChooseChannel(vol *wunit.Volume, prms *LHProperties) (*wtype.LHChannelParam
 				minvol = minv
 			}
 
-			if v < maxv {
+			if v <= maxv {
 
 				if head.GetParams().Minvol.SIValue() < headchosen.GetParams().Minvol.SIValue() {
 					headchosen = head

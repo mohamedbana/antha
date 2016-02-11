@@ -19,10 +19,13 @@ import (
 
 // Input parameters for this protocol (data)
 
+//NumberofBlanks int
+
 // Data which is returned from this protocol, and data types
 
 //map[string]string
 
+//Blankwells []string
 //NeatSamplewells []string
 
 // Physical Inputs to this protocol with types
@@ -45,7 +48,7 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 
 	_output.Runtowelllocationmap = make([]string, 0)
 	perconditionuntowelllocationmap := make([]string, 0)
-	_output.Blankwells = make([]string, 0)
+
 	//Runtowelllocationmap = make(map[string]string)
 
 	// work out well coordinates for any plate
@@ -60,10 +63,6 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 			wellpositionarray = append(wellpositionarray, location)
 		}
 	}
-
-	alphabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
-		"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
-		"Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"}
 
 	/*
 		//alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -130,28 +129,38 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 		}
 	}
 
-	// add blanks
-	for m := 0; m < _input.NumberofBlanks; m++ {
-		eachreaction := make([]*wtype.LHComponent, 0)
+	/*
+		// add blanks
 
-		// use defualt policy for blank
+		Blankwells = make([]string,0)
 
-		bufferSample := mixer.SampleForTotalVolume(_input.Diluent, _input.TotalVolume)
-		eachreaction = append(eachreaction, bufferSample)
+		alphabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+			"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
+			"Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"}
 
-		// add blanks to last column of plate
-		well := alphabet[_input.OutPlate.WlsY-1-m] + strconv.Itoa(_input.OutPlate.WlsX)
-		fmt.Println("blankwell", well)
-		reaction := execute.MixTo(_ctx, _input.OutPlate, well, eachreaction...)
-		//fmt.Println("where am I?",wellpositionarray[counter])
-		//Runtowelllocationmap= append(Runtowelllocationmap,"Blank"+ strconv.Itoa(m+1) +":" + well)
-		_output.Blankwells = append(_output.Blankwells, well)
 
-		reactions = append(reactions, reaction)
+		for m := 0; m< NumberofBlanks; m++ {
+		//eachreaction := make([]*wtype.LHComponent, 0)
+
+			// use defualt policy for blank
+
+			bufferSample := mixer.Sample(Diluent, TotalVolume)
+			//eachreaction = append(eachreaction,bufferSample)
+
+
+			// add blanks to last column of plate
+			well := alphabet[OutPlate.WlsY-1-m]+strconv.Itoa(OutPlate.WlsX)
+			fmt.Println("blankwell", well)
+			reaction := MixTo(OutPlate,well, bufferSample)
+			//fmt.Println("where am I?",wellpositionarray[counter])
+			//Runtowelllocationmap= append(Runtowelllocationmap,"Blank"+ strconv.Itoa(m+1) +":" + well)
+			Blankwells = append(Blankwells,well)
+
+			reactions = append(reactions,reaction)
 		counter = counter + 1
 
-	}
-
+		}
+	*/
 	_output.Reactions = reactions
 	_output.Runcount = len(_output.Reactions)
 	_output.Pixelcount = len(wellpositionarray)
@@ -218,7 +227,6 @@ type ScreenLHPolicies_AwesomeElement struct {
 type ScreenLHPolicies_AwesomeInput struct {
 	Diluent            *wtype.LHComponent
 	Imagefilename      string
-	NumberofBlanks     int
 	NumberofReplicates int
 	OutPlate           *wtype.LHPlate
 	TestSolVolumes     []wunit.Volume
@@ -227,7 +235,6 @@ type ScreenLHPolicies_AwesomeInput struct {
 }
 
 type ScreenLHPolicies_AwesomeOutput struct {
-	Blankwells           []string
 	Errors               []error
 	Pixelcount           int
 	Reactions            []*wtype.LHSolution
@@ -237,7 +244,6 @@ type ScreenLHPolicies_AwesomeOutput struct {
 
 type ScreenLHPolicies_AwesomeSOutput struct {
 	Data struct {
-		Blankwells           []string
 		Errors               []error
 		Pixelcount           int
 		Runcount             int
@@ -257,13 +263,11 @@ func init() {
 			Params: []ParamDesc{
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
-				{Name: "NumberofBlanks", Desc: "", Kind: "Parameters"},
 				{Name: "NumberofReplicates", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "TestSolVolumes", Desc: "", Kind: "Parameters"},
 				{Name: "TestSols", Desc: "", Kind: "Inputs"},
 				{Name: "TotalVolume", Desc: "", Kind: "Parameters"},
-				{Name: "Blankwells", Desc: "", Kind: "Data"},
 				{Name: "Errors", Desc: "", Kind: "Data"},
 				{Name: "Pixelcount", Desc: "", Kind: "Data"},
 				{Name: "Reactions", Desc: "", Kind: "Outputs"},
