@@ -20,7 +20,7 @@ import math "math"
 
 import (
 	context "github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
-	grpc "google.golang.org/grpc"
+	grpc "github.com/antha-lang/antha/bvendor/google.golang.org/grpc"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

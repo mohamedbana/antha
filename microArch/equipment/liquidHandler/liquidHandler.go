@@ -165,7 +165,7 @@ func (e *AnthaLiquidHandler) configRequest(actionDescription equipment.ActionDes
 	mnp, ok := params["MAX_N_PLATES"]
 
 	if ok {
-		req.Input_Setup_Weights["MAX_N_PLATES"] = mnp.(float64)
+		req.Input_setup_weights["MAX_N_PLATES"] = mnp.(float64)
 	} else {
 		logger.Debug("NO MAX N PLATES FOUND")
 	}
@@ -173,13 +173,13 @@ func (e *AnthaLiquidHandler) configRequest(actionDescription equipment.ActionDes
 	mnw, ok := params["MAX_N_WELLS"]
 
 	if ok {
-		req.Input_Setup_Weights["MAX_N_WELLS"] = mnw.(float64)
+		req.Input_setup_weights["MAX_N_WELLS"] = mnw.(float64)
 	}
 
 	rvw, ok := params["RESIDUAL_VOLUME_WEIGHT"]
 
 	if ok {
-		req.Input_Setup_Weights["RESIDUAL_VOLUME_WEIGHT"] = rvw.(float64)
+		req.Input_setup_weights["RESIDUAL_VOLUME_WEIGHT"] = rvw.(float64)
 	}
 
 	pt, ok := params["INPUT_PLATETYPE"]

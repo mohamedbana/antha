@@ -49,7 +49,7 @@ import (
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/credentials"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/grpclog"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/peer"
+	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/peer"
 )
 
 // ErrIllegalHeaderWrite indicates that setting header is illegal because of

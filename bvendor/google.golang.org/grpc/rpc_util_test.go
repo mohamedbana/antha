@@ -42,7 +42,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/codes"
-	perfpb "google.golang.org/grpc/test/codec_perf"
+	perfpb "github.com/antha-lang/antha/bvendor/google.golang.org/grpc/test/codec_perf"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/transport"
 )
 

@@ -50,14 +50,14 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
-	"google.golang.org/grpc"
+	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/codes"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/health"
-	healthpb "google.golang.org/grpc/health/grpc_health_v1alpha"
+	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/health"
+	healthpb "github.com/antha-lang/antha/bvendor/google.golang.org/grpc/health/grpc_health_v1alpha"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/peer"
-	testpb "google.golang.org/grpc/test/grpc_testing"
+	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/peer"
+	testpb "github.com/antha-lang/antha/bvendor/google.golang.org/grpc/test/grpc_testing"
 )
 
 var (
