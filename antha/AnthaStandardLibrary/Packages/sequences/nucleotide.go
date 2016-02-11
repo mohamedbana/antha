@@ -25,11 +25,15 @@ package sequences
 
 import (
 	"fmt"
+
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	//. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	"strings"
+
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/entrez"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"strings"
 )
 
 // Check for illegal nucleotides
@@ -160,7 +164,7 @@ var Nucleotidegpermol = map[string]float64{
 	"dNTP": 487.0,
 }
 
-// Calculate GC content
+// Calculate global GC content
 func GCcontent(fwdsequence string) (Percentage float64) {
 	numberofAs := strings.Count(fwdsequence, "A")
 	numberofTs := strings.Count(fwdsequence, "T")
@@ -173,6 +177,20 @@ func GCcontent(fwdsequence string) (Percentage float64) {
 	percentage := float64(gc) / float64(all)
 	Percentage = percentage
 	return Percentage
+}
+
+// Calculate local GC content in a sliding window
+func localGCContent(fwdsequence string, window int, shift int) (Pc []float64) {
+	incs := len(fwdsequence) / shift
+	pos := 0
+	Pc = make([]float64, 0)
+	for i := 0; i < (incs - 1); i++ {
+		region := fwdsequence[pos : pos+window]
+		gc := GCcontent(region)
+		Pc = append(Pc, gc)
+		pos += shift
+	}
+	return Pc
 }
 
 //Calculate Molecular weight of DNA
@@ -231,4 +249,125 @@ func Revarrayorder(array []string) (newarray []string) {
 		//newarray += array()
 	}
 	return newarray
+}
+
+// utility function to check if item is in list. move elsewhere?
+func isInList(item string, list []string) bool {
+	for _, v := range list {
+		if v == item {
+			return true
+		}
+	}
+	return false
+}
+
+// This simulates the sequence assembly reaction to validate if parts will synthesise with intended manufacturer.
+// Does not validate construct assembly so should be used in conjunction with enzymes.Assemblysimulator()
+func ValidateSynthesis(parts []wtype.DNASequence, vector string, manufacturer string) bool {
+
+	// type conversions
+	a, _ := SynthesisStandards[manufacturer]["RepeatMax"].(int)
+	b, _ := SynthesisStandards[manufacturer]["MinOrder"].(int)
+	c, _ := SynthesisStandards[manufacturer]["MinLength"].(int)
+	d, _ := SynthesisStandards[manufacturer]["MaxLength"].(int)
+	vectorR, _ := SynthesisStandards[manufacturer]["Vector"].([]string)
+
+	// min total order. Needs to be before local gc calc
+	total := 0
+	for _, part := range parts {
+		total += len(part.Seq)
+	}
+	if total < b {
+		fmt.Println("Warning: Total length of parts is less than", manufacturer, "minimum order requirement")
+		return false
+	}
+
+	// check if vector is appropriate
+	if isInList(vector, vectorR) == false {
+		fmt.Println("Warning: Non-standard vector used for", manufacturer,
+			"synthesis. Please see manufacturer instructions for the standard vector or the use of custom vectors")
+	}
+
+	for _, part := range parts {
+		GCC := GCcontent(part.Seq)              // global gc
+		gc := localGCContent(part.Seq, 100, 50) // local gc
+
+		// check lengths of seq, repeat content and global gc content of each part
+		if len(part.Seq) < c {
+			fmt.Println("Warning:", part.Nm, "is short and may be difficult to synthesise")
+			return false
+		} else if len(part.Seq) > d {
+			fmt.Println("Warning:", part.Nm, "is long and may be difficult to sythesise")
+			return false
+		} else if strings.Contains(strings.ToUpper(part.Seq), strings.Repeat("A", a)) || strings.Contains(strings.ToUpper(part.Seq), strings.Repeat("T", a)) ||
+			strings.Contains(strings.ToUpper(part.Seq), strings.Repeat("C", a)) || strings.Contains(strings.ToUpper(part.Seq), strings.Repeat("A", a)) == true {
+			fmt.Println("Warning:", part.Nm, "is highly repetetive and unsuitable for synthesis")
+			return false
+		} else if GCC > 0.65 || GCC < 0.40 {
+			fmt.Println("Warning: GC content of", part.Nm, "is very high or low and may be difficult to synthesise")
+		}
+
+		// check local gc content of each part in 100bp sliding window
+		for _, v := range gc {
+			if v < 0.25 || v > 0.80 {
+				fmt.Println("Warning: Local GC content very high or low in", part.Nm)
+				return false
+			}
+		}
+	}
+
+	fmt.Println("Your", manufacturer, "DNA synthesis order should work")
+	return true
+}
+
+var SynthesisStandards = map[string]map[string]interface{}{
+	"Gen9": map[string]interface{}{
+		"Vector":    []string{"pG9m-2"},
+		"MaxLength": 10000,
+		"MinLength": 400,
+		"RepeatMax": 70,
+		"MinOrder":  20000,
+	},
+	"DNA20": map[string]interface{}{
+		"Vector":    []string{"pJ341", "pJ221", "pJ321", "pJ201", "pJ344", "pJ224", "pJ324", "pJ204", "pJ347", "pJ227", "pJ327", "pJ207", "pJ348", "pJ228", "pJ328", "pJ208", "pJ349", "pJ229", "pJ329", "pJ209", "pJ351", "pJ231", "pJ331", "pJ211", "J354", "pJ234", "pJ334", "pJ214", "pJ357", "pJ234", "pJ334", "pJ217", "pJ358", "pJ238", "pJ338", "pJ218", "pJ359", "pJ239", "pJ339", "pJ219", "pM265", "pM268", "pM269", "pM275", "pM278", "pM279", "pM269E-19C", "pM269Y-19C", "pM262", "pM263", "pM264", "pM272", "pM273", "pM273", "pM274"},
+		"MaxLength": 3000,
+		"MinLength": 400,
+		"RepeatMax": 70,
+		"MinOrder":  0,
+	},
+	"GenScript": map[string]interface{}{
+		"Vector":    []string{"pUC57", "pUC57-Kan", "pUC57-Simple", "pUC57-mini", "pUC18", "pUC19"},
+		"MaxLength": 8000,
+		"MinLength": 400,
+		"RepeatMax": 70,
+		"MinOrder":  455,
+	},
+	"GeneWiz": map[string]interface{}{
+		"Vector":    []string{"pUC57"},
+		"MaxLength": 10000,
+		"MinLength": 200,
+		"RepeatMax": 70,
+		"MinOrder":  455,
+	},
+	"OriGene": map[string]interface{}{
+		"Vector":    []string{"pUCAmp", "pUCKan", "pUCAmpMinusMCS", "pUCKanMinusMCS"},
+		"MaxLength": 10000,
+		"MinLength": 200,
+		"RepeatMax": 70,
+		"MinOrder":  455,
+	},
+	"GeneArt": map[string]interface{}{
+		"Vector":    []string{"pUCAmp", "pUCKan", "pUCAmpMinusMCS", "pUCKanMinusMCS"},
+		"MaxLength": 10000,
+		"MinLength": 200,
+		"RepeatMax": 70,
+		"MinOrder":  455,
+	},
+	"EuroFins": map[string]interface{}{
+		"Vector":    []string{"pEX-A2", "pEX-K4"},
+		"MaxLength": 10000,
+		"MinLength": 200,
+		"RepeatMax": 20,
+		"MinOrder":  455,
+	},
 }

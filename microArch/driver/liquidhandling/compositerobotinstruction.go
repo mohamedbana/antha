@@ -640,9 +640,10 @@ func (ins *TransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProper
 		if ins.Volume[i] == nil || ins.Volume[i].LessThanFloat(0.001) {
 			continue
 		}
-
-		if i != 0 && ins.What[i] != ins.What[i-1] {
-			ret = append(ret, sci)
+		if i != 0 && (ins.What[i] != ins.What[i-1]) {
+			if len(sci.Volume) > 0 {
+				ret = append(ret, sci)
+			}
 			sci = NewSingleChannelBlockInstruction()
 			sci.Prms = prms.HeadsLoaded[0].Params
 		}
@@ -666,7 +667,10 @@ func (ins *TransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProper
 		ins.FVolume[i].Subtract(ins.Volume[i])
 		ins.TVolume[i].Add(ins.Volume[i])
 	}
-	ret = append(ret, sci)
+	if len(sci.Volume) > 0 {
+		ret = append(ret, sci)
+	}
+
 	return ret
 }
 
@@ -756,7 +760,6 @@ func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms
 	pol := policy.GetPolicyFor(ins)
 	ret := make([]RobotInstruction, 0)
 	// get tips
-
 	channel, tiptype := ChooseChannel(ins.Volume[0], prms)
 	ret = append(ret, GetTips(tiptype, prms, channel, 1, false))
 	n_tip_uses := 0

@@ -7,9 +7,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/trace"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"sync"
 )
 
@@ -33,16 +33,20 @@ func (a Port) String() string {
 	return fmt.Sprintf("%s.%s", a.Process, a.Port)
 }
 
+type Process struct {
+	Component string
+}
+
+type Connection struct {
+	Src Port
+	Tgt Port
+}
+
 // Description of a workflow. Structure inherited from and is a subset of
 // noflow library
 type Desc struct {
-	Processes map[string]struct {
-		Component string
-	}
-	Connections []struct {
-		Src Port
-		Tgt Port
-	}
+	Processes   map[string]Process
+	Connections []Connection
 }
 
 type endpoint struct {
@@ -246,6 +250,7 @@ func (a *Workflow) AddEdge(src, tgt Port) error {
 // Options for creating a new Workflow
 type Options struct {
 	FromBytes []byte
+	FromDesc  *Desc
 }
 
 // Create a new Workflow
@@ -255,11 +260,15 @@ func New(opt Options) (*Workflow, error) {
 		Outputs: make(map[Port]interface{}),
 	}
 
-	var desc Desc
-	if opt.FromBytes != nil {
+	var desc *Desc
+	if opt.FromDesc != nil {
+		desc = opt.FromDesc
+	} else if opt.FromBytes != nil {
 		if err := json.Unmarshal(opt.FromBytes, &desc); err != nil {
 			return nil, err
 		}
+	} else {
+		desc = &Desc{}
 	}
 
 	for name, process := range desc.Processes {

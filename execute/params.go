@@ -41,26 +41,54 @@ func constructOrError(v interface{}) (interface{}, error) {
 	return v, nil
 }
 
-type ConfigData struct {
-	MaxPlates            float64
-	MaxWells             float64
-	ResidualVolumeWeight float64
+type Config struct {
+	MaxPlates            *float64
+	MaxWells             *float64
+	ResidualVolumeWeight *float64
 	InputPlateType       []string
 	OutputPlateType      []string
-	PlanningVersion      int
-	WellByWell           bool
+	PlanningVersion      *int
+	WellByWell           *bool
+}
+
+// Merge two configs together and return the result. Values in the argument
+// override those in the receiver.
+func (a Config) Merge(x *Config) Config {
+	if x == nil {
+		return a
+	}
+	if x.MaxPlates != nil {
+		a.MaxPlates = x.MaxPlates
+	}
+	if x.MaxWells != nil {
+		a.MaxWells = x.MaxWells
+	}
+	if x.ResidualVolumeWeight != nil {
+		a.ResidualVolumeWeight = x.ResidualVolumeWeight
+	}
+	if len(x.InputPlateType) != 0 {
+		a.InputPlateType = x.InputPlateType
+	}
+	if len(x.OutputPlateType) != 0 {
+		a.OutputPlateType = x.OutputPlateType
+	}
+	if x.WellByWell != nil {
+		a.WellByWell = x.WellByWell
+	}
+
+	return a
 }
 
 // Structure of parameter data for unmarshalling
 type RawParams struct {
 	Parameters map[string]map[string]json.RawMessage
-	Config     ConfigData
+	Config     *Config
 }
 
 // Structure of parameter data for marshalling
 type Params struct {
 	Parameters map[string]map[string]interface{}
-	Config     ConfigData
+	Config     *Config
 }
 
 func findConstructor(typ reflect.Type) constructor {
@@ -159,11 +187,7 @@ func setParam(w *workflow.Workflow, process, name string, data []byte, in map[st
 	return w.SetParam(workflow.Port{Process: process, Port: name}, value.Interface())
 }
 
-func setParams(ctx context.Context, data []byte, w *workflow.Workflow) (*ConfigData, error) {
-	var params RawParams
-	if err := json.Unmarshal(data, &params); err != nil {
-		return nil, err
-	}
+func setParams(ctx context.Context, params *RawParams, w *workflow.Workflow) (*Config, error) {
 	for process, params := range params.Parameters {
 		c, err := w.FuncName(process)
 		if err != nil {
@@ -185,5 +209,5 @@ func setParams(ctx context.Context, data []byte, w *workflow.Workflow) (*ConfigD
 			}
 		}
 	}
-	return &params.Config, nil
+	return params.Config, nil
 }
