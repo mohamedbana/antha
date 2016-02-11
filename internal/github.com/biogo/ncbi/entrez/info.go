@@ -5,7 +5,7 @@
 package entrez
 
 import (
-	"github.com/biogo/ncbi/entrez/info"
+	"github.com/antha-lang/antha/internal/github.com/biogo/ncbi/entrez/info"
 )
 
 // <!--

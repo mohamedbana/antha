@@ -8,7 +8,7 @@ import (
 	"encoding/xml"
 	"strings"
 
-	"github.com/biogo/ncbi/entrez/link"
+	"github.com/antha-lang/antha/internal/github.com/biogo/ncbi/entrez/link"
 
 	"gopkg.in/check.v1"
 )

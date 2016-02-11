@@ -9,7 +9,7 @@ import (
 	"io"
 )
 
-// "github.com/biogo/entrez/xml"
+// "github.com/antha-lang/antha/internal/github.com/biogo/entrez/xml"
 
 // <!--
 // This is the Current DTD for Entrez eSpell
