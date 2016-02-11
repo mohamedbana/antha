@@ -201,7 +201,7 @@ func (e *AnthaLiquidHandler) configRequest(actionDescription equipment.ActionDes
 	return nil
 }
 func (e *AnthaLiquidHandler) sendMix(actionDescription equipment.ActionDescription) error {
-	var sol wtype.LHSolution
+	var sol wtype.LHInstruction
 	err := json.Unmarshal([]byte(actionDescription.ActionData), &sol)
 	if err != nil {
 		return err
@@ -230,7 +230,7 @@ func (e *AnthaLiquidHandler) sendMix(actionDescription equipment.ActionDescripti
 	}
 
 	req.Output_platetypes = opt
-	req.Output_solutions[sol.ID] = &sol
+	req.LHInstructions[sol.ID] = &sol
 
 	return nil
 }
