@@ -28,7 +28,7 @@ import (
 	"testing"
 	"time"
 
-	"golang.org/x/net/http2/hpack"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/http2/hpack"
 )
 
 var (

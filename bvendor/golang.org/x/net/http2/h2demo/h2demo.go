@@ -29,7 +29,7 @@ import (
 
 	"camlistore.org/pkg/googlestorage"
 	"go4.org/syncutil/singleflight"
-	"golang.org/x/net/http2"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/http2"
 )
 
 var (
@@ -74,7 +74,7 @@ href="https://http2.github.io/">HTTP/2</a> demo & interop server.</p>
 <p>This server exists for others in the HTTP/2 community to test their HTTP/2 client implementations and point out flaws in our server.</p>
 
 <p>
-The code is at <a href="https://golang.org/x/net/http2">golang.org/x/net/http2</a> and
+The code is at <a href="https://github.com/antha-lang/antha/bvendor/golang.org/x/net/http2">golang.org/x/net/http2</a> and
 is used transparently by the Go standard library from Go 1.6 and later.
 </p>
 

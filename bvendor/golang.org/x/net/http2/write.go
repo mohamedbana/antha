@@ -12,7 +12,7 @@ import (
 	"sort"
 	"time"
 
-	"golang.org/x/net/http2/hpack"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/http2/hpack"
 )
 
 // writeFramer is implemented by any type that is used to write frames.
