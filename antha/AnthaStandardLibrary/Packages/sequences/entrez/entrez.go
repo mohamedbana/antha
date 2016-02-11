@@ -27,7 +27,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
+	//"path/filepath"
 	"strings"
 	"time"
 
@@ -142,7 +142,7 @@ func RetrieveVector(id string) (sequence wtype.DNASequence) {
 
 	//first check if vector sequence is in fasta file
 	anthapath.CreatedotAnthafolder()
-	seq, err := parser.RetrieveSeqFromFASTA(id, filepath.Join(anthapath.Dirpath(), "vectors.txt"))
+	seq, err := parser.RetrieveSeqFromFASTA(id, "vectors.txt")
 
 	// if not in refactor, check db
 	if err != nil {
