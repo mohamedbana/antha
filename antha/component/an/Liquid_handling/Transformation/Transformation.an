@@ -27,7 +27,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Transformedcells *wtype.LHSolution
+	Transformedcells *wtype.LHComponent
 )
 
 Requirements {

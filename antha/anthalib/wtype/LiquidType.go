@@ -17,6 +17,9 @@ const (
 	LTProtein
 	LTDNA
 	LTload
+	LTDoNotMix
+	LTloadwater
+	LTNeedToMix
 )
 
 func LiquidTypeName(lt LiquidType) string {
@@ -37,6 +40,12 @@ func LiquidTypeName(lt LiquidType) string {
 		return "dna"
 	case LTload:
 		return "load"
+	case LTDoNotMix:
+		return "DoNotMix"
+	case LTloadwater:
+		return "loadwater"
+	case LTNeedToMix:
+		return "NeedToMix"
 	default:
 		return "water"
 	}

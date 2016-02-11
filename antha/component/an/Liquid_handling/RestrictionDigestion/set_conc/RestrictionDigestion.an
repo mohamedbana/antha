@@ -40,7 +40,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Reaction *wtype.LHSolution
+	Reaction *wtype.LHComponent
 )
 
 // Data which is returned from this protocol, and data types

@@ -27,7 +27,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	RecoveredCells *wtype.LHSolution
+	RecoveredCells *wtype.LHComponent
 )
 
 Requirements {

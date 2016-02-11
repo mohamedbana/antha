@@ -27,7 +27,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Platedculture *wtype.LHSolution
+	Platedculture *wtype.LHComponent
 )
 
 Requirements {

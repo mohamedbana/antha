@@ -30,7 +30,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Buffer *wtype.LHSolution
+	Buffer *wtype.LHComponent
 )
 
 // Data which is returned from this protocol, and data types

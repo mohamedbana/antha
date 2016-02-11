@@ -24,7 +24,7 @@ Parameters (
 	DNAgelrunvolume Volume
 	
 	
-	Mixingpolicy string
+	Mixingpolicy wtype.LiquidType
 	
 	//DNAladder Volume // or should this be a concentration?
 
@@ -69,7 +69,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Loadedsamples []*wtype.LHSolution//Gel
+	Loadedsamples []*wtype.LHComponent//Gel
     //
 )
 
@@ -99,12 +99,12 @@ Steps {
 		panic(fmt.Sprintln("length of sample names:",len(Samplenames), "is not equal to sample number:",Samplenumber))
 	}
 
-	loadedsamples := make([]*wtype.LHSolution,0)
+	loadedsamples := make([]*wtype.LHComponent,0)
 	
 	
 	var DNAgelloadmix *wtype.LHComponent
 
-	Water.Type = "loadwater"
+	Water.Type = wtype.LTloadwater
 	
 	for i:= 0;i < Samplenumber;i++{
 	// ready to add water to well
@@ -118,7 +118,7 @@ Steps {
 		mixer.Sample(Loadingdye,Loadingdyevolume),
 		mixer.SampleForTotalVolume(Sampletotest,DNAgelrunvolume),
 		)
-		DNAgelloadmix = wtype.SolutionToComponent(DNAgelloadmixsolution)
+		DNAgelloadmix = DNAgelloadmixsolution
 		}else {DNAgelloadmix = Sampletotest}
 
 	// Ensure  sample will be dispensed appropriately:

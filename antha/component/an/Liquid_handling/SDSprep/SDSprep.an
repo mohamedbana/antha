@@ -44,7 +44,7 @@ Inputs (
 Outputs (
 
 //Biologicals
-	LoadSample		*wtype.LHSolution
+	LoadSample		*wtype.LHComponent
 
 )
 

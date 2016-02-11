@@ -50,7 +50,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Platedculture *wtype.LHSolution
+	Platedculture *wtype.LHComponent
 )
 
 Requirements {
@@ -65,12 +65,12 @@ Setup {
 Steps {
 	competentcells := make([]*wtype.LHComponent,0)
 	competentcells = append(competentcells,CompetentCells)
-	readycompetentcells := MixInto(OutPlate, "", competentcells...)  // readycompetentcells IS now a LHSolution
-	Incubate (readycompetentcells,Preplasmidtemp, Preplasmidtime, false) // we can incubate an LHSolution so this is fine
+	readycompetentcells := MixInto(OutPlate, "", competentcells...)  // readycompetentcells IS now a LHComponent
+	Incubate (readycompetentcells,Preplasmidtemp, Preplasmidtime, false) // we can incubate an LHComponent so this is fine
 	
-	readycompetentcellsComp := wtype.SolutionToComponent(readycompetentcells)
+	readycompetentcellsComp := readycompetentcells
 	
-	competetentcellmix := mixer.Sample(readycompetentcellsComp, CompetentCellvolumeperassembly) // ERROR! mixer.Sample needs a liquid, not an LHSolution! however, the typeIIs method worked with a *wtype.LHComponent from inputs!
+	competetentcellmix := mixer.Sample(readycompetentcellsComp, CompetentCellvolumeperassembly) // ERROR! mixer.Sample needs a liquid, not an LHComponent! however, the typeIIs method worked with a *wtype.LHComponent from inputs!
 	transformationmix := make([]*wtype.LHComponent, 0)
 	transformationmix = append(transformationmix, competetentcellmix)
 	DNAsample := mixer.Sample(Reaction, Reactionvolume)
@@ -80,20 +80,20 @@ Steps {
 	
 	Incubate (transformedcells, Postplasmidtemp, Postplasmidtime,false)
 
-	transformedcellsComp := wtype.SolutionToComponent(transformedcells)
+	transformedcellsComp := transformedcells
 
 	recoverymix := make([]*wtype.LHComponent, 0)
 	recoverymixture := mixer.Sample(Recoverymedium, Recoveryvolume)
 
-	recoverymix = append(recoverymix,transformedcellsComp) // ERROR! transformedcells is now an LHSolution, not a liquid, so can't be used here
+	recoverymix = append(recoverymix,transformedcellsComp) // ERROR! transformedcells is now an LHComponent, not a liquid, so can't be used here
 	recoverymix = append(recoverymix,recoverymixture)
 	recoverymix2 := MixInto(OutPlate, "", recoverymix...)
 	
 	Incubate (recoverymix2,  Recoverytemp, Recoverytime, true)
 	
-	recoverymix2Comp := wtype.SolutionToComponent(recoverymix2)
+	recoverymix2Comp :=recoverymix2
 	
-	plateout := mixer.Sample(recoverymix2Comp, Plateoutvolume) // ERROR! recoverymix2 is now an LHSolution, not a liquid, so can't be used here
+	plateout := mixer.Sample(recoverymix2Comp, Plateoutvolume) // ERROR! recoverymix2 is now an LHComponent, not a liquid, so can't be used here
 	platedculture := MixInto(AgarPlate, "",  plateout)
 	
 	Platedculture = platedculture

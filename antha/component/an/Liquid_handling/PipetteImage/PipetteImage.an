@@ -34,7 +34,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	 Pixels[]*wtype.LHSolution
+	 Pixels[]*wtype.LHComponent
 )
 
 Requirements {
@@ -60,7 +60,7 @@ Steps {
 		panic(err)
 	}
 
-	solutions := make([]*wtype.LHSolution, 0)
+	solutions := make([]*wtype.LHComponent, 0)
 
 	counter := 0
 	// currently set up to only pipette if yellow (to make visualisation easier in trilution simulator
@@ -68,8 +68,8 @@ Steps {
 		
 		component := componentmap[image.Colourcomponentmap[colour]]
 
-		if component.Type == "dna" {
-			component.Type = "DoNotMix"
+		if component.TypeName() == "dna" {
+			component.Type = wtype.LTDoNotMix//"DoNotMix"
 		}
 		fmt.Println(image.Colourcomponentmap[colour])
 		

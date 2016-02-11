@@ -25,7 +25,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	ReadyCompCells *wtype.LHSolution
+	ReadyCompCells *wtype.LHComponent
 )
 
 Requirements {

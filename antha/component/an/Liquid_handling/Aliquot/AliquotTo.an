@@ -32,7 +32,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Aliquots []*wtype.LHSolution
+	Aliquots []*wtype.LHComponent
 )
 
 Requirements {
@@ -55,7 +55,7 @@ Steps {
 	}
 	
 	
-	aliquots := make([]*wtype.LHSolution,0)
+	aliquots := make([]*wtype.LHComponent,0)
 	
 	
 	// work out well coordinates for any plate
@@ -75,8 +75,8 @@ Steps {
 	}
 	
 	for k := 0; k < NumberofAliquots; k++ {
-		if Solution.Type == "dna"{
-		Solution.Type = "DoNotMix"
+		if Solution.TypeName() == "dna"{
+		Solution.Type = wtype.LTDoNotMix
 		}
 		aliquotSample := mixer.Sample(Solution, VolumePerAliquot)
 		aliquot := MixTo(OutPlate.Type,wellpositionarray[k], 0, aliquotSample)
