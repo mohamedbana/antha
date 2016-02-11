@@ -198,13 +198,6 @@ func (e *AnthaLiquidHandler) configRequest(actionDescription equipment.ActionDes
 		}
 	}
 
-	_, ok = params["WELLBYWELL"]
-
-	if ok {
-		logger.Debug("WELL BY WELL MODE SELECTED")
-		e.planner[data.BlockID].ExecutionPlanner = schedulerLiquidhandling.AdvancedExecutionPlanner2
-	}
-
 	return nil
 }
 func (e *AnthaLiquidHandler) sendMix(actionDescription equipment.ActionDescription) error {
