@@ -43,8 +43,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/hpack"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/http2"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/http2/hpack"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/codes"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/grpclog"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/metadata"

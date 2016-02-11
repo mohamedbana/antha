@@ -46,7 +46,7 @@ import (
 	"time"
 
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
-	"golang.org/x/net/http2"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/http2"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/codes"
 )
 

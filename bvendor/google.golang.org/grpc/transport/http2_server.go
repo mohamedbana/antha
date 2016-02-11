@@ -43,8 +43,8 @@ import (
 	"sync"
 
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/hpack"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/http2"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/http2/hpack"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/codes"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/credentials"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/grpclog"

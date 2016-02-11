@@ -22,6 +22,36 @@ const (
 	LTNeedToMix
 )
 
+func LiquidTypeFromString(s string) LiquidType {
+	switch s {
+	case "water":
+	case "":
+		return LTWater
+	case "glycerol":
+		return LTGlycerol
+	case "ethanol":
+		return LTEthanol
+	case "detergent":
+		return LTDetergent
+	case "culture":
+		return LTCulture
+	case "protein":
+		return LTProtein
+	case "dna":
+		return LTDNA
+	case "load":
+		return LTload
+	case "DoNotMix":
+		return LTDoNotMix
+	case "loadwater":
+		return LTloadwater
+	case "NeedToMix":
+		return LTNeedToMix
+	default:
+		return LTWater
+	}
+}
+
 func LiquidTypeName(lt LiquidType) string {
 	switch lt {
 	case LTWater:

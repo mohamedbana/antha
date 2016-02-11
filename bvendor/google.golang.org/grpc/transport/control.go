@@ -37,7 +37,7 @@ import (
 	"fmt"
 	"sync"
 
-	"golang.org/x/net/http2"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/http2"
 )
 
 const (
