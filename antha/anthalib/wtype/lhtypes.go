@@ -422,6 +422,7 @@ func (lhc *LHComponent) GetType() string {
 func NewLHComponent() *LHComponent {
 	var lhc LHComponent
 	lhc.ID = GetUUID()
+	lhc.Vunit = "ul"
 	return &lhc
 }
 
