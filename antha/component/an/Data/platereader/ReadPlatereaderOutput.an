@@ -1,13 +1,14 @@
 protocol AddPlateReaderresults
 
 import (
-	//"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	//"github.com/antha-lang/antha/antha/anthalib/wutil"
 	//"github.com/antha-lang/antha/antha/anthalib/mixer"
 	//"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/platereader"
 	//"path/filepath"
 	//antha "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"fmt"
@@ -20,17 +21,28 @@ Parameters (
 	MarsResultsFileXLSX           string 
 	DOEFilewithwelllocationsadded string 
 	DOEFiletype                   string 
-	
+	SheetNumber int
 	Responsecolumntofill string //= "AbsMV"
-
+	Sheet int
 	//Wavelength            int    = 440
 	ReadingTypeinMarsFile string // = "Abs Spectrum"
-
+	WavelengthtoUse            int   // = 440
+	
 	Blanks []string //= []string{"P9"}
 
 	ManualControls []string //= []string{"P24"}
-	
+	VolumePerwell Volume
+	WellForScanAnalysis []string // = []string{"A1"}
+	OutputFilename string
 )
+
+const (
+	PRESHAKEPRESPIN int = iota
+	POSTSHAKEPRESPIN
+	POSTSHAKEPOSTSPIN
+	PRESHAKEPRESPINPATHCORRECTED
+)
+
 
 // Data which is returned from this protocol, and data types
 Data (
@@ -40,7 +52,7 @@ Data (
 
 // Physical Inputs to this protocol with types
 Inputs (
-	
+	PlateType *wtype.LHPlate
 )
 
 // Physical outputs from this protocol with types
@@ -69,7 +81,7 @@ Steps {
 
 	if DOEFiletype == "DX" || DOEFiletype == "Design Expert" {
 
-		marsdata, err = parser.ParseMarsXLSXOutput(MarsResultsFileXLSX)
+		marsdata, err = parser.ParseMarsXLSXOutput(MarsResultsFileXLSX, Sheet)
 		if err != nil {
 			panic(err)
 		}
@@ -79,7 +91,7 @@ Steps {
 	runs, err := doe.RunsFromDXDesign(DOEFilewithwelllocationsadded, []string{"Pre_MIX", "POST_MIX"})
 
 	// find optimal wavlength from scan of positive control and blank
-	optimalwavelength := marsdata.FindOptimalWavelength(ManualControls[0], Blanks[0], "Raw Data")
+	optimalwavelength := marsdata.FindOptimalWavelength(WellForScanAnalysis[0], Blanks[0], "Raw Data")
 
 	// range through pairing up wells from mars output and doe design
 
@@ -107,8 +119,22 @@ Steps {
 
 		samples := []string{well.(string)}
 
-		blankcorrected, err := marsdata.BlankCorrect(samples, Blanks, optimalwavelength, ReadingTypeinMarsFile)
-		run.AddResponseValue(Responsecolumntofill, blankcorrected)
+		blankcorrected, err := marsdata.BlankCorrect(samples, Blanks, WavelengthtoUse, ReadingTypeinMarsFile)
+
+		// path length correct
+		pathlength, err := platereader.EstimatePathLength(PlateType, VolumePerwell)
+
+		if err != nil {
+			panic(err)
+		}
+
+		var absorbance wtype.Absorbance
+
+		absorbance.Reading = blankcorrected
+
+		pathlengthcorrect := platereader.PathlengthCorrect(pathlength, absorbance)
+
+		run.AddResponseValue(Responsecolumntofill, pathlengthcorrect.Reading)
 		//	}
 	}
 	//	}
@@ -120,8 +146,6 @@ Steps {
 
 	fmt.Println("Optimal wavelength from manual", optimalwavelength)
 	fmt.Println("Optimal wavelength of each sample", measuredoptimalwavelengths)
-	
-	
 	
 }
 
