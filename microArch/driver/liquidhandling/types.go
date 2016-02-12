@@ -475,7 +475,7 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []s
 		}
 
 		if !foundIt {
-			logger.Fatal("NO SOURCE FOR ", v.CName, " at volume ", v.Volume())
+			logger.Fatal("NO SOURCE FOR ", v.CName, " at volume ", v.Volume().ToString())
 		}
 
 	}

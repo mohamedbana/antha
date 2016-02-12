@@ -549,7 +549,6 @@ func (lhp *LHPlate) GetComponent(cmp *LHComponent) ([]WellCoords, bool) {
 
 	for wc := it.Curr(); it.Valid(); wc = it.Next() {
 		w := lhp.Wellcoords[wc.FormatA1()]
-
 		if w.Contents().CName == cmp.CName {
 			v := w.WorkingVolume()
 			volGot.Add(v)
@@ -641,7 +640,7 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit s
 			arr[i][j] = welltype.Dup()
 
 			//crds := wutil.NumToAlpha(i+1) + ":" + strconv.Itoa(j+1)
-			crds := WellCoords{i, j}.FormatA1()
+			crds := WellCoords{j, i}.FormatA1()
 			wellcoords[crds] = arr[i][j]
 			arr[i][j].Crds = crds
 			colarr[j][i] = arr[i][j]
@@ -749,6 +748,12 @@ Plate     : %v,
 }
 
 func (w *LHWell) Contents() *LHComponent {
+	// be careful
+	if w == nil {
+		// not quite sure
+		panic("THIS MAKES LITTLE SENSE")
+		return NewLHComponent()
+	}
 	if w.WContents == nil {
 		return NewLHComponent()
 	}

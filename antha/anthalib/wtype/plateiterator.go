@@ -23,11 +23,11 @@ func (it *BasicPlateIterator) Curr() WellCoords {
 }
 
 func (it *BasicPlateIterator) Valid() bool {
-	if it.cur.X > it.p.WellsX() || it.cur.X < 0 {
+	if it.cur.X >= it.p.WellsX() || it.cur.X < 0 {
 		return false
 	}
 
-	if it.cur.Y > it.p.WellsY() || it.cur.Y < 0 {
+	if it.cur.Y >= it.p.WellsY() || it.cur.Y < 0 {
 		return false
 	}
 
@@ -39,7 +39,7 @@ func (it *BasicPlateIterator) Next() WellCoords {
 	return it.cur
 }
 
-func NextInColumnOnce(wc WellCoords, p *LHPlate) WellCoords {
+func NextInRowOnce(wc WellCoords, p *LHPlate) WellCoords {
 	wc.X += 1
 	if wc.X >= p.WellsX() {
 		wc.X = 0
@@ -47,7 +47,7 @@ func NextInColumnOnce(wc WellCoords, p *LHPlate) WellCoords {
 	}
 	return wc
 }
-func NextInColumn(wc WellCoords, p *LHPlate) WellCoords {
+func NextInRow(wc WellCoords, p *LHPlate) WellCoords {
 	wc.X += 1
 	if wc.X >= p.WellsX() {
 		wc.X = 0
@@ -60,7 +60,7 @@ func NextInColumn(wc WellCoords, p *LHPlate) WellCoords {
 	return wc
 }
 
-func NextInRow(wc WellCoords, p *LHPlate) WellCoords {
+func NextInColumn(wc WellCoords, p *LHPlate) WellCoords {
 	wc.Y += 1
 	if wc.Y >= p.WellsY() {
 		wc.Y = 0
@@ -72,7 +72,8 @@ func NextInRow(wc WellCoords, p *LHPlate) WellCoords {
 	}
 	return wc
 }
-func NextInRowOnce(wc WellCoords, p *LHPlate) WellCoords {
+func NextInColumnOnce(wc WellCoords, p *LHPlate) WellCoords {
+	//fmt.Println(wc.FormatA1(), " ", "X: ", wc.X, " Y: ", wc.Y, "WX: ", p.WellsX(), " WY: ", p.WellsY())
 	wc.Y += 1
 	if wc.Y >= p.WellsY() {
 		wc.Y = 0
