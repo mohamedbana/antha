@@ -20,7 +20,7 @@ Parameters (
 	MarsResultsFileXLSX           string 
 	DOEFilewithwelllocationsadded string 
 	DOEFiletype                   string 
-	
+	SheetNumber int
 	Responsecolumntofill string //= "AbsMV"
 
 	//Wavelength            int    = 440
@@ -69,7 +69,7 @@ Steps {
 
 	if DOEFiletype == "DX" || DOEFiletype == "Design Expert" {
 
-		marsdata, err = parser.ParseMarsXLSXOutput(MarsResultsFileXLSX)
+		marsdata, err = parser.ParseMarsXLSXOutput(MarsResultsFileXLSX,SheetNumber)
 		if err != nil {
 			panic(err)
 		}
