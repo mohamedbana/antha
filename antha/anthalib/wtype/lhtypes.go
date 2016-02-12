@@ -480,6 +480,7 @@ func NewLHSetup() LHSetup {
 }
 
 // structure describing a microplate
+// this needs to be harmonised with the version
 type LHPlate struct {
 	*GenericEntity
 	ID          string
@@ -881,6 +882,28 @@ func (lhw *LHWell) Dup() *LHWell {
 	return cp
 }
 
+func (lhw *LHWell) CalculateCrossSectionArea() (ca wunit.Area, err error) {
+
+	ca, err = lhw.Shape().CrossSectionalArea()
+
+	return
+}
+
+func (lhw *LHWell) Volume() (vol wunit.Volume, err error) {
+
+	if lhw.Bottom == 0 { // flat
+		vol, err = lhw.Shape().Volume()
+	} /*else if lhw.Bottom == 1 { // round
+		vol, err = lhw.Shape().Volume()
+		// + additional calculation
+	} else if lhw.Bottom == 2 { // Pointed / v-shaped /pyramid
+		vol, err = lhw.Shape().Volume()
+		// + additional calculation
+	}
+	*/
+	return
+}
+
 // make a new well structure
 func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
 	var well LHWell
@@ -1205,6 +1228,7 @@ func (tb *LHTipbox) GetTips(mirror bool, multi, orient int) []string {
 				for j := s; j >= 0; j-- {
 					tb.Tips[i][j] = nil
 					wc := WellCoords{i, j}
+					fmt.Println(j, "Getting TIP from ", wc.FormatA1())
 					ret = append(ret, wc.FormatA1())
 					n += 1
 					if n >= multi {
@@ -1212,6 +1236,7 @@ func (tb *LHTipbox) GetTips(mirror bool, multi, orient int) []string {
 					}
 				}
 
+				fmt.Println("RET: ", ret)
 				break
 			}
 		}

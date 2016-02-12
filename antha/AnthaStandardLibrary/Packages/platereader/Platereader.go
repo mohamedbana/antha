@@ -24,6 +24,8 @@
 package platereader
 
 import (
+	"fmt"
+
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 )
@@ -50,6 +52,33 @@ func Blankcorrect(blank wtype.Absorbance, sample wtype.Absorbance) (blankcorrect
 		}
 		blankcorrected.Status = append(blankcorrected.Status, "Blank Corrected")
 	}
+	return
+}
+
+func EstimatePathLength(plate wtype.LHPlate, volume wunit.Volume) (pathlength wunit.Length, err error) {
+
+	if plate.Welltype.Bottom == 0 /* i.e. flat */ && plate.Welltype.Shape().LengthUnit == "mm" {
+		wellarea, err := plate.Welltype.CalculateCrossSectionArea()
+		if err != nil {
+
+			return pathlength, err
+		}
+		wellvol, err := plate.Welltype.Volume()
+		if err != nil {
+			return pathlength, err
+		}
+		ratio := volume.SIValue() / wellvol.SIValue()
+
+		siwellheight := wellvol.SIValue() / wellarea.SIValue()
+
+		sipathlength := siwellheight * ratio
+
+		pathlength = wunit.NewLength(sipathlength, "m")
+
+	} else {
+		err = fmt.Errorf("Can't yet estimate pathlength for this welltype shape unit ", plate.Welltype.Shape().LengthUnit, "or non flat bottom type")
+	}
+
 	return
 }
 
