@@ -208,11 +208,28 @@ func (ins *LHInstruction) HasParent(id string) bool {
 }
 
 func (ins *LHInstruction) ParentString() string {
-	s := ""
-	for _, v := range ins.Components {
-		s += v.ParentID + "_"
+	if ins == nil {
+		return ""
 	}
-	return s
+
+	tx := make([]string, 0, 1)
+
+	for _, v := range ins.Components {
+		//s += v.ParentID + "_"
+
+		pid := v.ParentID
+
+		if pid != "" {
+			tx = append(tx, pid)
+		}
+	}
+
+	if len(tx) == 0 {
+		return ""
+	} else {
+		return strings.Join(tx, "_")
+	}
+
 }
 
 // structure describing a solution: a combination of liquid components

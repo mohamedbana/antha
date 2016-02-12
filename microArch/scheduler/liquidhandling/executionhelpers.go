@@ -143,6 +143,9 @@ func (it *IChain) FindNodeFor(ins *wtype.LHInstruction) *IChain {
 			logger.Fatal("Improper use of IChain")
 		}
 	} else {
+		if it == nil {
+			panic("IT shouldn't be nil")
+		}
 		for _, v := range it.Values {
 			// true if any component used by ins is *this*
 			if ins.HasParent(v.ProductID) {
@@ -150,7 +153,7 @@ func (it *IChain) FindNodeFor(ins *wtype.LHInstruction) *IChain {
 			}
 		}
 
-		return it.Child.FindNodeFor(ins)
+		return it.GetChild().FindNodeFor(ins)
 	}
 	// unreachable: pstr either is or isn't ""
 	return nil
@@ -158,6 +161,11 @@ func (it *IChain) FindNodeFor(ins *wtype.LHInstruction) *IChain {
 
 func (it *IChain) Flatten() []string {
 	var ret []string
+
+	if it == nil {
+		return ret
+	}
+
 	for _, v := range it.Values {
 		ret = append(ret, v.ID)
 	}
