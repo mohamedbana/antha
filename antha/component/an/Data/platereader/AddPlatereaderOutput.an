@@ -18,26 +18,26 @@ import (
 
 // Input parameters for this protocol (data)
 Parameters (
-	MarsResultsFileXLSX           string 
-	DOEFilewithwelllocationsadded string 
-	DOEFiletype                   string 
-	SheetNumber int
-	Responsecolumntofill string //= "AbsMV"
-	Sheet int
+	MarsResultsFileXLSX           	string 
+	DOEFilewithwelllocationsadded 	string 
+	DOEFiletype                   	string 
+	SheetNumber 					int
+	Responsecolumntofill 			string //= "AbsMV"
+	Sheet 							int // see const below
 	//Wavelength            int    = 440
-	ReadingTypeinMarsFile string // = "Abs Spectrum"
-	WavelengthtoUse            int   // = 440
+	ReadingTypeinMarsFile 			string // = "Abs Spectrum"
+	WavelengthtoUse            		int   // = 440
 	
-	Blanks []string //= []string{"P9"}
+	Blanks 							[]string //= []string{"P9"}
 
-	ManualControls []string //= []string{"P24"}
-	VolumePerwell Volume
-	WellForScanAnalysis []string // = []string{"A1"}
-	OutputFilename string
+	ManualControls 					[]string //= []string{"P24"}
+	VolumePerwell 					Volume
+	WellForScanAnalysis 			[]string // = []string{"A1"}
+	OutputFilename 					string
 )
 
 const (
-	PRESHAKEPRESPIN int = iota
+	PRESHAKEPRESPIN 				int = iota
 	POSTSHAKEPRESPIN
 	POSTSHAKEPOSTSPIN
 	PRESHAKEPRESPINPATHCORRECTED
