@@ -29,8 +29,8 @@ var (
 	dataoutput MarsData
 )
 */
-func ParseMarsXLSXOutput(xlsxname string) (dataoutput MarsData, err error) {
-	clario, headerrowcount, err := ParseHeadLines(xlsxname)
+func ParseMarsXLSXOutput(xlsxname string, sheet int) (dataoutput MarsData, err error) {
+	clario, headerrowcount, err := ParseHeadLines(xlsxname, sheet)
 	if err != nil {
 		return
 	}
@@ -38,7 +38,7 @@ func ParseMarsXLSXOutput(xlsxname string) (dataoutput MarsData, err error) {
 
 	//dataoutput.User = strings.Split(cell.String(), ": ")[1]
 
-	wellmap, err := ParseWellData(xlsxname, headerrowcount)
+	wellmap, err := ParseWellData(xlsxname, sheet, headerrowcount)
 	if err != nil {
 		return
 	}
@@ -47,7 +47,7 @@ func ParseMarsXLSXOutput(xlsxname string) (dataoutput MarsData, err error) {
 	return
 }
 
-func ParseHeadLines(xlsxname string) (dataoutput MarsData, headerrowcount int, err error) {
+func ParseHeadLines(xlsxname string, sheet int) (dataoutput MarsData, headerrowcount int, err error) {
 	xlsx, err := spreadsheet.OpenFile(xlsxname)
 
 	//file, err := os.Open(filename)
@@ -55,7 +55,7 @@ func ParseHeadLines(xlsxname string) (dataoutput MarsData, headerrowcount int, e
 		return
 	}
 
-	sheet1 := xlsx.Sheets[0]
+	sheet1 := xlsx.Sheets[sheet]
 
 	for i := 0; i < sheet1.MaxRow; i++ {
 		if sheet1.Cell(i, 0).String() == "" {
@@ -149,7 +149,7 @@ func ParseHeadLines(xlsxname string) (dataoutput MarsData, headerrowcount int, e
 	return
 }
 
-func ParseWellData(xlsxname string, headerrows int) (welldatamap map[string]WellData, err error) {
+func ParseWellData(xlsxname string, sheet int, headerrows int) (welldatamap map[string]WellData, err error) {
 	welldatamap = make(map[string]WellData)
 	var welldata WellData
 	var wavelengthstring string
@@ -163,7 +163,7 @@ func ParseWellData(xlsxname string, headerrows int) (welldatamap map[string]Well
 		return
 	}
 
-	sheet1 := xlsx.Sheets[0]
+	sheet1 := xlsx.Sheets[sheet]
 
 	//column1 := sheet1.Col(1)
 	wellrowstart := 0

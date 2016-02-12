@@ -59,22 +59,30 @@ func EstimatePathLength(plate wtype.LHPlate, volume wunit.Volume) (pathlength wu
 
 	if plate.Welltype.Bottom == 0 /* i.e. flat */ && plate.Welltype.Shape().LengthUnit == "mm" {
 		wellarea, err := plate.Welltype.CalculateCrossSectionArea()
+		fmt.Println("wellarea", wellarea.ToString())
+		fmt.Println(plate.Welltype.Xdim, plate.Welltype.Ydim, plate.Welltype.Zdim, plate.Welltype.Shape())
 		if err != nil {
 
 			return pathlength, err
 		}
-		wellvol, err := plate.Welltype.Volume()
+		wellvol, err := plate.Welltype.CalculateMaxVolume()
 		if err != nil {
 			return pathlength, err
 		}
-		ratio := volume.SIValue() / wellvol.SIValue()
 
-		siwellheight := wellvol.SIValue() / wellarea.SIValue()
+		if volume.Unit().PrefixedSymbol() == "ul" && wellvol.Unit().PrefixedSymbol() == "ul" && wellarea.Unit().PrefixedSymbol() == "mm^2" || wellarea.Unit().PrefixedSymbol() == "mm" /* mm generated previously - wrong and needs fixing */ {
+			ratio := volume.RawValue() / wellvol.RawValue()
+			fmt.Println("ratio", ratio)
+			wellheightinmm := wellvol.RawValue() / wellarea.RawValue()
 
-		sipathlength := siwellheight * ratio
+			pathlengthinmm := wellheightinmm * ratio
 
-		pathlength = wunit.NewLength(sipathlength, "m")
+			pathlength = wunit.NewLength(pathlengthinmm, "mm")
 
+		} else {
+			fmt.Println(volume.Unit().PrefixedSymbol(), wellvol.Unit().PrefixedSymbol(), wellarea.Unit().PrefixedSymbol(), wellarea.ToString())
+		}
+		//fmt.Println("pathlength", pathlength.ToString())
 	} else {
 		err = fmt.Errorf("Can't yet estimate pathlength for this welltype shape unit ", plate.Welltype.Shape().LengthUnit, "or non flat bottom type")
 	}
@@ -84,9 +92,9 @@ func EstimatePathLength(plate wtype.LHPlate, volume wunit.Volume) (pathlength wu
 
 func PathlengthCorrect(pathlength wunit.Length, reading wtype.Absorbance) (pathlengthcorrected wtype.Absorbance) {
 
-	referencepathlength := wunit.NewLength(0.01, "m")
+	referencepathlength := wunit.NewLength(10, "mm")
 
-	pathlengthcorrected.Reading = reading.Reading * referencepathlength.SIValue() / pathlength.SIValue()
+	pathlengthcorrected.Reading = reading.Reading * referencepathlength.RawValue() / pathlength.RawValue()
 	return
 }
 

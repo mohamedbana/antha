@@ -889,7 +889,7 @@ func (lhw *LHWell) CalculateCrossSectionArea() (ca wunit.Area, err error) {
 	return
 }
 
-func (lhw *LHWell) Volume() (vol wunit.Volume, err error) {
+func (lhw *LHWell) CalculateMaxVolume() (vol wunit.Volume, err error) {
 
 	if lhw.Bottom == 0 { // flat
 		vol, err = lhw.Shape().Volume()

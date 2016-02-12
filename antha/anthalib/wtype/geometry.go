@@ -30,6 +30,7 @@ import (
 
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
+	"github.com/antha-lang/antha/microArch/logger"
 )
 
 type Coordinates struct {
@@ -72,8 +73,13 @@ func (sh *Shape) Dup() *Shape {
 func (sh *Shape) CrossSectionalArea() (area wunit.Area, err error) {
 
 	shapename := strings.ToLower(sh.ShapeName)
-	areaunit := sh.LengthUnit + `^` + strconv.Itoa(2)
-
+	var areaunit string
+	if sh.LengthUnit == "mm" {
+		areaunit = "mm^2" //sh.LengthUnit + `^` + strconv.Itoa(2)
+	} else {
+		err = fmt.Errorf("sh.Lengthunit =", sh.LengthUnit)
+		logger.Debug(err.Error())
+	}
 	var circular bool
 	var boxlike bool
 
@@ -87,6 +93,7 @@ func (sh *Shape) CrossSectionalArea() (area wunit.Area, err error) {
 		area = wunit.NewArea(math.Pi*sh.H*sh.H, areaunit)
 	} else if boxlike {
 		area = wunit.NewArea(sh.H*sh.W, areaunit)
+		fmt.Println(sh.H, sh.W, sh.H*sh.W, areaunit)
 	} else {
 		err = fmt.Errorf("No method to work out cross sectional area for shape", sh.ShapeName, "yet")
 	}
