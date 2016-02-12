@@ -23,7 +23,7 @@ import (
 // Input parameters for this protocol (data)
 
 //= "AbsMV"
-
+// see const below
 //Wavelength            int    = 440
 // = "Abs Spectrum"
 // = 440
@@ -223,7 +223,7 @@ func init() {
 		Constructor: AddPlateReaderresultsNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/Data/platereader/ReadPlatereaderOutput.an",
+			Path: "antha/component/an/Data/platereader/AddPlatereaderOutput.an",
 			Params: []ParamDesc{
 				{Name: "Blanks", Desc: "= []string{\"P9\"}\n", Kind: "Parameters"},
 				{Name: "DOEFiletype", Desc: "", Kind: "Parameters"},
@@ -234,7 +234,7 @@ func init() {
 				{Name: "PlateType", Desc: "", Kind: "Inputs"},
 				{Name: "ReadingTypeinMarsFile", Desc: "Wavelength            int    = 440\n\n= \"Abs Spectrum\"\n", Kind: "Parameters"},
 				{Name: "Responsecolumntofill", Desc: "= \"AbsMV\"\n", Kind: "Parameters"},
-				{Name: "Sheet", Desc: "", Kind: "Parameters"},
+				{Name: "Sheet", Desc: "see const below\n", Kind: "Parameters"},
 				{Name: "SheetNumber", Desc: "", Kind: "Parameters"},
 				{Name: "VolumePerwell", Desc: "", Kind: "Parameters"},
 				{Name: "WavelengthtoUse", Desc: "= 440\n", Kind: "Parameters"},
