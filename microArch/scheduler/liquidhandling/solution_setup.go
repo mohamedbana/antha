@@ -34,8 +34,6 @@ import (
 // determines how to
 // fulfil the requirements for making
 // instructions to specifications
-// WHERE DO WE GET THE STOCK CONCENTRATIONS FROM???
-// NEED TO SPECIFY THESE
 
 func solution_setup(request *LHRequest, prms *liquidhandling.LHProperties) (map[string]*wtype.LHInstruction, map[string]float64) {
 	instructions := request.LHInstructions
@@ -151,7 +149,7 @@ func solution_setup(request *LHRequest, prms *liquidhandling.LHProperties) (map[
 
 	//	fmt.Println("PRMS: ", prms)
 
-	if prms.CurrConf != nil {
+	if prms.CurrConf != nil && prms.CurrConf.Minvol != nil {
 		vmin = *(prms.CurrConf.Minvol)
 	}
 

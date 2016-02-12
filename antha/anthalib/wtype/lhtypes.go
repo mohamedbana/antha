@@ -26,11 +26,11 @@ package wtype
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
+
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/microArch/logger"
-	"strconv"
-	"strings"
 )
 
 const (
@@ -623,7 +623,8 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit s
 			}
 			arr[i][j] = welltype.Dup()
 
-			crds := wutil.NumToAlpha(i+1) + ":" + strconv.Itoa(j+1)
+			//crds := wutil.NumToAlpha(i+1) + ":" + strconv.Itoa(j+1)
+			crds := WellCoords{i, j}.FormatA1()
 			wellcoords[crds] = arr[i][j]
 			arr[i][j].Crds = crds
 			colarr[j][i] = arr[i][j]
@@ -897,15 +898,22 @@ func Get_Next_Well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 		if nrow == -1 {
 			return nil, false
 		}
-		crds := wutil.NumToAlpha(nrow) + ":" + strconv.Itoa(ncol)
+		//	crds := wutil.NumToAlpha(nrow) + ":" + strconv.Itoa(ncol)
+
+		crds := WellCoords{nrow - 1, ncol - 1}.FormatA1()
 
 		new_well = plate.Wellcoords[crds]
 
-		cnts := new_well.Contents()
-
-		if cnts == nil {
+		if new_well.Empty() {
 			break
 		}
+		cnts := new_well.Contents()
+
+		/*
+			if cnts == nil {
+				break
+			}
+		*/
 
 		cont := cnts.Name()
 		if cont != component.Name() {

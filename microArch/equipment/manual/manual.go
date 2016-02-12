@@ -529,6 +529,7 @@ func (e *AnthaManualGrpc) Init() error {
 	//e.properties = factory.GetLiquidhandlerByType("GilsonPipetmax")
 	//e.properties = factory.GetLiquidhandlerByType("CyBioGeneTheatre")
 	p, s := e.driver.GetCapabilities()
+
 	e.properties = &p
 	e.properties.Driver = e.driver
 	if s.OK {

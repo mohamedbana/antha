@@ -23,6 +23,8 @@
 package liquidhandling
 
 import (
+	"fmt"
+
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	//"github.com/antha-lang/antha/antha/anthalib/wutil"
@@ -79,7 +81,7 @@ func get_and_complete_assignments(request *LHRequest) []PlateChoice {
 			i := defined(v.PlateID, s)
 
 			if i == -1 {
-				s = append(s, PlateChoice{v.Platetype, []string{v.ID}, v.PlateID, []string{}})
+				s = append(s, PlateChoice{v.Platetype, []string{v.ID}, v.PlateID, []string{v.Welladdress}})
 			} else {
 				s[i].Assigned = append(s[i].Assigned, v.ID)
 				s[i].Wells = append(s[i].Wells, v.Welladdress)
@@ -87,16 +89,17 @@ func get_and_complete_assignments(request *LHRequest) []PlateChoice {
 		} else if v.Majorlayoutgroup != -1 {
 			id, ok := m[v.Majorlayoutgroup]
 			if !ok {
-				id := wtype.NewUUID()
+				id = wtype.NewUUID()
 				m[v.Majorlayoutgroup] = id
-				//  fix the plate id to this temporary one
-				request.LHInstructions[k].PlateID = id
 			}
+
+			//  fix the plate id to this temporary one
+			request.LHInstructions[k].PlateID = id
 
 			i := defined(id, s)
 
 			if i == -1 {
-				s = append(s, PlateChoice{v.Platetype, []string{v.ID}, v.PlateID, []string{}})
+				s = append(s, PlateChoice{v.Platetype, []string{v.ID}, id, []string{v.Welladdress}})
 			} else {
 				s[i].Assigned = append(s[i].Assigned, v.ID)
 				s[i].Wells = append(s[i].Wells, v.Welladdress)
@@ -139,7 +142,7 @@ func choose_plates(request *LHRequest, pc []PlateChoice) []PlateChoice {
 			if ass == -1 {
 				// make a new plate
 				ass = len(pc)
-				pc = append(pc, PlateChoice{chooseAPlate(request, v), []string{v.ID}, wtype.GetUUID(), []string{}})
+				pc = append(pc, PlateChoice{chooseAPlate(request, v), []string{v.ID}, wtype.GetUUID(), []string{""}})
 			}
 
 			pc[ass].Assigned = append(pc[ass].Assigned, v.ID)
@@ -178,6 +181,7 @@ func modpc(choice PlateChoice, nwell int) []PlateChoice {
 		if e > len(choice.Assigned) {
 			e = len(choice.Assigned)
 		}
+		fmt.Println("S:", s, " E:", e)
 		r = append(r, PlateChoice{choice.Platetype, choice.Assigned[s:e], wtype.GetUUID(), choice.Wells[s:e]})
 	}
 	return r

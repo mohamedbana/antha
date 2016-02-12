@@ -29,6 +29,8 @@ func configMix(inst *MixInst) (*wtype.LHInstruction, error) {
 		PlateNum:    inst.Opt.PlateNum,
 		PlateType:   inst.Opt.PlateType,
 	})
+
+	r.BlockID = inst.Opt.OutputCmp.BlockID
 	return r, nil
 }
 

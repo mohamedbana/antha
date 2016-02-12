@@ -207,6 +207,8 @@ func (e *AnthaLiquidHandler) sendMix(actionDescription equipment.ActionDescripti
 		return err
 	}
 
+	fmt.Println(sol.BlockID, " AYAYAYAYAYAYAYAYAYAY")
+
 	e.queueLock.Lock()
 	defer e.queueLock.Unlock()
 
