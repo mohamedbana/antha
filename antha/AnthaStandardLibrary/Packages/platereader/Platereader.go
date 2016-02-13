@@ -98,6 +98,20 @@ func PathlengthCorrect(pathlength wunit.Length, reading wtype.Absorbance) (pathl
 	return
 }
 
+// based on Beer Lambert law A = ε l c
+func Concentration(pathlengthcorrected wtype.Absorbance, molarabsorbtivityatwavelengthLpermolpercm float64) (conc wunit.Concentration) {
+
+	A := pathlengthcorrected
+	l := 1                                         // 1cm if pathlengthcorrected add logic to use pathlength of absorbance reading input
+	ε := molarabsorbtivityatwavelengthLpermolpercm // L/Mol/cm
+
+	concfloat := A.Reading / (float64(l) * ε) // Mol/L
+	fmt.Println("concfloat", concfloat)
+	conc = wunit.NewConcentration(concfloat, "M/l")
+	fmt.Println("concfloat", conc)
+	return
+}
+
 //example
 
 /*
