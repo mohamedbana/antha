@@ -35,6 +35,32 @@ import (
 	"strings"
 )
 
+func GenbanktoSimpleSeq(filename string) (seq string) {
+
+	var line string
+	genbanklines := make([]string, 0)
+	file, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line = fmt.Sprintln(scanner.Text())
+		genbanklines = append(genbanklines, line)
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	seq = HandleSequence(genbanklines)
+
+	return
+
+}
+
 func GenbanktoDNASequence(filename string) (standardseq wtype.DNASequence, err error) {
 
 	var annotated sequences.AnnotatedSeq
@@ -136,7 +162,7 @@ func ParseGenbankfile(file *os.File) (annotated sequences.AnnotatedSeq, err erro
 		line = fmt.Sprintln(scanner.Text())
 		genbanklines = append(genbanklines, line)
 	}
-
+	fmt.Println("lines scanned")
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
@@ -151,7 +177,7 @@ func HandleGenbank(lines []string) (annotatedseq sequences.AnnotatedSeq, err err
 	if lines[0][0:5] == `LOCUS` {
 		// fmt.Println("in Locus")
 		name, _, _, circular, _, err := Locusline(lines[0])
-		// // fmt.Println("foundout this stuff", name, err)
+		fmt.Println("foundout this", name)
 		if err != nil {
 			return annotatedseq, err
 		}
