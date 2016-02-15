@@ -266,6 +266,11 @@ type Molecule struct {
 	CID              int     `json:"CID"`
 }
 
+func (molecule Molecule) WeightPerVol(molarity float64) (weightpervol float64) {
+	weightpervol = molarity * molecule.MolecularWeight
+	return
+}
+
 type Substance struct {
 	Substancename string
 	SID           int `json:"SID"`
