@@ -48,6 +48,23 @@ func (run Run) AddResponseValue(responsedescriptor string, responsevalue interfa
 
 }
 
+// inexplicably not working
+func (run Run) AddNewResponseFieldandValue(responsedescriptor string, responsevalue interface{}) {
+
+	responsedescriptors := make([]string, len(run.Responsedescriptors))
+	responsevalues := make([]interface{}, len(run.ResponseValues))
+
+	responsedescriptors = run.Responsedescriptors
+	responsevalues = run.ResponseValues
+
+	responsedescriptors = append(responsedescriptors, responsedescriptor)
+	responsevalues = append(responsevalues, responsevalue)
+
+	run.Responsedescriptors = responsedescriptors
+	run.ResponseValues = responsevalues
+	fmt.Println(run)
+}
+
 func (run Run) CheckAdditionalInfo(subheader string, value interface{}) bool {
 
 	for i, header := range run.AdditionalSubheaders {
