@@ -51,8 +51,8 @@ Steps {
 	
 	DmolarConc = Dnew.AsMolar(mass)
 	*/
-	Sum = *(wunit.CopyVolume(&A))
-	(&Sum).Add(&B)
+	Sum = (wunit.CopyVolume(A))
+	Sum.Add(B)
 	Status = fmt.Sprintln(
 	"Sum of", A.ToString(), "and", B.ToString(), "=", Sum.ToString(), "Temp=",C.ToString(),
 	)//"D Concentration in g/l", D, "D concentration in M/l", DmolarConc)

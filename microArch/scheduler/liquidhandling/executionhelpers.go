@@ -189,8 +189,8 @@ func set_output_order(rq *LHRequest) {
 }
 
 func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) (insOut *driver.TransferInstruction) {
-	wh := make([]string, len(insIn.Components))        // component types
-	va := make([]*wunit.Volume, len(insIn.Components)) // volumes
+	wh := make([]string, len(insIn.Components))       // component types
+	va := make([]wunit.Volume, len(insIn.Components)) // volumes
 
 	// four parameters applying to the destination
 
@@ -211,15 +211,15 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) 
 	for i, v := range insIn.Components {
 		wh[i] = v.TypeName()
 		v2 := wunit.NewVolume(v.Vol, v.Vunit)
-		va[i] = &v2
+		va[i] = v2
 		pt[i] = robot.PlateIDLookup[insIn.PlateID]
 		wt[i] = insIn.Welladdress
-		ptwx[i] = robot.Plates[insIn.PlateID].WellsX()
-		ptwy[i] = robot.Plates[insIn.PlateID].WellsY()
+		ptwx[i] = robot.Plates[robot.PlateIDLookup[insIn.PlateID]].WellsX()
+		ptwy[i] = robot.Plates[robot.PlateIDLookup[insIn.PlateID]].WellsY()
 		pf[i] = robot.PlateIDLookup[fromPlateID[i]]
 		wf[i] = fromWells[i]
-		pfwx[i] = robot.Plates[fromPlateID[i]].WellsX()
-		pfwy[i] = robot.Plates[fromPlateID[i]].WellsY()
+		pfwx[i] = robot.Plates[robot.PlateIDLookup[fromPlateID[i]]].WellsX()
+		pfwy[i] = robot.Plates[robot.PlateIDLookup[fromPlateID[i]]].WellsY()
 	}
 
 	ti := driver.TransferInstruction{Type: driver.TFR, What: wh, Volume: va, PltTo: pt, WellTo: wt, TPlateWX: ptwx, TPlateWY: ptwy, PltFrom: pf, WellFrom: wf, FPlateWX: pfwx, FPlateWY: pfwy}

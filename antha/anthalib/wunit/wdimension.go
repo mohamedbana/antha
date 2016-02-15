@@ -95,9 +95,9 @@ func NewVolume(v float64, unit string) Volume {
 	return a
 }
 */
-func CopyVolume(v *Volume) *Volume {
+func CopyVolume(v Volume) Volume {
 	ret := NewVolume(v.RawValue(), v.Unit().PrefixedSymbol())
-	return &ret
+	return ret
 }
 
 // temperature

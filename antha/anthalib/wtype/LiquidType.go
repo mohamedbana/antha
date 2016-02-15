@@ -115,14 +115,14 @@ func mergeTypes(c1, c2 *LHComponent) LiquidType {
 
 // merge two names... we have a lookup function to add here
 func mergeNames(a, b string) string {
-	tx := strings.Split(a, "_")
-	tx2 := strings.Split(b, "_")
+	tx := strings.Split(a, "+")
+	tx2 := strings.Split(b, "+")
 
 	tx3 := mergeTox(tx, tx2)
 
 	tx3 = Normalize(tx3)
 
-	return strings.Join(tx3, "_")
+	return strings.Join(tx3, "+")
 }
 
 // very simple, just add elements of tx2 not already in tx
@@ -153,5 +153,8 @@ func IndexOfStringArray(s string, a []string) int {
 // - water + salt = saline might be an eg
 // but unlikely to be useful
 func Normalize(tx []string) []string {
+	if tx[0] == "" && len(tx) > 1 {
+		return tx[1:len(tx)]
+	}
 	return tx
 }

@@ -95,6 +95,7 @@ func NewLHRequest() *LHRequest {
 	lhr.Output_assignments = make(map[string][]string)
 	lhr.Input_assignments = make(map[string][]string)
 	lhr.Order_instructions_added = make([]string, 0, 1)
+	lhr.InstructionSet = liquidhandling.NewRobotInstructionSet(nil)
 	return &lhr
 }
 

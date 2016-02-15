@@ -41,11 +41,11 @@ type TransferParams struct {
 	PltTo      string
 	WellFrom   string
 	WellTo     string
-	Volume     *wunit.Volume
+	Volume     wunit.Volume
 	FPlateType string
 	TPlateType string
-	FVolume    *wunit.Volume
-	TVolume    *wunit.Volume
+	FVolume    wunit.Volume
+	TVolume    wunit.Volume
 	Channel    *wtype.LHChannelParameter
 }
 
@@ -59,11 +59,11 @@ type MultiTransferParams struct {
 	PltTo      []string
 	WellFrom   []string
 	WellTo     []string
-	Volume     []*wunit.Volume
+	Volume     []wunit.Volume
 	FPlateType []string
 	TPlateType []string
-	FVolume    []*wunit.Volume
-	TVolume    []*wunit.Volume
+	FVolume    []wunit.Volume
+	TVolume    []wunit.Volume
 	Channel    *wtype.LHChannelParameter
 }
 
@@ -74,15 +74,15 @@ func NewMultiTransferParams(multi int) MultiTransferParams {
 	v.PltTo = make([]string, 0, multi)
 	v.WellFrom = make([]string, 0, multi)
 	v.WellTo = make([]string, 0, multi)
-	v.Volume = make([]*wunit.Volume, 0, multi)
-	v.FVolume = make([]*wunit.Volume, 0, multi)
-	v.TVolume = make([]*wunit.Volume, 0, multi)
+	v.Volume = make([]wunit.Volume, 0, multi)
+	v.FVolume = make([]wunit.Volume, 0, multi)
+	v.TVolume = make([]wunit.Volume, 0, multi)
 	v.FPlateType = make([]string, 0, multi)
 	v.TPlateType = make([]string, 0, multi)
 	return v
 }
 
-func ChooseChannel(vol *wunit.Volume, prms *LHProperties) (*wtype.LHChannelParameter, string) {
+func ChooseChannel(vol wunit.Volume, prms *LHProperties) (*wtype.LHChannelParameter, string) {
 	// very quick and dirty, basically just makes sure the minimum volume is
 	// below the required volume
 
@@ -171,15 +171,15 @@ type TransferInstruction struct {
 	PltTo      []string
 	WellFrom   []string
 	WellTo     []string
-	Volume     []*wunit.Volume
+	Volume     []wunit.Volume
 	FPlateType []string
 	TPlateType []string
 	FPlateWX   []int
 	FPlateWY   []int
 	TPlateWX   []int
 	TPlateWY   []int
-	FVolume    []*wunit.Volume
-	TVolume    []*wunit.Volume
+	FVolume    []wunit.Volume
+	TVolume    []wunit.Volume
 }
 
 func (ti *TransferInstruction) ToString() string {
@@ -196,7 +196,7 @@ func (ti *TransferInstruction) ParamSet(n int) TransferParams {
 	return TransferParams{ti.What[n], ti.PltFrom[n], ti.PltTo[n], ti.WellFrom[n], ti.WellTo[n], ti.Volume[n], ti.FPlateType[n], ti.TPlateType[n], ti.FVolume[n], ti.TVolume[n], nil}
 }
 
-func NewTransferInstruction(what, pltfrom, pltto, wellfrom, wellto, fplatetype, tplatetype []string, volume, fvolume, tvolume []*wunit.Volume, FPlateWX, FPlateWY, TPlateWX, TPlateWY []int) *TransferInstruction {
+func NewTransferInstruction(what, pltfrom, pltto, wellfrom, wellto, fplatetype, tplatetype []string, volume, fvolume, tvolume []wunit.Volume, FPlateWX, FPlateWY, TPlateWX, TPlateWY []int) *TransferInstruction {
 	var v TransferInstruction
 	v.Type = TFR
 	v.What = what
@@ -292,7 +292,7 @@ func TransferVolumes(Vol, Min, Max wunit.Volume) []wunit.Volume {
 	return ret
 }
 
-func (vs VolumeSet) MaxMultiTransferVolume() *wunit.Volume {
+func (vs VolumeSet) MaxMultiTransferVolume() wunit.Volume {
 	// the minimum volume in the set
 
 	ret := vs.Vols[0]
@@ -504,27 +504,26 @@ func isin(i int, a []int) bool {
 // helper thing
 
 type VolumeSet struct {
-	Vols []*wunit.Volume
+	Vols []wunit.Volume
 }
 
 func NewVolumeSet(n int) VolumeSet {
 	var vs VolumeSet
-	vs.Vols = make([]*wunit.Volume, n)
+	vs.Vols = make([]wunit.Volume, n)
 	for i := 0; i < n; i++ {
-		v := (wunit.NewVolume(0.0, "ul"))
-		vs.Vols[i] = &v
+		vs.Vols[i] = (wunit.NewVolume(0.0, "ul"))
 	}
 	return vs
 }
 
-func (vs VolumeSet) Add(v *wunit.Volume) {
+func (vs VolumeSet) Add(v wunit.Volume) {
 	for i := 0; i < len(vs.Vols); i++ {
 		vs.Vols[i].Add(v)
 	}
 }
 
-func (vs VolumeSet) Sub(v *wunit.Volume) []*wunit.Volume {
-	ret := make([]*wunit.Volume, len(vs.Vols))
+func (vs VolumeSet) Sub(v wunit.Volume) []wunit.Volume {
+	ret := make([]wunit.Volume, len(vs.Vols))
 	for i := 0; i < len(vs.Vols); i++ {
 		vs.Vols[i].Subtract(v)
 		ret[i] = wunit.CopyVolume(v)
@@ -532,14 +531,14 @@ func (vs VolumeSet) Sub(v *wunit.Volume) []*wunit.Volume {
 	return ret
 }
 
-func (vs VolumeSet) SetEqualTo(v *wunit.Volume) {
+func (vs VolumeSet) SetEqualTo(v wunit.Volume) {
 	for i := 0; i < len(vs.Vols); i++ {
 		vs.Vols[i] = wunit.CopyVolume(v)
 	}
 }
 
-func (vs VolumeSet) GetACopy() []*wunit.Volume {
-	r := make([]*wunit.Volume, len(vs.Vols))
+func (vs VolumeSet) GetACopy() []wunit.Volume {
+	r := make([]wunit.Volume, len(vs.Vols))
 	for i := 0; i < len(vs.Vols); i++ {
 		r[i] = wunit.CopyVolume(vs.Vols[i])
 	}
@@ -637,7 +636,7 @@ func (ins *TransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProper
 	sci.Prms = prms.HeadsLoaded[0].Params // TODO Fix Hard Code Here
 
 	for i, _ := range ins.What {
-		if ins.Volume[i] == nil || ins.Volume[i].LessThanFloat(0.001) {
+		if ins.Volume[i].LessThanFloat(0.001) {
 			continue
 		}
 
@@ -677,11 +676,11 @@ type SingleChannelBlockInstruction struct {
 	PltTo      []string
 	WellFrom   []string
 	WellTo     []string
-	Volume     []*wunit.Volume
+	Volume     []wunit.Volume
 	FPlateType []string
 	TPlateType []string
-	FVolume    []*wunit.Volume
-	TVolume    []*wunit.Volume
+	FVolume    []wunit.Volume
+	TVolume    []wunit.Volume
 	Prms       *wtype.LHChannelParameter
 }
 
@@ -693,9 +692,9 @@ func NewSingleChannelBlockInstruction() *SingleChannelBlockInstruction {
 	v.PltTo = make([]string, 0)
 	v.WellFrom = make([]string, 0)
 	v.WellTo = make([]string, 0)
-	v.Volume = make([]*wunit.Volume, 0)
-	v.FVolume = make([]*wunit.Volume, 0)
-	v.TVolume = make([]*wunit.Volume, 0)
+	v.Volume = make([]wunit.Volume, 0)
+	v.FVolume = make([]wunit.Volume, 0)
+	v.TVolume = make([]wunit.Volume, 0)
 	v.FPlateType = make([]string, 0)
 	v.TPlateType = make([]string, 0)
 	return &v
@@ -766,7 +765,7 @@ func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms
 
 	for t := 0; t < len(ins.Volume); t++ {
 		newchannel, newtiptype := ChooseChannel(ins.Volume[t], prms)
-		tvs := TransferVolumes(*ins.Volume[t], *channel.Minvol, *channel.Maxvol)
+		tvs := TransferVolumes(ins.Volume[t], channel.Minvol, channel.Maxvol)
 		for _, vol := range tvs {
 			// determine whether to change tips
 			change_tips := false
@@ -797,7 +796,7 @@ func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms
 			stci.PltTo = ins.PltTo[t]
 			stci.WellFrom = ins.WellFrom[t]
 			stci.WellTo = ins.WellTo[t]
-			stci.Volume = &vol
+			stci.Volume = vol
 			stci.FPlateType = ins.FPlateType[t]
 			stci.TPlateType = ins.TPlateType[t]
 			stci.FVolume = wunit.CopyVolume(ins.FVolume[t])
@@ -806,8 +805,8 @@ func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms
 
 			ret = append(ret, stci)
 
-			ins.FVolume[t].Subtract(&vol)
-			ins.TVolume[t].Add(&vol)
+			ins.FVolume[t].Subtract(vol)
+			ins.TVolume[t].Add(vol)
 			n_tip_uses += 1
 		}
 
@@ -824,11 +823,11 @@ type MultiChannelBlockInstruction struct {
 	PltTo      [][]string
 	WellFrom   [][]string
 	WellTo     [][]string
-	Volume     [][]*wunit.Volume
+	Volume     [][]wunit.Volume
 	FPlateType [][]string
 	TPlateType [][]string
-	FVolume    [][]*wunit.Volume
-	TVolume    [][]*wunit.Volume
+	FVolume    [][]wunit.Volume
+	TVolume    [][]wunit.Volume
 	Multi      int
 	Prms       *wtype.LHChannelParameter
 }
@@ -841,11 +840,11 @@ func NewMultiChannelBlockInstruction() *MultiChannelBlockInstruction {
 	v.PltTo = make([][]string, 0)
 	v.WellFrom = make([][]string, 0)
 	v.WellTo = make([][]string, 0)
-	v.Volume = make([][]*wunit.Volume, 0)
+	v.Volume = make([][]wunit.Volume, 0)
 	v.FPlateType = make([][]string, 0)
 	v.TPlateType = make([][]string, 0)
-	v.FVolume = make([][]*wunit.Volume, 0)
-	v.TVolume = make([][]*wunit.Volume, 0)
+	v.FVolume = make([][]wunit.Volume, 0)
+	v.TVolume = make([][]wunit.Volume, 0)
 	return &v
 }
 
@@ -925,7 +924,7 @@ func (ins *MultiChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms 
 
 		// split the transfer up
 		// NB we assume all volumes are equal here;
-		tvs := TransferVolumes(*ins.Volume[t][0], *newchannel.Minvol, *newchannel.Maxvol)
+		tvs := TransferVolumes(ins.Volume[t][0], newchannel.Minvol, newchannel.Maxvol)
 
 		for _, vol := range tvs {
 			// enforce tip usage policy
@@ -938,7 +937,7 @@ func (ins *MultiChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms 
 			}
 
 			mci := NewMultiChannelTransferInstruction()
-			vols.SetEqualTo(&vol)
+			vols.SetEqualTo(vol)
 			mci.What = ins.What[t]
 			mci.Volume = vols.GetACopy()
 			mci.FVolume = fvols.GetACopy()
@@ -955,8 +954,8 @@ func (ins *MultiChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms 
 
 			tiptype = newtiptype
 			channel = newchannel
-			fvols.Sub(&vol)
-			tvols.Add(&vol)
+			fvols.Sub(vol)
+			tvols.Add(vol)
 		}
 	}
 
@@ -973,11 +972,11 @@ type SingleChannelTransferInstruction struct {
 	PltTo      string
 	WellFrom   string
 	WellTo     string
-	Volume     *wunit.Volume
+	Volume     wunit.Volume
 	FPlateType string
 	TPlateType string
-	FVolume    *wunit.Volume
-	TVolume    *wunit.Volume
+	FVolume    wunit.Volume
+	TVolume    wunit.Volume
 	Prms       *wtype.LHChannelParameter
 }
 
@@ -1075,11 +1074,11 @@ type MultiChannelTransferInstruction struct {
 	PltTo      []string
 	WellFrom   []string
 	WellTo     []string
-	Volume     []*wunit.Volume
+	Volume     []wunit.Volume
 	FPlateType []string
 	TPlateType []string
-	FVolume    []*wunit.Volume
-	TVolume    []*wunit.Volume
+	FVolume    []wunit.Volume
+	TVolume    []wunit.Volume
 	Multi      int
 	Prms       *wtype.LHChannelParameter
 }
@@ -1107,9 +1106,9 @@ func NewMultiChannelTransferInstruction() *MultiChannelTransferInstruction {
 	v.PltTo = make([]string, 0)
 	v.WellFrom = make([]string, 0)
 	v.WellTo = make([]string, 0)
-	v.Volume = make([]*wunit.Volume, 0)
-	v.FVolume = make([]*wunit.Volume, 0)
-	v.TVolume = make([]*wunit.Volume, 0)
+	v.Volume = make([]wunit.Volume, 0)
+	v.FVolume = make([]wunit.Volume, 0)
+	v.TVolume = make([]wunit.Volume, 0)
 	v.FPlateType = make([]string, 0)
 	v.TPlateType = make([]string, 0)
 	return &v
@@ -1408,7 +1407,7 @@ func (ins *UnloadTipsMoveInstruction) Generate(policy *LHPolicyRuleSet, prms *LH
 type AspirateInstruction struct {
 	Type       int
 	Head       int
-	Volume     []*wunit.Volume
+	Volume     []wunit.Volume
 	Overstroke bool
 	Multi      int
 	Plt        []string
@@ -1419,7 +1418,7 @@ type AspirateInstruction struct {
 func NewAspirateInstruction() *AspirateInstruction {
 	var v AspirateInstruction
 	v.Type = ASP
-	v.Volume = make([]*wunit.Volume, 0)
+	v.Volume = make([]wunit.Volume, 0)
 	v.Plt = make([]string, 0)
 	v.What = make([]string, 0)
 	v.LLF = make([]bool, 0)
@@ -1468,7 +1467,7 @@ func (ins *AspirateInstruction) OutputTo(driver LiquidhandlingDriver) {
 type DispenseInstruction struct {
 	Type   int
 	Head   int
-	Volume []*wunit.Volume
+	Volume []wunit.Volume
 	Multi  int
 	Plt    []string
 	What   []string
@@ -1478,7 +1477,7 @@ type DispenseInstruction struct {
 func NewDispenseInstruction() *DispenseInstruction {
 	var v DispenseInstruction
 	v.Type = DSP
-	v.Volume = make([]*wunit.Volume, 0)
+	v.Volume = make([]wunit.Volume, 0)
 	v.Plt = make([]string, 0)
 	v.What = make([]string, 0)
 	v.LLF = make([]bool, 0)
@@ -1525,7 +1524,7 @@ func (ins *DispenseInstruction) OutputTo(driver LiquidhandlingDriver) {
 type BlowoutInstruction struct {
 	Type   int
 	Head   int
-	Volume []*wunit.Volume
+	Volume []wunit.Volume
 	Multi  int
 	Plt    []string
 	What   []string
@@ -1535,7 +1534,7 @@ type BlowoutInstruction struct {
 func NewBlowoutInstruction() *BlowoutInstruction {
 	var v BlowoutInstruction
 	v.Type = BLO
-	v.Volume = make([]*wunit.Volume, 0)
+	v.Volume = make([]wunit.Volume, 0)
 	return &v
 }
 func (ins *BlowoutInstruction) InstructionType() int {
@@ -1619,7 +1618,7 @@ type MoveInstruction struct {
 	Pos       []string
 	Plt       []string
 	Well      []string
-	WVolume   []*wunit.Volume
+	WVolume   []wunit.Volume
 	Reference []int
 	OffsetX   []float64
 	OffsetY   []float64
@@ -1632,7 +1631,7 @@ func NewMoveInstruction() *MoveInstruction {
 	v.Plt = make([]string, 0)
 	v.Pos = make([]string, 0)
 	v.Well = make([]string, 0)
-	v.WVolume = make([]*wunit.Volume, 0)
+	v.WVolume = make([]wunit.Volume, 0)
 	v.Reference = make([]int, 0)
 	v.OffsetX = make([]float64, 0)
 	v.OffsetY = make([]float64, 0)
@@ -1685,11 +1684,11 @@ type MoveRawInstruction struct {
 	PltTo      []string
 	WellFrom   []string
 	WellTo     []string
-	Volume     []*wunit.Volume
+	Volume     []wunit.Volume
 	FPlateType []string
 	TPlateType []string
-	FVolume    []*wunit.Volume
-	TVolume    []*wunit.Volume
+	FVolume    []wunit.Volume
+	TVolume    []wunit.Volume
 	Prms       *wtype.LHChannelParameter
 }
 
@@ -1703,9 +1702,9 @@ func NewMoveRawInstruction() *MoveRawInstruction {
 	v.WellTo = make([]string, 0)
 	v.FPlateType = make([]string, 0)
 	v.TPlateType = make([]string, 0)
-	v.Volume = make([]*wunit.Volume, 0)
-	v.FVolume = make([]*wunit.Volume, 0)
-	v.TVolume = make([]*wunit.Volume, 0)
+	v.Volume = make([]wunit.Volume, 0)
+	v.FVolume = make([]wunit.Volume, 0)
+	v.TVolume = make([]wunit.Volume, 0)
 	return &v
 }
 func (ins *MoveRawInstruction) InstructionType() int {
@@ -1871,9 +1870,9 @@ type SuckInstruction struct {
 	What       []string
 	PltFrom    []string
 	WellFrom   []string
-	Volume     []*wunit.Volume
+	Volume     []wunit.Volume
 	FPlateType []string
-	FVolume    []*wunit.Volume
+	FVolume    []wunit.Volume
 	Prms       *wtype.LHChannelParameter
 	Multi      int
 	Overstroke bool
@@ -1885,9 +1884,9 @@ func NewSuckInstruction() *SuckInstruction {
 	v.What = make([]string, 0)
 	v.PltFrom = make([]string, 0)
 	v.WellFrom = make([]string, 0)
-	v.Volume = make([]*wunit.Volume, 0)
+	v.Volume = make([]wunit.Volume, 0)
 	v.FPlateType = make([]string, 0)
-	v.FVolume = make([]*wunit.Volume, 0)
+	v.FVolume = make([]wunit.Volume, 0)
 	return &v
 }
 func (ins *SuckInstruction) InstructionType() int {
@@ -2031,10 +2030,10 @@ func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 		mix.Volume = ins.Volume
 
 		if ok {
-			v := make([]*wunit.Volume, ins.Multi)
+			v := make([]wunit.Volume, ins.Multi)
 			for i := 0; i < ins.Multi; i++ {
 				vl := wunit.NewVolume(mixvol.(float64), "ul")
-				v[i] = &vl
+				v[i] = vl
 			}
 			mix.Volume = v
 		}
@@ -2115,9 +2114,9 @@ type BlowInstruction struct {
 	What       []string
 	PltTo      []string
 	WellTo     []string
-	Volume     []*wunit.Volume
+	Volume     []wunit.Volume
 	TPlateType []string
-	TVolume    []*wunit.Volume
+	TVolume    []wunit.Volume
 	Prms       *wtype.LHChannelParameter
 	Multi      int
 }
@@ -2128,9 +2127,9 @@ func NewBlowInstruction() *BlowInstruction {
 	v.What = make([]string, 0)
 	v.PltTo = make([]string, 0)
 	v.WellTo = make([]string, 0)
-	v.Volume = make([]*wunit.Volume, 0)
+	v.Volume = make([]wunit.Volume, 0)
 	v.TPlateType = make([]string, 0)
-	v.TVolume = make([]*wunit.Volume, 0)
+	v.TVolume = make([]wunit.Volume, 0)
 	return &v
 }
 func (ins *BlowInstruction) InstructionType() int {
@@ -2274,7 +2273,7 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 		boins := NewBlowoutInstruction()
 		boins.Head = ins.Head
 		vl := wunit.NewVolume(pol["BLOWOUTVOLUME"].(float64), pol["BLOWOUTVOLUMEUNIT"].(string))
-		boins.Volume = append(boins.Volume, &vl)
+		boins.Volume = append(boins.Volume, vl)
 		boins.Multi = ins.Multi
 		boins.Plt = ins.TPlateType
 		boins.What = ins.What
@@ -2348,10 +2347,10 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 		mix.Volume = ins.Volume
 
 		if ok {
-			v := make([]*wunit.Volume, ins.Multi)
+			v := make([]wunit.Volume, ins.Multi)
 			for i := 0; i < ins.Multi; i++ {
 				vl := wunit.NewVolume(mixvol.(float64), "ul")
-				v[i] = &vl
+				v[i] = vl
 			}
 			mix.Volume = v
 		}
@@ -2571,11 +2570,11 @@ type LightsOnInstruction struct {
 	PltTo      []string
 	WellFrom   []string
 	WellTo     []string
-	Volume     []*wunit.Volume
+	Volume     []wunit.Volume
 	FPlateType []string
 	TPlateType []string
-	FVolume    *wunit.Volume
-	TVolume    *wunit.Volume
+	FVolume    wunit.Volume
+	TVolume    wunit.Volume
 	Prms       *wtype.LHChannelParameter
 }
 
@@ -2587,7 +2586,7 @@ func NewLightsOnInstruction() *LightsOnInstruction {
 	v.PltTo = make([]string, 0)
 	v.WellFrom = make([]string, 0)
 	v.WellTo = make([]string, 0)
-	v.Volume = make([]*wunit.Volume, 0)
+	v.Volume = make([]wunit.Volume, 0)
 	return &v
 }
 func (ins *LightsOnInstruction) InstructionType() int {
@@ -2614,11 +2613,11 @@ type LightsOffInstruction struct {
 	PltTo      []string
 	WellFrom   []string
 	WellTo     []string
-	Volume     []*wunit.Volume
+	Volume     []wunit.Volume
 	FPlateType []string
 	TPlateType []string
-	FVolume    *wunit.Volume
-	TVolume    *wunit.Volume
+	FVolume    wunit.Volume
+	TVolume    wunit.Volume
 	Prms       *wtype.LHChannelParameter
 }
 
@@ -2630,7 +2629,7 @@ func NewLightsOffInstruction() *LightsOffInstruction {
 	v.PltTo = make([]string, 0)
 	v.WellFrom = make([]string, 0)
 	v.WellTo = make([]string, 0)
-	v.Volume = make([]*wunit.Volume, 0)
+	v.Volume = make([]wunit.Volume, 0)
 	return &v
 }
 func (ins *LightsOffInstruction) InstructionType() int {
@@ -2657,11 +2656,11 @@ type OpenInstruction struct {
 	PltTo      []string
 	WellFrom   []string
 	WellTo     []string
-	Volume     []*wunit.Volume
+	Volume     []wunit.Volume
 	FPlateType []string
 	TPlateType []string
-	FVolume    *wunit.Volume
-	TVolume    *wunit.Volume
+	FVolume    wunit.Volume
+	TVolume    wunit.Volume
 	Prms       *wtype.LHChannelParameter
 }
 
@@ -2673,7 +2672,7 @@ func NewOpenInstruction() *OpenInstruction {
 	v.PltTo = make([]string, 0)
 	v.WellFrom = make([]string, 0)
 	v.WellTo = make([]string, 0)
-	v.Volume = make([]*wunit.Volume, 0)
+	v.Volume = make([]wunit.Volume, 0)
 	return &v
 }
 func (ins *OpenInstruction) InstructionType() int {
@@ -2700,11 +2699,11 @@ type CloseInstruction struct {
 	PltTo      []string
 	WellFrom   []string
 	WellTo     []string
-	Volume     []*wunit.Volume
+	Volume     []wunit.Volume
 	FPlateType []string
 	TPlateType []string
-	FVolume    *wunit.Volume
-	TVolume    *wunit.Volume
+	FVolume    wunit.Volume
+	TVolume    wunit.Volume
 	Prms       *wtype.LHChannelParameter
 }
 
@@ -2716,7 +2715,7 @@ func NewCloseInstruction() *CloseInstruction {
 	v.PltTo = make([]string, 0)
 	v.WellFrom = make([]string, 0)
 	v.WellTo = make([]string, 0)
-	v.Volume = make([]*wunit.Volume, 0)
+	v.Volume = make([]wunit.Volume, 0)
 	return &v
 }
 func (ins *CloseInstruction) InstructionType() int {
@@ -2743,11 +2742,11 @@ type LoadAdaptorInstruction struct {
 	PltTo      []string
 	WellFrom   []string
 	WellTo     []string
-	Volume     []*wunit.Volume
+	Volume     []wunit.Volume
 	FPlateType []string
 	TPlateType []string
-	FVolume    *wunit.Volume
-	TVolume    *wunit.Volume
+	FVolume    wunit.Volume
+	TVolume    wunit.Volume
 	Prms       *wtype.LHChannelParameter
 }
 
@@ -2759,7 +2758,7 @@ func NewLoadAdaptorInstruction() *LoadAdaptorInstruction {
 	v.PltTo = make([]string, 0)
 	v.WellFrom = make([]string, 0)
 	v.WellTo = make([]string, 0)
-	v.Volume = make([]*wunit.Volume, 0)
+	v.Volume = make([]wunit.Volume, 0)
 	return &v
 }
 func (ins *LoadAdaptorInstruction) InstructionType() int {
@@ -2786,11 +2785,11 @@ type UnloadAdaptorInstruction struct {
 	PltTo      []string
 	WellFrom   []string
 	WellTo     []string
-	Volume     []*wunit.Volume
+	Volume     []wunit.Volume
 	FPlateType []string
 	TPlateType []string
-	FVolume    *wunit.Volume
-	TVolume    *wunit.Volume
+	FVolume    wunit.Volume
+	TVolume    wunit.Volume
 	Prms       *wtype.LHChannelParameter
 }
 
@@ -2802,7 +2801,7 @@ func NewUnloadAdaptorInstruction() *UnloadAdaptorInstruction {
 	v.PltTo = make([]string, 0)
 	v.WellFrom = make([]string, 0)
 	v.WellTo = make([]string, 0)
-	v.Volume = make([]*wunit.Volume, 0)
+	v.Volume = make([]wunit.Volume, 0)
 	return &v
 }
 func (ins *UnloadAdaptorInstruction) InstructionType() int {
@@ -2829,11 +2828,11 @@ type ResetInstruction struct {
 	PltTo      []string
 	WellFrom   []string
 	WellTo     []string
-	Volume     []*wunit.Volume
+	Volume     []wunit.Volume
 	FPlateType []string
 	TPlateType []string
-	FVolume    []*wunit.Volume
-	TVolume    []*wunit.Volume
+	FVolume    []wunit.Volume
+	TVolume    []wunit.Volume
 	Prms       *wtype.LHChannelParameter
 }
 
@@ -2844,11 +2843,11 @@ func NewResetInstruction() *ResetInstruction {
 	ri.PltFrom = make([]string, 0)
 	ri.WellFrom = make([]string, 0)
 	ri.WellTo = make([]string, 0)
-	ri.Volume = make([]*wunit.Volume, 0)
+	ri.Volume = make([]wunit.Volume, 0)
 	ri.FPlateType = make([]string, 0)
 	ri.TPlateType = make([]string, 0)
-	ri.FVolume = make([]*wunit.Volume, 0)
-	ri.TVolume = make([]*wunit.Volume, 0)
+	ri.FVolume = make([]wunit.Volume, 0)
+	ri.TVolume = make([]wunit.Volume, 0)
 	return &ri
 }
 
@@ -2925,7 +2924,7 @@ func (ins *ResetInstruction) Generate(policy *LHPolicyRuleSet, prms *LHPropertie
 
 	blow.Head = ins.Prms.Head
 	bov := wunit.NewVolume(pol["BLOWOUTVOLUME"].(float64), pol["BLOWOUTVOLUMEUNIT"].(string))
-	blow.Volume = append(blow.Volume, &bov)
+	blow.Volume = append(blow.Volume, bov)
 	blow.Multi = len(ins.What)
 	blow.Plt = ins.TPlateType
 	blow.What = ins.What
@@ -2966,9 +2965,9 @@ type MoveMixInstruction struct {
 	Head      int
 	Plt       []string
 	Well      []string
-	Volume    []*wunit.Volume
+	Volume    []wunit.Volume
 	PlateType []string
-	FVolume   []*wunit.Volume
+	FVolume   []wunit.Volume
 	Cycles    []int
 	What      []string
 	Blowout   []bool
@@ -2982,8 +2981,8 @@ func NewMoveMixInstruction() *MoveMixInstruction {
 	mi.Type = MMX
 	mi.Plt = make([]string, 0)
 	mi.Well = make([]string, 0)
-	mi.Volume = make([]*wunit.Volume, 0)
-	mi.FVolume = make([]*wunit.Volume, 0)
+	mi.Volume = make([]wunit.Volume, 0)
+	mi.FVolume = make([]wunit.Volume, 0)
 	mi.PlateType = make([]string, 0)
 	mi.Cycles = make([]int, 0)
 	mi.Prms = make(map[string]interface{})
@@ -3064,7 +3063,7 @@ func (ins *MoveMixInstruction) Generate(policy *LHPolicyRuleSet, prms *LHPropert
 type MixInstruction struct {
 	Type      int
 	Head      int
-	Volume    []*wunit.Volume
+	Volume    []wunit.Volume
 	PlateType []string
 	What      []string
 	Blowout   []bool
@@ -3076,7 +3075,7 @@ func NewMixInstruction() *MixInstruction {
 	var mi MixInstruction
 
 	mi.Type = MMX
-	mi.Volume = make([]*wunit.Volume, 0)
+	mi.Volume = make([]wunit.Volume, 0)
 	mi.PlateType = make([]string, 0)
 	mi.Cycles = make([]int, 0)
 	mi.What = make([]string, 0)

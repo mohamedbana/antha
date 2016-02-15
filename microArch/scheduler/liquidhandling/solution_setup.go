@@ -149,8 +149,8 @@ func solution_setup(request *LHRequest, prms *liquidhandling.LHProperties) (map[
 
 	//	fmt.Println("PRMS: ", prms)
 
-	if prms.CurrConf != nil && prms.CurrConf.Minvol != nil {
-		vmin = *(prms.CurrConf.Minvol)
+	if prms.CurrConf != nil && !prms.CurrConf.Minvol.LessThanFloat(0.00000001) {
+		vmin = prms.CurrConf.Minvol
 	}
 
 	for cmp, arr := range mconcs {

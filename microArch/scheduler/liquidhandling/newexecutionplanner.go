@@ -46,5 +46,14 @@ func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProper
 		request.InstructionSet.Add(ConvertInstruction(request.LHInstructions[insID], robot))
 	}
 
+	// 4 -- make the low-level instructions
+
+	inx := request.InstructionSet.Generate(request.Policies, robot)
+	instrx := make([]liquidhandling.TerminalRobotInstruction, len(inx))
+	for i := 0; i < len(inx); i++ {
+		instrx[i] = inx[i].(liquidhandling.TerminalRobotInstruction)
+	}
+	request.Instructions = instrx
+
 	return request
 }

@@ -42,10 +42,10 @@ const (
 type LHChannelParameter struct {
 	ID          string
 	Name        string
-	Minvol      *wunit.Volume
-	Maxvol      *wunit.Volume
-	Minspd      *wunit.FlowRate
-	Maxspd      *wunit.FlowRate
+	Minvol      wunit.Volume
+	Maxvol      wunit.Volume
+	Minspd      wunit.FlowRate
+	Maxspd      wunit.FlowRate
 	Multi       int
 	Independent bool
 	Orientation int
@@ -67,10 +67,10 @@ func (lhcp LHChannelParameter) MarshalJSON() ([]byte, error) {
 	}{
 		lhcp.ID,
 		lhcp.Name,
-		*lhcp.Minvol,
-		*lhcp.Maxvol,
-		*lhcp.Minspd,
-		*lhcp.Maxspd,
+		lhcp.Minvol,
+		lhcp.Maxvol,
+		lhcp.Minspd,
+		lhcp.Maxspd,
 		lhcp.Multi,
 		lhcp.Independent,
 		lhcp.Orientation,
@@ -84,7 +84,7 @@ func (lhcp *LHChannelParameter) Dup() *LHChannelParameter {
 	return r
 }
 
-func NewLHChannelParameter(name string, minvol, maxvol *wunit.Volume, minspd, maxspd *wunit.FlowRate, multi int, independent bool, orientation int, head int) *LHChannelParameter {
+func NewLHChannelParameter(name string, minvol, maxvol wunit.Volume, minspd, maxspd wunit.FlowRate, multi int, independent bool, orientation int, head int) *LHChannelParameter {
 	var lhp LHChannelParameter
 	lhp.ID = GetUUID()
 	lhp.Name = name
@@ -549,6 +549,7 @@ func (lhp *LHPlate) GetComponent(cmp *LHComponent) ([]WellCoords, bool) {
 
 	for wc := it.Curr(); it.Valid(); wc = it.Next() {
 		w := lhp.Wellcoords[wc.FormatA1()]
+		//fmt.Println("WANT$$$: ", cmp.CName, " :: ", wc.FormatA1(), " ", w.Contents().CName)
 		if w.Contents().CName == cmp.CName {
 			v := w.WorkingVolume()
 			volGot.Add(v)
@@ -1215,8 +1216,8 @@ type LHTip struct {
 	Type   string
 	Mnfr   string
 	Dirty  bool
-	MaxVol *wunit.Volume
-	MinVol *wunit.Volume
+	MaxVol wunit.Volume
+	MinVol wunit.Volume
 }
 
 func (tip *LHTip) Dup() *LHTip {
@@ -1230,10 +1231,8 @@ func NewLHTip(mfr, ttype string, minvol, maxvol float64, volunit string) *LHTip 
 	lht.ID = GetUUID()
 	lht.Mnfr = mfr
 	lht.Type = ttype
-	v := wunit.NewVolume(maxvol, volunit)
-	lht.MaxVol = &v
-	v2 := wunit.NewVolume(minvol, volunit)
-	lht.MinVol = &v2
+	lht.MaxVol = wunit.NewVolume(maxvol, volunit)
+	lht.MinVol = wunit.NewVolume(minvol, volunit)
 	return &lht
 }
 
