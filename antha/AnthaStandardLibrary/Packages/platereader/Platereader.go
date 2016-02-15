@@ -99,6 +99,18 @@ func PathlengthCorrect(pathlength wunit.Length, reading wtype.Absorbance) (pathl
 }
 
 // based on Beer Lambert law A = ε l c
+/*
+Limitations of the Beer-Lambert law
+
+The linearity of the Beer-Lambert law is limited by chemical and instrumental factors. Causes of nonlinearity include:
+deviations in absorptivity coefficients at high concentrations (>0.01M) due to electrostatic interactions between molecules in close proximity
+scattering of light due to particulates in the sample
+fluoresecence or phosphorescence of the sample
+changes in refractive index at high analyte concentration
+shifts in chemical equilibria as a function of concentration
+non-monochromatic radiation, deviations can be minimized by using a relatively flat part of the absorption spectrum such as the maximum of an absorption band
+stray light
+*/
 func Concentration(pathlengthcorrected wtype.Absorbance, molarabsorbtivityatwavelengthLpermolpercm float64) (conc wunit.Concentration) {
 
 	A := pathlengthcorrected
