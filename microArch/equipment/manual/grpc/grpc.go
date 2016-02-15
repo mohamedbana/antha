@@ -197,14 +197,14 @@ func DecodeArrayOfPtrToLHAdaptor(arg *pb.ArrayOfPtrToLHAdaptorMessage) []*wtype.
 	return ret
 }
 func EncodeLHTip(arg wtype.LHTip) *pb.LHTipMessage {
-	ret := pb.LHTipMessage{(string)(arg.ID), (string)(arg.Type), (string)(arg.Mnfr), (bool)(arg.Dirty), EncodePtrToVolume(arg.MaxVol), EncodePtrToVolume(arg.MinVol)}
+	ret := pb.LHTipMessage{(string)(arg.ID), (string)(arg.Type), (string)(arg.Mnfr), (bool)(arg.Dirty), EncodeVolume(arg.MaxVol), EncodeVolume(arg.MinVol)}
 	return &ret
 }
 func DecodeLHTip(arg *pb.LHTipMessage) wtype.LHTip {
 	if arg == nil {
 		return wtype.LHTip{}
 	}
-	ret := wtype.LHTip{(string)(arg.Arg_1), (string)(arg.Arg_2), (string)(arg.Arg_3), (bool)(arg.Arg_4), (*wunit.Volume)(DecodePtrToVolume(arg.Arg_5)), (*wunit.Volume)(DecodePtrToVolume(arg.Arg_6))}
+	ret := wtype.LHTip{(string)(arg.Arg_1), (string)(arg.Arg_2), (string)(arg.Arg_3), (bool)(arg.Arg_4), (wunit.Volume)(DecodeVolume(arg.Arg_5)), (wunit.Volume)(DecodeVolume(arg.Arg_6))}
 	return ret
 }
 func EncodeLHPlate(arg wtype.LHPlate) *pb.LHPlateMessage {
@@ -591,14 +591,14 @@ func DecodeLHTipwaste(arg *pb.LHTipwasteMessage) wtype.LHTipwaste {
 	return ret
 }
 func EncodeLHChannelParameter(arg wtype.LHChannelParameter) *pb.LHChannelParameterMessage {
-	ret := pb.LHChannelParameterMessage{(string)(arg.ID), (string)(arg.Name), EncodePtrToVolume(arg.Minvol), EncodePtrToVolume(arg.Maxvol), EncodePtrToFlowRate(arg.Minspd), EncodePtrToFlowRate(arg.Maxspd), int64(arg.Multi), (bool)(arg.Independent), int64(arg.Orientation), int64(arg.Head)}
+	ret := pb.LHChannelParameterMessage{(string)(arg.ID), (string)(arg.Name), EncodeVolume(arg.Minvol), EncodeVolume(arg.Maxvol), EncodeFlowRate(arg.Minspd), EncodeFlowRate(arg.Maxspd), int64(arg.Multi), (bool)(arg.Independent), int64(arg.Orientation), int64(arg.Head)}
 	return &ret
 }
 func DecodeLHChannelParameter(arg *pb.LHChannelParameterMessage) wtype.LHChannelParameter {
 	if arg == nil {
 		return wtype.LHChannelParameter{}
 	}
-	ret := wtype.LHChannelParameter{(string)(arg.Arg_1), (string)(arg.Arg_2), (*wunit.Volume)(DecodePtrToVolume(arg.Arg_3)), (*wunit.Volume)(DecodePtrToVolume(arg.Arg_4)), (*wunit.FlowRate)(DecodePtrToFlowRate(arg.Arg_5)), (*wunit.FlowRate)(DecodePtrToFlowRate(arg.Arg_6)), (int)(arg.Arg_7), (bool)(arg.Arg_8), (int)(arg.Arg_9), (int)(arg.Arg_10)}
+	ret := wtype.LHChannelParameter{(string)(arg.Arg_1), (string)(arg.Arg_2), (wunit.Volume)(DecodeVolume(arg.Arg_3)), (wunit.Volume)(DecodeVolume(arg.Arg_4)), (wunit.FlowRate)(DecodeFlowRate(arg.Arg_5)), (wunit.FlowRate)(DecodeFlowRate(arg.Arg_6)), (int)(arg.Arg_7), (bool)(arg.Arg_8), (int)(arg.Arg_9), (int)(arg.Arg_10)}
 	return ret
 }
 func EncodeCoordinates(arg wtype.Coordinates) *pb.CoordinatesMessage {
@@ -762,28 +762,6 @@ func DecodeArrayOfArrayOfPtrToLHTip(arg *pb.ArrayOfArrayOfPtrToLHTipMessage) [][
 	}
 	return ret
 }
-func EncodePtrToFlowRate(arg *wunit.FlowRate) *pb.PtrToFlowRateMessage {
-	var ret pb.PtrToFlowRateMessage
-	if arg == nil {
-		ret = pb.PtrToFlowRateMessage{
-			nil,
-		}
-	} else {
-		ret = pb.PtrToFlowRateMessage{
-			EncodeFlowRate(*arg),
-		}
-	}
-	return &ret
-}
-func DecodePtrToFlowRate(arg *pb.PtrToFlowRateMessage) *wunit.FlowRate {
-	if arg == nil {
-		log.Println("Arg for PtrToFlowRate was nil")
-		return nil
-	}
-
-	ret := DecodeFlowRate(arg.Arg_1)
-	return &ret
-}
 func EncodeVolume(arg wunit.Volume) *pb.VolumeMessage {
 	ret := pb.VolumeMessage{EncodePtrToConcreteMeasurement(arg.ConcreteMeasurement)}
 	return &ret
@@ -844,28 +822,6 @@ func DecodeMapstringPtrToLHWellMessageFieldEntry(arg *pb.MapstringPtrToLHWellMes
 	k := (string)(arg.Key)
 	v := DecodePtrToLHWell(arg.Value)
 	return k, v
-}
-func EncodePtrToVolume(arg *wunit.Volume) *pb.PtrToVolumeMessage {
-	var ret pb.PtrToVolumeMessage
-	if arg == nil {
-		ret = pb.PtrToVolumeMessage{
-			nil,
-		}
-	} else {
-		ret = pb.PtrToVolumeMessage{
-			EncodeVolume(*arg),
-		}
-	}
-	return &ret
-}
-func DecodePtrToVolume(arg *pb.PtrToVolumeMessage) *wunit.Volume {
-	if arg == nil {
-		log.Println("Arg for PtrToVolume was nil")
-		return nil
-	}
-
-	ret := DecodeVolume(arg.Arg_1)
-	return &ret
 }
 func EncodeArrayOfLHDevice(arg []wtype.LHDevice) *pb.ArrayOfLHDeviceMessage {
 	a := make([]*pb.LHDeviceMessage, len(arg))

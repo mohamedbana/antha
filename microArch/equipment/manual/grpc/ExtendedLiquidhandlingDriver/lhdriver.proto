@@ -470,8 +470,8 @@ message LHTipMessage {
 	string Arg_2 = 2;
 	string Arg_3 = 3;
 	bool Arg_4 = 4;
-	PtrToVolumeMessage Arg_5 = 5;
-	PtrToVolumeMessage Arg_6 = 6;
+	VolumeMessage Arg_5 = 5;
+	VolumeMessage Arg_6 = 6;
 }
 message LHPlateMessage {
 	string Arg_1 = 1;
@@ -502,10 +502,10 @@ message ArrayOfPtrToLHHeadMessage{
 message LHChannelParameterMessage {
 	string Arg_1 = 1;
 	string Arg_2 = 2;
-	PtrToVolumeMessage Arg_3 = 3;
-	PtrToVolumeMessage Arg_4 = 4;
-	PtrToFlowRateMessage Arg_5 = 5;
-	PtrToFlowRateMessage Arg_6 = 6;
+	VolumeMessage Arg_3 = 3;
+	VolumeMessage Arg_4 = 4;
+	FlowRateMessage Arg_5 = 5;
+	FlowRateMessage Arg_6 = 6;
 	int64 Arg_7 = 7;
 	bool Arg_8 = 8;
 	int64 Arg_9 = 9;
@@ -569,14 +569,8 @@ message LHDeviceMessage {
 	string Arg_2 = 2;
 	string Arg_3 = 3;
 }
-message PtrToVolumeMessage{
-	VolumeMessage arg_1=1;
-}
 message ArrayOfArrayOfPtrToLHWellMessage{
 	repeated ArrayOfPtrToLHWellMessage arg_1=1;
-}
-message PtrToFlowRateMessage{
-	FlowRateMessage arg_1=1;
 }
 message VolumeMessage {
 	PtrToConcreteMeasurementMessage Arg_1 = 1;

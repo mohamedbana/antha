@@ -129,9 +129,9 @@ It has these top-level messages:
 	MapstringPtrToLHWellMessageMessageFieldEntry
 	MapstringPtrToLHWellMessageMessage
 	LHDeviceMessage
-	PtrToVolumeMessage
+	VolumeMessage
 	ArrayOfArrayOfPtrToLHWellMessage
-	PtrToFlowRateMessage
+	FlowRateMessage
 	VolumeMessage
 	FlowRateMessage
 	LHComponentMessage
@@ -2001,26 +2001,26 @@ func (m *PtrToLHHeadMessage) GetArg_1() *LHHeadMessage {
 }
 
 type LHTipMessage struct {
-	Arg_1 string              `protobuf:"bytes,1,opt,name=Arg_1" json:"Arg_1,omitempty"`
-	Arg_2 string              `protobuf:"bytes,2,opt,name=Arg_2" json:"Arg_2,omitempty"`
-	Arg_3 string              `protobuf:"bytes,3,opt,name=Arg_3" json:"Arg_3,omitempty"`
-	Arg_4 bool                `protobuf:"varint,4,opt,name=Arg_4" json:"Arg_4,omitempty"`
-	Arg_5 *PtrToVolumeMessage `protobuf:"bytes,5,opt,name=Arg_5" json:"Arg_5,omitempty"`
-	Arg_6 *PtrToVolumeMessage `protobuf:"bytes,6,opt,name=Arg_6" json:"Arg_6,omitempty"`
+	Arg_1 string         `protobuf:"bytes,1,opt,name=Arg_1" json:"Arg_1,omitempty"`
+	Arg_2 string         `protobuf:"bytes,2,opt,name=Arg_2" json:"Arg_2,omitempty"`
+	Arg_3 string         `protobuf:"bytes,3,opt,name=Arg_3" json:"Arg_3,omitempty"`
+	Arg_4 bool           `protobuf:"varint,4,opt,name=Arg_4" json:"Arg_4,omitempty"`
+	Arg_5 *VolumeMessage `protobuf:"bytes,5,opt,name=Arg_5" json:"Arg_5,omitempty"`
+	Arg_6 *VolumeMessage `protobuf:"bytes,6,opt,name=Arg_6" json:"Arg_6,omitempty"`
 }
 
 func (m *LHTipMessage) Reset()         { *m = LHTipMessage{} }
 func (m *LHTipMessage) String() string { return proto.CompactTextString(m) }
 func (*LHTipMessage) ProtoMessage()    {}
 
-func (m *LHTipMessage) GetArg_5() *PtrToVolumeMessage {
+func (m *LHTipMessage) GetArg_5() *VolumeMessage {
 	if m != nil {
 		return m.Arg_5
 	}
 	return nil
 }
 
-func (m *LHTipMessage) GetArg_6() *PtrToVolumeMessage {
+func (m *LHTipMessage) GetArg_6() *VolumeMessage {
 	if m != nil {
 		return m.Arg_6
 	}
@@ -2106,44 +2106,44 @@ func (m *ArrayOfPtrToLHHeadMessage) GetArg_1() []*PtrToLHHeadMessage {
 }
 
 type LHChannelParameterMessage struct {
-	Arg_1  string                `protobuf:"bytes,1,opt,name=Arg_1" json:"Arg_1,omitempty"`
-	Arg_2  string                `protobuf:"bytes,2,opt,name=Arg_2" json:"Arg_2,omitempty"`
-	Arg_3  *PtrToVolumeMessage   `protobuf:"bytes,3,opt,name=Arg_3" json:"Arg_3,omitempty"`
-	Arg_4  *PtrToVolumeMessage   `protobuf:"bytes,4,opt,name=Arg_4" json:"Arg_4,omitempty"`
-	Arg_5  *PtrToFlowRateMessage `protobuf:"bytes,5,opt,name=Arg_5" json:"Arg_5,omitempty"`
-	Arg_6  *PtrToFlowRateMessage `protobuf:"bytes,6,opt,name=Arg_6" json:"Arg_6,omitempty"`
-	Arg_7  int64                 `protobuf:"varint,7,opt,name=Arg_7" json:"Arg_7,omitempty"`
-	Arg_8  bool                  `protobuf:"varint,8,opt,name=Arg_8" json:"Arg_8,omitempty"`
-	Arg_9  int64                 `protobuf:"varint,9,opt,name=Arg_9" json:"Arg_9,omitempty"`
-	Arg_10 int64                 `protobuf:"varint,10,opt,name=Arg_10" json:"Arg_10,omitempty"`
+	Arg_1  string           `protobuf:"bytes,1,opt,name=Arg_1" json:"Arg_1,omitempty"`
+	Arg_2  string           `protobuf:"bytes,2,opt,name=Arg_2" json:"Arg_2,omitempty"`
+	Arg_3  *VolumeMessage   `protobuf:"bytes,3,opt,name=Arg_3" json:"Arg_3,omitempty"`
+	Arg_4  *VolumeMessage   `protobuf:"bytes,4,opt,name=Arg_4" json:"Arg_4,omitempty"`
+	Arg_5  *FlowRateMessage `protobuf:"bytes,5,opt,name=Arg_5" json:"Arg_5,omitempty"`
+	Arg_6  *FlowRateMessage `protobuf:"bytes,6,opt,name=Arg_6" json:"Arg_6,omitempty"`
+	Arg_7  int64            `protobuf:"varint,7,opt,name=Arg_7" json:"Arg_7,omitempty"`
+	Arg_8  bool             `protobuf:"varint,8,opt,name=Arg_8" json:"Arg_8,omitempty"`
+	Arg_9  int64            `protobuf:"varint,9,opt,name=Arg_9" json:"Arg_9,omitempty"`
+	Arg_10 int64            `protobuf:"varint,10,opt,name=Arg_10" json:"Arg_10,omitempty"`
 }
 
 func (m *LHChannelParameterMessage) Reset()         { *m = LHChannelParameterMessage{} }
 func (m *LHChannelParameterMessage) String() string { return proto.CompactTextString(m) }
 func (*LHChannelParameterMessage) ProtoMessage()    {}
 
-func (m *LHChannelParameterMessage) GetArg_3() *PtrToVolumeMessage {
+func (m *LHChannelParameterMessage) GetArg_3() *VolumeMessage {
 	if m != nil {
 		return m.Arg_3
 	}
 	return nil
 }
 
-func (m *LHChannelParameterMessage) GetArg_4() *PtrToVolumeMessage {
+func (m *LHChannelParameterMessage) GetArg_4() *VolumeMessage {
 	if m != nil {
 		return m.Arg_4
 	}
 	return nil
 }
 
-func (m *LHChannelParameterMessage) GetArg_5() *PtrToFlowRateMessage {
+func (m *LHChannelParameterMessage) GetArg_5() *FlowRateMessage {
 	if m != nil {
 		return m.Arg_5
 	}
 	return nil
 }
 
-func (m *LHChannelParameterMessage) GetArg_6() *PtrToFlowRateMessage {
+func (m *LHChannelParameterMessage) GetArg_6() *FlowRateMessage {
 	if m != nil {
 		return m.Arg_6
 	}
@@ -2362,21 +2362,6 @@ func (m *LHDeviceMessage) Reset()         { *m = LHDeviceMessage{} }
 func (m *LHDeviceMessage) String() string { return proto.CompactTextString(m) }
 func (*LHDeviceMessage) ProtoMessage()    {}
 
-type PtrToVolumeMessage struct {
-	Arg_1 *VolumeMessage `protobuf:"bytes,1,opt,name=arg_1" json:"arg_1,omitempty"`
-}
-
-func (m *PtrToVolumeMessage) Reset()         { *m = PtrToVolumeMessage{} }
-func (m *PtrToVolumeMessage) String() string { return proto.CompactTextString(m) }
-func (*PtrToVolumeMessage) ProtoMessage()    {}
-
-func (m *PtrToVolumeMessage) GetArg_1() *VolumeMessage {
-	if m != nil {
-		return m.Arg_1
-	}
-	return nil
-}
-
 type ArrayOfArrayOfPtrToLHWellMessage struct {
 	Arg_1 []*ArrayOfPtrToLHWellMessage `protobuf:"bytes,1,rep,name=arg_1" json:"arg_1,omitempty"`
 }
@@ -2386,21 +2371,6 @@ func (m *ArrayOfArrayOfPtrToLHWellMessage) String() string { return proto.Compac
 func (*ArrayOfArrayOfPtrToLHWellMessage) ProtoMessage()    {}
 
 func (m *ArrayOfArrayOfPtrToLHWellMessage) GetArg_1() []*ArrayOfPtrToLHWellMessage {
-	if m != nil {
-		return m.Arg_1
-	}
-	return nil
-}
-
-type PtrToFlowRateMessage struct {
-	Arg_1 *FlowRateMessage `protobuf:"bytes,1,opt,name=arg_1" json:"arg_1,omitempty"`
-}
-
-func (m *PtrToFlowRateMessage) Reset()         { *m = PtrToFlowRateMessage{} }
-func (m *PtrToFlowRateMessage) String() string { return proto.CompactTextString(m) }
-func (*PtrToFlowRateMessage) ProtoMessage()    {}
-
-func (m *PtrToFlowRateMessage) GetArg_1() *FlowRateMessage {
 	if m != nil {
 		return m.Arg_1
 	}
