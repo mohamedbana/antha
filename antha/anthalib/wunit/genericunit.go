@@ -94,3 +94,10 @@ func (gpu *GenericPrefixedUnit) Symbol() string {
 func (gpu *GenericPrefixedUnit) ConvertTo(p2 PrefixedUnit) float64 {
 	return gpu.BaseSIConversionFactor() / p2.BaseSIConversionFactor()
 }
+
+// convenience
+
+func NewGenericPrefixedUnit() *GenericPrefixedUnit {
+	gpu := GenericPrefixedUnit{}
+	return &gpu
+}
