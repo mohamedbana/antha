@@ -49,3 +49,31 @@ func TestTopoOrder(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestTransitiveReduction(t *testing.T) {
+	g := MakeTestGraph(map[string][]string{
+		"a": []string{"b", "c", "d"},
+		"b": []string{"c", "d"},
+		"c": []string{"d"},
+	})
+
+	if gr, err := TransitiveReduction(g); err != nil {
+		t.Error(err)
+	} else if ng, nr := g.NumNodes(), gr.NumNodes(); ng != nr {
+		t.Errorf("expected %d = %d", ng, nr)
+	} else if l := gr.NumOuts("a"); l != 1 {
+		t.Errorf("expected %d found %d", 1, l)
+	} else if n := gr.Out("a", 0).(string); n != "b" {
+		t.Errorf("expected %q found %q", "b", n)
+	} else if l := gr.NumOuts("b"); l != 1 {
+		t.Errorf("expected %d found %d", 1, l)
+	} else if n := gr.Out("b", 0).(string); n != "c" {
+		t.Errorf("expected %q found %q", "c", n)
+	} else if l := gr.NumOuts("c"); l != 1 {
+		t.Errorf("expected %d found %d", 1, l)
+	} else if n := gr.Out("c", 0).(string); n != "d" {
+		t.Errorf("expected %q found %q", "d", n)
+	} else if l := gr.NumOuts("d"); l != 0 {
+		t.Errorf("expected %d found %d", 0, l)
+	}
+}
