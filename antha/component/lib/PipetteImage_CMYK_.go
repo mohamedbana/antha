@@ -1,4 +1,4 @@
-// Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours
+// Generates instructions to pipette out a defined image onto a defined plate by blending cyan magenta yellow and black dyes
 package lib
 
 import (
@@ -11,6 +11,8 @@ import (
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 )
+
+//"image/color"
 
 // Input parameters for this protocol (data)
 
@@ -35,8 +37,9 @@ func _PipetteImage_CMYKSetup(_ctx context.Context, _input *PipetteImage_CMYKInpu
 // for every input
 func _PipetteImage_CMYKSteps(_ctx context.Context, _input *PipetteImage_CMYKInput, _output *PipetteImage_CMYKOutput) {
 
-	chosencolourpalette := image.AvailablePalettes["WebSafe"]
-	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, chosencolourpalette)
+	//var chosencolourpalette color.Palette
+	chosencolourpalette := image.AvailablePalettes["Plan9"]
+	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette)
 
 	solutions := make([]*wtype.LHComponent, 0)
 
@@ -183,7 +186,7 @@ func init() {
 	addComponent(Component{Name: "PipetteImage_CMYK",
 		Constructor: PipetteImage_CMYKNew,
 		Desc: ComponentDesc{
-			Desc: "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours\n",
+			Desc: "Generates instructions to pipette out a defined image onto a defined plate by blending cyan magenta yellow and black dyes\n",
 			Path: "antha/component/an/Liquid_handling/PipetteImage/PipetteImage_CMYK.an",
 			Params: []ParamDesc{
 				{Name: "Black", Desc: "", Kind: "Inputs"},

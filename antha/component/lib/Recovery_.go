@@ -11,11 +11,14 @@ import (
 
 // Input parameters for this protocol (data)
 
+//Recoveryvolume wunit.Volume
 //= 2 (hours)
 
 // Data which is returned from this protocol, and data types
 
 // Physical Inputs to this protocol with types
+
+// Recoverymedium *wtype.LHComponent
 
 // Physical outputs from this protocol with types
 
@@ -32,9 +35,12 @@ func _RecoverySteps(_ctx context.Context, _input *RecoveryInput, _output *Recove
 
 	recoverymix := make([]*wtype.LHComponent, 0)
 
-	transformedcellsComp := _input.Transformedcells
+	transformedcellsComp := mixer.Sample(_input.Transformedcells, _input.TransformedcellVolume)
 
-	recoverymixture := mixer.Sample(_input.Recoverymedium, _input.Recoveryvolume)
+	//recoverymixture := mixer.Sample(Recoverymedium, Recoveryvolume)
+
+	recoverymix = append(recoverymix, transformedcellsComp)
+	//recoverymix = append(recoverymix,recoverymixture)
 
 	recoverymix = append(recoverymix, transformedcellsComp, recoverymixture)
 	recoverymix2 := execute.MixInto(_ctx, _input.OutPlate, "", recoverymix...)
@@ -103,13 +109,11 @@ type RecoveryElement struct {
 }
 
 type RecoveryInput struct {
-	AgarPlate        *wtype.LHPlate
-	OutPlate         *wtype.LHPlate
-	Recoverymedium   *wtype.LHComponent
-	Recoverytemp     wunit.Temperature
-	Recoverytime     wunit.Time
-	Recoveryvolume   wunit.Volume
-	Transformedcells *wtype.LHComponent
+	OutPlate              *wtype.LHPlate
+	Recoverytemp          wunit.Temperature
+	Recoverytime          wunit.Time
+	TransformedcellVolume wunit.Volume
+	Transformedcells      *wtype.LHComponent
 }
 
 type RecoveryOutput struct {
@@ -131,12 +135,10 @@ func init() {
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/Transformation/Recovery.an",
 			Params: []ParamDesc{
-				{Name: "AgarPlate", Desc: "", Kind: "Inputs"},
-				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-				{Name: "Recoverymedium", Desc: "", Kind: "Inputs"},
+				{Name: "OutPlate", Desc: "Recoverymedium *wtype.LHComponent\n", Kind: "Inputs"},
 				{Name: "Recoverytemp", Desc: "", Kind: "Parameters"},
-				{Name: "Recoverytime", Desc: "= 2 (hours)\n", Kind: "Parameters"},
-				{Name: "Recoveryvolume", Desc: "", Kind: "Parameters"},
+				{Name: "Recoverytime", Desc: "Recoveryvolume wunit.Volume\n\n= 2 (hours)\n", Kind: "Parameters"},
+				{Name: "TransformedcellVolume", Desc: "", Kind: "Parameters"},
 				{Name: "Transformedcells", Desc: "", Kind: "Inputs"},
 				{Name: "RecoveredCells", Desc: "", Kind: "Outputs"},
 			},

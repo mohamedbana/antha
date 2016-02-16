@@ -1,0 +1,215 @@
+package graph
+
+import (
+	"fmt"
+	"math"
+	"math/rand"
+	"testing"
+)
+
+func makeTestColors(m map[string][]int) func(n Node) []int {
+	return func(n Node) []int {
+		return m[n.(string)]
+	}
+}
+
+func checkPartition(opt PartitionTreeOpt) (*TreePartition, error) {
+	contains := func(xs []int, c int) bool {
+		for _, x := range xs {
+			if x == c {
+				return true
+			}
+		}
+		return false
+	}
+
+	r, err := PartitionTree(opt)
+	if err != nil {
+		return r, err
+	}
+
+	if lr, lt := len(r.Parts), opt.Tree.NumNodes(); lr != lt {
+		return r, fmt.Errorf("expected %d found %d", lt, lr)
+	}
+
+	for i, inum := 0, opt.Tree.NumNodes(); i < inum; i += 1 {
+		n := opt.Tree.Node(i)
+		if c, hasColor := r.Parts[n]; !hasColor {
+			return r, fmt.Errorf("expecting color for node %q but found none", n)
+		} else if !contains(opt.Colors(n), c) {
+			return r, fmt.Errorf("node %q assigned wrong color %d", n, c)
+		}
+	}
+
+	sum := 0
+	VisitTree(VisitTreeOpt{
+		Tree: opt.Tree,
+		Root: opt.Root,
+		PreOrder: func(n, parent Node, err error) error {
+			if parent != nil {
+				sum += opt.Weights(r.Parts[parent], r.Parts[n])
+			}
+			return nil
+		},
+	})
+	if sum != r.Weight {
+		return r, fmt.Errorf("expected weight %d found %d", sum, r.Weight)
+	}
+	return r, nil
+}
+
+// Use benchmark infrastructure to figure out the largest problem solvable in
+// go test -benchtime TIME (TIME is 1s by default)
+func BenchmarkMinWeightTree(b *testing.B) {
+	logN := int(math.Log(float64(b.N)))
+	if logN < 1 {
+		logN = 1
+	}
+
+	N := struct{ Tree, Color int }{Tree: logN, Color: (logN+1)/2 + 1}
+
+	var colors []int
+	for i := 0; i < N.Color; i += 1 {
+		colors = append(colors, i+1)
+	}
+
+	weights := make(map[struct{ A, B int }]int)
+	// Make weight space sparse enough for interesting patterns to occur
+	maxWeight := N.Color * N.Color * N.Color * N.Color
+	for i := 0; i < N.Color; i += 1 {
+		for j := 0; j < N.Color; j += 1 {
+			k := struct{ A, B int }{A: i + 1, B: j + 1}
+			weights[k] = rand.Intn(maxWeight) + 1
+		}
+	}
+
+	makeTree := func(n int) (Graph, Node) {
+		m := make(map[string][]string)
+		for i := 0; i < n; i += 1 {
+			id := fmt.Sprintf("v%d", i)
+			kid1 := fmt.Sprintf("v%d", 2*i+1)
+			kid2 := fmt.Sprintf("v%d", 2*i+2)
+			m[id] = append(m[id], kid1, kid2)
+		}
+		return MakeTestGraph(m), "v0"
+	}
+
+	graph, root := makeTree(N.Tree)
+
+	opt := PartitionTreeOpt{
+		exact: true,
+		Tree:  graph,
+		Root:  root,
+		Colors: func(Node) []int {
+			return colors
+		},
+		Weights: func(x, y int) int {
+			if w, seen := weights[struct{ A, B int }{A: x, B: y}]; seen {
+				return w
+			}
+
+			b.Fatal("unexpected color")
+			return 0
+		},
+	}
+
+	r1, err := checkPartition(opt)
+	if err != nil {
+		b.Fatal(err)
+	}
+	opt.exact = false
+	r2, err := checkPartition(opt)
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	factor := float64(r2.Weight) / float64(r1.Weight)
+	if factor < 1.0 {
+		b.Errorf("non-exact solution better than exact")
+	}
+	b.Logf("Largest problem solvable in benchtime is %+v; SP factor is %fX (min: %d)\n", N, factor, r1.Weight)
+}
+
+func TestMinWeightTree(t *testing.T) {
+	testMinWeightTree(t, true)
+	testMinWeightTree(t, false)
+}
+
+func testMinWeightTree(t *testing.T, exact bool) {
+	if r, err := checkPartition(PartitionTreeOpt{
+		exact: exact,
+		Tree: MakeTestGraph(map[string][]string{
+			"root": []string{},
+		}),
+		Root: "root",
+		Colors: makeTestColors(map[string][]int{
+			"root": []int{1},
+		}),
+		Weights: func(a, b int) int {
+			return 1
+		},
+	}); err != nil {
+		t.Fatal(err)
+	} else if root := r.Parts["root"]; root != 1 {
+		t.Errorf("expected %d but found %d", 1, root)
+	}
+
+	if r, err := checkPartition(PartitionTreeOpt{
+		exact: exact,
+		Tree: MakeTestGraph(map[string][]string{
+			"root": []string{"a", "b"},
+			"a":    []string{"c"},
+		}),
+		Root: "root",
+		Colors: makeTestColors(map[string][]int{
+			"root": []int{1, 3},
+			"a":    []int{2, 3},
+			"b":    []int{1, 3},
+			"c":    []int{4},
+		}),
+		Weights: func(a, b int) int {
+			if a == b {
+				return 0
+			}
+			return 1
+		},
+	}); err != nil {
+		t.Fatal(err)
+	} else if !exact {
+	} else if root, a, b := r.Parts["root"], r.Parts["a"], r.Parts["b"]; root != 3 || a != 3 || b != 3 {
+		t.Errorf("expected %d but found %d %d %d", 3, root, a, b)
+	} else if c := r.Parts["c"]; c != 4 {
+		t.Errorf("expected %d found %d", 4, c)
+	}
+
+	if r, err := checkPartition(PartitionTreeOpt{
+		exact: exact,
+		Tree: MakeTestGraph(map[string][]string{
+			"root": []string{"a", "b"},
+			"a":    []string{"c", "d"},
+			"b":    []string{"e", "f"},
+		}),
+		Root: "root",
+		Colors: makeTestColors(map[string][]int{
+			"root": []int{1, 2, 3},
+			"a":    []int{1, 2, 3},
+			"b":    []int{1, 2, 3},
+			"c":    []int{1, 2, 3},
+			"d":    []int{1, 2, 3},
+			"e":    []int{1, 2, 3},
+			"f":    []int{1, 2, 3},
+		}),
+		Weights: func(a, b int) int {
+			return 100 - (a + b)
+		},
+	}); err != nil {
+		t.Fatal(err)
+	} else if !exact {
+	} else {
+		for n, v := range r.Parts {
+			if v != 3 {
+				t.Errorf("expected %d found %d for node %q", 3, v, n)
+			}
+		}
+	}
+}

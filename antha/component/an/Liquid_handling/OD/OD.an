@@ -26,7 +26,6 @@ Parameters (
 )
 
 Data (
-		
 	Sample_absorbance wtype.Absorbance//Absorbance
 	Blankcorrected_absorbance wtype.Absorbance//Absorbance
 	OD wtype.Absorbance//(pathlength corrected)

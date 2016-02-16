@@ -2,11 +2,11 @@ package lib
 
 import (
 	"fmt"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/export"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/entrez"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
@@ -27,18 +27,28 @@ func _GeneDesignSetup(_ctx context.Context, _input *GeneDesignInput) {
 func _GeneDesignSteps(_ctx context.Context, _input *GeneDesignInput, _output *GeneDesignOutput) {
 	PartDNA := make([]wtype.DNASequence, 4)
 
-	// Retrieve part seqs from iGem repository
+	// Retrieve part seqs from entrez
 	for i, part := range _input.Parts {
-		DNAString := igem.GetSequence(part)
-		PartDNA[i] = wtype.MakeLinearDNASequence(part, DNAString)
+		DNA := entrez.RetrieveSequence(part, "nucleotide")
+		PartDNA[i] = DNA
 	}
 
-	// Look up sequence of the desired vector and restriction enzyme
-	VectorSeq := Inventory.Partslist[_input.Vector]
+	// look up vector sequence
+	VectorSeq := entrez.RetrieveVector(_input.Vector)
+
+	// Look up the restriction enzyme
 	EnzymeInf, _ := lookup.TypeIIsLookup(_input.RE)
 
 	// Add overhangs
 	_output.PartsWithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(PartDNA, VectorSeq, EnzymeInf)
+
+	// validation
+	assembly := enzymes.Assemblyparameters{"MarksConstruct", _input.RE, VectorSeq, _output.PartsWithOverhangs}
+	Status, _, _, _, _ := enzymes.Assemblysimulator(assembly)
+	fmt.Println(Status)
+
+	// check if sequence meets requirements for synthesis
+	sequences.ValidateSynthesis(_output.PartsWithOverhangs, _input.Vector, "GenScript")
 
 	// export sequence to fasta
 	export.Makefastaserial2("MarksConstruct", _output.PartsWithOverhangs)
@@ -50,9 +60,7 @@ func _GeneDesignAnalysis(_ctx context.Context, _input *GeneDesignInput, _output 
 }
 
 func _GeneDesignValidation(_ctx context.Context, _input *GeneDesignInput, _output *GeneDesignOutput) {
-	assembly := enzymes.Assemblyparameters{"MarksConstruct", _input.RE, Inventory.Partslist[_input.Vector], _output.PartsWithOverhangs}
-	Status, _, _, _, _ := enzymes.Assemblysimulator(assembly)
-	fmt.Println(Status)
+
 }
 func _GeneDesignRun(_ctx context.Context, input *GeneDesignInput) *GeneDesignOutput {
 	output := &GeneDesignOutput{}

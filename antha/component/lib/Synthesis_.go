@@ -24,16 +24,15 @@ func _SynthesisRequirements() {}
 func _SynthesisSetup(_ctx context.Context, _input *SynthesisInput) {}
 
 func _SynthesisSteps(_ctx context.Context, _input *SynthesisInput, _output *SynthesisOutput) {
-	//made up element which synthesises DNA
+	// Element with mock synthesises DNA. Converts DNA sequence type to LHComponent.
 	var dna wtype.LHComponent
-
 	_output.Components = make([]wtype.LHComponent, 4)
 
-	for i := range _input.PartsWithOverhangs {
+	for i, part := range _input.PartsWithOverhangs {
+		dna.CName = part.Nm
 		_output.Components[i] = dna
 	}
 
-	//Components = components
 }
 
 func _SynthesisAnalysis(_ctx context.Context, _input *SynthesisInput, _output *SynthesisOutput) {

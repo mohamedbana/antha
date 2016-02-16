@@ -6,8 +6,8 @@
 	"Magenta": "Magenta",
 	"Yellow": "Yellow_ink",
 	"Black": "Black",
-      "OutPlate": "greiner384_riser",
-      "VolumeForFullcolour": "20ul"
+      "OutPlate": "DSW96_riser",
+      "VolumeForFullcolour": "150ul"
     }
   }
 }

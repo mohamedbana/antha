@@ -34,7 +34,8 @@ func _PlateOutSteps(_ctx context.Context, _input *PlateOutInput, _output *PlateO
 		diluentsample := mixer.SampleForTotalVolume(_input.Diluent, _input.Plateoutvolume)
 		plateout = append(plateout, diluentsample)
 		// redeclare Plateoutvolume for adjusted volume to add of recovery mixture based on dilution ratio
-		_input.Plateoutvolume = wunit.NewVolume(_input.Plateoutvolume.SIValue()/float64(_input.DilutionX), "l")
+		_input.Plateoutvolume = wunit.NewVolume(_input.Plateoutvolume.RawValue()/float64(_input.DilutionX), _input.Plateoutvolume.Unit().PrefixedSymbol())
+
 	}
 	plateoutsample := mixer.Sample(_input.RecoveredCells, _input.Plateoutvolume)
 	plateout = append(plateout, plateoutsample)
@@ -47,12 +48,14 @@ func _PlateOutSteps(_ctx context.Context, _input *PlateOutInput, _output *PlateO
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func _PlateOutAnalysis(_ctx context.Context, _input *PlateOutInput, _output *PlateOutOutput) {
+
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func _PlateOutValidation(_ctx context.Context, _input *PlateOutInput, _output *PlateOutOutput) {
+
 }
 func _PlateOutRun(_ctx context.Context, input *PlateOutInput) *PlateOutOutput {
 	output := &PlateOutOutput{}

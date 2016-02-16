@@ -2,8 +2,6 @@
 // designed to convert units: e.g. kg/m^3 to g/L etc
 package wunit
 
-import ()
-
 /*
 type
 
@@ -23,4 +21,16 @@ func MasstoVolume(m Mass, d Density) (v Volume) {
 	volume = volume * 1000   // in l
 	v = NewVolume(mass, "l")
 	return v
+}
+
+func VolumetoMass(v Volume, d Density) (m Mass) {
+	//mass := m.SIValue()
+	density := d.SIValue()
+
+	volume := v.SIValue() //* 1000 // convert m^3 to l
+
+	mass := volume * density // in m^3
+
+	m = NewMass(mass, "kg")
+	return m
 }

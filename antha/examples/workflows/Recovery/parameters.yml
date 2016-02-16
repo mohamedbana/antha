@@ -1,0 +1,13 @@
+{
+    "Parameters": {
+       "Recovery": {
+            "OutPlate": "DSW96",
+			"TransformedcellVolume":"50ul",
+            "Recoverymedium": "LB",
+            "Recoverytemp": "25C",
+            "Recoverytime": "57600s",
+            "Recoveryvolume": "500ul",
+            "Transformedcells": "neb5compcells"
+        }
+    }
+}

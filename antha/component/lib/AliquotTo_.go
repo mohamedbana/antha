@@ -45,7 +45,10 @@ func _AliquotToSteps(_ctx context.Context, _input *AliquotToInput, _output *Aliq
 	// work out well coordinates for any plate
 	wellpositionarray := make([]string, 0)
 
-	alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	//alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	alphabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+		"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
+		"Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"}
 	//k := 0
 	for j := 0; j < _input.OutPlate.WlsY; j++ {
 		for i := 0; i < _input.OutPlate.WlsX; i++ { //countingfrom1iswhatmakesushuman := j + 1

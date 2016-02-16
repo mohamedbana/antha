@@ -36,13 +36,13 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 
 	// deep square well 96
 	swshp := wtype.NewShape("box", "mm", 8.2, 8.2, 41.3)
-	welltype := wtype.NewLHWell("DSW96", "", "", "ul", 2000, 25, swshp, 3, 8.2, 8.2, 41.3, 4.7, "mm")
+	welltype := wtype.NewLHWell("DSW96", "", "", "ul", 1000, 100, swshp, 3, 8.2, 8.2, 41.3, 4.7, "mm")
 	plate := wtype.NewLHPlate("DSW96", "Unknown", 8, 12, 44.1, "mm", welltype, 9, 9, 0.0, 0.0, 0.0)
 	plates[plate.Type] = plate
 
 	// deep square well 96 on riser
 	swshp = wtype.NewShape("box", "mm", 8.2, 8.2, 41.3)
-	welltype = wtype.NewLHWell("DSW96", "", "", "ul", 2000, 25, swshp, 3, 8.2, 8.2, 41.3, 4.7, "mm")
+	welltype = wtype.NewLHWell("DSW96", "", "", "ul", 1000, 100, swshp, 3, 8.2, 8.2, 41.3, 4.7, "mm")
 	plate = wtype.NewLHPlate("DSW96_riser", "Unknown", 8, 12, 44.1, "mm", welltype, 9, 9, 0.0, 0.0, 40.0)
 	plates[plate.Type] = plate
 
@@ -122,15 +122,16 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	plate = wtype.NewLHPlate("pcrplate_with_cooler", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 15.5)
 	plates[plate.Type] = plate
 
+	// pcr plate skirted (on riser)
+	cone = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
+	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 200, 5, cone, 0, 5.5, 5.5, 20.4, 1.4, "mm")
+	plate = wtype.NewLHPlate("pcrplate_skirted", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 37.5)
+	plates[plate.Type] = plate
+
 	// pcr plate with incubator
 	cone = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
 	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 250, 5, cone, 0, 5.5, 5.5, 20.4, 1.4, "mm")
 	plate = wtype.NewLHPlate("pcrplate_with_incubater", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, (15.5 + 44.0))
-	plates[plate.Type] = plate
-	// pcr plate skirted
-	cone = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
-	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 200, 5, cone, 0, 5.5, 5.5, 20.4, 1.4, "mm")
-	plate = wtype.NewLHPlate("pcrplate_skirted", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 37.5)
 	plates[plate.Type] = plate
 
 	// Block Kombi 2ml
@@ -165,7 +166,7 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 
 	square := wtype.NewShape("box", "mm", 4, 4, 14)
 	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
-	welltype = wtype.NewLHWell("384flat", "", "", "ul", 100, 10, square, bottomtype, xdim, ydim, zdim, bottomh, "mm")
+	welltype = wtype.NewLHWell("384flat", "", "", "ul", 125, 10, square, bottomtype, xdim, ydim, zdim, bottomh, "mm")
 
 	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
 	plate = wtype.NewLHPlate("greiner384", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
@@ -187,7 +188,7 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 
 	square = wtype.NewShape("box", "mm", 4, 4, 14)
 	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
-	welltype = wtype.NewLHWell("384flat", "", "", "ul", 100, 10, square, bottomtype, xdim, ydim, zdim, bottomh, "mm")
+	welltype = wtype.NewLHWell("384flat", "", "", "ul", 125, 10, square, bottomtype, xdim, ydim, zdim, bottomh, "mm")
 
 	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
 	plate = wtype.NewLHPlate("greiner384_riser", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
@@ -250,7 +251,7 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	welltype = wtype.NewLHWell("EPAGE48", "", "", "ul", 25, 0, ep48g, 0, 2, 4, 2, 2, "mm")
 	//welltype = wtype.NewLHWell("384flat", "", "", "ul", 100, 10, square, bottomtype, xdim, ydim, zdim, bottomh, "mm")
 	//plate = wtype.NewLHPlate("EPAGE48", "Invitrogen", 2, 26, 50, "mm", welltype, 4.5, 34, -1.0, 17.25, 49.5)
-	plate = wtype.NewLHPlate("EPAGE48", "Invitrogen", 2, 26, 48.5, "mm", welltype, 4.5, 33.75, -1.0, 17.25, 47.5)
+	plate = wtype.NewLHPlate("EPAGE48", "Invitrogen", 2, 26, 48.5, "mm", welltype, 4.5, 33.75, -1.0, 18.0, 46.5)
 	//plate = wtype.NewLHPlate("greiner384", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 
 	plates[plate.Type] = plate

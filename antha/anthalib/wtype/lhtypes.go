@@ -245,7 +245,7 @@ type LHSolution struct {
 	Plateaddress     string
 	PlateID          string
 	Platetype        string
-	Vol              float64
+	Vol              float64 // in S.I units only for now
 	Type             string
 	Conc             float64
 	Tvol             float64

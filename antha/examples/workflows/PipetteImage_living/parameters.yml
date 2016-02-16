@@ -2,12 +2,12 @@
   "Parameters": {
     "PipetteImage": {
 		"OnlythisColour":"",
-		"Notthiscolour":"",
-	  	"Imagefilename": "nyancat3.jpg",
-		"Palettename":"ProteinPaintboxVisible",
+		"Notthiscolour":"white",
+	  	"Imagefilename": "ziggy6_384.jpg",
+		"Palettename":"ProteinPaintboxSubset",
       	"OutPlate": "greiner384_riser",
 		"UVimage":false,
-      	"VolumePerWell": "50ul"
+      	"VolumePerWell": "100ul"
     }
   }
 }

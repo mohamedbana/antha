@@ -34,7 +34,7 @@ Requirements {
 }
 
 // Conditions to run on startup
-Setup {
+Setup {	
 }
 
 // The core process for this protocol, with the steps to be performed
@@ -47,7 +47,8 @@ Steps {
 	diluentsample := mixer.SampleForTotalVolume(Diluent,Plateoutvolume)
 	plateout = append(plateout,diluentsample)
 	// redeclare Plateoutvolume for adjusted volume to add of recovery mixture based on dilution ratio
-	Plateoutvolume = wunit.NewVolume(Plateoutvolume.SIValue()/float64(DilutionX),"l")
+	Plateoutvolume = wunit.NewVolume(Plateoutvolume.RawValue()/float64(DilutionX),Plateoutvolume.Unit().PrefixedSymbol())
+	
 	}
 	plateoutsample := mixer.Sample(RecoveredCells, Plateoutvolume) 
 	plateout = append(plateout,plateoutsample)
@@ -55,16 +56,19 @@ Steps {
 	Incubate(platedculture,IncubationTemp,IncubationTime,false)
 	Platedculture = platedculture
 	
-
+	
 }
 
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 Analysis {
+	
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 Validation {
+	
+	
 }

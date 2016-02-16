@@ -27,7 +27,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
+	"strconv"
 
+	antha "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
+	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/internal/github.com/ghodss/yaml"
 )
@@ -55,8 +59,72 @@ func MakePolicies() map[string]LHPolicy {
 	pols["loadwater"] = MakeLoadWaterPolicy()
 	//      pols["lysate"] = MakeLysatePolicy()
 
+	/*policies, names := PolicyMaker(Allpairs, "DOE_run", false)
+	for i, policy := range policies {
+		pols[names[i]] = policy
+	}
+	*/
+	if antha.Anthafileexists("ScreenLHPolicyDOE2.xlsx") {
+		policies, names, err := PolicyMakerfromDesign("ScreenLHPolicyDOE2.xlsx", "DOE_run")
+
+		for i, policy := range policies {
+			pols[names[i]] = policy
+		}
+		if err != nil {
+			panic(err)
+		}
+	}
 	return pols
 
+}
+
+func PolicyMakerfromDesign(dxdesignfilename string, prepend string) (policies []LHPolicy, names []string, err error) {
+	runs, err := RunsFromDXDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), []string{"Pre_MIX", "POST_MIX"})
+	if err != nil {
+		return policies, names, err
+	}
+	policies, names = PolicyMakerfromRuns(runs, prepend, false)
+	return
+}
+
+func PolicyMaker(factors []DOEPair, nameprepend string, concatfactorlevelsinname bool) (policies []LHPolicy, names []string) {
+
+	runs := AllCombinations(factors)
+
+	policies, names = PolicyMakerfromRuns(runs, nameprepend, concatfactorlevelsinname)
+
+	return
+}
+
+func PolicyMakerfromRuns(runs []Run, nameprepend string, concatfactorlevelsinname bool) (policies []LHPolicy, names []string) {
+
+	names = make([]string, 0)
+	policies = make([]LHPolicy, 0)
+
+	//policy := make(LHPolicy, 0)
+	policy := MakeDefaultPolicy()
+	for i, run := range runs {
+		for j, desc := range run.Factordescriptors {
+			policy[desc] = run.Setpoints[j]
+		}
+
+		// raising runtime error when using concat == true
+		if concatfactorlevelsinname {
+			name := nameprepend
+			for key, value := range policy {
+				name = fmt.Sprint(name, "_", key, ":", value)
+
+			}
+			fmt.Println(name)
+		} else {
+			names = append(names, nameprepend+strconv.Itoa(i))
+		}
+		policies = append(policies, policy)
+		fmt.Println("len policy = ", len(policy))
+		policy = MakeDefaultPolicy()
+	}
+
+	return
 }
 
 //func MakeLysatePolicy() LHPolicy {
@@ -290,7 +358,6 @@ func MakeLVExtraPolicy() LHPolicy {
 	lvep := make(LHPolicy, 2)
 	lvep["EXTRA_ASP_VOLUME"] = wunit.NewVolume(0.5, "ul")
 	lvep["EXTRA_DISP_VOLUME"] = wunit.NewVolume(0.5, "ul")
-	lvep["BLOWOUTVOLUME"] = 50.0
 	return lvep
 }
 
