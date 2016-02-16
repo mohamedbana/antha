@@ -5,8 +5,10 @@ package execute
 import (
 	"encoding/json"
 	"errors"
-
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/microArch/equipment"
+	"github.com/antha-lang/antha/microArch/equipment/action"
 	"github.com/antha-lang/antha/target"
 	"github.com/antha-lang/antha/workflow"
 )
@@ -77,24 +79,16 @@ func Run(parent context.Context, opt Options) (*workflow.Workflow, error) {
 }
 
 // XXX Move out when equipment config is done
-/*
 func config(parent context.Context, lh equipment.Equipment, cd Config) error {
 	id := getId(parent)
 	config := make(map[string]interface{})
-	for _, cv := range cvalues {
-		if cv.UseA {
-			config[cv.Key] = cv.A
-
-			if cv.Key == "INPUT_PLATETYPE" {
-				logger.Info(fmt.Sprint("WARNING: No input plate types specified, reverting to default: ", cv.A))
-			} else if cv.Key == "OUTPUT_PLATETYPE" {
-				logger.Info(fmt.Sprint("WARNING: No output plate types specified, reverting to default: ", cv.A))
-			}
-
-		} else {
-			config[cv.Key] = cv.B
-		}
-	}
+	config["BLOCKID"] = wtype.NewBlockID(id)
+	config["MAX_N_PLATES"] = *cd.MaxPlates
+	config["MAX_N_WELLS"] = *cd.MaxWells
+	config["RESIDUAL_VOLUME_WEIGHT"] = *cd.ResidualVolumeWeight
+	config["INPUT_PLATETYPE"] = cd.InputPlateType
+	config["OUTPUT_PLATETYPE"] = cd.OutputPlateType
+	config["WELLBYWELL"] = *cd.WellByWell
 
 	configString, err := json.Marshal(config)
 	if err != nil {
@@ -105,4 +99,3 @@ func config(parent context.Context, lh equipment.Equipment, cd Config) error {
 	}
 	return nil
 }
-*/
