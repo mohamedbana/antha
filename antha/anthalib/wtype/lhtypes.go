@@ -568,7 +568,10 @@ func (lhp *LHPlate) GetComponent(cmp *LHComponent) ([]WellCoords, bool) {
 	return ret, true
 }
 
-func (lhp *LHPlate) Wells() map[string]*LHWell {
+func (lhp *LHPlate) Wells() [][]*LHWell {
+	return lhp.Rows
+}
+func (lhp *LHPlate) WellMap() map[string]*LHWell {
 	return lhp.Wellcoords
 }
 
