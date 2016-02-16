@@ -84,17 +84,6 @@ func NewVolume(v float64, unit string) (o Volume) {
 	return
 }
 
-/*
-func NewVolume(v float64, unit string) Volume {
-	if unit != "l" {
-		logger.Fatal("Can't make volumes which aren't in l")
-		panic("Can't make volumes which aren't in l")
-	}
-
-	a := Volume{NewMeasurement(v, "", unit)}
-	return a
-}
-*/
 func CopyVolume(v Volume) Volume {
 	ret := NewVolume(v.RawValue(), v.Unit().PrefixedSymbol())
 	return ret

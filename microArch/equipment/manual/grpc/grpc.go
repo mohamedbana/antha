@@ -434,6 +434,10 @@ func DecodePtrToLHTip(arg *pb.PtrToLHTipMessage) *wtype.LHTip {
 		return nil
 	}
 
+	if arg.Arg_1 == nil {
+		return nil
+	}
+
 	ret := DecodeLHTip(arg.Arg_1)
 	return &ret
 }

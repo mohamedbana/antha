@@ -404,10 +404,19 @@ func (this *Liquidhandler) Layout(request *LHRequest) *LHRequest {
 
 // make the instructions for executing this request
 func (this *Liquidhandler) ExecutionPlan(request *LHRequest) *LHRequest {
-	// finally define the instructions which will enact the transfers
-	// this is quite involved, we need a strategy to do this
 
-	return this.ExecutionPlanner(request, this.Properties)
+	// copy the robot -- need to verify this deep copy is working OK
+	// this copy needs to be sorted out, it's not copying the plate layouts
+	// for this debug I'll leave this out then revisit
+	//	rbtcpy := this.Properties.Dup()
+
+	rbtcpy := this.Properties
+
+	rq := this.ExecutionPlanner(request, rbtcpy)
+
+	// ensure any relevant state changes are noted
+
+	return rq
 }
 
 func OutputSetup(robot *liquidhandling.LHProperties) {

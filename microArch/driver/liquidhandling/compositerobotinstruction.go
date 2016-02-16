@@ -164,6 +164,7 @@ func ChooseChannel(vol wunit.Volume, prms *LHProperties) (*wtype.LHChannelParame
 	return headchosen.GetParams(), tiptype
 }
 
+// TODO -- refactor to pass actual plates through
 type TransferInstruction struct {
 	Type       int
 	What       []string
@@ -556,6 +557,8 @@ func (ins *TransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProper
 		// break out the sets of parallel instructions
 
 		// fix this HARD CODE here
+		// this is a bit problematic: we need to define head choice here partly on the
+		// basis of its multi, partly based on volume range
 		parallelsets := ins.GetParallelSetsFor(prms.HeadsLoaded[0].Params)
 		mci := NewMultiChannelBlockInstruction()
 		mci.Multi = prms.HeadsLoaded[0].Params.Multi // TODO Remove Hard code here
@@ -647,6 +650,11 @@ func (ins *TransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProper
 		}
 
 		var tp TransferParams
+
+		fmt.Println("HERE WE GO AGAIN: ", ins.What[i], " ", ins.PltFrom[i], ins.PltTo[i], ins.WellFrom[i], ins.WellTo[i], ins.Volume[i].ToString(), ins.FVolume[i].ToString(), " ", ins.TVolume[i].ToString())
+
+		fmt.Println(ins.FPlateType[i], " ", ins.TPlateType[i])
+
 		tp.What = ins.What[i]
 		tp.PltFrom = ins.PltFrom[i]
 		tp.PltTo = ins.PltTo[i]

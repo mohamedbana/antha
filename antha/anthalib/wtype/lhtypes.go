@@ -549,7 +549,7 @@ func (lhp *LHPlate) GetComponent(cmp *LHComponent) ([]WellCoords, bool) {
 
 	for wc := it.Curr(); it.Valid(); wc = it.Next() {
 		w := lhp.Wellcoords[wc.FormatA1()]
-		//fmt.Println("WANT$$$: ", cmp.CName, " :: ", wc.FormatA1(), " ", w.Contents().CName)
+		//	logger.Debug(fmt.Sprint("WANT$$$: ", cmp.CName, " :: ", wc.FormatA1(), " ", w.Contents().CName))
 		if w.Contents().CName == cmp.CName {
 			v := w.WorkingVolume()
 			volGot.Add(v)
@@ -580,6 +580,13 @@ func (lhp *LHPlate) GetName() string {
 
 func (lhp *LHPlate) WellAt(wc WellCoords) *LHWell {
 	return lhp.Wellcoords[wc.FormatA1()]
+}
+
+func (lhp *LHPlate) WellAtString(s string) (*LHWell, bool) {
+	// improve later, start by assuming these are in FormatA1()
+	w, ok := lhp.Wellcoords[s]
+
+	return w, ok
 }
 
 func (lhp *LHPlate) WellsX() int {
@@ -751,8 +758,7 @@ Plate     : %v,
 func (w *LHWell) Contents() *LHComponent {
 	// be careful
 	if w == nil {
-		// not quite sure
-		panic("THIS MAKES LITTLE SENSE")
+		logger.Debug("CONTENTS OF NIL WELL REQUESTED")
 		return NewLHComponent()
 	}
 	if w.WContents == nil {
@@ -1220,6 +1226,13 @@ type LHTip struct {
 	MinVol wunit.Volume
 }
 
+func (tip *LHTip) IsNil() bool {
+	if tip == nil || tip.Type == "" || tip.MaxVol.IsZero() || tip.MinVol.IsZero() {
+		return true
+	}
+	return false
+}
+
 func (tip *LHTip) Dup() *LHTip {
 	t := NewLHTip(tip.Mnfr, tip.Type, tip.MinVol.RawValue(), tip.MaxVol.RawValue(), tip.MinVol.Unit().PrefixedSymbol())
 	t.Dirty = tip.Dirty
@@ -1353,7 +1366,7 @@ func (lhh *LHHead) GetParams() *LHChannelParameter {
 }
 
 // adaptor
-
+// TODO -- should be an array of loaded tips
 type LHAdaptor struct {
 	Name          string
 	ID            string
@@ -1374,7 +1387,7 @@ func NewLHAdaptor(name, mf string, params *LHChannelParameter) *LHAdaptor {
 func (lha *LHAdaptor) Dup() *LHAdaptor {
 	ad := NewLHAdaptor(lha.Name, lha.Manufacturer, lha.Params.Dup())
 	ad.Ntipsloaded = lha.Ntipsloaded
-	if lha.Tiptypeloaded != nil {
+	if !ad.Tiptypeloaded.IsNil() {
 		ad.Tiptypeloaded = lha.Tiptypeloaded.Dup()
 	}
 

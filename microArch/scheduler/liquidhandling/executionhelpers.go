@@ -23,6 +23,7 @@
 package liquidhandling
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -192,14 +193,7 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) 
 	wh := make([]string, len(insIn.Components))       // component types
 	va := make([]wunit.Volume, len(insIn.Components)) // volumes
 
-	// four parameters applying to the destination
-
-	pt := make([]string, len(insIn.Components)) // dest plate positions
-	wt := make([]string, len(insIn.Components)) // dest wells
-	ptwx := make([]int, len(insIn.Components))  // dimensions of plate pipetting to (X)
-	ptwy := make([]int, len(insIn.Components))  // dimensions of plate pipetting to (Y)
-
-	// four parameters applying to the source
+	// six parameters applying to the source
 
 	fromPlateID, fromWells := robot.GetComponents(insIn.Components)
 
@@ -207,21 +201,58 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) 
 	wf := make([]string, len(insIn.Components))
 	pfwx := make([]int, len(insIn.Components))
 	pfwy := make([]int, len(insIn.Components))
+	vf := make([]wunit.Volume, len(insIn.Components))
+	ptt := make([]string, len(insIn.Components))
+
+	// six parameters applying to the destination
+
+	pt := make([]string, len(insIn.Components))       // dest plate positions
+	wt := make([]string, len(insIn.Components))       // dest wells
+	ptwx := make([]int, len(insIn.Components))        // dimensions of plate pipetting to (X)
+	ptwy := make([]int, len(insIn.Components))        // dimensions of plate pipetting to (Y)
+	vt := make([]wunit.Volume, len(insIn.Components)) // volume in well to
+	ptf := make([]string, len(insIn.Components))      // plate types
 
 	for i, v := range insIn.Components {
-		wh[i] = v.TypeName()
+		// get dem big ole plates out
+		// TODO -- pass them in instead of all this nonsense
+		flhp := robot.PlateLookup[fromPlateID[i]].(*wtype.LHPlate)
+		tlhp := robot.PlateLookup[insIn.PlateID].(*wtype.LHPlate)
+
+		wlt, ok := tlhp.WellAtString(insIn.Welladdress)
+
+		if !ok {
+			logger.Fatal(fmt.Sprint("Well ", insIn.Welladdress, " not found on dest plate ", insIn.PlateID))
+		}
+
 		v2 := wunit.NewVolume(v.Vol, v.Vunit)
+		vt[i] = wlt.CurrVolume()
+		wh[i] = v.TypeName()
 		va[i] = v2
 		pt[i] = robot.PlateIDLookup[insIn.PlateID]
 		wt[i] = insIn.Welladdress
-		ptwx[i] = robot.Plates[robot.PlateIDLookup[insIn.PlateID]].WellsX()
-		ptwy[i] = robot.Plates[robot.PlateIDLookup[insIn.PlateID]].WellsY()
+		ptwx[i] = tlhp.WellsX()
+		ptwy[i] = tlhp.WellsY()
+		ptt[i] = tlhp.Type
+
+		wlf, ok := flhp.WellAtString(fromWells[i])
+
+		if !ok {
+			logger.Fatal(fmt.Sprint("Well ", fromWells[i], " not found on source plate ", fromPlateID[i]))
+		}
+
+		vf[i] = wlf.CurrVolume()
+		wlf.Remove(va[i])
 		pf[i] = robot.PlateIDLookup[fromPlateID[i]]
 		wf[i] = fromWells[i]
-		pfwx[i] = robot.Plates[robot.PlateIDLookup[fromPlateID[i]]].WellsX()
-		pfwy[i] = robot.Plates[robot.PlateIDLookup[fromPlateID[i]]].WellsY()
+		pfwx[i] = flhp.WellsX()
+		pfwy[i] = flhp.WellsY()
+		ptf[i] = flhp.Type
+
+		//fmt.Println("HERE GOES: ", i, wh[i], vf[i].ToString(), vt[i].ToString(), va[i].ToString(), pt[i], wt[i], pf[i], wf[i], pfwx[i], pfwy[i], ptwx[i], ptwy[i])
+
 	}
 
-	ti := driver.TransferInstruction{Type: driver.TFR, What: wh, Volume: va, PltTo: pt, WellTo: wt, TPlateWX: ptwx, TPlateWY: ptwy, PltFrom: pf, WellFrom: wf, FPlateWX: pfwx, FPlateWY: pfwy}
+	ti := driver.TransferInstruction{Type: driver.TFR, What: wh, Volume: va, PltTo: pt, WellTo: wt, TPlateWX: ptwx, TPlateWY: ptwy, PltFrom: pf, WellFrom: wf, FPlateWX: pfwx, FPlateWY: pfwy, FVolume: vf, TVolume: vt, FPlateType: ptf, TPlateType: ptt}
 	return &ti
 }

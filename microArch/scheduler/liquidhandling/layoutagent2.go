@@ -24,14 +24,11 @@ package liquidhandling
 
 import (
 	"fmt"
-
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	//"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
-	//"github.com/antha-lang/antha/microArch/logger"
 )
 
 func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *LHRequest {
@@ -53,6 +50,15 @@ func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties
 	// make specific plates... this may mean splitting stuff out into multiple plates
 
 	make_plates(request)
+
+	// give them names
+
+	for _, v := range request.Output_plates {
+		// we need to ensure this has a name
+		if v.Name() == "" {
+			v.PlateName = fmt.Sprintf("Output_plate_%s", v.ID[0:6])
+		}
+	}
 
 	// now we have solutions of type 1 only -- we just need to
 	// say where on each plate they will go

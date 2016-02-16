@@ -24,6 +24,7 @@ package liquidhandling
 
 import "github.com/antha-lang/antha/microArch/driver/liquidhandling"
 
+// robot here should be a copy... this routine will be destructive of state
 func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProperties) *LHRequest {
 	/*
 		// this volume correction needs to be removed asap

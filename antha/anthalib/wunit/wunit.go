@@ -181,6 +181,15 @@ func (cm *ConcreteMeasurement) Subtract(m Measurement) {
 	cm.SetValue(cm.RawValue() - m.ConvertTo(cm.Unit()))
 }
 
+// define a zero
+
+func (cm *ConcreteMeasurement) IsZero() bool {
+	if cm == nil || cm.Munit == nil || cm.Mvalue < 0.00000000001 {
+		return true
+	}
+	return false
+}
+
 // comparison operators
 
 func (cm *ConcreteMeasurement) LessThan(m Measurement) bool {
