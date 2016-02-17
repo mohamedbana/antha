@@ -23,11 +23,8 @@
 package mixer
 
 import (
-	"fmt"
-
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/microArch/logger"
 )
 
 // mix needs to define the interface with liquid handling
@@ -45,6 +42,10 @@ func SampleAll(l *wtype.LHComponent) *wtype.LHComponent {
 func Sample(l *wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
 	ret.ID = l.ID
+	l.AddDaughter(ret.ID)
+	if l.HasAnyParent() {
+		ret.ParentID = l.ParentID
+	}
 	ret.CName = l.Name()
 	ret.Type = l.Type
 	ret.Vol = v.RawValue()
@@ -66,6 +67,10 @@ func MultiSample(l []*wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent 
 		ret := wtype.NewLHComponent()
 		vi := v[i]
 		ret.ID = j.ID
+		j.AddDaughter(ret.ID)
+		if j.HasAnyParent() {
+			ret.ParentID = j.ParentID
+		}
 		ret.CName = j.Name()
 		ret.Type = j.Type
 		ret.Vol = vi.RawValue()
@@ -84,6 +89,10 @@ func MultiSample(l []*wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent 
 func SampleForConcentration(l *wtype.LHComponent, c wunit.Concentration) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
 	ret.ID = l.ID
+	l.AddDaughter(ret.ID)
+	if l.HasAnyParent() {
+		ret.ParentID = l.ParentID
+	}
 	ret.CName = l.Name()
 	ret.Type = l.Type
 	ret.Conc = c.RawValue()
@@ -92,7 +101,7 @@ func SampleForConcentration(l *wtype.LHComponent, c wunit.Concentration) *wtype.
 	ret.Extra = l.GetExtra()
 	ret.Smax = l.GetSmax()
 	ret.Visc = l.GetVisc()
-	logger.Track(fmt.Sprintf("SAMPLE C %s %s %s", l.ID, ret.ID, c.ToString()))
+	//logger.Track(fmt.Sprintf("SAMPLE C %s %s %s", l.ID, ret.ID, c.ToString()))
 	return ret
 }
 
@@ -103,6 +112,10 @@ func SampleMass(s *wtype.LHComponent, m wunit.Mass, d wunit.Density) *wtype.LHCo
 
 	ret := wtype.NewLHComponent()
 	ret.ID = s.ID
+	s.AddDaughter(ret.ID)
+	if s.HasAnyParent() {
+		ret.ParentID = s.ParentID
+	}
 	ret.CName = s.Name()
 	ret.Type = s.Type
 	ret.Vol = v.RawValue()
@@ -120,6 +133,10 @@ func SampleMass(s *wtype.LHComponent, m wunit.Mass, d wunit.Density) *wtype.LHCo
 func SampleForTotalVolume(l *wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
 	ret.ID = l.ID
+	l.AddDaughter(ret.ID)
+	if l.HasAnyParent() {
+		ret.ParentID = l.ParentID
+	}
 	ret.CName = l.Name()
 	ret.Type = l.Type
 	ret.Tvol = v.RawValue()
@@ -128,7 +145,7 @@ func SampleForTotalVolume(l *wtype.LHComponent, v wunit.Volume) *wtype.LHCompone
 	ret.Extra = l.GetExtra()
 	ret.Smax = l.GetSmax()
 	ret.Visc = l.GetVisc()
-	logger.Track(fmt.Sprintf("SAMPLE T %s %s %s", l.ID, ret.ID, v.ToString()))
+	//logger.Track(fmt.Sprintf("SAMPLE T %s %s %s", l.ID, ret.ID, v.ToString()))
 
 	return ret
 }
