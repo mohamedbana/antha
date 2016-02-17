@@ -33,7 +33,7 @@ func _RestrictionDigestion_concSteps(_ctx context.Context, _input *RestrictionDi
 
 	// workout volume of buffer to add in SI units
 	BufferVol := wunit.NewVolume(float64(_input.ReactionVolume.SIValue()/float64(_input.BufferConcX)), "l")
-	fmt.Println("HELLLLLOOOOOO:", BufferVol.ToString())
+	fmt.Println("HELLLLLOOOOOO:", _input.ReactionVolume.SIValue(), _input.BufferConcX, float64(_input.ReactionVolume.SIValue()/float64(_input.BufferConcX)), BufferVol.SIValue())
 	bufferSample := mixer.Sample(_input.Buffer, BufferVol)
 	samples = append(samples, bufferSample)
 
@@ -46,7 +46,7 @@ func _RestrictionDigestion_concSteps(_ctx context.Context, _input *RestrictionDi
 
 	// work out necessary volume to add
 	DNAVol := wunit.NewVolume(float64((_input.DNAMassperReaction.SIValue() / _input.DNAConc.SIValue())), "l")
-	fmt.Println("HELLLLLOOOOOO Again:", DNAVol.ToString())
+	fmt.Println("HELLLLLOOOOOO Again:", _input.DNAMassperReaction.SIValue(), _input.DNAConc.SIValue(), float64((_input.DNAMassperReaction.SIValue() / _input.DNAConc.SIValue())), DNAVol.SIValue())
 	text.Print("DNAVOL", DNAVol.ToString())
 	dnaSample := mixer.Sample(_input.DNASolution, DNAVol)
 	samples = append(samples, dnaSample)
