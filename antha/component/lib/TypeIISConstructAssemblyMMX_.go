@@ -43,9 +43,12 @@ func _TypeIISConstructAssemblyMMXSteps(_ctx context.Context, _input *TypeIISCons
 		samples = append(samples, partSample)
 	}
 
-	_output.Reaction = execute.MixTo(_ctx, _input.OutPlate.Type, _input.OutputLocation, _input.OutputPlateNum, samples...)
+	r := execute.MixTo(_ctx, _input.OutPlate.Type, _input.OutputLocation, _input.OutputPlateNum, samples...)
 
-	// incubate the reaction mixture
+	s := mixer.Sample(_input.MasterMix, wunit.NewVolume(5.0, "ul"))
+	_output.Reaction = execute.MixTo(_ctx, _input.OutPlate.Type, _input.OutputLocation, _input.OutputPlateNum, r, s)
+
+	// incubate te reaction mixture
 	// commented out pending changes to incubate
 	//Incubate(Reaction, ReactionTemp, ReactionTime, false)
 	// inactivate

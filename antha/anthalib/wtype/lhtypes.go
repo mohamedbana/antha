@@ -29,7 +29,6 @@ import (
 	"strings"
 
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/microArch/logger"
 )
 
@@ -485,6 +484,10 @@ func CopyLHComponent(lhc *LHComponent) *LHComponent {
 	return &lhc2
 }
 
+// structure describing a sample
+
+type LHSample LHComponent
+
 // structure describing a microplate
 type LHPlate struct {
 	ID          string
@@ -937,10 +940,17 @@ func Get_Next_Well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 
 		crds := curwell.Crds
 
-		tx := strings.Split(crds, ":")
+		/*
+			tx := strings.Split(crds, ":")
 
-		nrow = wutil.AlphaToNum(tx[0])
-		ncol = wutil.ParseInt(tx[1])
+			nrow = wutil.AlphaToNum(tx[0])
+			ncol = wutil.ParseInt(tx[1])
+		*/
+		//TODO -- remove 96 well plate restriction here
+		logger.Debug("Warning: this usage restricts plate size to 96 maximum")
+		wc := MakeWellCoordsA1(crds)
+		nrow = wc.X
+		ncol = wc.Y
 	}
 
 	wellsx := plate.WlsX
@@ -949,14 +959,16 @@ func Get_Next_Well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 	var new_well *LHWell
 
 	for {
+		fmt.Println("CUR WELL : ", nrow, " ", ncol)
 		nrow, ncol = next_well_to_try(nrow, ncol, wellsy, wellsx)
 
+		fmt.Println("NEXT WELL : ", nrow, " ", ncol)
 		if nrow == -1 {
 			return nil, false
 		}
 		//	crds := wutil.NumToAlpha(nrow) + ":" + strconv.Itoa(ncol)
 
-		crds := WellCoords{nrow - 1, ncol - 1}.FormatA1()
+		crds := WellCoords{nrow, ncol}.FormatA1()
 
 		new_well = plate.Wellcoords[crds]
 
