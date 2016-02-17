@@ -4,6 +4,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
+	"fmt"
 )
 
 // Input parameters for this protocol (data)
@@ -61,7 +62,7 @@ Steps {
 
 	// workout volume of buffer to add in SI units
 	BufferVol := wunit.NewVolume(float64(ReactionVolume.SIValue()/float64(BufferConcX)),"l")	
-	
+	fmt.Println("HELLLLLOOOOOO:", BufferVol.ToString())
 	bufferSample := mixer.Sample(Buffer, BufferVol)
 	samples = append(samples, bufferSample)
 
@@ -73,6 +74,7 @@ Steps {
 	
 	// work out necessary volume to add
 	DNAVol := wunit.NewVolume(float64((DNAMassperReaction.SIValue()/DNAConc.SIValue())),"l")
+	fmt.Println("HELLLLLOOOOOO Again:", DNAVol.ToString())
 	text.Print("DNAVOL",DNAVol.ToString())
 	dnaSample := mixer.Sample(DNASolution, DNAVol)
 	samples = append(samples, dnaSample)

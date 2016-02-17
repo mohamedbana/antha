@@ -137,7 +137,7 @@ func PolicyMaker(factordescriptors []string, setpointsetsforeachdecriptorinorder
 */
 
 func PolicyMakerfromDesign(dxdesignfilename string, prepend string) (policies []LHPolicy, names []string, err error) {
-	runs, err := RunsFromDXDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), []string{"Pre_MIX", "POST_MIX"})
+	runs, err := RunsFromDXDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), []string{"PRE_MIX", "POST_MIX"})
 	if err != nil {
 		return policies, names, err
 	}
