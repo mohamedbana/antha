@@ -160,6 +160,14 @@ func (it *IChain) FindNodeFor(ins *wtype.LHInstruction) *IChain {
 	return nil
 }
 
+func (it *IChain) Print() {
+	fmt.Println("PARENT: ", it.Parent)
+	fmt.Println("\tValues:", it.Values)
+	if it.Child != nil {
+		it.Child.Print()
+	}
+}
+
 func (it *IChain) Flatten() []string {
 	var ret []string
 
@@ -187,6 +195,15 @@ func set_output_order(rq *LHRequest) {
 	}
 
 	rq.Output_order = it.Flatten()
+
+	it.Print()
+
+	// do these differ?
+
+	for i, _ := range rq.Order_instructions_added {
+		fmt.Println(i, " ", rq.Order_instructions_added[i], " ", rq.Output_order[i])
+	}
+
 }
 
 func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) (insOut *driver.TransferInstruction) {

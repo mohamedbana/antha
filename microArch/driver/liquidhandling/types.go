@@ -453,10 +453,6 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []s
 	r1 := make([]string, len(cmps))
 	r2 := make([]string, len(cmps))
 
-	for k, _ := range lhp.Plates {
-		fmt.Println("LOOK HERE YOU: ", k)
-	}
-
 	for i, v := range cmps {
 		foundIt := false
 		for _, ipref := range lhp.Input_preferences {
