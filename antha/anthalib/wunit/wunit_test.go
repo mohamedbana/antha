@@ -165,3 +165,44 @@ func ExampleNine() {
 	fmt.Println(er2)
 
 }
+
+type testunit struct {
+	value        float64
+	prefix       string
+	unit         string
+	prefixedunit string
+	siresult     float64
+}
+
+var units = []testunit{
+	{2.0000000000000003e-06, "", "l", "l", 2.0000000000000003e-06},
+	{2.05, "u", "l", "ul", 2.05e-6},
+}
+
+func TestNewMeasurement(t *testing.T) {
+	for _, testunit := range units {
+		r := NewMeasurement(testunit.value, testunit.prefix, testunit.unit)
+		if r.SIValue() != testunit.siresult {
+			t.Error(
+				"For", testunit.value, testunit.prefix, testunit.unit, "/n",
+				"expected", testunit.siresult, "\n",
+				"got", r.SIValue(), "\n",
+			)
+		}
+	}
+
+}
+
+func TestNewVolume(t *testing.T) {
+	for _, testunit := range units {
+		r := NewVolume(testunit.value, testunit.prefixedunit)
+		if r.SIValue() != testunit.siresult {
+			t.Error(
+				"For", testunit.value, testunit.prefixedunit, "/n",
+				"expected", testunit.siresult, "\n",
+				"got", r.SIValue(), "\n",
+			)
+		}
+	}
+
+}
