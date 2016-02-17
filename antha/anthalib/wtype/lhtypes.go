@@ -959,10 +959,7 @@ func Get_Next_Well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 	var new_well *LHWell
 
 	for {
-		fmt.Println("CUR WELL : ", nrow, " ", ncol)
 		nrow, ncol = next_well_to_try(nrow, ncol, wellsy, wellsx)
-
-		fmt.Println("NEXT WELL : ", nrow, " ", ncol)
 		if nrow == -1 {
 			return nil, false
 		}
