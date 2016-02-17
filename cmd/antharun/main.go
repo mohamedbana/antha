@@ -197,7 +197,6 @@ func run() error {
 	maxPlates := flag.String("maxPlates", "", "maximum number of plates")
 	maxWells := flag.String("maxWells", "", "maximum number of wells on a plate")
 	residualVolumeWeight := flag.String("residualVolumeWeight", "", "")
-	wellByWell := flag.String("wellByWell", "", "use well-by-well planner")
 	inputPlateType := flag.String("inputPlateType", "", "default input plate type to use")
 	outputPlateType := flag.String("outputPlateType", "", "default output plate to use")
 
@@ -224,7 +223,6 @@ func run() error {
 			ResidualVolumeWeight: parseFloat(residualVolumeWeight),
 			InputPlateType:       parseStringSlice(inputPlateType),
 			OutputPlateType:      parseStringSlice(outputPlateType),
-			WellByWell:           parseBool(wellByWell),
 		}
 		return
 	}
