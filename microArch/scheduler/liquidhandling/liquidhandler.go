@@ -224,10 +224,16 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 
 	for _, instruction := range instructions {
 		// components are either other solutions or come in as inputs
-		// this needs solving too
 		components := instruction.Components
 
 		for _, component := range components {
+
+			// ignore anything which is made in another mix
+
+			if component.HasAnyParent() {
+				continue
+			}
+
 			cmps, ok := inputs[component.CName]
 			if !ok {
 				cmps = make([]*wtype.LHComponent, 0, 3)
@@ -237,6 +243,10 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 			inputs[component.CName] = cmps
 
 			for j := 0; j < len(components); j++ {
+				// again exempt those parented components
+				if components[j].HasAnyParent() {
+					continue
+				}
 				if component.Order < components[j].Order {
 					m, ok := order[component.CName]
 					if !ok {
@@ -261,6 +271,7 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 	// define component ordering
 
 	component_order := DefineOrderOrFail(order)
+
 	(*request).Input_order = component_order
 
 	var requestinputs map[string][]*wtype.LHComponent

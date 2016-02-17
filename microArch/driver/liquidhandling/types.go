@@ -455,30 +455,58 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []s
 
 	for i, v := range cmps {
 		foundIt := false
-		for _, ipref := range lhp.Input_preferences {
-			// check if the plate at position ipref has the
-			// component we seek
 
-			p, ok := lhp.Plates[ipref]
+		if v.HasAnyParent() {
+			// this is a search which shouldn't be necessary...
+			// think we just need to specify the source location
+			for _, opref := range lhp.Output_preferences {
+				// check if the plate at position ipref has the
+				// component we seek
 
-			if ok {
-				// whaddya got?
-				// nb this won't work if we need to split a volume across several plates
-				wcarr, ok := p.GetComponent(v)
+				p, ok := lhp.Plates[opref]
 
 				if ok {
-					foundIt = true
-					// update r1 and r2
-					r1[i] = p.ID
-					r2[i] = wcarr[0].FormatA1()
+					// whaddya got?
+					// nb this won't work if we need to split a volume across several plates
+					wcarr, ok := p.GetComponent(v, true)
+
+					if ok {
+						foundIt = true
+						fmt.Println("FOUND DA BOY ", p.ID, wcarr[0].FormatA1())
+						// update r1 and r2
+						r1[i] = p.ID
+						r2[i] = wcarr[0].FormatA1()
+						break
+					}
 				}
 			}
-		}
+		} else {
+			for _, ipref := range lhp.Input_preferences {
+				// check if the plate at position ipref has the
+				// component we seek
 
-		if !foundIt {
-			logger.Fatal("NO SOURCE FOR ", v.CName, " at volume ", v.Volume().ToString())
-		}
+				p, ok := lhp.Plates[ipref]
 
+				if ok {
+					// whaddya got?
+					// nb this won't work if we need to split a volume across several plates
+					wcarr, ok := p.GetComponent(v, false)
+
+					if ok {
+						foundIt = true
+						// update r1 and r2
+						r1[i] = p.ID
+						r2[i] = wcarr[0].FormatA1()
+						break
+					}
+				}
+			}
+
+			if !foundIt {
+				logger.Fatal("NO SOURCE FOR ", v.CName, " at volume ", v.Volume().ToString())
+			}
+
+		}
 	}
 
 	return r1, r2

@@ -568,7 +568,7 @@ func (lhp LHPlate) String() string {
 
 // convenience method
 
-func (lhp *LHPlate) GetComponent(cmp *LHComponent) ([]WellCoords, bool) {
+func (lhp *LHPlate) GetComponent(cmp *LHComponent, exact bool) ([]WellCoords, bool) {
 	ret := make([]WellCoords, 0, 1)
 
 	it := NewOneTimeColumnWiseIterator(lhp)
@@ -578,6 +578,10 @@ func (lhp *LHPlate) GetComponent(cmp *LHComponent) ([]WellCoords, bool) {
 		w := lhp.Wellcoords[wc.FormatA1()]
 		//	logger.Debug(fmt.Sprint("WANT$$$: ", cmp.CName, " :: ", wc.FormatA1(), " ", w.Contents().CName))
 		if w.Contents().CName == cmp.CName {
+			if exact && w.Contents().ID != cmp.ID {
+				continue
+			}
+
 			v := w.WorkingVolume()
 			volGot.Add(v)
 			ret = append(ret, wc)
