@@ -10,6 +10,7 @@ import (
 	"github.com/antha-lang/antha/microArch/equipment"
 	"github.com/antha-lang/antha/microArch/equipment/action"
 	"github.com/antha-lang/antha/target"
+	"github.com/antha-lang/antha/trace"
 	"github.com/antha-lang/antha/workflow"
 )
 
@@ -71,7 +72,8 @@ func Run(parent context.Context, opt Options) (*workflow.Workflow, error) {
 		return nil, err
 	}
 
-	if err := w.Run(ctx); err != nil {
+	// Resolver context
+	if err := w.Run(trace.WithResolver(ctx, resolveIntrinsics)); err != nil {
 		return nil, err
 	}
 

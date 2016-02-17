@@ -36,7 +36,7 @@ func (a *fromValue) Name() Name {
 type promiseValue struct {
 	name Name
 	v    interface{}
-	inst Inst
+	inst interface{}
 }
 
 func (a *promiseValue) Get() interface{} {

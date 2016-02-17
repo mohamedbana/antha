@@ -5,6 +5,30 @@ import (
 	"sync"
 )
 
+type scopeKey int
+
+const theScopeKey scopeKey = 0
+
+func withScope(parent context.Context) context.Context {
+	pscope, _ := parent.Value(theScopeKey).(*Scope)
+	var s *Scope
+	if pscope == nil {
+		s = &Scope{}
+	} else {
+		s = pscope.MakeScope()
+	}
+
+	return context.WithValue(parent, theScopeKey, s)
+}
+
+func getScope(ctx context.Context) *Scope {
+	s := ctx.Value(theScopeKey).(*Scope)
+	if s == nil {
+		panic("trace: scope not defined")
+	}
+	return s
+}
+
 // A name
 type Name struct {
 	scope *Scope

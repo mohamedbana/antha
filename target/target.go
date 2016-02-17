@@ -94,7 +94,6 @@ type Device interface {
 //
 // NB(ddn): API is in flux while the abstractions for targets are being worked
 // out (29-01-2016).
-//
 type Target struct {
 	equips  []equipment.Equipment // TODO(ddn): merge
 	devices []Device
