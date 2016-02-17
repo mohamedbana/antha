@@ -18,7 +18,7 @@ Parameters (
 	BSAvol						Volume
 	
 	StockReConcinUperml 		[]int
-	DesiredConcinUperml	 		[]int
+	DesiredConcinUperml	 	[]int
 	
 	ReactionTemp 				Temperature
 	ReactionTime 				Time
@@ -62,7 +62,7 @@ Steps {
 
 	// workout volume of buffer to add in SI units
 	BufferVol := wunit.NewVolume(float64(ReactionVolume.SIValue()/float64(BufferConcX)),"l")	
-	fmt.Println("HELLLLLOOOOOO:", BufferVol.ToString())
+	fmt.Println("HELLLLLOOOOOO:",ReactionVolume.SIValue(),BufferConcX, float64(ReactionVolume.SIValue()/float64(BufferConcX)),BufferVol.SIValue())
 	bufferSample := mixer.Sample(Buffer, BufferVol)
 	samples = append(samples, bufferSample)
 
@@ -74,7 +74,7 @@ Steps {
 	
 	// work out necessary volume to add
 	DNAVol := wunit.NewVolume(float64((DNAMassperReaction.SIValue()/DNAConc.SIValue())),"l")
-	fmt.Println("HELLLLLOOOOOO Again:", DNAVol.ToString())
+	fmt.Println("HELLLLLOOOOOO Again:", DNAMassperReaction.SIValue(),DNAConc.SIValue(),float64((DNAMassperReaction.SIValue()/DNAConc.SIValue())),DNAVol.SIValue())
 	text.Print("DNAVOL",DNAVol.ToString())
 	dnaSample := mixer.Sample(DNASolution, DNAVol)
 	samples = append(samples, dnaSample)
