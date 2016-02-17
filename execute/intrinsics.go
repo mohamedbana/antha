@@ -1,14 +1,11 @@
 package execute
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
-	"github.com/antha-lang/antha/microArch/equipment"
-	"github.com/antha-lang/antha/microArch/equipment/action"
 	"github.com/antha-lang/antha/target"
 	"github.com/antha-lang/antha/trace"
 	"runtime/debug"
@@ -76,56 +73,6 @@ func MixTo(ctx context.Context, outplatetype, address string, platenum int, comp
 	})
 }
 
-func runMix(ctx context.Context, blockIds map[wtype.BlockID]bool, inst *mixInst) error {
-	toSol := func(inst *mixInst) *wtype.LHInstruction {
-		r := mixer.GenericMix(mixer.MixOptions{
-			Components:  inst.Args,
-			Address:     inst.Address,
-			Destination: inst.Plate,
-			PlateNum:    inst.PlateNum,
-			PlateType:   inst.PlateType,
-		})
-		r.BlockID = inst.OutputCmp.BlockID
-		return r
-	}
-
-	if t, err := target.GetTarget(ctx); err != nil {
-		return err
-	} else if lh, err := t.GetLiquidHandler(); err != nil {
-		return err
-	} else if rbs, err := json.Marshal(toSol(inst)); err != nil {
-		return err
-	} else if err := lh.Do(*equipment.NewActionDescription(action.LH_MIX, string(rbs), nil)); err != nil {
-		return err
-	} else {
-		id := inst.OutputCmp.BlockID
-		blockIds[id] = true
-		return nil
-	}
-}
-
-func runIn(ctx context.Context, blockIds map[wtype.BlockID]bool, in interface{}) (err error) {
-	switch inst := in.(type) {
-	case nil:
-	case *mixInst:
-		err = runMix(ctx, blockIds, inst)
-	case *incubateInst:
-	default:
-		err = fmt.Errorf("invalid instruction: %T", inst)
-	}
-	return err
-}
-
-func runEnd(ctx context.Context, blockId wtype.BlockID) error {
-	if t, err := target.GetTarget(ctx); err != nil {
-		return err
-	} else if lh, err := t.GetLiquidHandler(); err != nil {
-		return err
-	} else {
-		return lh.Do(*equipment.NewActionDescription(action.LH_END, blockId.String(), nil))
-	}
-}
-
 type goError struct {
 	BaseError interface{}
 	Stack     []byte
@@ -142,20 +89,42 @@ func resolveIntrinsics(ctx context.Context, insts []interface{}) (ret map[int]in
 			err = &goError{BaseError: res, Stack: debug.Stack()}
 		}
 	}()
-	blockIds := make(map[wtype.BlockID]bool)
+
+	toInst := func(inst *mixInst) *wtype.LHInstruction {
+		r := mixer.GenericMix(mixer.MixOptions{
+			Components:  inst.Args,
+			Address:     inst.Address,
+			Destination: inst.Plate,
+			PlateNum:    inst.PlateNum,
+			PlateType:   inst.PlateType,
+		})
+		r.BlockID = inst.OutputCmp.BlockID
+		return r
+	}
+
 	ret = make(map[int]interface{})
 
+	var mixes []*wtype.LHInstruction
 	for idx, in := range insts {
-		if err = runIn(ctx, blockIds, in); err != nil {
+		switch inst := in.(type) {
+		case nil:
+		case *incubateInst:
+		case *mixInst:
+			mixes = append(mixes, toInst(inst))
+		default:
+			err = fmt.Errorf("invalid instruction: %T", inst)
 			return
 		}
+
 		ret[idx] = nil
 	}
 
-	for id := range blockIds {
-		if err = runEnd(ctx, id); err != nil {
-			return
-		}
+	var t *target.Target
+	if t, err = target.GetTarget(ctx); err != nil {
+		return
+	} else if err = t.Mix(mixes); err != nil {
+		return
 	}
+
 	return
 }

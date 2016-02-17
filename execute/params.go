@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"reflect"
+
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/microArch/factory"
+	"github.com/antha-lang/antha/target/mixer"
 	"github.com/antha-lang/antha/workflow"
-	"reflect"
 )
 
 type constructor func(string) (interface{}, error)
@@ -41,54 +43,16 @@ func constructOrError(v interface{}) (interface{}, error) {
 	return v, nil
 }
 
-type Config struct {
-	MaxPlates            *float64
-	MaxWells             *float64
-	ResidualVolumeWeight *float64
-	InputPlateType       []string
-	OutputPlateType      []string
-	PlanningVersion      *int
-	WellByWell           *bool
-}
-
-// Merge two configs together and return the result. Values in the argument
-// override those in the receiver.
-func (a Config) Merge(x *Config) Config {
-	if x == nil {
-		return a
-	}
-	if x.MaxPlates != nil {
-		a.MaxPlates = x.MaxPlates
-	}
-	if x.MaxWells != nil {
-		a.MaxWells = x.MaxWells
-	}
-	if x.ResidualVolumeWeight != nil {
-		a.ResidualVolumeWeight = x.ResidualVolumeWeight
-	}
-	if len(x.InputPlateType) != 0 {
-		a.InputPlateType = x.InputPlateType
-	}
-	if len(x.OutputPlateType) != 0 {
-		a.OutputPlateType = x.OutputPlateType
-	}
-	if x.WellByWell != nil {
-		a.WellByWell = x.WellByWell
-	}
-
-	return a
-}
-
 // Structure of parameter data for unmarshalling
 type RawParams struct {
 	Parameters map[string]map[string]json.RawMessage
-	Config     *Config
+	Config     *mixer.Opt
 }
 
 // Structure of parameter data for marshalling
 type Params struct {
 	Parameters map[string]map[string]interface{}
-	Config     *Config
+	Config     *mixer.Opt
 }
 
 func findConstructor(typ reflect.Type) constructor {
@@ -187,7 +151,7 @@ func setParam(w *workflow.Workflow, process, name string, data []byte, in map[st
 	return w.SetParam(workflow.Port{Process: process, Port: name}, value.Interface())
 }
 
-func setParams(ctx context.Context, params *RawParams, w *workflow.Workflow) (*Config, error) {
+func setParams(ctx context.Context, params *RawParams, w *workflow.Workflow) (*mixer.Opt, error) {
 	for process, params := range params.Parameters {
 		c, err := w.FuncName(process)
 		if err != nil {

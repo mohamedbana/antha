@@ -5,10 +5,8 @@ package execute
 import (
 	"encoding/json"
 	"errors"
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
+
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
-	"github.com/antha-lang/antha/microArch/equipment"
-	"github.com/antha-lang/antha/microArch/equipment/action"
 	"github.com/antha-lang/antha/target"
 	"github.com/antha-lang/antha/trace"
 	"github.com/antha-lang/antha/workflow"
@@ -16,19 +14,6 @@ import (
 
 var (
 	cannotConfigure = errors.New("cannot configure liquid handler")
-
-	defaultMaxPlates            = 4.5
-	defaultMaxWells             = 278.0
-	defaultResidualVolumeWeight = 1.0
-	defaultWellByWell           = false
-	DefaultConfig               = Config{
-		MaxPlates:            &defaultMaxPlates,
-		MaxWells:             &defaultMaxWells,
-		ResidualVolumeWeight: &defaultResidualVolumeWeight,
-		InputPlateType:       []string{"pcrplate_skirted"},
-		OutputPlateType:      []string{"pcrplate_skirted"},
-		WellByWell:           &defaultWellByWell,
-	}
 )
 
 type Options struct {
@@ -38,7 +23,6 @@ type Options struct {
 	Params       *RawParams     // Or parameters directly
 	Target       *target.Target // Target machine configuration
 	Id           string         // Job Id
-	Config       *Config        // Override config data in ParamData
 }
 
 // Simple entrypoint for one-shot execution of workflows.
@@ -57,46 +41,15 @@ func Run(parent context.Context, opt Options) (*workflow.Workflow, error) {
 		}
 	}
 
-	cd, err := setParams(parent, params, w)
-	if err != nil {
+	if _, err := setParams(parent, params, w); err != nil {
 		return nil, err
 	}
 
 	ctx := target.WithTarget(WithId(parent, opt.Id), opt.Target)
 
-	lh, err := opt.Target.GetLiquidHandler()
-	if err != nil {
-		return nil, err
-	}
-	if err := config(opt.Id, lh, DefaultConfig.Merge(cd).Merge(opt.Config)); err != nil {
-		return nil, err
-	}
-
-	// Resolver context
 	if err := w.Run(trace.WithResolver(ctx, resolveIntrinsics)); err != nil {
 		return nil, err
 	}
 
 	return w, nil
-}
-
-// XXX Move out when equipment config is done
-func config(id string, lh equipment.Equipment, cd Config) error {
-	config := make(map[string]interface{})
-	config["BLOCKID"] = wtype.NewBlockID(id)
-	config["MAX_N_PLATES"] = *cd.MaxPlates
-	config["MAX_N_WELLS"] = *cd.MaxWells
-	config["RESIDUAL_VOLUME_WEIGHT"] = *cd.ResidualVolumeWeight
-	config["INPUT_PLATETYPE"] = cd.InputPlateType
-	config["OUTPUT_PLATETYPE"] = cd.OutputPlateType
-	config["WELLBYWELL"] = *cd.WellByWell
-
-	configString, err := json.Marshal(config)
-	if err != nil {
-		return cannotConfigure
-	}
-	if err := lh.Do(*equipment.NewActionDescription(action.LH_CONFIG, string(configString), nil)); err != nil {
-		return cannotConfigure
-	}
-	return nil
 }

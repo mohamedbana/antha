@@ -1,11 +1,12 @@
 // Package target provides the construction of a target machine from a
-// collection of equipment
+// collection of devices
 package target
 
 import (
 	"errors"
+
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
-	"github.com/antha-lang/antha/microArch/equipment"
 )
 
 // Capabilities for Devices
@@ -14,8 +15,6 @@ import (
 //   - MinIncubateTemp, MaxIncubateTemp
 // Capabilities for movers
 //   - Cost(Device, Device) int
-
-// TODO(ddn): Move equipment.Equipment here
 
 // TODO(ddn): Add target instruction description
 
@@ -95,31 +94,7 @@ type Device interface {
 // NB(ddn): API is in flux while the abstractions for targets are being worked
 // out (29-01-2016).
 type Target struct {
-	equips  []equipment.Equipment // TODO(ddn): merge
 	devices []Device
-}
-
-const (
-	manualByManualCost = 50  // Cost of manually moving from another manual device
-	manualByXCost      = 100 // Cost of manually moving from any non-manual device
-)
-
-var (
-	TheManualDevice Device = &manualDevice{}
-)
-
-// Human device
-type manualDevice struct{}
-
-func (a manualDevice) Can(...Request) bool {
-	return true
-}
-
-func (a manualDevice) MoveCost(from Device) int {
-	if from == TheManualDevice {
-		return manualByManualCost
-	}
-	return manualByXCost
 }
 
 func New() *Target {
@@ -136,14 +111,20 @@ func (a *Target) Can(reqs ...Request) (r []Device) {
 	return
 }
 
-func (a *Target) AddLiquidHandler(e equipment.Equipment) error {
-	a.equips = append(a.equips, e)
-	return nil
+func (a *Target) AddDevice(d Device) {
+	a.devices = append(a.devices, d)
 }
 
-func (a *Target) GetLiquidHandler() (equipment.Equipment, error) {
-	if len(a.equips) == 0 {
-		return nil, noLh
+// XXX(ddn): remove after compile refactor is done
+func (a *Target) Mix(insts []*wtype.LHInstruction) error {
+	for _, d := range a.devices {
+		if mixer, ok := d.(Mixer); !ok {
+			continue
+		} else if _, err := mixer.PrepareMix(insts); err != nil {
+			return err
+		} else {
+			return nil
+		}
 	}
-	return a.equips[0], nil
+	return noLh
 }

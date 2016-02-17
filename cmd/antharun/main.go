@@ -26,13 +26,15 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"os"
+
 	"github.com/antha-lang/antha/antha/component/lib"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/target"
-	"io/ioutil"
-	"os"
+	"github.com/antha-lang/antha/target/mixer"
 )
 
 const (
@@ -56,37 +58,42 @@ func makeContext() (context.Context, error) {
 	return ctx, nil
 }
 
-type opts struct {
+type opt struct {
 	Frontend       string
 	DriverURI      string
 	ParametersFile string
 	WorkflowFile   string
-	Config         *execute.Config
+	MixerOpt       *mixer.Opt
 }
 
-func runOne(opts opts) error {
-	t := target.New()
-	fe, err := NewFrontend(Options{
-		Kind:   opts.Frontend,
-		Target: t,
-		URI:    opts.DriverURI,
-	})
-	if err != nil {
-		return err
-	}
-	defer fe.Shutdown()
-
-	wdata, err := ioutil.ReadFile(opts.WorkflowFile)
+func runOne(opt opt) error {
+	wdata, err := ioutil.ReadFile(opt.WorkflowFile)
 	if err != nil {
 		return err
 	}
 
-	pdata, err := ioutil.ReadFile(opts.ParametersFile)
+	pdata, err := ioutil.ReadFile(opt.ParametersFile)
 	if err != nil {
 		return err
 	}
 
 	wdesc, params, err := tryExpand(wdata, pdata)
+	if err != nil {
+		return err
+	}
+
+	mixerOpt := mixer.DefaultOpt.Merge(params.Config).Merge(opt.MixerOpt)
+	t := target.New()
+	fe, err := NewFrontend(FrontendOpt{
+		Kind:     opt.Frontend,
+		MixerOpt: mixerOpt,
+		Target:   t,
+		URI:      opt.DriverURI,
+	})
+	if err != nil {
+		return err
+	}
+	defer fe.Shutdown()
 
 	ctx, err := makeContext()
 	if err != nil {
@@ -97,7 +104,6 @@ func runOne(opts opts) error {
 		Target:   t,
 		Workflow: wdesc,
 		Params:   params,
-		Config:   opts.Config,
 	})
 	if err != nil {
 		return err
@@ -206,13 +212,13 @@ func run() error {
 		return nil
 	}
 
-	makeConfig := func() (cd *execute.Config, err error) {
+	makeOpt := func() (cd *mixer.Opt, err error) {
 		defer func() {
 			if res := recover(); res != nil {
 				err = fmt.Errorf("%s", res)
 			}
 		}()
-		cd = &execute.Config{
+		cd = &mixer.Opt{
 			MaxPlates:            parseFloat(maxPlates),
 			MaxWells:             parseFloat(maxWells),
 			ResidualVolumeWeight: parseFloat(residualVolumeWeight),
@@ -223,7 +229,7 @@ func run() error {
 		return
 	}
 
-	config, err := makeConfig()
+	mixerOpt, err := makeOpt()
 	if err != nil {
 		return err
 	}
@@ -263,12 +269,12 @@ func run() error {
 		*frontend = REMOTE
 	}
 
-	if err := runOne(opts{
+	if err := runOne(opt{
 		Frontend:       *frontend,
 		DriverURI:      *driver,
 		ParametersFile: *parametersFile,
 		WorkflowFile:   *workflowFile,
-		Config:         config,
+		MixerOpt:       mixerOpt,
 	}); err != nil {
 		return err
 	}

@@ -24,61 +24,28 @@ package main
 
 import (
 	"fmt"
+	"os"
 
-	"github.com/antha-lang/antha/internal/github.com/twinj/uuid"
-	"github.com/antha-lang/antha/microArch/equipment"
-	"github.com/antha-lang/antha/microArch/equipment/manual"
-	"github.com/antha-lang/antha/microArch/equipment/void"
-	"github.com/antha-lang/antha/microArch/logger"
+	"github.com/antha-lang/antha/microArch/equipment/manual/grpc"
 	"github.com/antha-lang/antha/target"
+	"github.com/antha-lang/antha/target/human"
+	"github.com/antha-lang/antha/target/mixer"
 )
 
 const (
 	DEBUG  = "debug"
 	REMOTE = "remote"
-	CUI    = "cui"
 )
 
-type Options struct {
-	Kind   string
-	Target *target.Target
-	URI    string
+type FrontendOpt struct {
+	Kind     string
+	Target   *target.Target
+	MixerOpt mixer.Opt
+	URI      string
 }
 
 type Frontend struct {
 	shutdowns []func() error
-}
-
-func getEq(opts Options) (equipment.Equipment, error) {
-	id := uuid.NewV4().String()
-	switch opts.Kind {
-	case CUI:
-		eq := manual.NewAnthaManualCUI(id)
-		logger.RegisterMiddleware(eq.Cui)
-		return eq, nil
-	case DEBUG:
-		return void.NewVoidEquipment(id), nil
-	case REMOTE:
-		return manual.NewAnthaManualGrpc(id, opts.URI), nil
-	default:
-		return nil, fmt.Errorf("unknown frontend %q", opts.Kind)
-	}
-}
-
-func NewFrontend(opts Options) (*Frontend, error) {
-	t := opts.Target
-	if eq, err := getEq(opts); err != nil {
-		return nil, err
-	} else if err := eq.Init(); err != nil {
-		return nil, err
-	} else {
-		t.AddLiquidHandler(eq)
-		return &Frontend{
-			shutdowns: []func() error{func() error {
-				return eq.Shutdown()
-			}},
-		}, nil
-	}
 }
 
 func (a *Frontend) Shutdown() (err error) {
@@ -88,4 +55,23 @@ func (a *Frontend) Shutdown() (err error) {
 		}
 	}
 	return
+}
+
+func NewFrontend(opt FrontendOpt) (*Frontend, error) {
+	t := opt.Target
+
+	switch opt.Kind {
+	case DEBUG:
+		t.AddDevice(human.New(human.Opt{Out: os.Stdout}))
+	case REMOTE:
+		if m, err := mixer.New(opt.MixerOpt, grpc.NewDriver(opt.URI)); err != nil {
+			return nil, err
+		} else {
+			t.AddDevice(m)
+		}
+	default:
+		return nil, fmt.Errorf("unknown frontend %q", opt.Kind)
+	}
+
+	return &Frontend{}, nil
 }
