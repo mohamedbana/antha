@@ -9,7 +9,8 @@ import (
 type LiquidType int
 
 const (
-	LTWater = iota
+	LTNIL = iota
+	LTWater
 	LTGlycerol
 	LTEthanol
 	LTDetergent
@@ -97,6 +98,15 @@ func mergeTypes(c1, c2 *LHComponent) LiquidType {
 	// special water so we retain that characteristic whatever happens
 	// ditto culture... otherwise we look for the majority
 	// what we do for protein-dna mixtures I'm not sure! :)
+
+	// nil type is overridden
+
+	if c1.Type == LTNIL {
+		return c2.Type
+	} else if c2.Type == LTNIL {
+		return c1.Type
+	}
+
 	if c1.Type == LTCulture || c2.Type == LTCulture {
 	} else if c1.Type == LTDNA || c2.Type == LTDNA {
 		return LTDNA

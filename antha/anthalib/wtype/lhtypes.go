@@ -333,6 +333,16 @@ type LHComponent struct {
 	Destination        string
 }
 
+func (lhc *LHComponent) IsZero() bool {
+	if lhc == nil || lhc.Type == LTNIL || lhc.CName == "" || lhc.Vol < 0.0000001 {
+		return true
+	}
+
+	fmt.Println("NOT ZERO: ", lhc, lhc.Type, lhc.CName)
+
+	return false
+}
+
 func (lhc *LHComponent) SetVolume(v wunit.Volume) {
 	lhc.Vol = v.RawValue()
 	lhc.Vunit = v.Unit().PrefixedSymbol()
@@ -386,6 +396,16 @@ func (lhc *LHComponent) Dup() *LHComponent {
 }
 
 func (cmp *LHComponent) Mix(cmp2 *LHComponent) {
+	// if this component is zero we inherit the id of the other one
+	if cmp.IsZero() {
+		cmp.ID = cmp2.ID
+	} else {
+		// track the parent-child relationship
+		// nb the sample mechanism ensures that there will be a 1:1 parent:child
+		// relationship from the POV of the liquid handler
+		cmp2.DaughterID += cmp.ID + "_"
+		cmp.ParentID += cmp2.ID + "_"
+	}
 	cmp.Smax = mergeSolubilities(cmp, cmp2)
 	// determine type of final
 	cmp.Type = mergeTypes(cmp, cmp2)
@@ -397,11 +417,6 @@ func (cmp *LHComponent) Mix(cmp2 *LHComponent) {
 	cmp.CName = mergeNames(cmp.CName, cmp2.CName)
 	// allow trace back
 	logger.Track(fmt.Sprintf("MIX %s %s %s", cmp.ID, cmp2.ID, vcmp.ToString()))
-	// track the parent-child relationship
-	// nb the sample mechanism ensures that there will be a 1:1 parent:child
-	// relationship from the POV of the liquid handler
-	cmp2.DaughterID += cmp.ID + "_"
-	cmp.ParentID += cmp2.ID + "_"
 }
 
 // @implement Liquid

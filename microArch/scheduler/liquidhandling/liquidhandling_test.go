@@ -23,15 +23,8 @@
 package liquidhandling
 
 import (
-	"encoding/json"
-	"fmt"
 	"math/rand"
 	"testing"
-
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/microArch/factory"
-	"github.com/antha-lang/antha/microArch/logger"
 )
 
 func TestStockConcs(*testing.T) {

@@ -59,14 +59,16 @@ func TestJSON(*testing.T) {
 
 func ExampleBasic() {
 	degreeC := GenericPrefixedUnit{GenericUnit{"DegreeC", "C", 1.0, "C"}, SIPrefix{"m", 1e-03}}
-	TdegreeC := Temperature{ConcreteMeasurement{1.0, &degreeC}}
+	cm := ConcreteMeasurement{1.0, &degreeC}
+	TdegreeC := Temperature{&cm}
 	fmt.Println(TdegreeC.SIValue())
 	// Output:
 	// 0.001
 }
 func ExampleTwo() {
 	Joule := GenericPrefixedUnit{GenericUnit{"Joule", "J", 1.0, "J"}, SIPrefix{"k", 1e3}}
-	NJoule := Energy{ConcreteMeasurement{23.4, &Joule}}
+	cm := ConcreteMeasurement{23.4, &Joule}
+	NJoule := Energy{&cm}
 	fmt.Println(NJoule.SIValue())
 	// Output:
 	// 23400
