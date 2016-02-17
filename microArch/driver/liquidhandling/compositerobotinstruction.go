@@ -652,10 +652,6 @@ func (ins *TransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProper
 
 		var tp TransferParams
 
-		fmt.Println("HERE WE GO AGAIN: ", ins.What[i], " ", ins.PltFrom[i], ins.PltTo[i], ins.WellFrom[i], ins.WellTo[i], ins.Volume[i].ToString(), ins.FVolume[i].ToString(), " ", ins.TVolume[i].ToString())
-
-		fmt.Println(ins.FPlateType[i], " ", ins.TPlateType[i])
-
 		tp.What = ins.What[i]
 		tp.PltFrom = ins.PltFrom[i]
 		tp.PltTo = ins.PltTo[i]
