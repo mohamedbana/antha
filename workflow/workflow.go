@@ -7,13 +7,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sync"
+
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/trace"
-	"sync"
 )
 
-// XXX: deterministic node name/order
+// TODO: deterministic node name/order
 
 var (
 	cyclicWorkflow  = errors.New("cyclic workflow")
@@ -189,7 +190,7 @@ func (a *Workflow) Run(parent context.Context) error {
 	trace.Go(ctx, func(ctx context.Context) error {
 		for len(roots) != 0 {
 			var newRoots []*node
-			// XXX: Go parallelize this loop
+			// TODO: Parallelize this loop
 			for _, n := range roots {
 				if rs, err := a.run(ctx, n); err != nil {
 					return fmt.Errorf("cannot run process %q: %s", n.Process, err)

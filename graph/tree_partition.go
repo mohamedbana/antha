@@ -9,8 +9,6 @@ var (
 	missingColors = errors.New("missing color")
 )
 
-// TODO(ddn): Add option to use greedy algorithm based off of shortest paths (?)
-
 type PartitionTreeOpt struct {
 	Tree    Graph
 	Root    Node

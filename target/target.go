@@ -9,15 +9,6 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 )
 
-// Capabilities for Devices
-//   - MinVol, MaxVol
-//   - MinIncubateTime, MaxIncubateTime
-//   - MinIncubateTemp, MaxIncubateTemp
-// Capabilities for movers
-//   - Cost(Device, Device) int
-
-// TODO(ddn): Add target instruction description
-
 var (
 	noLh     = errors.New("no liquid handler found")
 	noTarget = errors.New("no target configuration found")
@@ -90,15 +81,11 @@ type Device interface {
 }
 
 // Target machine for execution.
-//
-// NB(ddn): API is in flux while the abstractions for targets are being worked
-// out (29-01-2016).
 type Target struct {
 	devices []Device
 }
 
 func New() *Target {
-	// TODO(ddn): Add Generic Manual Equipment
 	return &Target{}
 }
 
