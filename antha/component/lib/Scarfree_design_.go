@@ -58,8 +58,8 @@ func _Scarfree_designSteps(_ctx context.Context, _input *Scarfree_designInput, _
 	partsinorder := make([]wtype.DNASequence, 0)
 
 	var partDNA wtype.DNASequence
+	var vectordata wtype.DNASequence
 
-	_output.Status = "all parts available"
 	for i, part := range _input.Seqsinorder {
 		if strings.Contains(part, ".gb") && strings.Contains(part, "Feature:") {
 
@@ -71,6 +71,9 @@ func _Scarfree_designSteps(_ctx context.Context, _input *Scarfree_designInput, _
 
 			partDNA, _ = parser.GenbankFeaturetoDNASequence(file, feature)
 		} else if strings.Contains(part, ".gb") {
+
+			/*annotated,_ := parser.GenbanktoAnnotatedSeq(part)
+			partDNA = annotated.DNASequence */
 
 			partDNA, _ = parser.GenbanktoDNASequence(part)
 		} else {
@@ -84,7 +87,19 @@ func _Scarfree_designSteps(_ctx context.Context, _input *Scarfree_designInput, _
 	}
 
 	// make vector into an antha type DNASequence
-	vectordata := wtype.MakePlasmidDNASequence("Vector", _input.Vector)
+
+	if strings.Contains(_input.Vector, ".gb") {
+
+		vectordata, _ = parser.GenbanktoDNASequence(_input.Vector)
+		vectordata.Plasmid = true
+	} else {
+
+		if strings.Contains(_input.Vector, "BBa_") {
+			_input.Vector = igem.GetSequence(_input.Vector)
+
+		}
+		vectordata = wtype.MakePlasmidDNASequence("Vector", _input.Vector)
+	}
 
 	//lookup restriction enzyme
 	restrictionenzyme, err := lookup.TypeIIsLookup(_input.Enzymename)
@@ -93,7 +108,14 @@ func _Scarfree_designSteps(_ctx context.Context, _input *Scarfree_designInput, _
 	}
 
 	//  Add overhangs for scarfree assembly based on part seqeunces only, i.e. no Assembly standard
-	_output.PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
+
+	//PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
+
+	if _input.EndsAlreadyadded {
+		_output.PartswithOverhangs = partsinorder
+	} else {
+		_output.PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
+	}
 
 	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
 	assembly := enzymes.Assemblyparameters{_input.Constructname, restrictionenzyme.Name, vectordata, _output.PartswithOverhangs}
@@ -134,9 +156,10 @@ func _Scarfree_designSteps(_ctx context.Context, _input *Scarfree_designInput, _
 
 	sites := make([]int, 0)
 	multiple := make([]string, 0)
+
+	enz := lookup.EnzymeLookup(_input.Enzymename)
 	for _, part := range _output.PartswithOverhangs {
 
-		enz := lookup.EnzymeLookup(_input.Enzymename)
 		info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 
 		sitepositions := enzymes.SitepositionString(info[0])
@@ -243,11 +266,12 @@ type Scarfree_designElement struct {
 }
 
 type Scarfree_designInput struct {
-	Constructname string
-	Enzymename    string
-	ORFstoConfirm []string
-	Seqsinorder   []string
-	Vector        string
+	Constructname    string
+	EndsAlreadyadded bool
+	Enzymename       string
+	ORFstoConfirm    []string
+	Seqsinorder      []string
+	Vector           string
 }
 
 type Scarfree_designOutput struct {
@@ -280,6 +304,7 @@ func init() {
 			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/Scarfree_design.an",
 			Params: []ParamDesc{
 				{Name: "Constructname", Desc: "", Kind: "Parameters"},
+				{Name: "EndsAlreadyadded", Desc: "", Kind: "Parameters"},
 				{Name: "Enzymename", Desc: "", Kind: "Parameters"},
 				{Name: "ORFstoConfirm", Desc: "enter each as amino acid sequence\n", Kind: "Parameters"},
 				{Name: "Seqsinorder", Desc: "", Kind: "Parameters"},

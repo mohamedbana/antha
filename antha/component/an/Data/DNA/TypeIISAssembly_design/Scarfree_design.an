@@ -28,6 +28,7 @@ Parameters (
 	Vector					string
 	Enzymename				string
 	ORFstoConfirm			[]string // enter each as amino acid sequence
+	EndsAlreadyadded bool
 )
 
 // Physical Inputs to this protocol with types
@@ -70,33 +71,48 @@ Steps {
 	partsinorder := make([]wtype.DNASequence,0)
 	
 	var partDNA wtype.DNASequence
+	var vectordata wtype.DNASequence
 	
-	Status = "all parts available"
 	for i, part := range Seqsinorder {
 		if strings.Contains(part, ".gb") && strings.Contains(part, "Feature:") {
-			
+
 			split := strings.SplitAfter(part, ".gb")
 			file := split[0]
-			
-			split2 := strings.Split(split[1],":")
+
+			split2 := strings.Split(split[1], ":")
 			feature := split2[1]
-			
-			partDNA,_ = parser.GenbankFeaturetoDNASequence(file,feature)
-		}else if strings.Contains(part, ".gb") {
-	
+
+			partDNA, _ = parser.GenbankFeaturetoDNASequence(file, feature)
+		} else if strings.Contains(part, ".gb") {
+
+			/*annotated,_ := parser.GenbanktoAnnotatedSeq(part)
+			partDNA = annotated.DNASequence */
+
 			partDNA, _ = parser.GenbanktoDNASequence(part)
-		}else {
-		
-		if strings.Contains(part, "BBa_") {
-			part = igem.GetSequence(part)
+		} else {
+
+			if strings.Contains(part, "BBa_") {
+				part = igem.GetSequence(part)
+			}
+			partDNA = wtype.MakeLinearDNASequence("Part "+strconv.Itoa(i), part)
 		}
-		partDNA = wtype.MakeLinearDNASequence("Part " + strconv.Itoa(i),part)
-		}
-	partsinorder = append(partsinorder,partDNA)
+		partsinorder = append(partsinorder, partDNA)
 	}
 	
 	// make vector into an antha type DNASequence
-	vectordata := wtype.MakePlasmidDNASequence("Vector",Vector)
+	
+		if strings.Contains(Vector, ".gb") {
+	
+			vectordata, _ = parser.GenbanktoDNASequence(Vector)
+			vectordata.Plasmid = true
+		}else {
+		
+		if strings.Contains(Vector, "BBa_") {
+			Vector = igem.GetSequence(Vector)
+			
+		}
+		vectordata = wtype.MakePlasmidDNASequence("Vector",Vector)
+		}
 	
 	//lookup restriction enzyme
 	restrictionenzyme,err := lookup.TypeIIsLookup(Enzymename) 
@@ -105,7 +121,13 @@ Steps {
 	}
 		
 	//  Add overhangs for scarfree assembly based on part seqeunces only, i.e. no Assembly standard
-	PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
+
+	//PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
+	
+	if EndsAlreadyadded {
+		PartswithOverhangs = partsinorder
+	} else {PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
+	}
 	
 	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
 	assembly := enzymes.Assemblyparameters{Constructname, restrictionenzyme.Name,vectordata,PartswithOverhangs}
@@ -115,48 +137,48 @@ Steps {
 	//sites := "Restriction mapper only run in the event of assembly simulation failure"
 	NewDNASequence = newDNASequence
 	if err == nil && numberofassemblies == 1 {
-		
+
 		Simulationpass = true
 	} else {
-		
-		
-		warnings = append(warnings,status)
+
+		warnings = append(warnings, status)
 		// perform mock digest to test fragement overhangs (fragments are hidden by using _, )
-	_,stickyends5,stickyends3 := enzymes.TypeIIsdigest(vectordata, restrictionenzyme)
-	
-	allends := make([]string,0)
-	ends := ""
-	
-	ends = text.Print(vectordata.Nm + " 5 Prime end: ",stickyends5)
-	allends =append(allends,ends)
-	ends = text.Print(vectordata.Nm + " 3 Prime end: ",stickyends3)
-	allends =append(allends,ends)
-	
-	for _, part := range PartswithOverhangs {
-	_,stickyends5,stickyends3 := enzymes.TypeIIsdigest(part, restrictionenzyme)
-	ends = text.Print(part.Nm + " 5 Prime end: ",stickyends5)
-	allends =append(allends,ends)
-	ends = text.Print(part.Nm + " 3 Prime end: ",stickyends3)
-	allends =append(allends,ends)
+		_, stickyends5, stickyends3 := enzymes.TypeIIsdigest(vectordata, restrictionenzyme)
+
+		allends := make([]string, 0)
+		ends := ""
+
+		ends = text.Print(vectordata.Nm+" 5 Prime end: ", stickyends5)
+		allends = append(allends, ends)
+		ends = text.Print(vectordata.Nm+" 3 Prime end: ", stickyends3)
+		allends = append(allends, ends)
+
+		for _, part := range PartswithOverhangs {
+			_, stickyends5, stickyends3 := enzymes.TypeIIsdigest(part, restrictionenzyme)
+			ends = text.Print(part.Nm+" 5 Prime end: ", stickyends5)
+			allends = append(allends, ends)
+			ends = text.Print(part.Nm+" 3 Prime end: ", stickyends3)
+			allends = append(allends, ends)
+		}
+		endreport = strings.Join(allends, " ")
+		warnings = append(warnings, endreport)
 	}
-	endreport = strings.Join(allends," ")
-	warnings = append(warnings,endreport)
-	}	
+
+	// check number of sites per part !
+
+	sites := make([]int, 0)
+	multiple := make([]string, 0)
 	
-		// check number of sites per part !
-	
-	sites := make([]int,0)
-	multiple := make ([]string,0)
-	for _,part := range PartswithOverhangs {
-	
-		enz := lookup.EnzymeLookup(Enzymename)
-	info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
-	
-	sitepositions := enzymes.SitepositionString(info[0])
-	
-	sites = append(sites,info[0].Numberofsites)
-	sitepositions = text.Print(part.Nm + " " + Enzymename + " positions:", sitepositions)
-	multiple = append(multiple,sitepositions)
+	enz := lookup.EnzymeLookup(Enzymename)
+	for _, part := range PartswithOverhangs {
+
+		info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
+
+		sitepositions := enzymes.SitepositionString(info[0])
+
+		sites = append(sites, info[0].Numberofsites)
+		sitepositions = text.Print(part.Nm+" "+Enzymename+" positions:", sitepositions)
+		multiple = append(multiple, sitepositions)
 	}
 	
 	for _,orf := range ORFstoConfirm {
