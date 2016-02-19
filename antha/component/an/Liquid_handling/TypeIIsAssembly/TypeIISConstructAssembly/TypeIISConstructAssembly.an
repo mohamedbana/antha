@@ -82,12 +82,12 @@ Steps {
 	ligSample := mixer.Sample(Ligase, LigVol)
 	samples = append(samples, ligSample)
 
-	Reaction = MixInto(OutPlate, "", samples...)
+	out1 := MixInto(OutPlate, "", samples...)
 
 	// incubate the reaction mixture
-	Incubate(Reaction, ReactionTemp, ReactionTime, false)
+	out2 := Incubate(out1, ReactionTemp, ReactionTime, false)
 	// inactivate
-	Incubate(Reaction, InactivationTemp, InactivationTime, false)
+	Reaction = Incubate(out2, InactivationTemp, InactivationTime, false)
 }
 
 // Run after controls and a steps block are completed to
