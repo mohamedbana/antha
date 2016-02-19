@@ -5,6 +5,7 @@ type PlateIterator interface {
 	Next() WellCoords
 	Curr() WellCoords
 	Valid() bool
+	SetStartTo(WellCoords)
 }
 
 type BasicPlateIterator struct {
@@ -37,6 +38,9 @@ func (it *BasicPlateIterator) Valid() bool {
 func (it *BasicPlateIterator) Next() WellCoords {
 	it.cur = it.rule(it.cur, it.p)
 	return it.cur
+}
+func (it *BasicPlateIterator) SetStartTo(wc WellCoords) {
+	it.fst = wc
 }
 
 func NextInRowOnce(wc WellCoords, p *LHPlate) WellCoords {

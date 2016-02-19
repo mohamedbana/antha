@@ -212,6 +212,8 @@ func GenericMix(opt MixOptions) *wtype.LHInstruction {
 	for idx, comp := range r.Components {
 		comp.Order = idx
 		r.Result.Mix(comp)
+		r.Result.AddParent(comp.ID)
+		comp.AddDaughter(r.Result.ID)
 	}
 
 	return r

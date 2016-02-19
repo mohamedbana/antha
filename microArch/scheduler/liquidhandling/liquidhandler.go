@@ -64,7 +64,6 @@ type Liquidhandler struct {
 	LayoutAgent      func(*LHRequest, *liquidhandling.LHProperties) *LHRequest
 	ExecutionPlanner func(*LHRequest, *liquidhandling.LHProperties) *LHRequest
 	PolicyManager    *LHPolicyManager
-	Counter          int
 	Once             sync.Once
 }
 
@@ -95,6 +94,7 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) *LHRequest {
 		OutputSetup(this.Properties)
 	}
 
+	// this is protective, should not be needed
 	this.Once.Do(f)
 
 	return request
@@ -213,11 +213,6 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 // request the inputs which are needed to run the plan, unless they have already
 // been requested
 func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
-	if this.Counter > 0 {
-		return request
-	}
-	this.Counter += 1
-
 	instructions := (*request).LHInstructions
 	inputs := make(map[string][]*wtype.LHComponent, 3)
 	order := make(map[string]map[string]int, 3)
@@ -227,7 +222,6 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 		components := instruction.Components
 
 		for _, component := range components {
-
 			// ignore anything which is made in another mix
 
 			if component.HasAnyParent() {

@@ -457,6 +457,7 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []s
 		foundIt := false
 
 		if v.HasAnyParent() {
+			fmt.Println("Trying to get component ", v.CName, v.ParentID)
 			// this is a search which shouldn't be necessary...
 			// think we just need to specify the source location
 			for _, opref := range lhp.Output_preferences {
