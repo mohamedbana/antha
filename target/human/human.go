@@ -1,10 +1,9 @@
 package human
 
 import (
-	"errors"
-	"io"
+	"fmt"
 
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/ast"
 	"github.com/antha-lang/antha/target"
 )
 
@@ -14,19 +13,17 @@ const (
 )
 
 var (
-	tbd = errors.New("to be implemented")
-)
-
-var (
 	_ target.Device = &Human{}
-	_ target.Mixer  = &Human{}
-	_ target.Mover  = &Human{}
 )
 
 type Human struct {
+	opt Opt
 }
 
-func (a *Human) Can(...target.Request) bool {
+func (a *Human) Can(req ast.Request) bool {
+	if !a.opt.CanMix && req.MixVol != nil {
+		return false
+	}
 	return true
 }
 
@@ -37,19 +34,26 @@ func (a *Human) MoveCost(from target.Device) int {
 	return HumanByXCost
 }
 
-func (a *Human) Move(from, to target.Device) error {
-	return tbd
+func (a *Human) String() string {
+	return "Human"
 }
 
-func (a *Human) PrepareMix(mixes []*wtype.LHInstruction) (*target.MixResult, error) {
-	return nil, nil
+func (a *Human) Compile(cmds []ast.Command) ([]target.Inst, error) {
+	var ret []target.Inst
+	// XXX
+	for _, c := range cmds {
+		ret = append(ret, &target.ManualInst{
+			Details: fmt.Sprintf("%s", c),
+		})
+	}
+
+	return ret, nil
 }
 
 type Opt struct {
-	In  io.Reader
-	Out io.Writer
+	CanMix bool
 }
 
 func New(opt Opt) *Human {
-	return nil
+	return &Human{opt}
 }

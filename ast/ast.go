@@ -2,12 +2,19 @@ package ast
 
 import (
 	"fmt"
+
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/graph"
 )
 
 const (
 	AllDeps = iota
 	DataDeps
+)
+
+var (
+	_ Command = &Incubate{}
+	_ Command = &Mix{}
 )
 
 // Input to code generation. An abstract syntax tree generated via execution of
@@ -26,86 +33,92 @@ type Node interface {
 	NodeString() string
 }
 
-// Use an external value
-type UseExpr struct {
-	Desc string // Description only used during pretty printing
+type Command interface {
+	Node
+	Requests() []Request // Requirements for device selection
+	Output() interface{} // Output from compilation
+	SetOutput(interface{})
 }
 
-func (a *UseExpr) NodeString() string {
+// Use of a liquid component
+type UseComp struct {
+	From  []Node
+	Value *wtype.LHComponent
+}
+
+func (a *UseComp) NodeString() string {
 	return fmt.Sprintf("%+v", struct {
-		Desc interface{}
+		Value interface{}
 	}{
-		Desc: a.Desc,
+		Value: a.Value,
 	})
 }
 
-// Unordered set of nodes
-type BundleExpr struct {
+// Incubate expression
+type Incubate struct {
+	From []Node
+	Reqs []Request
+	Out  interface{}
+}
+
+func (a *Incubate) Requests() []Request {
+	return a.Reqs
+}
+
+func (a *Incubate) Output() interface{} {
+	return a.Out
+}
+
+func (a *Incubate) SetOutput(x interface{}) {
+	a.Out = x
+}
+
+func (a *Incubate) NodeString() string {
+	return fmt.Sprintf("%+v", struct {
+		Requests interface{}
+	}{
+		Requests: a.Requests,
+	})
+}
+
+// Mix expression
+type Mix struct {
+	From []Node
+	Reqs []Request
+	Inst *wtype.LHInstruction // Data for planner
+	Out  interface{}
+}
+
+func (a *Mix) Requests() []Request {
+	return a.Reqs
+}
+
+func (a *Mix) Output() interface{} {
+	return a.Out
+}
+
+func (a *Mix) SetOutput(x interface{}) {
+	a.Out = x
+}
+
+func (a *Mix) NodeString() string {
+	return fmt.Sprintf("%+v", struct {
+		Requests interface{}
+	}{
+		Requests: a.Requests,
+	})
+}
+
+// Unordered collection of expressions
+type Bundle struct {
 	From []Node
 }
 
-func (a *BundleExpr) NodeString() string {
+func (a *Bundle) NodeString() string {
 	return ""
 }
 
-// Ordered set of nodes
-type ListExpr struct {
-	From []Node
-}
-
-func (a *ListExpr) NodeString() string {
-	return ""
-}
-
-// Create a BundleExpr of Nodes with matching Keys subject to dependencies
-type GatherExpr struct {
-	Key  interface{} // If nil, gather maximal subject to Gathers with non-nil keys
-	From Node
-}
-
-func (a *GatherExpr) NodeString() string {
-	return fmt.Sprintf("%+v", struct {
-		Key interface{}
-	}{
-		Key: a.Key,
-	})
-}
-
-// Create a new value.
-type NewExpr struct {
-	From Node
-}
-
-func (a *NewExpr) NodeString() string {
-	return ""
-}
-
-// Apply some intrinsic function.
-//
-// Sequencing between applications can be expressed in four ways:
-//   1. Data dependency on From node
-//   2. Control dependency on Prev node
-//   3. Temporal dependency on Near node
-//   4. Generation color: all the applications from one generation are done
-//      before any subsequent generations
-type ApplyExpr struct {
-	Opt  interface{} // Function-specific options to pass to code gen
-	From Node        // Input value
-	Prev Node        // Optional control dependence
-	Near Node        // Optional temporal dependence
-	Func string      // Name of function to call
-	Gen  interface{} // Generation this application belongs to
-}
-
-func (a *ApplyExpr) NodeString() string {
-	return fmt.Sprintf("%+v", struct {
-		Func, Gen interface{}
-	}{
-		Func: a.Func,
-		Gen:  a.Gen,
-	})
-}
-
+// View AST as a graph
 type Graph struct {
 	Nodes     []Node
 	whichDeps int
@@ -136,25 +149,14 @@ func notNil(n Node) bool {
 
 func getOut(n Node, i, deps int) Node {
 	switch n := n.(type) {
-	case *UseExpr:
-		return nil
-	case *BundleExpr:
+	case *UseComp:
 		return n.From[i]
-	case *ListExpr:
+	case *Bundle:
 		return n.From[i]
-	case *GatherExpr:
-		return n.From
-	case *NewExpr:
-		return n.From
-	case *ApplyExpr:
-		switch deps {
-		case AllDeps:
-			return matching(notNil, n.From, n.Prev, n.Near)[i]
-		case DataDeps:
-			return matching(notNil, n.From)[i]
-		default:
-			panic(fmt.Sprintf("codegen.getOut: unknown dep type %d", deps))
-		}
+	case *Mix:
+		return n.From[i]
+	case *Incubate:
+		return n.From[i]
 	default:
 		panic(fmt.Sprintf("codegen.getOut: unknown node type %T", n))
 	}
@@ -162,25 +164,15 @@ func getOut(n Node, i, deps int) Node {
 
 func numOuts(n Node, deps int) int {
 	switch n := n.(type) {
-	case *UseExpr:
-		return 0
-	case *BundleExpr:
+	case *UseComp:
 		return len(n.From)
-	case *ListExpr:
+		return 1
+	case *Bundle:
 		return len(n.From)
-	case *GatherExpr:
-		return len(matching(notNil, n.From))
-	case *NewExpr:
-		return len(matching(notNil, n.From))
-	case *ApplyExpr:
-		switch deps {
-		case AllDeps:
-			return len(matching(notNil, n.From, n.Prev, n.Near))
-		case DataDeps:
-			return len(matching(notNil, n.From))
-		default:
-			panic(fmt.Sprintf("codegen.numOuts: unknown dep type %d", deps))
-		}
+	case *Mix:
+		return len(n.From)
+	case *Incubate:
+		return len(n.From)
 	default:
 		panic(fmt.Sprintf("codegen.numOuts: unknown node type %T", n))
 	}
@@ -195,7 +187,7 @@ func (a *Graph) Out(n graph.Node, i int) graph.Node {
 }
 
 type ToGraphOpt struct {
-	Root      Node
+	Roots     []Node
 	WhichDeps int
 }
 
@@ -204,13 +196,29 @@ func ToGraph(opt ToGraphOpt) *Graph {
 		whichDeps: opt.WhichDeps,
 	}
 
-	// Traverse doesn't use Graph.NumNodes() or Graph.Node(int), so we can pass
-	// in our partially constructed graph to extract the reachable nodes in the
-	// AST
-	results, _ := graph.Visit(graph.VisitOpt{Graph: g, Root: opt.Root})
+	seen := make(map[graph.Node]bool)
+	for _, root := range opt.Roots {
+		// Traverse doesn't use Graph.NumNodes() or Graph.Node(int), so we can pass
+		// in our partially constructed graph to extract the reachable nodes in the
+		// AST
+		results, _ := graph.Visit(graph.VisitOpt{
+			Graph: g,
+			Root:  root,
+			Visitor: func(n graph.Node) error {
+				if seen[n] {
+					return graph.NextNode
+				}
+				return nil
+			},
+		})
 
-	for k := range results.Seen.Range() {
-		g.Nodes = append(g.Nodes, k.(Node))
+		for k := range results.Seen.Range() {
+			if seen[k] {
+				continue
+			}
+			g.Nodes = append(g.Nodes, k.(Node))
+			seen[k] = true
+		}
 	}
 
 	return g

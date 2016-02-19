@@ -1,34 +1,12 @@
 package target
 
-import (
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	lh "github.com/antha-lang/antha/microArch/scheduler/liquidhandling"
-)
+import "github.com/antha-lang/antha/ast"
 
-type MixResult struct {
-	Request *lh.LHRequest
-	Data    []byte
-}
+type Device interface {
+	Can(req ast.Request) bool // Can device handle this request
+	MoveCost(from Device) int // A non-negative cost to move to this device
 
-// Devices that can mix liquids in batched execution
-type Mixer interface {
-	Device
-	PrepareMix(mixes []*wtype.LHInstruction) (*MixResult, error)
-}
-
-// Devices that can be configured
-type Shaper interface {
-	Device
-	Shape() interface{}
-}
-
-// Devices that can move things between devices
-type Mover interface {
-	Device
-	Move(from, to Device) error
-}
-
-type Incubator interface {
-	Device
-	Incubate() error
+	// Produce a single-entry, single-exit DAG of instructions where insts[0]
+	// is the entry point and insts[len(insts)-1] is the exit point
+	Compile(cmds []ast.Command) (insts []Inst, err error)
 }

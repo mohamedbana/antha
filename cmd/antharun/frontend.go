@@ -24,7 +24,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/antha-lang/antha/microArch/equipment/manual/grpc"
 	"github.com/antha-lang/antha/target"
@@ -62,7 +61,7 @@ func NewFrontend(opt FrontendOpt) (*Frontend, error) {
 
 	switch opt.Kind {
 	case DEBUG:
-		t.AddDevice(human.New(human.Opt{Out: os.Stdout}))
+		t.AddDevice(human.New(human.Opt{CanMix: true}))
 	case REMOTE:
 		if m, err := mixer.New(opt.MixerOpt, grpc.NewDriver(opt.URI)); err != nil {
 			return nil, err

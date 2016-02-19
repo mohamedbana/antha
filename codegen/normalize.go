@@ -1,82 +1,94 @@
 package codegen
 
 import (
+	"fmt"
+
 	"github.com/antha-lang/antha/ast"
 	"github.com/antha-lang/antha/graph"
-	"sort"
 )
 
-type counts struct {
-	Counts []int
-	Nodes  []ast.Node
-}
-
-func (a *counts) Len() int {
-	return len(a.Counts)
-}
-
-func (a *counts) Less(i, j int) bool {
-	return a.Counts[i] < a.Counts[j]
-}
-
-func (a *counts) Swap(i, j int) {
-	a.Counts[i], a.Counts[j] = a.Counts[j], a.Counts[i]
-	a.Nodes[i], a.Nodes[j] = a.Nodes[j], a.Nodes[i]
-}
-
-// Prune out root expressions that appear as subexpressions of other
-// expressions.
-func pruneRoots(g *ast.Graph, root *ast.BundleExpr) (*ast.BundleExpr, error) {
-	// For an expression to contain another, it must contain at least as many
-	// nodes. Process roots in descending size order.
-	var c counts
-	for _, n := range root.From {
-		count := 0
-		graph.Visit(graph.VisitOpt{
-			Root:  n,
-			Graph: g,
-			Visitor: func(graph.Node) error {
-				count += 1
-				return nil
-			},
-		})
-		c.Counts = append(c.Counts, count)
-		c.Nodes = append(c.Nodes, n)
-	}
-
-	sort.Sort(sort.Reverse(&c))
-
-	r := &ast.BundleExpr{}
-	seen := make(map[graph.Node]bool)
-	for _, n := range c.Nodes {
-		if seen[n] {
-			continue
+// Build rooted graph
+func makeRoot(nodes []ast.Node) (ast.Node, error) {
+	someNode := func(g graph.Graph, m map[graph.Node]bool) graph.Node {
+		for i, inum := 0, g.NumNodes(); i < inum; i += 1 {
+			n := g.Node(i)
+			if !m[n] {
+				return n
+			}
 		}
+		return nil
+	}
 
-		graph.Visit(graph.VisitOpt{
-			Root:  n,
+	g := ast.ToGraph(ast.ToGraphOpt{
+		Roots: nodes,
+	})
+
+	roots := graph.Schedule(g).Roots
+	seen := make(map[graph.Node]bool)
+	for _, root := range roots {
+		results, _ := graph.Visit(graph.VisitOpt{
 			Graph: g,
+			Root:  root,
 			Visitor: func(n graph.Node) error {
-				seen[n] = true
+				if seen[n] {
+					return graph.NextNode
+				}
 				return nil
 			},
 		})
-		r.From = append(r.From, n)
+		for k := range results.Seen.Range() {
+			seen[k] = true
+		}
 	}
 
-	return r, nil
+	// If some nodes are not reachable from roots, there must be a cycle
+	if len(seen) != g.NumNodes() {
+		return nil, fmt.Errorf("cycle containing %q", someNode(g, seen))
+	}
+
+	ret := &ast.Bundle{}
+	for _, r := range roots {
+		ret.From = append(ret.From, r.(ast.Node))
+	}
+	return ret, nil
 }
 
-// Cleanup client input
-func normalize(root ast.Node) (ast.Node, error) {
+// Build IR
+func build(root ast.Node) (*ir, error) {
 	g := ast.ToGraph(ast.ToGraphOpt{
-		Root: root,
+		Roots: []ast.Node{root},
 	})
-	if r, ok := root.(*ast.BundleExpr); ok {
-		return pruneRoots(g, r)
-	} else if err := graph.IsDag(g); err != nil {
+
+	// Check that data dependencies are single-consumer (because they model
+	// destructive update of values)
+	if err := graph.IsTree(g, root); err != nil {
 		return nil, err
-	} else {
-		return &ast.BundleExpr{From: []ast.Node{root}}, nil
 	}
+
+	for i, inum := 0, g.NumNodes(); i < inum; i += 1 {
+		switch n := g.Node(i).(type) {
+		case *ast.UseComp:
+			if len(n.From) > 1 {
+				return nil, fmt.Errorf("component %q created multiple times", n)
+			}
+		default:
+		}
+	}
+
+	ct := graph.Eliminate(graph.EliminateOpt{
+		Graph: g,
+		In: func(n graph.Node) bool {
+			c, ok := n.(ast.Command)
+			return (ok && c.Output() == nil) || n == root
+		},
+	})
+	if err := graph.IsTree(ct, root); err != nil {
+		return nil, err
+	}
+
+	return &ir{
+		Root:        root,
+		Graph:       g,
+		CommandTree: ct,
+	}, nil
 }

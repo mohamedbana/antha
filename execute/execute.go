@@ -16,6 +16,14 @@ var (
 	cannotConfigure = errors.New("cannot configure liquid handler")
 )
 
+// TODO(ddn): extend result when protocols can block
+
+// Result of executing a workflow.
+type RunResult struct {
+	Workflow *workflow.Workflow
+	Insts    []target.Inst
+}
+
 type Options struct {
 	WorkflowData []byte         // JSON data describing workflow
 	Workflow     *workflow.Desc // Or workflow directly
@@ -26,7 +34,7 @@ type Options struct {
 }
 
 // Simple entrypoint for one-shot execution of workflows.
-func Run(parent context.Context, opt Options) (*workflow.Workflow, error) {
+func Run(parent context.Context, opt Options) (*RunResult, error) {
 	w, err := workflow.New(workflow.Options{FromBytes: opt.WorkflowData, FromDesc: opt.Workflow})
 	if err != nil {
 		return nil, err
@@ -47,9 +55,16 @@ func Run(parent context.Context, opt Options) (*workflow.Workflow, error) {
 
 	ctx := target.WithTarget(WithId(parent, opt.Id), opt.Target)
 
-	if err := w.Run(trace.WithResolver(ctx, resolveIntrinsics)); err != nil {
+	r := &resolver{}
+
+	if err := w.Run(trace.WithResolver(ctx, func(ctx context.Context, insts []interface{}) (map[int]interface{}, error) {
+		return r.resolve(ctx, insts)
+	})); err != nil {
 		return nil, err
 	}
 
-	return w, nil
+	return &RunResult{
+		Workflow: w,
+		Insts:    r.insts,
+	}, nil
 }

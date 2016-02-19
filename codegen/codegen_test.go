@@ -1,147 +1,83 @@
 package codegen
 
 import (
+	"fmt"
+	"testing"
+
 	"github.com/antha-lang/antha/ast"
 	"github.com/antha-lang/antha/target"
-	"testing"
+	"github.com/antha-lang/antha/target/human"
 )
 
-func makeOneSample(masterMix ast.Node) (r []ast.Node) {
-	cells := &ast.ApplyExpr{
-		Func: "incubate",
-		From: &ast.GatherExpr{
-			Key:  "CellStart",
-			From: &ast.NewExpr{From: &ast.UseExpr{Desc: "cells"}},
-		},
-	}
-	r = append(r, cells)
+type incubator struct{}
 
-	sample := &ast.ApplyExpr{
-		Func: "mix",
-		From: &ast.GatherExpr{
-			From: &ast.ListExpr{
-				From: []ast.Node{
-					&ast.NewExpr{From: &ast.UseExpr{Desc: "water"}},
-					masterMix,
-					&ast.NewExpr{From: &ast.UseExpr{Desc: "part1"}},
-					&ast.NewExpr{From: &ast.UseExpr{Desc: "part2"}},
-				},
-			},
-		},
+func (a *incubator) Can(req ast.Request) bool {
+	if req.MixVol != nil {
+		return false
 	}
-	r = append(r, sample)
+	return req.Time != nil || req.Temp != nil
+}
 
-	sample1 := &ast.ApplyExpr{
-		Func: "incubate",
-		From: &ast.GatherExpr{
-			Key:  "SampleStart",
-			From: sample,
+func (a *incubator) Compile(insts []ast.Command) ([]target.Inst, error) {
+	return []target.Inst{
+		&target.ManualInst{
+			Details: "hello",
 		},
-	}
-	r = append(r, sample1)
+	}, nil
+}
 
-	sample2 := &ast.ApplyExpr{
-		Func: "incubate",
-		From: &ast.GatherExpr{
-			Key:  "SampleStop",
-			From: sample1,
-		},
+func (a *incubator) MoveCost(from target.Device) int {
+	if a == from {
+		return 0
 	}
-	r = append(r, sample2)
+	return human.HumanByXCost - 1
+}
 
-	scells := &ast.ApplyExpr{
-		Func: "mix",
-		Near: cells,
-		From: &ast.GatherExpr{
-			From: &ast.ListExpr{
-				From: []ast.Node{
-					cells,
-					sample2,
-				},
-			},
-		},
-	}
-	r = append(r, scells)
-
-	scells1 := &ast.ApplyExpr{
-		Func: "incubate",
-		From: &ast.GatherExpr{
-			Key:  "PostPlasmid",
-			From: scells,
-		},
-	}
-	r = append(r, scells1)
-
-	scells2 := &ast.ApplyExpr{
-		Func: "mix",
-		From: &ast.GatherExpr{
-			From: &ast.ListExpr{
-				From: []ast.Node{
-					scells1,
-					&ast.NewExpr{From: &ast.UseExpr{Desc: "recovery"}},
-				},
-			},
-		},
-	}
-	r = append(r, scells2)
-
-	rcells := &ast.ApplyExpr{
-		Func: "incubate",
-		From: &ast.GatherExpr{
-			Key:  "Recovery",
-			From: scells2,
-		},
-	}
-	r = append(r, rcells)
-
-	pcells := &ast.ApplyExpr{
-		Opt:  "agarplate",
-		Func: "mix",
-		From: &ast.GatherExpr{
-			From: &ast.ListExpr{
-				From: []ast.Node{
-					rcells,
-				},
-			},
-		},
-	}
-	r = append(r, pcells)
-	return
+func (a *incubator) String() string {
+	return "Incubator"
 }
 
 func TestWellFormed(t *testing.T) {
-	t.Skip("tbd")
-	// Example transformation protocol in AST form
-
 	var nodes []ast.Node
-	for i := 0; i < 4; i += 1 {
-		// Premake master mix
-		mix := &ast.ApplyExpr{
-			Func: "mix",
-			Gen:  0,
-			From: &ast.GatherExpr{
-				From: &ast.ListExpr{
-					From: []ast.Node{
-						&ast.NewExpr{From: &ast.UseExpr{Desc: "premix1"}},
-						&ast.NewExpr{From: &ast.UseExpr{Desc: "premix2"}},
-					},
+	for idx := 0; idx < 4; idx += 1 {
+		m := &ast.Mix{
+			Reqs: []ast.Request{
+				ast.Request{
+					MixVol: ast.NewInterval(0.1, 1.0),
 				},
 			},
+			From: []ast.Node{
+				&ast.UseComp{},
+				&ast.UseComp{},
+				&ast.UseComp{},
+			},
 		}
-		nodes = append(nodes, makeOneSample(mix)...)
-		nodes = append(nodes, mix)
+		u := &ast.UseComp{}
+		u.From = append(u.From, m)
+
+		i := &ast.Incubate{
+			Reqs: []ast.Request{
+				ast.Request{
+					Temp: ast.NewPoint(25),
+					Time: ast.NewPoint(60 * 60),
+				},
+			},
+			From: []ast.Node{u},
+		}
+
+		nodes = append(nodes, i)
 	}
 
-	if _, err := Compile(target.New(), &ast.BundleExpr{From: nodes}); err != nil {
+	machine := target.New()
+	machine.AddDevice(human.New())
+	machine.AddDevice(&incubator{})
+
+	if insts, err := Compile(machine, nodes); err != nil {
 		t.Fatal(err)
+	} else {
+		// XXX
+		for _, in := range insts {
+			fmt.Printf("  %T %+v\n", in, in)
+		}
 	}
-}
-
-func TestGenConstraint(t *testing.T) {
-}
-
-func TestNearConstraint(t *testing.T) {
-}
-
-func TestPrevConstraint(t *testing.T) {
 }

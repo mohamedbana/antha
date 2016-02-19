@@ -100,7 +100,7 @@ func runOne(opt opt) error {
 		return err
 	}
 
-	w, err := execute.Run(ctx, execute.Options{
+	rout, err := execute.Run(ctx, execute.Options{
 		Target:   t,
 		Workflow: wdesc,
 		Params:   params,
@@ -109,8 +109,11 @@ func runOne(opt opt) error {
 		return err
 	}
 
-	for k, v := range w.Outputs {
+	for k, v := range rout.Workflow.Outputs {
 		fmt.Printf("%s: %s\n", k, v)
+	}
+	for _, inst := range rout.Insts {
+		fmt.Println(inst)
 	}
 
 	return nil

@@ -2,8 +2,10 @@ package mixer
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/ast"
 	driver "github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
 	lh "github.com/antha-lang/antha/microArch/scheduler/liquidhandling"
@@ -17,19 +19,24 @@ var (
 
 var (
 	_ target.Device = &Mixer{}
-	_ target.Mixer  = &Mixer{}
-	_ target.Shaper = &Mixer{}
 )
 
 type Mixer struct {
 	driver     driver.ExtendedLiquidhandlingDriver
 	properties driver.LHProperties
 	opt        Opt
-	Out        *lh.LHRequest // XXX: remove me
 }
 
-func (a *Mixer) Can(...target.Request) bool {
-	return true // XXX: implement me
+func (a *Mixer) Can(req ast.Request) bool {
+	// TODO: remove when mixers have wait instruction
+	if req.Time != nil {
+		return false
+	}
+	if req.Temp != nil {
+		return false
+	}
+	// TODO: Add specific volume constraints
+	return req.MixVol != nil
 }
 
 func (a *Mixer) MoveCost(from target.Device) int {
@@ -37,10 +44,6 @@ func (a *Mixer) MoveCost(from target.Device) int {
 		return 0
 	}
 	return human.HumanByXCost - 1
-}
-
-func (a *Mixer) Shape() interface{} {
-	return &a.properties
 }
 
 func (a *Mixer) makeReq() (*lh.LHRequest, *lh.Liquidhandler) {
@@ -75,7 +78,23 @@ func (a *Mixer) makeReq() (*lh.LHRequest, *lh.Liquidhandler) {
 	return req, planner
 }
 
-func (a *Mixer) PrepareMix(mixes []*wtype.LHInstruction) (*target.MixResult, error) {
+func (a *Mixer) Compile(cmds []ast.Command) ([]target.Inst, error) {
+	var mixes []*wtype.LHInstruction
+	for _, c := range cmds {
+		if m, ok := c.(*ast.Mix); !ok {
+			return nil, fmt.Errorf("cannot compile %T", c)
+		} else {
+			mixes = append(mixes, m.Inst)
+		}
+	}
+	if inst, err := a.makeMix(mixes); err != nil {
+		return nil, err
+	} else {
+		return []target.Inst{inst}, nil
+	}
+}
+
+func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 	hasPlate := func(plates []*wtype.LHPlate, typ, id string) bool {
 		for _, p := range plates {
 			if p.Type == typ && (id == "" || p.ID == id) {
@@ -89,9 +108,6 @@ func (a *Mixer) PrepareMix(mixes []*wtype.LHInstruction) (*target.MixResult, err
 		m := make(map[wtype.BlockID]bool)
 		for _, mix := range mixes {
 			m[mix.BlockID] = true
-		}
-		if len(m) > 1 {
-			panic("aa") // XXX
 		}
 		for k := range m {
 			r = k
@@ -114,10 +130,10 @@ func (a *Mixer) PrepareMix(mixes []*wtype.LHInstruction) (*target.MixResult, err
 
 	planner.MakeSolutions(req)
 
-	a.Out = req
-
-	return &target.MixResult{
-		Request: req,
+	return &target.MixInst{
+		Request:    req,
+		Properties: a.properties,
+		Files:      nil, // XXX
 	}, nil
 }
 
