@@ -24,6 +24,7 @@ package parser
 
 import (
 	"fmt"
+
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
@@ -458,15 +459,17 @@ func HandleFeatures(lines []string, seq string, seqtype string) (features []sequ
 			if reverse {
 				rev = "Reverse"
 			}
-			fmt.Println(startposition)
-			if len(seq) > 0 /*&& startposition > 0 /*&& endposition < len(seq) */ {
-				feature = sequences.MakeFeature(description, seq[startposition-1:endposition], seqtype, class, rev)
-				if start > end {
-					return
-				}
 
-			} else {
-				fmt.Println("sequence", description, seq, "startposition", startposition, "endposition", endposition, " not valid")
+			fmt.Println("seq,start,end = ", seq, startposition, endposition)
+
+			// Warning! this needs to change to handle cases where start and position assignment has failed rather than just ignoring the problem
+			if startposition != 0 && endposition != 0 {
+
+				feature = sequences.MakeFeature(description, seq[startposition-1:endposition], seqtype, class, rev)
+			}
+			if start > end {
+				return
+
 			}
 			features = append(features, feature)
 			lines = lines[end:len(lines)]
