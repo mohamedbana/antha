@@ -51,10 +51,11 @@ func (a *qgraph) Orig(n Node, i int) Node {
 }
 
 type MakeQuotientOpt struct {
-	Graph    Graph
-	Colorer  func(Node) interface{}
-	HasColor func(Node) bool
-	Present  func(Node) bool // Should not be included at all
+	Graph         Graph
+	Colorer       func(Node) interface{}
+	HasColor      func(Node) bool
+	Present       func(Node) bool // Should n be included at all
+	KeepSelfEdges bool
 }
 
 // Return a quotient graph. Nodes with the same color merged into a single
@@ -107,6 +108,9 @@ func MakeQuotient(opt MakeQuotientOpt) QGraph {
 		}
 
 		for n := range neighs {
+			if !opt.KeepSelfEdges && n == newNode {
+				continue
+			}
 			ret.Outs[newNode] = append(ret.Outs[newNode], n)
 		}
 	}
