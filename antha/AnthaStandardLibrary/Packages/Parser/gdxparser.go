@@ -25,11 +25,12 @@ package parser
 import (
 	"encoding/xml"
 	"fmt"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"io/ioutil"
 	"strconv"
 	"strings"
+
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 )
 
 type Project struct {
@@ -123,7 +124,7 @@ func ParsetoAssemblyParameters(filename string) ([]enzymes.Assemblyparameters, e
 	return construct_list, nil
 }
 
-func ParsetoDNASequence(filename string) (parts_list []wtype.DNASequence, err error) {
+func GDXtoDNASequence(filename string) (parts_list []wtype.DNASequence, err error) {
 	str, _ := ioutil.ReadFile(filename)
 
 	var gdx Project

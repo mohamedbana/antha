@@ -200,3 +200,43 @@ func ExportFastaandSummaryforEachSeq(assemblyparameters enzymes.Assemblyparamete
 	}
 	return err
 }
+
+func ExportFastaSerialfromMultipleAssemblies(dirname string, multipleassemblyparameters []enzymes.Assemblyparameters) (filename string, err error) {
+
+	seqs := make([]wtype.DNASequence, 0)
+
+	for _, assemblyparameters := range multipleassemblyparameters {
+
+		enzymename := strings.ToUpper(assemblyparameters.Enzymename)
+
+		// should change this to rebase lookup; what happens if this fails?
+		//enzyme := TypeIIsEnzymeproperties[enzymename]
+		enzyme, err := lookup.TypeIIsLookup(enzymename)
+		if err != nil {
+			return filename, err
+		}
+		//assemble (note that sapIenz is found in package enzymes)
+		_, plasmidproductsfromXprimaryseq, err := enzymes.JoinXnumberofparts(assemblyparameters.Vector, assemblyparameters.Partsinorder, enzyme)
+
+		if err != nil {
+			return filename, err
+		}
+
+		for _, assemblyproduct := range plasmidproductsfromXprimaryseq {
+
+			/*	fileprefix := anthapath.Dirpath() + "/"
+				tojoin := make([]string, 0)
+				tojoin = append(tojoin, fileprefix, assemblyparameters.Constructname)
+				filename := strings.Join(tojoin, "")
+				Exporttofile(filename, &assemblyproduct)
+				ExportFasta(filename, &assemblyproduct)*/
+
+			seqs = append(seqs, assemblyproduct)
+		}
+
+	}
+
+	filename = Makefastaserial2(dirname, seqs)
+
+	return filename, err
+}
