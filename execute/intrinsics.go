@@ -22,9 +22,13 @@ func mix(ctx context.Context, opt trace.MixOpt, components []*wtype.LHComponent)
 	cmp.BlockID = wtype.NewBlockID(getId(ctx))
 
 	var values []trace.Value
-	for _, c := range components {
+	for i, c := range components {
+		// make sure we set the order here
+		c.Order = i
 		values = append(values, trace.MakeValue(ctx, "", c))
 		cmp.Mix(c)
+		cmp.AddParent(c.ID)
+		c.AddDaughter(cmp.ID)
 	}
 
 	opt.OutputCmp = cmp

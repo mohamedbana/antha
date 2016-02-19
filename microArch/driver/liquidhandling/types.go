@@ -25,6 +25,7 @@ package liquidhandling
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/antha-lang/antha/antha/anthalib/material"
@@ -52,7 +53,7 @@ type LHProperties struct {
 	Model                string
 	Mnfr                 string
 	LHType               string
-	TipType              string
+	TipType              string // this is most likely no longer appropriate
 	Heads                []*wtype.LHHead
 	HeadsLoaded          []*wtype.LHHead
 	Adaptors             []*wtype.LHAdaptor
@@ -458,29 +459,16 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []s
 
 		if v.HasAnyParent() {
 			fmt.Println("Trying to get component ", v.CName, v.ParentID)
-			// this is a search which shouldn't be necessary...
-			// think we just need to specify the source location
-			for _, opref := range lhp.Output_preferences {
-				// check if the plate at position ipref has the
-				// component we seek
 
-				p, ok := lhp.Plates[opref]
+			// the component could be a sample, we need to ensure that we know where
+			// it came from
 
-				if ok {
-					// whaddya got?
-					// nb this won't work if we need to split a volume across several plates
-					wcarr, ok := p.GetComponent(v, true)
+			tx := strings.Split(v.Loc, ":")
 
-					if ok {
-						foundIt = true
-						fmt.Println("FOUND DA BOY ", p.ID, wcarr[0].FormatA1())
-						// update r1 and r2
-						r1[i] = p.ID
-						r2[i] = wcarr[0].FormatA1()
-						break
-					}
-				}
-			}
+			r1[i] = tx[0]
+			r2[i] = tx[1]
+			foundIt = true
+
 		} else {
 			for _, ipref := range lhp.Input_preferences {
 				// check if the plate at position ipref has the

@@ -210,15 +210,13 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 	request = this.Tip_box_setup(request)
 }
 
-// request the inputs which are needed to run the plan, unless they have already
-// been requested
+// sort out inputs
 func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 	instructions := (*request).LHInstructions
 	inputs := make(map[string][]*wtype.LHComponent, 3)
 	order := make(map[string]map[string]int, 3)
 
 	for _, instruction := range instructions {
-		// components are either other solutions or come in as inputs
 		components := instruction.Components
 
 		for _, component := range components {
@@ -324,6 +322,7 @@ func DefineOrderOrFail(mapin map[string]map[string]int) []string {
 			c2 := mapin[cmps[j]][cmps[i]]
 
 			if c1 > 0 && c2 > 0 {
+				fmt.Println(cmps[i], " ", cmps[j], " ", c1, " ", c2)
 				log.Fatal("CANNOT DEAL WITH INCONSISTENT COMPONENT ORDERING")
 			}
 
