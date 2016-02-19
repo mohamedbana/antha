@@ -5,8 +5,9 @@
 package trace
 
 import (
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"sync"
+
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 )
 
 type instrKey int
@@ -154,9 +155,8 @@ func Flush(ctx context.Context) {
 
 type trace struct {
 	// Given a list of pending instructions, return their values
-	lock    sync.Mutex
-	issues  []instp
-	retired [][]instp
+	lock   sync.Mutex
+	issues []instp
 }
 
 func (a *trace) signal(lockedPool *poolCtx) error {
@@ -178,7 +178,6 @@ func (a *trace) execute(ctx context.Context) error {
 		return err
 	}
 
-	a.retired = append(a.retired, a.issues)
 	a.issues = nil
 
 	return nil
