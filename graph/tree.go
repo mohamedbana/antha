@@ -58,8 +58,8 @@ type TreeVisitor func(n, parent Node, err error) error
 type VisitTreeOpt struct {
 	Tree      Graph
 	Root      Node
-	PreOrder  TreeVisitor
-	PostOrder TreeVisitor
+	PreOrder  TreeVisitor // if err != TraversalDone, propagate error
+	PostOrder TreeVisitor // if err != TraversalDone, propagate error
 }
 
 // Apply a tree visitor.
@@ -86,11 +86,17 @@ func VisitTree(opt VisitTreeOpt) error {
 		if f.Post {
 			if err := apply(opt.PostOrder, f.Node, f.Parent, lastError); err != nil {
 				lastError = err
+				if err == TraversalDone {
+					break
+				}
 			}
 			continue
 		} else {
 			if err := apply(opt.PreOrder, f.Node, f.Parent, lastError); err != nil {
 				lastError = err
+				if err == TraversalDone {
+					break
+				}
 				continue
 			}
 		}

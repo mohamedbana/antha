@@ -1,14 +1,6 @@
 // Package graph provides common graph algorithms
 package graph
 
-import (
-	"errors"
-)
-
-var (
-	TraversalDone = errors.New("traversal done") // Predefined error for expected early termination of a traversal
-)
-
 type Node interface{}
 
 type Graph interface {

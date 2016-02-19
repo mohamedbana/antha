@@ -12,7 +12,7 @@ type topoOrder struct {
 	gray  nodeSet // Nodes currently being processed
 }
 
-// TODO(ddn): For performance consider avoiding recursion
+// TODO(ddn): For performance, consider avoiding recursion
 
 // Visit leaves, then nodes next to leaves, etc.
 func (a *topoOrder) visit(n Node) {
