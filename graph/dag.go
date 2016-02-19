@@ -75,8 +75,8 @@ type TopoSortOpt struct {
 	NodeOrder LessThan // Optional argument to ensure deterministic output
 }
 
-// Return topological sort of graph. Returns an error if graph contains a
-// cycle.
+// Return topological sort of graph. If edge (a, b) is in g, then b < a in the
+// resulting order.  Returns an error if graph contains a cycle.
 func TopoSort(opt TopoSortOpt) ([]Node, error) {
 	to := topoSort(opt)
 	if err := to.cycleError(); err != nil {

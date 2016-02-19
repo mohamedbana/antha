@@ -24,9 +24,23 @@ func Eliminate(opt EliminateOpt) Graph {
 		Outs: make(map[Node][]Node),
 	}
 
+	// Elimination can be quadatric. Reduce to linear on special case of trees
+	// with reverse topological order.
+	var nodes []Node
+	if order, err := TopoSort(TopoSortOpt{
+		Graph: opt.Graph,
+	}); err != nil {
+		for i, inum := 0, opt.Graph.NumNodes(); i < inum; i += 1 {
+			nodes = append(nodes, opt.Graph.Node(i))
+		}
+	} else {
+		for i := len(order) - 1; i >= 0; i -= 1 {
+			nodes = append(nodes, order[i])
+		}
+	}
+
 	ins := make(map[Node][]Node)
-	for i, inum := 0, opt.Graph.NumNodes(); i < inum; i += 1 {
-		n := opt.Graph.Node(i)
+	for _, n := range nodes {
 		for j, jnum := 0, opt.Graph.NumOuts(n); j < jnum; j += 1 {
 			out := opt.Graph.Out(n, j)
 			ins[out] = append(ins[out], n)
@@ -34,8 +48,7 @@ func Eliminate(opt EliminateOpt) Graph {
 	}
 
 	outs := make(map[Node][]Node)
-	for i, inum := 0, opt.Graph.NumNodes(); i < inum; i += 1 {
-		n := opt.Graph.Node(i)
+	for _, n := range nodes {
 		if keep(n) {
 			continue
 		}
@@ -49,8 +62,7 @@ func Eliminate(opt EliminateOpt) Graph {
 	}
 
 	// Filter out nodes
-	for i, inum := 0, opt.Graph.NumNodes(); i < inum; i += 1 {
-		n := opt.Graph.Node(i)
+	for _, n := range nodes {
 		if !keep(n) {
 			continue
 		}
