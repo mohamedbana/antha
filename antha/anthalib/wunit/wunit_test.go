@@ -167,6 +167,7 @@ func ExampleNine() {
 }
 
 // simple reverse complement check to test testing methodology initially
+
 type testunit struct {
 	value        float64
 	prefix       string

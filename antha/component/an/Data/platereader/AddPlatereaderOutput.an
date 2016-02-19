@@ -18,12 +18,14 @@ import (
 
 // Input parameters for this protocol (data)
 Parameters (
+
 	MarsResultsFileXLSX           	string 
 	DOEFilewithwelllocationsadded 	string 
 	DOEFiletype                   	string 
 	SheetNumber 					int
 	Responsecolumntofill 			string //= "AbsMV"
-	Sheet 							int // see const below
+
+
 	//Wavelength            int    = 440
 	ReadingTypeinMarsFile 			string // = "Abs Spectrum"
 	WavelengthtoUse            		int   // = 440
@@ -81,7 +83,9 @@ Steps {
 
 	if DOEFiletype == "DX" || DOEFiletype == "Design Expert" {
 
-		marsdata, err = parser.ParseMarsXLSXOutput(MarsResultsFileXLSX, Sheet)
+
+		marsdata, err = parser.ParseMarsXLSXOutput(MarsResultsFileXLSX,SheetNumber)
+
 		if err != nil {
 			panic(err)
 		}

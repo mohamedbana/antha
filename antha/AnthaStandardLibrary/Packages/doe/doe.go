@@ -33,8 +33,8 @@ type Run struct {
 	Setpoints            []interface{}
 	Responsedescriptors  []string
 	ResponseValues       []interface{}
-	AdditionalHeaders    []string
-	AdditionalSubheaders []string
+	AdditionalHeaders    []string // could represent a class e.g. Environment variable, processed, raw, location
+	AdditionalSubheaders []string // e.g. well ID, Ambient Temp, order,
 	AdditionalValues     []interface{}
 }
 
@@ -63,6 +63,41 @@ func (run Run) AddNewResponseFieldandValue(responsedescriptor string, responseva
 	run.Responsedescriptors = responsedescriptors
 	run.ResponseValues = responsevalues
 	fmt.Println(run)
+}
+func (run Run) AddAdditionalValue(additionalsubheader string, additionalvalue interface{}) {
+
+	for i, descriptor := range run.AdditionalSubheaders {
+		if strings.ToUpper(descriptor) == strings.ToUpper(additionalsubheader) {
+			run.AdditionalValues[i] = additionalvalue
+		}
+	}
+
+}
+
+func (run Run) AddAdditionalHeaders(additionalheader string, additionalsubheader string) {
+
+	headers := make([]string, len(run.AdditionalHeaders))
+
+	for _, header := range run.AdditionalHeaders {
+		headers = append(headers, header)
+	}
+
+	headers = append(headers, additionalheader)
+
+	subheaders := make([]string, len(run.AdditionalSubheaders))
+
+	for _, subheader := range run.AdditionalSubheaders {
+		subheaders = append(subheaders, subheader)
+	}
+
+	subheaders = append(subheaders, additionalsubheader)
+
+}
+
+func (run Run) AddAdditionalHeaderandValue(additionalheader string, additionalsubheader string, additionalvalue interface{}) {
+	run.AddAdditionalHeaders(additionalheader, additionalsubheader)
+	run.AddAdditionalValue(additionalsubheader, additionalvalue)
+
 }
 
 func (run Run) CheckAdditionalInfo(subheader string, value interface{}) bool {

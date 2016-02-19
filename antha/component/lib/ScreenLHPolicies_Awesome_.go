@@ -45,7 +45,7 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 
 	_output.Runtowelllocationmap = make([]string, 0)
 	perconditionuntowelllocationmap := make([]string, 0)
-	_output.Blankwells = make([]string, 0)
+
 	//Runtowelllocationmap = make(map[string]string)
 
 	// work out well coordinates for any plate
@@ -60,10 +60,6 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 			wellpositionarray = append(wellpositionarray, location)
 		}
 	}
-
-	alphabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
-		"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
-		"Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"}
 
 	/*
 		//alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -124,6 +120,13 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 				outputfilename := filepath.Join(antha.Dirpath(), "DOE2"+"_"+outputsandwich+".xlsx")
 				_output.Errors = append(_output.Errors, doe.AddWelllocations(filepath.Join(antha.Dirpath(), "ScreenLHPolicyDOE2.xlsx"), 0, perconditionuntowelllocationmap, "DOE_run", outputfilename, []string{"Volume", "Solution", "Replicate"}, []interface{}{_input.TestSolVolumes[l].ToString(), _input.TestSols[k].CName, string(j)}))
 
+				// other things to add to check for covariance
+				// order in which wells were pippetted
+				// plate ID
+				// row
+				// column
+				// ambient temp
+
 				// empty
 				perconditionuntowelllocationmap = make([]string, 0)
 			}
@@ -131,18 +134,25 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 	}
 
 	// add blanks
+
+	_output.Blankwells = make([]string, 0)
+
+	alphabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+		"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
+		"Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"}
+
 	for m := 0; m < _input.NumberofBlanks; m++ {
-		eachreaction := make([]*wtype.LHComponent, 0)
+		//eachreaction := make([]*wtype.LHComponent, 0)
 
 		// use defualt policy for blank
 
-		bufferSample := mixer.SampleForTotalVolume(_input.Diluent, _input.TotalVolume)
-		eachreaction = append(eachreaction, bufferSample)
+		bufferSample := mixer.Sample(_input.Diluent, _input.TotalVolume)
+		//eachreaction = append(eachreaction,bufferSample)
 
 		// add blanks to last column of plate
 		well := alphabet[_input.OutPlate.WlsY-1-m] + strconv.Itoa(_input.OutPlate.WlsX)
 		fmt.Println("blankwell", well)
-		reaction := execute.MixTo(_ctx, _input.OutPlate, well, eachreaction...)
+		reaction := execute.MixTo(_ctx, _input.OutPlate, well, bufferSample)
 		//fmt.Println("where am I?",wellpositionarray[counter])
 		//Runtowelllocationmap= append(Runtowelllocationmap,"Blank"+ strconv.Itoa(m+1) +":" + well)
 		_output.Blankwells = append(_output.Blankwells, well)

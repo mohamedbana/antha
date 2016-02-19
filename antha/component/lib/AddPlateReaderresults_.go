@@ -23,7 +23,7 @@ import (
 // Input parameters for this protocol (data)
 
 //= "AbsMV"
-// see const below
+
 //Wavelength            int    = 440
 // = "Abs Spectrum"
 // = 440
@@ -64,7 +64,8 @@ func _AddPlateReaderresultsSteps(_ctx context.Context, _input *AddPlateReaderres
 
 	if _input.DOEFiletype == "DX" || _input.DOEFiletype == "Design Expert" {
 
-		marsdata, err = parser.ParseMarsXLSXOutput(_input.MarsResultsFileXLSX, _input.Sheet)
+		marsdata, err = parser.ParseMarsXLSXOutput(_input.MarsResultsFileXLSX, _input.SheetNumber)
+
 		if err != nil {
 			panic(err)
 		}
@@ -199,7 +200,6 @@ type AddPlateReaderresultsInput struct {
 	PlateType                     *wtype.LHPlate
 	ReadingTypeinMarsFile         string
 	Responsecolumntofill          string
-	Sheet                         int
 	SheetNumber                   int
 	VolumePerwell                 wunit.Volume
 	WavelengthtoUse               int
@@ -234,7 +234,6 @@ func init() {
 				{Name: "PlateType", Desc: "", Kind: "Inputs"},
 				{Name: "ReadingTypeinMarsFile", Desc: "Wavelength            int    = 440\n\n= \"Abs Spectrum\"\n", Kind: "Parameters"},
 				{Name: "Responsecolumntofill", Desc: "= \"AbsMV\"\n", Kind: "Parameters"},
-				{Name: "Sheet", Desc: "see const below\n", Kind: "Parameters"},
 				{Name: "SheetNumber", Desc: "", Kind: "Parameters"},
 				{Name: "VolumePerwell", Desc: "", Kind: "Parameters"},
 				{Name: "WavelengthtoUse", Desc: "= 440\n", Kind: "Parameters"},
