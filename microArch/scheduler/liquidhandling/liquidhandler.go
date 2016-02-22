@@ -64,7 +64,6 @@ type Liquidhandler struct {
 	LayoutAgent      func(*LHRequest, *liquidhandling.LHProperties) *LHRequest
 	ExecutionPlanner func(*LHRequest, *liquidhandling.LHProperties) *LHRequest
 	PolicyManager    *LHPolicyManager
-	Counter          int
 	Once             sync.Once
 }
 
@@ -95,6 +94,7 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) *LHRequest {
 		OutputSetup(this.Properties)
 	}
 
+	// this is protective, should not be needed
 	this.Once.Do(f)
 
 	return request
@@ -210,24 +210,22 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 	request = this.Tip_box_setup(request)
 }
 
-// request the inputs which are needed to run the plan, unless they have already
-// been requested
+// sort out inputs
 func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
-	if this.Counter > 0 {
-		return request
-	}
-	this.Counter += 1
-
 	instructions := (*request).LHInstructions
 	inputs := make(map[string][]*wtype.LHComponent, 3)
 	order := make(map[string]map[string]int, 3)
 
 	for _, instruction := range instructions {
-		// components are either other solutions or come in as inputs
-		// this needs solving too
 		components := instruction.Components
 
 		for _, component := range components {
+			// ignore anything which is made in another mix
+
+			if component.HasAnyParent() {
+				continue
+			}
+
 			cmps, ok := inputs[component.CName]
 			if !ok {
 				cmps = make([]*wtype.LHComponent, 0, 3)
@@ -237,6 +235,10 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 			inputs[component.CName] = cmps
 
 			for j := 0; j < len(components); j++ {
+				// again exempt those parented components
+				if components[j].HasAnyParent() {
+					continue
+				}
 				if component.Order < components[j].Order {
 					m, ok := order[component.CName]
 					if !ok {
@@ -261,6 +263,7 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 	// define component ordering
 
 	component_order := DefineOrderOrFail(order)
+
 	(*request).Input_order = component_order
 
 	var requestinputs map[string][]*wtype.LHComponent
@@ -319,6 +322,7 @@ func DefineOrderOrFail(mapin map[string]map[string]int) []string {
 			c2 := mapin[cmps[j]][cmps[i]]
 
 			if c1 > 0 && c2 > 0 {
+				fmt.Println(cmps[i], " ", cmps[j], " ", c1, " ", c2)
 				log.Fatal("CANNOT DEAL WITH INCONSISTENT COMPONENT ORDERING")
 			}
 

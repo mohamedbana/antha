@@ -46,9 +46,14 @@ func mix(ctx context.Context, inst *mixInst) *wtype.LHComponent {
 	inst.Node.Inst.Result.BlockID = inst.Node.Inst.BlockID
 	inst.Comp = inst.Node.Inst.Result
 	inst.Comp.BlockID = inst.Node.Inst.BlockID
-	for _, c := range inst.Args {
+	for i, c := range inst.Args {
 		v := c.Volume().SIValue()
 		inst.Node.Reqs = append(inst.Node.Reqs, ast.Request{MixVol: ast.NewPoint(v)})
+
+		c.Order = i
+		inst.Comp.Mix(c)
+		inst.Comp.AddParent(c.ID)
+		c.AddDaughter(inst.Comp.ID)
 	}
 
 	trace.Issue(ctx, inst)

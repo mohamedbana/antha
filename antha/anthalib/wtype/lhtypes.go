@@ -29,7 +29,6 @@ import (
 	"strings"
 
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/microArch/logger"
 )
 
@@ -196,6 +195,16 @@ type LHInstruction struct {
 	Tvol             float64
 	Majorlayoutgroup int
 	Result           *LHComponent
+}
+
+func (ins *LHInstruction) HasAnyParent() bool {
+	for _, v := range ins.Components {
+		if v.HasAnyParent() {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (ins *LHInstruction) HasParent(id string) bool {
@@ -413,15 +422,13 @@ func (cmp *LHComponent) Mix(cmp2 *LHComponent) {
 	if cmp.IsZero() {
 		cmp.ID = cmp2.ID
 	}
-	cmp2.AddDaughter(cmp.ID)
-	cmp.AddParent(cmp2.ID)
 	cmp.Smax = mergeSolubilities(cmp, cmp2)
 	// determine type of final
 	cmp.Type = mergeTypes(cmp, cmp2)
 	// add cmp2 to cmp
 	vcmp := wunit.NewVolume(cmp.Vol, cmp.Vunit)
 	vcmp2 := wunit.NewVolume(cmp2.Vol, cmp2.Vunit)
-	vcmp.Add(&vcmp2)
+	vcmp.Add(vcmp2)
 	cmp.Vol = vcmp.RawValue() // same units
 	cmp.CName = mergeNames(cmp.CName, cmp2.CName)
 	// allow trace back
@@ -484,6 +491,10 @@ func CopyLHComponent(lhc *LHComponent) *LHComponent {
 	}
 	return &lhc2
 }
+
+// structure describing a sample
+
+type LHSample LHComponent
 
 // structure describing a microplate
 type LHPlate struct {
@@ -565,7 +576,7 @@ func (lhp LHPlate) String() string {
 
 // convenience method
 
-func (lhp *LHPlate) GetComponent(cmp *LHComponent) ([]WellCoords, bool) {
+func (lhp *LHPlate) GetComponent(cmp *LHComponent, exact bool) ([]WellCoords, bool) {
 	ret := make([]WellCoords, 0, 1)
 
 	it := NewOneTimeColumnWiseIterator(lhp)
@@ -575,6 +586,10 @@ func (lhp *LHPlate) GetComponent(cmp *LHComponent) ([]WellCoords, bool) {
 		w := lhp.Wellcoords[wc.FormatA1()]
 		//	logger.Debug(fmt.Sprint("WANT$$$: ", cmp.CName, " :: ", wc.FormatA1(), " ", w.Contents().CName))
 		if w.Contents().CName == cmp.CName {
+			if exact && w.Contents().ID != cmp.ID {
+				continue
+			}
+
 			v := w.WorkingVolume()
 			volGot.Add(v)
 			ret = append(ret, wc)
@@ -920,9 +935,9 @@ func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape 
 // this function tries to find somewhere to put something... it was written before
 // i had an iterator. fml
 func Get_Next_Well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LHWell, bool) {
-	nrow, ncol := 0, 1
-
 	vol := component.Vol
+
+	it := NewOneTimeColumnWiseIterator(plate)
 
 	if curwell != nil {
 		// quick check to see if we have room
@@ -933,30 +948,17 @@ func Get_Next_Well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 			return curwell, true
 		}
 
-		// we need a defined traversal of the wells
-
-		crds := curwell.Crds
-
-		tx := strings.Split(crds, ":")
-
-		nrow = wutil.AlphaToNum(tx[0])
-		ncol = wutil.ParseInt(tx[1])
+		startcoords := MakeWellCoords(curwell.Crds)
+		it.SetStartTo(startcoords)
+		it.Rewind()
+		it.Next()
 	}
-
-	wellsx := plate.WlsX
-	wellsy := plate.WlsY
 
 	var new_well *LHWell
 
-	for {
-		nrow, ncol = next_well_to_try(nrow, ncol, wellsy, wellsx)
+	for wc := it.Curr(); it.Valid(); wc = it.Next() {
 
-		if nrow == -1 {
-			return nil, false
-		}
-		//	crds := wutil.NumToAlpha(nrow) + ":" + strconv.Itoa(ncol)
-
-		crds := WellCoords{nrow - 1, ncol - 1}.FormatA1()
+		crds := wc.FormatA1()
 
 		new_well = plate.Wellcoords[crds]
 
@@ -964,12 +966,6 @@ func Get_Next_Well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 			break
 		}
 		cnts := new_well.Contents()
-
-		/*
-			if cnts == nil {
-				break
-			}
-		*/
 
 		cont := cnts.Name()
 		if cont != component.Name() {
@@ -981,6 +977,10 @@ func Get_Next_Well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 		if vol < vol_left {
 			break
 		}
+	}
+
+	if new_well == nil {
+		return nil, false
 	}
 
 	return new_well, true
@@ -998,30 +998,6 @@ func get_vol_left(well *LHWell) float64 {
 	rvol := well.Rvol
 	vol := well.MaxVol
 	return vol - (Currvol() + total_carry_vol + rvol)
-}
-
-func next_well_to_try(row, col, nrows, ncols int) (int, int) {
-	// this needs to be refactored into an iterator
-
-	nrow := -1
-	ncol := -1
-
-	// iterate down columns
-
-	if row+1 > nrows {
-		if col+1 <= ncols {
-			nrow = 1
-			ncol = col + 1
-		}
-	} else {
-		ncol = col
-		nrow = row + 1
-	}
-
-	// note that the default should be to leave ncol/nrow unchanged
-	// and return -1 -1
-
-	return nrow, ncol
 }
 
 func New_Solution() *LHSolution {

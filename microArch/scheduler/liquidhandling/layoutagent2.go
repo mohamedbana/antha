@@ -24,6 +24,8 @@ package liquidhandling
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
@@ -49,7 +51,7 @@ func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties
 
 	// make specific plates... this may mean splitting stuff out into multiple plates
 
-	make_plates(request)
+	remap := make_plates(request)
 
 	// give them names
 
@@ -64,6 +66,46 @@ func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties
 	// say where on each plate they will go
 	// this needs to set Output_assignments
 	make_layouts(request, plate_choices)
+
+	lkp := make(map[string][]*wtype.LHComponent)
+	lk2 := make(map[string]string)
+	// fix the output locations correctly
+
+	for _, v := range request.LHInstructions {
+		lkp[v.ID] = make([]*wtype.LHComponent, 0, 1) //v.Result
+		lk2[v.Result.ID] = v.ID
+	}
+
+	for _, v := range request.LHInstructions {
+		for _, c := range v.Components {
+			// if this component has the same ID
+			// as the result of another instruction
+			// we map it in
+			iID, ok := lk2[c.ID]
+
+			if ok {
+				// iID is an instruction ID
+				lkp[iID] = append(lkp[iID], c)
+			}
+		}
+
+		// now we put the actual result in
+		lkp[v.ID] = append(lkp[v.ID], v.Result)
+	}
+
+	// now map the output assignments in
+	for k, v := range request.Output_assignments {
+		for _, id := range v {
+			l := lkp[id]
+			for _, x := range l {
+				// x.Loc = k
+				// also need to remap the plate id
+				tx := strings.Split(k, ":")
+				x.Loc = remap[tx[0]] + ":" + tx[1]
+				logger.Track(fmt.Sprintf("OUTPUT ASSIGNMENT I=%s R=%s A=%s", id, x.ID, x.Loc))
+			}
+		}
+	}
 
 	return request
 }
@@ -242,7 +284,7 @@ func plateidarray(arr []*wtype.LHPlate) []string {
 // we have potentially added extra theoretical plates above
 // now we make real plates and swap them in
 
-func make_plates(request *LHRequest) {
+func make_plates(request *LHRequest) map[string]string {
 	remap := make(map[string]string)
 	for k, v := range request.LHInstructions {
 		_, skip := remap[v.PlateID]
@@ -261,6 +303,8 @@ func make_plates(request *LHRequest) {
 		}
 
 	}
+
+	return remap
 }
 
 func make_layouts(request *LHRequest, pc []PlateChoice) {

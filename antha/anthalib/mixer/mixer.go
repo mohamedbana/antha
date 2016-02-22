@@ -42,6 +42,7 @@ func SampleAll(l *wtype.LHComponent) *wtype.LHComponent {
 func Sample(l *wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
 	ret.ID = l.ID
+
 	l.AddDaughter(ret.ID)
 	if l.HasAnyParent() {
 		ret.ParentID = l.ParentID
@@ -205,14 +206,19 @@ func GenericMix(opt MixOptions) *wtype.LHInstruction {
 		r.Majorlayoutgroup = opt.PlateNum - 1
 	}
 
-	r.Result = wtype.NewLHComponent()
-
 	// We must respect the order in which things are mixed. The convention is
 	// that mix(X,Y) corresponds to "Add Y to X".
-	for idx, comp := range r.Components {
-		comp.Order = idx
-		r.Result.Mix(comp)
-	}
+	/*
+		-- this has already happened in execute.mix
+		for idx, comp := range r.Components {
+			comp.Order = idx
+			r.Result.Mix(comp)
+			r.Result.AddParent(comp.ID)
+			comp.AddDaughter(r.Result.ID)
+		}
+	*/
+
+	r.Result = opt.Result
 
 	return r
 }
