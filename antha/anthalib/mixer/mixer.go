@@ -187,6 +187,12 @@ func GenericMix(opt MixOptions) *wtype.LHInstruction {
 	}
 	r.Components = opt.Components
 
+	if opt.Result != nil {
+		r.Result = opt.Result
+	} else {
+		r.Result = wtype.NewLHComponent()
+	}
+
 	if opt.Destination != nil {
 		r.ContainerType = opt.Destination.Type
 		r.Platetype = opt.Destination.Type
@@ -217,8 +223,6 @@ func GenericMix(opt MixOptions) *wtype.LHInstruction {
 			comp.AddDaughter(r.Result.ID)
 		}
 	*/
-
-	r.Result = opt.Result
 
 	return r
 }
