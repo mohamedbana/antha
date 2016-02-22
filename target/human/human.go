@@ -47,27 +47,40 @@ func (a *Human) Compile(cmds []ast.Command) ([]target.Inst, error) {
 		return
 	}
 
-	// TODO bulk up moves and vectorize mixes
+	// TODO: parallelize and vectorize
+	entry := &target.Wait{}
+	exit := &target.Wait{}
+	var insts []target.Inst
 
-	var ret []target.Inst
+	insts = append(insts, entry)
+	exit.Depends = append(exit.Depends, entry)
+
 	for _, c := range cmds {
 		switch c := c.(type) {
 		case *ast.Move:
-			ret = append(ret, &target.Move{
-				Comps: extract(c),
+			insts = append(insts, &target.Manual{
+				Depends: []target.Inst{entry},
+				Details: fmt.Sprintf("MOVE %q", extract(c)),
+			})
+		case *ast.Mix:
+			insts = append(insts, &target.Manual{
+				Depends: []target.Inst{entry},
+				Details: fmt.Sprintf("MIX %q", c.Inst),
+			})
+		case *ast.Incubate:
+			insts = append(insts, &target.Manual{
+				Depends: []target.Inst{entry},
+				Details: fmt.Sprintf("INCUBATE %q", c),
 			})
 		default:
-			ret = append(ret, &target.Manual{
-				Details: fmt.Sprintf("%s", c),
-			})
+			return nil, fmt.Errorf("unknown command %T", c)
 		}
+		exit.Depends = append(exit.Depends, insts[len(insts)-1])
 	}
 
-	for i, n := 1, len(ret); i < n; i += 1 {
-		ret[i].SetDependsOn([]target.Inst{ret[i-1]})
-	}
+	insts = append(insts, exit)
 
-	return ret, nil
+	return insts, nil
 }
 
 type Opt struct {

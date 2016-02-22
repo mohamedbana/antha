@@ -204,8 +204,8 @@ func findBestMoveDevice(t *target.Target, from, to ast.Node, fromD, toD *drun) t
 }
 
 // NB(ddn): Could blindly add edges from insts to head, but would like
-// Compile() to be able to introduce instructions that don't depend on any
-// existing instructions
+// Compile() to be able to introduce instructions that just depend on the start
+// or end (or neither) of a device run.
 //
 // From:
 //   head: h
@@ -214,17 +214,19 @@ func findBestMoveDevice(t *target.Target, from, to ast.Node, fromD, toD *drun) t
 // To:
 //   h <- a <-... <- b <- t
 func splice(head, tail target.Inst, insts []target.Inst) {
-	if len(insts) == 0 && head != nil {
-		tail.SetDependsOn(append(tail.DependsOn(), head))
-	} else {
-		oldH := insts[0]
-		oldT := insts[len(insts)-1]
-		if head != nil {
-			oldH.SetDependsOn(append(oldH.DependsOn(), head))
+	if len(insts) == 0 {
+		if head != nil && tail != nil {
+			tail.SetDependsOn(append(tail.DependsOn(), head))
 		}
-		if tail != nil {
-			tail.SetDependsOn(append(tail.DependsOn(), oldT))
-		}
+		return
+	}
+	oldH := insts[0]
+	oldT := insts[len(insts)-1]
+	if head != nil {
+		oldH.SetDependsOn(append(oldH.DependsOn(), head))
+	}
+	if tail != nil {
+		tail.SetDependsOn(append(tail.DependsOn(), oldT))
 	}
 }
 
