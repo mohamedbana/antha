@@ -12,7 +12,7 @@ type Inst interface {
 	SetDependsOn([]Inst)
 }
 
-type MixInst struct {
+type Mix struct {
 	Dev        Device
 	Depends    []Inst
 	Request    *lh.LHRequest
@@ -20,68 +20,68 @@ type MixInst struct {
 	Files      []byte
 }
 
-func (a *MixInst) Device() Device {
+func (a *Mix) Device() Device {
 	return a.Dev
 }
 
-func (a *MixInst) DependsOn() []Inst {
+func (a *Mix) DependsOn() []Inst {
 	return a.Depends
 }
 
-func (a *MixInst) SetDependsOn(x []Inst) {
+func (a *Mix) SetDependsOn(x []Inst) {
 	a.Depends = x
 }
 
-type ManualInst struct {
+type Manual struct {
 	Dev     Device
 	Details string
 	Depends []Inst
 }
 
-func (a *ManualInst) DependsOn() []Inst {
+func (a *Manual) DependsOn() []Inst {
 	return a.Depends
 }
 
-func (a *ManualInst) Device() Device {
+func (a *Manual) Device() Device {
 	return a.Dev
 }
 
-func (a *ManualInst) SetDependsOn(x []Inst) {
+func (a *Manual) SetDependsOn(x []Inst) {
 	a.Depends = x
 }
 
 // Virtual instruction to hang dependencies on
-type WaitInst struct {
+type Wait struct {
 	Depends []Inst
 }
 
-func (a *WaitInst) Device() Device {
+func (a *Wait) Device() Device {
 	return nil
 }
 
-func (a *WaitInst) DependsOn() []Inst {
+func (a *Wait) DependsOn() []Inst {
 	return a.Depends
 }
 
-func (a *WaitInst) SetDependsOn(x []Inst) {
+func (a *Wait) SetDependsOn(x []Inst) {
 	a.Depends = x
 }
 
 // TODO: refine with more accurate representation
-type MoveToInst struct {
+type Move struct {
 	Dev     Device
 	Depends []Inst
 	Comps   []*wtype.LHComponent
 }
 
-func (a *MoveToInst) Device() Device {
+func (a *Move) Device() Device {
 	return a.Dev
 }
 
-func (a *MoveToInst) DependsOn() []Inst {
+func (a *Move) DependsOn() []Inst {
 	return a.Depends
 }
 
-func (a *MoveToInst) SetDependsOn(x []Inst) {
+func (a *Move) SetDependsOn(x []Inst) {
 	a.Depends = x
 }

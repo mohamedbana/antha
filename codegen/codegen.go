@@ -4,23 +4,21 @@
 package codegen
 
 import (
-	"errors"
 	"fmt"
 
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/ast"
 	"github.com/antha-lang/antha/graph"
 	"github.com/antha-lang/antha/target"
 )
 
-var (
-	tbd = errors.New("not yet implemented")
-)
-
+// Intermediate representation.
 type ir struct {
 	Root        ast.Node
-	Graph       graph.Graph
-	CommandTree graph.Graph // Tree of intrinsic (and potentially BundleExpr root)
+	Graph       *ast.Graph              // Graph of ast.Nodes
+	CommandTree graph.Graph             // Tree of ast.Commands (and potentially BundleExpr root)
+	DeviceDeps  graph.QGraph            // Dependencies of druns
+	assignment  map[ast.Node]*drun      // From Commands/Root to device runs
+	output      map[*drun][]target.Inst // Output of device-specific planners
 }
 
 // Run of a device.
@@ -28,18 +26,13 @@ type drun struct {
 	Device target.Device
 }
 
-type plan struct {
-	Assignment map[ast.Node]*drun      // ApplyExprs to device runs
-	Output     map[*drun][]target.Inst // Output of device-specific planners
-}
-
 // Assign runs of a device to each ApplyExpr. Construct initial plan by
 // by maximally coalescing ApplyExprs with the same device into the same
 // device run.
-func assignDevices(ir *ir, t *target.Target) (*plan, error) {
+func (a *ir) assignDevices(t *target.Target) error {
 	colors := make(map[ast.Node][]target.Device)
-	for i, inum := 0, ir.CommandTree.NumNodes(); i < inum; i += 1 {
-		n := ir.CommandTree.Node(i).(ast.Node)
+	for i, inum := 0, a.CommandTree.NumNodes(); i < inum; i += 1 {
+		n := a.CommandTree.Node(i).(ast.Node)
 		var reqs []ast.Request
 		if c, ok := n.(ast.Command); ok {
 			reqs = c.Requests()
@@ -59,8 +52,8 @@ func assignDevices(ir *ir, t *target.Target) (*plan, error) {
 	}
 
 	r, err := graph.PartitionTree(graph.PartitionTreeOpt{
-		Tree: ir.CommandTree,
-		Root: ir.Root,
+		Tree: a.CommandTree,
+		Root: a.Root,
 		Colors: func(n graph.Node) (r []int) {
 			for _, d := range colors[n.(ast.Node)] {
 				r = append(r, d2c[d])
@@ -72,7 +65,7 @@ func assignDevices(ir *ir, t *target.Target) (*plan, error) {
 		},
 	})
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	ret := make(map[ast.Node]target.Device)
@@ -80,16 +73,18 @@ func assignDevices(ir *ir, t *target.Target) (*plan, error) {
 		ret[n.(ast.Node)] = devices[idx]
 	}
 
-	return coalesceDevices(ir, ret), nil
+	a.coalesceDevices(ret)
+
+	return nil
 }
 
 // Coalesce adjacent devices into the same run of a device
-func coalesceDevices(ir *ir, device map[ast.Node]target.Device) *plan {
+func (a *ir) coalesceDevices(device map[ast.Node]target.Device) {
 	run := make(map[ast.Node]*drun)
 
 	kidRun := func(n ast.Node) *drun {
-		for i, inum := 0, ir.CommandTree.NumOuts(n); i < inum; i += 1 {
-			kid := ir.CommandTree.Out(n, i).(ast.Node)
+		for i, inum := 0, a.CommandTree.NumOuts(n); i < inum; i += 1 {
+			kid := a.CommandTree.Out(n, i).(ast.Node)
 			if device[kid] == device[n] {
 				return run[kid]
 			}
@@ -97,7 +92,7 @@ func coalesceDevices(ir *ir, device map[ast.Node]target.Device) *plan {
 		return nil
 	}
 
-	dag := graph.Schedule(graph.Reverse(ir.CommandTree))
+	dag := graph.Schedule(graph.Reverse(a.CommandTree))
 
 	for len(dag.Roots) > 0 {
 		var next []graph.Node
@@ -122,37 +117,53 @@ func coalesceDevices(ir *ir, device map[ast.Node]target.Device) *plan {
 		dag.Roots = next
 	}
 
-	return &plan{Assignment: run}
+	a.assignment = run
 }
 
-type instGen struct {
-	Ir        *ir
-	Plan      *plan
-	dg        graph.QGraph
-	insts     []target.Inst
-	dependsOn map[target.Inst][]target.Inst
-	entry     map[graph.Node]target.Inst
-	exit      map[graph.Node]target.Inst
-}
+// Run plan through device-specific planners. Adjust assignment based on
+// planner capabilities and return output.
+func (a *ir) tryPlan() error {
+	dg := graph.MakeQuotient(graph.MakeQuotientOpt{
+		Graph: a.CommandTree,
+		Colorer: func(n graph.Node) interface{} {
+			return a.assignment[n.(ast.Node)]
+		},
+	})
+	if err := graph.IsDag(dg); err != nil {
+		return fmt.Errorf("invalid assignment: %s", err)
+	}
 
-func (a *instGen) NumNodes() int {
-	return len(a.insts)
-}
+	// TODO: When initial assignment is not feasible for a device (e.g.,
+	// capacity constraints), split up run until feasible or give up.
 
-func (a *instGen) Node(i int) graph.Node {
-	return a.insts[i]
-}
+	// TODO: When splitting a mix sequence, adjust LHInstructions to place
+	// output samples on the same plate
 
-func (a *instGen) NumOuts(n graph.Node) int {
-	return len(a.dependsOn[n.(target.Inst)])
-}
+	cmds := make(map[*drun][]ast.Command)
+	for n, d := range a.assignment {
+		if c, ok := n.(ast.Command); !ok {
+			continue
+		} else {
+			cmds[d] = append(cmds[d], c)
+		}
+	}
 
-func (a *instGen) Out(n graph.Node, i int) graph.Node {
-	return a.dependsOn[n.(target.Inst)][i]
+	output := make(map[*drun][]target.Inst)
+	for d, cs := range cmds {
+		if insts, err := d.Device.Compile(cs); err != nil {
+			return err
+		} else {
+			output[d] = insts
+		}
+	}
+
+	a.output = output
+
+	return nil
 }
 
 // Find the components that connect from to to
-func (a *instGen) findComps(from, to ast.Node) ([]*ast.UseComp, error) {
+func findComps(g graph.Graph, from, to ast.Node) []*ast.UseComp {
 	findComp := func(u *ast.UseComp, t ast.Node) *ast.UseComp {
 		for _, v := range u.From {
 			if v == t {
@@ -163,129 +174,196 @@ func (a *instGen) findComps(from, to ast.Node) ([]*ast.UseComp, error) {
 	}
 
 	var comps []*ast.UseComp
-	for i, inum := 0, a.Ir.Graph.NumOuts(from); i < inum; i += 1 {
-		n := a.Ir.Graph.Out(from, i)
+	for i, inum := 0, g.NumOuts(to); i < inum; i += 1 {
+		n := g.Out(to, i)
 		if u, ok := n.(*ast.UseComp); !ok {
 			continue
-		} else if c := findComp(u, to); c == nil {
+		} else if c := findComp(u, from); c == nil {
 			continue
 		} else {
 			comps = append(comps, c)
 		}
 	}
-	return comps, nil
+	return comps
+}
+
+// Find best device to move a component between two devices
+func findBestMoveDevice(t *target.Target, from, to ast.Node, fromD, toD *drun) target.Device {
+	req := ast.Request{Move: &ast.Movement{}}
+	var minD target.Device
+	minC := -1
+
+	for _, d := range t.Can(req) {
+		c := toD.Device.MoveCost(d) + d.MoveCost(fromD.Device)
+		if minC == -1 || c < minC {
+			minC = c
+			minD = d
+		}
+	}
+	return minD
+}
+
+// NB(ddn): Could blindly add edges from insts to head, but would like
+// Compile() to be able to introduce instructions that don't depend on any
+// existing instructions
+//
+// From:
+//   head: h
+//   tail: t
+//   insts: [a <- ... <- b]
+// To:
+//   h <- a <-... <- b <- t
+func splice(head, tail target.Inst, insts []target.Inst) {
+	if len(insts) == 0 && head != nil {
+		tail.SetDependsOn(append(tail.DependsOn(), head))
+	} else {
+		oldH := insts[0]
+		oldT := insts[len(insts)-1]
+		if head != nil {
+			oldH.SetDependsOn(append(oldH.DependsOn(), head))
+		}
+		if tail != nil {
+			tail.SetDependsOn(append(tail.DependsOn(), oldT))
+		}
+	}
 }
 
 // Create move of dependencies if neccessary
-func (a *instGen) makeMove(run *drun, root graph.Node) (*target.MoveToInst, error) {
-	var comps []*wtype.LHComponent
-	for i, inum := 0, a.dg.NumOrigs(root); i < inum; i += 1 {
-		n := a.dg.Orig(root, i).(ast.Node)
-		for j, jnum := 0, a.Ir.CommandTree.NumOuts(n); j < jnum; j += 1 {
-			out := a.Ir.CommandTree.Out(n, j).(ast.Node)
-			if run == a.Plan.Assignment[out] {
+func (a *ir) addMove(t *target.Target, dnode graph.Node, run *drun) error {
+	rewrite := func(n ast.Node, cs []*ast.UseComp, move *ast.Move) {
+		m := make(map[ast.Node]bool)
+		for _, c := range cs {
+			m[c] = true
+		}
+		for i, inum := 0, a.Graph.NumOuts(n); i < inum; i += 1 {
+			out := a.Graph.Out(n, i).(ast.Node)
+			if m[out] {
+				a.Graph.SetOut(n, i, move)
+			}
+		}
+	}
+
+	newRuns := make(map[target.Device]*drun)
+	getRun := func(d target.Device) *drun {
+		r, ok := newRuns[d]
+		if !ok {
+			r = &drun{d}
+			newRuns[d] = r
+		}
+		return r
+	}
+
+	moves := make(map[target.Device][]ast.Command)
+	for i, inum := 0, a.DeviceDeps.NumOrigs(dnode); i < inum; i += 1 {
+		n := a.DeviceDeps.Orig(dnode, i).(ast.Node)
+		for j, jnum := 0, a.CommandTree.NumOuts(n); j < jnum; j += 1 {
+			out := a.CommandTree.Out(n, j).(ast.Node)
+			if run == a.assignment[out] {
 				continue
 			}
 			// Command has input dependence on a previous run
-			if cs, err := a.findComps(n, out); err != nil {
-				return nil, err
+			if cs := findComps(a.Graph, out, n); len(cs) == 0 {
+				return fmt.Errorf("cannot find component to move")
+			} else if dev := findBestMoveDevice(t, out, n, a.assignment[out], run); dev == nil {
+				return fmt.Errorf("cannot find any device to move inputs")
 			} else {
-				for _, c := range cs {
-					comps = append(comps, c.Value)
-				}
+				// Add move
+				m := &ast.Move{From: cs}
+				moves[dev] = append(moves[dev], m)
+				a.assignment[m] = getRun(dev)
+				rewrite(n, cs, m)
 			}
 		}
 	}
-	if len(comps) == 0 {
-		return nil, nil
+
+	if len(moves) == 0 {
+		return nil
 	}
-	return &target.MoveToInst{
-		Comps: comps,
-		Dev:   run.Device,
-	}, nil
+
+	var insts []target.Inst
+	head := &target.Wait{}
+	tail := &target.Wait{}
+	insts = append(insts, head, tail)
+
+	splice(head, tail, nil)
+	splice(tail, nil, a.output[run])
+
+	for dev, ms := range moves {
+		if ins, err := dev.Compile(ms); err != nil {
+			return nil
+		} else {
+			splice(head, tail, ins)
+			insts = append(insts, ins...)
+		}
+	}
+
+	a.output[run] = append(insts, a.output[run]...)
+	return nil
 }
 
-func (a *instGen) add(root graph.Node, run *drun, insts []target.Inst) error {
-	exit := &target.WaitInst{}
-	var entry target.Inst
-	if move, err := a.makeMove(run, root); err != nil {
+// Add implied moves between devices
+func (a *ir) addMoves(t *target.Target) error {
+	a.DeviceDeps = graph.MakeQuotient(graph.MakeQuotientOpt{
+		Graph: a.CommandTree,
+		Colorer: func(n graph.Node) interface{} {
+			return a.assignment[n.(ast.Node)]
+		},
+	})
+
+	order, err := graph.TopoSort(graph.TopoSortOpt{
+		Graph: a.DeviceDeps,
+	})
+	if err != nil {
 		return err
-	} else if move != nil {
-		entry = move
-	} else {
-		entry = &target.WaitInst{}
 	}
 
-	a.entry[root] = entry
-	a.exit[root] = exit
-	a.insts = append(a.insts, entry)
-	a.insts = append(a.insts, exit)
-	a.dependsOn[exit] = append(a.dependsOn[exit], entry)
-
-	for idx, in := range insts {
-		if idx == 0 {
-			a.dependsOn[in] = append(a.dependsOn[in], entry)
+	for _, n := range order {
+		if a.DeviceDeps.NumOrigs(n) == 0 {
+			return fmt.Errorf("no instructions for node %q", n)
 		}
-		if idx == len(insts)-1 {
-			a.dependsOn[exit] = append(a.dependsOn[exit], in)
-		}
-		a.insts = append(a.insts, in)
-		for _, v := range in.DependsOn() {
-			a.dependsOn[in] = append(a.dependsOn[in], v)
+		someNode := a.DeviceDeps.Orig(n, 0).(ast.Node)
+		run := a.assignment[someNode]
+		if err := a.addMove(t, n, run); err != nil {
+			return err
 		}
 	}
 
 	return nil
 }
 
-func (a *instGen) Run() ([]target.Inst, error) {
-	a.entry = make(map[graph.Node]target.Inst)
-	a.exit = make(map[graph.Node]target.Inst)
-	a.dependsOn = make(map[target.Inst][]target.Inst)
-
-	a.dg = graph.MakeQuotient(graph.MakeQuotientOpt{
-		Graph: a.Ir.CommandTree,
-		Colorer: func(n graph.Node) interface{} {
-			return a.Plan.Assignment[n.(ast.Node)]
-		},
-	})
-
-	order, err := graph.TopoSort(graph.TopoSortOpt{
-		Graph: a.dg,
-	})
-	if err != nil {
-		return nil, err
+// Lower plan to instructions
+func (a *ir) genInsts() ([]target.Inst, error) {
+	ig := &instGraph{
+		entry:     make(map[graph.Node]target.Inst),
+		exit:      make(map[graph.Node]target.Inst),
+		dependsOn: make(map[target.Inst][]target.Inst),
 	}
 
-	// Add generated instructions along with any required moves
-	for _, n := range order {
-		if a.dg.NumOrigs(n) == 0 {
-			return nil, fmt.Errorf("no instructions for node %q", n)
-		}
-		someNode := a.dg.Orig(n, 0).(ast.Node)
-		run := a.Plan.Assignment[someNode]
-		insts := a.Plan.Output[run]
-		if err := a.add(n, run, insts); err != nil {
-			return nil, err
-		}
+	// Insert instructions
+	for i, inum := 0, a.DeviceDeps.NumNodes(); i < inum; i += 1 {
+		n := a.DeviceDeps.Node(i)
+		someNode := a.DeviceDeps.Orig(n, 0).(ast.Node)
+		run := a.assignment[someNode]
+		insts := a.output[run]
+		ig.addInsts(n, insts)
 	}
 
 	// Add tree edges
-	for i, inum := 0, a.dg.NumNodes(); i < inum; i += 1 {
-		n := a.dg.Node(i)
-		nentry := a.entry[n]
-		for j, jnum := 0, a.dg.NumOuts(n); j < jnum; j += 1 {
-			dst := a.dg.Out(n, j)
-			dexit := a.exit[dst]
-			a.dependsOn[nentry] = append(a.dependsOn[nentry], dexit)
+	for i, inum := 0, a.DeviceDeps.NumNodes(); i < inum; i += 1 {
+		n := a.DeviceDeps.Node(i)
+		nentry := ig.entry[n]
+		for j, jnum := 0, a.DeviceDeps.NumOuts(n); j < jnum; j += 1 {
+			dst := a.DeviceDeps.Out(n, j)
+			dexit := ig.exit[dst]
+			ig.dependsOn[nentry] = append(ig.dependsOn[nentry], dexit)
 		}
 	}
 
 	// Remove synthetic nodes and redundant edges
 	sg, err := graph.TransitiveReduction(graph.Eliminate(graph.EliminateOpt{
-		Graph: a,
+		Graph: ig,
 		In: func(n graph.Node) bool {
-			if _, isWait := n.(*target.WaitInst); isWait {
+			if _, isWait := n.(*target.Wait); isWait {
 				return false
 			}
 			return true
@@ -296,7 +374,7 @@ func (a *instGen) Run() ([]target.Inst, error) {
 	}
 
 	// Cleanup dependencies
-	order, err = graph.TopoSort(graph.TopoSortOpt{
+	order, err := graph.TopoSort(graph.TopoSortOpt{
 		Graph: sg,
 	})
 	if err != nil {
@@ -319,58 +397,65 @@ func (a *instGen) Run() ([]target.Inst, error) {
 	return insts, nil
 }
 
-// Lower plan to instructions: add manual moves between devices and update
-// original IR nodes for incremental compiles
-func genInsts(ir *ir, p *plan) ([]target.Inst, error) {
-	gen := &instGen{
-		Ir:   ir,
-		Plan: p,
-	}
-	// XXX set outputs
-	return gen.Run()
-}
-
-// Run plan through device-specific planners. Adjust assignment based on
-// planner capabilities and return output.
-func tryPlan(ir *ir, p *plan) (*plan, error) {
-	dg := graph.MakeQuotient(graph.MakeQuotientOpt{
-		Graph: ir.CommandTree,
-		Colorer: func(n graph.Node) interface{} {
-			return p.Assignment[n.(ast.Node)]
-		},
-	})
-	if err := graph.IsDag(dg); err != nil {
-		return nil, fmt.Errorf("invalid assignment: %s", err)
-	}
-
-	// TODO: When initial assignment is not feasible for a device (e.g.,
-	// capacity constraints), split up run until feasible or give up.
-
-	// TODO: When splitting a mix sequence, adjust LHInstructions to place
-	// output samples on the same plate
-
-	cmds := make(map[*drun][]ast.Command)
-	for n, d := range p.Assignment {
+// Mark nodes as compiled
+func (a *ir) setOutputs() error {
+	for _, n := range a.Graph.Nodes {
 		if c, ok := n.(ast.Command); !ok {
 			continue
-		} else {
-			cmds[d] = append(cmds[d], c)
+		} else if c.Output() != nil {
+			continue
+		} else if run := a.assignment[c]; run != nil {
+			c.SetOutput(run)
 		}
 	}
+	return nil
+}
 
-	output := make(map[*drun][]target.Inst)
-	for d, cs := range cmds {
-		if insts, err := d.Device.Compile(cs); err != nil {
-			return nil, err
-		} else {
-			output[d] = insts
+// Dependencies between target instructions
+type instGraph struct {
+	insts     []target.Inst
+	dependsOn map[target.Inst][]target.Inst
+	entry     map[graph.Node]target.Inst
+	exit      map[graph.Node]target.Inst
+}
+
+func (a *instGraph) NumNodes() int {
+	return len(a.insts)
+}
+
+func (a *instGraph) Node(i int) graph.Node {
+	return a.insts[i]
+}
+
+func (a *instGraph) NumOuts(n graph.Node) int {
+	return len(a.dependsOn[n.(target.Inst)])
+}
+
+func (a *instGraph) Out(n graph.Node, i int) graph.Node {
+	return a.dependsOn[n.(target.Inst)][i]
+}
+
+func (a *instGraph) addInsts(root graph.Node, insts []target.Inst) {
+	exit := &target.Wait{}
+	entry := &target.Wait{}
+
+	a.entry[root] = entry
+	a.exit[root] = exit
+	a.insts = append(a.insts, entry, exit)
+	a.dependsOn[exit] = append(a.dependsOn[exit], entry)
+
+	for idx, in := range insts {
+		if idx == 0 {
+			a.dependsOn[in] = append(a.dependsOn[in], entry)
+		}
+		if idx == len(insts)-1 {
+			a.dependsOn[exit] = append(a.dependsOn[exit], in)
+		}
+		a.insts = append(a.insts, in)
+		for _, v := range in.DependsOn() {
+			a.dependsOn[in] = append(a.dependsOn[in], v)
 		}
 	}
-
-	return &plan{
-		Assignment: p.Assignment,
-		Output:     output,
-	}, nil
 }
 
 // Compile an expression program into a sequence of instructions for a target
@@ -386,12 +471,16 @@ func Compile(t *target.Target, roots []ast.Node) ([]target.Inst, error) {
 		return nil, fmt.Errorf("invalid program: %s", err)
 	} else if ir, err := build(root); err != nil {
 		return nil, fmt.Errorf("invalid program: %s", err)
-	} else if plan, err := assignDevices(ir, t); err != nil {
+	} else if err := ir.assignDevices(t); err != nil {
 		return nil, fmt.Errorf("error assigning devices: %s", err)
-	} else if plan, err := tryPlan(ir, plan); err != nil {
+	} else if err := ir.tryPlan(); err != nil {
 		return nil, fmt.Errorf("error planning: %s", err)
-	} else if insts, err := genInsts(ir, plan); err != nil {
+	} else if err := ir.addMoves(t); err != nil {
+		return nil, fmt.Errorf("error adding moves: %s", err)
+	} else if insts, err := ir.genInsts(); err != nil {
 		return nil, fmt.Errorf("error generating instructions: %s", err)
+	} else if err := ir.setOutputs(); err != nil {
+		return nil, fmt.Errorf("error setting outputs: %s", err)
 	} else {
 		return insts, nil
 	}

@@ -118,6 +118,30 @@ func (a *Bundle) NodeString() string {
 	return ""
 }
 
+// Low-level move instruction
+type Move struct {
+	From     []*UseComp
+	FromLocs []Location
+	ToLocs   []Location
+	Out      interface{}
+}
+
+func (a *Move) Requests() []Request {
+	return nil
+}
+
+func (a *Move) Output() interface{} {
+	return a.Out
+}
+
+func (a *Move) SetOutput(x interface{}) {
+	a.Out = x
+}
+
+func (a *Move) NodeString() string {
+	return ""
+}
+
 // View AST as a graph
 type Graph struct {
 	Nodes     []Node
@@ -147,6 +171,23 @@ func notNil(n Node) bool {
 	return n != nil
 }
 
+func setOut(n Node, i, deps int, x Node) {
+	switch n := n.(type) {
+	case *UseComp:
+		n.From[i] = x
+	case *Bundle:
+		n.From[i] = x
+	case *Mix:
+		n.From[i] = x
+	case *Incubate:
+		n.From[i] = x
+	case *Move:
+		n.From[i] = x.(*UseComp)
+	default:
+		panic(fmt.Sprintf("ast.setOut: unknown node type %T", n))
+	}
+}
+
 func getOut(n Node, i, deps int) Node {
 	switch n := n.(type) {
 	case *UseComp:
@@ -157,8 +198,10 @@ func getOut(n Node, i, deps int) Node {
 		return n.From[i]
 	case *Incubate:
 		return n.From[i]
+	case *Move:
+		return n.From[i]
 	default:
-		panic(fmt.Sprintf("codegen.getOut: unknown node type %T", n))
+		panic(fmt.Sprintf("ast.getOut: unknown node type %T", n))
 	}
 }
 
@@ -173,8 +216,10 @@ func numOuts(n Node, deps int) int {
 		return len(n.From)
 	case *Incubate:
 		return len(n.From)
+	case *Move:
+		return len(n.From)
 	default:
-		panic(fmt.Sprintf("codegen.numOuts: unknown node type %T", n))
+		panic(fmt.Sprintf("ast.numOuts: unknown node type %T", n))
 	}
 }
 
@@ -184,6 +229,10 @@ func (a *Graph) NumOuts(n graph.Node) int {
 
 func (a *Graph) Out(n graph.Node, i int) graph.Node {
 	return getOut(n.(Node), i, a.whichDeps)
+}
+
+func (a *Graph) SetOut(n Node, i int, x Node) {
+	setOut(n.(Node), a.whichDeps, i, x)
 }
 
 type ToGraphOpt struct {

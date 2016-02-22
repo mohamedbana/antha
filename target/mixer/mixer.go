@@ -35,6 +35,9 @@ func (a *Mixer) Can(req ast.Request) bool {
 	if req.Temp != nil {
 		return false
 	}
+	if req.Move != nil {
+		return false
+	}
 	// TODO: Add specific volume constraints
 	return req.MixVol != nil
 }
@@ -43,7 +46,7 @@ func (a *Mixer) MoveCost(from target.Device) int {
 	if from == a {
 		return 0
 	}
-	return human.HumanByXCost - 1
+	return human.HumanByXCost + 1
 }
 
 func (a *Mixer) makeReq() (*lh.LHRequest, *lh.Liquidhandler) {
@@ -130,10 +133,10 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 
 	planner.MakeSolutions(req)
 
-	return &target.MixInst{
+	return &target.Mix{
 		Request:    req,
 		Properties: a.properties,
-		Files:      nil, // XXX
+		Files:      nil, // TODO: add data when grpc driver supports it
 	}, nil
 }
 

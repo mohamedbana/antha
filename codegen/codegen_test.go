@@ -20,7 +20,7 @@ func (a *incubator) Can(req ast.Request) bool {
 
 func (a *incubator) Compile(insts []ast.Command) ([]target.Inst, error) {
 	return []target.Inst{
-		&target.ManualInst{
+		&target.Manual{
 			Details: "hello",
 		},
 	}, nil
@@ -69,13 +69,13 @@ func TestWellFormed(t *testing.T) {
 	}
 
 	machine := target.New()
-	machine.AddDevice(human.New())
+	machine.AddDevice(human.New(human.Opt{CanMix: true}))
 	machine.AddDevice(&incubator{})
 
 	if insts, err := Compile(machine, nodes); err != nil {
 		t.Fatal(err)
 	} else {
-		// XXX
+		// XXX check output
 		for _, in := range insts {
 			fmt.Printf("  %T %+v\n", in, in)
 		}

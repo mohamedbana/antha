@@ -3,6 +3,7 @@ package human
 import (
 	"fmt"
 
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/ast"
 	"github.com/antha-lang/antha/target"
 )
@@ -39,12 +40,31 @@ func (a *Human) String() string {
 }
 
 func (a *Human) Compile(cmds []ast.Command) ([]target.Inst, error) {
+	extract := func(m *ast.Move) (r []*wtype.LHComponent) {
+		for _, u := range m.From {
+			r = append(r, u.Value)
+		}
+		return
+	}
+
+	// TODO bulk up moves and vectorize mixes
+
 	var ret []target.Inst
-	// XXX
 	for _, c := range cmds {
-		ret = append(ret, &target.ManualInst{
-			Details: fmt.Sprintf("%s", c),
-		})
+		switch c := c.(type) {
+		case *ast.Move:
+			ret = append(ret, &target.Move{
+				Comps: extract(c),
+			})
+		default:
+			ret = append(ret, &target.Manual{
+				Details: fmt.Sprintf("%s", c),
+			})
+		}
+	}
+
+	for i, n := 1, len(ret); i < n; i += 1 {
+		ret[i].SetDependsOn([]target.Inst{ret[i-1]})
 	}
 
 	return ret, nil
