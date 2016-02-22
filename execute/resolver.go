@@ -5,9 +5,9 @@ import (
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/ast"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/codegen"
 	"github.com/antha-lang/antha/target"
-	"golang.org/x/net/context"
 )
 
 // Converts execute instructions to their ast equivalents
