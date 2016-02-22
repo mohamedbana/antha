@@ -1,13 +1,28 @@
 package codegen
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/antha-lang/antha/ast"
 	"github.com/antha-lang/antha/target"
 	"github.com/antha-lang/antha/target/human"
 )
+
+type incubateInst struct {
+	Depends []target.Inst
+}
+
+func (a *incubateInst) Device() target.Device {
+	return nil
+}
+
+func (a *incubateInst) DependsOn() []target.Inst {
+	return a.Depends
+}
+
+func (a *incubateInst) SetDependsOn(xs []target.Inst) {
+	a.Depends = xs
+}
 
 type incubator struct{}
 
@@ -19,11 +34,7 @@ func (a *incubator) Can(req ast.Request) bool {
 }
 
 func (a *incubator) Compile(insts []ast.Command) ([]target.Inst, error) {
-	return []target.Inst{
-		&target.Manual{
-			Details: "hello",
-		},
-	}, nil
+	return []target.Inst{&incubateInst{}}, nil
 }
 
 func (a *incubator) MoveCost(from target.Device) int {
@@ -74,10 +85,11 @@ func TestWellFormed(t *testing.T) {
 
 	if insts, err := Compile(machine, nodes); err != nil {
 		t.Fatal(err)
-	} else {
-		// XXX check output
-		for _, in := range insts {
-			fmt.Printf("  %T %+v\n", in, in)
-		}
+	} else if l := len(insts); l == 0 {
+		t.Errorf("expected > %d instructions found %d", 0, l)
+	} else if last, ok := insts[l-1].(*incubateInst); !ok {
+		t.Errorf("expected incubateInst found %T", insts[l-1])
+	} else if n := len(last.Depends); n != 4 {
+		t.Errorf("expected %d dependencies found %d", 4, n)
 	}
 }

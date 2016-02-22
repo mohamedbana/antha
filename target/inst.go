@@ -1,7 +1,6 @@
 package target
 
 import (
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	lh "github.com/antha-lang/antha/microArch/scheduler/liquidhandling"
 )
@@ -64,24 +63,5 @@ func (a *Wait) DependsOn() []Inst {
 }
 
 func (a *Wait) SetDependsOn(x []Inst) {
-	a.Depends = x
-}
-
-// TODO: refine with more accurate representation
-type Move struct {
-	Dev     Device
-	Depends []Inst
-	Comps   []*wtype.LHComponent
-}
-
-func (a *Move) Device() Device {
-	return a.Dev
-}
-
-func (a *Move) DependsOn() []Inst {
-	return a.Depends
-}
-
-func (a *Move) SetDependsOn(x []Inst) {
 	a.Depends = x
 }
