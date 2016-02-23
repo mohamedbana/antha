@@ -79,7 +79,7 @@ func _SDSprepSteps(_ctx context.Context, _input *SDSprepInput, _output *SDSprepO
 
 	//Denature the load mixture at specified temperature and time ie 95oC for 5min
 	//	Step2
-	execute.Incubate(_ctx, _output.LoadSample, _input.DenatureTemp, _input.DenatureTime, false)
+	_output.LoadSample = execute.Incubate(_ctx, _output.LoadSample, _input.DenatureTemp, _input.DenatureTime, false)
 
 	//Load the water in EPAGE gel wells
 	//	Step3

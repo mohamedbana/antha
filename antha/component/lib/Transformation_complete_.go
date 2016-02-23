@@ -49,10 +49,9 @@ func _Transformation_completeSetup(_ctx context.Context, _input *Transformation_
 func _Transformation_completeSteps(_ctx context.Context, _input *Transformation_completeInput, _output *Transformation_completeOutput) {
 	competentcells := make([]*wtype.LHComponent, 0)
 	competentcells = append(competentcells, _input.CompetentCells)
-	readycompetentcells := execute.MixInto(_ctx, _input.OutPlate, "", competentcells...)             // readycompetentcells IS now a LHComponent
-	execute.Incubate(_ctx, readycompetentcells, _input.Preplasmidtemp, _input.Preplasmidtime, false) // we can incubate an LHComponent so this is fine
+	readycompetentcells := execute.MixInto(_ctx, _input.OutPlate, "", competentcells...) // readycompetentcells IS now a LHComponent
 
-	readycompetentcellsComp := readycompetentcells
+	readycompetentcellsComp := execute.Incubate(_ctx, readycompetentcells, _input.Preplasmidtemp, _input.Preplasmidtime, false) // we can incubate an LHComponent so this is fine
 
 	competetentcellmix := mixer.Sample(readycompetentcellsComp, _input.CompetentCellvolumeperassembly) // ERROR! mixer.Sample needs a liquid, not an LHComponent! however, the typeIIs method worked with a *wtype.LHComponent from inputs!
 	transformationmix := make([]*wtype.LHComponent, 0)
@@ -62,9 +61,7 @@ func _Transformation_completeSteps(_ctx context.Context, _input *Transformation_
 
 	transformedcells := execute.MixInto(_ctx, _input.OutPlate, "", transformationmix...)
 
-	execute.Incubate(_ctx, transformedcells, _input.Postplasmidtemp, _input.Postplasmidtime, false)
-
-	transformedcellsComp := transformedcells
+	transformedcellsComp := execute.Incubate(_ctx, transformedcells, _input.Postplasmidtemp, _input.Postplasmidtime, false)
 
 	recoverymix := make([]*wtype.LHComponent, 0)
 	recoverymixture := mixer.Sample(_input.Recoverymedium, _input.Recoveryvolume)
@@ -73,9 +70,7 @@ func _Transformation_completeSteps(_ctx context.Context, _input *Transformation_
 	recoverymix = append(recoverymix, recoverymixture)
 	recoverymix2 := execute.MixInto(_ctx, _input.OutPlate, "", recoverymix...)
 
-	execute.Incubate(_ctx, recoverymix2, _input.Recoverytemp, _input.Recoverytime, true)
-
-	recoverymix2Comp := recoverymix2
+	recoverymix2Comp := execute.Incubate(_ctx, recoverymix2, _input.Recoverytemp, _input.Recoverytime, true)
 
 	plateout := mixer.Sample(recoverymix2Comp, _input.Plateoutvolume) // ERROR! recoverymix2 is now an LHComponent, not a liquid, so can't be used here
 	platedculture := execute.MixInto(_ctx, _input.AgarPlate, "", plateout)
