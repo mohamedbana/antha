@@ -49,9 +49,7 @@ Steps {
 	
 	transformedcells := MixInto(OutPlate, "", transformationmix...)
 	
-	Incubate (transformedcells, Postplasmidtemp, Postplasmidtime,false)
-
-	Transformedcells = transformedcells
+	Transformedcells = Incubate (transformedcells, Postplasmidtemp, Postplasmidtime,false)
 
 }
 

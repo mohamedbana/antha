@@ -42,11 +42,8 @@ Steps {
 	competentcellsample := mixer.Sample(CompetentCells,CompetentCellvolumeperassembly)
 	competentcells = append(competentcells,competentcellsample)
 	readycompetentcells := MixInto(OutPlate, "", competentcells...)  
-	Incubate (readycompetentcells,Preplasmidtemp, Preplasmidtime, false) 
 	
-	ReadyCompCells = readycompetentcells
-
-
+	ReadyCompCells = Incubate (readycompetentcells,Preplasmidtemp, Preplasmidtime, false)
 }
 
 // Run after controls and a steps block are completed to

@@ -56,9 +56,7 @@ Steps {
 	recoverymix = append(recoverymix,transformedcellsComp)
 	recoverymix2 := MixInto(OutPlate, "", recoverymix...)
 	
-	Incubate (recoverymix2,  Recoverytemp, Recoverytime, true)
-	
-	RecoveredCells = recoverymix2
+	RecoveredCells = Incubate (recoverymix2,  Recoverytemp, Recoverytime, true)
 	
 }
 
