@@ -66,9 +66,8 @@ Steps {
 	competentcells := make([]*wtype.LHComponent,0)
 	competentcells = append(competentcells,CompetentCells)
 	readycompetentcells := MixInto(OutPlate, "", competentcells...)  // readycompetentcells IS now a LHComponent
-	Incubate (readycompetentcells,Preplasmidtemp, Preplasmidtime, false) // we can incubate an LHComponent so this is fine
 	
-	readycompetentcellsComp := readycompetentcells
+	readycompetentcellsComp := Incubate (readycompetentcells,Preplasmidtemp, Preplasmidtime, false) // we can incubate an LHComponent so this is fine
 	
 	competetentcellmix := mixer.Sample(readycompetentcellsComp, CompetentCellvolumeperassembly) // ERROR! mixer.Sample needs a liquid, not an LHComponent! however, the typeIIs method worked with a *wtype.LHComponent from inputs!
 	transformationmix := make([]*wtype.LHComponent, 0)
@@ -78,9 +77,8 @@ Steps {
 	
 	transformedcells := MixInto(OutPlate, "" ,  transformationmix...)
 	
-	Incubate (transformedcells, Postplasmidtemp, Postplasmidtime,false)
 
-	transformedcellsComp := transformedcells
+	transformedcellsComp := Incubate (transformedcells, Postplasmidtemp, Postplasmidtime,false)
 
 	recoverymix := make([]*wtype.LHComponent, 0)
 	recoverymixture := mixer.Sample(Recoverymedium, Recoveryvolume)
@@ -89,9 +87,8 @@ Steps {
 	recoverymix = append(recoverymix,recoverymixture)
 	recoverymix2 := MixInto(OutPlate, "", recoverymix...)
 	
-	Incubate (recoverymix2,  Recoverytemp, Recoverytime, true)
 	
-	recoverymix2Comp :=recoverymix2
+	recoverymix2Comp := Incubate (recoverymix2,  Recoverytemp, Recoverytime, true)
 	
 	plateout := mixer.Sample(recoverymix2Comp, Plateoutvolume) // ERROR! recoverymix2 is now an LHComponent, not a liquid, so can't be used here
 	platedculture := MixInto(AgarPlate, "",  plateout)

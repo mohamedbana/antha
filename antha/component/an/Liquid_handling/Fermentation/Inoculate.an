@@ -37,7 +37,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Inoculated_culture *wtype.LHSolution
+	Inoculated_culture *wtype.LHComponent
 )
 
 Requirements {
@@ -53,7 +53,7 @@ Steps {
 	
 	media_with_antibiotic := Media
 	//media_with_antibiotic := mixer.Mix(mixer.Sample(Antibiotic,antibiotic_volume), mixer.Sample(Media,Media_volume))
-	Inoculated_culture = MixInto(OutPlate,mixer.Sample(Seed,Seed_volume), mixer.Sample(media_with_antibiotic,Media_volume))
+	Inoculated_culture = MixInto(OutPlate, "", mixer.Sample(Seed,Seed_volume), mixer.Sample(media_with_antibiotic,Media_volume))
 }
 //should the transfer to thermomixer/incubator command be included in this protocol or in a separate protocol 
 Analysis {

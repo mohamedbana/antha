@@ -1,16 +1,13 @@
 // Package target provides the construction of a target machine from a
-// collection of equipment
+// collection of devices
 package target
 
 import (
 	"errors"
+
+	"github.com/antha-lang/antha/ast"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
-	"github.com/antha-lang/antha/microArch/equipment"
 )
-
-// TODO(ddn): Move equipment.Equipment here
-
-// TODO(ddn): Add target instruction description
 
 var (
 	noLh     = errors.New("no liquid handler found")
@@ -34,26 +31,31 @@ func WithTarget(parent context.Context, t *Target) context.Context {
 }
 
 // Target machine for execution.
-//
-// NB(ddn): API is in flux while the abstractions for targets are being worked
-// out (29-01-2016).
 type Target struct {
-	equips []equipment.Equipment
+	devices []Device
 }
 
 func New() *Target {
-	// TODO(ddn): Add Generic Manual Equipment
 	return &Target{}
 }
 
-func (a *Target) AddLiquidHandler(e equipment.Equipment) error {
-	a.equips = append(a.equips, e)
-	return nil
+func (a *Target) can(d Device, reqs ...ast.Request) bool {
+	for _, req := range reqs {
+		if !d.Can(req) {
+			return false
+		}
+	}
+	return true
+}
+func (a *Target) Can(reqs ...ast.Request) (r []Device) {
+	for _, d := range a.devices {
+		if a.can(d, reqs...) {
+			r = append(r, d)
+		}
+	}
+	return
 }
 
-func (a *Target) GetLiquidHandler() (equipment.Equipment, error) {
-	if len(a.equips) == 0 {
-		return nil, noLh
-	}
-	return a.equips[0], nil
+func (a *Target) AddDevice(d Device) {
+	a.devices = append(a.devices, d)
 }

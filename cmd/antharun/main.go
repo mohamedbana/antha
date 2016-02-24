@@ -26,13 +26,15 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"os"
+
 	"github.com/antha-lang/antha/antha/component/lib"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/target"
-	"io/ioutil"
-	"os"
+	"github.com/antha-lang/antha/target/mixer"
 )
 
 const (
@@ -56,55 +58,62 @@ func makeContext() (context.Context, error) {
 	return ctx, nil
 }
 
-type opts struct {
+type opt struct {
 	Frontend       string
 	DriverURI      string
 	ParametersFile string
 	WorkflowFile   string
-	Config         *execute.Config
+	MixerOpt       *mixer.Opt
 }
 
-func runOne(opts opts) error {
+func runOne(opt opt) error {
+	wdata, err := ioutil.ReadFile(opt.WorkflowFile)
+	if err != nil {
+		return err
+	}
+
+	pdata, err := ioutil.ReadFile(opt.ParametersFile)
+	if err != nil {
+		return err
+	}
+
+	wdesc, params, err := tryExpand(wdata, pdata)
+	if err != nil {
+		return err
+	}
+
+	mixerOpt := mixer.DefaultOpt.Merge(params.Config).Merge(opt.MixerOpt)
 	t := target.New()
-	fe, err := NewFrontend(Options{
-		Kind:   opts.Frontend,
-		Target: t,
-		URI:    opts.DriverURI,
+	fe, err := NewFrontend(FrontendOpt{
+		Kind:     opt.Frontend,
+		MixerOpt: mixerOpt,
+		Target:   t,
+		URI:      opt.DriverURI,
 	})
 	if err != nil {
 		return err
 	}
 	defer fe.Shutdown()
 
-	wdata, err := ioutil.ReadFile(opts.WorkflowFile)
-	if err != nil {
-		return err
-	}
-
-	pdata, err := ioutil.ReadFile(opts.ParametersFile)
-	if err != nil {
-		return err
-	}
-
-	wdesc, params, err := tryExpand(wdata, pdata)
-
 	ctx, err := makeContext()
 	if err != nil {
 		return err
 	}
 
-	w, err := execute.Run(ctx, execute.Options{
+	rout, err := execute.Run(ctx, execute.Options{
 		Target:   t,
 		Workflow: wdesc,
 		Params:   params,
-		Config:   opts.Config,
 	})
 	if err != nil {
 		return err
 	}
 
-	for k, v := range w.Outputs {
+	for k, v := range rout.Workflow.Outputs {
 		fmt.Printf("%s: %s\n", k, v)
+	}
+	for _, inst := range rout.Insts {
+		fmt.Println(inst)
 	}
 
 	return nil
@@ -191,7 +200,6 @@ func run() error {
 	maxPlates := flag.String("maxPlates", "", "maximum number of plates")
 	maxWells := flag.String("maxWells", "", "maximum number of wells on a plate")
 	residualVolumeWeight := flag.String("residualVolumeWeight", "", "")
-	wellByWell := flag.String("wellByWell", "", "use well-by-well planner")
 	inputPlateType := flag.String("inputPlateType", "", "default input plate type to use")
 	outputPlateType := flag.String("outputPlateType", "", "default output plate to use")
 
@@ -206,24 +214,23 @@ func run() error {
 		return nil
 	}
 
-	makeConfig := func() (cd *execute.Config, err error) {
+	makeOpt := func() (cd *mixer.Opt, err error) {
 		defer func() {
 			if res := recover(); res != nil {
 				err = fmt.Errorf("%s", res)
 			}
 		}()
-		cd = &execute.Config{
+		cd = &mixer.Opt{
 			MaxPlates:            parseFloat(maxPlates),
 			MaxWells:             parseFloat(maxWells),
 			ResidualVolumeWeight: parseFloat(residualVolumeWeight),
 			InputPlateType:       parseStringSlice(inputPlateType),
 			OutputPlateType:      parseStringSlice(outputPlateType),
-			WellByWell:           parseBool(wellByWell),
 		}
 		return
 	}
 
-	config, err := makeConfig()
+	mixerOpt, err := makeOpt()
 	if err != nil {
 		return err
 	}
@@ -263,12 +270,12 @@ func run() error {
 		*frontend = REMOTE
 	}
 
-	if err := runOne(opts{
+	if err := runOne(opt{
 		Frontend:       *frontend,
 		DriverURI:      *driver,
 		ParametersFile: *parametersFile,
 		WorkflowFile:   *workflowFile,
-		Config:         config,
+		MixerOpt:       mixerOpt,
 	}); err != nil {
 		return err
 	}

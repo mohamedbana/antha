@@ -86,12 +86,10 @@ Steps {
 		samples = append(samples, enzSample)
 	}
 
-	Reaction = MixInto(OutPlate, "",samples...)
-
 	// incubate the reaction mixture
-	Incubate(Reaction, ReactionTemp, ReactionTime, false)
+	r1 := Incubate(MixInto(OutPlate, "",samples...), ReactionTemp, ReactionTime, false)
 	// inactivate
-	Incubate(Reaction, InactivationTemp, InactivationTime, false)
+	Reaction = Incubate(r1, InactivationTemp, InactivationTime, false)
 }
 
 // Run after controls and a steps block are completed to

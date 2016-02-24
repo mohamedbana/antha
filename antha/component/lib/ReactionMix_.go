@@ -42,10 +42,8 @@ func _ReactionMixSteps(_ctx context.Context, _input *ReactionMixInput, _output *
 	samples = append(samples, VectorS, BufferS, LigaseS, ATPS, RES, WaterS)
 	samples = append(samples, ComponentsS...)
 
-	_output.Reaction = mixer.MixInto(_input.OutPlate, "", samples...)
-
 	// Incubate
-	execute.Incubate(_ctx, _output.Reaction, _input.ReactionTemp, _input.ReactionTime, false)
+	_output.Reaction = execute.Incubate(_ctx, mixer.MixInto(_input.OutPlate, "", samples...), _input.ReactionTemp, _input.ReactionTime, false)
 
 }
 

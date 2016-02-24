@@ -9,14 +9,13 @@ var (
 	missingColors = errors.New("missing color")
 )
 
-// TODO(ddn): Add option to use greedy algorithm based off of shortest paths (?)
-
 type PartitionTreeOpt struct {
-	Tree    Graph
-	Root    Node
-	Colors  func(n Node) []int // Possible colors n may take; all nodes in graph must have at least one color
-	Weights func(a, b int) int // Weight between a and b (non-negative); depth(a) < depth(b)
-	exact   bool
+	Tree       Graph
+	Root       Node
+	Colors     func(n Node) []int // Possible colors n may take; all nodes in graph must have at least one color
+	EdgeWeight func(a, b int) int // Weight between a and b (non-negative); depth(a) < depth(b)
+	NodeWeight func(a int) int    // Weight of a
+	exact      bool
 }
 
 type TreePartition struct {
@@ -50,20 +49,20 @@ func PartitionTree(opt PartitionTreeOpt) (*TreePartition, error) {
 }
 
 type partitionTree struct {
-	weights map[struct{ A, B int }]int
-	colors  map[Node][]int
+	edgeWeight map[struct{ A, B int }]int
+	colors     map[Node][]int
 }
 
 // Cache results of weight function. We'll be calling it a lot.
 func (a *partitionTree) getW(opt PartitionTreeOpt, x, y int) int {
-	if a.weights == nil {
-		a.weights = make(map[struct{ A, B int }]int)
+	if a.edgeWeight == nil {
+		a.edgeWeight = make(map[struct{ A, B int }]int)
 	}
 	p := struct{ A, B int }{A: x, B: y}
-	v, seen := a.weights[p]
+	v, seen := a.edgeWeight[p]
 	if !seen {
-		v = opt.Weights(x, y)
-		a.weights[p] = v
+		v = opt.EdgeWeight(x, y)
+		a.edgeWeight[p] = v
 	}
 	return v
 }

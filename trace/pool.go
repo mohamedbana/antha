@@ -7,12 +7,8 @@ import (
 	"sync"
 )
 
-type scopeKey int
-type instrKey int
 type poolKey int
 
-const theScopeKey scopeKey = 0
-const theInstrKey instrKey = 0
 const thePoolKey poolKey = 0
 
 var poolDoneError error = errors.New("trace: done error") // Dummy error to signal sucessful execution
@@ -103,60 +99,12 @@ func WithPool(parent context.Context) (context.Context, context.CancelFunc, Done
 		}
 }
 
-func withScope(parent context.Context) context.Context {
-	pscope, _ := parent.Value(theScopeKey).(*Scope)
-	var s *Scope
-	if pscope == nil {
-		s = &Scope{}
-	} else {
-		s = pscope.MakeScope()
-	}
-
-	return context.WithValue(parent, theScopeKey, s)
-}
-
-func withTrace(parent context.Context) context.Context {
-	return context.WithValue(parent, theInstrKey, &trace{})
-}
-
-// Create a new trace and pool context. The general template for clients is:
-//   ctx, cancel, allDone := NewContext(parent)
-//   defer cancel()
-//   ...
-//   Go(ctx, ...)
-//   ...
-//   select {
-//     case <-allDone():
-//       return ctx.Err()
-//     ...
-//   }
-func NewContext(parent context.Context) (context.Context, context.CancelFunc, DoneFunc) {
-	c, cfn, dfn := WithPool(withTrace(withScope(parent)))
-	return c, cfn, dfn
-}
-
 func getPool(ctx context.Context) *poolCtx {
 	c := ctx.Value(thePoolKey).(*poolCtx)
 	if c == nil {
 		panic("trace: pool not found")
 	}
 	return c
-}
-
-func getScope(ctx context.Context) *Scope {
-	s := ctx.Value(theScopeKey).(*Scope)
-	if s == nil {
-		panic("trace: scope not defined")
-	}
-	return s
-}
-
-func getTrace(ctx context.Context) *trace {
-	t := ctx.Value(theInstrKey).(*trace)
-	if t == nil {
-		panic("trace: trace not found")
-	}
-	return t
 }
 
 func tryUnblock(tr *trace, pctx *poolCtx) {
@@ -181,76 +129,6 @@ func decrement(pctx *poolCtx, tr *trace, delta int, err error) {
 	if cancel != nil {
 		pctx.cancelWithLock(cancel)
 	}
-}
-
-// Read a promise value
-func Read(ctx context.Context, p *Promise) (Value, error) {
-	if v := p.value(); v != nil {
-		return v, nil
-	}
-
-	pctx := getPool(ctx)
-	tr := getTrace(ctx)
-
-	pctx.lock.Lock()
-	pctx.blocked[p] = true
-	tryUnblock(tr, pctx)
-	pctx.lock.Unlock()
-
-	var err error
-	select {
-	case <-ctx.Done():
-		err = ctx.Err()
-	case v, ok := <-p.out:
-		if ok {
-			p.set(v)
-		}
-	}
-
-	if err == nil {
-		err = p.err()
-	}
-
-	pctx.remove(p)
-
-	return p.value(), err
-}
-
-// Read all promises concurrently
-func ReadAll(parent context.Context, ps ...*Promise) ([]Value, error) {
-	var mapLock sync.Mutex
-	vs := make(map[int]Value)
-
-	pctx, cancel, allDone := WithPool(parent)
-	defer cancel()
-
-	for idx, promise := range ps {
-		i := idx
-		p := promise
-		Go(pctx, func(ctx context.Context) error {
-			v, err := Read(ctx, p)
-			if err != nil {
-				return err
-			}
-
-			mapLock.Lock()
-			defer mapLock.Unlock()
-			vs[i] = v
-
-			return nil
-		})
-	}
-
-	<-allDone()
-	if err := pctx.Err(); err != nil {
-		return nil, err
-	}
-
-	var ret []Value
-	for i := 0; i < len(ps); i += 1 {
-		ret = append(ret, vs[i])
-	}
-	return ret, nil
 }
 
 // Create a new goroutine in the pool context

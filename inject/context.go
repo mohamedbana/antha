@@ -3,6 +3,7 @@ package inject
 
 import (
 	"errors"
+
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 )
 
@@ -58,8 +59,7 @@ func Find(parent context.Context, query NameQuery) (Runner, error) {
 		reg = getRegistry(ctx)
 	}
 
-	// XXX: better matching heuristics?
-
+	// TODO: better matching heuristics?
 	for _, r := range results {
 		return r.runner, nil
 	}

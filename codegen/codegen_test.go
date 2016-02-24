@@ -1,138 +1,95 @@
 package codegen
 
 import (
-	"github.com/antha-lang/antha/target"
 	"testing"
+
+	"github.com/antha-lang/antha/ast"
+	"github.com/antha-lang/antha/target"
+	"github.com/antha-lang/antha/target/human"
 )
 
-// TODO(ddn): add gathers after mix-sample to make mix-plate
+type incubateInst struct {
+	Depends []target.Inst
+}
 
-func makeOneSample(masterMix AstNode) (r []AstNode) {
-	cells := &ApplyExpr{
-		Func: "incubate0",
-		From: &GatherExpr{
-			Key:  "CellStart",
-			From: &NewExpr{From: &UseExpr{Desc: "cells"}},
-		},
-	}
-	r = append(r, cells)
+func (a *incubateInst) Device() target.Device {
+	return nil
+}
 
-	sample := &ApplyExpr{
-		Func: "mix",
-		From: &ListExpr{
-			From: []AstNode{
-				&NewExpr{From: &UseExpr{Desc: "water"}},
-				masterMix,
-				&NewExpr{From: &UseExpr{Desc: "part1"}},
-				&NewExpr{From: &UseExpr{Desc: "part2"}},
-			},
-		},
-	}
-	r = append(r, sample)
+func (a *incubateInst) DependsOn() []target.Inst {
+	return a.Depends
+}
 
-	sample1 := &ApplyExpr{
-		Func: "incubate1",
-		From: &GatherExpr{
-			Key:  "SampleStart",
-			From: sample,
-		},
-	}
-	r = append(r, sample1)
+func (a *incubateInst) SetDependsOn(xs []target.Inst) {
+	a.Depends = xs
+}
 
-	sample2 := &ApplyExpr{
-		Func: "incubate2",
-		From: &GatherExpr{
-			Key:  "SampleStop",
-			From: sample1,
-		},
-	}
-	r = append(r, sample2)
+type incubator struct{}
 
-	scells := &ApplyExpr{
-		Func: "mix",
-		Near: cells,
-		From: &ListExpr{
-			From: []AstNode{
-				cells,
-				sample2,
-			},
-		},
+func (a *incubator) Can(req ast.Request) bool {
+	if req.MixVol != nil {
+		return false
 	}
-	r = append(r, scells)
+	return req.Time != nil || req.Temp != nil
+}
 
-	scells1 := &ApplyExpr{
-		Func: "incubate3",
-		From: &GatherExpr{
-			Key:  "PostPlasmid",
-			From: scells,
-		},
-	}
-	r = append(r, scells1)
+func (a *incubator) Compile(insts []ast.Command) ([]target.Inst, error) {
+	return []target.Inst{&incubateInst{}}, nil
+}
 
-	scells2 := &ApplyExpr{
-		Func: "mix",
-		From: &ListExpr{
-			From: []AstNode{
-				scells1,
-				&NewExpr{From: &UseExpr{Desc: "recovery"}},
-			},
-		},
+func (a *incubator) MoveCost(from target.Device) int {
+	if a == from {
+		return 0
 	}
-	r = append(r, scells2)
+	return human.HumanByXCost - 1
+}
 
-	rcells := &ApplyExpr{
-		Func: "incubate4",
-		From: &GatherExpr{
-			Key:  "Recovery",
-			From: scells2,
-		},
-	}
-	r = append(r, rcells)
-
-	pcells := &ApplyExpr{
-		Opt:  "agarplate",
-		Func: "mix",
-		From: &ListExpr{
-			From: []AstNode{
-				rcells,
-			},
-		},
-	}
-	r = append(r, pcells)
-	return
+func (a *incubator) String() string {
+	return "Incubator"
 }
 
 func TestWellFormed(t *testing.T) {
-	t.Skip("tbd")
-	// Example transformation protocol in AST form
-
-	var nodes []AstNode
-	for i := 0; i < 4; i += 1 {
-		// Premake master mix
-		mix := &ApplyExpr{
-			Func: "mix",
-			Gen:  0,
-			From: &ListExpr{
-				From: []AstNode{
-					&NewExpr{From: &UseExpr{Desc: "premix1"}},
-					&NewExpr{From: &UseExpr{Desc: "premix2"}},
+	var nodes []ast.Node
+	for idx := 0; idx < 4; idx += 1 {
+		m := &ast.Mix{
+			Reqs: []ast.Request{
+				ast.Request{
+					MixVol: ast.NewInterval(0.1, 1.0),
 				},
 			},
+			From: []ast.Node{
+				&ast.UseComp{},
+				&ast.UseComp{},
+				&ast.UseComp{},
+			},
 		}
-		nodes = append(nodes, makeOneSample(mix)...)
-		nodes = append(nodes, mix)
+		u := &ast.UseComp{}
+		u.From = append(u.From, m)
+
+		i := &ast.Incubate{
+			Reqs: []ast.Request{
+				ast.Request{
+					Temp: ast.NewPoint(25),
+					Time: ast.NewPoint(60 * 60),
+				},
+			},
+			From: []ast.Node{u},
+		}
+
+		nodes = append(nodes, i)
 	}
 
-	if _, err := Compile(target.New(), &BundleExpr{From: nodes}); err != nil {
+	machine := target.New()
+	machine.AddDevice(human.New(human.Opt{CanMix: true}))
+	machine.AddDevice(&incubator{})
+
+	if insts, err := Compile(machine, nodes); err != nil {
 		t.Fatal(err)
+	} else if l := len(insts); l == 0 {
+		t.Errorf("expected > %d instructions found %d", 0, l)
+	} else if last, ok := insts[l-1].(*incubateInst); !ok {
+		t.Errorf("expected incubateInst found %T", insts[l-1])
+	} else if n := len(last.Depends); n != 4 {
+		t.Errorf("expected %d dependencies found %d", 4, n)
 	}
-}
-
-func TestGenConstraint(t *testing.T) {
-}
-
-func TestNearConstraint(t *testing.T) {
-}
-
-func TestPrevConstraint(t *testing.T) {
 }

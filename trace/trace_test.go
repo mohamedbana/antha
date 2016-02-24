@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
-	//"github.com/antha-lang/antha/microArch/equipment/void"
-	//"github.com/antha-lang/antha/target"
 	"testing"
 	"time"
 )
@@ -19,7 +17,7 @@ func TestGoOneRead(t *testing.T) {
 	defer cancel()
 
 	Go(ctx, func(ctx context.Context) error {
-		p := Issue(ctx, MakeDebug("noop", nil))
+		p := Issue(ctx, "noop")
 		_, err := Read(ctx, p)
 		return err
 	})
@@ -40,7 +38,7 @@ func TestCommandSequence(t *testing.T) {
 
 	Go(ctx, func(ctx context.Context) error {
 		for i := 0; i < 5; i += 1 {
-			p := Issue(ctx, MakeDebug("noop", nil))
+			p := Issue(ctx, "noop")
 			if _, err := Read(ctx, p); err != nil {
 				return err
 			}
@@ -67,7 +65,7 @@ func TestNestedCommandSequence(t *testing.T) {
 			pidx := i
 			Go(ctx, func(ctx context.Context) error {
 				for i := 0; i < 10; i += 1 {
-					p := Issue(ctx, MakeDebug(fmt.Sprintf("noop.%d.%d", pidx, i), nil))
+					p := Issue(ctx, fmt.Sprintf("noop.%d.%d", pidx, i))
 					if _, err := Read(ctx, p); err != nil {
 						return err
 					}
@@ -98,7 +96,7 @@ func TestGoGoReadAll(t *testing.T) {
 			Go(ctx, func(ctx context.Context) error {
 				var promises []*Promise
 				for i := 0; i < 5; i += 1 {
-					p := Issue(ctx, MakeDebug(fmt.Sprintf("noop.%d.%d", pidx, i), nil))
+					p := Issue(ctx, fmt.Sprintf("noop.%d.%d", pidx, i))
 					promises = append(promises, p)
 				}
 				if _, err := ReadAll(ctx, promises...); err != nil {
@@ -126,7 +124,7 @@ func TestGoReadAll(t *testing.T) {
 	Go(ctx, func(ctx context.Context) error {
 		var promises []*Promise
 		for i := 0; i < 5; i += 1 {
-			p := Issue(ctx, MakeDebug(fmt.Sprintf("noop.%d", i), nil))
+			p := Issue(ctx, fmt.Sprintf("noop.%d", i))
 			promises = append(promises, p)
 		}
 		if _, err := ReadAll(ctx, promises...); err != nil {
@@ -151,7 +149,7 @@ func TestReadAll(t *testing.T) {
 
 	var promises []*Promise
 	for i := 0; i < 5; i += 1 {
-		p := Issue(ctx, MakeDebug(fmt.Sprintf("noop.%d", i), nil))
+		p := Issue(ctx, fmt.Sprintf("noop.%d", i))
 		promises = append(promises, p)
 	}
 	if _, err := ReadAll(ctx, promises...); err != nil {
@@ -174,7 +172,7 @@ func TestIdempotentRead(t *testing.T) {
 	defer cancel()
 
 	Go(ctx, func(ctx context.Context) error {
-		p := Issue(ctx, MakeDebug("noop", nil))
+		p := Issue(ctx, "noop")
 		if _, err := Read(ctx, p); err != nil {
 			return err
 		} else if _, err := Read(ctx, p); err != nil {
@@ -200,7 +198,7 @@ func TestOneError(t *testing.T) {
 	myErr := errors.New("myerror")
 
 	Go(ctx, func(ctx context.Context) error {
-		Issue(ctx, MakeDebug("noop", nil))
+		Issue(ctx, "noop")
 		return myErr
 	})
 
@@ -223,7 +221,7 @@ func TestOneErrorOutOfN(t *testing.T) {
 	for idx := 0; idx < 5; idx += 1 {
 		i := idx
 		Go(ctx, func(ctx context.Context) error {
-			Issue(ctx, MakeDebug("noop", nil))
+			Issue(ctx, "noop")
 			if i == 4 {
 				return myErr
 			} else {

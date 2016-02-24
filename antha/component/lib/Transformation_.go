@@ -38,9 +38,7 @@ func _TransformationSteps(_ctx context.Context, _input *TransformationInput, _ou
 
 	transformedcells := execute.MixInto(_ctx, _input.OutPlate, "", transformationmix...)
 
-	execute.Incubate(_ctx, transformedcells, _input.Postplasmidtemp, _input.Postplasmidtime, false)
-
-	_output.Transformedcells = transformedcells
+	_output.Transformedcells = execute.Incubate(_ctx, transformedcells, _input.Postplasmidtemp, _input.Postplasmidtime, false)
 
 }
 

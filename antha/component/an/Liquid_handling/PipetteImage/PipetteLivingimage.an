@@ -125,8 +125,8 @@ Steps {
 		pixelSample := mixer.Sample(component, VolumePerWell)
 		components = append(components,pixelSample)
 		solution := MixTo(OutPlate.Type, locationkey, 0,components...)
-		Incubate(solution,IncTemp,IncTime,true)
-		solutions = append(solutions, solution)
+		
+		solutions = append(solutions, Incubate(solution,IncTemp,IncTime,true))
 			}
 			
 		}else{
@@ -148,8 +148,7 @@ Steps {
 		components = append(components,pixelSample)
 		solution := MixTo(OutPlate.Type, locationkey, 0, components...)
 		
-		Incubate(solution,IncTemp,IncTime,true)
-		solutions = append(solutions, solution)
+		solutions = append(solutions, Incubate(solution,IncTemp,IncTime,true))
 		}
 		}
 	}

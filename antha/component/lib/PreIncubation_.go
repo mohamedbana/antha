@@ -33,10 +33,8 @@ func _PreIncubationSteps(_ctx context.Context, _input *PreIncubationInput, _outp
 	competentcellsample := mixer.Sample(_input.CompetentCells, _input.CompetentCellvolumeperassembly)
 	competentcells = append(competentcells, competentcellsample)
 	readycompetentcells := execute.MixInto(_ctx, _input.OutPlate, "", competentcells...)
-	execute.Incubate(_ctx, readycompetentcells, _input.Preplasmidtemp, _input.Preplasmidtime, false)
 
-	_output.ReadyCompCells = readycompetentcells
-
+	_output.ReadyCompCells = execute.Incubate(_ctx, readycompetentcells, _input.Preplasmidtemp, _input.Preplasmidtime, false)
 }
 
 // Run after controls and a steps block are completed to
