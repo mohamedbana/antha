@@ -1,7 +1,7 @@
 // Go support for Protocol Buffers - Google's data interchange format
 //
 // Copyright 2014 The Go Authors.  All rights reserved.
-// https://github.com/golang/protobuf
+// https://github.com/antha-lang/antha/bvendor/github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -38,7 +38,7 @@ import (
 
 func TestUnmarshalMessageSetWithDuplicate(t *testing.T) {
 	// Check that a repeated message set entry will be concatenated.
-	in := &MessageSet{
+	in := &messageSet{
 		Item: []*_MessageSet_Item{
 			{TypeId: Int32(12345), Message: []byte("hoo")},
 			{TypeId: Int32(12345), Message: []byte("hah")},

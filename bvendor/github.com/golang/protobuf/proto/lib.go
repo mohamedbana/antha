@@ -1,7 +1,7 @@
 // Go support for Protocol Buffers - Google's data interchange format
 //
 // Copyright 2010 The Go Authors.  All rights reserved.
-// https://github.com/golang/protobuf
+// https://github.com/antha-lang/antha/bvendor/github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -70,6 +70,12 @@ for a protocol buffer variable v:
 	with distinguished wrapper types for each possible field value.
   - Marshal and Unmarshal are functions to encode and decode the wire format.
 
+When the .proto file specifies `syntax="proto3"`, there are some differences:
+
+  - Non-repeated fields of non-message type are values instead of pointers.
+  - Getters are only generated for message and oneof fields.
+  - Enum types do not get an Enum method.
+
 The simplest way to describe this is to see an example.
 Given file test.proto, containing
 
@@ -94,7 +100,7 @@ The resulting file, test.pb.go, is:
 
 	package example
 
-	import proto "github.com/golang/protobuf/proto"
+	import proto "github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto"
 	import math "math"
 
 	type FOO int32
@@ -216,12 +222,12 @@ The resulting file, test.pb.go, is:
 
 To create and play with a Test object:
 
-package main
+	package main
 
 	import (
 		"log"
 
-		"github.com/golang/protobuf/proto"
+		"github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto"
 		pb "./example.pb"
 	)
 
@@ -229,6 +235,7 @@ package main
 		test := &pb.Test{
 			Label: proto.String("hello"),
 			Type:  proto.Int32(17),
+			Reps:  []int64{1, 2, 3},
 			Optionalgroup: &pb.Test_OptionalGroup{
 				RequiredField: proto.String("good bye"),
 			},
@@ -881,3 +888,7 @@ func isProto3Zero(v reflect.Value) bool {
 	}
 	return false
 }
+
+// ProtoPackageIsVersion1 is referenced from generated protocol buffer files
+// to assert that that code is compatible with this version of the proto package.
+const ProtoPackageIsVersion1 = true

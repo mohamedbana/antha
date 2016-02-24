@@ -1,7 +1,7 @@
 // Go support for Protocol Buffers - Google's data interchange format
 //
 // Copyright 2010 The Go Authors.  All rights reserved.
-// https://github.com/golang/protobuf
+// https://github.com/antha-lang/antha/bvendor/github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -301,7 +301,6 @@ func decodeExtension(b []byte, extension *ExtensionDesc) (interface{}, error) {
 	o := NewBuffer(b)
 
 	t := reflect.TypeOf(extension.ExtensionType)
-	rep := extension.repeated()
 
 	props := extensionProperties(extension)
 
@@ -323,7 +322,7 @@ func decodeExtension(b []byte, extension *ExtensionDesc) (interface{}, error) {
 			return nil, err
 		}
 
-		if !rep || o.index >= len(o.buf) {
+		if o.index >= len(o.buf) {
 			break
 		}
 	}

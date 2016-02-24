@@ -1,7 +1,7 @@
 // Go support for Protocol Buffers - Google's data interchange format
 //
 // Copyright 2010 The Go Authors.  All rights reserved.
-// https://github.com/golang/protobuf
+// https://github.com/antha-lang/antha/bvendor/github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -2007,6 +2007,19 @@ func TestOneof(t *testing.T) {
 	ss, ok := m.Union.(*Communique_Msg)
 	if !ok || ss.Msg.GetStringField() != "deep deep string" {
 		t.Errorf("After round trip with oneof set to message, Union = %+v", m.Union)
+	}
+}
+
+func TestInefficientPackedBool(t *testing.T) {
+	// https://github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/issues/76
+	inp := []byte{
+		0x12, 0x02, // 0x12 = 2<<3|2; 2 bytes
+		// Usually a bool should take a single byte,
+		// but it is permitted to be any varint.
+		0xb9, 0x30,
+	}
+	if err := Unmarshal(inp, new(MoreRepeated)); err != nil {
+		t.Error(err)
 	}
 }
 

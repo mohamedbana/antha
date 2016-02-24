@@ -68,4 +68,5 @@ type ExtendedLiquidhandlingDriver interface {
 	Open() driver.CommandStatus
 	Close() driver.CommandStatus
 	Message(level int, title, text string, showcancel bool) driver.CommandStatus
+	GetOutputFile() (string, driver.CommandStatus)
 }

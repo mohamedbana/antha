@@ -1,7 +1,7 @@
 // Go support for Protocol Buffers - Google's data interchange format
 //
 // Copyright 2010 The Go Authors.  All rights reserved.
-// https://github.com/golang/protobuf
+// https://github.com/antha-lang/antha/bvendor/github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -95,9 +95,34 @@ var unMarshalTextTests = []UnmarshalTextTest{
 		},
 	},
 
-	// Quoted string concatenation
+	// Quoted string concatenation with double quotes
 	{
 		in: `count:42 name: "My name is "` + "\n" + `"elsewhere"`,
+		out: &MyMessage{
+			Count: Int32(42),
+			Name:  String("My name is elsewhere"),
+		},
+	},
+
+	// Quoted string concatenation with single quotes
+	{
+		in: "count:42 name: 'My name is '\n'elsewhere'",
+		out: &MyMessage{
+			Count: Int32(42),
+			Name:  String("My name is elsewhere"),
+		},
+	},
+
+	// Quoted string concatenations with mixed quotes
+	{
+		in: "count:42 name: 'My name is '\n\"elsewhere\"",
+		out: &MyMessage{
+			Count: Int32(42),
+			Name:  String("My name is elsewhere"),
+		},
+	},
+	{
+		in: "count:42 name: \"My name is \"\n'elsewhere'",
 		out: &MyMessage{
 			Count: Int32(42),
 			Name:  String("My name is elsewhere"),
@@ -250,6 +275,15 @@ var unMarshalTextTests = []UnmarshalTextTest{
 	// Repeated field
 	{
 		in: `count:42 pet: "horsey" pet:"bunny"`,
+		out: &MyMessage{
+			Count: Int32(42),
+			Pet:   []string{"horsey", "bunny"},
+		},
+	},
+
+	// Repeated field with list notation
+	{
+		in: `count:42 pet: ["horsey", "bunny"]`,
 		out: &MyMessage{
 			Count: Int32(42),
 			Pet:   []string{"horsey", "bunny"},
