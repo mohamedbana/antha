@@ -141,7 +141,7 @@ func FastatoDNASequences(inputfilename string) (seqs []wtype.DNASequence, err er
 		plasmidstatus := ""
 		//seqtype := "DNA"
 		//class := "not specified"
-		if strings.Contains(record.Desc, "Plasmid") || strings.Contains(record.Id, "Circular") || strings.Contains(record.Id, "Vector") {
+		if strings.Contains(strings.ToUpper(record.Desc), "PLASMID") || strings.Contains(strings.ToUpper(record.Desc), "CIRCULAR") || strings.Contains(strings.ToUpper(record.Desc), "VECTOR") {
 			plasmidstatus = "PLASMID"
 		}
 		/*	if strings.Contains(record.Desc, "Amino acid") || strings.Contains(record.Id, "aa") {
@@ -183,7 +183,66 @@ func Build_fasta(header string, seq bytes.Buffer) (Record Fasta) {
 	return Record
 }
 
-// Sarah's new version
+// new new version
+
+func FastaParse(fastaFh io.Reader) chan Fasta {
+
+	outputChannel := make(chan Fasta)
+
+	scanner := bufio.NewScanner(fastaFh)
+	// scanner.Split(bufio.ScanLines)
+	header := ""
+	var seq bytes.Buffer
+
+	go func() {
+		// Loop over the letters in inputString
+		for scanner.Scan() {
+			line := strings.TrimSpace(scanner.Text())
+			line = strings.Replace(line, "\t", "", -1)
+			sublines := strings.Split(line, "\r")
+			for _, line := range sublines {
+
+				if len(line) == 0 {
+					continue
+				}
+
+				// line := scanner.Text()
+
+				if line[0] == '>' {
+					// If we stored a previous identifier, get the DNA string and map to the
+					// identifier and clear the string
+					if header != "" {
+						// outputChannel <- build_fasta(header, seq.String())
+						outputChannel <- Build_fasta(header, seq)
+						header = ""
+						seq.Reset()
+					}
+
+					// Standard FASTA identifiers look like: ">id desc"
+					header = line[1:]
+					//fmt.Println(" header: ", header)
+					//header = strings.Join(line[1:], " ")
+
+				} else {
+					// Append here since multi-line DNA strings are possible
+					seq.WriteString(line)
+				}
+			}
+
+		}
+
+		outputChannel <- Build_fasta(header, seq)
+
+		// Close the output channel, so anything that loops over it
+		// will know that it is finished.
+		close(outputChannel)
+	}()
+
+	return outputChannel
+}
+
+/*
+// new version
 func FastaParse(fastaFh io.Reader) chan Fasta {
 
 	outputChannel := make(chan Fasta)
@@ -235,7 +294,7 @@ func FastaParse(fastaFh io.Reader) chan Fasta {
 
 	return outputChannel
 }
-
+*/
 /*
 func FastaParse(fastaFh io.Reader) chan Fasta {
 
