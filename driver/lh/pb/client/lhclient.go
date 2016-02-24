@@ -1,4 +1,4 @@
-package grpc
+package client
 
 import (
 	"encoding/json"
@@ -9,9 +9,9 @@ import (
 	wunit "github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc"
+	pb "github.com/antha-lang/antha/driver/lh/pb"
 	driver "github.com/antha-lang/antha/microArch/driver"
 	liquidhandling "github.com/antha-lang/antha/microArch/driver/liquidhandling"
-	pb "github.com/antha-lang/antha/microArch/equipment/manual/grpc/ExtendedLiquidhandlingDriver"
 )
 
 type Driver struct {

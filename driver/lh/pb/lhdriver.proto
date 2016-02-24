@@ -1,5 +1,5 @@
 syntax="proto3";
-package ExtendedLiquidhandlingDriver;
+package pb;
 service ExtendedLiquidhandlingDriver {
 rpc AddPlateTo (AddPlateToRequest) returns (AddPlateToReply) {}
 rpc Aspirate (AspirateRequest) returns (AspirateReply) {}

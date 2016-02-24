@@ -25,7 +25,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/antha-lang/antha/microArch/equipment/manual/grpc"
+	lhclient "github.com/antha-lang/antha/driver/lh/pb/client"
 	"github.com/antha-lang/antha/target"
 	"github.com/antha-lang/antha/target/human"
 	"github.com/antha-lang/antha/target/mixer"
@@ -63,7 +63,7 @@ func NewFrontend(opt FrontendOpt) (*Frontend, error) {
 	case DEBUG:
 		t.AddDevice(human.New(human.Opt{CanMix: true}))
 	case REMOTE:
-		if m, err := mixer.New(opt.MixerOpt, grpc.NewDriver(opt.URI)); err != nil {
+		if m, err := mixer.New(opt.MixerOpt, lhclient.NewDriver(opt.URI)); err != nil {
 			return nil, err
 		} else {
 			t.AddDevice(m)
