@@ -67,6 +67,7 @@ func NewFrontend(opt FrontendOpt) (*Frontend, error) {
 			return nil, err
 		} else {
 			t.AddDevice(m)
+			t.AddDevice(human.New(human.Opt{CanMix: false}))
 		}
 	default:
 		return nil, fmt.Errorf("unknown frontend %q", opt.Kind)
