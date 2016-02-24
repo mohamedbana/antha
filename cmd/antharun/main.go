@@ -84,6 +84,7 @@ func runOne(opt opt) error {
 
 	mixerOpt := mixer.DefaultOpt.Merge(params.Config).Merge(opt.MixerOpt)
 	t := target.New()
+
 	fe, err := NewFrontend(FrontendOpt{
 		Kind:     opt.Frontend,
 		MixerOpt: mixerOpt,
