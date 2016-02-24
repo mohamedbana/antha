@@ -35,7 +35,7 @@ type Opt struct {
 
 // Simple entrypoint for one-shot execution of workflows.
 func Run(parent context.Context, opt Opt) (*RunResult, error) {
-	w, err := workflow.New(workflow.Options{FromBytes: opt.WorkflowData, FromDesc: opt.Workflow})
+	w, err := workflow.New(workflow.Opt{FromBytes: opt.WorkflowData, FromDesc: opt.Workflow})
 	if err != nil {
 		return nil, err
 	}
