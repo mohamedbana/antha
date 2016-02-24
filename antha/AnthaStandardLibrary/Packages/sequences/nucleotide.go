@@ -162,6 +162,8 @@ var Nucleotidegpermol = map[string]float64{
 
 // Calculate GC content
 func GCcontent(fwdsequence string) (Percentage float64) {
+	fwdsequence = strings.ToUpper(fwdsequence)
+
 	numberofAs := strings.Count(fwdsequence, "A")
 	numberofTs := strings.Count(fwdsequence, "T")
 	numberofCs := strings.Count(fwdsequence, "C")
