@@ -122,6 +122,47 @@ func FASTAtoPlasmidDNASeqs(filename string) (seqs []wtype.DNASequence, err error
 
 }
 
+func FastatoDNASequences(inputfilename string) (seqs []wtype.DNASequence, err error) {
+	fastaFh, err := os.Open(inputfilename)
+	if err != nil {
+		return
+	}
+	defer fastaFh.Close()
+
+	seqs = make([]wtype.DNASequence, 0)
+
+	var seq wtype.DNASequence
+
+	/*records := make([][]string, 0)
+	seq := make([]string, 0)
+	seq = []string{"#Name", "Sequence", "Plasmid?", "Seq Type", "Class"}
+	records = append(records, seq)*/
+	for record := range FastaParse(fastaFh) {
+		plasmidstatus := ""
+		//seqtype := "DNA"
+		//class := "not specified"
+		if strings.Contains(record.Desc, "Plasmid") || strings.Contains(record.Id, "Circular") || strings.Contains(record.Id, "Vector") {
+			plasmidstatus = "PLASMID"
+		}
+		/*	if strings.Contains(record.Desc, "Amino acid") || strings.Contains(record.Id, "aa") {
+				seqtype = "AA"
+			}
+
+			if strings.Contains(record.Desc, "Class:") {
+				uptoclass := strings.Index(record.Desc, "Class:")
+				prefix := uptoclass + len("class:")
+				class = record.Desc[prefix:]
+			}*/
+		seq, err = wtype.MakeDNASequence(record.Id, record.Seq, []string{plasmidstatus})
+		if err != nil {
+			return seqs, err
+		}
+		seqs = append(seqs, seq)
+	}
+
+	return
+}
+
 func Build_fasta(header string, seq bytes.Buffer) (Record Fasta) {
 	fields := strings.SplitN(header, " ", 2)
 

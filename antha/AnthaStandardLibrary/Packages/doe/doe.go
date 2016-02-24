@@ -141,6 +141,9 @@ func AllCombinations(factors []DOEPair) (runs []Run) {
 	descriptors := make([]string, 0)
 	setpoints := make([]interface{}, 0)
 	runs = make([]Run, AllComboCount(factors))
+	if AllComboCount(factors) == 0 {
+		panic("all combo count == 0")
+	}
 	var run Run
 	var factorswithonelevel int
 	for i, factor := range factors {
@@ -160,6 +163,7 @@ func AllCombinations(factors []DOEPair) (runs []Run) {
 			//	fmt.Println("factor:", factor, i, j)
 
 			if i-factorswithonelevel < 0 {
+				fmt.Println(i, j, factorswithonelevel, i+1-factorswithonelevel+j)
 				runs[i+1-factorswithonelevel+j] = run
 			} else {
 				runs[i-factorswithonelevel+j] = run

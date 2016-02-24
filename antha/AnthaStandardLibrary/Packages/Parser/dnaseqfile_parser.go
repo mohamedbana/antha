@@ -30,20 +30,29 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 )
 
-func DNAFiletoDNASequence(filename string, plasmid bool) (seqs []wtype.DNASequence, err error) {
+func DNAFiletoDNASequence(filename string, plasmid bool) (sequences []wtype.DNASequence, err error) {
 
-	seqs = make([]wtype.DNASequence, 0)
+	sequences = make([]wtype.DNASequence, 0)
+
+	var seqs []wtype.DNASequence
 	var seq wtype.DNASequence
 	//for _, file := range files {
 	switch fn := filename; {
 	case strings.HasSuffix(fn, ".gdx"):
 
 		seqs, err = GDXtoDNASequence(filename)
+		for _, seq := range seqs {
+			sequences = append(sequences, seq)
+		}
 	case strings.HasSuffix(fn, ".fasta"):
-		if plasmid {
+		/*if plasmid {
 			seqs, err = FASTAtoPlasmidDNASeqs(filename)
 		} else {
 			seqs, err = FASTAtoLinearDNASeqs(filename)
+		}*/
+		seqs, err = FastatoDNASequences(filename)
+		for _, seq := range seqs {
+			sequences = append(sequences, seq)
 		}
 	case strings.HasSuffix(fn, ".gb"):
 
