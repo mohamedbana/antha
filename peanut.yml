@@ -10,6 +10,7 @@ modules:
             - ~bvendor
     docker:
         packages:
-            - libopencv-dev
             - libglpk-dev
             - libsqlite3-dev
+            - libopencv-dev
+            - libopencv-photo-dev
