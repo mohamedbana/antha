@@ -188,7 +188,7 @@ func FastaParse(fastaFh io.Reader) chan Fasta {
 	outputChannel := make(chan Fasta)
 
 	scanner := bufio.NewScanner(fastaFh)
-	// scanner.Split(bufio.ScanLines)
+	//scanner.Split(bufio.ScanLines)
 	header := ""
 	var seq bytes.Buffer
 
@@ -196,6 +196,8 @@ func FastaParse(fastaFh io.Reader) chan Fasta {
 		// Loop over the letters in inputString
 		for scanner.Scan() {
 			line := strings.TrimSpace(scanner.Text())
+
+			line = strings.Replace(line, "^M", "", -1)
 			if len(line) == 0 {
 				continue
 			}

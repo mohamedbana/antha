@@ -58,7 +58,7 @@ func DNAFiletoDNASequence(filename string, plasmid bool) (sequences []wtype.DNAS
 
 		seq, err = GenbanktoDNASequence(filename)
 
-		seqs = append(seqs, seq)
+		sequences = append(sequences, seq)
 	default:
 		err = fmt.Errorf("non valid sequence file")
 	}

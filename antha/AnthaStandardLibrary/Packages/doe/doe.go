@@ -142,7 +142,9 @@ func AllCombinations(factors []DOEPair) (runs []Run) {
 	setpoints := make([]interface{}, 0)
 	runs = make([]Run, AllComboCount(factors))
 	if AllComboCount(factors) == 0 {
-		panic("all combo count == 0")
+		return
+		//	panic("all combo count == 0")
+		//	fmt.Println(factors)
 	}
 	var run Run
 	var factorswithonelevel int
