@@ -24,7 +24,7 @@ type RunResult struct {
 	Insts    []target.Inst
 }
 
-type Options struct {
+type Opt struct {
 	WorkflowData []byte         // JSON data describing workflow
 	Workflow     *workflow.Desc // Or workflow directly
 	ParamData    []byte         // JSON data describing parameters
@@ -34,7 +34,7 @@ type Options struct {
 }
 
 // Simple entrypoint for one-shot execution of workflows.
-func Run(parent context.Context, opt Options) (*RunResult, error) {
+func Run(parent context.Context, opt Opt) (*RunResult, error) {
 	w, err := workflow.New(workflow.Options{FromBytes: opt.WorkflowData, FromDesc: opt.Workflow})
 	if err != nil {
 		return nil, err

@@ -100,7 +100,7 @@ func runOne(opt opt) error {
 		return err
 	}
 
-	rout, err := execute.Run(ctx, execute.Options{
+	rout, err := execute.Run(ctx, execute.Opt{
 		Target:   t,
 		Workflow: wdesc,
 		Params:   params,
