@@ -36,6 +36,32 @@ import (
 	"strings"
 )
 
+func GenbanktoSimpleSeq(filename string) (seq string) {
+
+	var line string
+	genbanklines := make([]string, 0)
+	file, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line = fmt.Sprintln(scanner.Text())
+		genbanklines = append(genbanklines, line)
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	seq = HandleSequence(genbanklines)
+
+	return
+
+}
+
 func GenbanktoDNASequence(filename string) (standardseq wtype.DNASequence, err error) {
 
 	var annotated sequences.AnnotatedSeq
@@ -137,7 +163,7 @@ func ParseGenbankfile(file *os.File) (annotated sequences.AnnotatedSeq, err erro
 		line = fmt.Sprintln(scanner.Text())
 		genbanklines = append(genbanklines, line)
 	}
-
+	fmt.Println("lines scanned")
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
@@ -152,7 +178,7 @@ func HandleGenbank(lines []string) (annotatedseq sequences.AnnotatedSeq, err err
 	if lines[0][0:5] == `LOCUS` {
 		// fmt.Println("in Locus")
 		name, _, _, circular, _, err := Locusline(lines[0])
-		// // fmt.Println("foundout this stuff", name, err)
+
 		if err != nil {
 			return annotatedseq, err
 		}
@@ -469,6 +495,17 @@ func HandleFeatures(lines []string, seq string, seqtype string) (features []sequ
 			}
 			if start > end {
 				return
+
+				//	fmt.Println(startposition)
+				//		if len(seq) > 0 /*&& startposition > 0 /*&& endposition < len(seq) */ {
+				/*			feature = sequences.MakeFeature(description, seq[startposition-1:endposition], seqtype, class, rev)
+								if start > end {
+									return
+								}
+
+							} else {
+								fmt.Println("sequence", description, seq, "startposition", startposition, "endposition", endposition, " not valid")
+				*/
 
 			}
 			features = append(features, feature)
