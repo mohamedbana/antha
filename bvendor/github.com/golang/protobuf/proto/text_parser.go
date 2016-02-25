@@ -1,7 +1,7 @@
 // Go support for Protocol Buffers - Google's data interchange format
 //
 // Copyright 2010 The Go Authors.  All rights reserved.
-// https://github.com/golang/protobuf
+// https://github.com/antha-lang/antha/bvendor/github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -114,6 +114,14 @@ func isIdentOrNumberChar(c byte) bool {
 func isWhitespace(c byte) bool {
 	switch c {
 	case ' ', '\t', '\n', '\r':
+		return true
+	}
+	return false
+}
+
+func isQuote(c byte) bool {
+	switch c {
+	case '"', '\'':
 		return true
 	}
 	return false
@@ -333,13 +341,13 @@ func (p *textParser) next() *token {
 	p.advance()
 	if p.done {
 		p.cur.value = ""
-	} else if len(p.cur.value) > 0 && p.cur.value[0] == '"' {
+	} else if len(p.cur.value) > 0 && isQuote(p.cur.value[0]) {
 		// Look for multiple quoted strings separated by whitespace,
 		// and concatenate them.
 		cat := p.cur
 		for {
 			p.skipWhitespace()
-			if p.done || p.s[0] != '"' {
+			if p.done || !isQuote(p.s[0]) {
 				break
 			}
 			p.advance()
@@ -672,18 +680,32 @@ func (p *textParser) readAny(v reflect.Value, props *Properties) error {
 			fv.Set(reflect.ValueOf(bytes))
 			return nil
 		}
-		// Repeated field. May already exist.
-		flen := fv.Len()
-		if flen == fv.Cap() {
-			nav := reflect.MakeSlice(at, flen, 2*flen+1)
-			reflect.Copy(nav, fv)
-			fv.Set(nav)
+		// Repeated field.
+		if tok.value == "[" {
+			// Repeated field with list notation, like [1,2,3].
+			for {
+				fv.Set(reflect.Append(fv, reflect.New(at.Elem()).Elem()))
+				err := p.readAny(fv.Index(fv.Len()-1), props)
+				if err != nil {
+					return err
+				}
+				tok := p.next()
+				if tok.err != nil {
+					return tok.err
+				}
+				if tok.value == "]" {
+					break
+				}
+				if tok.value != "," {
+					return p.errorf("Expected ']' or ',' found %q", tok.value)
+				}
+			}
+			return nil
 		}
-		fv.SetLen(flen + 1)
-
-		// Read one.
+		// One value of the repeated field.
 		p.back()
-		return p.readAny(fv.Index(flen), props)
+		fv.Set(reflect.Append(fv, reflect.New(at.Elem()).Elem()))
+		return p.readAny(fv.Index(fv.Len()-1), props)
 	case reflect.Bool:
 		// Either "true", "false", 1 or 0.
 		switch tok.value {

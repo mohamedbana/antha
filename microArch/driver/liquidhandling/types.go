@@ -458,11 +458,7 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []s
 		foundIt := false
 
 		if v.HasAnyParent() {
-			fmt.Println("Trying to get component ", v.CName, v.ParentID)
-
-			// the component could be a sample, we need to ensure that we know where
-			// it came from
-
+			//fmt.Println("Trying to get component ", v.CName, v.ParentID)
 			tx := strings.Split(v.Loc, ":")
 
 			r1[i] = tx[0]

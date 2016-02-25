@@ -1045,6 +1045,13 @@ func (d *Driver) GetCurrentPosition(arg_1 int) (string, driver.CommandStatus) {
 	ret, _ := d.C.GetCurrentPosition(context.Background(), &req)
 	return (string)(ret.Ret_1), (driver.CommandStatus)(DecodeCommandStatus(ret.Ret_2))
 }
+
+func (d *Driver) GetOutputFile() (string, driver.CommandStatus) {
+	req := pb.GetOutputFileRequest{}
+
+	ret, _ := d.C.GetOutputFile(context.Background(), &req)
+	return (string)(ret.Ret_1), (driver.CommandStatus)(DecodeCommandStatus(ret.Ret_2))
+}
 func (d *Driver) GetHeadState(arg_1 int) (string, driver.CommandStatus) {
 	req := pb.GetHeadStateRequest{
 		int64(arg_1),

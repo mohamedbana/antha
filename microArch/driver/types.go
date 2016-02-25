@@ -25,8 +25,9 @@ package driver
 // need an errcode lookup
 
 const (
-	ERR int = iota
-	OK
+	OK int = iota
+	ERR
+	WRN
 	NIM // Not implemented
 )
 

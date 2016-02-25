@@ -1,7 +1,7 @@
 // Go support for Protocol Buffers - Google's data interchange format
 //
 // Copyright 2011 The Go Authors.  All rights reserved.
-// https://github.com/golang/protobuf
+// https://github.com/antha-lang/antha/bvendor/github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -30,7 +30,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Protocol buffer deep copy and merge.
-// TODO: MessageSet and RawMessage.
+// TODO: RawMessage.
 
 package proto
 

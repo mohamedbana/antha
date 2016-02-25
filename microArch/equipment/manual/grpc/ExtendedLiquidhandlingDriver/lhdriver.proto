@@ -10,6 +10,7 @@ rpc GetCapabilities (GetCapabilitiesRequest) returns (GetCapabilitiesReply) {}
 rpc GetCurrentPosition (GetCurrentPositionRequest) returns (GetCurrentPositionReply) {}
 rpc GetHeadState (GetHeadStateRequest) returns (GetHeadStateReply) {}
 rpc GetPositionState (GetPositionStateRequest) returns (GetPositionStateReply) {}
+rpc GetOutputFile(GetOutputFileRequest) returns (GetOutputFileReply) {}
 rpc GetStatus (GetStatusRequest) returns (GetStatusReply) {}
 rpc Go (GoRequest) returns (GoReply) {}
 rpc Initialize (InitializeRequest) returns (InitializeReply) {}
@@ -148,6 +149,12 @@ message GetPositionStateRequest {
 string arg_1 = 1;
 }
 message GetPositionStateReply {
+string Ret_1 = 1;
+CommandStatusMessage Ret_2 = 2;
+}
+message GetOutputFileRequest{
+}
+message GetOutputFileReply{
 string Ret_1 = 1;
 CommandStatusMessage Ret_2 = 2;
 }

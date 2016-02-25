@@ -1,7 +1,7 @@
 // Go support for Protocol Buffers - Google's data interchange format
 //
 // Copyright 2010 The Go Authors.  All rights reserved.
-// https://github.com/golang/protobuf
+// https://github.com/antha-lang/antha/bvendor/github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -103,6 +103,11 @@ func (p *Buffer) EncodeVarint(x uint64) error {
 	}
 	p.buf = append(p.buf, uint8(x))
 	return nil
+}
+
+// SizeVarint returns the varint encoding size of an integer.
+func SizeVarint(x uint64) int {
+	return sizeVarint(x)
 }
 
 func sizeVarint(x uint64) (n int) {
@@ -1115,9 +1120,8 @@ func (o *Buffer) enc_new_map(p *Properties, base structPointer) error {
 		return nil
 	}
 
-	keys := v.MapKeys()
-	sort.Sort(mapKeys(keys))
-	for _, key := range keys {
+	// Don't sort map keys. It is not required by the spec, and C++ doesn't do it.
+	for _, key := range v.MapKeys() {
 		val := v.MapIndex(key)
 
 		// The only illegal map entry values are nil message pointers.
@@ -1249,24 +1253,9 @@ func size_struct(prop *StructProperties, base structPointer) (n int) {
 	}
 
 	// Factor in any oneof fields.
-	// TODO: This could be faster and use less reflection.
-	if prop.oneofMarshaler != nil {
-		sv := reflect.ValueOf(structPointer_Interface(base, prop.stype)).Elem()
-		for i := 0; i < prop.stype.NumField(); i++ {
-			fv := sv.Field(i)
-			if fv.Kind() != reflect.Interface || fv.IsNil() {
-				continue
-			}
-			if prop.stype.Field(i).Tag.Get("protobuf_oneof") == "" {
-				continue
-			}
-			spv := fv.Elem()         // interface -> *T
-			sv := spv.Elem()         // *T -> T
-			sf := sv.Type().Field(0) // StructField inside T
-			var prop Properties
-			prop.Init(sf.Type, "whatever", sf.Tag.Get("protobuf"), &sf)
-			n += prop.size(&prop, toStructPointer(spv))
-		}
+	if prop.oneofSizer != nil {
+		m := structPointer_Interface(base, prop.stype).(Message)
+		n += prop.oneofSizer(m)
 	}
 
 	return

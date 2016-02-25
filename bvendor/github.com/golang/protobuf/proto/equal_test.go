@@ -1,7 +1,7 @@
 // Go support for Protocol Buffers - Google's data interchange format
 //
 // Copyright 2011 The Go Authors.  All rights reserved.
-// https://github.com/golang/protobuf
+// https://github.com/antha-lang/antha/bvendor/github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -35,6 +35,7 @@ import (
 	"testing"
 
 	. "github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto"
+	proto3pb "github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto/proto3_proto"
 	pb "github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto/testdata"
 )
 
@@ -131,6 +132,8 @@ var EqualTests = []struct {
 		&pb.MyMessage{RepBytes: [][]byte{[]byte("sham"), []byte("wow")}},
 		true,
 	},
+	// In proto3, []byte{} and []byte(nil) are equal.
+	{"proto3 bytes, empty vs nil", &proto3pb.Message{Data: []byte{}}, &proto3pb.Message{Data: nil}, true},
 
 	{"extension vs. no extension", messageWithoutExtension, messageWithExtension1a, false},
 	{"extension vs. same extension", messageWithExtension1a, messageWithExtension1b, true},
