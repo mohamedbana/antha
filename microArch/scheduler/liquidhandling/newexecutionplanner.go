@@ -34,12 +34,12 @@ func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProper
 	*/
 
 	// 1 -- set output order, this is based on dependencies
-	set_output_order(request)
+	chain := set_output_order(request)
 
 	// 2 -- we might optimize at this point: for instance grouping components
 	//      or generating stages of execution
 
-	// optimize_runs(request)
+	optimize_runs(request, chain)
 
 	// 3 -- generate top-level instructions
 

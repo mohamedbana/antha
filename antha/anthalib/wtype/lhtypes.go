@@ -401,6 +401,34 @@ func (lhc *LHComponent) Dup() *LHComponent {
 	return c
 }
 
+func (cmp *LHComponent) SetIsSample(flag bool) bool {
+	if cmp == nil {
+		return false
+	}
+
+	if cmp.Extra == nil {
+		cmp.Extra = make(map[string]interface{})
+	}
+
+	cmp.Extra["IsSample"] = flag
+
+	return true
+}
+
+func (cmp *LHComponent) IsSample() bool {
+	if cmp == nil {
+		return false
+	}
+
+	f, ok := cmp.Extra["IsSample"]
+
+	if !ok || !f.(bool) {
+		return false
+	}
+
+	return true
+}
+
 func (cmp *LHComponent) HasAnyParent() bool {
 	if cmp.ParentID != "" {
 		return true

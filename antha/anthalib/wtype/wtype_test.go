@@ -72,3 +72,84 @@ func TestWellCoords(*testing.T) {
 	fmt.Println(wc.X, " ", wc.Y)
 	fmt.Println("Finished Testing Well Coords")
 }
+
+func TestLHComponentSampleStuff(t *testing.T) {
+	var c LHComponent
+
+	faux := c.IsSample()
+
+	if faux {
+		t.Fatal("IsSample() must return false on new components")
+	}
+
+	c.SetIsSample(true)
+
+	vrai := c.IsSample()
+
+	if !vrai {
+		t.Fatal("IsSample() must return true following SetIsSample(true)")
+	}
+
+	c.SetIsSample(false)
+
+	faux = c.IsSample()
+
+	if faux {
+		t.Fatal("IsSample() must return false following SetIsSample(false)")
+	}
+
+	// now the same from NewLHComponent
+
+	c2 := NewLHComponent()
+
+	faux = c2.IsSample()
+
+	if faux {
+		t.Fatal("IsSample() must return false on new components")
+	}
+
+	c2.SetIsSample(true)
+
+	vrai = c2.IsSample()
+
+	if !vrai {
+		t.Fatal("IsSample() must return true following SetIsSample(true)")
+	}
+
+	c2.SetIsSample(false)
+
+	faux = c2.IsSample()
+
+	if faux {
+		t.Fatal("IsSample() must return false following SetIsSample(false)")
+	}
+
+	// finally need to make sure sample works
+	// grrr import cycle not allowed: honestly I think Sample should just be an
+	// instance method of LHComponent now anyway
+	/*
+
+		c.CName = "YOMAMMA"
+		s := mixer.Sample(c, wunit.NewVolume(10.0, "ul"))
+
+		vrai = s.IsSample()
+
+		if !vrai {
+			t.Fatal("IsSample() must return true for results of mixer.Sample()")
+		}
+		s = mixer.SampleForConcentration(c, wunit.NewConcentration(10.0, "mol/l"))
+
+		vrai = s.IsSample()
+
+		if !vrai {
+			t.Fatal("IsSample() must return true for results of mixer.SampleForConcentration()")
+		}
+		s = mixer.SampleForTotalVolume(c, wunit.NewVolume(10.0, "ul"))
+
+		vrai = s.IsSample()
+
+		if !vrai {
+			t.Fatal("IsSample() must return true for results of mixer.SampleForTotalVolume()")
+		}
+	*/
+}

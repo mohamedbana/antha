@@ -41,6 +41,7 @@ func SampleAll(l *wtype.LHComponent) *wtype.LHComponent {
 // take a sample of volume v from this liquid
 func Sample(l *wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
+	ret.SetSample(true)
 	ret.ID = l.ID
 
 	l.AddDaughter(ret.ID)
@@ -66,6 +67,7 @@ func MultiSample(l []*wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent 
 
 	for i, j := range l {
 		ret := wtype.NewLHComponent()
+		ret.SetSample(true)
 		vi := v[i]
 		ret.ID = j.ID
 		j.AddDaughter(ret.ID)
@@ -89,6 +91,7 @@ func MultiSample(l []*wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent 
 // take a sample of this liquid and aim for a particular concentration
 func SampleForConcentration(l *wtype.LHComponent, c wunit.Concentration) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
+	ret.SetSample(true)
 	ret.ID = l.ID
 	l.AddDaughter(ret.ID)
 	if l.HasAnyParent() {
@@ -112,6 +115,7 @@ func SampleMass(s *wtype.LHComponent, m wunit.Mass, d wunit.Density) *wtype.LHCo
 	v := wunit.MasstoVolume(m, d)
 
 	ret := wtype.NewLHComponent()
+	ret.SetSample(true)
 	ret.ID = s.ID
 	s.AddDaughter(ret.ID)
 	if s.HasAnyParent() {
@@ -133,6 +137,7 @@ func SampleMass(s *wtype.LHComponent, m wunit.Mass, d wunit.Density) *wtype.LHCo
 // edited to take into account the volume of the other solution components
 func SampleForTotalVolume(l *wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
+	ret.SetSample(true)
 	ret.ID = l.ID
 	l.AddDaughter(ret.ID)
 	if l.HasAnyParent() {
