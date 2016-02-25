@@ -188,6 +188,11 @@
 			"revisionTime": "2015-05-19T08:45:55-07:00"
 		},
 		{
+			"path": "github.com/lazywei/go-opencv/opencv",
+			"revision": "1d8dd6c04e813a368aa334242b4c73a68cb61eb2",
+			"revisionTime": "2016-01-27T00:08:56+08:00"
+		},
+		{
 			"path": "github.com/mattn/go-colorable",
 			"revision": "51a7e7a8b1665b25ca173debdc8d52d493348f15",
 			"revisionTime": "2015-11-10T18:43:35+09:00"

@@ -13,4 +13,4 @@ modules:
             - libglpk-dev
             - libsqlite3-dev
             - libopencv-dev
-            - libopencv-photo-dev
+            
