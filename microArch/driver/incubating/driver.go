@@ -35,9 +35,11 @@ type IncubatingDriver interface {
 }
 
 // change returns to driver.CommandStatus
+//ShakeIncubate(what *wtype.LHSolution, temp wunit.Temperature, time wunit.Time, rpm int)
+//Incubate(what *wtype.LHSolution, temp wunit.Temperature, time wunit.Time, shaking bool)
 type ShakerIncubatordriver interface {
 	Initialise()
-	Command(string) //driver.CommandStatus
+	Command(string) string //driver.CommandStatus
 	Shake(speed int) driver.CommandStatus
 	ShakeforEngParameter(parameter string, liquid string, target float64)
 	ShakeforTime(speed, time int) (status driver.CommandStatus)
@@ -52,6 +54,6 @@ type ShakerIncubatordriver interface {
 	LookupProperty(string) float64 // map lookup function from devices map in anthastandardlibrary. E.g. Maxspeed, dimensions etc..
 	AllProperties() (map[string]float64, string)
 	CheckState()
-	ShakeIncubate(what *wtype.LHSolution, temp wunit.Temperature, time wunit.Time, rpm int)
-	Incubate(what *wtype.LHSolution, temp wunit.Temperature, time wunit.Time, shaking bool)
+	//ShakeIncubate(what *wtype.LHSolution, temp wunit.Temperature, time wunit.Time, rpm int)
+	//Incubate(what *wtype.LHSolution, temp wunit.Temperature, time wunit.Time, shaking bool)
 }
