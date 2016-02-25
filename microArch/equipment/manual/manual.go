@@ -379,7 +379,7 @@ func (e *AnthaManualGrpc) configRequest(actionDescription equipment.ActionDescri
 	// MIS fix here - only allow a single plate in here
 	if len(req.Input_platetypes) == 0 {
 
-		pwc := factory.GetPlateByType("DWST12_riser")
+		pwc := factory.GetPlateByType("DSW96_riser")
 
 		//pwc := factory.GetPlateByType("pcrplate_with_cooler")
 		//pwc := factory.GetPlateByType("pcrplate_skirted")

@@ -3,8 +3,8 @@
     "PipetteImage": {
 		"OnlythisColour":"",
 		"Notthiscolour":"white",
-	  	"Imagefilename": "ziggy6_384.jpg",
-		"Palettename":"ProteinPaintboxSubset",
+	  	"Imagefilename": "ziggy5_384.jpg",
+		"Palettename":"NewProteinPaintboxSubsetmap",
       	"OutPlate": "greiner384_riser",
 		"UVimage":false,
       	"VolumePerWell": "100ul"
