@@ -15,32 +15,33 @@ import (
 
 // simple reverse complement check to test testing methodology initially
 type testpair struct {
-	pairs      []DOEPair
-	combocount int
+	pairs         []DOEPair
+	combocount    int
+	factorheaders []string
 }
 
 var factorsandlevels = []testpair{
 
 	{pairs: []DOEPair{Pair("Level 1", []interface{}{1})},
-		combocount: 1},
+		combocount: 1, factorheaders: []string{"Level 1"}},
 	{pairs: []DOEPair{Pair("Level 1", []interface{}{1}), Pair("Level 2", []interface{}{1})},
-		combocount: 1},
+		combocount: 1, factorheaders: []string{"Level 1", "Level 2"}},
 	{pairs: []DOEPair{Pair("Level 1", []interface{}{1}), Pair("Level 2", []interface{}{1, 2})},
-		combocount: 2},
+		combocount: 2, factorheaders: []string{"Level 1", "Level 2"}},
 	{pairs: []DOEPair{Pair("Level 1", []interface{}{1, 2}), Pair("Level 2", []interface{}{1})},
-		combocount: 2},
+		combocount: 2, factorheaders: []string{"Level 1", "Level 2"}},
 	{pairs: []DOEPair{Pair("Level 1", []interface{}{1, 2}), Pair("Level 2", []interface{}{1, 2})},
-		combocount: 4},
+		combocount: 4, factorheaders: []string{"Level 1", "Level 2"}},
 	{pairs: []DOEPair{Pair("Level 1", []interface{}{1}), Pair("Level 2", []interface{}{1}), Pair("Level 3", []interface{}{1})},
-		combocount: 1},
+		combocount: 1, factorheaders: []string{"Level 1", "Level 2", "Level 3"}},
 	{pairs: []DOEPair{Pair("Level 1", []interface{}{1, 2}), Pair("Level 2", []interface{}{1, 2}), Pair("Level 3", []interface{}{1, 2})},
-		combocount: 8},
+		combocount: 8, factorheaders: []string{"Level 1", "Level 2", "Level 3"}},
 	{pairs: []DOEPair{Pair("Level 1", []interface{}{1}), Pair("Level 2", []interface{}{1, 2}), Pair("Level 3", []interface{}{1, 2})},
-		combocount: 4},
+		combocount: 4, factorheaders: []string{"Level 1", "Level 2", "Level 3"}},
 	{pairs: []DOEPair{Pair("Level 1", []interface{}{1}), Pair("Level 2", []interface{}{1, 2}), Pair("Level 3", []interface{}{1})},
-		combocount: 2},
+		combocount: 2, factorheaders: []string{"Level 1", "Level 2", "Level 3"}},
 	{pairs: []DOEPair{Pair("Level 1", []interface{}{1, 2}), Pair("Level 2", []interface{}{1, 2}), Pair("Level 3", []interface{}{1})},
-		combocount: 4},
+		combocount: 4, factorheaders: []string{"Level 1", "Level 2", "Level 3"}},
 }
 
 func TestAllComboCount(t *testing.T) {
@@ -67,8 +68,30 @@ func TestAllCombinations(t *testing.T) {
 				"got", r, "\n",
 			)
 		}
-	}
+		for j, run := range r {
 
+			if len(run.Factordescriptors) != len(factor.factorheaders) {
+				t.Error(
+					"For", factor.pairs, "/n",
+					"expected", factor.factorheaders, "\n",
+					"got", run.Factordescriptors, "\n",
+				)
+			}
+
+			for i, descriptor := range run.Factordescriptors {
+
+				if descriptor != factor.factorheaders[i] {
+					t.Error(
+						"For", factor.pairs, "/n",
+						"For", run, j, "/n",
+						"descriptor", descriptor, "/n",
+						"expected", factor.factorheaders[i], "\n",
+						"got", run.Factordescriptors[i], "\n",
+					)
+				}
+			}
+		}
+	}
 }
 
 /*

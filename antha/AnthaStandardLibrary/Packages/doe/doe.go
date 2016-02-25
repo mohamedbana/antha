@@ -157,17 +157,23 @@ func AllCombinations(factors []DOEPair) (runs []Run) {
 		}
 
 		for j, level := range factor.Levels {
-			//fmt.Println("factor:", factor, level, i, j /*i+j*/)
-			descriptors = append(descriptors, factor.Factor)
-			setpoints = append(setpoints, level)
-			run.Factordescriptors = descriptors
-			run.Setpoints = setpoints
+
 			//	fmt.Println("factor:", factor, i, j)
 
 			if i-factorswithonelevel < 0 {
+				//fmt.Println("factor:", factor, level, i, j /*i+j*/)
+				descriptors = append(descriptors, factor.Factor)
+				setpoints = append(setpoints, level)
+				run.Factordescriptors = descriptors
+				run.Setpoints = setpoints
 				fmt.Println(i, j, factorswithonelevel, i+1-factorswithonelevel+j)
 				runs[i+1-factorswithonelevel+j] = run
 			} else {
+				//fmt.Println("factor:", factor, level, i, j /*i+j*/)
+				descriptors = append(descriptors, factor.Factor)
+				setpoints = append(setpoints, level)
+				run.Factordescriptors = descriptors
+				run.Setpoints = setpoints
 				runs[i-factorswithonelevel+j] = run
 			}
 		}
