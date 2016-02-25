@@ -24,8 +24,11 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"os"
 
 	lhclient "github.com/antha-lang/antha/driver/lh/pb/client"
+	"github.com/antha-lang/antha/microArch/logger"
 	"github.com/antha-lang/antha/target"
 	"github.com/antha-lang/antha/target/human"
 	"github.com/antha-lang/antha/target/mixer"
@@ -56,6 +59,23 @@ func (a *Frontend) Shutdown() (err error) {
 	return
 }
 
+type middleware struct {
+	out io.Writer
+}
+
+func (a *middleware) Log(lvl logger.LogLevel, ts int64, source, msg string, extra ...interface{}) {
+	if lvl == logger.TRACK {
+		return
+	}
+	fmt.Fprint(a.out, msg)
+	fmt.Fprint(a.out, extra...)
+	fmt.Fprint(a.out, "\n")
+}
+
+func (a *middleware) Measure(ts int64, source, msg string, extra ...interface{}) {}
+
+func (a *middleware) Sensor(ts int64, source, msg string, extra ...interface{}) {}
+
 func NewFrontend(opt FrontendOpt) (*Frontend, error) {
 	t := opt.Target
 
@@ -73,5 +93,14 @@ func NewFrontend(opt FrontendOpt) (*Frontend, error) {
 		return nil, fmt.Errorf("unknown frontend %q", opt.Kind)
 	}
 
-	return &Frontend{}, nil
+	mw := &middleware{out: os.Stdout}
+	logger.RegisterMiddleware(mw)
+
+	ret := &Frontend{}
+	ret.shutdowns = append(ret.shutdowns, func() error {
+		logger.UnregisterMiddleware(mw)
+		return nil
+	})
+
+	return ret, nil
 }

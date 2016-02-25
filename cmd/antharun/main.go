@@ -110,12 +110,7 @@ func runOne(opt opt) error {
 		return err
 	}
 
-	for k, v := range rout.Workflow.Outputs {
-		fmt.Printf("%s: %s\n", k, v)
-	}
-	for _, inst := range rout.Insts {
-		fmt.Println(inst)
-	}
+	printTimeline(os.Stdout, rout)
 
 	return nil
 }
