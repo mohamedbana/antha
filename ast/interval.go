@@ -7,6 +7,24 @@ type Interval struct {
 	values []struct{ A, B float64 }
 }
 
+func (a Interval) Extrema() (min, max float64) {
+	if len(a.values) == 0 {
+		return
+	}
+	min = a.values[0].A
+	max = a.values[0].B
+	for i, n := 1, len(a.values); i < n; i += 1 {
+		if a.values[i].A < min {
+			min = a.values[i].A
+		}
+
+		if a.values[i].B > max {
+			max = a.values[i].B
+		}
+	}
+	return
+}
+
 // The nil interval does not contain any points
 func (a Interval) Nil() bool {
 	return len(a.values) == 0

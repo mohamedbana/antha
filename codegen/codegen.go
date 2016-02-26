@@ -270,7 +270,7 @@ func (a *ir) addMove(t *target.Target, dnode graph.Node, run *drun) error {
 				return fmt.Errorf("cannot find any device to move inputs")
 			} else {
 				// Add move
-				m := &ast.Move{From: cs}
+				m := &ast.Move{From: cs, ToLoc: fmt.Sprintf("%p", dev)}
 				moves[dev] = append(moves[dev], m)
 				a.assignment[m] = getRun(dev)
 				rewrite(n, cs, m)
@@ -413,7 +413,8 @@ func (a *ir) setOutputs() error {
 	return nil
 }
 
-// Dependencies between target instructions
+// Dependencies between target instructions. Can't use target.Graph because we
+// are using this to build the initial DependsOn relation.
 type instGraph struct {
 	insts     []target.Inst
 	dependsOn map[target.Inst][]target.Inst

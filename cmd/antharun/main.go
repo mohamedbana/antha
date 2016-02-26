@@ -84,6 +84,7 @@ func runOne(opt opt) error {
 
 	mixerOpt := mixer.DefaultOpt.Merge(params.Config).Merge(opt.MixerOpt)
 	t := target.New()
+
 	fe, err := NewFrontend(FrontendOpt{
 		Kind:     opt.Frontend,
 		MixerOpt: mixerOpt,
@@ -100,7 +101,7 @@ func runOne(opt opt) error {
 		return err
 	}
 
-	rout, err := execute.Run(ctx, execute.Options{
+	rout, err := execute.Run(ctx, execute.Opt{
 		Target:   t,
 		Workflow: wdesc,
 		Params:   params,
@@ -109,12 +110,7 @@ func runOne(opt opt) error {
 		return err
 	}
 
-	for k, v := range rout.Workflow.Outputs {
-		fmt.Printf("%s: %s\n", k, v)
-	}
-	for _, inst := range rout.Insts {
-		fmt.Println(inst)
-	}
+	printTimeline(os.Stdout, rout)
 
 	return nil
 }

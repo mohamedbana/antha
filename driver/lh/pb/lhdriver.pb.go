@@ -146,7 +146,7 @@ It has these top-level messages:
 	SIPrefixMessage
 	GenericUnitMessage
 */
-package ExtendedLiquidhandlingDriver
+package pb
 
 import proto "github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto"
 import fmt "fmt"
