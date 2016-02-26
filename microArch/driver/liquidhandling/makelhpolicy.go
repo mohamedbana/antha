@@ -64,8 +64,8 @@ func MakePolicies() map[string]LHPolicy {
 		pols[names[i]] = policy
 	}
 	*/
-	if antha.Anthafileexists("ScreenLHPolicyDOE2.xlsx") {
-		policies, names, err := PolicyMakerfromDesign("ScreenLHPolicyDOE2.xlsx", "DOE_run")
+	if antha.Anthafileexists("260216RSM.xlsx") {
+		policies, names, err := PolicyMakerfromDesign("260216RSM.xlsx", "DOE_run")
 
 		for i, policy := range policies {
 			pols[names[i]] = policy

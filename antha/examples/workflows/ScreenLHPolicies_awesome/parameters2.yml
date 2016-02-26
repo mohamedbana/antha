@@ -1,19 +1,21 @@
 {
     "Parameters": {
         "ScreenLHPolicies_Awesome": {
-            "Diluent": "water",
+            "Diluent": "LB",
             "TestSols": [
-			"tartrazine"
+			"cells"
 			],
             "NumberofReplicates": 1,
             "OutPlate": "greiner384_riser",
             "TestSolVolumes": [
-			"40ul",
-			"80ul"
+			"50ul"
+		
 			],
 			"Imagefilename": "star1.png",
             "TotalVolume": "200ul",
-			"NumberofBlanks": 5
+			"NumberofBlanks": 3, 
+			"Doedesignfile":"260216RSM.xlsx"
+			
         }
     }
 }

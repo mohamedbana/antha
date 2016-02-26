@@ -82,7 +82,7 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 	//policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run",false)
 
 	//intfactors := []string{"Pre_MIX","POST_MIX"}
-	policies, names, err := liquidhandling.PolicyMakerfromDesign("ScreenLHPolicyDOE2.xlsx", "DOE_run")
+	policies, names, err := liquidhandling.PolicyMakerfromDesign(_input.Doedesignfile, "DOE_run")
 	if err != nil {
 		panic(err)
 	}
@@ -118,7 +118,7 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 				outputsandwich := strconv.Itoa(wutil.RoundInt(_input.TestSolVolumes[l].RawValue())) + _input.TestSols[k].CName + strconv.Itoa(j+1)
 
 				outputfilename := filepath.Join(antha.Dirpath(), "DOE2"+"_"+outputsandwich+".xlsx")
-				_output.Errors = append(_output.Errors, doe.AddWelllocations(filepath.Join(antha.Dirpath(), "ScreenLHPolicyDOE2.xlsx"), 0, perconditionuntowelllocationmap, "DOE_run", outputfilename, []string{"Volume", "Solution", "Replicate"}, []interface{}{_input.TestSolVolumes[l].ToString(), _input.TestSols[k].CName, string(j)}))
+				_output.Errors = append(_output.Errors, doe.AddWelllocations(filepath.Join(antha.Dirpath(), _input.Doedesignfile), 0, perconditionuntowelllocationmap, "DOE_run", outputfilename, []string{"Volume", "Solution", "Replicate"}, []interface{}{_input.TestSolVolumes[l].ToString(), _input.TestSols[k].CName, string(j)}))
 
 				// other things to add to check for covariance
 				// order in which wells were pippetted
@@ -227,6 +227,7 @@ type ScreenLHPolicies_AwesomeElement struct {
 
 type ScreenLHPolicies_AwesomeInput struct {
 	Diluent            *wtype.LHComponent
+	Doedesignfile      string
 	Imagefilename      string
 	NumberofBlanks     int
 	NumberofReplicates int
@@ -266,6 +267,7 @@ func init() {
 			Path: "antha/component/an/Liquid_handling/FindbestLHPolicy/ScreenLHPolicies_Awesome.an",
 			Params: []ParamDesc{
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
+				{Name: "Doedesignfile", Desc: "", Kind: "Parameters"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
 				{Name: "NumberofBlanks", Desc: "", Kind: "Parameters"},
 				{Name: "NumberofReplicates", Desc: "", Kind: "Parameters"},

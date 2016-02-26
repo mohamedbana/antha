@@ -21,6 +21,7 @@ Parameters (
 	NumberofReplicates int
 	Imagefilename string
 	NumberofBlanks int
+	Doedesignfile string
 
 )
 
@@ -102,7 +103,7 @@ Steps {
 	//policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run",false)
 	
 	//intfactors := []string{"Pre_MIX","POST_MIX"}
-	policies, names,err := liquidhandling.PolicyMakerfromDesign("ScreenLHPolicyDOE2.xlsx", "DOE_run")
+	policies, names,err := liquidhandling.PolicyMakerfromDesign(Doedesignfile, "DOE_run")
 	if err != nil{
 		panic(err)
 	}
@@ -142,7 +143,7 @@ Steps {
 	outputsandwich := strconv.Itoa(wutil.RoundInt(TestSolVolumes[l].RawValue()))+TestSols[k].CName+strconv.Itoa(j+1)
 	
 	outputfilename := filepath.Join(antha.Dirpath(),"DOE2"+ "_" + outputsandwich+ ".xlsx")
-	Errors = append(Errors,doe.AddWelllocations(filepath.Join(antha.Dirpath(), "ScreenLHPolicyDOE2.xlsx"),0,perconditionuntowelllocationmap,"DOE_run",outputfilename,[]string{"Volume","Solution","Replicate"}, []interface{}{TestSolVolumes[l].ToString(),TestSols[k].CName,string(j)}))
+	Errors = append(Errors,doe.AddWelllocations(filepath.Join(antha.Dirpath(), Doedesignfile),0,perconditionuntowelllocationmap,"DOE_run",outputfilename,[]string{"Volume","Solution","Replicate"}, []interface{}{TestSolVolumes[l].ToString(),TestSols[k].CName,string(j)}))
 	
 	// other things to add to check for covariance
 	// order in which wells were pippetted
