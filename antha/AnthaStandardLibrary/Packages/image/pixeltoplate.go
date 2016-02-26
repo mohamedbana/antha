@@ -290,8 +290,8 @@ var NewProteinPaintboxSubsetmap = map[color.Color]string{
 	// under visible light
 
 	// Chromogenic proteins
-	//color.RGBA{R: uint8(70), G: uint8(105), B: uint8(172), A: uint8(255)}:  "BlitzenBlue",
-	color.RGBA{R: uint8(27), G: uint8(79), B: uint8(146), A: uint8(255)}: "DreidelTeal",
+	color.RGBA{R: uint8(70), G: uint8(105), B: uint8(172), A: uint8(255)}: "BlitzenBlue",
+	//color.RGBA{R: uint8(27), G: uint8(79), B: uint8(146), A: uint8(255)}: "DreidelTeal",
 	//color.RGBA{R: uint8(107), G: uint8(80), B: uint8(140), A: uint8(255)}:  "VirginiaViolet",
 	color.RGBA{R: uint8(120), G: uint8(76), B: uint8(190), A: uint8(255)}: "VixenPurple",
 	color.RGBA{R: uint8(77), G: uint8(11), B: uint8(137), A: uint8(255)}:  "TinselPurple",
