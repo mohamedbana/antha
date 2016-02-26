@@ -1947,10 +1947,48 @@ func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 	pol := policy.GetPolicyFor(ins)
 
 	// so a simple list of questions
+	// do we pre-mix?
 
-	// first we generate the move
+	cycles, premix := pol["PRE_MIX"]
+
+	if premix {
+		// add the premix step
+		mix := NewMoveMixInstruction()
+		mix.Head = ins.Head
+		mix.Plt = ins.PltFrom
+		mix.PlateType = ins.FPlateType
+		mix.Well = ins.WellFrom
+		mix.Multi = ins.Multi
+		mix.What = ins.What
+		// TODO get rid of this HARD CODE
+		mix.Blowout = []bool{false}
+
+		// this is not safe
+		mixvol, ok := pol["PRE_MIX_VOL"]
+		mix.Volume = ins.Volume
+
+		if ok {
+			v := make([]*wunit.Volume, ins.Multi)
+			for i := 0; i < ins.Multi; i++ {
+				vl := wunit.NewVolume(mixvol.(float64), "ul")
+				v[i] = &vl
+			}
+			mix.Volume = v
+		}
+
+		c := make([]int, ins.Multi)
+
+		for i := 0; i < ins.Multi; i++ {
+			c[i] = cycles.(int)
+		}
+
+		mix.Cycles = c
+		ret = append(ret, mix)
+	}
 
 	// do we need to enter slowly?
+	// depending on where we end up after the mix this might generate redundant
+	// moves... TODO fix this
 
 	entryspeed, gentlynow := pol["ASPENTRYSPEED"]
 
@@ -2012,45 +2050,6 @@ func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 			mov.OffsetZ = append(mov.OffsetZ, pol["ASPZOFFSET"].(float64))
 		}
 		ret = append(ret, mov)
-	}
-
-	// do we pre-mix?
-
-	cycles, premix := pol["PRE_MIX"]
-
-	if premix {
-		// add the premix step
-		mix := NewMoveMixInstruction()
-		mix.Head = ins.Head
-		mix.Plt = ins.PltFrom
-		mix.PlateType = ins.FPlateType
-		mix.Well = ins.WellFrom
-		mix.Multi = ins.Multi
-		mix.What = ins.What
-		// TODO get rid of this HARD CODE
-		mix.Blowout = []bool{false}
-
-		// this is not safe
-		mixvol, ok := pol["PRE_MIX_VOL"]
-		mix.Volume = ins.Volume
-
-		if ok {
-			v := make([]*wunit.Volume, ins.Multi)
-			for i := 0; i < ins.Multi; i++ {
-				vl := wunit.NewVolume(mixvol.(float64), "ul")
-				v[i] = &vl
-			}
-			mix.Volume = v
-		}
-
-		c := make([]int, ins.Multi)
-
-		for i := 0; i < ins.Multi; i++ {
-			c[i] = cycles.(int)
-		}
-
-		mix.Cycles = c
-		ret = append(ret, mix)
 	}
 
 	// Set the pipette speed if needed
