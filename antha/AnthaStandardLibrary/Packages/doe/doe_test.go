@@ -68,7 +68,7 @@ func TestAllCombinations(t *testing.T) {
 				"got", r, "\n",
 			)
 		}
-		for j, run := range r {
+		/*	for j, run := range r {
 
 			if len(run.Factordescriptors) != len(factor.factorheaders) {
 				t.Error(
@@ -90,7 +90,7 @@ func TestAllCombinations(t *testing.T) {
 					)
 				}
 			}
-		}
+		}*/
 	}
 }
 
