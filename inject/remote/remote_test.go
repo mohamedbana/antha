@@ -8,7 +8,23 @@ import (
 	"github.com/antha-lang/antha/inject"
 )
 
+func haveNetwork() error {
+	ln, err := net.Listen("tcp", ":0")
+	if err != nil {
+		return err
+	}
+	defer ln.Close()
+
+	if _, err := net.Dial("tcp", ln.Addr().String()); err != nil {
+		return err
+	}
+	return nil
+}
+
 func TestRunner(t *testing.T) {
+	if err := haveNetwork(); err != nil {
+		t.Skip("no network")
+	}
 	ln, err := net.Listen("tcp", ":0")
 	if err != nil {
 		t.Fatal(err)
