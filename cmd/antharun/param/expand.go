@@ -1,9 +1,10 @@
-package main
+package param
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/workflow"
 )
@@ -75,7 +76,7 @@ func flattenList(pdata []byte, param *execute.RawParams) error {
 
 // Parse parameters and workflow. If there are multiple input parameters and
 // workflow is just one element, modify workflow to take multiple parameters.
-func tryExpand(wdata, pdata []byte) (desc *workflow.Desc, param *execute.RawParams, err error) {
+func TryExpand(wdata, pdata []byte) (desc *workflow.Desc, param *execute.RawParams, err error) {
 	getFirstProcess := func(desc *workflow.Desc) *workflow.Process {
 		for _, p := range desc.Processes {
 			return &p

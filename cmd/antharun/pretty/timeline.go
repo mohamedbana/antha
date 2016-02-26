@@ -1,9 +1,10 @@
-package main
+package pretty
 
 import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/graph"
@@ -24,43 +25,39 @@ func summarize(inst target.Inst) (string, error) {
 	}
 }
 
-func printTimeline(out io.Writer, result *execute.Result) error {
+func Timeline(out io.Writer, result *execute.Result) error {
 	g := &target.Graph{
 		Insts: result.Insts,
 	}
 
 	dag := graph.Schedule(graph.Reverse(g))
+	var lines []string
 	for round := 1; len(dag.Roots) != 0; round += 1 {
-		if _, err := fmt.Fprintf(out, "== Round %2d:\n", round); err != nil {
-			return err
-		}
+		lines = append(lines, fmt.Sprintf("== Round %2d:\n", round))
 		var next []graph.Node
 		for _, n := range dag.Roots {
 			inst := n.(target.Inst)
 			if s, err := summarize(inst); err != nil {
 				return err
-			} else if _, err := fmt.Fprintf(out, "    * %s\n", s); err != nil {
-				return err
+			} else {
+				lines = append(lines, fmt.Sprintf("    * %s\n", s))
+				next = append(next, dag.Visit(n)...)
 			}
-			next = append(next, dag.Visit(n)...)
 		}
 
 		dag.Roots = next
 	}
 
-	if _, err := fmt.Fprint(out, "== Workflow Outputs:\n"); err != nil {
-		return err
-	}
+	lines = append(lines, fmt.Sprint("== Workflow Outputs:\n"))
 
 	for k, v := range result.Workflow.Outputs {
 		bs, err := json.Marshal(v)
 		if err != nil {
 			return err
 		}
-		if _, err := fmt.Fprintf(out, "    - %s: %s\n", k, string(bs)); err != nil {
-			return err
-		}
+		lines = append(lines, fmt.Sprintf("    - %s: %s\n", k, string(bs)))
 	}
 
-	return nil
+	_, err := fmt.Fprint(out, strings.Join(lines, ""))
+	return err
 }

@@ -1,4 +1,4 @@
-// /antharun/frontend.go: Part of the Antha language
+// frontend.go: Part of the Antha language
 // Copyright (C) 2015 The Antha authors. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
@@ -20,31 +20,17 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
-package main
+package frontend
 
 import (
 	"fmt"
 	"io"
 	"os"
 
-	lhclient "github.com/antha-lang/antha/driver/lh/pb/client"
 	"github.com/antha-lang/antha/microArch/logger"
-	"github.com/antha-lang/antha/target"
-	"github.com/antha-lang/antha/target/human"
-	"github.com/antha-lang/antha/target/mixer"
 )
 
-const (
-	DEBUG  = "debug"
-	REMOTE = "remote"
-)
-
-type FrontendOpt struct {
-	Kind     string
-	Target   *target.Target
-	MixerOpt mixer.Opt
-	URI      string
-}
+type Opt struct{}
 
 type Frontend struct {
 	shutdowns []func() error
@@ -76,23 +62,7 @@ func (a *middleware) Measure(ts int64, source, msg string, extra ...interface{})
 
 func (a *middleware) Sensor(ts int64, source, msg string, extra ...interface{}) {}
 
-func NewFrontend(opt FrontendOpt) (*Frontend, error) {
-	t := opt.Target
-
-	switch opt.Kind {
-	case DEBUG:
-		t.AddDevice(human.New(human.Opt{CanMix: true}))
-	case REMOTE:
-		if m, err := mixer.New(opt.MixerOpt, lhclient.NewDriver(opt.URI)); err != nil {
-			return nil, err
-		} else {
-			t.AddDevice(m)
-			t.AddDevice(human.New(human.Opt{CanMix: false}))
-		}
-	default:
-		return nil, fmt.Errorf("unknown frontend %q", opt.Kind)
-	}
-
+func New(opt Opt) (*Frontend, error) {
 	mw := &middleware{out: os.Stdout}
 	logger.RegisterMiddleware(mw)
 

@@ -1,4 +1,4 @@
-package main
+package writer
 
 import (
 	"bytes"
@@ -63,6 +63,6 @@ func (a *Writer) Flush() error {
 	return nil
 }
 
-func NewWriter(w io.Writer, prepend string) *Writer {
+func New(w io.Writer, prepend string) *Writer {
 	return &Writer{writer: w, prepend: []byte(prepend)}
 }
