@@ -183,6 +183,10 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 	request.LHInstructions = instructions
 	request.Stockconcs = stockconcs
 
+	// figure out the output order
+
+	set_output_order(request)
+
 	// looks at components, determines what inputs are required and
 	// requests them
 	request = this.GetInputs(request)
@@ -408,11 +412,8 @@ func (this *Liquidhandler) Layout(request *LHRequest) *LHRequest {
 
 // make the instructions for executing this request
 func (this *Liquidhandler) ExecutionPlan(request *LHRequest) *LHRequest {
-
-	// copy the robot -- need to verify this deep copy is working OK
-	// this copy needs to be sorted out, it's not copying the plate layouts
-	// for this debug I'll leave this out then revisit
-	//	rbtcpy := this.Properties.Dup()
+	//TODO -- this dup is missing some plate stuff
+	//rbtcpy := this.Properties.Dup()
 
 	rbtcpy := this.Properties
 

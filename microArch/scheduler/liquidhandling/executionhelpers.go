@@ -108,7 +108,7 @@ func copyplates(plts map[string]*wtype.LHPlate) map[string]*wtype.LHPlate {
 	return ret
 }
 
-func set_output_order(rq *LHRequest) *IChain {
+func set_output_order(rq *LHRequest) {
 	// gather things into groups with dependency relationships
 	// TODO -- implement time constraints and anything else
 
@@ -122,7 +122,7 @@ func set_output_order(rq *LHRequest) *IChain {
 
 	//it.Print()
 
-	return it
+	rq.InstructionChain = it
 }
 
 func optimize_runs(rq *LHRequest, chain *IChain, newoutputorder []string) {
@@ -148,16 +148,19 @@ func optimize_runs(rq *LHRequest, chain *IChain, newoutputorder []string) {
 	optimize_runs(rq, chain.Child, newoutputorder)
 }
 
-func groupByComponents(instructions []*LHInstruction) []*LHInstruction {
-	hsh := make(map[string][]*LHInstruction, len(instructions))
+func groupByComponents(instructions []*wtype.LHInstruction) []*wtype.LHInstruction {
+	/*
+		hsh := make(map[string][]*LHInstruction, len(instructions))
 
-	for _, ins := range instructions {
-		hsh[ins.Result.CName] = append(hsh[ins.Result.CName], ins)
-	}
+		for _, ins := range instructions {
+			hsh[ins.Result.CName] = append(hsh[ins.Result.CName], ins)
+		}
 
-	// component ordering needs deciding here... as a general rule it's
-	// best to stick with higher volumes first
-
+		// component ordering needs deciding here... as a general rule it's
+		// best to stick with higher volumes first
+	*/
+	r := make([]*wtype.LHInstruction, 0, 1)
+	return r
 }
 
 func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) (insOut *driver.TransferInstruction) {

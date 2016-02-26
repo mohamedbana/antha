@@ -123,7 +123,7 @@ func get_and_complete_assignments(request *LHRequest) []PlateChoice {
 
 	// inconsistent plate types will be assigned randomly!
 	//	for k, v := range request.LHInstructions {
-	for _, k := range request.Order_instructions_added {
+	for _, k := range request.Output_order {
 		v := request.LHInstructions[k]
 		if v.PlateID != "" {
 			i := defined(v.PlateID, s)
@@ -152,6 +152,9 @@ func get_and_complete_assignments(request *LHRequest) []PlateChoice {
 				s[i].Assigned = append(s[i].Assigned, v.ID)
 				s[i].Wells = append(s[i].Wells, v.Welladdress)
 			}
+		} else if v.IsMixInPlace() {
+			// the first component sets the destination
+			// which must of course be set by now
 		}
 	}
 

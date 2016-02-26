@@ -82,7 +82,7 @@ func TestLHComponentSampleStuff(t *testing.T) {
 		t.Fatal("IsSample() must return false on new components")
 	}
 
-	c.SetIsSample(true)
+	c.SetSample(true)
 
 	vrai := c.IsSample()
 
@@ -90,7 +90,7 @@ func TestLHComponentSampleStuff(t *testing.T) {
 		t.Fatal("IsSample() must return true following SetIsSample(true)")
 	}
 
-	c.SetIsSample(false)
+	c.SetSample(false)
 
 	faux = c.IsSample()
 
@@ -108,7 +108,7 @@ func TestLHComponentSampleStuff(t *testing.T) {
 		t.Fatal("IsSample() must return false on new components")
 	}
 
-	c2.SetIsSample(true)
+	c2.SetSample(true)
 
 	vrai = c2.IsSample()
 
@@ -116,7 +116,7 @@ func TestLHComponentSampleStuff(t *testing.T) {
 		t.Fatal("IsSample() must return true following SetIsSample(true)")
 	}
 
-	c2.SetIsSample(false)
+	c2.SetSample(false)
 
 	faux = c2.IsSample()
 

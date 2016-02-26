@@ -197,6 +197,11 @@ type LHInstruction struct {
 	Result           *LHComponent
 }
 
+func (ins *LHInstruction) IsMixInPlace() bool {
+	smp := ins.Components[0].IsSample()
+	return !smp
+}
+
 func (ins *LHInstruction) HasAnyParent() bool {
 	for _, v := range ins.Components {
 		if v.HasAnyParent() {
@@ -401,7 +406,7 @@ func (lhc *LHComponent) Dup() *LHComponent {
 	return c
 }
 
-func (cmp *LHComponent) SetIsSample(flag bool) bool {
+func (cmp *LHComponent) SetSample(flag bool) bool {
 	if cmp == nil {
 		return false
 	}

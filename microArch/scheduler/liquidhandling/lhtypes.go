@@ -55,6 +55,7 @@ type LHRequest struct {
 	Output_order             []string
 	Order_instructions_added []string
 	OutputIteratorFactory    func(*wtype.LHPlate) wtype.PlateIterator
+	InstructionChain         *IChain
 }
 
 // this function checks requests so we can see early on whether or not they
