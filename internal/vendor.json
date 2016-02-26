@@ -218,6 +218,11 @@
 			"revisionTime": "2015-06-17T20:38:20-07:00"
 		},
 		{
+			"path": "github.com/sajari/regression",
+			"revision": "bd620299e76090cad5beb97e33f6ae6f53154f8a",
+			"revisionTime": "2014-11-18T12:36:22+11:00"
+		},
+		{
 			"path": "github.com/tealeg/xlsx",
 			"revision": "c2885b3e5cb5fb9b241bdab3430ca6e1c1057079",
 			"revisionTime": "2015-07-24T21:09:55+02:00"
