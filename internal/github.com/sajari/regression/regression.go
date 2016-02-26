@@ -2,7 +2,7 @@ package regression
 
 import (
 	"fmt"
-	"github.com/skelterjohn/go.matrix"
+	"github.com/antha-lang/antha/internal/github.com/skelterjohn/go.matrix"
 	"math"
 	"strconv"
 	"strings"
