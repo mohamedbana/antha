@@ -4,10 +4,46 @@
 package buffers
 
 import (
-//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Pubchem"
-//"github.com/antha-lang/antha/antha/anthalib/wunit"
-//"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Pubchem"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	//"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"fmt"
 )
+
+func StockConcentration(nameofmolecule string, massofmoleculeactuallyaddedinG float64, diluent string, volumeofdiluentinL float64) (actualconc wunit.Concentration) {
+
+	molecule := pubchem.MakeMolecule(nameofmolecule)
+
+	// in particular, the molecular weight
+	molecularweight := molecule.MolecularWeight
+
+	diluentmolecule := pubchem.MakeMolecule(diluent)
+
+	fmt.Println(diluentmolecule)
+
+	actualconcfloat := massofmoleculeactuallyaddedinG / (molecularweight * volumeofdiluentinL)
+
+	actualconc = wunit.NewConcentration(actualconcfloat, "M/l")
+
+	return
+}
+
+func Dilute(moleculename string, stockconc wunit.Concentration, stockvolume wunit.Volume, diluentname string, diluentvoladded wunit.Volume) (dilutedconc wunit.Concentration) {
+
+	molecule := pubchem.MakeMolecule(moleculename)
+
+	stockMperL := stockconc.MolPerL(molecule.MolecularWeight)
+
+	diluentSI := diluentvoladded.SIValue()
+
+	stockSI := stockvolume.SIValue()
+
+	dilutedconcMperL := stockMperL.SIValue() * stockSI / (stockSI + diluentSI)
+
+	dilutedconc = wunit.NewConcentration(dilutedconcMperL, "M/l")
+	fmt.Println(diluentname)
+	return
+}
 
 /*
 From pubchem...
