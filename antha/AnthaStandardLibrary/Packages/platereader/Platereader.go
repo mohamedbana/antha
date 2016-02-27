@@ -24,6 +24,8 @@
 package platereader
 
 import (
+	"fmt"
+
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 )
@@ -53,11 +55,72 @@ func Blankcorrect(blank wtype.Absorbance, sample wtype.Absorbance) (blankcorrect
 	return
 }
 
+func EstimatePathLength(plate *wtype.LHPlate, volume wunit.Volume) (pathlength wunit.Length, err error) {
+
+	if plate.Welltype.Bottom == 0 /* i.e. flat */ && plate.Welltype.Shape().LengthUnit == "mm" {
+		wellarea, err := plate.Welltype.CalculateCrossSectionArea()
+		fmt.Println("wellarea", wellarea.ToString())
+		fmt.Println(plate.Welltype.Xdim, plate.Welltype.Ydim, plate.Welltype.Zdim, plate.Welltype.Shape())
+		if err != nil {
+
+			return pathlength, err
+		}
+		wellvol, err := plate.Welltype.CalculateMaxVolume()
+		if err != nil {
+			return pathlength, err
+		}
+
+		if volume.Unit().PrefixedSymbol() == "ul" && wellvol.Unit().PrefixedSymbol() == "ul" && wellarea.Unit().PrefixedSymbol() == "mm^2" || wellarea.Unit().PrefixedSymbol() == "mm" /* mm generated previously - wrong and needs fixing */ {
+			ratio := volume.RawValue() / wellvol.RawValue()
+			fmt.Println("ratio", ratio)
+			wellheightinmm := wellvol.RawValue() / wellarea.RawValue()
+
+			pathlengthinmm := wellheightinmm * ratio
+
+			pathlength = wunit.NewLength(pathlengthinmm, "mm")
+
+		} else {
+			fmt.Println(volume.Unit().PrefixedSymbol(), wellvol.Unit().PrefixedSymbol(), wellarea.Unit().PrefixedSymbol(), wellarea.ToString())
+		}
+		//fmt.Println("pathlength", pathlength.ToString())
+	} else {
+		err = fmt.Errorf("Can't yet estimate pathlength for this welltype shape unit ", plate.Welltype.Shape().LengthUnit, "or non flat bottom type")
+	}
+
+	return
+}
+
 func PathlengthCorrect(pathlength wunit.Length, reading wtype.Absorbance) (pathlengthcorrected wtype.Absorbance) {
 
-	referencepathlength := wunit.NewLength(0.01, "m")
+	referencepathlength := wunit.NewLength(10, "mm")
 
-	pathlengthcorrected.Reading = reading.Reading * referencepathlength.SIValue() / pathlength.SIValue()
+	pathlengthcorrected.Reading = reading.Reading * referencepathlength.RawValue() / pathlength.RawValue()
+	return
+}
+
+// based on Beer Lambert law A = ε l c
+/*
+Limitations of the Beer-Lambert law
+
+The linearity of the Beer-Lambert law is limited by chemical and instrumental factors. Causes of nonlinearity include:
+deviations in absorptivity coefficients at high concentrations (>0.01M) due to electrostatic interactions between molecules in close proximity
+scattering of light due to particulates in the sample
+fluoresecence or phosphorescence of the sample
+changes in refractive index at high analyte concentration
+shifts in chemical equilibria as a function of concentration
+non-monochromatic radiation, deviations can be minimized by using a relatively flat part of the absorption spectrum such as the maximum of an absorption band
+stray light
+*/
+func Concentration(pathlengthcorrected wtype.Absorbance, molarabsorbtivityatwavelengthLpermolpercm float64) (conc wunit.Concentration) {
+
+	A := pathlengthcorrected
+	l := 1                                         // 1cm if pathlengthcorrected add logic to use pathlength of absorbance reading input
+	ε := molarabsorbtivityatwavelengthLpermolpercm // L/Mol/cm
+
+	concfloat := A.Reading / (float64(l) * ε) // Mol/L
+	fmt.Println("concfloat", concfloat)
+	conc = wunit.NewConcentration(concfloat, "M/l")
+	fmt.Println("concfloat", conc)
 	return
 }
 

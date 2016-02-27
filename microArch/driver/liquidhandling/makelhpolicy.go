@@ -103,7 +103,7 @@ func PolicyMakerfromRuns(runs []Run, nameprepend string, concatfactorlevelsinnam
 
 	//policy := make(LHPolicy, 0)
 	policy := MakeDefaultPolicy()
-	for i, run := range runs {
+	for _, run := range runs {
 		for j, desc := range run.Factordescriptors {
 			policy[desc] = run.Setpoints[j]
 		}
@@ -117,7 +117,7 @@ func PolicyMakerfromRuns(runs []Run, nameprepend string, concatfactorlevelsinnam
 			}
 			fmt.Println(name)
 		} else {
-			names = append(names, nameprepend+strconv.Itoa(i))
+			names = append(names, nameprepend+strconv.Itoa(run.RunNumber))
 		}
 		policies = append(policies, policy)
 		fmt.Println("len policy = ", len(policy))

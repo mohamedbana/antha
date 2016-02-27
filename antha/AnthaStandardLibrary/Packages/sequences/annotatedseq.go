@@ -51,6 +51,7 @@ type Feature struct {
 	EndPosition   int
 	DNASeq        string
 	Protseq       string
+	//Status        string
 }
 
 func (feat *Feature) Coordinates() (pair []int) {
@@ -63,6 +64,16 @@ type AnnotatedSeq struct {
 	//Nm string
 	wtype.DNASequence
 	Features []Feature
+}
+
+func (annotated AnnotatedSeq) FeatureNames() (featurenames []string) {
+
+	featurenames = make([]string, 0)
+
+	for _, feature := range annotated.Features {
+		featurenames = append(featurenames, feature.Name)
+	}
+	return
 }
 
 func Annotate(dnaseq wtype.DNASequence, features []Feature) (annotated AnnotatedSeq) {
