@@ -72,3 +72,34 @@ func TestWellCoords(*testing.T) {
 	fmt.Println(wc.X, " ", wc.Y)
 	fmt.Println("Finished Testing Well Coords")
 }
+
+type testpair struct {
+	ltstring string
+	ltint    int
+}
+
+var lts []testpair = []testpair{testpair{ltstring: "DOE_run2", ltint: 102}, testpair{ltstring: "DOE_run0", ltint: 100}}
+
+func TestLiquidTypeFromString(t *testing.T) {
+
+	for _, lt := range lts {
+
+		ltnum := LiquidTypeFromString(lt.ltstring)
+		if int(ltnum) != lt.ltint {
+			t.Error("running LiquidTypeFromString on ", lt.ltstring, "expected", lt.ltint, "got", ltnum)
+		}
+
+	}
+}
+
+func TestLiquidTypeName(t *testing.T) {
+
+	for _, lt := range lts {
+
+		ltstr := LiquidTypeName(LiquidType(lt.ltint))
+		if ltstr != lt.ltstring {
+			t.Error("running LiquidTypeName on ", lt.ltint, "expected", lt.ltstring, "got", ltstr)
+		}
+
+	}
+}
