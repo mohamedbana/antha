@@ -34,6 +34,20 @@ import (
 )
 
 func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *LHRequest {
+	// do this multiply based on the order in the chain
+
+	ch := request.InstructionChain
+	for {
+		if ch == nil {
+			break
+		}
+		request = LayoutStage(request, params, ch)
+		ch = ch.Child
+	}
+
+	return request
+}
+func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain *IChain) *LHRequest {
 	// we have three kinds of solution
 	// 1- ones going to a specific plate
 	// 2- ones going to a specific plate type
@@ -117,13 +131,14 @@ type PlateChoice struct {
 	Wells     []string
 }
 
-func get_and_complete_assignments(request *LHRequest) []PlateChoice {
+func get_and_complete_assignments(request *LHRequest, order []string) []PlateChoice {
 	s := make([]PlateChoice, 0, 3)
 	m := make(map[int]string)
 
 	// inconsistent plate types will be assigned randomly!
 	//	for k, v := range request.LHInstructions {
-	for _, k := range request.Output_order {
+	//for _, k := range request.Output_order {
+	for _, l := range order {
 		v := request.LHInstructions[k]
 		if v.PlateID != "" {
 			i := defined(v.PlateID, s)
@@ -154,7 +169,12 @@ func get_and_complete_assignments(request *LHRequest) []PlateChoice {
 			}
 		} else if v.IsMixInPlace() {
 			// the first component sets the destination
-			// which must of course be set by now
+			// and now it should indeed be set
+
+			addr := v.Components[0].Loc
+			tx := strings.Split(addr, ":")
+			request.LHInstructions[k].PlateAddress = tx[0]
+			request.LHInstructions[k].WellAddress = tx[1]
 		}
 	}
 
