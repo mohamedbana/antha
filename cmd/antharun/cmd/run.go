@@ -30,6 +30,7 @@ import (
 	"path"
 
 	"github.com/antha-lang/antha/antha/component/lib"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/cmd/antharun/frontend"
 	"github.com/antha-lang/antha/cmd/antharun/param"
 	"github.com/antha-lang/antha/cmd/antharun/pretty"
@@ -37,12 +38,11 @@ import (
 	lhclient "github.com/antha-lang/antha/driver/lh/pb/client"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"github.com/antha-lang/antha/internal/github.com/spf13/cobra"
+	"github.com/antha-lang/antha/internal/github.com/spf13/viper"
 	"github.com/antha-lang/antha/target"
 	"github.com/antha-lang/antha/target/human"
 	"github.com/antha-lang/antha/target/mixer"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"golang.org/x/net/context"
 )
 
 const (

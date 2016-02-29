@@ -30,8 +30,8 @@ import (
 
 	"github.com/antha-lang/antha/cmd/antharun/comp"
 	"github.com/antha-lang/antha/cmd/antharun/pretty"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"github.com/antha-lang/antha/internal/github.com/spf13/cobra"
+	"github.com/antha-lang/antha/internal/github.com/spf13/viper"
 )
 
 const (

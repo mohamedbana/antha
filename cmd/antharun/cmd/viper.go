@@ -3,7 +3,7 @@ package cmd
 import (
 	"strings"
 
-	"github.com/spf13/viper"
+	"github.com/antha-lang/antha/internal/github.com/spf13/viper"
 )
 
 // Workaround for a bug in viper: string slice flags like:
