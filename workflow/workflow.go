@@ -249,13 +249,13 @@ func (a *Workflow) AddEdge(src, tgt Port) error {
 }
 
 // Options for creating a new Workflow
-type Options struct {
+type Opt struct {
 	FromBytes []byte
 	FromDesc  *Desc
 }
 
 // Create a new Workflow
-func New(opt Options) (*Workflow, error) {
+func New(opt Opt) (*Workflow, error) {
 	w := &Workflow{
 		nodes:   make(map[string]*node),
 		Outputs: make(map[Port]interface{}),

@@ -24,6 +24,8 @@ func Incubate(ctx context.Context, in *wtype.LHComponent, temp wunit.Temperature
 		Arg:  in,
 		Comp: comp,
 		Node: &ast.Incubate{
+			Time: time,
+			Temp: temp,
 			Reqs: []ast.Request{
 				ast.Request{
 					Time: ast.NewPoint(time.SIValue()),

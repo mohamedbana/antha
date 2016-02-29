@@ -1,14 +1,18 @@
 package mixer
 
 import (
+	"archive/tar"
+	"bytes"
+	"compress/gzip"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/ast"
 	driver "github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
-	lh "github.com/antha-lang/antha/microArch/scheduler/liquidhandling"
+	planner "github.com/antha-lang/antha/microArch/scheduler/liquidhandling"
 	"github.com/antha-lang/antha/target"
 	"github.com/antha-lang/antha/target/human"
 )
@@ -49,10 +53,10 @@ func (a *Mixer) MoveCost(from target.Device) int {
 	return human.HumanByXCost + 1
 }
 
-func (a *Mixer) makeReq() (*lh.LHRequest, *lh.Liquidhandler) {
-	req := lh.NewLHRequest()
+func (a *Mixer) makeReq() (*planner.LHRequest, *planner.Liquidhandler) {
+	req := planner.NewLHRequest()
 	req.Policies = driver.GetLHPolicyForTest()
-	planner := lh.Init(&a.properties)
+	p := planner.Init(&a.properties)
 
 	if p := a.opt.MaxPlates; p != nil {
 		req.Input_setup_weights["MAX_N_PLATES"] = *p
@@ -78,7 +82,7 @@ func (a *Mixer) makeReq() (*lh.LHRequest, *lh.Liquidhandler) {
 		}
 	}
 
-	return req, planner
+	return req, p
 }
 
 func (a *Mixer) Compile(cmds []ast.Command) ([]target.Inst, error) {
@@ -94,6 +98,34 @@ func (a *Mixer) Compile(cmds []ast.Command) ([]target.Inst, error) {
 		return nil, err
 	} else {
 		return []target.Inst{inst}, nil
+	}
+}
+
+func (a *Mixer) saveFile(name string) ([]byte, error) {
+	data, status := a.driver.GetOutputFile()
+	if !status.OK {
+		return nil, fmt.Errorf("%d: %s", status.Errorcode, status.Msg)
+	} else if len(data) == 0 {
+		return nil, nil
+	}
+
+	var buf bytes.Buffer
+	w := tar.NewWriter(gzip.NewWriter(&buf))
+	bs := []byte(data)
+
+	if err := w.WriteHeader(&tar.Header{
+		Name:    name,
+		Mode:    0644,
+		Size:    int64(len(bs)),
+		ModTime: time.Now(),
+	}); err != nil {
+		return nil, err
+	} else if _, err := w.Write(bs); err != nil {
+		return nil, err
+	} else if err := w.Close(); err != nil {
+		return nil, err
+	} else {
+		return buf.Bytes(), nil
 	}
 }
 
@@ -119,7 +151,7 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 		return
 	}
 
-	req, planner := a.makeReq()
+	req, p := a.makeReq()
 	req.BlockID = getId(mixes)
 
 	for _, mix := range mixes {
@@ -131,12 +163,17 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 		req.Add_instruction(mix)
 	}
 
-	planner.MakeSolutions(req)
+	p.MakeSolutions(req)
+
+	tarball, err := a.saveFile("input")
+	if err != nil {
+		return nil, err
+	}
 
 	return &target.Mix{
 		Request:    req,
 		Properties: a.properties,
-		Files:      nil, // TODO: add data when grpc driver supports it
+		Files:      tarball,
 	}, nil
 }
 
