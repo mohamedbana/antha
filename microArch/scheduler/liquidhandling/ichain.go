@@ -20,6 +20,15 @@ func NewIChain(parent *IChain) *IChain {
 	return &it
 }
 
+func (it *IChain) ValueIDs() []string {
+	r := make([]string, 0, 1)
+
+	for _, v := range it.Values {
+		r = append(r, v.ID)
+	}
+	return r
+}
+
 func (it *IChain) Add(ins *wtype.LHInstruction) {
 	p := it.FindNodeFor(ins)
 	p.Values = append(p.Values, ins)
