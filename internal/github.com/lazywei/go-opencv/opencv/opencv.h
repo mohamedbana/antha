@@ -9,7 +9,9 @@
 
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
-//#include <opencv2/photo/photo_c.h>
+#if (CV_VERSION_MAJOR * 100000 + CV_VERSION_MINOR * 100) >= 200400
+# include <opencv2/photo/photo_c.h>
+#endif
 #include <opencv2/imgproc/imgproc_c.h>
 #include <opencv2/core/core_c.h>
 #include <opencv2/core/version.hpp>
