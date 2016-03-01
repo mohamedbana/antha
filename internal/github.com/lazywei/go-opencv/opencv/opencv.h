@@ -9,7 +9,7 @@
 
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
-#include <opencv2/photo/photo_c.h>
+//#include <opencv2/photo/photo_c.h>
 #include <opencv2/imgproc/imgproc_c.h>
 #include <opencv2/core/core_c.h>
 #include <opencv2/core/version.hpp>

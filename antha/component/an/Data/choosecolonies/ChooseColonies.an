@@ -1,7 +1,7 @@
 protocol ChooseColonies
 
 import (
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image/pick"
 
 )
 
@@ -42,7 +42,7 @@ Setup {
 // for every input
 Steps {
 	
-	Wellstopick = image.Pick(Imagefile, NumbertoPick,Setplateperimeterfirst,Rotate)
+	Wellstopick = pick.Pick(Imagefile, NumbertoPick,Setplateperimeterfirst,Rotate)
 	
 }
 // Run after controls and a steps block are completed to

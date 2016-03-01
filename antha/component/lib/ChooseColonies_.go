@@ -1,7 +1,7 @@
 package lib
 
 import (
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image/pick"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
@@ -29,7 +29,7 @@ func _ChooseColoniesSetup(_ctx context.Context, _input *ChooseColoniesInput) {
 // for every input
 func _ChooseColoniesSteps(_ctx context.Context, _input *ChooseColoniesInput, _output *ChooseColoniesOutput) {
 
-	_output.Wellstopick = image.Pick(_input.Imagefile, _input.NumbertoPick, _input.Setplateperimeterfirst, _input.Rotate)
+	_output.Wellstopick = pick.Pick(_input.Imagefile, _input.NumbertoPick, _input.Setplateperimeterfirst, _input.Rotate)
 
 }
 
