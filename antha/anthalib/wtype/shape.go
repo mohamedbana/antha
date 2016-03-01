@@ -79,7 +79,6 @@ func (sh *Shape) CrossSectionalArea() (area wunit.Area, err error) {
 		area = wunit.NewArea(math.Pi*sh.H*sh.H, areaunit)
 	} else if boxlike {
 		area = wunit.NewArea(sh.H*sh.W, areaunit)
-		fmt.Println(sh.H, sh.W, sh.H*sh.W, areaunit)
 	} else {
 		err = fmt.Errorf("No method to work out cross sectional area for shape", sh.ShapeName, "yet")
 	}

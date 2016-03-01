@@ -1,20 +1,17 @@
 package liquidhandling
 
-import (
-	"fmt"
-	"time"
-)
+import "time"
 
 func GetTimerFor(model, mnfr string) *LHTimer {
 	timers := makeTimers()
 
-	fmt.Println("Getting timer for ", model, mnfr)
+	//fmt.Println("Getting timer for ", model, mnfr)
 
 	_, ok := timers[model+mnfr]
 	if ok {
 		return timers[model+mnfr]
 	} else {
-		fmt.Println("None found")
+		//fmt.Println("None found")
 	}
 
 	return nil

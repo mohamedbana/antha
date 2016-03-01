@@ -232,7 +232,7 @@ func modpc(choice PlateChoice, nwell int) []PlateChoice {
 		if e > len(choice.Assigned) {
 			e = len(choice.Assigned)
 		}
-		fmt.Println("S:", s, " E:", e)
+		//fmt.Println("S:", s, " E:", e)
 		r = append(r, PlateChoice{choice.Platetype, choice.Assigned[s:e], wtype.GetUUID(), choice.Wells[s:e]})
 	}
 	return r

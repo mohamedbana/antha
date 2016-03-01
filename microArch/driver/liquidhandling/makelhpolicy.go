@@ -115,12 +115,12 @@ func PolicyMakerfromRuns(runs []Run, nameprepend string, concatfactorlevelsinnam
 				name = fmt.Sprint(name, "_", key, ":", value)
 
 			}
-			fmt.Println(name)
+			//	fmt.Println(name)
 		} else {
 			names = append(names, nameprepend+strconv.Itoa(run.RunNumber))
 		}
 		policies = append(policies, policy)
-		fmt.Println("len policy = ", len(policy))
+		//fmt.Println("len policy = ", len(policy))
 		policy = MakeDefaultPolicy()
 	}
 
