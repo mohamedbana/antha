@@ -1,6 +1,7 @@
 package wtype
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -24,37 +25,56 @@ const (
 )
 
 func LiquidTypeFromString(s string) LiquidType {
-	switch s {
-	case "water":
-	case "":
-		return LTWater
-	case "glycerol":
-		return LTGlycerol
-	case "ethanol":
-		return LTEthanol
-	case "detergent":
-		return LTDetergent
-	case "culture":
-		return LTCulture
-	case "protein":
-		return LTProtein
-	case "dna":
-		return LTDNA
-	case "load":
-		return LTload
-	case "DoNotMix":
-		return LTDoNotMix
-	case "loadwater":
-		return LTloadwater
-	case "NeedToMix":
-		return LTNeedToMix
-	default:
-		return LTWater
+	if strings.Contains(s, "DOE_run") {
+		fields := strings.SplitAfter(s, "DOE_run")
+
+		runnumber, err := strconv.Atoi(fields[1])
+		if err != nil {
+			panic(err.Error())
+		}
+		liquid := LiquidType(100 + runnumber)
+
+		return liquid
+	} else {
+
+		switch s {
+		case "water":
+		case "":
+			return LTWater
+		case "glycerol":
+			return LTGlycerol
+		case "ethanol":
+			return LTEthanol
+		case "detergent":
+			return LTDetergent
+		case "culture":
+			return LTCulture
+		case "protein":
+			return LTProtein
+		case "dna":
+			return LTDNA
+		case "load":
+			return LTload
+		case "DoNotMix":
+			return LTDoNotMix
+		case "loadwater":
+			return LTloadwater
+		case "NeedToMix":
+			return LTNeedToMix
+		default:
+			return LTWater
+		}
+
 	}
 	return LTWater
 }
 
 func LiquidTypeName(lt LiquidType) string {
+
+	if lt > 99 {
+		return "DOE_run" + strconv.Itoa(int(lt)-100)
+	}
+
 	switch lt {
 	case LTWater:
 		return "water"

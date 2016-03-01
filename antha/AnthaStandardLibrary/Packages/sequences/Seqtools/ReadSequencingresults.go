@@ -18,6 +18,11 @@ func Npercent(NumberofN int, FullSeq string) float64 {
 	return undet
 }
 
+func CountN(Seq string) int {
+	n := strings.Count(Seq, "N")
+	return n
+}
+
 func ReadtoCsvfromcurrentdir(filenametocreate string) {
 
 	//Make an output file
@@ -94,7 +99,7 @@ func ReadtoCsvfromcurrentdir(filenametocreate string) {
 				fmt.Println("Sequencing run length =", len(Seq))
 
 				//count the number of nucleotides which have been designated "n" (undetermined) and print the amount
-				N := strings.Count(Seq, "N")
+				N := CountN(Seq)
 				fmt.Println("Nucleotides not sequenced =", N)
 
 				//print the proportion of undetermined nucleotides in the sequence
