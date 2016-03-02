@@ -93,6 +93,7 @@ func ChooseChannel(vol wunit.Volume, prms *LHProperties) (*wtype.LHChannelParame
 	v := vol.RawValue()
 
 	for _, head := range prms.HeadsLoaded {
+		//fmt.Println("Trying head ", head.Name, " Which has minimum volume ", head.Adaptor.Params.Minvol.ConvertTo(vol.Unit()))
 
 		minv := head.Params.Minvol.ConvertTo(vol.Unit())
 		maxv := head.Params.Maxvol.ConvertTo(vol.Unit())
@@ -1971,10 +1972,10 @@ func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 		mix.Volume = ins.Volume
 
 		if ok {
-			v := make([]*wunit.Volume, ins.Multi)
+			v := make([]wunit.Volume, ins.Multi)
 			for i := 0; i < ins.Multi; i++ {
 				vl := wunit.NewVolume(mixvol.(float64), "ul")
-				v[i] = &vl
+				v[i] = vl
 			}
 			mix.Volume = v
 		}
