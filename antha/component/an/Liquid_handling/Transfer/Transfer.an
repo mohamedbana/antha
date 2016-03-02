@@ -25,7 +25,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	FinalSolution *wtype.LHSolution
+	FinalSolution *wtype.LHComponent
 	
 )
 
@@ -43,7 +43,7 @@ Setup {
 Steps {
 	
 	sample := mixer.Sample(Startingsolution,LiquidVolume) 
-	FinalSolution = MixInto(OutPlate,sample)
+	FinalSolution = MixInto(OutPlate, "",sample)
 	
 	Status = LiquidVolume.ToString() + " of " + Liquidname + " was mixed into " + OutPlate.Type
 	

@@ -39,7 +39,7 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 
 	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette)
 
-	solutions := make([]*wtype.LHSolution, 0)
+	solutions := make([]*wtype.LHComponent, 0)
 
 	counter := 0
 
@@ -76,7 +76,7 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 			blackSample := mixer.Sample(_input.Black, blackvol)
 			components = append(components, blackSample)
 
-			solution := execute.MixTo(_ctx, _input.OutPlate, locationkey, components...)
+			solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 0, components...)
 			solutions = append(solutions, solution)
 
 		}
@@ -156,7 +156,7 @@ type PipetteImage_GrayInput struct {
 
 type PipetteImage_GrayOutput struct {
 	Numberofpixels int
-	Pixels         []*wtype.LHSolution
+	Pixels         []*wtype.LHComponent
 }
 
 type PipetteImage_GraySOutput struct {
@@ -164,7 +164,7 @@ type PipetteImage_GraySOutput struct {
 		Numberofpixels int
 	}
 	Outputs struct {
-		Pixels []*wtype.LHSolution
+		Pixels []*wtype.LHComponent
 	}
 }
 

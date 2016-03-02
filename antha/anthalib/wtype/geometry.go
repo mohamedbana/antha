@@ -24,9 +24,6 @@ package wtype
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"strconv"
-	"strings"
 )
 
 type Coordinates struct {
@@ -40,84 +37,4 @@ type Geometry interface {
 	Height() wunit.Length
 	Width() wunit.Length
 	Depth() wunit.Length
-}
-
-type Shape struct {
-	ShapeName  string
-	LengthUnit string
-	H          float64
-	W          float64
-	D          float64
-}
-
-// let shape implement geometry
-
-func (sh *Shape) Height() wunit.Length { // y?
-	return wunit.NewLength(sh.H, sh.LengthUnit)
-}
-func (sh *Shape) Width() wunit.Length { // X?
-	return wunit.NewLength(sh.W, sh.LengthUnit)
-}
-func (sh *Shape) Depth() wunit.Length { // Z?
-	return wunit.NewLength(sh.D, sh.LengthUnit)
-}
-
-func (sh *Shape) Dup() *Shape {
-	return &(Shape{sh.ShapeName, sh.LengthUnit, sh.H, sh.W, sh.D})
-}
-
-func NewShape(name, lengthunit string, h, w, d float64) *Shape {
-	sh := Shape{name, lengthunit, h, w, d}
-	return &sh
-}
-
-// convenience structure for handling well coordinates
-type WellCoords struct {
-	X int
-	Y int
-}
-
-// make well coordinates in the "A1" convention
-func MakeWellCoordsA1(a1 string) WellCoords {
-	// only handles 96 well plates
-	return WellCoords{wutil.ParseInt(a1[1:len(a1)]) - 1, AlphaToNum(string(a1[0])) - 1}
-}
-
-// make well coordinates in the "1A" convention
-func MakeWellCoords1A(a1 string) WellCoords {
-	// only handles 96 well plates
-	return WellCoords{AlphaToNum(string(a1[0])) - 1, wutil.ParseInt(a1[1:len(a1)]) - 1}
-}
-
-// make well coordinates in a manner compatble with "X1,Y1" etc.
-func MakeWellCoordsXYsep(x, y string) WellCoords {
-	return WellCoords{wutil.ParseInt(y[1:len(y)]) - 1, wutil.ParseInt(x[1:len(x)]) - 1}
-}
-
-func MakeWellCoordsXY(xy string) WellCoords {
-	tx := strings.Split(xy, "Y")
-	x := wutil.ParseInt(tx[0][1:len(tx[0])]) - 1
-	y := wutil.ParseInt(tx[1]) - 1
-	return WellCoords{x, y}
-}
-
-// return well coordinates in "X1Y1" format
-func (wc *WellCoords) FormatXY() string {
-	return "X" + strconv.Itoa(wc.X+1) + "Y" + strconv.Itoa(wc.Y+1)
-}
-func (wc *WellCoords) Format1A() string {
-	return strconv.Itoa(wc.X+1) + NumToAlpha(wc.Y+1)
-}
-func (wc *WellCoords) FormatA1() string {
-	return NumToAlpha(wc.Y+1) + strconv.Itoa(wc.X+1)
-}
-func (wc *WellCoords) WellNumber() int {
-	return (8*(wc.X-1) + wc.Y)
-}
-
-func (wc *WellCoords) ColNumString() string {
-	return strconv.Itoa(wc.X + 1)
-}
-func (wc *WellCoords) RowLettString() string {
-	return NumToAlpha(wc.Y + 1)
 }

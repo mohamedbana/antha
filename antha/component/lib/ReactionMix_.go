@@ -33,18 +33,17 @@ func _ReactionMixSteps(_ctx context.Context, _input *ReactionMixInput, _output *
 	ATPS := mixer.Sample(_input.ATP, _input.ATPV)
 	RES := mixer.Sample(_input.RE, _input.REV)
 
-	com := []wunit.Volume{_input.VectorV, _input.BufferV, _input.LigaseV, _input.ATPV, _input.REV}
-	WaterS := mixer.TopUpVolume(_input.Water, com, _input.ReactionVolume)
+	//com := []wunit.Volume{VectorV, BufferV, LigaseV, ATPV, REV}
+	//WaterS := mixer.TopUpVolume(Water, com, ReactionVolume)
+	WaterS := mixer.SampleForTotalVolume(_input.Water, _input.ReactionVolume)
 
 	ComponentsS := mixer.MultiSample(_input.Components, _input.ComponentsV)
 
 	samples = append(samples, VectorS, BufferS, LigaseS, ATPS, RES, WaterS)
 	samples = append(samples, ComponentsS...)
 
-	_output.Reaction = mixer.MixInto(_input.OutPlate, samples...)
-
 	// Incubate
-	execute.Incubate(_ctx, _output.Reaction, _input.ReactionTemp, _input.ReactionTime, false)
+	_output.Reaction = execute.Incubate(_ctx, mixer.MixInto(_input.OutPlate, "", samples...), _input.ReactionTemp, _input.ReactionTime, false)
 
 }
 
@@ -105,7 +104,7 @@ type ReactionMixInput struct {
 	ATPV           wunit.Volume
 	Buffer         *wtype.LHComponent
 	BufferV        wunit.Volume
-	Components     []wtype.LHComponent
+	Components     []*wtype.LHComponent
 	ComponentsV    []wunit.Volume
 	InPlate        *wtype.LHPlate
 	Ligase         *wtype.LHComponent
@@ -122,14 +121,14 @@ type ReactionMixInput struct {
 }
 
 type ReactionMixOutput struct {
-	Reaction *wtype.LHSolution
+	Reaction *wtype.LHComponent
 }
 
 type ReactionMixSOutput struct {
 	Data struct {
 	}
 	Outputs struct {
-		Reaction *wtype.LHSolution
+		Reaction *wtype.LHComponent
 	}
 }
 

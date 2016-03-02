@@ -81,7 +81,11 @@ func Visit(opt VisitOpt) (res *VisitResult, err error) {
 		}
 
 		if err = apply(opt.Visitor, p.Node); err != nil {
-			break
+			if err == TraversalDone {
+				break
+			} else {
+				continue
+			}
 		}
 
 		nextDist := p.Dist + 1

@@ -40,6 +40,7 @@ func TestDeserializeLHSolution(t *testing.T) {
 	}
 }
 
+/*
 func TestDeserializeGenericPhysical(t *testing.T) {
 	str := `{"Iname":"","Imp":"0.000 ","Ibp":"0.000 ","Ishc":{"Mvalue":0,"Munit":null},"Myname":"","Mymass":"0.000 ","Myvol":"0.000 ","Mytemp":"0.000 "}`
 	var gp GenericPhysical
@@ -68,7 +69,7 @@ func TestDeserializeGenericMatter(t *testing.T) {
 		t.Fatal(err)
 	}
 }
-
+*/
 func TestLHWellSerialize(t *testing.T) {
 	//	LHWELL{
 	//		ID        : 15cf94b7-ae06-443d-bc9a-9aadc30790fd,
@@ -103,9 +104,8 @@ func TestLHWellSerialize(t *testing.T) {
 		"A1",
 		20,
 		"ul",
-		make([]*LHComponent, 0),
-		1,
-		0,
+		NewLHComponent(),
+		1.0,
 		&Shape{
 			"cylinder",
 			"mm",
@@ -161,18 +161,19 @@ func TestSerializeLHPlate_1(t *testing.T) {
 	}
 }
 
+// entity is now greatly stripped down
+/*
 func TestSerializeLHPlateGenericEntity(t *testing.T) {
 	plate := LHPlate{}
-	location := NewLocation("somewhere", 1, NewShape(
-		"box", "m",
-		0, 1, 1,
-	))
-	ge := GenericEntity{
-		NewGenericSolid("water", "box"),
-		location.(*ConcreteLocation),
-	}
-	plate.GenericEntity = &ge
-
+		location := NewLocation("somewhere", 1, NewShape(
+			"box", "m",
+			0, 1, 1,
+		))
+			ge := GenericEntity{
+				NewGenericSolid("water", "box"),
+				location.(*ConcreteLocation),
+			}
+			plate.GenericEntity = &ge
 	enc, err := json.Marshal(plate)
 	if err != nil {
 		t.Fatal(err)
@@ -184,6 +185,7 @@ func TestSerializeLHPlateGenericEntity(t *testing.T) {
 	}
 	if reflect.DeepEqual(plate, outPlate) {
 		fmt.Println(pretty.Compare(plate, outPlate))
-		t.Fatal("input plate and out plate dondiffer")
+		t.Fatal("input plate and out plate do not differ")
 	}
 }
+*/

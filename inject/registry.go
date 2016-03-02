@@ -2,8 +2,9 @@ package inject
 
 import (
 	"errors"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"sync"
+
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 )
 
 var alreadyAdded = errors.New("already added")
@@ -12,7 +13,7 @@ type registry struct {
 	lock   sync.Mutex
 	parent context.Context
 	reg    map[Name]Runner
-	// XXX: add remote registries...
+	// TODO: add remote registries...
 }
 
 // Unique identifier for Runner
@@ -42,7 +43,6 @@ func (a *registry) Add(name Name, runner Runner) error {
 	return nil
 }
 
-// XXX: lift more complicated search/typing logic out
 func (a *registry) Find(query NameQuery) ([]Runner, error) {
 	a.lock.Lock()
 	defer a.lock.Unlock()

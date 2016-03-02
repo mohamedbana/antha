@@ -89,11 +89,11 @@ func _DNA_gelSteps(_ctx context.Context, _input *DNA_gelInput, _output *DNA_gelO
 		panic(fmt.Sprintln("length of sample names:", len(_input.Samplenames), "is not equal to sample number:", _input.Samplenumber))
 	}
 
-	loadedsamples := make([]*wtype.LHSolution, 0)
+	loadedsamples := make([]*wtype.LHComponent, 0)
 
 	var DNAgelloadmix *wtype.LHComponent
 
-	_input.Water.Type = "loadwater"
+	_input.Water.Type = wtype.LTloadwater
 
 	for i := 0; i < _input.Samplenumber; i++ {
 		// ready to add water to well
@@ -102,10 +102,11 @@ func _DNA_gelSteps(_ctx context.Context, _input *DNA_gelInput, _output *DNA_gelO
 		// load gel
 		if _input.Loadingdyeinsample == false {
 			DNAgelloadmixsolution := execute.MixInto(_ctx, _input.DNAgel,
+				"",
 				mixer.Sample(_input.Loadingdye, _input.Loadingdyevolume),
 				mixer.SampleForTotalVolume(_input.Sampletotest, _input.DNAgelrunvolume),
 			)
-			DNAgelloadmix = wtype.SolutionToComponent(DNAgelloadmixsolution)
+			DNAgelloadmix = DNAgelloadmixsolution
 		} else {
 			DNAgelloadmix = _input.Sampletotest
 		}
@@ -120,6 +121,7 @@ func _DNA_gelSteps(_ctx context.Context, _input *DNA_gelInput, _output *DNA_gelO
 		//DNAgelloadmix.Type = "loadwater"
 
 		loadedsample := execute.MixInto(_ctx, _input.DNAgel,
+			"",
 			waterSample,
 			mixer.Sample(DNAgelloadmix, _input.DNAgelrunvolume),
 		)
@@ -233,7 +235,7 @@ type DNA_gelInput struct {
 	Loadingdye         *wtype.LHComponent
 	Loadingdyeinsample bool
 	Loadingdyevolume   wunit.Volume
-	Mixingpolicy       string
+	Mixingpolicy       wtype.LiquidType
 	Samplenames        []string
 	Samplenumber       int
 	Sampletotest       *wtype.LHComponent
@@ -242,14 +244,14 @@ type DNA_gelInput struct {
 }
 
 type DNA_gelOutput struct {
-	Loadedsamples []*wtype.LHSolution
+	Loadedsamples []*wtype.LHComponent
 }
 
 type DNA_gelSOutput struct {
 	Data struct {
 	}
 	Outputs struct {
-		Loadedsamples []*wtype.LHSolution
+		Loadedsamples []*wtype.LHComponent
 	}
 }
 

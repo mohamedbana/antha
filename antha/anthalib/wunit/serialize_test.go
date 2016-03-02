@@ -24,6 +24,7 @@ package wunit
 
 import (
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -47,7 +48,8 @@ func TestVolumeMarshal(t *testing.T) {
 
 	var v3 Volume
 
-	v = Volume{ConcreteMeasurement{0, nil}}
+	cm := ConcreteMeasurement{0, nil}
+	v = Volume{&cm}
 	if enc, err = json.Marshal(v); err != nil {
 		t.Fatal(err)
 	}
@@ -55,6 +57,8 @@ func TestVolumeMarshal(t *testing.T) {
 		t.Fatal(err)
 	}
 	if !reflect.DeepEqual(v, v3) {
+		fmt.Println(v.ToString())
+		fmt.Println(v3.ToString())
 		t.Fatalf("volumes not equal, expecting %v, got %v", v, v3)
 	}
 }

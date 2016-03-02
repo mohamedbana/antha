@@ -27,7 +27,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Transformedcells *wtype.LHSolution
+	Transformedcells *wtype.LHComponent
 )
 
 Requirements {
@@ -47,11 +47,9 @@ Steps {
 	DNAsample := mixer.Sample(Reaction, Reactionvolume)
 	transformationmix = append(transformationmix, DNAsample)
 	
-	transformedcells := MixInto(OutPlate, transformationmix...)
+	transformedcells := MixInto(OutPlate, "", transformationmix...)
 	
-	Incubate (transformedcells, Postplasmidtemp, Postplasmidtime,false)
-
-	Transformedcells = transformedcells
+	Transformedcells = Incubate (transformedcells, Postplasmidtemp, Postplasmidtime,false)
 
 }
 

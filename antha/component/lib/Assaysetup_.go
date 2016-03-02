@@ -28,7 +28,7 @@ func _AssaysetupSetup(_ctx context.Context, _input *AssaysetupInput) {
 // for every input
 func _AssaysetupSteps(_ctx context.Context, _input *AssaysetupInput, _output *AssaysetupOutput) {
 
-	reactions := make([]*wtype.LHSolution, 0)
+	reactions := make([]*wtype.LHComponent, 0)
 
 	for i := 0; i < _input.NumberofReactions; i++ {
 		eachreaction := make([]*wtype.LHComponent, 0)
@@ -38,7 +38,7 @@ func _AssaysetupSteps(_ctx context.Context, _input *AssaysetupInput, _output *As
 		eachreaction = append(eachreaction, subSample)
 		enzSample := mixer.Sample(_input.Enzyme, _input.EnzymeVolume)
 		eachreaction = append(eachreaction, enzSample)
-		reaction := execute.MixInto(_ctx, _input.OutPlate, eachreaction...)
+		reaction := execute.MixInto(_ctx, _input.OutPlate, "", eachreaction...)
 		reactions = append(reactions, reaction)
 
 	}
@@ -115,7 +115,7 @@ type AssaysetupInput struct {
 }
 
 type AssaysetupOutput struct {
-	Reactions []*wtype.LHSolution
+	Reactions []*wtype.LHComponent
 	Status    string
 }
 
@@ -124,7 +124,7 @@ type AssaysetupSOutput struct {
 		Status string
 	}
 	Outputs struct {
-		Reactions []*wtype.LHSolution
+		Reactions []*wtype.LHComponent
 	}
 }
 

@@ -17,49 +17,13 @@ func IsTree(g Graph, root Node) error {
 	return err
 }
 
-type FilterTreeOpt struct {
-	Tree Graph
-	Root Node
-	In   func(Node) bool // Should node be included
-}
-
-// Return tree (generally forest) that results from removing some nodes of a
-// tree while keeping the same reachability relation (e.g., if a is an ancestor
-// of b in G, a' will be an ancestor of b' in G').
-func FilterTree(opt FilterTreeOpt) Graph {
-	ret := &qgraph{
-		Outs: make(map[Node][]Node),
-	}
-	inParent := make(map[Node]Node)
-	VisitTree(VisitTreeOpt{
-		Tree: opt.Tree,
-		Root: opt.Root,
-		PreOrder: func(n, parent Node, err error) error {
-			var p Node
-			if !opt.In(n) {
-				// Not in
-				p = inParent[parent]
-			} else {
-				p = n
-				ret.Nodes = append(ret.Nodes, n)
-				if pp := inParent[parent]; pp != nil {
-					ret.Outs[pp] = append(ret.Outs[pp], n)
-				}
-			}
-			inParent[n] = p
-			return nil
-		},
-	})
-	return ret
-}
-
 type TreeVisitor func(n, parent Node, err error) error
 
 type VisitTreeOpt struct {
 	Tree      Graph
 	Root      Node
-	PreOrder  TreeVisitor
-	PostOrder TreeVisitor
+	PreOrder  TreeVisitor // if err != TraversalDone, propagate error
+	PostOrder TreeVisitor // if err != TraversalDone, propagate error
 }
 
 // Apply a tree visitor.
@@ -86,11 +50,17 @@ func VisitTree(opt VisitTreeOpt) error {
 		if f.Post {
 			if err := apply(opt.PostOrder, f.Node, f.Parent, lastError); err != nil {
 				lastError = err
+				if err == TraversalDone {
+					break
+				}
 			}
 			continue
 		} else {
 			if err := apply(opt.PreOrder, f.Node, f.Parent, lastError); err != nil {
 				lastError = err
+				if err == TraversalDone {
+					break
+				}
 				continue
 			}
 		}

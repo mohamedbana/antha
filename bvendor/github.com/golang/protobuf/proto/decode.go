@@ -1,7 +1,7 @@
 // Go support for Protocol Buffers - Google's data interchange format
 //
 // Copyright 2010 The Go Authors.  All rights reserved.
-// https://github.com/golang/protobuf
+// https://github.com/antha-lang/antha/bvendor/github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -597,9 +597,13 @@ func (o *Buffer) dec_slice_packed_bool(p *Properties, base structPointer) error 
 		return err
 	}
 	nb := int(nn) // number of bytes of encoded bools
+	fin := o.index + nb
+	if fin < o.index {
+		return errOverflow
+	}
 
 	y := *v
-	for i := 0; i < nb; i++ {
+	for o.index < fin {
 		u, err := p.valDec(o)
 		if err != nil {
 			return err

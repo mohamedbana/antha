@@ -31,7 +31,7 @@ func _TransferSetup(_ctx context.Context, _input *TransferInput) {
 func _TransferSteps(_ctx context.Context, _input *TransferInput, _output *TransferOutput) {
 
 	sample := mixer.Sample(_input.Startingsolution, _input.LiquidVolume)
-	_output.FinalSolution = execute.MixInto(_ctx, _input.OutPlate, sample)
+	_output.FinalSolution = execute.MixInto(_ctx, _input.OutPlate, "", sample)
 
 	_output.Status = _input.LiquidVolume.ToString() + " of " + _input.Liquidname + " was mixed into " + _input.OutPlate.Type
 
@@ -103,7 +103,7 @@ type TransferInput struct {
 }
 
 type TransferOutput struct {
-	FinalSolution *wtype.LHSolution
+	FinalSolution *wtype.LHComponent
 	Status        string
 }
 
@@ -112,7 +112,7 @@ type TransferSOutput struct {
 		Status string
 	}
 	Outputs struct {
-		FinalSolution *wtype.LHSolution
+		FinalSolution *wtype.LHComponent
 	}
 }
 

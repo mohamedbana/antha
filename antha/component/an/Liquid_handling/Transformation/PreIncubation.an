@@ -25,7 +25,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	ReadyCompCells *wtype.LHSolution
+	ReadyCompCells *wtype.LHComponent
 )
 
 Requirements {
@@ -41,12 +41,9 @@ Steps {
 	competentcells := make([]*wtype.LHComponent,0)
 	competentcellsample := mixer.Sample(CompetentCells,CompetentCellvolumeperassembly)
 	competentcells = append(competentcells,competentcellsample)
-	readycompetentcells := MixInto(OutPlate, competentcells...)  
-	Incubate (readycompetentcells,Preplasmidtemp, Preplasmidtime, false) 
+	readycompetentcells := MixInto(OutPlate, "", competentcells...)  
 	
-	ReadyCompCells = readycompetentcells
-
-
+	ReadyCompCells = Incubate (readycompetentcells,Preplasmidtemp, Preplasmidtime, false)
 }
 
 // Run after controls and a steps block are completed to

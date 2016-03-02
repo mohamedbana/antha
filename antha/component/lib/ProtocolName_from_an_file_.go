@@ -37,7 +37,7 @@ func _ProtocolName_from_an_fileSteps(_ctx context.Context, _input *ProtocolName_
 		_output.OutputData = append(_output.OutputData, output)
 	}
 	sample := mixer.Sample(_input.InputVariable, _input.ParameterVariableAsValuewithunit)
-	_output.PhysicalOutput = execute.MixInto(_ctx, _input.OutPlate, sample)
+	_output.PhysicalOutput = execute.MixInto(_ctx, _input.OutPlate, "", sample)
 
 }
 
@@ -109,7 +109,7 @@ type ProtocolName_from_an_fileInput struct {
 
 type ProtocolName_from_an_fileOutput struct {
 	OutputData     []string
-	PhysicalOutput *wtype.LHSolution
+	PhysicalOutput *wtype.LHComponent
 }
 
 type ProtocolName_from_an_fileSOutput struct {
@@ -117,7 +117,7 @@ type ProtocolName_from_an_fileSOutput struct {
 		OutputData []string
 	}
 	Outputs struct {
-		PhysicalOutput *wtype.LHSolution
+		PhysicalOutput *wtype.LHComponent
 	}
 }
 

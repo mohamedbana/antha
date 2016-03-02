@@ -72,3 +72,115 @@ func TestWellCoords(*testing.T) {
 	fmt.Println(wc.X, " ", wc.Y)
 	fmt.Println("Finished Testing Well Coords")
 }
+
+func TestLHComponentSampleStuff(t *testing.T) {
+	var c LHComponent
+
+	faux := c.IsSample()
+
+	if faux {
+		t.Fatal("IsSample() must return false on new components")
+	}
+
+	c.SetSample(true)
+
+	vrai := c.IsSample()
+
+	if !vrai {
+		t.Fatal("IsSample() must return true following SetIsSample(true)")
+	}
+
+	c.SetSample(false)
+
+	faux = c.IsSample()
+
+	if faux {
+		t.Fatal("IsSample() must return false following SetIsSample(false)")
+	}
+
+	// now the same from NewLHComponent
+
+	c2 := NewLHComponent()
+
+	faux = c2.IsSample()
+
+	if faux {
+		t.Fatal("IsSample() must return false on new components")
+	}
+
+	c2.SetSample(true)
+
+	vrai = c2.IsSample()
+
+	if !vrai {
+		t.Fatal("IsSample() must return true following SetIsSample(true)")
+	}
+
+	c2.SetSample(false)
+
+	faux = c2.IsSample()
+
+	if faux {
+		t.Fatal("IsSample() must return false following SetIsSample(false)")
+	}
+
+	// finally need to make sure sample works
+	// grrr import cycle not allowed: honestly I think Sample should just be an
+	// instance method of LHComponent now anyway
+	/*
+
+		c.CName = "YOMAMMA"
+		s := mixer.Sample(c, wunit.NewVolume(10.0, "ul"))
+
+		vrai = s.IsSample()
+
+		if !vrai {
+			t.Fatal("IsSample() must return true for results of mixer.Sample()")
+		}
+		s = mixer.SampleForConcentration(c, wunit.NewConcentration(10.0, "mol/l"))
+
+		vrai = s.IsSample()
+
+		if !vrai {
+			t.Fatal("IsSample() must return true for results of mixer.SampleForConcentration()")
+		}
+		s = mixer.SampleForTotalVolume(c, wunit.NewVolume(10.0, "ul"))
+
+		vrai = s.IsSample()
+
+		if !vrai {
+			t.Fatal("IsSample() must return true for results of mixer.SampleForTotalVolume()")
+		}
+	*/
+}
+
+type testpair struct {
+	ltstring string
+	ltint    int
+}
+
+var lts []testpair = []testpair{testpair{ltstring: "DOE_run2", ltint: 102}, testpair{ltstring: "DOE_run0", ltint: 100}}
+
+func TestLiquidTypeFromString(t *testing.T) {
+
+	for _, lt := range lts {
+
+		ltnum := LiquidTypeFromString(lt.ltstring)
+		if int(ltnum) != lt.ltint {
+			t.Error("running LiquidTypeFromString on ", lt.ltstring, "expected", lt.ltint, "got", ltnum)
+		}
+
+	}
+}
+
+func TestLiquidTypeName(t *testing.T) {
+
+	for _, lt := range lts {
+
+		ltstr := LiquidTypeName(LiquidType(lt.ltint))
+		if ltstr != lt.ltstring {
+			t.Error("running LiquidTypeName on ", lt.ltint, "expected", lt.ltstring, "got", ltstr)
+		}
+
+	}
+}

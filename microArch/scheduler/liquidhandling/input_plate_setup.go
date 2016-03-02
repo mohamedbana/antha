@@ -24,11 +24,12 @@ package liquidhandling
 
 import (
 	"fmt"
+	"sort"
+
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
-	"sort"
 )
 
 type InputSorter struct {
@@ -132,7 +133,7 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 
 	input_order = isrt.Ordered
 
-	weights_constraints := request.Input_Setup_Weights
+	weights_constraints := request.Input_setup_weights
 
 	// get the assignment
 
@@ -189,11 +190,12 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 				ass = append(ass, location)
 
 				// make a duplicate of this component to stick in the well
-
+				// wait wait wait is this right?
 				newcomponent := component.Dup()
-				newcomponent.Vol = curr_well.Vol
-				newcomponent.Loc = location
+				newcomponent.Vol = curr_well.MaxVol
 				volume.Subtract(curr_well.WorkingVolume())
+
+				//fmt.Println("ADDING component ", component.CName, " to ", location)
 
 				curr_well.Add(newcomponent)
 				input_plates[curr_plate.ID] = curr_plate

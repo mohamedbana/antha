@@ -81,7 +81,7 @@ func _PCRSteps(_ctx context.Context, _input *PCRInput, _output *PCROutput) {
 
 	polySample := mixer.SampleForConcentration(_input.PCRPolymerase, _input.TargetpolymeraseConcentration)
 	samples = append(samples, polySample)
-	reaction := execute.MixInto(_ctx, _input.OutPlate, samples...)
+	reaction := execute.MixInto(_ctx, _input.OutPlate, "", samples...)
 
 	// thermocycle parameters called from enzyme lookup:
 
@@ -92,28 +92,28 @@ func _PCRSteps(_ctx context.Context, _input *PCRInput, _output *PCROutput) {
 
 	// initial Denaturation
 
-	execute.Incubate(_ctx, reaction, meltingTemp, _input.InitDenaturationtime, false)
+	r1 := execute.Incubate(_ctx, reaction, meltingTemp, _input.InitDenaturationtime, false)
 
 	for i := 0; i < _input.Numberofcycles; i++ {
 
 		// Denature
 
-		execute.Incubate(_ctx, reaction, meltingTemp, _input.Denaturationtime, false)
+		r1 = execute.Incubate(_ctx, r1, meltingTemp, _input.Denaturationtime, false)
 
 		// Anneal
-		execute.Incubate(_ctx, reaction, _input.AnnealingTemp, _input.Annealingtime, false)
+		r1 = execute.Incubate(_ctx, r1, _input.AnnealingTemp, _input.Annealingtime, false)
 
 		//extensiontime := TargetTemplatelengthinBP/PCRPolymerase.RateBPpers // we'll get type issues here so leave it out for now
 
 		// Extend
-		execute.Incubate(_ctx, reaction, extensionTemp, _input.Extensiontime, false)
+		r1 = execute.Incubate(_ctx, r1, extensionTemp, _input.Extensiontime, false)
 
 	}
 	// Final Extension
-	execute.Incubate(_ctx, reaction, extensionTemp, _input.Finalextensiontime, false)
+	r1 = execute.Incubate(_ctx, r1, extensionTemp, _input.Finalextensiontime, false)
 
 	// all done
-	_output.Reaction = reaction
+	_output.Reaction = r1
 }
 
 // Run after controls and a steps block are completed to
@@ -200,14 +200,14 @@ type PCRInput struct {
 }
 
 type PCROutput struct {
-	Reaction *wtype.LHSolution
+	Reaction *wtype.LHComponent
 }
 
 type PCRSOutput struct {
 	Data struct {
 	}
 	Outputs struct {
-		Reaction *wtype.LHSolution
+		Reaction *wtype.LHComponent
 	}
 }
 

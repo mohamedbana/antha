@@ -32,6 +32,13 @@ import (
 )
 
 //Logging Functions
+func Track(message string, extra ...interface{}) {
+	_middlewares_mutex.Lock()
+	defer _middlewares_mutex.Unlock()
+	for _, h := range getMiddlewareList() {
+		h.Log(TRACK, time.Now().Unix(), getSource(), message, extra...)
+	}
+}
 func Info(message string, extra ...interface{}) {
 	_middlewares_mutex.Lock()
 	defer _middlewares_mutex.Unlock()
@@ -106,6 +113,19 @@ func RegisterMiddleware(m LoggerMiddleware) {
 	middlewares = append(middlewares, m)
 }
 
+func UnregisterMiddleware(u LoggerMiddleware) {
+	_middlewares_mutex.Lock()
+	defer _middlewares_mutex.Unlock()
+
+	var newM []LoggerMiddleware
+	for _, m := range middlewares {
+		if m != u {
+			newM = append(newM, m)
+		}
+	}
+	middlewares = newM
+}
+
 func getMiddlewareList() []LoggerMiddleware {
 	//return the list or list with default inside if empty
 	if len(middlewares) == 0 {
@@ -125,11 +145,11 @@ func cleanMiddleware() {
 
 //LoggerMiddleware a means to react to specific log events
 type LoggerMiddleware interface {
-	Log(LogLevel, int64, string, string, ...interface{})
+	Log(level LogLevel, ts int64, source, msg string, extra ...interface{})
 	//Measure react to specific telemetry messages
-	Measure(int64, string, string, ...interface{})
+	Measure(ts int64, source, msg string, extra ...interface{})
 	//Sensor react to specific sensor readouts
-	Sensor(int64, string, string, ...interface{})
+	Sensor(ts int64, source, msg string, extra ...interface{})
 }
 
 //getSource returns a string representing the line of code that the preceeding call was generated.

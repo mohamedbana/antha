@@ -28,7 +28,7 @@ func _PaintmixSetup(_ctx context.Context, _input *PaintmixInput) {
 // for every input
 func _PaintmixSteps(_ctx context.Context, _input *PaintmixInput, _output *PaintmixOutput) {
 
-	reactions := make([]*wtype.LHSolution, 0)
+	reactions := make([]*wtype.LHComponent, 0)
 
 	for i := 0; i < _input.Numberofcopies; i++ {
 		eachreaction := make([]*wtype.LHComponent, 0)
@@ -36,7 +36,7 @@ func _PaintmixSteps(_ctx context.Context, _input *PaintmixInput, _output *Paintm
 		eachreaction = append(eachreaction, col1Sample)
 		col2Sample := mixer.Sample(_input.Colour2, _input.Colour2vol)
 		eachreaction = append(eachreaction, col2Sample)
-		reaction := execute.MixInto(_ctx, _input.OutPlate, eachreaction...)
+		reaction := execute.MixInto(_ctx, _input.OutPlate, "", eachreaction...)
 		reactions = append(reactions, reaction)
 
 	}
@@ -111,7 +111,7 @@ type PaintmixInput struct {
 }
 
 type PaintmixOutput struct {
-	NewColours []*wtype.LHSolution
+	NewColours []*wtype.LHComponent
 	Status     string
 }
 
@@ -120,7 +120,7 @@ type PaintmixSOutput struct {
 		Status string
 	}
 	Outputs struct {
-		NewColours []*wtype.LHSolution
+		NewColours []*wtype.LHComponent
 	}
 }
 

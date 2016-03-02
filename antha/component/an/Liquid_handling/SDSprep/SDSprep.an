@@ -44,7 +44,7 @@ Inputs (
 Outputs (
 
 //Biologicals
-	LoadSample		*wtype.LHSolution
+	LoadSample		*wtype.LHComponent
 
 )
 
@@ -75,7 +75,7 @@ Steps {
     proteinSample.CName = SampleName
     samples = append(samples, proteinSample)
     fmt.Println ("This is a sample list ", samples)
-    LoadSample = MixInto(OutPlate, samples...)
+    LoadSample = MixInto(OutPlate, "", samples...)
 
 
 //Methods 2.Make a sample of two things creating a list
@@ -95,7 +95,7 @@ Steps {
 
 //Denature the load mixture at specified temperature and time ie 95oC for 5min 
 //	Step2
-	Incubate(LoadSample, DenatureTemp, DenatureTime, false)
+	LoadSample = Incubate(LoadSample, DenatureTemp, DenatureTime, false)
 
 
 //Load the water in EPAGE gel wells	

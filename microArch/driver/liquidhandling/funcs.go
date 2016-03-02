@@ -33,8 +33,8 @@ func MinMinVol(channels []*wtype.LHChannelParameter) wunit.Volume {
 	mmv := wunit.NewVolume(9999999.0, "ul")
 
 	for _, c := range channels {
-		if c.Minvol.LessThan(&mmv) {
-			mmv = *(c.Minvol)
+		if c.Minvol.LessThan(mmv) {
+			mmv = c.Minvol
 		}
 	}
 

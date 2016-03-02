@@ -64,7 +64,6 @@ type Liquidhandler struct {
 	LayoutAgent      func(*LHRequest, *liquidhandling.LHProperties) *LHRequest
 	ExecutionPlanner func(*LHRequest, *liquidhandling.LHProperties) *LHRequest
 	PolicyManager    *LHPolicyManager
-	Counter          int
 	Once             sync.Once
 }
 
@@ -72,8 +71,8 @@ type Liquidhandler struct {
 func Init(properties *liquidhandling.LHProperties) *Liquidhandler {
 	lh := Liquidhandler{}
 	lh.SetupAgent = BasicSetupAgent
-	lh.LayoutAgent = BasicLayoutAgent
-	lh.ExecutionPlanner = AdvancedExecutionPlanner
+	lh.LayoutAgent = ImprovedLayoutAgent
+	lh.ExecutionPlanner = ImprovedExecutionPlanner
 	lh.Properties = properties
 	return &lh
 }
@@ -82,7 +81,7 @@ func Init(properties *liquidhandling.LHProperties) *Liquidhandler {
 // solutions
 func (this *Liquidhandler) MakeSolutions(request *LHRequest) *LHRequest {
 	// the minimal request which is possible defines what solutions are to be made
-	if len(request.Output_solutions) == 0 {
+	if len(request.LHInstructions) == 0 {
 		return request
 	}
 
@@ -95,6 +94,7 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) *LHRequest {
 		OutputSetup(this.Properties)
 	}
 
+	// this is protective, should not be needed
 	this.Once.Do(f)
 
 	return request
@@ -179,24 +179,29 @@ func (this *Liquidhandler) do_setup(rq *LHRequest) {
 
 func (this *Liquidhandler) Plan(request *LHRequest) {
 	// convert requests to volumes and determine required stock concentrations
-	solutions, stockconcs := solution_setup(request, this.Properties)
-	request.Output_solutions = solutions
+	instructions, stockconcs := solution_setup(request, this.Properties)
+	request.LHInstructions = instructions
 	request.Stockconcs = stockconcs
+
+	// figure out the output order
+
+	set_output_order(request)
 
 	// looks at components, determines what inputs are required and
 	// requests them
 	request = this.GetInputs(request)
 
 	// define the input plates
+	// should be merged with the above
 
 	request = input_plate_setup(request)
 
 	// set up the mapping of the outputs
-	// this assumes the input plates are set
 	request = this.Layout(request)
 
 	// define the output plates
-	request = output_plate_setup(request)
+	// DEPRECATED, marked for deletion
+	//request = output_plate_setup(request)
 
 	// next we need to determine the liquid handler setup
 	request = this.Setup(request)
@@ -204,34 +209,27 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 	// now make instructions
 	request = this.ExecutionPlan(request)
 
-	// define the tip boxes - this will depend on the execution plan
-	// this can eventually be removed if we allow state to pass from the execution
-	// planner back outside but for now it works on a copy
+	// fix the deck setup
 
 	request = this.Tip_box_setup(request)
 }
 
-// request the inputs which are needed to run the plan, unless they have already
-// been requested
+// sort out inputs
 func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
-
-	if this.Counter > 0 {
-		return request
-	}
-	this.Counter += 1
-
-	solutions := (*request).Output_solutions
+	instructions := (*request).LHInstructions
 	inputs := make(map[string][]*wtype.LHComponent, 3)
-
 	order := make(map[string]map[string]int, 3)
 
-	for _, solution := range solutions {
-		// components are either other solutions or come in as inputs
-		// this needs solving too
-		components := solution.Components
+	for _, instruction := range instructions {
+		components := instruction.Components
 
 		for _, component := range components {
-			component.Destination = solution.ID
+			// ignore anything which is made in another mix
+
+			if component.HasAnyParent() {
+				continue
+			}
+
 			cmps, ok := inputs[component.CName]
 			if !ok {
 				cmps = make([]*wtype.LHComponent, 0, 3)
@@ -241,6 +239,10 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 			inputs[component.CName] = cmps
 
 			for j := 0; j < len(components); j++ {
+				// again exempt those parented components
+				if components[j].HasAnyParent() {
+					continue
+				}
 				if component.Order < components[j].Order {
 					m, ok := order[component.CName]
 					if !ok {
@@ -265,6 +267,7 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 	// define component ordering
 
 	component_order := DefineOrderOrFail(order)
+
 	(*request).Input_order = component_order
 
 	var requestinputs map[string][]*wtype.LHComponent
@@ -323,7 +326,7 @@ func DefineOrderOrFail(mapin map[string]map[string]int) []string {
 			c2 := mapin[cmps[j]][cmps[i]]
 
 			if c1 > 0 && c2 > 0 {
-				log.Fatal("CANNOT DEAL WITH INCONSISTENT COMPONENT ORDERING")
+				log.Fatalf("CANNOT DEAL WITH INCONSISTENT COMPONENT ORDERING", cmps[i], " ", cmps[j], " ", c1, " ", c2)
 			}
 
 			// if c1 > 0 we add to the count
@@ -408,10 +411,16 @@ func (this *Liquidhandler) Layout(request *LHRequest) *LHRequest {
 
 // make the instructions for executing this request
 func (this *Liquidhandler) ExecutionPlan(request *LHRequest) *LHRequest {
-	// finally define the instructions which will enact the transfers
-	// this is quite involved, we need a strategy to do this
+	//TODO -- this dup is missing some plate stuff
+	//rbtcpy := this.Properties.Dup()
 
-	return this.ExecutionPlanner(request, this.Properties)
+	rbtcpy := this.Properties
+
+	rq := this.ExecutionPlanner(request, rbtcpy)
+
+	// ensure any relevant state changes are noted
+
+	return rq
 }
 
 func OutputSetup(robot *liquidhandling.LHProperties) {

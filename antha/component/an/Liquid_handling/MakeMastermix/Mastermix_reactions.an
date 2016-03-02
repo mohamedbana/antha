@@ -32,7 +32,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Mastermixes []*wtype.LHSolution
+	Mastermixes []*wtype.LHComponent
 )
 
 Requirements {
@@ -57,7 +57,7 @@ Steps {
 		panic("len(Components) != len(OtherComponentVolumes)")
 	}
 	
-	mastermixes := make([]*wtype.LHSolution,0)
+	mastermixes := make([]*wtype.LHComponent,0)
 	
 	if AliquotbyRow {
 			panic("MixTo based method coming soon!")
@@ -73,7 +73,7 @@ Steps {
 		
 		for k,component := range Components {
 			if k == len(Components){
-				component.Type = "NeedToMix"
+				component.Type = wtype.LTNeedToMix //"NeedToMix"
 			}
 		
 		// multiply volume of each component by number of reactions per mastermix
@@ -83,7 +83,7 @@ Steps {
 		eachmastermix = append(eachmastermix,componentSample)
 		}
 		
-		mastermix := MixInto(OutPlate, eachmastermix...)
+		mastermix := MixInto(OutPlate, "",  eachmastermix...)
 		mastermixes = append(mastermixes,mastermix)
 		
 	}

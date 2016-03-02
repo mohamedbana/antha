@@ -29,7 +29,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Aliquots []*wtype.LHSolution
+	Aliquots []*wtype.LHComponent
 )
 
 Requirements {
@@ -52,15 +52,15 @@ Steps {
 	}
 	
 	
-	aliquots := make([]*wtype.LHSolution,0)
+	aliquots := make([]*wtype.LHComponent,0)
 	
 	
 	for i := 0; i < NumberofAliquots; i++ {
-		if Solution.Type == "dna"{
-		Solution.Type = "DoNotMix"
+		if Solution.TypeName() == "dna"{
+		Solution.Type = wtype.LTDoNotMix
 		}
 		aliquotSample := mixer.Sample(Solution, VolumePerAliquot)
-		aliquot := MixInto(OutPlate, aliquotSample)
+		aliquot := MixInto(OutPlate, "", aliquotSample)
 		aliquots = append(aliquots,aliquot)
 	}
 	Aliquots = aliquots

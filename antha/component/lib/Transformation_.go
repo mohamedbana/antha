@@ -36,11 +36,9 @@ func _TransformationSteps(_ctx context.Context, _input *TransformationInput, _ou
 	DNAsample := mixer.Sample(_input.Reaction, _input.Reactionvolume)
 	transformationmix = append(transformationmix, DNAsample)
 
-	transformedcells := execute.MixInto(_ctx, _input.OutPlate, transformationmix...)
+	transformedcells := execute.MixInto(_ctx, _input.OutPlate, "", transformationmix...)
 
-	execute.Incubate(_ctx, transformedcells, _input.Postplasmidtemp, _input.Postplasmidtime, false)
-
-	_output.Transformedcells = transformedcells
+	_output.Transformedcells = execute.Incubate(_ctx, transformedcells, _input.Postplasmidtemp, _input.Postplasmidtime, false)
 
 }
 
@@ -112,14 +110,14 @@ type TransformationInput struct {
 }
 
 type TransformationOutput struct {
-	Transformedcells *wtype.LHSolution
+	Transformedcells *wtype.LHComponent
 }
 
 type TransformationSOutput struct {
 	Data struct {
 	}
 	Outputs struct {
-		Transformedcells *wtype.LHSolution
+		Transformedcells *wtype.LHComponent
 	}
 }
 

@@ -146,14 +146,14 @@ type MakeAssembliesInput struct {
 }
 
 type MakeAssembliesOutput struct {
-	Reactions []*wtype.LHSolution
+	Reactions []*wtype.LHComponent
 }
 
 type MakeAssembliesSOutput struct {
 	Data struct {
 	}
 	Outputs struct {
-		Reactions []*wtype.LHSolution
+		Reactions []*wtype.LHComponent
 	}
 }
 

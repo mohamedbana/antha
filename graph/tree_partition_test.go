@@ -47,7 +47,7 @@ func checkPartition(opt PartitionTreeOpt) (*TreePartition, error) {
 		Root: opt.Root,
 		PreOrder: func(n, parent Node, err error) error {
 			if parent != nil {
-				sum += opt.Weights(r.Parts[parent], r.Parts[n])
+				sum += opt.EdgeWeight(r.Parts[parent], r.Parts[n])
 			}
 			return nil
 		},
@@ -103,7 +103,7 @@ func BenchmarkMinWeightTree(b *testing.B) {
 		Colors: func(Node) []int {
 			return colors
 		},
-		Weights: func(x, y int) int {
+		EdgeWeight: func(x, y int) int {
 			if w, seen := weights[struct{ A, B int }{A: x, B: y}]; seen {
 				return w
 			}
@@ -145,7 +145,7 @@ func testMinWeightTree(t *testing.T, exact bool) {
 		Colors: makeTestColors(map[string][]int{
 			"root": []int{1},
 		}),
-		Weights: func(a, b int) int {
+		EdgeWeight: func(a, b int) int {
 			return 1
 		},
 	}); err != nil {
@@ -167,7 +167,7 @@ func testMinWeightTree(t *testing.T, exact bool) {
 			"b":    []int{1, 3},
 			"c":    []int{4},
 		}),
-		Weights: func(a, b int) int {
+		EdgeWeight: func(a, b int) int {
 			if a == b {
 				return 0
 			}
@@ -199,7 +199,7 @@ func testMinWeightTree(t *testing.T, exact bool) {
 			"e":    []int{1, 2, 3},
 			"f":    []int{1, 2, 3},
 		}),
-		Weights: func(a, b int) int {
+		EdgeWeight: func(a, b int) int {
 			return 100 - (a + b)
 		},
 	}); err != nil {

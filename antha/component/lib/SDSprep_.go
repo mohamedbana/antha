@@ -62,7 +62,7 @@ func _SDSprepSteps(_ctx context.Context, _input *SDSprepInput, _output *SDSprepO
 	proteinSample.CName = _input.SampleName
 	samples = append(samples, proteinSample)
 	fmt.Println("This is a sample list ", samples)
-	_output.LoadSample = execute.MixInto(_ctx, _input.OutPlate, samples...)
+	_output.LoadSample = execute.MixInto(_ctx, _input.OutPlate, "", samples...)
 
 	//Methods 2.Make a sample of two things creating a list
 	//	Step 1b
@@ -79,7 +79,7 @@ func _SDSprepSteps(_ctx context.Context, _input *SDSprepInput, _output *SDSprepO
 
 	//Denature the load mixture at specified temperature and time ie 95oC for 5min
 	//	Step2
-	execute.Incubate(_ctx, _output.LoadSample, _input.DenatureTemp, _input.DenatureTime, false)
+	_output.LoadSample = execute.Incubate(_ctx, _output.LoadSample, _input.DenatureTemp, _input.DenatureTime, false)
 
 	//Load the water in EPAGE gel wells
 	//	Step3
@@ -166,7 +166,7 @@ type SDSprepInput struct {
 }
 
 type SDSprepOutput struct {
-	LoadSample *wtype.LHSolution
+	LoadSample *wtype.LHComponent
 	Status     string
 }
 
@@ -175,7 +175,7 @@ type SDSprepSOutput struct {
 		Status string
 	}
 	Outputs struct {
-		LoadSample *wtype.LHSolution
+		LoadSample *wtype.LHComponent
 	}
 }
 

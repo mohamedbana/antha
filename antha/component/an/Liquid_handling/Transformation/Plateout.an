@@ -27,7 +27,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Platedculture *wtype.LHSolution
+	Platedculture *wtype.LHComponent
 )
 
 Requirements {
@@ -52,8 +52,8 @@ Steps {
 	}
 	plateoutsample := mixer.Sample(RecoveredCells, Plateoutvolume) 
 	plateout = append(plateout,plateoutsample)
-	platedculture := MixInto(AgarPlate, plateout...)
-	Incubate(platedculture,IncubationTemp,IncubationTime,false)
+	platedculture := MixInto(AgarPlate, "",  plateout...)
+	platedculture = Incubate(platedculture,IncubationTemp,IncubationTime,false)
 	Platedculture = platedculture
 	
 	

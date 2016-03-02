@@ -23,7 +23,7 @@ Parameters (
 
 // Physical Inputs to this protocol with types
 Inputs (
-	Components []wtype.LHComponent
+	Components []*wtype.LHComponent
 	Vector *wtype.LHComponent
 	Buffer *wtype.LHComponent
 	Ligase *wtype.LHComponent
@@ -38,7 +38,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Reaction *wtype.LHSolution
+	Reaction *wtype.LHComponent
 )
 
 // Data which is returned from this protocol, and data types
@@ -61,18 +61,17 @@ Steps {
 	ATPS := mixer.Sample(ATP, ATPV)
 	RES := mixer.Sample(RE, REV)
 	
-	com := []wunit.Volume{VectorV, BufferV, LigaseV, ATPV, REV}
-	WaterS := mixer.TopUpVolume(Water, com, ReactionVolume)
+	//com := []wunit.Volume{VectorV, BufferV, LigaseV, ATPV, REV}
+	//WaterS := mixer.TopUpVolume(Water, com, ReactionVolume)
+	WaterS:=mixer.SampleForTotalVolume(Water, ReactionVolume)
 	
 	ComponentsS := mixer.MultiSample(Components, ComponentsV)
 	
 	samples = append(samples, VectorS, BufferS, LigaseS, ATPS, RES, WaterS)
 	samples = append(samples, ComponentsS...)
 	
-	Reaction = mixer.MixInto(OutPlate, samples...)
-	
 	// Incubate
-	Incubate(Reaction, ReactionTemp, ReactionTime, false)
+	Reaction = Incubate(mixer.MixInto(OutPlate, "", samples...), ReactionTemp, ReactionTime, false)
 	
 }
 

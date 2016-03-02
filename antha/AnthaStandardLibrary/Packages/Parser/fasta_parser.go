@@ -68,6 +68,101 @@ func RetrieveSeqFromFASTA(id string, filename string) (seq wtype.DNASequence, er
 	return
 }
 
+// This will retrieve seq from FASTA file
+func FASTAtoLinearDNASeqs(filename string) (seqs []wtype.DNASequence, err error) {
+
+	seqs = make([]wtype.DNASequence, 0)
+
+	var seq wtype.DNASequence
+
+	allparts, err := ioutil.ReadFile(filename)
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fastaFh := bytes.NewReader(allparts)
+
+	// then retrieve the particular record
+	for record := range FastaParse(fastaFh) {
+		//if strings.Contains(record.Id, id) {
+		seq = wtype.DNASequence{record.Id, record.Seq, false, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, ""}
+
+		seqs = append(seqs, seq)
+
+	}
+	return
+
+}
+
+// This will retrieve seq from FASTA file
+func FASTAtoPlasmidDNASeqs(filename string) (seqs []wtype.DNASequence, err error) {
+
+	seqs = make([]wtype.DNASequence, 0)
+
+	var seq wtype.DNASequence
+
+	allparts, err := ioutil.ReadFile(filename)
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	fastaFh := bytes.NewReader(allparts)
+
+	// then retrieve the particular record
+	for record := range FastaParse(fastaFh) {
+		//if strings.Contains(record.Id, id) {
+		seq = wtype.DNASequence{record.Id, record.Seq, true, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, ""}
+
+		seqs = append(seqs, seq)
+
+	}
+	return
+
+}
+
+func FastatoDNASequences(inputfilename string) (seqs []wtype.DNASequence, err error) {
+	fastaFh, err := os.Open(inputfilename)
+	if err != nil {
+		return
+	}
+	defer fastaFh.Close()
+
+	seqs = make([]wtype.DNASequence, 0)
+
+	var seq wtype.DNASequence
+
+	/*records := make([][]string, 0)
+	seq := make([]string, 0)
+	seq = []string{"#Name", "Sequence", "Plasmid?", "Seq Type", "Class"}
+	records = append(records, seq)*/
+	for record := range FastaParse(fastaFh) {
+		plasmidstatus := ""
+		//seqtype := "DNA"
+		//class := "not specified"
+		if strings.Contains(strings.ToUpper(record.Desc), "PLASMID") || strings.Contains(strings.ToUpper(record.Desc), "CIRCULAR") || strings.Contains(strings.ToUpper(record.Desc), "VECTOR") {
+			plasmidstatus = "PLASMID"
+		}
+		/*	if strings.Contains(record.Desc, "Amino acid") || strings.Contains(record.Id, "aa") {
+				seqtype = "AA"
+			}
+
+			if strings.Contains(record.Desc, "Class:") {
+				uptoclass := strings.Index(record.Desc, "Class:")
+				prefix := uptoclass + len("class:")
+				class = record.Desc[prefix:]
+			}*/
+		seq, err = wtype.MakeDNASequence(record.Id, record.Seq, []string{plasmidstatus})
+		if err != nil {
+			return seqs, err
+		}
+		seqs = append(seqs, seq)
+	}
+
+	return
+}
+
 func Build_fasta(header string, seq bytes.Buffer) (Record Fasta) {
 	fields := strings.SplitN(header, " ", 2)
 
@@ -88,6 +183,8 @@ func Build_fasta(header string, seq bytes.Buffer) (Record Fasta) {
 	return Record
 }
 
+// new new version
+
 func FastaParse(fastaFh io.Reader) chan Fasta {
 
 	outputChannel := make(chan Fasta)
@@ -101,6 +198,119 @@ func FastaParse(fastaFh io.Reader) chan Fasta {
 		// Loop over the letters in inputString
 		for scanner.Scan() {
 			line := strings.TrimSpace(scanner.Text())
+			line = strings.Replace(line, "\t", "", -1)
+			sublines := strings.Split(line, "\r")
+			for _, line := range sublines {
+
+				if len(line) == 0 {
+					continue
+				}
+
+				// line := scanner.Text()
+
+				if line[0] == '>' {
+					// If we stored a previous identifier, get the DNA string and map to the
+					// identifier and clear the string
+					if header != "" {
+						// outputChannel <- build_fasta(header, seq.String())
+						outputChannel <- Build_fasta(header, seq)
+						header = ""
+						seq.Reset()
+					}
+
+					// Standard FASTA identifiers look like: ">id desc"
+					header = line[1:]
+					//fmt.Println(" header: ", header)
+					//header = strings.Join(line[1:], " ")
+
+				} else {
+					// Append here since multi-line DNA strings are possible
+					seq.WriteString(line)
+				}
+			}
+
+		}
+
+		outputChannel <- Build_fasta(header, seq)
+
+		// Close the output channel, so anything that loops over it
+		// will know that it is finished.
+		close(outputChannel)
+	}()
+
+	return outputChannel
+}
+
+/*
+// new version
+func FastaParse(fastaFh io.Reader) chan Fasta {
+
+	outputChannel := make(chan Fasta)
+
+	scanner := bufio.NewScanner(fastaFh)
+	// scanner.Split(bufio.ScanLines)
+	header := ""
+	var seq bytes.Buffer
+
+	go func() {
+		// Loop over the letters in inputString
+		for scanner.Scan() {
+			fullline := strings.TrimSpace(scanner.Text())
+			sublines := strings.Fields(fullline)
+			for _, line := range sublines {
+
+				if len(line) == 0 {
+					continue
+				}
+
+				// line := scanner.Text()
+
+				if line[0] == '>' {
+					// If we stored a previous identifier, get the DNA string and map to the
+					// identifier and clear the string
+					if header != "" {
+						// outputChannel <- build_fasta(header, seq.String())
+						outputChannel <- Build_fasta(header, seq)
+						header = ""
+						seq.Reset()
+					}
+
+					// Standard FASTA identifiers look like: ">id desc"
+					header = line[1:]
+				} else {
+					// Append here since multi-line DNA strings are possible
+					seq.WriteString(line)
+				}
+			}
+
+		}
+
+		outputChannel <- Build_fasta(header, seq)
+
+		// Close the output channel, so anything that loops over it
+		// will know that it is finished.
+		close(outputChannel)
+	}()
+
+	return outputChannel
+}
+*/
+/*
+func FastaParse(fastaFh io.Reader) chan Fasta {
+
+	outputChannel := make(chan Fasta)
+
+	scanner := bufio.NewScanner(fastaFh)
+	//scanner.Split(bufio.ScanLines)
+	header := ""
+	var seq bytes.Buffer
+
+	go func() {
+		// Loop over the letters in inputString
+		for scanner.Scan() {
+			line := strings.TrimSpace(scanner.Text())
+
+			line = strings.Replace(line, "^M", "", -1)
 			if len(line) == 0 {
 				continue
 			}
@@ -135,7 +345,7 @@ func FastaParse(fastaFh io.Reader) chan Fasta {
 
 	return outputChannel
 }
-
+*/
 func Fastatocsv(inputfilename string, outputfileprefix string) (csvfile *os.File, err error) {
 	fastaFh, err := os.Open(inputfilename)
 	if err != nil {

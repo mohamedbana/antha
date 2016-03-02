@@ -4,6 +4,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
+	"fmt"
 )
 
 // Input parameters for this protocol (data)
@@ -17,7 +18,7 @@ Parameters (
 	BSAvol						Volume
 	
 	StockReConcinUperml 		[]int
-	DesiredConcinUperml	 		[]int
+	DesiredConcinUperml	 	[]int
 	
 	ReactionTemp 				Temperature
 	ReactionTime 				Time
@@ -40,7 +41,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Reaction *wtype.LHSolution
+	Reaction *wtype.LHComponent
 )
 
 // Data which is returned from this protocol, and data types
@@ -61,7 +62,7 @@ Steps {
 
 	// workout volume of buffer to add in SI units
 	BufferVol := wunit.NewVolume(float64(ReactionVolume.SIValue()/float64(BufferConcX)),"l")	
-	
+	fmt.Println("HELLLLLOOOOOO:",ReactionVolume.SIValue(),BufferConcX, float64(ReactionVolume.SIValue()/float64(BufferConcX)),BufferVol.SIValue())
 	bufferSample := mixer.Sample(Buffer, BufferVol)
 	samples = append(samples, bufferSample)
 
@@ -73,6 +74,7 @@ Steps {
 	
 	// work out necessary volume to add
 	DNAVol := wunit.NewVolume(float64((DNAMassperReaction.SIValue()/DNAConc.SIValue())),"l")
+	fmt.Println("HELLLLLOOOOOO Again:", DNAMassperReaction.SIValue(),DNAConc.SIValue(),float64((DNAMassperReaction.SIValue()/DNAConc.SIValue())),DNAVol.SIValue())
 	text.Print("DNAVOL",DNAVol.ToString())
 	dnaSample := mixer.Sample(DNASolution, DNAVol)
 	samples = append(samples, dnaSample)
@@ -102,12 +104,10 @@ Steps {
 		samples = append(samples, enzSample)
 	}
 
-	Reaction = MixInto(OutPlate, samples...)
-
 	// incubate the reaction mixture
-	Incubate(Reaction, ReactionTemp, ReactionTime, false)
+	r1 := Incubate(MixInto(OutPlate, "", samples...), ReactionTemp, ReactionTime, false)
 	// inactivate
-	Incubate(Reaction, InactivationTemp, InactivationTime, false)
+	Reaction = Incubate(r1, InactivationTemp, InactivationTime, false)
 }
 
 // Run after controls and a steps block are completed to

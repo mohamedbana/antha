@@ -68,12 +68,10 @@ func _TypeIISConstructAssembly_altSteps(_ctx context.Context, _input *TypeIISCon
 	ligSample := mixer.Sample(_input.Ligase, _input.LigVol)
 	samples = append(samples, ligSample)
 
-	_output.Reaction = execute.MixInto(_ctx, _input.OutPlate, samples...)
-
 	// incubate the reaction mixture
-	execute.Incubate(_ctx, _output.Reaction, _input.ReactionTemp, _input.ReactionTime, false)
+	out1 := execute.Incubate(_ctx, execute.MixInto(_ctx, _input.OutPlate, "", samples...), _input.ReactionTemp, _input.ReactionTime, false)
 	// inactivate
-	execute.Incubate(_ctx, _output.Reaction, _input.InactivationTemp, _input.InactivationTime, false)
+	_output.Reaction = execute.Incubate(_ctx, out1, _input.InactivationTemp, _input.InactivationTime, false)
 }
 
 // Run after controls and a steps block are completed to
@@ -159,7 +157,7 @@ type TypeIISConstructAssembly_altInput struct {
 }
 
 type TypeIISConstructAssembly_altOutput struct {
-	Reaction *wtype.LHSolution
+	Reaction *wtype.LHComponent
 	S        string
 }
 
@@ -168,7 +166,7 @@ type TypeIISConstructAssembly_altSOutput struct {
 		S string
 	}
 	Outputs struct {
-		Reaction *wtype.LHSolution
+		Reaction *wtype.LHComponent
 	}
 }
 

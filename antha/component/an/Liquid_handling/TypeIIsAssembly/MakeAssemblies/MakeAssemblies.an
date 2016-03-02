@@ -37,7 +37,7 @@ Inputs (
 )
 
 Outputs (
-	Reactions []*wtype.LHSolution      // List of assembled parts
+	Reactions []*wtype.LHComponent      // List of assembled parts
 )
 
 Setup {}

@@ -27,7 +27,7 @@ Inputs (
 
 
 Outputs (
-    RunSolutions   []*wtype.LHSolution
+    RunSolutions   []*wtype.LHComponent
 )
 
 Data (
@@ -61,9 +61,9 @@ Steps {
 	}
 
 
-	RunSolutions = make([]*wtype.LHSolution,0)
+	RunSolutions = make([]*wtype.LHComponent,0)
 
-	var RunSolution *wtype.LHSolution
+	var RunSolution *wtype.LHComponent
 
 
 	for k, SampleName := range SampleNames {
@@ -77,7 +77,7 @@ Steps {
     samples = append(samples, loadSample)
     fmt.Println ("This is a list of samples for loading:", samples)
 
-    RunSolution = MixTo(GelPlate,wellpositionarray[k], samples...)
+    RunSolution = MixTo(GelPlate.Type,wellpositionarray[k], 0, samples...)
 	RunSolutions = append(RunSolutions,RunSolution)
 	}
 }

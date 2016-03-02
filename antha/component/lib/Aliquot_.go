@@ -37,14 +37,14 @@ func _AliquotSteps(_ctx context.Context, _input *AliquotInput, _output *AliquotO
 		panic("Not enough solution for this many aliquots")
 	}
 
-	aliquots := make([]*wtype.LHSolution, 0)
+	aliquots := make([]*wtype.LHComponent, 0)
 
 	for i := 0; i < _input.NumberofAliquots; i++ {
-		if _input.Solution.Type == "dna" {
-			_input.Solution.Type = "DoNotMix"
+		if _input.Solution.TypeName() == "dna" {
+			_input.Solution.Type = wtype.LTDoNotMix
 		}
 		aliquotSample := mixer.Sample(_input.Solution, _input.VolumePerAliquot)
-		aliquot := execute.MixInto(_ctx, _input.OutPlate, aliquotSample)
+		aliquot := execute.MixInto(_ctx, _input.OutPlate, "", aliquotSample)
 		aliquots = append(aliquots, aliquot)
 	}
 	_output.Aliquots = aliquots
@@ -118,14 +118,14 @@ type AliquotInput struct {
 }
 
 type AliquotOutput struct {
-	Aliquots []*wtype.LHSolution
+	Aliquots []*wtype.LHComponent
 }
 
 type AliquotSOutput struct {
 	Data struct {
 	}
 	Outputs struct {
-		Aliquots []*wtype.LHSolution
+		Aliquots []*wtype.LHComponent
 	}
 }
 

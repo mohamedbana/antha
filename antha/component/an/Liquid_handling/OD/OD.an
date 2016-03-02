@@ -55,12 +55,12 @@ Setup {
 }
 Steps {
 
-var product *wtype.LHSolution//WaterSolution
+var product *wtype.LHComponent//WaterSolution
 
 	for {
-	product = MixInto(ODplate,mixer.Sample(Sampletotest,Sample_volume),mixer.Sample(Diluent,Diluent_volume))
+	product = MixInto(ODplate,"", mixer.Sample(Sampletotest,Sample_volume),mixer.Sample(Diluent,Diluent_volume))
 	/*Is it necessary to include platetype in Read function? 
-	or is the info on volume, opacity, pathlength etc implied in LHSolution?*/
+	or is the info on volume, opacity, pathlength etc implied in LHComponent?*/
 	Sample_absorbance = platereader.ReadAbsorbance(*ODplate,*product, Wlength)
 	
 	if Sample_absorbance.Reading < 1 {break}

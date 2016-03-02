@@ -44,7 +44,7 @@ func _Mastermix_reactionsSteps(_ctx context.Context, _input *Mastermix_reactions
 		panic("len(Components) != len(OtherComponentVolumes)")
 	}
 
-	mastermixes := make([]*wtype.LHSolution, 0)
+	mastermixes := make([]*wtype.LHComponent, 0)
 
 	if _input.AliquotbyRow {
 		panic("MixTo based method coming soon!")
@@ -60,7 +60,7 @@ func _Mastermix_reactionsSteps(_ctx context.Context, _input *Mastermix_reactions
 
 			for k, component := range _input.Components {
 				if k == len(_input.Components) {
-					component.Type = "NeedToMix"
+					component.Type = wtype.LTNeedToMix //"NeedToMix"
 				}
 
 				// multiply volume of each component by number of reactions per mastermix
@@ -70,7 +70,7 @@ func _Mastermix_reactionsSteps(_ctx context.Context, _input *Mastermix_reactions
 				eachmastermix = append(eachmastermix, componentSample)
 			}
 
-			mastermix := execute.MixInto(_ctx, _input.OutPlate, eachmastermix...)
+			mastermix := execute.MixInto(_ctx, _input.OutPlate, "", eachmastermix...)
 			mastermixes = append(mastermixes, mastermix)
 
 		}
@@ -151,7 +151,7 @@ type Mastermix_reactionsInput struct {
 }
 
 type Mastermix_reactionsOutput struct {
-	Mastermixes []*wtype.LHSolution
+	Mastermixes []*wtype.LHComponent
 	Status      string
 }
 
@@ -160,7 +160,7 @@ type Mastermix_reactionsSOutput struct {
 		Status string
 	}
 	Outputs struct {
-		Mastermixes []*wtype.LHSolution
+		Mastermixes []*wtype.LHComponent
 	}
 }
 

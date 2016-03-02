@@ -73,7 +73,7 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 	}
 	fmt.Println(componentmap)
 
-	solutions := make([]*wtype.LHSolution, 0)
+	solutions := make([]*wtype.LHComponent, 0)
 
 	counter := 0
 
@@ -83,8 +83,9 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 
 		component := componentmap[colourtostringmap[colour]]
 
-		component.Type = "default"
-
+		if component.TypeName() == "dna" {
+			component.Type = wtype.LTDoNotMix // "DoNotMix"
+		}
 		fmt.Println(image.Colourcomponentmap[colour])
 
 		if _input.OnlythisColour != "" {
@@ -105,9 +106,9 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 				components = append(components,inducerSample)*/
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
 				components = append(components, pixelSample)
-				solution := execute.MixTo(_ctx, _input.OutPlate, locationkey, components...)
-				execute.Incubate(_ctx, solution, _input.IncTemp, _input.IncTime, true)
-				solutions = append(solutions, solution)
+				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 0, components...)
+
+				solutions = append(solutions, execute.Incubate(_ctx, solution, _input.IncTemp, _input.IncTime, true))
 			}
 
 		} else {
@@ -127,10 +128,9 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 				components = append(components,inducerSample)*/
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
 				components = append(components, pixelSample)
-				solution := execute.MixTo(_ctx, _input.OutPlate, locationkey, components...)
+				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 0, components...)
 
-				execute.Incubate(_ctx, solution, _input.IncTemp, _input.IncTime, true)
-				solutions = append(solutions, solution)
+				solutions = append(solutions, execute.Incubate(_ctx, solution, _input.IncTemp, _input.IncTime, true))
 			}
 		}
 	}
@@ -218,7 +218,7 @@ type PipetteImage_livingInput struct {
 
 type PipetteImage_livingOutput struct {
 	Numberofpixels   int
-	Pixels           []*wtype.LHSolution
+	Pixels           []*wtype.LHComponent
 	UniqueComponents []string
 }
 
@@ -228,7 +228,7 @@ type PipetteImage_livingSOutput struct {
 		UniqueComponents []string
 	}
 	Outputs struct {
-		Pixels []*wtype.LHSolution
+		Pixels []*wtype.LHComponent
 	}
 }
 

@@ -46,11 +46,11 @@ func (ph *PHMeasurement) TempCompensation(reftemp wunit.Temperature, tempcoeffic
 
 // placeholder
 
-/*func MeasurePH(*wtype.LHSolution) (measurement float64) {
+/*func MeasurePH(*wtype.LHComponent) (measurement float64) {
 	return 7.0
 }*/
 
-func MeasurePH(*wtype.LHSolution) (measured PHMeasurement) {
+func MeasurePH(*wtype.LHComponent) (measured PHMeasurement) {
 	measured = PHMeasurement{nil, nil, 0.0, wunit.NewTemperature(0.0, "C"), nil, nil, nil, nil, nil}
 	return
 }
@@ -69,7 +69,7 @@ func (ph *PHMeasurement) AdjustpH(ph_setpoint float64, ph_tolerance float64, ph_
 		for {
 			//newphmeasurement = ph
 			acidsamp := mixer.Sample(Acid, wunit.NewVolume(10, "ul"))
-			temporary := mixer.MixInto(ph.Location, ph.Component, acidsamp)
+			temporary := mixer.MixInto(ph.Location, "", ph.Component, acidsamp)
 			time.Sleep(10 * time.Second)
 			newphmeasurement := MeasurePH(temporary)
 			if newphmeasurement.PHValue > pHmax {
@@ -94,7 +94,7 @@ func (ph *PHMeasurement) AdjustpH(ph_setpoint float64, ph_tolerance float64, ph_
 		for {
 			//newphmeasurement = ph
 			basesamp := mixer.Sample(Base, wunit.NewVolume(10, "ul"))
-			temporary := mixer.MixInto(ph.Location, ph.Component, basesamp)
+			temporary := mixer.MixInto(ph.Location, "", ph.Component, basesamp)
 			time.Sleep(10 * time.Second)
 			newphmeasurement := MeasurePH(temporary)
 			if newphmeasurement.PHValue > pHmax {

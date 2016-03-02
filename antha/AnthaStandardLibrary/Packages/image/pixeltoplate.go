@@ -454,14 +454,14 @@ func PrintFPImagePreview(imagefile string, plate *wtype.LHPlate, visiblemap, uvm
 }
 
 //  Final function for user which uses a given map of position to colour generated from the image processing function  along with lists of available colours, components and plate types
-/*func PipetteImagetoPlate(OutPlate *wtype.LHPlate, positiontocolourmap map[string]color.Color, availablecolours []string, componentlist []*wtype.LHComponent, volumeperwell wunit.Volume) (finalsolutions []*wtype.LHSolution) {
+/*func PipetteImagetoPlate(OutPlate *wtype.LHPlate, positiontocolourmap map[string]color.Color, availablecolours []string, componentlist []*wtype.LHComponent, volumeperwell wunit.Volume) (finalsolutions []*wtype.LHComponent) {
 
 	componentmap, err := MakestringtoComponentMap(availablecolours, componentlist)
 	if err != nil {
 		panic(err)
 	}
 
-	solutions := make([]*wtype.LHSolution, 0)
+	solutions := make([]*wtype.LHComponent, 0)
 
 	for locationkey, colour := range positiontocolourmap {
 
@@ -523,9 +523,9 @@ func MakestringtoComponentMap(keys []string, componentlist []*wtype.LHComponent)
 }
 
 //  Final function for blending colours to make and image. Uses a given map of position to colour generated from the image processing function  along with lists of available colours, components and plate types
-func PipetteImagebyBlending(OutPlate *wtype.LHPlate, positiontocolourmap map[string]color.Color, cyan *wtype.LHComponent, magenta *wtype.LHComponent, yellow *wtype.LHComponent, black *wtype.LHComponent, volumeperfullcolour wunit.Volume) (finalsolutions []*wtype.LHSolution) {
+func PipetteImagebyBlending(OutPlate *wtype.LHPlate, positiontocolourmap map[string]color.Color, cyan *wtype.LHComponent, magenta *wtype.LHComponent, yellow *wtype.LHComponent, black *wtype.LHComponent, volumeperfullcolour wunit.Volume) (finalsolutions []*wtype.LHComponent) {
 
-	solutions := make([]*wtype.LHSolution, 0)
+	solutions := make([]*wtype.LHComponent, 0)
 
 	for locationkey, colour := range positiontocolourmap {
 
@@ -546,7 +546,7 @@ func PipetteImagebyBlending(OutPlate *wtype.LHPlate, positiontocolourmap map[str
 		components = append(components, magentaSample)
 		blackSample := mixer.Sample(black, blackvol)
 		components = append(components, blackSample)
-		solution := mixer.MixTo(OutPlate, locationkey, components...)
+		solution := mixer.MixTo(OutPlate.Type, locationkey, 1, components...)
 		solutions = append(solutions, solution)
 	}
 
@@ -555,9 +555,9 @@ func PipetteImagebyBlending(OutPlate *wtype.LHPlate, positiontocolourmap map[str
 }
 
 //  Final function for blending colours to make and image. Uses a given map of position to colour generated from the image processing function  along with lists of available colours, components and plate types
-func PipetteImageGrayscale(OutPlate *wtype.LHPlate, positiontocolourmap map[string]color.Color, water *wtype.LHComponent, black *wtype.LHComponent, volumeperfullcolour wunit.Volume) (finalsolutions []*wtype.LHSolution) {
+func PipetteImageGrayscale(OutPlate *wtype.LHPlate, positiontocolourmap map[string]color.Color, water *wtype.LHComponent, black *wtype.LHComponent, volumeperfullcolour wunit.Volume) (finalsolutions []*wtype.LHComponent) {
 
-	solutions := make([]*wtype.LHSolution, 0)
+	solutions := make([]*wtype.LHComponent, 0)
 
 	for locationkey, colour := range positiontocolourmap {
 
@@ -574,7 +574,7 @@ func PipetteImageGrayscale(OutPlate *wtype.LHPlate, positiontocolourmap map[stri
 		blackSample := mixer.Sample(black, blackvol)
 		components = append(components, blackSample)
 
-		solution := mixer.MixTo(OutPlate, locationkey, components...)
+		solution := mixer.MixTo(OutPlate.Type, locationkey, 1, components...)
 		solutions = append(solutions, solution)
 	}
 

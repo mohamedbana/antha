@@ -68,6 +68,9 @@ func (m *Volume) UnmarshalJSON(b []byte) error {
 		return err
 	} else if unit != "" {
 		*m = NewVolume(value, unit)
+	} else {
+		cm := ConcreteMeasurement{0, nil}
+		*m = Volume{&cm}
 	}
 	return nil
 }
@@ -81,6 +84,9 @@ func (m *Temperature) UnmarshalJSON(b []byte) error {
 		return err
 	} else if unit != "" {
 		*m = NewTemperature(value, unit)
+	} else {
+		cm := ConcreteMeasurement{0, nil}
+		*m = Temperature{&cm}
 	}
 	return nil
 }
@@ -94,6 +100,9 @@ func (m *Concentration) UnmarshalJSON(b []byte) error {
 		return err
 	} else if unit != "" {
 		*m = NewConcentration(value, unit)
+	} else {
+		cm := ConcreteMeasurement{0, nil}
+		*m = Concentration{&cm}
 	}
 	return nil
 }
@@ -108,6 +117,9 @@ func (m *Time) UnmarshalJSON(b []byte) error {
 		return err
 	} else if unit != "" {
 		*m = NewTime(value, unit)
+	} else {
+		cm := ConcreteMeasurement{0, nil}
+		*m = Time{&cm}
 	}
 	return nil
 }
@@ -121,6 +133,9 @@ func (m *Density) UnmarshalJSON(b []byte) error {
 		return err
 	} else if unit != "" {
 		*m = NewDensity(value, unit)
+	} else {
+		cm := ConcreteMeasurement{0, nil}
+		*m = Density{&cm}
 	}
 	return nil
 }
@@ -135,6 +150,10 @@ func (m *Mass) UnmarshalJSON(b []byte) error {
 		return err
 	} else if unit != "" {
 		*m = NewMass(value, unit)
+	} else {
+		cm := ConcreteMeasurement{0, nil}
+		*m = Mass{&cm}
+
 	}
 	return nil
 }
@@ -149,6 +168,10 @@ func (m *FlowRate) UnmarshalJSON(b []byte) error {
 		return err
 	} else if unit != "" {
 		*m = NewFlowRate(value, unit)
+	} else {
+		cm := ConcreteMeasurement{0, nil}
+		*m = FlowRate{&cm}
+
 	}
 	return nil
 }
@@ -163,6 +186,9 @@ func (m *Moles) UnmarshalJSON(b []byte) error {
 		return err
 	} else if unit != "" {
 		*m = NewAmount(value, unit)
+	} else {
+		cm := ConcreteMeasurement{0, nil}
+		*m = Moles{&cm}
 	}
 	return nil
 }
@@ -177,6 +203,9 @@ func (m *Pressure) UnmarshalJSON(b []byte) error {
 		return err
 	} else if unit != "" {
 		*m = NewPressure(value, unit)
+	} else {
+		cm := ConcreteMeasurement{0, nil}
+		*m = Pressure{&cm}
 	}
 	return nil
 }
@@ -191,6 +220,9 @@ func (m *Length) UnmarshalJSON(b []byte) error {
 		return err
 	} else if unit != "" {
 		*m = NewLength(value, unit)
+	} else {
+		cm := ConcreteMeasurement{0, nil}
+		*m = Length{&cm}
 	}
 	return nil
 }
@@ -204,6 +236,9 @@ func (m *Area) UnmarshalJSON(b []byte) error {
 		return err
 	} else if unit != "" {
 		*m = NewArea(value, unit)
+	} else {
+		cm := ConcreteMeasurement{0, nil}
+		*m = Area{&cm}
 	}
 	return nil
 }
@@ -217,6 +252,9 @@ func (m *Angle) UnmarshalJSON(b []byte) error {
 		return err
 	} else if unit != "" {
 		*m = NewAngle(value, unit)
+	} else {
+		cm := ConcreteMeasurement{0, nil}
+		*m = Angle{&cm}
 	}
 	return nil
 }
@@ -230,6 +268,9 @@ func (m *Energy) UnmarshalJSON(b []byte) error {
 		return err
 	} else if unit != "" {
 		*m = NewEnergy(value, unit)
+	} else {
+		cm := ConcreteMeasurement{0, nil}
+		*m = Energy{&cm}
 	}
 	return nil
 }
@@ -243,6 +284,9 @@ func (m *Force) UnmarshalJSON(b []byte) error {
 		return err
 	} else if unit != "" {
 		*m = NewForce(value, unit)
+	} else {
+		cm := ConcreteMeasurement{0, nil}
+		*m = Force{&cm}
 	}
 	return nil
 }
@@ -256,6 +300,9 @@ func (m *Velocity) UnmarshalJSON(b []byte) error {
 		return err
 	} else if unit != "" {
 		*m = NewVelocity(value, unit)
+	} else {
+		cm := ConcreteMeasurement{0, nil}
+		*m = Velocity{&cm}
 	}
 	return nil
 }
@@ -272,6 +319,9 @@ func (m *Rate) UnmarshalJSON(b []byte) error {
 		if err != nil {
 			return err
 		}
+	} else {
+		cm := ConcreteMeasurement{0, nil}
+		*m = Rate{&cm}
 	}
 	return nil
 }

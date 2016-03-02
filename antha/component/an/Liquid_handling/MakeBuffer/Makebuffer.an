@@ -30,7 +30,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Buffer *wtype.LHSolution
+	Buffer *wtype.LHComponent
 )
 
 // Data which is returned from this protocol, and data types
@@ -51,7 +51,7 @@ Setup {}
 Steps {
 	//Bufferstockvolume := wunit.NewVolume((FinalVolume.SIValue() * FinalConcentration.SIValue()/Bufferstockconc.SIValue()),"l")
 		
-	Buffer = MixInto(OutPlate,
+	Buffer = MixInto(OutPlate,"",
 	mixer.Sample(Bufferstock,Bufferstockvolume),
 	mixer.Sample(Diluent,Diluentvolume))
 

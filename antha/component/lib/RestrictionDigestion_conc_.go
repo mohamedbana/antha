@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -32,7 +33,7 @@ func _RestrictionDigestion_concSteps(_ctx context.Context, _input *RestrictionDi
 
 	// workout volume of buffer to add in SI units
 	BufferVol := wunit.NewVolume(float64(_input.ReactionVolume.SIValue()/float64(_input.BufferConcX)), "l")
-
+	fmt.Println("HELLLLLOOOOOO:", _input.ReactionVolume.SIValue(), _input.BufferConcX, float64(_input.ReactionVolume.SIValue()/float64(_input.BufferConcX)), BufferVol.SIValue())
 	bufferSample := mixer.Sample(_input.Buffer, BufferVol)
 	samples = append(samples, bufferSample)
 
@@ -45,6 +46,7 @@ func _RestrictionDigestion_concSteps(_ctx context.Context, _input *RestrictionDi
 
 	// work out necessary volume to add
 	DNAVol := wunit.NewVolume(float64((_input.DNAMassperReaction.SIValue() / _input.DNAConc.SIValue())), "l")
+	fmt.Println("HELLLLLOOOOOO Again:", _input.DNAMassperReaction.SIValue(), _input.DNAConc.SIValue(), float64((_input.DNAMassperReaction.SIValue() / _input.DNAConc.SIValue())), DNAVol.SIValue())
 	text.Print("DNAVOL", DNAVol.ToString())
 	dnaSample := mixer.Sample(_input.DNASolution, DNAVol)
 	samples = append(samples, dnaSample)
@@ -74,12 +76,10 @@ func _RestrictionDigestion_concSteps(_ctx context.Context, _input *RestrictionDi
 		samples = append(samples, enzSample)
 	}
 
-	_output.Reaction = execute.MixInto(_ctx, _input.OutPlate, samples...)
-
 	// incubate the reaction mixture
-	execute.Incubate(_ctx, _output.Reaction, _input.ReactionTemp, _input.ReactionTime, false)
+	r1 := execute.Incubate(_ctx, execute.MixInto(_ctx, _input.OutPlate, "", samples...), _input.ReactionTemp, _input.ReactionTime, false)
 	// inactivate
-	execute.Incubate(_ctx, _output.Reaction, _input.InactivationTemp, _input.InactivationTime, false)
+	_output.Reaction = execute.Incubate(_ctx, r1, _input.InactivationTemp, _input.InactivationTime, false)
 }
 
 // Run after controls and a steps block are completed to
@@ -163,14 +163,14 @@ type RestrictionDigestion_concInput struct {
 }
 
 type RestrictionDigestion_concOutput struct {
-	Reaction *wtype.LHSolution
+	Reaction *wtype.LHComponent
 }
 
 type RestrictionDigestion_concSOutput struct {
 	Data struct {
 	}
 	Outputs struct {
-		Reaction *wtype.LHSolution
+		Reaction *wtype.LHComponent
 	}
 }
 

@@ -69,7 +69,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Reaction *wtype.LHSolution
+	Reaction *wtype.LHComponent
 )
 
 Requirements {
@@ -103,7 +103,7 @@ Steps {
 
 	polySample := mixer.SampleForConcentration(PCRPolymerase, TargetpolymeraseConcentration)
 	samples = append(samples, polySample)
-	reaction := MixInto(OutPlate, samples...)
+	reaction := MixInto(OutPlate, "", samples...)
 
 	// thermocycle parameters called from enzyme lookup:
 
@@ -115,29 +115,29 @@ Steps {
 
 	// initial Denaturation
 
-	Incubate(reaction, meltingTemp, InitDenaturationtime, false)
+	r1 := Incubate(reaction, meltingTemp, InitDenaturationtime, false)
 	
 	for i:=0; i < Numberofcycles; i++ {
 		
 		// Denature
 
-	Incubate(reaction, meltingTemp, Denaturationtime, false)
+	r1 = Incubate(r1, meltingTemp, Denaturationtime, false)
 	
 		// Anneal
-	Incubate(reaction, AnnealingTemp, Annealingtime, false)
+	r1 = Incubate(r1, AnnealingTemp, Annealingtime, false)
 	
 	//extensiontime := TargetTemplatelengthinBP/PCRPolymerase.RateBPpers // we'll get type issues here so leave it out for now
 	
 		// Extend
-	Incubate(reaction, extensionTemp, Extensiontime, false)
+	r1 = Incubate(r1, extensionTemp, Extensiontime, false)
 		
 	}
 		// Final Extension
-	Incubate(reaction, extensionTemp, Finalextensiontime, false)
+	r1 = Incubate(r1, extensionTemp, Finalextensiontime, false)
 	
 
 	// all done
-	Reaction = reaction
+	Reaction = r1
 }
 
 // Run after controls and a steps block are completed to

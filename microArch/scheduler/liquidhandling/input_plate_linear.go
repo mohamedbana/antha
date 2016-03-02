@@ -152,8 +152,8 @@ func choose_plate_assignments(component_volumes map[string]wunit.Volume, plate_t
 				// pick out a set of columns according to which row we're on
 				// volume constraints are the working volumes of the wells
 				if c == i {
-					vol := wunit.NewVolume(plate_types[j].Welltype.Vol, plate_types[j].Welltype.Vunit)
-					rvol := wunit.NewVolume(plate_types[j].Welltype.Rvol, plate_types[j].Welltype.Vunit)
+					vol := plate_types[j].Welltype.MaxVolume()       //wunit.NewVolume(plate_types[j].Welltype.Vol, plate_types[j].Welltype.Vunit)
+					rvol := plate_types[j].Welltype.ResidualVolume() //wunit.NewVolume(plate_types[j].Welltype.Rvol, plate_types[j].Welltype.Vunit)
 					vol.Subtract(&rvol)
 					vc = vol.ConvertTo(wunit.ParsePrefixedUnit("ul"))
 					//debug

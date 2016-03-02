@@ -28,7 +28,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	NewColours []*wtype.LHSolution
+	NewColours []*wtype.LHComponent
 )
 
 Requirements {
@@ -42,7 +42,7 @@ Setup {
 // for every input
 Steps {
 	
-	reactions := make([]*wtype.LHSolution,0)
+	reactions := make([]*wtype.LHComponent,0)
 	
 	
 	for i := 0; i < Numberofcopies; i++ {
@@ -51,7 +51,7 @@ Steps {
 		eachreaction = append(eachreaction,col1Sample)
 		col2Sample := mixer.Sample(Colour2, Colour2vol)
 		eachreaction = append(eachreaction,col2Sample)
-		reaction := MixInto(OutPlate, eachreaction...)
+		reaction := MixInto(OutPlate, "", eachreaction...)
 		reactions = append(reactions,reaction)
 		
 	}

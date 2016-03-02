@@ -48,7 +48,7 @@ func _InoculateSteps(_ctx context.Context, _input *InoculateInput, _output *Inoc
 
 	media_with_antibiotic := _input.Media
 	//media_with_antibiotic := mixer.Mix(mixer.Sample(Antibiotic,antibiotic_volume), mixer.Sample(Media,Media_volume))
-	_output.Inoculated_culture = execute.MixInto(_ctx, _input.OutPlate, mixer.Sample(_input.Seed, _input.Seed_volume), mixer.Sample(media_with_antibiotic, _input.Media_volume))
+	_output.Inoculated_culture = execute.MixInto(_ctx, _input.OutPlate, "", mixer.Sample(_input.Seed, _input.Seed_volume), mixer.Sample(media_with_antibiotic, _input.Media_volume))
 }
 
 //should the transfer to thermomixer/incubator command be included in this protocol or in a separate protocol
@@ -127,7 +127,7 @@ type InoculateInput struct {
 }
 
 type InoculateOutput struct {
-	Inoculated_culture *wtype.LHSolution
+	Inoculated_culture *wtype.LHComponent
 	OD_at_inoculation  float64
 }
 
@@ -136,7 +136,7 @@ type InoculateSOutput struct {
 		OD_at_inoculation float64
 	}
 	Outputs struct {
-		Inoculated_culture *wtype.LHSolution
+		Inoculated_culture *wtype.LHComponent
 	}
 }
 

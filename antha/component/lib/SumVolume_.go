@@ -44,8 +44,8 @@ func _SumVolumeSteps(_ctx context.Context, _input *SumVolumeInput, _output *SumV
 
 		DmolarConc = Dnew.AsMolar(mass)
 	*/
-	_output.Sum = *(wunit.CopyVolume(&_input.A))
-	(&_output.Sum).Add(&_input.B)
+	_output.Sum = (wunit.CopyVolume(_input.A))
+	_output.Sum.Add(_input.B)
 	_output.Status = fmt.Sprintln(
 		"Sum of", _input.A.ToString(), "and", _input.B.ToString(), "=", _output.Sum.ToString(), "Temp=", _input.C.ToString(),
 	) //"D Concentration in g/l", D, "D concentration in M/l", DmolarConc)

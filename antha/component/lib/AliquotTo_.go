@@ -40,7 +40,7 @@ func _AliquotToSteps(_ctx context.Context, _input *AliquotToInput, _output *Aliq
 		panic("Not enough solution for this many aliquots")
 	}
 
-	aliquots := make([]*wtype.LHSolution, 0)
+	aliquots := make([]*wtype.LHComponent, 0)
 
 	// work out well coordinates for any plate
 	wellpositionarray := make([]string, 0)
@@ -61,11 +61,11 @@ func _AliquotToSteps(_ctx context.Context, _input *AliquotToInput, _output *Aliq
 	}
 
 	for k := 0; k < _input.NumberofAliquots; k++ {
-		if _input.Solution.Type == "dna" {
-			_input.Solution.Type = "DoNotMix"
+		if _input.Solution.TypeName() == "dna" {
+			_input.Solution.Type = wtype.LTDoNotMix
 		}
 		aliquotSample := mixer.Sample(_input.Solution, _input.VolumePerAliquot)
-		aliquot := execute.MixTo(_ctx, _input.OutPlate, wellpositionarray[k], aliquotSample)
+		aliquot := execute.MixTo(_ctx, _input.OutPlate.Type, wellpositionarray[k], 0, aliquotSample)
 		aliquots = append(aliquots, aliquot)
 	}
 	_output.Aliquots = aliquots
@@ -139,14 +139,14 @@ type AliquotToInput struct {
 }
 
 type AliquotToOutput struct {
-	Aliquots []*wtype.LHSolution
+	Aliquots []*wtype.LHComponent
 }
 
 type AliquotToSOutput struct {
 	Data struct {
 	}
 	Outputs struct {
-		Aliquots []*wtype.LHSolution
+		Aliquots []*wtype.LHComponent
 	}
 }
 

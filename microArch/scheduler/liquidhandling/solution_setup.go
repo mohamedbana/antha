@@ -33,12 +33,10 @@ import (
 
 // determines how to
 // fulfil the requirements for making
-// solutions to specifications
-// WHERE DO WE GET THE STOCK CONCENTRATIONS FROM???
-// NEED TO SPECIFY THESE
+// instructions to specifications
 
-func solution_setup(request *LHRequest, prms *liquidhandling.LHProperties) (map[string]*wtype.LHSolution, map[string]float64) {
-	solutions := request.Output_solutions
+func solution_setup(request *LHRequest, prms *liquidhandling.LHProperties) (map[string]*wtype.LHInstruction, map[string]float64) {
+	instructions := request.LHInstructions
 
 	// index of components used to make up to a total volume, along with the required total
 	mtvols := make(map[string][]float64, 10)
@@ -48,13 +46,13 @@ func solution_setup(request *LHRequest, prms *liquidhandling.LHProperties) (map[
 	fixconcs := make([]*wtype.LHComponent, 0)
 	// maximum solubilities of each component
 	Smax := make(map[string]float64, 10)
-	// maximum total volume of any solution containing each component
+	// maximum total volume of any instruction containing each component
 	hshTVol := make(map[string]float64)
 
 	// find the minimum and maximum required concentrations
-	// across all the solutions
-	for _, solution := range solutions {
-		components := solution.Components
+	// across all the instructions
+	for _, instruction := range instructions {
+		components := instruction.Components
 
 		// we need to identify the concentration components
 		// and the total volume components, if we have
@@ -139,7 +137,7 @@ func solution_setup(request *LHRequest, prms *liquidhandling.LHProperties) (map[
 			mtvols[nm] = tvslc
 		}
 
-	} // end solutions
+	} // end instructions
 	// so now we should be able to make stock concentrations
 	// first we need the min and max for each
 
@@ -151,8 +149,8 @@ func solution_setup(request *LHRequest, prms *liquidhandling.LHProperties) (map[
 
 	//	fmt.Println("PRMS: ", prms)
 
-	if prms.CurrConf != nil {
-		vmin = *(prms.CurrConf.Minvol)
+	if prms.CurrConf != nil && !prms.CurrConf.Minvol.LessThanFloat(0.00000001) {
+		vmin = prms.CurrConf.Minvol
 	}
 
 	for cmp, arr := range mconcs {
@@ -183,12 +181,12 @@ func solution_setup(request *LHRequest, prms *liquidhandling.LHProperties) (map[
 
 	// nearly there now! Need to turn all the components into volumes, then we're done
 
-	// make an array for the new solutions
+	// make an array for the new instructions
 
-	newSolutions := make(map[string]*wtype.LHSolution, len(solutions))
+	newInstructions := make(map[string]*wtype.LHInstruction, len(instructions))
 
-	for _, solution := range solutions {
-		components := solution.Components
+	for _, instruction := range instructions {
+		components := instruction.Components
 		arrCncs := make([]*wtype.LHComponent, 0, len(components))
 		arrTvol := make([]*wtype.LHComponent, 0, len(components))
 		arrSvol := make([]*wtype.LHComponent, 0, len(components))
@@ -245,14 +243,14 @@ func solution_setup(request *LHRequest, prms *liquidhandling.LHProperties) (map[
 
 		arrFinalComponents = append(arrFinalComponents, arrSvol...)
 
-		// finally we replace the components in this solution
+		// finally we replace the components in this instruction
 
-		solution.Components = arrFinalComponents
+		instruction.Components = arrFinalComponents
 
-		// and put the new solution in the array
+		// and put the new instruction in the array
 
-		newSolutions[solution.ID] = solution
+		newInstructions[instruction.ID] = instruction
 	}
 
-	return newSolutions, stockconcs
+	return newInstructions, stockconcs
 }

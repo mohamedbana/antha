@@ -34,7 +34,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Pixels[]*wtype.LHSolution
+	Pixels[]*wtype.LHComponent
 )
 
 Requirements {
@@ -54,7 +54,7 @@ Steps {
 	chosencolourpalette := image.AvailablePalettes["Plan9"]
 	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette) 
 	
-	solutions := make([]*wtype.LHSolution, 0)
+	solutions := make([]*wtype.LHComponent, 0)
 
 	counter := 0
 
@@ -101,7 +101,7 @@ Steps {
 		components = append(components, blackSample)
 		}
 		
-		solution := MixTo(OutPlate, locationkey, components...)
+		solution := MixTo(OutPlate.Type, locationkey,0, components...)
 		solutions = append(solutions, solution)
 		
 		}

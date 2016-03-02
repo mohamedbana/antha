@@ -59,14 +59,16 @@ func TestJSON(*testing.T) {
 
 func ExampleBasic() {
 	degreeC := GenericPrefixedUnit{GenericUnit{"DegreeC", "C", 1.0, "C"}, SIPrefix{"m", 1e-03}}
-	TdegreeC := Temperature{ConcreteMeasurement{1.0, &degreeC}}
+	cm := ConcreteMeasurement{1.0, &degreeC}
+	TdegreeC := Temperature{&cm}
 	fmt.Println(TdegreeC.SIValue())
 	// Output:
 	// 0.001
 }
 func ExampleTwo() {
 	Joule := GenericPrefixedUnit{GenericUnit{"Joule", "J", 1.0, "J"}, SIPrefix{"k", 1e3}}
-	NJoule := Energy{ConcreteMeasurement{23.4, &Joule}}
+	cm := ConcreteMeasurement{23.4, &Joule}
+	NJoule := Energy{&cm}
 	fmt.Println(NJoule.SIValue())
 	// Output:
 	// 23400
@@ -163,5 +165,48 @@ func ExampleNine() {
 
 	fmt.Println("Unmarshalled: ", pu2)
 	fmt.Println(er2)
+
+}
+
+// simple reverse complement check to test testing methodology initially
+
+type testunit struct {
+	value        float64
+	prefix       string
+	unit         string
+	prefixedunit string
+	siresult     float64
+}
+
+var units = []testunit{
+	{2.0000000000000003e-06, "", "l", "l", 2.0000000000000003e-06},
+	{2.05, "u", "l", "ul", 2.05e-6},
+}
+
+func TestNewMeasurement(t *testing.T) {
+	for _, testunit := range units {
+		r := NewMeasurement(testunit.value, testunit.prefix, testunit.unit)
+		if r.SIValue() != testunit.siresult {
+			t.Error(
+				"For", testunit.value, testunit.prefix, testunit.unit, "/n",
+				"expected", testunit.siresult, "\n",
+				"got", r.SIValue(), "\n",
+			)
+		}
+	}
+
+}
+
+func TestNewVolume(t *testing.T) {
+	for _, testunit := range units {
+		r := NewVolume(testunit.value, testunit.prefixedunit)
+		if r.SIValue() != testunit.siresult {
+			t.Error(
+				"For", testunit.value, testunit.prefixedunit, "/n",
+				"expected", testunit.siresult, "\n",
+				"got", r.SIValue(), "\n",
+			)
+		}
+	}
 
 }

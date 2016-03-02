@@ -221,8 +221,8 @@ func init() {
 }
 
 // Verify that the printer doesn't crash if the AST contains BadXXX nodes.
-// XXX(ddn): test disabled because additional boilerplate throws off
-// comparisons
+
+// ddn: test disabled because additional boilerplate throws off comparisons
 func xTestBadNodes(t *testing.T) {
 	const src = "package p\n("
 	//	const res = "package p\nBadDecl\n"
@@ -335,8 +335,7 @@ func identCount(f *ast.File) int {
 	return n
 }
 
-// XXX(ddn): test disabled because additional boilerplate throws off
-// comparisons
+// NB(ddn): test disabled because additional boilerplate throws off comparisons
 func xTestSourcePos(t *testing.T) {
 	const src = `
 package p

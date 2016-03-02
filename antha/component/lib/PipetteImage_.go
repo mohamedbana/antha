@@ -45,7 +45,7 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 		panic(err)
 	}
 
-	solutions := make([]*wtype.LHSolution, 0)
+	solutions := make([]*wtype.LHComponent, 0)
 
 	counter := 0
 	// currently set up to only pipette if yellow (to make visualisation easier in trilution simulator
@@ -53,8 +53,8 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 
 		component := componentmap[image.Colourcomponentmap[colour]]
 
-		if component.Type == "dna" {
-			component.Type = "DoNotMix"
+		if component.TypeName() == "dna" {
+			component.Type = wtype.LTDoNotMix //"DoNotMix"
 		}
 		fmt.Println(image.Colourcomponentmap[colour])
 
@@ -64,7 +64,7 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 				counter = counter + 1
 				fmt.Println("wells", counter)
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
-				solution := execute.MixTo(_ctx, _input.OutPlate, locationkey, pixelSample)
+				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 0, pixelSample)
 				solutions = append(solutions, solution)
 			}
 
@@ -73,7 +73,7 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 				counter = counter + 1
 				fmt.Println("wells", counter)
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
-				solution := execute.MixTo(_ctx, _input.OutPlate, locationkey, pixelSample)
+				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 0, pixelSample)
 				solutions = append(solutions, solution)
 			}
 		}
@@ -156,7 +156,7 @@ type PipetteImageInput struct {
 
 type PipetteImageOutput struct {
 	Numberofpixels int
-	Pixels         []*wtype.LHSolution
+	Pixels         []*wtype.LHComponent
 }
 
 type PipetteImageSOutput struct {
@@ -164,7 +164,7 @@ type PipetteImageSOutput struct {
 		Numberofpixels int
 	}
 	Outputs struct {
-		Pixels []*wtype.LHSolution
+		Pixels []*wtype.LHComponent
 	}
 }
 

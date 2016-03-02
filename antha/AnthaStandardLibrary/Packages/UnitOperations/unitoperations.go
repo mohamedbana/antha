@@ -9,7 +9,6 @@ import (
 )
 
 type Pellet struct {
-	wtype.Physical
 }
 
 type Culture struct {
@@ -55,25 +54,33 @@ type Phytips struct { // interface?
 }
 
 // may already be functions for aspirate and dispense in anthalib
-func Aspirate(column Column, mixture *wtype.LHSolution, volume wunit.Volume, aspiraterate wunit.FlowRate) (aspiratedcolumn Column, aspiratedsolution *wtype.LHSolution) {
+func Aspirate(column Column, mixture *wtype.LHComponent, volume wunit.Volume, aspiraterate wunit.FlowRate) (aspiratedcolumn Column, aspiratedsolution *wtype.LHComponent) {
 
 	return
 }
 
-func Dispense(column Column, mixture *wtype.LHSolution, volume wunit.Volume, aspiraterate wunit.FlowRate) (dispensedcolumn Column, dispensedsolution *wtype.LHSolution) {
+func Dispense(column Column, mixture *wtype.LHComponent, volume wunit.Volume, aspiraterate wunit.FlowRate) (dispensedcolumn Column, dispensedsolution *wtype.LHComponent) {
 
 	return
 }
 
+/*
 func PhysicaltoComponent(pellet *wtype.Physical) (component *wtype.LHComponent) {
 	// placeholder
 	return
 }
+*/
 
-func Resuspend(pellet *wtype.Physical, step Chromstep, column Column) (output_c *wtype.LHComponent, processedcolumn Column) {
+func PelletToComponent(p Pellet) *wtype.LHComponent {
+	return wtype.NewLHComponent()
+}
 
-	var output *wtype.LHSolution
-	input := PhysicaltoComponent(pellet)
+/*
+func Resuspend(pellet Pellet, step Chromstep, column Column) (output_c *wtype.LHComponent, processedcolumn Column) {
+
+	var output *wtype.LHComponent
+	//input := PhysicaltoComponent(pellet)
+	input := PelletToComponent(pellet)
 	samples := make([]*wtype.LHComponent, 0)
 	samples = append(samples, step.Buffer, input)
 	mixture := mixer.Mix(samples...)
@@ -89,9 +96,10 @@ func Resuspend(pellet *wtype.Physical, step Chromstep, column Column) (output_c 
 	output_c = wtype.SolutionToComponent(output)
 	return output_c, processedcolumn
 }
+*/
 func Chromatography(input *wtype.LHComponent, step Chromstep, column Column) (output_c *wtype.LHComponent, processedcolumn Column) {
 
-	var output *wtype.LHSolution
+	var output *wtype.LHComponent
 	samples := make([]*wtype.LHComponent, 0)
 	samples = append(samples, input, step.Buffer)
 	mixture := mixer.Mix(samples...)
@@ -104,8 +112,7 @@ func Chromatography(input *wtype.LHComponent, step Chromstep, column Column) (ou
 	}
 
 	processedcolumn = column
-	output_c = wtype.SolutionToComponent(output)
-	return output_c, processedcolumn
+	return output, processedcolumn
 }
 
 func Blot(column Column, blotcycles int, blottime time.Duration) (blottedcolumn Column) {

@@ -25,13 +25,11 @@ package wtype
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/antha/anthalib/wutil"
+	"github.com/antha-lang/antha/microArch/logger"
 )
 
 const (
@@ -43,10 +41,10 @@ const (
 type LHChannelParameter struct {
 	ID          string
 	Name        string
-	Minvol      *wunit.Volume
-	Maxvol      *wunit.Volume
-	Minspd      *wunit.FlowRate
-	Maxspd      *wunit.FlowRate
+	Minvol      wunit.Volume
+	Maxvol      wunit.Volume
+	Minspd      wunit.FlowRate
+	Maxspd      wunit.FlowRate
 	Multi       int
 	Independent bool
 	Orientation int
@@ -68,10 +66,10 @@ func (lhcp LHChannelParameter) MarshalJSON() ([]byte, error) {
 	}{
 		lhcp.ID,
 		lhcp.Name,
-		*lhcp.Minvol,
-		*lhcp.Maxvol,
-		*lhcp.Minspd,
-		*lhcp.Maxspd,
+		lhcp.Minvol,
+		lhcp.Maxvol,
+		lhcp.Minspd,
+		lhcp.Maxspd,
 		lhcp.Multi,
 		lhcp.Independent,
 		lhcp.Orientation,
@@ -85,7 +83,7 @@ func (lhcp *LHChannelParameter) Dup() *LHChannelParameter {
 	return r
 }
 
-func NewLHChannelParameter(name string, minvol, maxvol *wunit.Volume, minspd, maxspd *wunit.FlowRate, multi int, independent bool, orientation int, head int) *LHChannelParameter {
+func NewLHChannelParameter(name string, minvol, maxvol wunit.Volume, minspd, maxspd wunit.FlowRate, multi int, independent bool, orientation int, head int) *LHChannelParameter {
 	var lhp LHChannelParameter
 	lhp.ID = GetUUID()
 	lhp.Name = name
@@ -178,26 +176,78 @@ func (lhp *LHPosition) Shape() *Shape {
 	return NewShape("box", "mm", 0.08548, 0.12776, 0.0)
 }
 
-/*
-// question over whether this is necessary
-//@implement SolidContainer
-func (lhp *LHPosition) Contents() []Solid {
-	return nil
+//  instruction to a liquid handler
+type LHInstruction struct {
+	ID               string
+	ProductID        string
+	BlockID          BlockID
+	SName            string
+	Order            int
+	Components       []*LHComponent
+	ContainerType    string
+	Welladdress      string
+	Plateaddress     string
+	PlateID          string
+	Platetype        string
+	Vol              float64
+	Type             string
+	Conc             float64
+	Tvol             float64
+	Majorlayoutgroup int
+	Result           *LHComponent
 }
-func (lhp *LHPosition) ContainerType() string {
-	return lhp.Name
+
+func (ins *LHInstruction) IsMixInPlace() bool {
+	smp := ins.Components[0].IsSample()
+	return !smp
 }
-func Empty() bool {
+
+func (ins *LHInstruction) HasAnyParent() bool {
+	for _, v := range ins.Components {
+		if v.HasAnyParent() {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (ins *LHInstruction) HasParent(id string) bool {
+	for _, v := range ins.Components {
+		if v.HasParent(id) {
+			return true
+		}
+	}
+	return false
+}
+
+func (ins *LHInstruction) ParentString() string {
+	if ins == nil {
+		return ""
+	}
+
+	tx := make([]string, 0, 1)
+
+	for _, v := range ins.Components {
+		//s += v.ParentID + "_"
+
+		pid := v.ParentID
+
+		if pid != "" {
+			tx = append(tx, pid)
+		}
+	}
+
+	if len(tx) == 0 {
+		return ""
+	} else {
+		return strings.Join(tx, "_")
+	}
 
 }
-func PartOf() Entity {
-
-}
-*/
 
 // structure describing a solution: a combination of liquid components
 type LHSolution struct {
-	*GenericPhysical
 	ID               string
 	BlockID          BlockID
 	Inst             string
@@ -217,11 +267,16 @@ type LHSolution struct {
 	Minorlayoutgroup int
 }
 
+func NewLHInstruction() *LHInstruction {
+	var lhi LHInstruction
+	lhi.ID = GetUUID()
+	lhi.Majorlayoutgroup = -1
+	return &lhi
+}
+
 func NewLHSolution() *LHSolution {
 	var lhs LHSolution
 	lhs.ID = GetUUID()
-	var gp GenericPhysical
-	lhs.GenericPhysical = &gp
 	lhs.Majorlayoutgroup = -1
 	lhs.Minorlayoutgroup = -1
 	return &lhs
@@ -265,80 +320,73 @@ func (sol LHSolution) String() string {
 	return one + two
 }
 
-/*
-func (lhc *LHSolution) Add(v wunit.Volume) {
-	// fudge ... assumes lhc.Vol is in SI
-
-	//meas := wunit.ConcreteMeasurement{lhc.Vol, wunit.ParsePrefixedUnit(lhc.Vunit)}
-
-	lhc.Vol = lhc.Vol + v.SIValue()
-}
-
-func (lhc *LHSolution) Container() LiquidContainer {
-	return lhc.ContainerType
-}
-*/
-func SolutionToComponent(s *LHSolution) (c *LHComponent) {
-
-	c = New_Component(s.SName, s.Type, s.Vol)
-
-	/*
-		c = NewLHComponent()
-
-		c.ID = s.ID
-		c.Inst = s.Inst
-		//
-
-		c.GenericPhysical = s.GenericPhysical
-		c.Order = s.Order
-		c.CName = s.SName
-		c.Type = s.Type
-		c.Vol = s.Vol
-		c.Conc = s.Conc
-		c.Vunit = s.Vunit
-		c.Tvol = s.TVol
-		c.Loc = s.Loc
-		c.Smax = s.Smax
-		c.Visc = s.Visc
-		c.LContainer = //LHWell.Dup() //NewLHWell(s.Platetype, s.PlateID, crds, vunit string, vol, rvol float64, shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
-		c.Destination = s.Destination
-		c.StockConcentration = s.StockConcentration
-
-	*/
-
-	/*c.Extra = make(map[string]interface{}, len(lhc.Extra))
-	for k, v := range lhc.Extra {
-		c.Extra[k] = v
-	}*/
-	return c
-
+func (lhs *LHSolution) GetAssignment() string {
+	return lhs.Plateaddress + ":" + lhs.Welladdress
 }
 
 // structure describing a liquid component and its desired properties
 type LHComponent struct {
-	*GenericPhysical
 	ID                 string
+	BlockID            BlockID
+	DaughterID         string
+	ParentID           string
 	Inst               string
 	Order              int
 	CName              string
-	Type               string
+	Type               LiquidType
 	Vol                float64
 	Conc               float64
 	Vunit              string
 	Cunit              string
 	Tvol               float64
-	Loc                string
 	Smax               float64
 	Visc               float64
 	StockConcentration float64
-	LContainer         *LHWell `gotopb:"-" json:"-"`
-	Destination        string
 	Extra              map[string]interface{}
+	Loc                string
+	Destination        string
+}
+
+func (lhc *LHComponent) IsZero() bool {
+	if lhc == nil || lhc.Type == LTNIL || lhc.CName == "" || lhc.Vol < 0.0000001 {
+		return true
+	}
+	return false
+}
+
+func (lhc *LHComponent) SetVolume(v wunit.Volume) {
+	lhc.Vol = v.RawValue()
+	lhc.Vunit = v.Unit().PrefixedSymbol()
+}
+
+func (lhc *LHComponent) HasParent(s string) bool {
+	return strings.Contains(lhc.ParentID, s)
+}
+
+func (lhc *LHComponent) HasDaughter(s string) bool {
+	return strings.Contains(lhc.DaughterID, s)
+}
+
+func (lhc *LHComponent) Name() string {
+	return lhc.CName
+}
+
+func (lhc *LHComponent) TypeName() string {
+	return LiquidTypeName(lhc.Type)
+}
+
+func (lhc *LHComponent) Volume() wunit.Volume {
+	return wunit.NewVolume(lhc.Vol, lhc.Vunit)
+}
+
+func (lhc *LHComponent) Remove(v wunit.Volume) {
+	///TODO -- catch errors
+	lhc.Vol -= v.ConvertToString(lhc.Vunit)
 }
 
 func (lhc *LHComponent) Dup() *LHComponent {
 	c := NewLHComponent()
-	c.GenericPhysical = lhc.GenericPhysical
+	c.ID = lhc.ID
 	c.Order = lhc.Order
 	c.CName = lhc.CName
 	c.Type = lhc.Type
@@ -346,76 +394,82 @@ func (lhc *LHComponent) Dup() *LHComponent {
 	c.Conc = lhc.Conc
 	c.Vunit = lhc.Vunit
 	c.Tvol = lhc.Vol
-	c.Loc = lhc.Loc
 	c.Smax = lhc.Smax
 	c.Visc = lhc.Visc
-	c.LContainer = lhc.LContainer
-	c.Destination = lhc.Destination
 	c.StockConcentration = lhc.StockConcentration
 	c.Extra = make(map[string]interface{}, len(lhc.Extra))
 	for k, v := range lhc.Extra {
 		c.Extra[k] = v
 	}
+	c.Loc = lhc.Loc
+	c.Destination = lhc.Destination
 	return c
 }
 
-// @implement Liquid
-
-func (lhc *LHComponent) Viscosity() float64 {
-	return lhc.Visc
-}
-
-func (lhc *LHComponent) Name() string {
-	return lhc.CName
-}
-
-func (lhc *LHComponent) Container() LiquidContainer {
-	return lhc.LContainer
-}
-
-func (lhc *LHComponent) Sample(v wunit.Volume) Liquid {
-	// need to jig around with units a bit here
-	// Should probably just make Vunit, Cunit etc. wunits anyway
-	meas := wunit.ConcreteMeasurement{lhc.Vol, wunit.ParsePrefixedUnit(lhc.Vunit)}
-
-	// we need some logic potentially
-
-	if v.SIValue() > meas.SIValue() {
-		wutil.Error(errors.New(fmt.Sprintf("LHComponent ID: %s Not enough volume for sample", lhc.ID)))
-	} else if v.SIValue() == meas.SIValue() {
-		return lhc
+func (cmp *LHComponent) SetSample(flag bool) bool {
+	if cmp == nil {
+		return false
 	}
-	smp := CopyLHComponent(lhc)
-	// need a convention here
 
-	smp.Vol = v.RawValue()
-	smp.Vunit = v.Unit().PrefixedSymbol()
-	meas.Subtract(&v.ConcreteMeasurement)
-	lhc.Vol = meas.RawValue()
-	return smp
+	if cmp.Extra == nil {
+		cmp.Extra = make(map[string]interface{})
+	}
+
+	cmp.Extra["IsSample"] = flag
+
+	return true
 }
 
-func (lhc *LHComponent) SampleSolidtoLiquid(m wunit.Mass, d wunit.Density) Liquid {
+func (cmp *LHComponent) IsSample() bool {
+	if cmp == nil {
+		return false
+	}
 
-	// calculate volume to add from density
-	v := wunit.MasstoVolume(m, d)
-	ret := lhc.Sample(v)
-	return ret
+	f, ok := cmp.Extra["IsSample"]
+
+	if !ok || !f.(bool) {
+		return false
+	}
+
+	return true
 }
 
-func (lhc *LHComponent) GetStockConcentration() float64 {
-	return lhc.StockConcentration
+func (cmp *LHComponent) HasAnyParent() bool {
+	if cmp.ParentID != "" {
+		return true
+	}
+
+	return false
 }
 
-func (lhc *LHComponent) Add(v wunit.Volume) {
-	meas := wunit.ConcreteMeasurement{lhc.Vol, wunit.ParsePrefixedUnit(lhc.Vunit)}
-	meas.Add(&v)
-	lhc.Vol = meas.RawValue()
+func (cmp *LHComponent) AddParent(parentID string) {
+	cmp.ParentID += parentID + "_"
 }
 
-func (lhc *LHComponent) Volume() wunit.Volume {
-	return wunit.NewVolume(lhc.Vol, lhc.Vunit)
+func (cmp *LHComponent) AddDaughter(daughterID string) {
+	cmp.DaughterID += daughterID + "_"
 }
+
+func (cmp *LHComponent) Mix(cmp2 *LHComponent) {
+	// if this component is zero we inherit the id of the other one
+	if cmp.IsZero() {
+		cmp.ID = cmp2.ID
+	}
+	cmp.Smax = mergeSolubilities(cmp, cmp2)
+	// determine type of final
+	cmp.Type = mergeTypes(cmp, cmp2)
+	// add cmp2 to cmp
+	vcmp := wunit.NewVolume(cmp.Vol, cmp.Vunit)
+	vcmp2 := wunit.NewVolume(cmp2.Vol, cmp2.Vunit)
+	vcmp.Add(vcmp2)
+	cmp.Vol = vcmp.RawValue() // same units
+	cmp.CName = mergeNames(cmp.CName, cmp2.CName)
+	// allow trace back
+	logger.Track(fmt.Sprintf("MIX %s %s %s", cmp.ID, cmp2.ID, vcmp.ToString()))
+}
+
+// @implement Liquid
+// @deprecate Liquid
 
 func (lhc *LHComponent) GetSmax() float64 {
 	return lhc.Smax
@@ -448,17 +502,17 @@ func (lhc *LHComponent) GetVunit() string {
 }
 
 func (lhc *LHComponent) GetType() string {
-	return lhc.Type
+	return LiquidTypeName(lhc.Type)
 }
 
 func NewLHComponent() *LHComponent {
 	var lhc LHComponent
-	var gp GenericPhysical
-	lhc.GenericPhysical = &gp
 	lhc.ID = GetUUID()
+	lhc.Vunit = "ul"
 	return &lhc
 }
 
+// XXX -- why is this different from Dup?
 func CopyLHComponent(lhc *LHComponent) *LHComponent {
 	tmp, _ := json.Marshal(lhc)
 	var lhc2 LHComponent
@@ -471,17 +525,13 @@ func CopyLHComponent(lhc *LHComponent) *LHComponent {
 	return &lhc2
 }
 
-// structure defining a liquid handler setup
+// structure describing a sample
 
-type LHSetup map[string]interface{}
-
-func NewLHSetup() LHSetup {
-	return make(LHSetup, 10)
-}
+type LHSample LHComponent
 
 // structure describing a microplate
+// this needs to be harmonised with the version
 type LHPlate struct {
-	*GenericEntity
 	ID          string
 	Inst        string
 	Loc         string
@@ -558,52 +608,61 @@ func (lhp LHPlate) String() string {
 	)
 }
 
+// convenience method
+
+func (lhp *LHPlate) GetComponent(cmp *LHComponent, exact bool) ([]WellCoords, bool) {
+	ret := make([]WellCoords, 0, 1)
+
+	it := NewOneTimeColumnWiseIterator(lhp)
+	volGot := wunit.NewVolume(0.0, "ul")
+
+	for wc := it.Curr(); it.Valid(); wc = it.Next() {
+		w := lhp.Wellcoords[wc.FormatA1()]
+		//	logger.Debug(fmt.Sprint("WANT$$$: ", cmp.CName, " :: ", wc.FormatA1(), " ", w.Contents().CName))
+		if w.Contents().CName == cmp.CName {
+			if exact && w.Contents().ID != cmp.ID {
+				continue
+			}
+
+			v := w.WorkingVolume()
+			volGot.Add(v)
+			ret = append(ret, wc)
+
+			if volGot.GreaterThan(cmp.Volume()) {
+				break
+			}
+		}
+	}
+
+	if !volGot.GreaterThan(cmp.Volume()) {
+		return ret, false
+	}
+
+	return ret, true
+}
+
+func (lhp *LHPlate) Wells() [][]*LHWell {
+	return lhp.Rows
+}
+func (lhp *LHPlate) WellMap() map[string]*LHWell {
+	return lhp.Wellcoords
+}
+
 // @implement named
 
 func (lhp *LHPlate) GetName() string {
 	return lhp.PlateName
 }
 
-// @implement Location
-
-func (lhp *LHPlate) Location_ID() string {
-	return lhp.ID
+func (lhp *LHPlate) WellAt(wc WellCoords) *LHWell {
+	return lhp.Wellcoords[wc.FormatA1()]
 }
 
-func (lhp *LHPlate) Location_Name() string {
-	return lhp.PlateName
-}
+func (lhp *LHPlate) WellAtString(s string) (*LHWell, bool) {
+	// improve later, start by assuming these are in FormatA1()
+	w, ok := lhp.Wellcoords[s]
 
-func (lhp *LHPlate) Positions() []Location {
-	ret := make([]Location, lhp.Nwells)
-	x := 0
-	for _, v := range lhp.Cols {
-		for _, w := range v {
-			ret[x] = Location(w)
-			x += 1
-		}
-	}
-	return ret
-}
-
-func (lhp *LHPlate) Container() Location {
-	return lhp
-}
-
-// @implement Labware
-func (lhp *LHPlate) Wells() [][]Well {
-	ret := make([][]Well, len(lhp.Rows))
-	for i := 0; i < len(lhp.Rows); i++ {
-		ret[i] = make([]Well, len(lhp.Rows[i]))
-		for j := 0; j < len(lhp.Rows[i]); j++ {
-			ret[i][j] = lhp.Rows[i][j]
-		}
-	}
-	return ret
-}
-
-func (lhp *LHPlate) WellAt(crds WellCoords) Well {
-	return lhp.Cols[crds.X][crds.Y]
+	return w, ok
 }
 
 func (lhp *LHPlate) WellsX() int {
@@ -612,8 +671,24 @@ func (lhp *LHPlate) WellsX() int {
 
 func (lhp *LHPlate) WellsY() int {
 	return lhp.WlsY
-
 }
+
+func (lhp *LHPlate) NextEmptyWell(it PlateIterator) WellCoords {
+	c := 0
+	for wc := it.Curr(); it.Valid(); wc = it.Next() {
+		if c == lhp.Nwells {
+			// prevent iterators from ever making this loop infinitely
+			break
+		}
+
+		if lhp.Cols[wc.X][wc.Y].Empty() {
+			return wc
+		}
+	}
+
+	return ZeroWellCoords()
+}
+
 func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
 	var lhp LHPlate
 	lhp.Type = platetype
@@ -648,7 +723,8 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit s
 			}
 			arr[i][j] = welltype.Dup()
 
-			crds := wutil.NumToAlpha(i+1) + ":" + strconv.Itoa(j+1)
+			//crds := wutil.NumToAlpha(i+1) + ":" + strconv.Itoa(j+1)
+			crds := WellCoords{j, i}.FormatA1()
 			wellcoords[crds] = arr[i][j]
 			arr[i][j].Crds = crds
 			colarr[j][i] = arr[i][j]
@@ -695,11 +771,10 @@ type LHWell struct {
 	Plateid   string
 	Platetype string
 	Crds      string
-	Vol       float64
+	MaxVol    float64
 	Vunit     string
-	WContents []*LHComponent
+	WContents *LHComponent
 	Rvol      float64
-	Currvol   float64
 	WShape    *Shape
 	Bottom    int
 	Xdim      float64
@@ -720,11 +795,10 @@ Plateinst : %s,
 Plateid   : %s,
 Platetype : %s,
 Crds      : %s,
-Vol       : %g,
+MaxVol    : %g,
 Vunit     : %s,
 WContents : %v,
 Rvol      : %g,
-Currvol   : %g,
 WShape    : %v,
 Bottom    : %d,
 Xdim      : %g,
@@ -741,11 +815,10 @@ Plate     : %v,
 		w.Plateid,
 		w.Platetype,
 		w.Crds,
-		w.Vol,
+		w.MaxVol,
 		w.Vunit,
 		w.WContents,
 		w.Rvol,
-		w.Currvol,
 		w.WShape,
 		w.Bottom,
 		w.Xdim,
@@ -758,18 +831,71 @@ Plate     : %v,
 	)
 }
 
-func (w *LHWell) WorkingVolume() *wunit.Volume {
-	v := wunit.NewVolume(w.Vol, w.Vunit)
-	v2 := wunit.NewVolume(w.Rvol, w.Vunit)
-	v.Subtract(&v2)
-	return &v
+func (w *LHWell) Contents() *LHComponent {
+	// be careful
+	if w == nil {
+		logger.Debug("CONTENTS OF NIL WELL REQUESTED")
+		return NewLHComponent()
+	}
+	if w.WContents == nil {
+		return NewLHComponent()
+	}
+
+	return w.WContents
 }
 
-func (w *LHWell) updateVolume() {
-	w.Vol = 0.0
-	for _, val := range w.WContents {
-		w.Vol += val.Vol
+func (w *LHWell) Currvol() float64 {
+	return w.Contents().Vol
+}
+
+func (w *LHWell) CurrVolume() wunit.Volume {
+	return w.Contents().Volume()
+}
+
+func (w *LHWell) MaxVolume() wunit.Volume {
+	return wunit.NewVolume(w.MaxVol, w.Vunit)
+}
+func (w *LHWell) Add(c *LHComponent) {
+	mv := wunit.NewVolume(w.MaxVol, w.Vunit)
+	cv := wunit.NewVolume(c.Vol, c.Vunit)
+	wv := w.CurrentVolume()
+	cv.Add(wv)
+	if cv.GreaterThan(mv) {
+		// could make this fatal but we don't track state well enough
+		// for that to be worthwhile
+		logger.Debug("WARNING: OVERFULL WELL AT ", w.Crds)
 	}
+	w.Contents().Mix(c)
+}
+
+func (w *LHWell) Remove(v wunit.Volume) *LHComponent {
+	// if the volume is too high we complain
+
+	if v.GreaterThan(w.CurrentVolume()) {
+		logger.Debug("You ask too much: ", w.Crds, v.ToString())
+		return nil
+	}
+
+	ret := w.Contents().Dup()
+	ret.Vol = v.ConvertToString(w.Vunit)
+
+	return ret
+}
+
+func (w *LHWell) WorkingVolume() wunit.Volume {
+	v := wunit.NewVolume(w.Currvol(), w.Vunit)
+	v2 := wunit.NewVolume(w.Rvol, w.Vunit)
+	v.Subtract(v2)
+	return v
+}
+
+func (w *LHWell) ResidualVolume() wunit.Volume {
+	v := wunit.NewVolume(w.Rvol, w.Vunit)
+	return v
+}
+
+func (w *LHWell) CurrentVolume() wunit.Volume {
+	return w.Contents().Volume()
 }
 
 //@implement Location
@@ -782,83 +908,23 @@ func (lhw *LHWell) Location_Name() string {
 	return lhw.Platetype
 }
 
-func (lhw *LHWell) Positions() []Location {
-	return nil
-}
-
-func (lhw *LHWell) Container() Location {
-	return lhw.Plate
-}
-
 func (lhw *LHWell) Shape() *Shape {
+	if lhw.WShape == nil {
+		// return the non-shape
+		return NewNilShape()
+	}
 	return lhw.WShape
 }
 
 // @implement Well
-func (w *LHWell) WellTypeName() string {
-	return w.Platetype
-}
-
-func (w *LHWell) ResidualVolume() wunit.Volume {
-	return wunit.NewVolume(w.Rvol, w.Vunit)
-}
-
-func (w *LHWell) Coords() WellCoords {
-	return MakeWellCoordsXY(w.Crds)
-}
-
-func (w *LHWell) ContainerVolume() wunit.Volume {
-	return wunit.NewVolume(w.Vol, w.Vunit)
-}
-
-func (w *LHWell) Contents() []Physical {
-	ret := make([]Physical, len(w.WContents))
-	for i := 0; i < len(w.WContents); i++ {
-		ret[i] = Physical(w.WContents[i])
-	}
-	return ret
-}
-
-func (w *LHWell) Add(p Physical) {
-	switch t := p.(type) {
-	default:
-		wutil.Error(errors.New(fmt.Sprintf("LHWell: Cannot add type %T", t)))
-	case *LHSolution:
-		// do something
-	case *LHComponent:
-		w.WContents = append(w.WContents, p.(*LHComponent))
-
-		w.Currvol += p.(*LHComponent).Vol
-		p.(*LHComponent).LContainer = w
-	}
-}
-
-// this is pretty dodgy... we will have to be quite careful here
-// the core problem is how to maintain a list of components and volumes
-// but respect the physical fact that we can't actually unmix things
-func (w *LHWell) Remove(v wunit.Volume) Physical {
-	defer w.updateVolume()
-	ret := w.WContents[0]
-
-	if ret.Vol > v.SIValue() {
-		ret.Vol = v.SIValue()
-		w.WContents[0].Vol -= v.SIValue()
-	} else {
-		w.WContents = w.WContents[1:len(w.WContents)]
-	}
-	return ret
-}
+// @deprecate Well
 
 func (w *LHWell) ContainerType() string {
 	return w.Platetype
 }
 
-func (w *LHWell) PartOf() Entity {
-	return w.Plate
-}
-
 func (w *LHWell) Empty() bool {
-	if w.Vol <= 0.000001 {
+	if w.Currvol() <= 0.000001 {
 		return true
 	} else {
 		return false
@@ -866,34 +932,51 @@ func (w *LHWell) Empty() bool {
 }
 
 func (lhw *LHWell) Dup() *LHWell {
-	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.Vol, lhw.Rvol, lhw.WShape.Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, lhw.Dunit)
-
-	cp.Currvol = lhw.Currvol
+	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, lhw.Dunit)
 
 	for k, v := range lhw.Extra {
 		cp.Extra[k] = v
 	}
 
-	for _, c := range lhw.WContents {
-		cp.WContents = append(cp.WContents, c.Dup())
-	}
+	cp.WContents = lhw.Contents().Dup()
 
 	return cp
+}
+
+func (lhw *LHWell) CalculateCrossSectionArea() (ca wunit.Area, err error) {
+
+	ca, err = lhw.Shape().CrossSectionalArea()
+
+	return
+}
+
+func (lhw *LHWell) CalculateMaxVolume() (vol wunit.Volume, err error) {
+
+	if lhw.Bottom == 0 { // flat
+		vol, err = lhw.Shape().Volume()
+	} /*else if lhw.Bottom == 1 { // round
+		vol, err = lhw.Shape().Volume()
+		// + additional calculation
+	} else if lhw.Bottom == 2 { // Pointed / v-shaped /pyramid
+		vol, err = lhw.Shape().Volume()
+		// + additional calculation
+	}
+	*/
+	return
 }
 
 // make a new well structure
 func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
 	var well LHWell
 
-	well.WContents = make([]*LHComponent, 0, 5)
+	well.WContents = NewLHComponent()
 	well.ID = GetUUID()
 	well.Platetype = platetype
 	well.Plateid = plateid
 	well.Crds = crds
-	well.Vol = vol
+	well.MaxVol = vol
 	well.Rvol = rvol
 	well.Vunit = vunit
-	well.Currvol = 0.0
 	well.WShape = shape.Dup()
 	well.Bottom = bott
 	well.Xdim = xdim
@@ -905,10 +988,12 @@ func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape 
 	return &well
 }
 
+// this function tries to find somewhere to put something... it was written before
+// i had an iterator. fml
 func Get_Next_Well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LHWell, bool) {
-	nrow, ncol := 0, 1
-
 	vol := component.Vol
+
+	it := NewOneTimeColumnWiseIterator(plate)
 
 	if curwell != nil {
 		// quick check to see if we have room
@@ -919,38 +1004,26 @@ func Get_Next_Well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 			return curwell, true
 		}
 
-		// we need a defined traversal of the wells
-
-		crds := curwell.Crds
-
-		tx := strings.Split(crds, ":")
-
-		nrow = wutil.AlphaToNum(tx[0])
-		ncol = wutil.ParseInt(tx[1])
+		startcoords := MakeWellCoords(curwell.Crds)
+		it.SetStartTo(startcoords)
+		it.Rewind()
+		it.Next()
 	}
-
-	wellsx := plate.WlsX
-	wellsy := plate.WlsY
 
 	var new_well *LHWell
 
-	for {
-		nrow, ncol = next_well_to_try(nrow, ncol, wellsy, wellsx)
+	for wc := it.Curr(); it.Valid(); wc = it.Next() {
 
-		if nrow == -1 {
-			return nil, false
-		}
-		crds := wutil.NumToAlpha(nrow) + ":" + strconv.Itoa(ncol)
+		crds := wc.FormatA1()
 
 		new_well = plate.Wellcoords[crds]
 
-		cnts := new_well.WContents
-
-		if len(cnts) == 0 {
+		if new_well.Empty() {
 			break
 		}
+		cnts := new_well.Contents()
 
-		cont := cnts[0].Name()
+		cont := cnts.Name()
 		if cont != component.Name() {
 			continue
 		}
@@ -962,54 +1035,25 @@ func Get_Next_Well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 		}
 	}
 
+	if new_well == nil {
+		return nil, false
+	}
+
 	return new_well, true
 }
 
+//XXX sloboda? This makes no sense now; need to revise
 func get_vol_left(well *LHWell) float64 {
-	cnts := well.WContents
-
-	// in the first instance we have a fixed constant times the number of
-	// transfers... volumes are in microlitres as always
-
+	//cnts := well.WContents
+	// this is very odd... I can see how this works as a heuristic
+	// but it doesn't make much sense to me
 	carry_vol := 10.0 // microlitres
-	total_carry_vol := float64(len(cnts)) * carry_vol
+	//	total_carry_vol := float64(len(cnts)) * carry_vol
+	total_carry_vol := carry_vol // yeah right
 	Currvol := well.Currvol
 	rvol := well.Rvol
-	vol := well.Vol
-	return vol - (Currvol + total_carry_vol + rvol)
-}
-
-func next_well_to_try(row, col, nrows, ncols int) (int, int) {
-	// this needs to be refactored into an iterator
-
-	nrow := -1
-	ncol := -1
-
-	// iterate down columns
-
-	if row+1 > nrows {
-		if col+1 <= ncols {
-			nrow = 1
-			ncol = col + 1
-		}
-	} else {
-		ncol = col
-		nrow = row + 1
-	}
-
-	// note that the default should be to leave ncol/nrow unchanged
-	// and return -1 -1
-
-	return nrow, ncol
-}
-
-func New_Component(name, ctype string, vol float64) *LHComponent {
-	var component LHComponent
-	component.ID = GetUUID()
-	component.CName = name
-	component.Type = ctype
-	component.Vol = vol
-	return &component
+	vol := well.MaxVol
+	return vol - (Currvol() + total_carry_vol + rvol)
 }
 
 func New_Solution() *LHSolution {
@@ -1033,7 +1077,6 @@ func Initialize_Wells(plate *LHPlate) {
 	for _, well := range wells {
 		well.ID = GetUUID()
 		well.Plateid = id
-		well.Currvol = 0.0
 		newwells[well.ID] = well
 		wellcrds[well.Crds] = well
 	}
@@ -1044,7 +1087,6 @@ func Initialize_Wells(plate *LHPlate) {
 /* tip box */
 
 type LHTipbox struct {
-	*GenericSolid
 	ID         string
 	Boxname    string
 	Type       string
@@ -1205,6 +1247,7 @@ func (tb *LHTipbox) GetTips(mirror bool, multi, orient int) []string {
 				for j := s; j >= 0; j-- {
 					tb.Tips[i][j] = nil
 					wc := WellCoords{i, j}
+					//fmt.Println(j, "Getting TIP from ", wc.FormatA1())
 					ret = append(ret, wc.FormatA1())
 					n += 1
 					if n >= multi {
@@ -1212,6 +1255,7 @@ func (tb *LHTipbox) GetTips(mirror bool, multi, orient int) []string {
 					}
 				}
 
+				//fmt.Println("RET: ", ret)
 				break
 			}
 		}
@@ -1239,8 +1283,15 @@ type LHTip struct {
 	Type   string
 	Mnfr   string
 	Dirty  bool
-	MaxVol *wunit.Volume
-	MinVol *wunit.Volume
+	MaxVol wunit.Volume
+	MinVol wunit.Volume
+}
+
+func (tip *LHTip) IsNil() bool {
+	if tip == nil || tip.Type == "" || tip.MaxVol.IsZero() || tip.MinVol.IsZero() {
+		return true
+	}
+	return false
 }
 
 func (tip *LHTip) Dup() *LHTip {
@@ -1254,10 +1305,8 @@ func NewLHTip(mfr, ttype string, minvol, maxvol float64, volunit string) *LHTip 
 	lht.ID = GetUUID()
 	lht.Mnfr = mfr
 	lht.Type = ttype
-	v := wunit.NewVolume(maxvol, volunit)
-	lht.MaxVol = &v
-	v2 := wunit.NewVolume(minvol, volunit)
-	lht.MinVol = &v2
+	lht.MaxVol = wunit.NewVolume(maxvol, volunit)
+	lht.MinVol = wunit.NewVolume(minvol, volunit)
 	return &lht
 }
 
@@ -1378,7 +1427,7 @@ func (lhh *LHHead) GetParams() *LHChannelParameter {
 }
 
 // adaptor
-
+// TODO -- should be an array of loaded tips
 type LHAdaptor struct {
 	Name          string
 	ID            string
@@ -1399,7 +1448,7 @@ func NewLHAdaptor(name, mf string, params *LHChannelParameter) *LHAdaptor {
 func (lha *LHAdaptor) Dup() *LHAdaptor {
 	ad := NewLHAdaptor(lha.Name, lha.Manufacturer, lha.Params.Dup())
 	ad.Ntipsloaded = lha.Ntipsloaded
-	if lha.Tiptypeloaded != nil {
+	if !ad.Tiptypeloaded.IsNil() {
 		ad.Tiptypeloaded = lha.Tiptypeloaded.Dup()
 	}
 

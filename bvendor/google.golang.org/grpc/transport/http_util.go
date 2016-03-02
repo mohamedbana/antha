@@ -43,11 +43,11 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/http2"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/http2/hpack"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/codes"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/grpclog"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/metadata"
-	"github.com/antha-lang/antha/internal/github.com/bradfitz/http2"
-	"github.com/antha-lang/antha/internal/github.com/bradfitz/http2/hpack"
 )
 
 const (
@@ -89,6 +89,7 @@ var (
 // Records the states during HPACK decoding. Must be reset once the
 // decoding of the entire headers are finished.
 type decodeState struct {
+	encoding string
 	// statusCode caches the stream status received from the trailer
 	// the server sent. Client side only.
 	statusCode codes.Code
@@ -141,13 +142,12 @@ func newHPACKDecoder() *hpackDecoder {
 	d.h = hpack.NewDecoder(http2InitHeaderTableSize, func(f hpack.HeaderField) {
 		switch f.Name {
 		case "content-type":
-			// TODO(zhaoq): Tentatively disable the check until a bug is fixed.
-			/*
-				if !strings.Contains(f.Value, "application/grpc") {
-					d.err = StreamErrorf(codes.FailedPrecondition, "transport: received the unexpected header")
-					return
-				}
-			*/
+			if !strings.Contains(f.Value, "application/grpc") {
+				d.err = StreamErrorf(codes.FailedPrecondition, "transport: received the unexpected header")
+				return
+			}
+		case "grpc-encoding":
+			d.state.encoding = f.Value
 		case "grpc-status":
 			code, err := strconv.Atoi(f.Value)
 			if err != nil {

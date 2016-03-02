@@ -24,11 +24,12 @@ package enzymes
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
+
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"strconv"
-	"strings"
 )
 
 func jointwoparts(upstreampart []Digestedfragment, downstreampart []Digestedfragment) (assembledfragments []Digestedfragment, plasmidproducts []wtype.DNASequence, err error) {
@@ -262,9 +263,14 @@ func Assemblysimulator(assemblyparameters Assemblyparameters) (s string, success
 // MultipleAssemblies will perform simulated assemblies on multiple constructs
 // and return a description of whether each was successful and how many are
 // expected to work
-func MultipleAssemblies(parameters []Assemblyparameters) (s string, successfulassemblies int, errors map[string]string) {
+func MultipleAssemblies(parameters []Assemblyparameters) (s string, successfulassemblies int, errors map[string]string, seqs []wtype.DNASequence) {
+
+	seqs = make([]wtype.DNASequence, 0)
+
 	for _, construct := range parameters {
-		output, _, _, _, err := Assemblysimulator(construct)
+		output, _, _, seq, err := Assemblysimulator(construct)
+
+		seqs = append(seqs, seq)
 
 		if err == nil {
 			successfulassemblies += 1

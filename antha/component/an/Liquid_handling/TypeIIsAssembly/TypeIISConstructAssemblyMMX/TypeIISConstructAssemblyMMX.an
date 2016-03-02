@@ -11,7 +11,6 @@ Parameters (
 	ReactionVolume				Volume
 	PartVols				[]Volume
 	PartNames				[]string
-	//MMXVol					Volume
 	ReactionTemp				Temperature
 	ReactionTime				Time
 	InactivationTemp			Temperature
@@ -24,7 +23,6 @@ Parameters (
 // Physical Inputs to this protocol with types
 Inputs (
 	Parts			[]*wtype.LHComponent
-//	Water			*wtype.LHComponent
 	MasterMix		*wtype.LHComponent
 	OutPlate		*wtype.LHPlate
 )
@@ -32,7 +30,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Reaction *wtype.LHSolution
+	Reaction *wtype.LHComponent
 )
 
 // Data which is returned from this protocol, and data types
@@ -58,7 +56,7 @@ Steps {
 		samples = append(samples, partSample)
 	}
 
-	Reaction = MixTo(OutPlate, OutputLocation, samples...)
+	Reaction = MixTo(OutPlate.Type, OutputLocation, OutputPlateNum, samples...)
 
 	// incubate the reaction mixture
 	// commented out pending changes to incubate

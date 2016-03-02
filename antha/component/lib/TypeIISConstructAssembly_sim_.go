@@ -120,12 +120,10 @@ func _TypeIISConstructAssembly_simSteps(_ctx context.Context, _input *TypeIISCon
 		ligSample := mixer.Sample(_input.Ligase, _input.LigVol)
 		samples = append(samples, ligSample)
 
-		_output.Reaction = execute.MixInto(_ctx, _input.OutPlate, samples...)
-
 		// incubate the reaction mixture
-		execute.Incubate(_ctx, _output.Reaction, _input.ReactionTemp, _input.ReactionTime, false)
+		out1 := execute.Incubate(_ctx, execute.MixInto(_ctx, _input.OutPlate, "", samples...), _input.ReactionTemp, _input.ReactionTime, false)
 		// inactivate
-		execute.Incubate(_ctx, _output.Reaction, _input.InactivationTemp, _input.InactivationTime, false)
+		_output.Reaction = execute.Incubate(_ctx, out1, _input.InactivationTemp, _input.InactivationTime, false)
 	}
 
 }
@@ -219,7 +217,7 @@ type TypeIISConstructAssembly_simOutput struct {
 	MolarratiotoVector []float64
 	Molesperpart       []float64
 	NewDNASequence     wtype.DNASequence
-	Reaction           *wtype.LHSolution
+	Reaction           *wtype.LHComponent
 	Simulationpass     bool
 	Sitesfound         []enzymes.Restrictionsites
 	Status             string
@@ -235,7 +233,7 @@ type TypeIISConstructAssembly_simSOutput struct {
 		Status             string
 	}
 	Outputs struct {
-		Reaction *wtype.LHSolution
+		Reaction *wtype.LHComponent
 	}
 }
 

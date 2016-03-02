@@ -47,7 +47,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	 Pixels[]*wtype.LHSolution
+	 Pixels[]*wtype.LHComponent
 )
 
 Requirements {
@@ -91,7 +91,7 @@ Steps {
 	}
 	fmt.Println(componentmap)
 
-	solutions := make([]*wtype.LHSolution, 0)
+	solutions := make([]*wtype.LHComponent, 0)
 
 	counter := 0
 
@@ -101,8 +101,9 @@ Steps {
 		
 		component := componentmap[colourtostringmap[colour]]
 
-		component.Type = "default"
-		
+		if component.TypeName() == "dna" {
+			component.Type = wtype.LTDoNotMix // "DoNotMix"
+		}
 		fmt.Println(image.Colourcomponentmap[colour])
 		
 		if OnlythisColour !="" {
@@ -123,9 +124,9 @@ Steps {
 		components = append(components,inducerSample)*/
 		pixelSample := mixer.Sample(component, VolumePerWell)
 		components = append(components,pixelSample)
-		solution := MixTo(OutPlate, locationkey, components...)
-		Incubate(solution,IncTemp,IncTime,true)
-		solutions = append(solutions, solution)
+		solution := MixTo(OutPlate.Type, locationkey, 0,components...)
+		
+		solutions = append(solutions, Incubate(solution,IncTemp,IncTime,true))
 			}
 			
 		}else{
@@ -145,10 +146,9 @@ Steps {
 		components = append(components,inducerSample)*/
 		pixelSample := mixer.Sample(component, VolumePerWell)
 		components = append(components,pixelSample)
-		solution := MixTo(OutPlate, locationkey, components...)
+		solution := MixTo(OutPlate.Type, locationkey, 0, components...)
 		
-		Incubate(solution,IncTemp,IncTime,true)
-		solutions = append(solutions, solution)
+		solutions = append(solutions, Incubate(solution,IncTemp,IncTime,true))
 		}
 		}
 	}

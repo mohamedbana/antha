@@ -25,7 +25,6 @@ package liquidhandling
 import (
 	"fmt"
 
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/logger"
 )
@@ -62,14 +61,7 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 
 	// tips
 	//	tips := request.Tips
-
-	// we put tips on first
-
-	setup := request.Setup
-
-	if len(setup) == 0 {
-		setup = wtype.NewLHSetup()
-	}
+	setup := make(map[string]interface{})
 	// make sure anything in setup is in synch
 
 	for pos, id := range params.PosLookup {
@@ -99,7 +91,7 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 	*/
 	// this logic may not transfer well but I expect that outputs are more constrained
 	// than inputs for the simple reason that most output takes place to single wells
-	// while input takes place from reservoirs
+	// while input (sometimes) takes place from reservoirs
 
 	// outputs
 
@@ -119,13 +111,14 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 		if position == "" {
 			RaiseError("No positions left for input")
 		}
+		//fmt.Println("PLAATE: ", position)
 		setup[position] = p
 		plate_lookup[p.ID] = position
 		params.AddPlate(position, p)
 		logger.Info(fmt.Sprintf("Input plate of type %s in position %s", p.Type, position))
 	}
 
-	request.Setup = setup
+	//request.Setup = setup
 	request.Plate_lookup = plate_lookup
 	return request
 }

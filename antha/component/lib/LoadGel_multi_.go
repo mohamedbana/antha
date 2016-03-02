@@ -44,9 +44,9 @@ func _LoadGel_multiSteps(_ctx context.Context, _input *LoadGel_multiInput, _outp
 
 	}
 
-	_output.RunSolutions = make([]*wtype.LHSolution, 0)
+	_output.RunSolutions = make([]*wtype.LHComponent, 0)
 
-	var RunSolution *wtype.LHSolution
+	var RunSolution *wtype.LHComponent
 
 	for k, SampleName := range _input.SampleNames {
 		samples := make([]*wtype.LHComponent, 0)
@@ -59,7 +59,7 @@ func _LoadGel_multiSteps(_ctx context.Context, _input *LoadGel_multiInput, _outp
 		samples = append(samples, loadSample)
 		fmt.Println("This is a list of samples for loading:", samples)
 
-		RunSolution = execute.MixTo(_ctx, _input.GelPlate, wellpositionarray[k], samples...)
+		RunSolution = execute.MixTo(_ctx, _input.GelPlate.Type, wellpositionarray[k], 0, samples...)
 		_output.RunSolutions = append(_output.RunSolutions, RunSolution)
 	}
 }
@@ -128,7 +128,7 @@ type LoadGel_multiInput struct {
 }
 
 type LoadGel_multiOutput struct {
-	RunSolutions []*wtype.LHSolution
+	RunSolutions []*wtype.LHComponent
 	Status       string
 }
 
@@ -137,7 +137,7 @@ type LoadGel_multiSOutput struct {
 		Status string
 	}
 	Outputs struct {
-		RunSolutions []*wtype.LHSolution
+		RunSolutions []*wtype.LHComponent
 	}
 }
 

@@ -29,7 +29,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	RecoveredCells *wtype.LHSolution
+	RecoveredCells *wtype.LHComponent
 )
 
 Requirements {
@@ -52,11 +52,11 @@ Steps {
 	recoverymix = append(recoverymix,transformedcellsComp)
 	//recoverymix = append(recoverymix,recoverymixture)
 
-	recoverymix2 := MixInto(OutPlate,recoverymix...)
+	//recoverymix = append(recoverymix,transformedcellsComp,recoverymixture)
+	recoverymix = append(recoverymix,transformedcellsComp)
+	recoverymix2 := MixInto(OutPlate, "", recoverymix...)
 	
-	Incubate (recoverymix2,  Recoverytemp, Recoverytime, true)
-	
-	RecoveredCells = recoverymix2
+	RecoveredCells = Incubate (recoverymix2,  Recoverytemp, Recoverytime, true)
 	
 }
 
