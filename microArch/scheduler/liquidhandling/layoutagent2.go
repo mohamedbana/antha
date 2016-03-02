@@ -134,6 +134,7 @@ type PlateChoice struct {
 }
 
 func get_and_complete_assignments(request *LHRequest, order []string, s []PlateChoice, m map[int]string) ([]PlateChoice, map[int]string) {
+	fmt.Println("GET AND COMPLETE ASSIGNMENTS")
 	//s := make([]PlateChoice, 0, 3)
 	//m := make(map[int]string)
 
@@ -172,6 +173,8 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 		} else if v.IsMixInPlace() {
 			// the first component sets the destination
 			// and now it should indeed be set
+
+			fmt.Println("YEAH YEAH MIX IN PLAAACE: ")
 
 			addr := v.Components[0].Loc
 			tx := strings.Split(addr, ":")
