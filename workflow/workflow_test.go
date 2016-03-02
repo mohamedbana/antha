@@ -2,8 +2,8 @@ package workflow
 
 import (
 	"fmt"
-	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/inject"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
@@ -65,7 +65,7 @@ func TestRunFromFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	w, err := New(Options{FromBytes: bs})
+	w, err := New(Opt{FromBytes: bs})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -99,7 +99,7 @@ func TestRunFromFile(t *testing.T) {
 }
 
 func TestRun(t *testing.T) {
-	w, err := New(Options{})
+	w, err := New(Opt{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -151,7 +151,7 @@ func TestRun(t *testing.T) {
 }
 
 func TestDuplicateIns(t *testing.T) {
-	w, err := New(Options{})
+	w, err := New(Opt{})
 	if err != nil {
 		t.Fatal(err)
 	}

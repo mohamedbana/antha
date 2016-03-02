@@ -1,6 +1,7 @@
 package ast
 
-type Location struct{}
+// TODO make more specific
+type Location interface{}
 
 type Movement struct {
 	From Location

@@ -4,12 +4,13 @@ import (
 	"fmt"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/graph"
 )
 
 const (
-	AllDeps = iota
-	DataDeps
+	AllDeps  = iota // Follow all AST edges
+	DataDeps        // Follow only consumer-producer edges
 )
 
 var (
@@ -58,6 +59,8 @@ func (a *UseComp) NodeString() string {
 type Incubate struct {
 	From []Node
 	Reqs []Request
+	Time wunit.Time
+	Temp wunit.Temperature
 	Out  interface{}
 }
 
@@ -122,7 +125,7 @@ func (a *Bundle) NodeString() string {
 type Move struct {
 	From     []*UseComp
 	FromLocs []Location
-	ToLocs   []Location
+	ToLoc    Location
 	Out      interface{}
 }
 
@@ -236,10 +239,12 @@ func (a *Graph) SetOut(n Node, i int, x Node) {
 }
 
 type ToGraphOpt struct {
-	Roots     []Node
-	WhichDeps int
+	Roots     []Node // Roots of program
+	WhichDeps int    // Edges to follow when building graph
 }
 
+// Create a graph from a list of roots. Incude any referenced ast nodes in the
+// resulting graph.
 func ToGraph(opt ToGraphOpt) *Graph {
 	g := &Graph{
 		whichDeps: opt.WhichDeps,
@@ -271,4 +276,19 @@ func ToGraph(opt ToGraphOpt) *Graph {
 	}
 
 	return g
+}
+
+// Construct the data dependencies between a set of commands.
+func Deps(roots []Node) graph.Graph {
+	g := ToGraph(ToGraphOpt{Roots: roots, WhichDeps: DataDeps})
+	root := make(map[graph.Node]bool)
+	for _, r := range roots {
+		root[r] = true
+	}
+	return graph.Eliminate(graph.EliminateOpt{
+		Graph: g,
+		In: func(n graph.Node) bool {
+			return root[n]
+		},
+	})
 }

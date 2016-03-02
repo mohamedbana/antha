@@ -23,7 +23,13 @@
 package wtype
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/microArch/logger"
+
+	"math"
 )
 
 type Shape struct {
@@ -48,6 +54,64 @@ func (sh *Shape) Depth() wunit.Length { // Z?
 
 func (sh *Shape) Dup() *Shape {
 	return &(Shape{sh.ShapeName, sh.LengthUnit, sh.H, sh.W, sh.D})
+}
+
+func (sh *Shape) CrossSectionalArea() (area wunit.Area, err error) {
+
+	shapename := strings.ToLower(sh.ShapeName)
+	var areaunit string
+	if sh.LengthUnit == "mm" {
+		areaunit = "mm^2" //sh.LengthUnit + `^` + strconv.Itoa(2)
+	} else {
+		err = fmt.Errorf("sh.Lengthunit =", sh.LengthUnit)
+		logger.Debug(err.Error())
+	}
+	var circular bool
+	var boxlike bool
+
+	if shapename == "circle" || shapename == "cylinder" || shapename == "round" || shapename == "sphere" {
+		circular = true
+	} else if shapename == "square" || shapename == "rectangle" || shapename == "box" {
+		boxlike = true
+	}
+
+	if circular && sh.Height() == sh.Width() {
+		area = wunit.NewArea(math.Pi*sh.H*sh.H, areaunit)
+	} else if boxlike {
+		area = wunit.NewArea(sh.H*sh.W, areaunit)
+	} else {
+		err = fmt.Errorf("No method to work out cross sectional area for shape", sh.ShapeName, "yet")
+	}
+	return
+}
+
+func (sh *Shape) Volume() (volume wunit.Volume, err error) {
+
+	shapename := strings.ToLower(sh.ShapeName)
+	var volumeunit string
+	if sh.LengthUnit == "mm" {
+		volumeunit = "ul"
+	} else {
+		err = fmt.Errorf("can't handle conversion of", sh.LengthUnit, "to volume unit yet")
+	}
+
+	var cylinder bool
+	var boxlike bool
+
+	if shapename == "cylinder" {
+		cylinder = true
+	} else if shapename == "square" || shapename == "rectangle" || shapename == "box" {
+		boxlike = true
+	}
+
+	if cylinder && sh.Height() == sh.Width() {
+		volume = wunit.NewVolume(math.Pi*sh.H*sh.H*sh.D, volumeunit)
+	} else if boxlike {
+		volume = wunit.NewVolume(sh.H*sh.W*sh.D, volumeunit)
+	} else {
+		err = fmt.Errorf("No method to work out volume for shape", sh.ShapeName, "yet")
+	}
+	return
 }
 
 func NewShape(name, lengthunit string, h, w, d float64) *Shape {

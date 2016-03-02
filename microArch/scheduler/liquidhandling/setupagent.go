@@ -111,7 +111,7 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 		if position == "" {
 			RaiseError("No positions left for input")
 		}
-		fmt.Println("PLAATE: ", position)
+		//fmt.Println("PLAATE: ", position)
 		setup[position] = p
 		plate_lookup[p.ID] = position
 		params.AddPlate(position, p)

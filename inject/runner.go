@@ -2,6 +2,7 @@ package inject
 
 import (
 	"fmt"
+
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 )
 

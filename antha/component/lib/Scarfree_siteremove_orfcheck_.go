@@ -61,6 +61,7 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 	partsinorder := make([]wtype.DNASequence, 0)
 
 	var partDNA wtype.DNASequence
+	var vectordata wtype.DNASequence
 
 	_output.Status = "all parts available"
 	for i, part := range _input.Seqsinorder {
@@ -159,8 +160,21 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 			}
 		}
 	}
+
 	// make vector into an antha type DNASequence
-	vectordata := wtype.MakePlasmidDNASequence("Vector", _input.Vector)
+
+	if strings.Contains(_input.Vector, ".gb") {
+
+		vectordata, _ = parser.GenbanktoDNASequence(_input.Vector)
+		vectordata.Plasmid = true
+	} else {
+
+		if strings.Contains(_input.Vector, "BBa_") {
+			_input.Vector = igem.GetSequence(_input.Vector)
+
+		}
+		vectordata = wtype.MakePlasmidDNASequence("Vector", _input.Vector)
+	}
 
 	//lookup restriction enzyme
 	restrictionenzyme, err := lookup.TypeIIsLookup(_input.Enzymename)
@@ -170,7 +184,12 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 
 	//  Add overhangs for scarfree assembly based on part seqeunces only, i.e. no Assembly standard
 	fmt.Println("warnings:", warnings)
-	_output.PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
+
+	if _input.EndsAlreadyadded {
+		_output.PartswithOverhangs = partsinorder
+	} else {
+		_output.PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
+	}
 
 	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
 	assembly := enzymes.Assemblyparameters{_input.Constructname, restrictionenzyme.Name, vectordata, _output.PartswithOverhangs}
@@ -324,6 +343,7 @@ type Scarfree_siteremove_orfcheckElement struct {
 
 type Scarfree_siteremove_orfcheckInput struct {
 	Constructname                 string
+	EndsAlreadyadded              bool
 	Enzymename                    string
 	ORFstoConfirm                 []string
 	RemoveproblemRestrictionSites bool
@@ -361,6 +381,7 @@ func init() {
 			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/Scarfree_removesites_checkorfs.an",
 			Params: []ParamDesc{
 				{Name: "Constructname", Desc: "", Kind: "Parameters"},
+				{Name: "EndsAlreadyadded", Desc: "", Kind: "Parameters"},
 				{Name: "Enzymename", Desc: "", Kind: "Parameters"},
 				{Name: "ORFstoConfirm", Desc: "enter each as amino acid sequence\n", Kind: "Parameters"},
 				{Name: "RemoveproblemRestrictionSites", Desc: "", Kind: "Parameters"},

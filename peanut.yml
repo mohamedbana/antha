@@ -12,3 +12,4 @@ modules:
         packages:
             - libglpk-dev
             - libsqlite3-dev
+            - libopencv-dev

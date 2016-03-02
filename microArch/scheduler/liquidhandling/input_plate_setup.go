@@ -24,11 +24,12 @@ package liquidhandling
 
 import (
 	"fmt"
+	"sort"
+
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
-	"sort"
 )
 
 type InputSorter struct {
@@ -194,7 +195,7 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 				newcomponent.Vol = curr_well.MaxVol
 				volume.Subtract(curr_well.WorkingVolume())
 
-				fmt.Println("ADDING component ", component.CName, " to ", location)
+				//fmt.Println("ADDING component ", component.CName, " to ", location)
 
 				curr_well.Add(newcomponent)
 				input_plates[curr_plate.ID] = curr_plate

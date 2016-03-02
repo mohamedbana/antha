@@ -29,6 +29,7 @@ Parameters (
 	Enzymename				string
 	ORFstoConfirm			[]string // enter each as amino acid sequence
 	RemoveproblemRestrictionSites bool
+	EndsAlreadyadded bool
 )
 
 // Physical Inputs to this protocol with types
@@ -71,6 +72,7 @@ Steps {
 	partsinorder := make([]wtype.DNASequence, 0)
 
 	var partDNA wtype.DNASequence
+	var vectordata wtype.DNASequence
 
 	Status = "all parts available"
 	for i, part := range Seqsinorder {
@@ -169,8 +171,21 @@ Steps {
 			}
 		}
 	}
+	
 	// make vector into an antha type DNASequence
-	vectordata := wtype.MakePlasmidDNASequence("Vector", Vector)
+	
+		if strings.Contains(Vector, ".gb") {
+	
+			vectordata, _ = parser.GenbanktoDNASequence(Vector)
+			vectordata.Plasmid = true
+		}else {
+		
+		if strings.Contains(Vector, "BBa_") {
+			Vector = igem.GetSequence(Vector)
+			
+		}
+		vectordata = wtype.MakePlasmidDNASequence("Vector",Vector)
+		}
 
 	//lookup restriction enzyme
 	restrictionenzyme, err := lookup.TypeIIsLookup(Enzymename)
@@ -180,8 +195,12 @@ Steps {
 
 	//  Add overhangs for scarfree assembly based on part seqeunces only, i.e. no Assembly standard
 	fmt.Println("warnings:", warnings)
-	PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
-
+	
+	if EndsAlreadyadded {
+		PartswithOverhangs = partsinorder
+	} else {PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
+	}
+	
 	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
 	assembly := enzymes.Assemblyparameters{Constructname, restrictionenzyme.Name, vectordata, PartswithOverhangs}
 	status, numberofassemblies, _, newDNASequence, err := enzymes.Assemblysimulator(assembly)

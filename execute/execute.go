@@ -19,12 +19,12 @@ var (
 // TODO(ddn): extend result when protocols can block
 
 // Result of executing a workflow.
-type RunResult struct {
+type Result struct {
 	Workflow *workflow.Workflow
 	Insts    []target.Inst
 }
 
-type Options struct {
+type Opt struct {
 	WorkflowData []byte         // JSON data describing workflow
 	Workflow     *workflow.Desc // Or workflow directly
 	ParamData    []byte         // JSON data describing parameters
@@ -34,8 +34,8 @@ type Options struct {
 }
 
 // Simple entrypoint for one-shot execution of workflows.
-func Run(parent context.Context, opt Options) (*RunResult, error) {
-	w, err := workflow.New(workflow.Options{FromBytes: opt.WorkflowData, FromDesc: opt.Workflow})
+func Run(parent context.Context, opt Opt) (*Result, error) {
+	w, err := workflow.New(workflow.Opt{FromBytes: opt.WorkflowData, FromDesc: opt.Workflow})
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func Run(parent context.Context, opt Options) (*RunResult, error) {
 		return nil, err
 	}
 
-	return &RunResult{
+	return &Result{
 		Workflow: w,
 		Insts:    r.insts,
 	}, nil

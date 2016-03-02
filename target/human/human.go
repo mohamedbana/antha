@@ -1,9 +1,6 @@
 package human
 
 import (
-	"fmt"
-
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/ast"
 	"github.com/antha-lang/antha/target"
 )
@@ -40,45 +37,44 @@ func (a *Human) String() string {
 }
 
 func (a *Human) Compile(cmds []ast.Command) ([]target.Inst, error) {
-	extract := func(m *ast.Move) (r []*wtype.LHComponent) {
-		for _, u := range m.From {
-			r = append(r, u.Value)
-		}
-		return
+	addDep := func(in, dep target.Inst) {
+		in.SetDependsOn(append(in.DependsOn(), dep))
 	}
 
-	// TODO: parallelize and vectorize
+	var nodes []ast.Node
+	for _, c := range cmds {
+		nodes = append(nodes, c)
+	}
+	g := ast.Deps(nodes)
+
 	entry := &target.Wait{}
 	exit := &target.Wait{}
 	var insts []target.Inst
+	inst := make(map[ast.Node]target.Inst)
 
 	insts = append(insts, entry)
-	exit.Depends = append(exit.Depends, entry)
-
-	for _, c := range cmds {
-		switch c := c.(type) {
-		case *ast.Move:
-			insts = append(insts, &target.Manual{
-				Depends: []target.Inst{entry},
-				Details: fmt.Sprintf("MOVE %q", extract(c)),
-			})
-		case *ast.Mix:
-			insts = append(insts, &target.Manual{
-				Depends: []target.Inst{entry},
-				Details: fmt.Sprintf("MIX %q", c.Inst),
-			})
-		case *ast.Incubate:
-			insts = append(insts, &target.Manual{
-				Depends: []target.Inst{entry},
-				Details: fmt.Sprintf("INCUBATE %q", c),
-			})
-		default:
-			return nil, fmt.Errorf("unknown command %T", c)
+	for i, inum := 0, g.NumNodes(); i < inum; i += 1 {
+		n := g.Node(i).(ast.Node)
+		in, err := a.makeInst(n.(ast.Command))
+		if err != nil {
+			return nil, err
 		}
-		exit.Depends = append(exit.Depends, insts[len(insts)-1])
+		insts = append(insts, in)
+		inst[n] = in
 	}
-
 	insts = append(insts, exit)
+
+	for i, inum := 0, g.NumNodes(); i < inum; i += 1 {
+		n := g.Node(i).(ast.Node)
+		in := inst[n]
+		for j, jnum := 0, g.NumOuts(n); j < jnum; j += 1 {
+			kid := g.Out(n, j).(ast.Node)
+			kidIn := inst[kid]
+			addDep(in, kidIn)
+		}
+		addDep(in, entry)
+		addDep(exit, in)
+	}
 
 	return insts, nil
 }
