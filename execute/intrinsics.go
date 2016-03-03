@@ -48,15 +48,23 @@ func mix(ctx context.Context, inst *mixInst) *wtype.LHComponent {
 	inst.Node.Inst.Result.BlockID = inst.Node.Inst.BlockID
 	inst.Comp = inst.Node.Inst.Result
 	inst.Comp.BlockID = inst.Node.Inst.BlockID
+	mx := 0
 	for i, c := range inst.Args {
 		v := c.Volume().SIValue()
 		inst.Node.Reqs = append(inst.Node.Reqs, ast.Request{MixVol: ast.NewPoint(v)})
-
 		c.Order = i
 		inst.Comp.Mix(c)
 		inst.Comp.AddParent(c.ID)
 		c.AddDaughter(inst.Comp.ID)
+		if c.Generation() > mx {
+			mx = c.Generation()
+		}
 	}
+
+	inst.Node.Inst.SetGeneration(mx)
+	inst.Comp.SetGeneration(mx)
+
+	inst.Node.Inst.ProductID = inst.Comp.ID
 
 	trace.Issue(ctx, inst)
 
@@ -64,8 +72,10 @@ func mix(ctx context.Context, inst *mixInst) *wtype.LHComponent {
 }
 
 func Mix(ctx context.Context, components ...*wtype.LHComponent) *wtype.LHComponent {
+	// from the protocol POV components need to be passed by value
+	cmps := wtype.CopyComponentArray(components)
 	return mix(ctx, &mixInst{
-		Args: components,
+		Args: cmps,
 		Node: &ast.Mix{
 			Inst: mixer.GenericMix(mixer.MixOptions{
 				Components: components,
@@ -74,8 +84,9 @@ func Mix(ctx context.Context, components ...*wtype.LHComponent) *wtype.LHCompone
 }
 
 func MixInto(ctx context.Context, outplate *wtype.LHPlate, address string, components ...*wtype.LHComponent) *wtype.LHComponent {
+	cmps := wtype.CopyComponentArray(components)
 	return mix(ctx, &mixInst{
-		Args: components,
+		Args: cmps,
 		Node: &ast.Mix{
 			Inst: mixer.GenericMix(mixer.MixOptions{
 				Components:  components,
@@ -86,8 +97,9 @@ func MixInto(ctx context.Context, outplate *wtype.LHPlate, address string, compo
 }
 
 func MixTo(ctx context.Context, outplatetype, address string, platenum int, components ...*wtype.LHComponent) *wtype.LHComponent {
+	cmps := wtype.CopyComponentArray(components)
 	return mix(ctx, &mixInst{
-		Args: components,
+		Args: cmps,
 		Node: &ast.Mix{
 			Inst: mixer.GenericMix(mixer.MixOptions{
 				Components: components,

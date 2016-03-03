@@ -80,6 +80,7 @@ func Init(properties *liquidhandling.LHProperties) *Liquidhandler {
 // high-level function which requests planning and execution for an incoming set of
 // solutions
 func (this *Liquidhandler) MakeSolutions(request *LHRequest) *LHRequest {
+	logger.Debug("OK YOU MAKE SOLUTIONS NOW")
 	// the minimal request which is possible defines what solutions are to be made
 	if len(request.LHInstructions) == 0 {
 		return request

@@ -23,6 +23,8 @@
 package mixer
 
 import (
+	"fmt"
+
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 )
@@ -41,7 +43,6 @@ func SampleAll(l *wtype.LHComponent) *wtype.LHComponent {
 // take a sample of volume v from this liquid
 func Sample(l *wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
-	ret.SetSample(true)
 	ret.ID = l.ID
 
 	l.AddDaughter(ret.ID)
@@ -55,6 +56,7 @@ func Sample(l *wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 	ret.Extra = l.GetExtra()
 	ret.Smax = l.GetSmax()
 	ret.Visc = l.GetVisc()
+	ret.SetSample(true)
 
 	//logger.Track(fmt.Sprintf("SAMPLE V %s %s %s", l.ID, ret.ID, v.ToString()))
 
@@ -67,7 +69,6 @@ func MultiSample(l []*wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent 
 
 	for i, j := range l {
 		ret := wtype.NewLHComponent()
-		ret.SetSample(true)
 		vi := v[i]
 		ret.ID = j.ID
 		j.AddDaughter(ret.ID)
@@ -82,6 +83,7 @@ func MultiSample(l []*wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent 
 		ret.Smax = j.GetSmax()
 		ret.Visc = j.GetVisc()
 		//	logger.Track(fmt.Sprintf("SAMPLE V %s %s %s", j.ID, ret.ID, vi.ToString()))
+		ret.SetSample(true)
 		reta = append(reta, ret)
 	}
 
@@ -91,7 +93,6 @@ func MultiSample(l []*wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent 
 // take a sample of this liquid and aim for a particular concentration
 func SampleForConcentration(l *wtype.LHComponent, c wunit.Concentration) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
-	ret.SetSample(true)
 	ret.ID = l.ID
 	l.AddDaughter(ret.ID)
 	if l.HasAnyParent() {
@@ -105,6 +106,7 @@ func SampleForConcentration(l *wtype.LHComponent, c wunit.Concentration) *wtype.
 	ret.Extra = l.GetExtra()
 	ret.Smax = l.GetSmax()
 	ret.Visc = l.GetVisc()
+	ret.SetSample(true)
 	//logger.Track(fmt.Sprintf("SAMPLE C %s %s %s", l.ID, ret.ID, c.ToString()))
 	return ret
 }
@@ -115,7 +117,6 @@ func SampleMass(s *wtype.LHComponent, m wunit.Mass, d wunit.Density) *wtype.LHCo
 	v := wunit.MasstoVolume(m, d)
 
 	ret := wtype.NewLHComponent()
-	ret.SetSample(true)
 	ret.ID = s.ID
 	s.AddDaughter(ret.ID)
 	if s.HasAnyParent() {
@@ -129,6 +130,7 @@ func SampleMass(s *wtype.LHComponent, m wunit.Mass, d wunit.Density) *wtype.LHCo
 	ret.Smax = s.GetSmax()
 	ret.Visc = s.GetVisc()
 	//logger.Track(fmt.Sprintf("SAMPLE M %s %s %s %s", s.ID, ret.ID, m.ToString(), d.ToString()))
+	ret.SetSample(true)
 	return ret
 }
 
@@ -137,7 +139,6 @@ func SampleMass(s *wtype.LHComponent, m wunit.Mass, d wunit.Density) *wtype.LHCo
 // edited to take into account the volume of the other solution components
 func SampleForTotalVolume(l *wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
-	ret.SetSample(true)
 	ret.ID = l.ID
 	l.AddDaughter(ret.ID)
 	if l.HasAnyParent() {
@@ -152,6 +153,7 @@ func SampleForTotalVolume(l *wtype.LHComponent, v wunit.Volume) *wtype.LHCompone
 	ret.Smax = l.GetSmax()
 	ret.Visc = l.GetVisc()
 	//logger.Track(fmt.Sprintf("SAMPLE T %s %s %s", l.ID, ret.ID, v.ToString()))
+	ret.SetSample(true)
 
 	return ret
 }
@@ -194,8 +196,10 @@ func GenericMix(opt MixOptions) *wtype.LHInstruction {
 
 	if opt.Result != nil {
 		r.Result = opt.Result
+		fmt.Println("Using result coming in with ID: ", r.Result.ID)
 	} else {
 		r.Result = wtype.NewLHComponent()
+		fmt.Println("Making new component with ID", r.Result.ID)
 	}
 
 	if opt.Destination != nil {
@@ -217,21 +221,11 @@ func GenericMix(opt MixOptions) *wtype.LHInstruction {
 		r.Majorlayoutgroup = opt.PlateNum - 1
 	}
 
-	// We must respect the order in which things are mixed. The convention is
-	// that mix(X,Y) corresponds to "Add Y to X".
-	/*
-		-- this has already happened in execute.mix
-		for idx, comp := range r.Components {
-			comp.Order = idx
-			r.Result.Mix(comp)
-			r.Result.AddParent(comp.ID)
-			comp.AddDaughter(r.Result.ID)
-		}
-	*/
-
 	return r
 }
 
+// XXX The functions below will be deleted soon as they do not generate liquid handling
+//     instructions
 // Mix the specified wtype.LHComponents together and leave the destination TBD
 func Mix(components ...*wtype.LHComponent) *wtype.LHComponent {
 	r := GenericMix(MixOptions{

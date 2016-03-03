@@ -22,10 +22,14 @@
 
 package liquidhandling
 
-import "github.com/antha-lang/antha/microArch/driver/liquidhandling"
+import (
+	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
+	"github.com/antha-lang/antha/microArch/logger"
+)
 
 // robot here should be a copy... this routine will be destructive of state
 func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProperties) *LHRequest {
+	logger.Info("Improved execution planner YEAH")
 	/*
 		// this volume correction needs to be removed asap
 		// essentially its purpose is to account for extra volume lost

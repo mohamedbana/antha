@@ -24,6 +24,7 @@ package liquidhandling
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -108,19 +109,42 @@ func copyplates(plts map[string]*wtype.LHPlate) map[string]*wtype.LHPlate {
 	return ret
 }
 
+func insSliceFromMap(m map[string]*wtype.LHInstruction) []*wtype.LHInstruction {
+	ret := make([]*wtype.LHInstruction, 0, len(m))
+
+	for _, v := range m {
+		ret = append(ret, v)
+	}
+
+	return ret
+}
+
+type ByGeneration []*wtype.LHInstruction
+
+func (bg ByGeneration) Len() int           { return len(bg) }
+func (bg ByGeneration) Swap(i, j int)      { bg[i], bg[j] = bg[j], bg[i] }
+func (bg ByGeneration) Less(i, j int) bool { return bg[i].Generation() < bg[j].Generation() }
+
 func set_output_order(rq *LHRequest) {
-	// gather things into groups with dependency relationships
-	// TODO -- implement time constraints and anything else
+	// sort into equivalence classes by generation
+	// nb that this basically means the below is a bit pointless
+	// however for now it will be maintained to test whether
+	// parent-child relationships are working OK
+
+	sorted := insSliceFromMap(rq.LHInstructions)
+
+	sort.Sort(ByGeneration(sorted))
 
 	it := NewIChain(nil)
 
-	for _, v := range rq.Order_instructions_added {
-		it.Add(rq.LHInstructions[v])
+	for _, v := range sorted {
+		it.Add(v)
 	}
 
 	rq.Output_order = it.Flatten()
 
-	//it.Print()
+	// wha
+	it.Print()
 
 	rq.InstructionChain = it
 }

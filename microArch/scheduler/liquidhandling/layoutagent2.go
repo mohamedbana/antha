@@ -36,6 +36,8 @@ import (
 func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *LHRequest {
 	// do this multiply based on the order in the chain
 
+	logger.Debug("IMPROVED LAY OUT AGENT YEAH")
+
 	ch := request.InstructionChain
 	pc := make([]PlateChoice, 0, 3)
 	mp := make(map[int]string)
@@ -55,19 +57,29 @@ func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain 
 	// 2- ones going to a specific plate type
 	// 3- ones going to a plate of our choosing
 
+	logger.Debug("LAY OUT STAGE YEAH")
+
+	for _, lhi := range chain.Values {
+		logger.Debug("Instruction: ", lhi.ID, " 1st component: ", lhi.Components[0].ID, " Result: ", lhi.ProductID)
+	}
+
 	// find existing assignments
 
 	plate_choices, mapchoices = get_and_complete_assignments(request, chain.ValueIDs(), plate_choices, mapchoices)
 
+	logger.Debug(fmt.Sprint("PLATE CHOICE LENGTH 1: ", len(plate_choices)))
+
 	// now we know what remains unassigned, we assign it
 
-	plate_choices = choose_plates(request, plate_choices)
+	plate_choices = choose_plates(request, plate_choices, chain.ValueIDs())
+
+	logger.Debug(fmt.Sprint("PLATE CHOICE LENGTH 2: ", len(plate_choices)))
 
 	// now we have plates of type 1 & 2
 
 	// make specific plates... this may mean splitting stuff out into multiple plates
 
-	remap := make_plates(request)
+	remap := make_plates(request, chain.ValueIDs())
 
 	// give them names
 
@@ -118,6 +130,7 @@ func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain 
 				// also need to remap the plate id
 				tx := strings.Split(k, ":")
 				x.Loc = remap[tx[0]] + ":" + tx[1]
+				logger.Debug(fmt.Sprint("REMAPPING HERE: ", id, " ", x.ID, " ", x.Loc))
 				logger.Track(fmt.Sprintf("OUTPUT ASSIGNMENT I=%s R=%s A=%s", id, x.ID, x.Loc))
 			}
 		}
@@ -141,6 +154,7 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 	// inconsistent plate types will be assigned randomly!
 	//	for k, v := range request.LHInstructions {
 	//for _, k := range request.Output_order {
+
 	for _, k := range order {
 		v := request.LHInstructions[k]
 		if v.PlateID != "" {
@@ -174,9 +188,8 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 			// the first component sets the destination
 			// and now it should indeed be set
 
-			fmt.Println("YEAH YEAH MIX IN PLAAACE: ")
-
 			addr := v.Components[0].Loc
+			logger.Debug(fmt.Sprint("ID: ", v.ID, " ", v.Components[0].ID, " THIS SHOULD NOT BE NIL: ", addr))
 			tx := strings.Split(addr, ":")
 			request.LHInstructions[k].Plateaddress = tx[0]
 			request.LHInstructions[k].Welladdress = tx[1]
@@ -206,8 +219,9 @@ func defined(s string, pc []PlateChoice) int {
 	return r
 }
 
-func choose_plates(request *LHRequest, pc []PlateChoice) []PlateChoice {
-	for _, v := range request.LHInstructions {
+func choose_plates(request *LHRequest, pc []PlateChoice, order []string) []PlateChoice {
+	for _, k := range order {
+		v := request.LHInstructions[k]
 		// this id may be temporary, only things without it still are not assigned to a
 		// plate, even a virtual one
 		if v.PlateID == "" {
@@ -257,7 +271,7 @@ func modpc(choice PlateChoice, nwell int) []PlateChoice {
 		if e > len(choice.Assigned) {
 			e = len(choice.Assigned)
 		}
-		//fmt.Println("S:", s, " E:", e)
+		logger.Debug("S:", s, " E:", e, " L: ", len(choice.Assigned), " LW: ", len(choice.Wells))
 		r = append(r, PlateChoice{choice.Platetype, choice.Assigned[s:e], wtype.GetUUID(), choice.Wells[s:e]})
 	}
 	return r
@@ -312,9 +326,11 @@ func plateidarray(arr []*wtype.LHPlate) []string {
 // we have potentially added extra theoretical plates above
 // now we make real plates and swap them in
 
-func make_plates(request *LHRequest) map[string]string {
+func make_plates(request *LHRequest, order []string) map[string]string {
 	remap := make(map[string]string)
-	for k, v := range request.LHInstructions {
+	//for k, v := range request.LHInstructions {
+	for _, k := range order {
+		v := request.LHInstructions[k]
 		_, skip := remap[v.PlateID]
 
 		if skip {

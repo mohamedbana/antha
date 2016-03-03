@@ -195,6 +195,14 @@ type LHInstruction struct {
 	Tvol             float64
 	Majorlayoutgroup int
 	Result           *LHComponent
+	gen              int
+}
+
+func (ins *LHInstruction) Generation() int {
+	return ins.gen
+}
+func (ins *LHInstruction) SetGeneration(i int) {
+	ins.gen = i
 }
 
 func (ins *LHInstruction) IsMixInPlace() bool {
@@ -347,6 +355,20 @@ type LHComponent struct {
 	Destination        string
 }
 
+func (lhc *LHComponent) Generation() int {
+	g, ok := lhc.Extra["Generation"]
+
+	if ok {
+		return g.(int)
+	}
+
+	return 0
+}
+
+func (lhc *LHComponent) SetGeneration(i int) {
+	lhc.Extra["Generation"] = i
+}
+
 func (lhc *LHComponent) IsZero() bool {
 	if lhc == nil || lhc.Type == LTNIL || lhc.CName == "" || lhc.Vol < 0.0000001 {
 		return true
@@ -452,9 +474,15 @@ func (cmp *LHComponent) AddDaughter(daughterID string) {
 
 func (cmp *LHComponent) Mix(cmp2 *LHComponent) {
 	// if this component is zero we inherit the id of the other one
-	if cmp.IsZero() {
-		cmp.ID = cmp2.ID
-	}
+	// unless the other component is a sample: in this case it retains
+	// the parent ID so this would not be safe
+	// do I want to do this at all?
+	/*
+		if cmp.IsZero() && !cmp2.IsSample() {
+			fmt.Println("CMP IS ZERO: REDEFINING ID")
+			cmp.ID = cmp2.ID
+		}
+	*/
 	cmp.Smax = mergeSolubilities(cmp, cmp2)
 	// determine type of final
 	cmp.Type = mergeTypes(cmp, cmp2)
@@ -509,6 +537,7 @@ func NewLHComponent() *LHComponent {
 	var lhc LHComponent
 	lhc.ID = GetUUID()
 	lhc.Vunit = "ul"
+	lhc.Extra = make(map[string]interface{})
 	return &lhc
 }
 
@@ -524,10 +553,6 @@ func CopyLHComponent(lhc *LHComponent) *LHComponent {
 	}
 	return &lhc2
 }
-
-// structure describing a sample
-
-type LHSample LHComponent
 
 // structure describing a microplate
 // this needs to be harmonised with the version

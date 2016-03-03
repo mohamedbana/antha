@@ -31,6 +31,7 @@ func (it *IChain) ValueIDs() []string {
 
 func (it *IChain) Add(ins *wtype.LHInstruction) {
 	p := it.FindNodeFor(ins)
+
 	p.Values = append(p.Values, ins)
 }
 
@@ -44,27 +45,77 @@ func (it *IChain) GetChild() *IChain {
 func (it *IChain) FindNodeFor(ins *wtype.LHInstruction) *IChain {
 	pstr := ins.ParentString()
 	if pstr == "" {
+		// instruction is a root... belongs in the root node
 		if it.Parent == nil {
 			return it
 		} else {
 			// should not be here!
 			logger.Fatal("Improper use of IChain")
 		}
-	} else {
-		if it == nil {
-			logger.Fatal("IT shouldn't be nil")
-		}
-		for _, v := range it.Values {
-			// true if any component used by ins is *this*
-			if ins.HasParent(v.ProductID) {
-				return it.GetChild()
-			}
-		}
+	}
 
+	// is this node the root? We know pstr is not the right place for this
+	// so we keep searching
+
+	if it.Parent == nil {
 		return it.GetChild().FindNodeFor(ins)
 	}
-	// unreachable: pstr either is or isn't ""
-	return nil
+
+	// so now we're here we know neither ins nor it is a root
+
+	// if there are no values here we return this node - we're at the leaf
+
+	if len(it.Values) == 0 {
+		return it
+	}
+
+	Ihasparent := it.HasParentOf(ins)
+
+	Chaschild := false
+
+	if it.Child != nil && it.Child.HasChildOf(ins) {
+		Chaschild = true
+	}
+
+	if Ihasparent || Chaschild {
+		if it.Child != nil {
+			// need a new link
+			ch := it.Child
+			it.Child = NewIChain(it)
+			it.Child.Child = ch
+			return ch
+		} else {
+			// add a new link
+			return it.GetChild()
+		}
+	}
+
+	// so we have neither the parent of ins in this node,
+	// nor the child of ins in our child node, so we just
+	// carry on the search
+
+	return it.GetChild().FindNodeFor(ins)
+
+}
+
+func (it *IChain) HasParentOf(ins *wtype.LHInstruction) bool {
+	for _, v := range it.Values {
+		if ins.HasParent(v.ProductID) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (it *IChain) HasChildOf(ins *wtype.LHInstruction) bool {
+	for _, v := range it.Values {
+		if v.HasParent(v.ProductID) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (it *IChain) Print() {
