@@ -62,7 +62,7 @@ func mix(ctx context.Context, inst *mixInst) *wtype.LHComponent {
 	}
 
 	inst.Node.Inst.SetGeneration(mx)
-	inst.Comp.SetGeneration(mx)
+	inst.Comp.SetGeneration(mx + 1)
 
 	inst.Node.Inst.ProductID = inst.Comp.ID
 

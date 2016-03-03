@@ -138,6 +138,7 @@ func set_output_order(rq *LHRequest) {
 	it := NewIChain(nil)
 
 	for _, v := range sorted {
+		fmt.Println("Generation: ", v.Generation())
 		it.Add(v)
 	}
 
