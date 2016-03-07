@@ -81,8 +81,13 @@ func Parse(filename string) (parts_list []string, err error) {
 }
 
 func ParsetoAssemblyParameters(filename string) ([]enzymes.Assemblyparameters, error) {
-
-	str, _ := ioutil.ReadFile(filename)
+	if str, err := ioutil.ReadFile(filename); err != nil {
+		return nil, err
+	} else {
+		return stringToAssemblyParameters(str)
+	}
+}
+func stringToAssemblyParameters(str []byte) ([]enzymes.Assemblyparameters, error) {
 
 	var gdx Project
 
