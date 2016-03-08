@@ -198,6 +198,19 @@ type LHInstruction struct {
 	gen              int
 }
 
+func (inst *LHInstruction) AddProduct(cmp *LHComponent) {
+	inst.Result = cmp
+	inst.ProductID = cmp.ID
+}
+
+func (inst *LHInstruction) AddComponent(cmp *LHComponent) {
+	if inst == nil {
+		return
+	}
+
+	inst.Components = append(inst.Components, cmp)
+}
+
 func (ins *LHInstruction) Generation() int {
 	return ins.gen
 }
@@ -255,6 +268,7 @@ func (ins *LHInstruction) ParentString() string {
 }
 
 // structure describing a solution: a combination of liquid components
+// deprecated and no longer used... may well need to be deleted
 type LHSolution struct {
 	ID               string
 	BlockID          BlockID

@@ -36,8 +36,6 @@ import (
 func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *LHRequest {
 	// do this multiply based on the order in the chain
 
-	logger.Debug("IMPROVED LAY OUT AGENT YEAH")
-
 	ch := request.InstructionChain
 	pc := make([]PlateChoice, 0, 3)
 	mp := make(map[int]string)
@@ -57,23 +55,13 @@ func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain 
 	// 2- ones going to a specific plate type
 	// 3- ones going to a plate of our choosing
 
-	logger.Debug("LAY OUT STAGE YEAH")
-
-	for _, lhi := range chain.Values {
-		logger.Debug("Instruction: ", lhi.ID, " 1st component: ", lhi.Components[0].ID, " Result: ", lhi.ProductID)
-	}
-
 	// find existing assignments
 
 	plate_choices, mapchoices = get_and_complete_assignments(request, chain.ValueIDs(), plate_choices, mapchoices)
 
-	logger.Debug(fmt.Sprint("PLATE CHOICE LENGTH 1: ", len(plate_choices)))
-
 	// now we know what remains unassigned, we assign it
 
 	plate_choices = choose_plates(request, plate_choices, chain.ValueIDs())
-
-	logger.Debug(fmt.Sprint("PLATE CHOICE LENGTH 2: ", len(plate_choices)))
 
 	// now we have plates of type 1 & 2
 
@@ -123,6 +111,7 @@ func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain 
 
 	// now map the output assignments in
 	for k, v := range request.Output_assignments {
+		fmt.Println("OUTPUT ASSIGNMENTS: ", k, " LEN ", len(v))
 		for _, id := range v {
 			l := lkp[id]
 			for _, x := range l {
@@ -130,9 +119,17 @@ func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain 
 				// also need to remap the plate id
 				tx := strings.Split(k, ":")
 				x.Loc = remap[tx[0]] + ":" + tx[1]
-				logger.Debug(fmt.Sprint("REMAPPING HERE: ", id, " ", x.ID, " ", x.Loc))
 				logger.Track(fmt.Sprintf("OUTPUT ASSIGNMENT I=%s R=%s A=%s", id, x.ID, x.Loc))
 			}
+		}
+	}
+
+	// make sure plate choices is remapped
+	for i, v := range plate_choices {
+		_, ok := remap[v.ID]
+
+		if ok {
+			plate_choices[i].ID = remap[v.ID]
 		}
 	}
 
@@ -147,7 +144,6 @@ type PlateChoice struct {
 }
 
 func get_and_complete_assignments(request *LHRequest, order []string, s []PlateChoice, m map[int]string) ([]PlateChoice, map[int]string) {
-	fmt.Println("GET AND COMPLETE ASSIGNMENTS")
 	//s := make([]PlateChoice, 0, 3)
 	//m := make(map[int]string)
 
@@ -189,10 +185,24 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 			// and now it should indeed be set
 
 			addr := v.Components[0].Loc
-			logger.Debug(fmt.Sprint("ID: ", v.ID, " ", v.Components[0].ID, " THIS SHOULD NOT BE NIL: ", addr))
 			tx := strings.Split(addr, ":")
-			request.LHInstructions[k].Plateaddress = tx[0]
 			request.LHInstructions[k].Welladdress = tx[1]
+			request.LHInstructions[k].PlateID = tx[0]
+
+			// same as condition 1 except we get the plate id somewhere else
+			i := defined(tx[0], s)
+
+			if i == -1 {
+				panic("THIS SHOULD NOT BE POSSIBLE")
+			}
+
+			for i2, v2 := range s[i].Wells {
+				if v2 == tx[1] {
+					s[i].Assigned[i2] = v.ID
+					break
+				}
+			}
+
 		}
 	}
 
@@ -227,6 +237,7 @@ func choose_plates(request *LHRequest, pc []PlateChoice, order []string) []Plate
 		if v.PlateID == "" {
 			pt := v.Platetype
 
+			// find a plate choice to put it in or return -1 for a new one
 			ass := assignmentWithType(pt, pc)
 
 			if ass == -1 {
@@ -239,7 +250,8 @@ func choose_plates(request *LHRequest, pc []PlateChoice, order []string) []Plate
 		}
 	}
 
-	// make sure the plate isn't too full
+	// now we have everything assigned to virtual plates
+	// make sure the plates aren't too full
 
 	pc2 := make([]PlateChoice, 0, len(pc))
 
@@ -271,7 +283,6 @@ func modpc(choice PlateChoice, nwell int) []PlateChoice {
 		if e > len(choice.Assigned) {
 			e = len(choice.Assigned)
 		}
-		logger.Debug("S:", s, " E:", e, " L: ", len(choice.Assigned), " LW: ", len(choice.Wells))
 		r = append(r, PlateChoice{choice.Platetype, choice.Assigned[s:e], wtype.GetUUID(), choice.Wells[s:e]})
 	}
 	return r
@@ -355,7 +366,8 @@ func make_layouts(request *LHRequest, pc []PlateChoice) {
 	// we need to fill in the platechoice structure then
 	// transfer the info across to the solutions
 
-	opa := request.Output_assignments
+	//opa := request.Output_assignments
+	opa := make(map[string][]string)
 
 	for _, c := range pc {
 		// make a temporary plate to hold info

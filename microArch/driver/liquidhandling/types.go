@@ -53,7 +53,7 @@ type LHProperties struct {
 	Model                string
 	Mnfr                 string
 	LHType               string
-	TipType              string // this is most likely no longer appropriate
+	TipType              string
 	Heads                []*wtype.LHHead
 	HeadsLoaded          []*wtype.LHHead
 	Adaptors             []*wtype.LHAdaptor
@@ -64,9 +64,9 @@ type LHProperties struct {
 	Tipwaste_preferences []string
 	Waste_preferences    []string
 	Wash_preferences     []string
-	Driver               LiquidhandlingDriver        `gotopb:"-"`
-	CurrConf             *wtype.LHChannelParameter   // TODO: initialise
-	Cnfvol               []*wtype.LHChannelParameter // TODO: initialise
+	Driver               LiquidhandlingDriver `gotopb:"-"`
+	CurrConf             *wtype.LHChannelParameter
+	Cnfvol               []*wtype.LHChannelParameter
 	Layout               map[string]wtype.Coordinates
 	MaterialType         material.MaterialType
 }

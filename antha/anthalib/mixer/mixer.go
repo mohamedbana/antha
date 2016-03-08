@@ -23,8 +23,6 @@
 package mixer
 
 import (
-	"fmt"
-
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 )
@@ -196,10 +194,8 @@ func GenericMix(opt MixOptions) *wtype.LHInstruction {
 
 	if opt.Result != nil {
 		r.Result = opt.Result
-		fmt.Println("Using result coming in with ID: ", r.Result.ID)
 	} else {
 		r.Result = wtype.NewLHComponent()
-		fmt.Println("Making new component with ID", r.Result.ID)
 	}
 
 	if opt.Destination != nil {
