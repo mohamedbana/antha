@@ -54,7 +54,7 @@ Steps {
 	chosencolourpalette := image.AvailablePalettes[Palettename]
 	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette) 
 	
-//Pixels = image.PipetteImagetoPlate(OutPlate, positiontocolourmap, AvailableColours, Colourcomponents, VolumePerWell)
+	//Pixels = image.PipetteImagetoPlate(OutPlate, positiontocolourmap, AvailableColours, Colourcomponents, VolumePerWell)
 
 	componentmap, err := image.MakestringtoComponentMap(AvailableColours, Colourcomponents)
 	if err != nil {

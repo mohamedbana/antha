@@ -49,6 +49,8 @@ func _Transformation_completeSetup(_ctx context.Context, _input *Transformation_
 func _Transformation_completeSteps(_ctx context.Context, _input *Transformation_completeInput, _output *Transformation_completeOutput) {
 	competentcells := make([]*wtype.LHComponent, 0)
 	competentcells = append(competentcells, _input.CompetentCells)
+
+	// MixInto a specific plate e.g. plate ID blahblahblah001
 	readycompetentcells := execute.MixInto(_ctx, _input.OutPlate, "", competentcells...) // readycompetentcells IS now a LHComponent
 
 	readycompetentcellsComp := execute.Incubate(_ctx, readycompetentcells, _input.Preplasmidtemp, _input.Preplasmidtime, false) // we can incubate an LHComponent so this is fine
@@ -210,7 +212,7 @@ func init() {
 		Constructor: Transformation_completeNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/Liquid_handling/Transformation/Transformation_almostworking.an",
+			Path: "antha/component/an/Liquid_handling/Transformation/Transformation_complete.an",
 			Params: []ParamDesc{
 				{Name: "AgarPlate", Desc: "", Kind: "Inputs"},
 				{Name: "CompetentCells", Desc: "", Kind: "Inputs"},

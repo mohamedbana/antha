@@ -311,6 +311,23 @@ func ResizeImagetoPlate(imagefilename string, plate *wtype.LHPlate, algorithm im
 
 }
 
+func MakePalleteFromImage(imagefilename string, plate *wtype.LHPlate) (newpallette color.Palette) {
+	plateimage := ResizeImagetoPlate(imagefilename, plate, imaging.CatmullRom)
+	colourarray := make([]color.Color, 0)
+
+	// Find out colour at each position:
+	for y := 0; y < plateimage.Bounds().Dy(); y++ {
+		for x := 0; x < plateimage.Bounds().Dx(); x++ {
+			// colour or pixel in RGB
+			colour := plateimage.At(x, y)
+			colourarray = append(colourarray, colour)
+
+		}
+	}
+
+	return
+}
+
 // create a map of pixel to plate position from processing a given image with a chosen colour palette.
 // It's recommended to use at least 384 well plate
 func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolourpalette *color.Palette) (wellpositiontocolourmap map[string]color.Color, numberofpixels int) {
@@ -591,4 +608,44 @@ func toNRGBA(img goimage.Image) *goimage.NRGBA {
 		}
 	}
 	return imaging.Clone(img)
+}
+
+func RemoveDuplicatesKeysfromMap(elements map[string]color.Color) map[string]color.Color {
+	// Use map to record duplicates as we find them.
+	encountered := map[string]bool{}
+	result := make(map[string]color.Color, 0)
+
+	for key, v := range elements {
+
+		if encountered[key] == true {
+			// Do not add duplicate.
+		} else {
+			// Record this element as an encountered element.
+			encountered[key] = true
+			// Append to result slice.
+			result[key] = v
+		}
+	}
+	// Return the new slice.
+	return result
+}
+
+func RemoveDuplicatesValuesfromMap(elements map[string]color.Color) map[string]color.Color {
+	// Use map to record duplicates as we find them.
+	encountered := map[color.Color]bool{}
+	result := make(map[string]color.Color, 0)
+
+	for key, v := range elements {
+
+		if encountered[v] == true {
+			// Do not add duplicate.
+		} else {
+			// Record this element as an encountered element.
+			encountered[v] = true
+			// Append to result slice.
+			result[key] = v
+		}
+	}
+	// Return the new slice.
+	return result
 }

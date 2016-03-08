@@ -61,3 +61,43 @@ func RemoveDuplicates(elements []string) []string {
 	// Return the new slice.
 	return result
 }
+
+func RemoveDuplicatesKeysfromMap(elements map[interface{}]interface{}) map[interface{}]interface{} {
+	// Use map to record duplicates as we find them.
+	encountered := map[interface{}]bool{}
+	result := make(map[interface{}]interface{}, 0)
+
+	for key, v := range elements {
+
+		if encountered[key] == true {
+			// Do not add duplicate.
+		} else {
+			// Record this element as an encountered element.
+			encountered[key] = true
+			// Append to result slice.
+			result[key] = v
+		}
+	}
+	// Return the new slice.
+	return result
+}
+
+func RemoveDuplicatesValuesfromMap(elements map[interface{}]interface{}) map[interface{}]interface{} {
+	// Use map to record duplicates as we find them.
+	encountered := map[interface{}]bool{}
+	result := make(map[interface{}]interface{}, 0)
+
+	for key, v := range elements {
+
+		if encountered[v] == true {
+			// Do not add duplicate.
+		} else {
+			// Record this element as an encountered element.
+			encountered[v] = true
+			// Append to result slice.
+			result[key] = v
+		}
+	}
+	// Return the new slice.
+	return result
+}

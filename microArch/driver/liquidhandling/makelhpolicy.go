@@ -65,6 +65,7 @@ func MakePolicies() map[string]LHPolicy {
 	}
 	*/
 	if antha.Anthafileexists("ScreenLHPolicyDOE2.xlsx") {
+		fmt.Println("found lhpolicy doe file")
 		policies, names, err := PolicyMakerfromDesign("ScreenLHPolicyDOE2.xlsx", "DOE_run")
 
 		for i, policy := range policies {
@@ -73,6 +74,8 @@ func MakePolicies() map[string]LHPolicy {
 		if err != nil {
 			panic(err)
 		}
+	} else {
+		fmt.Println("no lhpolicy doe file found")
 	}
 	return pols
 

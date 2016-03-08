@@ -1,12 +1,12 @@
 {
     "Parameters": {
         "PlateOut": {
-            "AgarPlate": "falcon6wellAgar",
+            "AgarPlate": "pcrplate_with_cooler",
             "Diluent": "water",
-            "DilutionX": 20,
+            "DilutionX": 10,
             "IncubationTemp": "25C",
             "IncubationTime": "57600s",
-            "Plateoutvolume": "100ul",
+            "Plateoutvolume": "10ul",
             "RecoveredCells": "neb5compcells"
         }
     }

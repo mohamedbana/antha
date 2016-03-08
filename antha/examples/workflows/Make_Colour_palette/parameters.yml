@@ -1,0 +1,15 @@
+{
+  "Parameters": {
+    "PipetteImage": {
+		"Imagefilename":"rainbow1.png",
+      "Cyan": "Cyan",
+	"Magenta": "Magenta",
+	"Yellow": "Yellow_ink",
+	"Black": "Black",
+      "OutPlate": "DSW96_riser",
+      "VolumeForFullcolour": "150ul"
+    }
+  }
+}
+
+

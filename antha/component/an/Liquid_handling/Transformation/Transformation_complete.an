@@ -65,6 +65,8 @@ Setup {
 Steps {
 	competentcells := make([]*wtype.LHComponent,0)
 	competentcells = append(competentcells,CompetentCells)
+	
+	// MixInto a specific plate e.g. plate ID blahblahblah001
 	readycompetentcells := MixInto(OutPlate, "", competentcells...)  // readycompetentcells IS now a LHComponent
 	
 	readycompetentcellsComp := Incubate (readycompetentcells,Preplasmidtemp, Preplasmidtime, false) // we can incubate an LHComponent so this is fine
