@@ -111,15 +111,20 @@ func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain 
 
 	// now map the output assignments in
 	for k, v := range request.Output_assignments {
-		fmt.Println("OUTPUT ASSIGNMENTS: ", k, " LEN ", len(v))
 		for _, id := range v {
 			l := lkp[id]
 			for _, x := range l {
 				// x.Loc = k
 				// also need to remap the plate id
 				tx := strings.Split(k, ":")
-				x.Loc = remap[tx[0]] + ":" + tx[1]
-				logger.Track(fmt.Sprintf("OUTPUT ASSIGNMENT I=%s R=%s A=%s", id, x.ID, x.Loc))
+				_, ok := remap[tx[0]]
+
+				if ok {
+					x.Loc = remap[tx[0]] + ":" + tx[1]
+					logger.Track(fmt.Sprintf("OUTPUT ASSIGNMENT I=%s R=%s A=%s", id, x.ID, x.Loc))
+				} else {
+					x.Loc = tx[0] + ":" + tx[1]
+				}
 			}
 		}
 	}
@@ -283,7 +288,12 @@ func modpc(choice PlateChoice, nwell int) []PlateChoice {
 		if e > len(choice.Assigned) {
 			e = len(choice.Assigned)
 		}
-		r = append(r, PlateChoice{choice.Platetype, choice.Assigned[s:e], wtype.GetUUID(), choice.Wells[s:e]})
+		ID := choice.ID
+		if s != 0 {
+			// new ID
+			ID = wtype.GetUUID()
+		}
+		r = append(r, PlateChoice{choice.Platetype, choice.Assigned[s:e], ID, choice.Wells[s:e]})
 	}
 	return r
 }
