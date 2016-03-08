@@ -24,7 +24,6 @@ package liquidhandling
 
 import (
 	"fmt"
-	"log"
 	"sync"
 	"time"
 
@@ -321,15 +320,19 @@ func DefineOrderOrFail(mapin map[string]map[string]int) []string {
 				continue
 			}
 
+			// PREVIOUSLY
 			// only one side can be > 0
+			// NOW we don't care
 
 			c1 := mapin[cmps[i]][cmps[j]]
-			c2 := mapin[cmps[j]][cmps[i]]
+			//c2 := mapin[cmps[j]][cmps[i]]
 
-			if c1 > 0 && c2 > 0 {
-				log.Fatalf("CANNOT DEAL WITH INCONSISTENT COMPONENT ORDERING", cmps[i], " ", cmps[j], " ", c1, " ", c2)
-			}
+			/*
+				if c1 > 0 && c2 > 0 {
+					log.Fatalf(fmt.Sprint("CANNOT DEAL WITH INCONSISTENT COMPONENT ORDERING ", cmps[i], " ", cmps[j], " ", c1, " ", c2))
+				}
 
+			*/
 			// if c1 > 0 we add to the count
 
 			if c1 > 0 {
