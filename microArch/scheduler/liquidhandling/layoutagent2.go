@@ -34,6 +34,22 @@ import (
 )
 
 func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *LHRequest {
+	// do this multiply based on the order in the chain
+
+	ch := request.InstructionChain
+	pc := make([]PlateChoice, 0, 3)
+	mp := make(map[int]string)
+	for {
+		if ch == nil {
+			break
+		}
+		request, pc, mp = LayoutStage(request, params, ch, pc, mp)
+		ch = ch.Child
+	}
+
+	return request
+}
+func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain *IChain, plate_choices []PlateChoice, mapchoices map[int]string) (*LHRequest, []PlateChoice, map[int]string) {
 	// we have three kinds of solution
 	// 1- ones going to a specific plate
 	// 2- ones going to a specific plate type
@@ -41,17 +57,17 @@ func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties
 
 	// find existing assignments
 
-	plate_choices := get_and_complete_assignments(request)
+	plate_choices, mapchoices = get_and_complete_assignments(request, chain.ValueIDs(), plate_choices, mapchoices)
 
 	// now we know what remains unassigned, we assign it
 
-	plate_choices = choose_plates(request, plate_choices)
+	plate_choices = choose_plates(request, plate_choices, chain.ValueIDs())
 
 	// now we have plates of type 1 & 2
 
 	// make specific plates... this may mean splitting stuff out into multiple plates
 
-	remap := make_plates(request)
+	remap := make_plates(request, chain.ValueIDs())
 
 	// give them names
 
@@ -101,13 +117,28 @@ func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties
 				// x.Loc = k
 				// also need to remap the plate id
 				tx := strings.Split(k, ":")
-				x.Loc = remap[tx[0]] + ":" + tx[1]
-				logger.Track(fmt.Sprintf("OUTPUT ASSIGNMENT I=%s R=%s A=%s", id, x.ID, x.Loc))
+				_, ok := remap[tx[0]]
+
+				if ok {
+					x.Loc = remap[tx[0]] + ":" + tx[1]
+					logger.Track(fmt.Sprintf("OUTPUT ASSIGNMENT I=%s R=%s A=%s", id, x.ID, x.Loc))
+				} else {
+					x.Loc = tx[0] + ":" + tx[1]
+				}
 			}
 		}
 	}
 
-	return request
+	// make sure plate choices is remapped
+	for i, v := range plate_choices {
+		_, ok := remap[v.ID]
+
+		if ok {
+			plate_choices[i].ID = remap[v.ID]
+		}
+	}
+
+	return request, plate_choices, mapchoices
 }
 
 type PlateChoice struct {
@@ -117,13 +148,15 @@ type PlateChoice struct {
 	Wells     []string
 }
 
-func get_and_complete_assignments(request *LHRequest) []PlateChoice {
-	s := make([]PlateChoice, 0, 3)
-	m := make(map[int]string)
+func get_and_complete_assignments(request *LHRequest, order []string, s []PlateChoice, m map[int]string) ([]PlateChoice, map[int]string) {
+	//s := make([]PlateChoice, 0, 3)
+	//m := make(map[int]string)
 
 	// inconsistent plate types will be assigned randomly!
 	//	for k, v := range request.LHInstructions {
-	for _, k := range request.Output_order {
+	//for _, k := range request.Output_order {
+
+	for _, k := range order {
 		v := request.LHInstructions[k]
 		if v.PlateID != "" {
 			i := defined(v.PlateID, s)
@@ -154,7 +187,27 @@ func get_and_complete_assignments(request *LHRequest) []PlateChoice {
 			}
 		} else if v.IsMixInPlace() {
 			// the first component sets the destination
-			// which must of course be set by now
+			// and now it should indeed be set
+
+			addr := v.Components[0].Loc
+			tx := strings.Split(addr, ":")
+			request.LHInstructions[k].Welladdress = tx[1]
+			request.LHInstructions[k].PlateID = tx[0]
+
+			// same as condition 1 except we get the plate id somewhere else
+			i := defined(tx[0], s)
+
+			if i == -1 {
+				panic("THIS SHOULD NOT BE POSSIBLE")
+			}
+
+			for i2, v2 := range s[i].Wells {
+				if v2 == tx[1] {
+					s[i].Assigned[i2] = v.ID
+					break
+				}
+			}
+
 		}
 	}
 
@@ -166,7 +219,7 @@ func get_and_complete_assignments(request *LHRequest) []PlateChoice {
 		}
 	}
 
-	return s
+	return s, m
 }
 
 func defined(s string, pc []PlateChoice) int {
@@ -181,13 +234,15 @@ func defined(s string, pc []PlateChoice) int {
 	return r
 }
 
-func choose_plates(request *LHRequest, pc []PlateChoice) []PlateChoice {
-	for _, v := range request.LHInstructions {
+func choose_plates(request *LHRequest, pc []PlateChoice, order []string) []PlateChoice {
+	for _, k := range order {
+		v := request.LHInstructions[k]
 		// this id may be temporary, only things without it still are not assigned to a
 		// plate, even a virtual one
 		if v.PlateID == "" {
 			pt := v.Platetype
 
+			// find a plate choice to put it in or return -1 for a new one
 			ass := assignmentWithType(pt, pc)
 
 			if ass == -1 {
@@ -200,7 +255,8 @@ func choose_plates(request *LHRequest, pc []PlateChoice) []PlateChoice {
 		}
 	}
 
-	// make sure the plate isn't too full
+	// now we have everything assigned to virtual plates
+	// make sure the plates aren't too full
 
 	pc2 := make([]PlateChoice, 0, len(pc))
 
@@ -232,8 +288,12 @@ func modpc(choice PlateChoice, nwell int) []PlateChoice {
 		if e > len(choice.Assigned) {
 			e = len(choice.Assigned)
 		}
-		//fmt.Println("S:", s, " E:", e)
-		r = append(r, PlateChoice{choice.Platetype, choice.Assigned[s:e], wtype.GetUUID(), choice.Wells[s:e]})
+		ID := choice.ID
+		if s != 0 {
+			// new ID
+			ID = wtype.GetUUID()
+		}
+		r = append(r, PlateChoice{choice.Platetype, choice.Assigned[s:e], ID, choice.Wells[s:e]})
 	}
 	return r
 }
@@ -287,9 +347,11 @@ func plateidarray(arr []*wtype.LHPlate) []string {
 // we have potentially added extra theoretical plates above
 // now we make real plates and swap them in
 
-func make_plates(request *LHRequest) map[string]string {
+func make_plates(request *LHRequest, order []string) map[string]string {
 	remap := make(map[string]string)
-	for k, v := range request.LHInstructions {
+	//for k, v := range request.LHInstructions {
+	for _, k := range order {
+		v := request.LHInstructions[k]
 		_, skip := remap[v.PlateID]
 
 		if skip {
@@ -314,7 +376,8 @@ func make_layouts(request *LHRequest, pc []PlateChoice) {
 	// we need to fill in the platechoice structure then
 	// transfer the info across to the solutions
 
-	opa := request.Output_assignments
+	//opa := request.Output_assignments
+	opa := make(map[string][]string)
 
 	for _, c := range pc {
 		// make a temporary plate to hold info

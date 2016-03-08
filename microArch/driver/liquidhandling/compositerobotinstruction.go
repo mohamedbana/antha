@@ -1063,6 +1063,8 @@ func (ins *SingleChannelTransferInstruction) Generate(policy *LHPolicyRuleSet, p
 	blowinstruction.Multi = 1
 	blowinstruction.Prms = ins.Prms
 	ret = append(ret, blowinstruction)
+	logger.Debug(InsToString(suckinstruction))
+	logger.Debug(InsToString(blowinstruction))
 
 	/*
 		// commented out pending putting it as part of blow
@@ -1181,7 +1183,6 @@ func (ins *MultiChannelTransferInstruction) Generate(policy *LHPolicyRuleSet, pr
 
 	ret = append(ret, suckinstruction)
 	ret = append(ret, blowinstruction)
-
 	ret = append(ret, resetinstruction)
 
 	return ret
@@ -3145,6 +3146,9 @@ func GetTips(tiptype string, params *LHProperties, channel *wtype.LHChannelParam
 	ins.FPosition = tipboxpositions
 	ins.FPlateType = tipboxtypes
 	ins.Multi = multi
+
+	logger.Debug(InsToString(ins))
+
 	return ins
 }
 
@@ -3162,5 +3166,6 @@ func DropTips(tiptype string, params *LHProperties, channel *wtype.LHChannelPara
 	ins.PltTo = tipwastepositions
 	ins.TPlateType = tipwastetypes
 	ins.Multi = multi
+	logger.Debug(InsToString(ins))
 	return ins
 }

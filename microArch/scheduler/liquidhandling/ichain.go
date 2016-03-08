@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"github.com/antha-lang/antha/microArch/logger"
 )
 
 type IChain struct {
@@ -20,6 +19,15 @@ func NewIChain(parent *IChain) *IChain {
 	return &it
 }
 
+func (it *IChain) ValueIDs() []string {
+	r := make([]string, 0, 1)
+
+	for _, v := range it.Values {
+		r = append(r, v.ID)
+	}
+	return r
+}
+
 func (it *IChain) Add(ins *wtype.LHInstruction) {
 	p := it.FindNodeFor(ins)
 	p.Values = append(p.Values, ins)
@@ -33,37 +41,80 @@ func (it *IChain) GetChild() *IChain {
 }
 
 func (it *IChain) FindNodeFor(ins *wtype.LHInstruction) *IChain {
-	pstr := ins.ParentString()
-	if pstr == "" {
+	// having now done this above it's pretty trivial
+
+	if ins.ParentString() == "" {
 		if it.Parent == nil {
+			// this is the root, and we are in the right place
 			return it
-		} else {
-			// should not be here!
-			logger.Fatal("Improper use of IChain")
 		}
-	} else {
-		if it == nil {
-			logger.Fatal("IT shouldn't be nil")
-		}
-		for _, v := range it.Values {
-			// true if any component used by ins is *this*
-			if ins.HasParent(v.ProductID) {
-				return it.GetChild()
+	}
+
+	if it.HasParentOf(ins) {
+		return it.GetChild()
+	}
+
+	// if we're at the end, return it
+
+	if len(it.Values) == 0 {
+		return it
+	}
+
+	return it.GetChild().FindNodeFor(ins)
+}
+
+func (it *IChain) HasParentOf(ins *wtype.LHInstruction) bool {
+	for _, v := range it.Values {
+		for _, cmp := range v.Components {
+			if ins.HasParent(cmp.ID) {
+				return true
 			}
 		}
-
-		return it.GetChild().FindNodeFor(ins)
 	}
-	// unreachable: pstr either is or isn't ""
-	return nil
+
+	return false
+}
+
+func (it *IChain) HasChildOf(ins *wtype.LHInstruction) bool {
+	for _, v := range it.Values {
+		if v.HasParent(v.ProductID) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (it *IChain) Print() {
-	fmt.Println("PARENT: ", it.Parent)
-	fmt.Println("\tValues:", it.Values)
+	fmt.Println("****")
+	fmt.Println("\tPARENT NIL: ", it.Parent == nil)
+	fmt.Println("\tINPUTS: ", it.InputIDs())
+	fmt.Println("\tPRODUCTS: ", it.ProductIDs())
 	if it.Child != nil {
 		it.Child.Print()
 	}
+}
+
+func (it *IChain) InputIDs() string {
+	s := ""
+
+	for _, ins := range it.Values {
+		for _, c := range ins.Components {
+			s += c.ID + "   "
+		}
+		s += ","
+	}
+
+	return s
+}
+
+func (it *IChain) ProductIDs() string {
+	s := ""
+
+	for _, ins := range it.Values {
+		s += ins.ProductID + "   "
+	}
+	return s
 }
 
 func (it *IChain) Flatten() []string {

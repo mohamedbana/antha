@@ -184,3 +184,30 @@ func TestLiquidTypeName(t *testing.T) {
 
 	}
 }
+
+func TestParent(t *testing.T) {
+	c := NewLHComponent()
+
+	c.AddParent("A")
+	c.AddParent("B")
+	c.AddParent("C")
+
+	vrai := c.HasParent("A")
+
+	if !vrai {
+		t.Error("LHComponent.HasParent() must return true for values set with AddParent")
+	}
+
+	vrai = c.HasParent("B")
+
+	if !vrai {
+		t.Error("LHComponent.HasParent() must return true for values set with AddParent")
+	}
+
+	faux := c.HasParent("D")
+
+	if faux {
+		t.Error("LHComponent.HasParent() must return false for values not set")
+	}
+
+}

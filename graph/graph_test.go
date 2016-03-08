@@ -36,29 +36,8 @@ func toString(ns []Node) (r []string) {
 	return
 }
 
-type TestGraph struct {
-	Nodes []string
-	Outs  map[string][]string
-}
-
-func (a *TestGraph) NumNodes() int {
-	return len(a.Nodes)
-}
-
-func (a *TestGraph) Node(i int) Node {
-	return a.Nodes[i]
-}
-
-func (a *TestGraph) NumOuts(n Node) int {
-	return len(a.Outs[n.(string)])
-}
-
-func (a *TestGraph) Out(n Node, i int) Node {
-	return a.Outs[n.(string)][i]
-}
-
-func MakeTestGraph(m map[string][]string) *TestGraph {
-	g := &TestGraph{
+func MakeTestGraph(m map[string][]string) *StringGraph {
+	g := &StringGraph{
 		Outs: m,
 	}
 	ns := make(map[string]bool)

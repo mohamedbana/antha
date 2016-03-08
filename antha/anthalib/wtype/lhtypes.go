@@ -195,6 +195,27 @@ type LHInstruction struct {
 	Tvol             float64
 	Majorlayoutgroup int
 	Result           *LHComponent
+	gen              int
+}
+
+func (inst *LHInstruction) AddProduct(cmp *LHComponent) {
+	inst.Result = cmp
+	inst.ProductID = cmp.ID
+}
+
+func (inst *LHInstruction) AddComponent(cmp *LHComponent) {
+	if inst == nil {
+		return
+	}
+
+	inst.Components = append(inst.Components, cmp)
+}
+
+func (ins *LHInstruction) Generation() int {
+	return ins.gen
+}
+func (ins *LHInstruction) SetGeneration(i int) {
+	ins.gen = i
 }
 
 func (ins *LHInstruction) IsMixInPlace() bool {
@@ -247,6 +268,7 @@ func (ins *LHInstruction) ParentString() string {
 }
 
 // structure describing a solution: a combination of liquid components
+// deprecated and no longer used... may well need to be deleted
 type LHSolution struct {
 	ID               string
 	BlockID          BlockID
@@ -345,6 +367,20 @@ type LHComponent struct {
 	Extra              map[string]interface{}
 	Loc                string
 	Destination        string
+}
+
+func (lhc *LHComponent) Generation() int {
+	g, ok := lhc.Extra["Generation"]
+
+	if ok {
+		return g.(int)
+	}
+
+	return 0
+}
+
+func (lhc *LHComponent) SetGeneration(i int) {
+	lhc.Extra["Generation"] = i
 }
 
 func (lhc *LHComponent) IsZero() bool {
@@ -452,9 +488,15 @@ func (cmp *LHComponent) AddDaughter(daughterID string) {
 
 func (cmp *LHComponent) Mix(cmp2 *LHComponent) {
 	// if this component is zero we inherit the id of the other one
-	if cmp.IsZero() {
-		cmp.ID = cmp2.ID
-	}
+	// unless the other component is a sample: in this case it retains
+	// the parent ID so this would not be safe
+	// do I want to do this at all?
+	/*
+		if cmp.IsZero() && !cmp2.IsSample() {
+			fmt.Println("CMP IS ZERO: REDEFINING ID")
+			cmp.ID = cmp2.ID
+		}
+	*/
 	cmp.Smax = mergeSolubilities(cmp, cmp2)
 	// determine type of final
 	cmp.Type = mergeTypes(cmp, cmp2)
@@ -509,6 +551,7 @@ func NewLHComponent() *LHComponent {
 	var lhc LHComponent
 	lhc.ID = GetUUID()
 	lhc.Vunit = "ul"
+	lhc.Extra = make(map[string]interface{})
 	return &lhc
 }
 
@@ -524,10 +567,6 @@ func CopyLHComponent(lhc *LHComponent) *LHComponent {
 	}
 	return &lhc2
 }
-
-// structure describing a sample
-
-type LHSample LHComponent
 
 // structure describing a microplate
 // this needs to be harmonised with the version
