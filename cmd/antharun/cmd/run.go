@@ -35,7 +35,7 @@ import (
 	"github.com/antha-lang/antha/cmd/antharun/param"
 	"github.com/antha-lang/antha/cmd/antharun/pretty"
 	"github.com/antha-lang/antha/cmd/antharun/spawn"
-	lhclient "github.com/antha-lang/antha/driver/lh/pb/client"
+	"github.com/antha-lang/antha/driver/lh"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/internal/github.com/spf13/cobra"
@@ -105,7 +105,7 @@ func (a *runOpt) makeTarget(mixerOpt mixer.Opt) (*target.Target, error) {
 		t.AddDevice(human.New(human.Opt{CanMix: false}))
 	}
 	for _, uri := range a.Drivers {
-		if m, err := mixer.New(mixerOpt, lhclient.NewDriver(uri)); err != nil {
+		if m, err := mixer.New(mixerOpt, lh.NewDriver(uri)); err != nil {
 			return nil, err
 		} else {
 			t.AddDevice(m)

@@ -1,4 +1,4 @@
-package client
+package lh
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	wunit "github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc"
-	pb "github.com/antha-lang/antha/driver/lh/pb"
+	pb "github.com/antha-lang/antha/driver/pb/lh"
 	driver "github.com/antha-lang/antha/microArch/driver"
 	liquidhandling "github.com/antha-lang/antha/microArch/driver/liquidhandling"
 )
