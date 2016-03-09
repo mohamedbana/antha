@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/workflow"
 )
@@ -13,10 +15,18 @@ var (
 	badFormat = errors.New("bad format")
 )
 
+func unmarshal(data []byte, v interface{}) error {
+	if err := json.Unmarshal(data, v); err == nil {
+		return nil
+	} else {
+		return yaml.Unmarshal(data, v)
+	}
+}
+
 // Flatten []map[string]RawMessage to RawParams
 func flattenSList(pdata []byte, param *execute.RawParams) error {
 	var params []map[string]json.RawMessage
-	if err := json.Unmarshal(pdata, &params); err != nil {
+	if err := unmarshal(pdata, &params); err != nil {
 		return err
 	} else if len(params) == 0 {
 		return badFormat
@@ -53,7 +63,7 @@ func flattenSList(pdata []byte, param *execute.RawParams) error {
 // Flatten []RawParams to RawParams
 func flattenList(pdata []byte, param *execute.RawParams) error {
 	var params []execute.RawParams
-	if err := json.Unmarshal(pdata, &params); err != nil {
+	if err := unmarshal(pdata, &params); err != nil {
 		return err
 	} else if len(params) == 0 {
 		return badFormat
@@ -84,10 +94,12 @@ func TryExpand(wdata, pdata []byte) (desc *workflow.Desc, param *execute.RawPara
 		return nil
 	}
 
-	if err = json.Unmarshal(wdata, &desc); err != nil {
+	if err = unmarshal(wdata, &desc); err != nil {
 		return
-	} else if err = json.Unmarshal(pdata, &param); err == nil {
-		// Not list of parameters, use data as-is
+	}
+
+	// Try to parse parameters as is
+	if err = unmarshal(pdata, &param); err == nil {
 		return
 	}
 
