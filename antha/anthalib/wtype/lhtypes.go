@@ -895,6 +895,7 @@ func (w *LHWell) MaxVolume() wunit.Volume {
 	return wunit.NewVolume(w.MaxVol, w.Vunit)
 }
 func (w *LHWell) Add(c *LHComponent) {
+	wasEmpty := w.Empty()
 	mv := wunit.NewVolume(w.MaxVol, w.Vunit)
 	cv := wunit.NewVolume(c.Vol, c.Vunit)
 	wv := w.CurrentVolume()
@@ -904,7 +905,14 @@ func (w *LHWell) Add(c *LHComponent) {
 		// for that to be worthwhile
 		logger.Debug("WARNING: OVERFULL WELL AT ", w.Crds)
 	}
+
 	w.Contents().Mix(c)
+
+	if wasEmpty {
+		// get rid of junk ID
+		logger.Track(fmt.Sprintf("MIX REPLACED WELL CONTENTS ID WAS %s NOW %s", w.WContents.ID, c.ID))
+		w.WContents.ID = c.ID
+	}
 }
 
 func (w *LHWell) Remove(v wunit.Volume) *LHComponent {
