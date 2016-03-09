@@ -44,12 +44,15 @@ type mixInst struct {
 }
 
 func mix(ctx context.Context, inst *mixInst) *wtype.LHComponent {
+	// from the protocol POV components need to be passed by value
+	cmps := wtype.CopyComponentArray(inst.Args)
+
 	inst.Node.Inst.BlockID = wtype.NewBlockID(getId(ctx))
 	inst.Node.Inst.Result.BlockID = inst.Node.Inst.BlockID
 	inst.Comp = inst.Node.Inst.Result
 	inst.Comp.BlockID = inst.Node.Inst.BlockID
 	mx := 0
-	for i, c := range inst.Args {
+	for i, c := range cmps {
 		v := c.Volume().SIValue()
 		inst.Node.Reqs = append(inst.Node.Reqs, ast.Request{MixVol: ast.NewPoint(v)})
 		c.Order = i
@@ -72,10 +75,8 @@ func mix(ctx context.Context, inst *mixInst) *wtype.LHComponent {
 }
 
 func Mix(ctx context.Context, components ...*wtype.LHComponent) *wtype.LHComponent {
-	// from the protocol POV components need to be passed by value
-	cmps := wtype.CopyComponentArray(components)
 	return mix(ctx, &mixInst{
-		Args: cmps,
+		Args: components,
 		Node: &ast.Mix{
 			Inst: mixer.GenericMix(mixer.MixOptions{
 				Components: components,
@@ -84,9 +85,8 @@ func Mix(ctx context.Context, components ...*wtype.LHComponent) *wtype.LHCompone
 }
 
 func MixInto(ctx context.Context, outplate *wtype.LHPlate, address string, components ...*wtype.LHComponent) *wtype.LHComponent {
-	cmps := wtype.CopyComponentArray(components)
 	return mix(ctx, &mixInst{
-		Args: cmps,
+		Args: components,
 		Node: &ast.Mix{
 			Inst: mixer.GenericMix(mixer.MixOptions{
 				Components:  components,
@@ -97,9 +97,8 @@ func MixInto(ctx context.Context, outplate *wtype.LHPlate, address string, compo
 }
 
 func MixTo(ctx context.Context, outplatetype, address string, platenum int, components ...*wtype.LHComponent) *wtype.LHComponent {
-	cmps := wtype.CopyComponentArray(components)
 	return mix(ctx, &mixInst{
-		Args: cmps,
+		Args: components,
 		Node: &ast.Mix{
 			Inst: mixer.GenericMix(mixer.MixOptions{
 				Components: components,
