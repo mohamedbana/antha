@@ -5,6 +5,7 @@ package codegen
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/antha-lang/antha/ast"
 	"github.com/antha-lang/antha/graph"
@@ -19,6 +20,25 @@ type ir struct {
 	DeviceDeps  graph.QGraph            // Dependencies of druns
 	assignment  map[ast.Node]*drun      // From Commands/Root to device runs
 	output      map[*drun][]target.Inst // Output of device-specific planners
+}
+
+// Print out IR for debugging
+func (a *ir) Print(g graph.Graph, out io.Writer) error {
+	s := graph.Print(graph.PrintOpt{
+		Graph: g,
+		NodeLabelers: []graph.Labeler{
+			func(x interface{}) string {
+				n := x.(ast.Node)
+				drun := a.assignment[n]
+				if drun != nil {
+					return fmt.Sprintf("Run %p Device %p", drun, drun.Device)
+				}
+				return "NoRun"
+			},
+		},
+	})
+	_, err := fmt.Fprint(out, s, "\n")
+	return err
 }
 
 // Run of a device.
@@ -83,11 +103,19 @@ func (a *ir) coalesceDevices(device map[ast.Node]target.Device) {
 	run := make(map[ast.Node]*drun)
 
 	kidRun := func(n ast.Node) *drun {
+		m := make(map[*drun]bool)
 		for i, inum := 0, a.CommandTree.NumOuts(n); i < inum; i += 1 {
 			kid := a.CommandTree.Out(n, i).(ast.Node)
-			if device[kid] == device[n] {
-				return run[kid]
+			m[run[kid]] = true
+			if device[kid] != device[n] {
+				return nil
 			}
+		}
+		if len(m) != 1 {
+			return nil
+		}
+		for k := range m {
+			return k
 		}
 		return nil
 	}
