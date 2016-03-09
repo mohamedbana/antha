@@ -4,11 +4,11 @@
             "Airvelocity": "0m/s",
             "Executiontime": "7200s",
             "Liquid": "water",
-            "Pa": "101325Pa",
-            "Platetype": "96DSW_axygen",
-            "Relativehumidity": 0.28,
-            "Temp": "25C",
-            "Volumeperwell": "5000nl"
+            "Pa": "99700Pa",
+            "Plate": "greiner384",
+            "Relativehumidity": 0.35,
+            "Temp": "23.2C",
+            "Volumeperwell": "1000ul"
         }
     }
 }

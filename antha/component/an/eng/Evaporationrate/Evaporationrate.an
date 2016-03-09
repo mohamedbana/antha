@@ -28,15 +28,17 @@ x = humidity ratio in the air (kg/kg) (kg H2O in kg Dry Air) */
 protocol Evaporationrate 
 import (
 	"fmt"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Labware"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Labware"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/eng"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Liquidclasses"	
-	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	//"github.com/antha-lang/antha/antha/anthalib/wunit"
+	//"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/microArch/factory"
 )
 Parameters (
   	
 	Liquid string 
-	Platetype string
+	Plate string
 	Volumeperwell Volume // ul
 	
 	// cubesensor streams:
@@ -56,6 +58,7 @@ Data (
 	Estimatedevaporationtime Time
 )
 Inputs (
+	//Platetype *wtype.LHPlate
 )
 Outputs (
 )
@@ -67,10 +70,24 @@ Steps {
 	}
 Analysis {
 	
+	Platetype := factory.GetPlateByType(Plate)
+	
+	var surfacearea wunit.Area 
+	if Platetype.Welltype.Bottom == 0 /* i.e. flat */ && Platetype.Welltype.Shape().LengthUnit == "mm" {
+		wellarea, err := Platetype.Welltype.CalculateCrossSectionArea()
+		if err != nil {
+			panic(err.Error())
+		}
+		fmt.Println("wellarea", wellarea.ToString())
+		fmt.Println(Platetype.Welltype.Xdim, Platetype.Welltype.Ydim, Platetype.Welltype.Zdim, Platetype.Welltype.Shape())
+	surfacearea = wellarea
+	}else {
+		panic("plate "+ Platetype.String() +" Wellshape "+ Platetype.Welltype.String() +" surface area not yet calculated due to bottom type")
+	}
 	var PWS float64 = eng.Pws(Temp)
 	var pw float64 = eng.Pw(Relativehumidity, PWS) // vapour partial pressure in Pascals
 	var	Gh = (eng.Θ(Liquid, Airvelocity) * 
-	(labware.Labwaregeometry[Platetype]["Surfacearea"] * 
+	((surfacearea.RawValue()/1000000)* 
 	((eng.Xs(PWS, Pa)) - (eng.X(pw, Pa))))) // Gh is rate of evaporation in kg/h
 	evaporatedliquid := (Gh * (Executiontime.SIValue()/3600)) // in kg
 	evaporatedliquid = (evaporatedliquid * liquidclasses.Liquidclass[Liquid]["ro"])/1000 // converted to litres
@@ -82,7 +99,7 @@ Analysis {
 	Estimatedevaporationtime = wunit.NewTime((estimatedevaporationtime*3600),"s") 
 	
 	Status = fmt.Sprintln("Well Surface Area=", 
-				(labware.Labwaregeometry[Platetype]["Surfacearea"])*1000000, "mm2", 
+				surfacearea.ToString(),
 				"evaporation rate =", Gh*1000000, "ul/h", 
 				"total evaporated liquid =", Evaporatedliquid.ToString(), "after", Executiontime.ToString(),
 				"estimated evaporation time = ", Estimatedevaporationtime.ToString())

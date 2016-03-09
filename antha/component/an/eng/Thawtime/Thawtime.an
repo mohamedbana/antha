@@ -82,7 +82,7 @@ Steps {
 	this (and all parameters!) can be adjusted over time as we see emprically how reliable this function is as more datapoints are collected */
 	Thawtimeused = wunit.NewTime(Estimatedthawtime.SIValue()*Fudgefactor,"s")
 	
-	Status = fmt.Sprintln("For", mass.ToString(), "of", Liquid, "in", Platetype, 
+	Status = fmt.Sprintln("For", cd ...ToString(), "of", Liquid, "in", Platetype, 
 	"Thawtime required =", Estimatedthawtime.ToString(), 
 	"Thawtime used =", Thawtimeused.ToString(), 
 	"power required =", q, "J", 

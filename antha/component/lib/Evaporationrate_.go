@@ -29,13 +29,16 @@ package lib
 
 import (
 	"fmt"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Labware"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Labware"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Liquidclasses"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/eng"
+	//"github.com/antha-lang/antha/antha/anthalib/wunit"
+	//"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"github.com/antha-lang/antha/microArch/factory"
 )
 
 // ul
@@ -52,6 +55,8 @@ import (
 // ul/h
 // ul
 
+//Platetype *wtype.LHPlate
+
 func _EvaporationrateRequirements() {
 }
 func _EvaporationrateSetup(_ctx context.Context, _input *EvaporationrateInput) {
@@ -60,10 +65,24 @@ func _EvaporationrateSteps(_ctx context.Context, _input *EvaporationrateInput, _
 }
 func _EvaporationrateAnalysis(_ctx context.Context, _input *EvaporationrateInput, _output *EvaporationrateOutput) {
 
+	Platetype := factory.GetPlateByType(_input.Plate)
+
+	var surfacearea wunit.Area
+	if Platetype.Welltype.Bottom == 0 /* i.e. flat */ && Platetype.Welltype.Shape().LengthUnit == "mm" {
+		wellarea, err := Platetype.Welltype.CalculateCrossSectionArea()
+		if err != nil {
+			panic(err.Error())
+		}
+		fmt.Println("wellarea", wellarea.ToString())
+		fmt.Println(Platetype.Welltype.Xdim, Platetype.Welltype.Ydim, Platetype.Welltype.Zdim, Platetype.Welltype.Shape())
+		surfacearea = wellarea
+	} else {
+		panic("plate " + Platetype.String() + " Wellshape " + Platetype.Welltype.String() + " surface area not yet calculated due to bottom type")
+	}
 	var PWS float64 = eng.Pws(_input.Temp)
 	var pw float64 = eng.Pw(_input.Relativehumidity, PWS) // vapour partial pressure in Pascals
 	var Gh = (eng.Θ(_input.Liquid, _input.Airvelocity) *
-		(labware.Labwaregeometry[_input.Platetype]["Surfacearea"] *
+		((surfacearea.RawValue() / 1000000) *
 			((eng.Xs(PWS, _input.Pa)) - (eng.X(pw, _input.Pa))))) // Gh is rate of evaporation in kg/h
 	evaporatedliquid := (Gh * (_input.Executiontime.SIValue() / 3600))                            // in kg
 	evaporatedliquid = (evaporatedliquid * liquidclasses.Liquidclass[_input.Liquid]["ro"]) / 1000 // converted to litres
@@ -75,7 +94,7 @@ func _EvaporationrateAnalysis(_ctx context.Context, _input *EvaporationrateInput
 	_output.Estimatedevaporationtime = wunit.NewTime((estimatedevaporationtime * 3600), "s")
 
 	_output.Status = fmt.Sprintln("Well Surface Area=",
-		(labware.Labwaregeometry[_input.Platetype]["Surfacearea"])*1000000, "mm2",
+		surfacearea.ToString(),
 		"evaporation rate =", Gh*1000000, "ul/h",
 		"total evaporated liquid =", _output.Evaporatedliquid.ToString(), "after", _input.Executiontime.ToString(),
 		"estimated evaporation time = ", _output.Estimatedevaporationtime.ToString())
@@ -139,7 +158,7 @@ type EvaporationrateInput struct {
 	Executiontime    wunit.Time
 	Liquid           string
 	Pa               wunit.Pressure
-	Platetype        string
+	Plate            string
 	Relativehumidity float64
 	Temp             wunit.Temperature
 	Volumeperwell    wunit.Volume
@@ -174,7 +193,7 @@ func init() {
 				{Name: "Executiontime", Desc: "time\n", Kind: "Parameters"},
 				{Name: "Liquid", Desc: "", Kind: "Parameters"},
 				{Name: "Pa", Desc: "cubesensor streams:\n\nin pascals atmospheric pressure of moist air (Pa) 100mBar = 1 pa. Not yet built in unit so we import it from wunit.\n", Kind: "Parameters"},
-				{Name: "Platetype", Desc: "", Kind: "Parameters"},
+				{Name: "Plate", Desc: "", Kind: "Parameters"},
 				{Name: "Relativehumidity", Desc: "Percentage // density water vapor (kg/m3)\n", Kind: "Parameters"},
 				{Name: "Temp", Desc: "input in deg C will be converted to Kelvin\n", Kind: "Parameters"},
 				{Name: "Volumeperwell", Desc: "ul\n", Kind: "Parameters"},
