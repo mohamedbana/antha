@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"gopkg.in/yaml.v2"
+	"github.com/antha-lang/antha/internal/gopkg.in/yaml.v2"
 
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/workflow"
