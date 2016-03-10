@@ -1325,6 +1325,7 @@ func initialize_tips(tipbox *LHTipbox, tiptype *LHTip) *LHTipbox {
 	return tipbox
 }
 
+//TODO add extra properties, i.e. filter
 type LHTip struct {
 	ID     string
 	Type   string

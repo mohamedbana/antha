@@ -62,7 +62,7 @@ func (sc DefaultChannelScoreFunc) ScoreCombinedChannel(vol wunit.Volume, head *w
 
 func (sc DefaultChannelScoreFunc) ScoreChannel(vol wunit.Volume, lhcp *wtype.LHChannelParameter) float64 {
 	// cannot have 0 error
-	extra := 0.1
+	extra := 1.0
 	// we try to estimate the error of using a channel outside its limits
 	// first of all how many movements do we need?
 
@@ -70,20 +70,20 @@ func (sc DefaultChannelScoreFunc) ScoreChannel(vol wunit.Volume, lhcp *wtype.LHC
 	mx := lhcp.Maxvol.ConvertTo(vol.Unit())
 	mn := lhcp.Minvol.ConvertTo(vol.Unit())
 
-	n, _ := math.Modf(vol.RawValue() / lhcp.Maxvol.ConvertTo(vol.Unit()))
+	n := int(math.Ceil(vol.RawValue() / lhcp.Maxvol.ConvertTo(vol.Unit())))
 
 	// we assume errors scale linearly
 	// and that the error is generally greatest at the lowest levels
 
 	tv := v
-	if n >= 1 {
+	if n > 1 {
 		tv = mx
 	}
 
 	err := (mx-tv)/(mx-mn) + extra
 
 	if n > 1 {
-		err *= (n + 1)
+		err *= float64(n + 1)
 	}
 
 	score := 1.0 / err
@@ -101,10 +101,11 @@ func ChooseChannel(vol wunit.Volume, prms *LHProperties) (*wtype.LHChannelParame
 	// just choose the best... need to iterate on this sometime though
 	// we don't consider head or adaptor changes now
 
+	//fmt.Println("There are ", len(prms.HeadsLoaded), " heads loaded and ", len(prms.Tips), " Tip types available ")
+
 	for _, head := range prms.HeadsLoaded {
 		for _, tip := range prms.Tips {
 			sc := scorer.ScoreCombinedChannel(vol, head, head.Adaptor, tip)
-			//fmt.Println("HEAD: ", head.Name, " TIP: ", tip.Type, " SCORE: ", sc)
 			if sc > bestscore {
 				headchosen = head
 				tipchosen = tip
@@ -119,81 +120,7 @@ func ChooseChannel(vol wunit.Volume, prms *LHProperties) (*wtype.LHChannelParame
 	}
 
 	// shouldn't we also return the adaptor?
+	// and probably the whole head rather than just its channel parameters
 
 	return headchosen.GetParams(), tipchosen.Type
-
-	/*
-		for _, head := range prms.HeadsLoaded {
-			//fmt.Println("Trying head ", head.Name, " Which has minimum volume ", head.Adaptor.Params.Minvol.ConvertTo(vol.Unit()))
-
-			minv := head.Params.Minvol.ConvertTo(vol.Unit())
-			maxv := head.Params.Maxvol.ConvertTo(vol.Unit())
-
-			d := v - minv
-
-			if d >= 0.0 && minv < minvol {
-
-				if headchosen == nil {
-					headchosen = head
-					minvol = minv
-				}
-
-				if v <= maxv {
-
-					if head.GetParams().Minvol.SIValue() < headchosen.GetParams().Minvol.SIValue() {
-						headchosen = head
-						minvol = minv
-					}
-				} else {
-					if head.GetParams().Maxvol.SIValue() > headchosen.GetParams().Maxvol.SIValue() {
-						headchosen = head
-						minvol = minv
-					}
-					//minvol = minv
-					//headchosen = head
-				}
-			}
-			//headchosen = prms.Heads[0]
-		}
-
-		if headchosen == nil {
-			logger.Fatal(fmt.Sprintf("Cannot find a head with suitable capacity to handle volume %s", vol.ToString()))
-			panic("NO HEAD CHOSEN")
-		}
-
-		// check if we need to change adaptor
-
-		//logger.Debug(fmt.Sprintf("want vol %s min vol %s", vol.ToString(), headchosen.Adaptor.Params.Minvol.ToString()))
-
-		if headchosen.Adaptor.Params.Minvol.GreaterThan(vol) {
-			logger.Fatal(fmt.Sprintf("Handling volume %s is possible but an adaptor change is required first. This is not presently implemented. Sorry.", vol.ToString()))
-			panic("ADAPTOR CHANGE NEEDED BUT NOT IMPLEMENTED")
-		}
-
-		// now get the requisite tip
-		// this is just a big bowl of wrong... </JeffGreene>
-		// need to make this more dependent on what's actually there
-		tiptype := ""
-		// get the closest to the min vol
-		d := 99999.0
-		for _, tip := range prms.Tips {
-			//if tip.Minvol.LessThan(vol) || tip.Minvol.EqualTo(vol) {
-			//	tiptype = tip.Type
-			//}
-
-			dif := vol.ConvertTo(tip.Minvol.Unit()) - tip.Minvol.RawValue()
-			if dif >= 0.0 && dif < d {
-				tiptype = tip.Type
-				d = dif
-			}
-
-		}
-
-		if tiptype == "" {
-			logger.Fatal(fmt.Sprintf("No tips are available for servicing a volume of %s.", vol.ToString()))
-			panic("NO TIP TYPE FOUND")
-		}
-
-		return headchosen.GetParams(), tiptype
-	*/
 }
