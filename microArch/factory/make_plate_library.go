@@ -241,7 +241,29 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	welltype = wtype.NewLHWell("1536flat", "", "", "ul", 13, 2, square, bottomtype, xdim, ydim, zdim, bottomh, "mm")
 
 	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
-	plate = wtype.NewLHPlate("Agarplateforpicking_riser", "Unknown", 32, 48, 7, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+	// greiner one well with 50ml of agar in
+	plate = wtype.NewLHPlate("Agarplateforpicking1536_riser", "Unknown", 32, 48, 7, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+	plates[plate.Type] = plate
+
+	bottomtype = 0
+	xdim = 4.0
+	ydim = 4.0
+	zdim = 14.0
+	bottomh = 1.0
+
+	wellxoffset = 4.5 // centre of well to centre of neighbouring well in x direction
+	wellyoffset = 4.5 //centre of well to centre of neighbouring well in y direction
+	xstart = -2.5     // distance from top left side of plate to first well
+	ystart = -2.5     // distance from top left side of plate to first well
+	zstart = 42       // offset of bottom of deck to bottom of well
+
+	square = wtype.NewShape("box", "mm", 4, 4, 14)
+	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
+	welltype = wtype.NewLHWell("384flat", "", "", "ul", 125, 10, square, bottomtype, xdim, ydim, zdim, bottomh, "mm")
+
+	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
+	// greiner one well with 50ml of agar in
+	plate = wtype.NewLHPlate("Agarplateforpicking384_riser", "Unknown", 32, 48, 7, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
 
 	/*
@@ -269,7 +291,7 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 
 	//refactored for reverse position
 
-	ep48g := wtype.NewShape("box", "mm", 2, 4, 2)
+	ep48g := wtype.NewShape("trap", "mm", 2, 4, 2)
 	//can't reach all wells; change to 24 wells per row?
 	welltype = wtype.NewLHWell("EPAGE48", "", "", "ul", 25, 0, ep48g, 0, 2, 4, 2, 2, "mm")
 	//welltype = wtype.NewLHWell("384flat", "", "", "ul", 100, 10, square, bottomtype, xdim, ydim, zdim, bottomh, "mm")
