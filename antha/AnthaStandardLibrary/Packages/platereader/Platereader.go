@@ -58,7 +58,7 @@ func Blankcorrect(blank wtype.Absorbance, sample wtype.Absorbance) (blankcorrect
 func EstimatePathLength(plate *wtype.LHPlate, volume wunit.Volume) (pathlength wunit.Length, err error) {
 
 	if plate.Welltype.Bottom == 0 /* i.e. flat */ && plate.Welltype.Shape().LengthUnit == "mm" {
-		wellarea, err := plate.Welltype.CalculateCrossSectionArea()
+		wellarea, err := plate.Welltype.CalculateMaxCrossSectionArea()
 		fmt.Println("wellarea", wellarea.ToString())
 		fmt.Println(plate.Welltype.Xdim, plate.Welltype.Ydim, plate.Welltype.Zdim, plate.Welltype.Shape())
 		if err != nil {

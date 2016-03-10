@@ -56,7 +56,7 @@ func (sh *Shape) Dup() *Shape {
 	return &(Shape{sh.ShapeName, sh.LengthUnit, sh.H, sh.W, sh.D})
 }
 
-func (sh *Shape) CrossSectionalArea() (area wunit.Area, err error) {
+func (sh *Shape) MaxCrossSectionalArea() (area wunit.Area, err error) {
 
 	shapename := strings.ToLower(sh.ShapeName)
 	var areaunit string
@@ -75,12 +75,12 @@ func (sh *Shape) CrossSectionalArea() (area wunit.Area, err error) {
 		boxlike = true
 	}
 
-	if circular && sh.Height() == sh.Width() {
-		area = wunit.NewArea(math.Pi*sh.H*sh.H, areaunit)
+	if circular /*&& sh.Height() == sh.Width() */ {
+		area = wunit.NewArea(math.Pi*(sh.W/2)*(sh.W/2), areaunit)
 	} else if boxlike {
 		area = wunit.NewArea(sh.H*sh.W, areaunit)
 	} else {
-		err = fmt.Errorf("No method to work out cross sectional area for shape", sh.ShapeName, "yet")
+		err = fmt.Errorf("No method to work out cross sectional area for shape", sh.ShapeName, "yet", "Circular?", circular)
 	}
 	return
 }

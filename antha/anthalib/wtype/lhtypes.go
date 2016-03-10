@@ -990,9 +990,9 @@ func (lhw *LHWell) Dup() *LHWell {
 	return cp
 }
 
-func (lhw *LHWell) CalculateCrossSectionArea() (ca wunit.Area, err error) {
+func (lhw *LHWell) CalculateMaxCrossSectionArea() (ca wunit.Area, err error) {
 
-	ca, err = lhw.Shape().CrossSectionalArea()
+	ca, err = lhw.Shape().MaxCrossSectionalArea()
 
 	return
 }

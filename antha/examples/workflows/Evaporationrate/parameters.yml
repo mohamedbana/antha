@@ -2,13 +2,13 @@
     "Parameters": {
         "Evaporationrate": {
             "Airvelocity": "0m/s",
-            "Executiontime": "7200s",
+            "Executiontime": "3600s",
             "Liquid": "water",
-            "Pa": "99700Pa",
-            "Plate": "greiner384",
-            "Relativehumidity": 0.35,
-            "Temp": "23.2C",
-            "Volumeperwell": "1000ul"
+            "Pa": "100800Pa",
+            "Platetype": "SRWFB96",
+            "Relativehumidity": 0.33,
+            "Temp": "23.0C",
+            "Volumeperwell": "100ul"
         }
     }
 }

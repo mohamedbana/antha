@@ -32,13 +32,13 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/eng"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Liquidclasses"	
 	//"github.com/antha-lang/antha/antha/anthalib/wunit"
-	//"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"github.com/antha-lang/antha/microArch/factory"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	//"github.com/antha-lang/antha/microArch/factory"
 )
 Parameters (
   	
-	Liquid string 
-	Plate string
+	//Liquid string 
+	//Plate string
 	Volumeperwell Volume // ul
 	
 	// cubesensor streams:
@@ -46,7 +46,7 @@ Parameters (
 	Temp Temperature // input in deg C will be converted to Kelvin
 	Relativehumidity float64 // Percentage // density water vapor (kg/m3)
 	
-	Airvelocity wunit.Velocity  // // velocity of air above water in m/s ; could be calculated or measured
+	Airvelocity wunit.Velocity  // // velocity of air above water in m/s ; could be calculated or measured by an anemometer
 	
 	Executiontime Time// time 
 	
@@ -58,7 +58,8 @@ Data (
 	Estimatedevaporationtime Time
 )
 Inputs (
-	//Platetype *wtype.LHPlate
+	Platetype *wtype.LHPlate
+	Liquid *wtype.LHComponent
 )
 Outputs (
 )
@@ -70,11 +71,11 @@ Steps {
 	}
 Analysis {
 	
-	Platetype := factory.GetPlateByType(Plate)
+	//Platetype := factory.GetPlateByType(Plate)
 	
 	var surfacearea wunit.Area 
-	if Platetype.Welltype.Bottom == 0 /* i.e. flat */ && Platetype.Welltype.Shape().LengthUnit == "mm" {
-		wellarea, err := Platetype.Welltype.CalculateCrossSectionArea()
+	if /*Platetype.Welltype.Bottom == 0  i.e. flat  && */ Platetype.Welltype.Shape().LengthUnit == "mm" {
+		wellarea, err := Platetype.Welltype.CalculateMaxCrossSectionArea()
 		if err != nil {
 			panic(err.Error())
 		}
@@ -86,11 +87,11 @@ Analysis {
 	}
 	var PWS float64 = eng.Pws(Temp)
 	var pw float64 = eng.Pw(Relativehumidity, PWS) // vapour partial pressure in Pascals
-	var	Gh = (eng.Θ(Liquid, Airvelocity) * 
+	var	Gh = (eng.Θ(Liquid.TypeName(), Airvelocity) * 
 	((surfacearea.RawValue()/1000000)* 
 	((eng.Xs(PWS, Pa)) - (eng.X(pw, Pa))))) // Gh is rate of evaporation in kg/h
 	evaporatedliquid := (Gh * (Executiontime.SIValue()/3600)) // in kg
-	evaporatedliquid = (evaporatedliquid * liquidclasses.Liquidclass[Liquid]["ro"])/1000 // converted to litres
+	evaporatedliquid = (evaporatedliquid * liquidclasses.Liquidclass[Liquid.TypeName()]["ro"])/1000 // converted to litres
 	Evaporatedliquid = wunit.NewVolume((evaporatedliquid*1000000),"ul") // convert to ul
 	
 	Evaporationrateestimate = Gh*1000000 // ul/h if declared in parameters or data it doesn't need declaring again
@@ -108,28 +109,7 @@ Analysis {
 
 Validation {
 	if Evaporatedliquid.SIValue() > Volumeperwell.SIValue() {
-	panic("not enough liquid")
+	panic("not enough liquid, Expected that liquid volume " + Volumeperwell.ToString() +" will evaporate during this time " + Executiontime.ToString()  + " Status:  "+ Status)
 	}
 }
 
-// Go helper functions:
-
-//Functions for rounding numbers to a specified number of decimal places (places):
-/*func Round(f float64) float64 {
-	return math.Floor(f + .5)
-}
-
-func RoundPlus(f float64, places int) float64 {
-	shift := math.Pow(10, float64(places))
-	return Round(f*shift) / shift
-}
-*/
-/* This function calculates Θ required for the evaporation calculator based on air velocity above the sample; 
-this will be important in a laminar flow cabinet, fume cabinet and when the plates are mixing: 
-*/
-
-
-
-
-/*: 0.62198 * pws / (pa - pws), // humidity ratio in saturated air at the same temperature as the water surface (kg/kg)  (kg H2O in kg Dry Air)
-"x":  0.62198 * pw / (pa - pw), */
