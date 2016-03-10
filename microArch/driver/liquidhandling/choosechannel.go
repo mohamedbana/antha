@@ -1,5 +1,13 @@
 package liquidhandling
 
+import (
+	"fmt"
+
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/microArch/logger"
+)
+
 func ChooseChannel(vol wunit.Volume, prms *LHProperties) (*wtype.LHChannelParameter, string) {
 	// very quick and dirty, basically just makes sure the minimum volume is
 	// below the required volume
