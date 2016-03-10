@@ -596,3 +596,11 @@ func (lhp *LHProperties) GetMaterialType() material.MaterialType {
 func (lhp *LHProperties) GetTimer() *LHTimer {
 	return GetTimerFor(lhp.Mnfr, lhp.Model)
 }
+
+func (lhp *LHProperties) GetChannelScoreFunc() ChannelScoreFunc {
+	// this is to permit us to make this flexible
+
+	sc := DefaultChannelScoreFunc{}
+
+	return sc
+}
