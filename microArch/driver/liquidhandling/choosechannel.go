@@ -32,7 +32,7 @@ func (sc DefaultChannelScoreFunc) ScoreCombinedChannel(vol wunit.Volume, head *w
 
 	// we should always make sure we do not send a volume which is too low
 
-	if lhcp.Minvol.LessThan(vol) {
+	if lhcp.Minvol.GreaterThan(vol) {
 		return 0
 	}
 
@@ -104,6 +104,7 @@ func ChooseChannel(vol wunit.Volume, prms *LHProperties) (*wtype.LHChannelParame
 	for _, head := range prms.HeadsLoaded {
 		for _, tip := range prms.Tips {
 			sc := scorer.ScoreCombinedChannel(vol, head, head.Adaptor, tip)
+			//fmt.Println("HEAD: ", head.Name, " TIP: ", tip.Type, " SCORE: ", sc)
 			if sc > bestscore {
 				headchosen = head
 				tipchosen = tip
