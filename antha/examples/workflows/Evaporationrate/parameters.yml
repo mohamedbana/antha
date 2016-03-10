@@ -2,7 +2,7 @@
     "Parameters": {
         "Evaporationrate": {
             "Airvelocity": "0m/s",
-            "Executiontime": "3600s",
+            "Executiontime": "3960s",
             "Liquid": "water",
             "Pa": "100800Pa",
             "Platetype": "SRWFB96",
