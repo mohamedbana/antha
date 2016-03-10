@@ -40,30 +40,3 @@ func MinMinVol(channels []*wtype.LHChannelParameter) wunit.Volume {
 
 	return mmv
 }
-
-/*
-func ChooseChannel(vol *wunit.Volume, channels []*wtype.LHChannelParameter) *wtype.LHChannelParameter {
-	// greedy greedy
-	var r *wtype.LHChannelParameter = nil
-
-	d := 999999.0
-	v := vol.RawValue()
-
-	for _, c := range channels {
-		min := c.Minvol.ConvertTo(vol.Unit())
-
-		// can't do less than the stated minimum
-		// choose the channel which has the minimum
-		// nearest the required volume; change this in future
-		if v > min {
-			df := v - min
-			if df < d {
-				d = v - min
-				r = c
-			}
-		}
-	}
-
-	return r
-}
-*/

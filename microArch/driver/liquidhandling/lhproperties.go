@@ -26,7 +26,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/antha-lang/antha/antha/anthalib/material"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -598,26 +597,10 @@ func (lhp *LHProperties) GetTimer() *LHTimer {
 	return GetTimerFor(lhp.Mnfr, lhp.Model)
 }
 
-// records timing info
-// preliminary implementation assumes all instructions of a given
-// type have the same timing, TimeFor is expressed in terms of the instruction
-// however so it will be possible to modify this behaviour in future
+func (lhp *LHProperties) GetChannelScoreFunc() ChannelScoreFunc {
+	// this is to permit us to make this flexible
 
-type LHTimer struct {
-	Times []time.Duration
-}
+	sc := DefaultChannelScoreFunc{}
 
-func NewTimer() *LHTimer {
-	var t LHTimer
-	t.Times = make([]time.Duration, 50)
-	return &t
-}
-
-func (t *LHTimer) TimeFor(r RobotInstruction) time.Duration {
-	var d time.Duration
-	if r.InstructionType() > 0 && r.InstructionType() < len(t.Times) {
-		d = t.Times[r.InstructionType()]
-	} else {
-	}
-	return d
+	return sc
 }

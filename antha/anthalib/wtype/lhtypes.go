@@ -1334,6 +1334,29 @@ type LHTip struct {
 	MinVol wunit.Volume
 }
 
+/*
+	ID          string
+	Name        string
+	Minvol      wunit.Volume
+	Maxvol      wunit.Volume
+	Minspd      wunit.FlowRate
+	Maxspd      wunit.FlowRate
+	Multi       int
+	Independent bool
+	Orientation int
+	Head        int
+*/
+
+func (tip *LHTip) GetParams() *LHChannelParameter {
+	// be safe
+	if tip.IsNil() {
+		return nil
+	}
+
+	lhcp := LHChannelParameter{Name: tip.Type + "Params", Minvol: tip.MinVol, Maxvol: tip.MaxVol, Multi: 1, Independent: false, Orientation: LHVChannel}
+	return &lhcp
+}
+
 func (tip *LHTip) IsNil() bool {
 	if tip == nil || tip.Type == "" || tip.MaxVol.IsZero() || tip.MinVol.IsZero() {
 		return true
