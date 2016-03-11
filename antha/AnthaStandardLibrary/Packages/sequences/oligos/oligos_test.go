@@ -52,7 +52,7 @@ var oligotests = []testpair{
 func TestBasicMeltingTemp(t *testing.T) {
 	for _, oligo := range meltingtemptests {
 		result := BasicMeltingTemp(oligo.sequence)
-		if result != oligo.meltingtemp {
+		if result.ToString() != oligo.meltingtemp.ToString() {
 			t.Error(
 				"For", oligo.sequence, "/n",
 				"expected", oligo.meltingtemp.ToString(), "\n",
