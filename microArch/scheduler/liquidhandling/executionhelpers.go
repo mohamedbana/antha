@@ -188,33 +188,49 @@ func groupByComponents(instructions []*wtype.LHInstruction) []*wtype.LHInstructi
 }
 
 func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) (insOut *driver.TransferInstruction) {
-	wh := make([]string, len(insIn.Components))       // component types
-	va := make([]wunit.Volume, len(insIn.Components)) // volumes
+
+	cmps := insIn.Components
+
+	lenToMake := len(insIn.Components)
+
+	if insIn.IsMixInPlace() {
+		lenToMake = lenToMake - 1
+		cmps = cmps[1:len(cmps)]
+	}
+
+	wh := make([]string, lenToMake)       // component types
+	va := make([]wunit.Volume, lenToMake) // volumes
 
 	// six parameters applying to the source
 
-	fromPlateID, fromWells := robot.GetComponents(insIn.Components)
+	fromPlateID, fromWells := robot.GetComponents(cmps)
 
-	pf := make([]string, len(insIn.Components))
-	wf := make([]string, len(insIn.Components))
-	pfwx := make([]int, len(insIn.Components))
-	pfwy := make([]int, len(insIn.Components))
-	vf := make([]wunit.Volume, len(insIn.Components))
-	ptt := make([]string, len(insIn.Components))
+	pf := make([]string, lenToMake)
+	wf := make([]string, lenToMake)
+	pfwx := make([]int, lenToMake)
+	pfwy := make([]int, lenToMake)
+	vf := make([]wunit.Volume, lenToMake)
+	ptt := make([]string, lenToMake)
 
 	// six parameters applying to the destination
 
-	pt := make([]string, len(insIn.Components))       // dest plate positions
-	wt := make([]string, len(insIn.Components))       // dest wells
-	ptwx := make([]int, len(insIn.Components))        // dimensions of plate pipetting to (X)
-	ptwy := make([]int, len(insIn.Components))        // dimensions of plate pipetting to (Y)
-	vt := make([]wunit.Volume, len(insIn.Components)) // volume in well to
-	ptf := make([]string, len(insIn.Components))      // plate types
+	pt := make([]string, lenToMake)       // dest plate positions
+	wt := make([]string, lenToMake)       // dest wells
+	ptwx := make([]int, lenToMake)        // dimensions of plate pipetting to (X)
+	ptwy := make([]int, lenToMake)        // dimensions of plate pipetting to (Y)
+	vt := make([]wunit.Volume, lenToMake) // volume in well to
+	ptf := make([]string, lenToMake)      // plate types
+
+	ix := 0
 
 	for i, v := range insIn.Components {
+		if insIn.IsMixInPlace() && i == 0 {
+			continue
+		}
+
 		// get dem big ole plates out
 		// TODO -- pass them in instead of all this nonsense
-		flhp := robot.PlateLookup[fromPlateID[i]].(*wtype.LHPlate)
+		flhp := robot.PlateLookup[fromPlateID[ix]].(*wtype.LHPlate)
 		tlhp := robot.PlateLookup[insIn.PlateID].(*wtype.LHPlate)
 
 		wlt, ok := tlhp.WellAtString(insIn.Welladdress)
@@ -224,31 +240,32 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) 
 		}
 
 		v2 := wunit.NewVolume(v.Vol, v.Vunit)
-		vt[i] = wlt.CurrVolume()
-		wh[i] = v.TypeName()
-		va[i] = v2
-		pt[i] = robot.PlateIDLookup[insIn.PlateID]
-		wt[i] = insIn.Welladdress
-		ptwx[i] = tlhp.WellsX()
-		ptwy[i] = tlhp.WellsY()
-		ptt[i] = tlhp.Type
+		vt[ix] = wlt.CurrVolume()
+		wh[ix] = v.TypeName()
+		va[ix] = v2
+		pt[ix] = robot.PlateIDLookup[insIn.PlateID]
+		wt[ix] = insIn.Welladdress
+		ptwx[ix] = tlhp.WellsX()
+		ptwy[ix] = tlhp.WellsY()
+		ptt[ix] = tlhp.Type
 
-		wlf, ok := flhp.WellAtString(fromWells[i])
+		wlf, ok := flhp.WellAtString(fromWells[ix])
 
 		if !ok {
-			logger.Fatal(fmt.Sprint("Well ", fromWells[i], " not found on source plate ", fromPlateID[i]))
+			logger.Fatal(fmt.Sprint("Well ", fromWells[ix], " not found on source plate ", fromPlateID[ix]))
 		}
 
-		vf[i] = wlf.CurrVolume()
-		wlf.Remove(va[i])
-		pf[i] = robot.PlateIDLookup[fromPlateID[i]]
-		wf[i] = fromWells[i]
-		pfwx[i] = flhp.WellsX()
-		pfwy[i] = flhp.WellsY()
-		ptf[i] = flhp.Type
+		vf[ix] = wlf.CurrVolume()
+		wlf.Remove(va[ix])
+		pf[ix] = robot.PlateIDLookup[fromPlateID[ix]]
+		wf[ix] = fromWells[ix]
+		pfwx[ix] = flhp.WellsX()
+		pfwy[ix] = flhp.WellsY()
+		ptf[ix] = flhp.Type
 
 		//fmt.Println("HERE GOES: ", i, wh[i], vf[i].ToString(), vt[i].ToString(), va[i].ToString(), pt[i], wt[i], pf[i], wf[i], pfwx[i], pfwy[i], ptwx[i], ptwy[i])
 
+		ix += 1
 	}
 
 	ti := driver.TransferInstruction{Type: driver.TFR, What: wh, Volume: va, PltTo: pt, WellTo: wt, TPlateWX: ptwx, TPlateWY: ptwy, PltFrom: pf, WellFrom: wf, FPlateWX: pfwx, FPlateWY: pfwy, FVolume: vf, TVolume: vt, FPlateType: ptf, TPlateType: ptt}
