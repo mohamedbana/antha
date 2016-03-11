@@ -50,9 +50,10 @@ const (
 )
 
 var runCmd = &cobra.Command{
-	Use:   "antharun",
-	Short: "Run an antha workflow",
-	RunE:  runWorkflow,
+	Use:          "antharun",
+	Short:        "Run an antha workflow",
+	RunE:         runWorkflow,
+	SilenceUsage: true,
 }
 
 func makeMixerOpt() mixer.Opt {
