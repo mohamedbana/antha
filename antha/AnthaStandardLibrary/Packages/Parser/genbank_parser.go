@@ -63,13 +63,13 @@ func GenbanktoSimpleSeq(filename string) (seq string) {
 }
 
 func GenbanktoDNASequence(filename string) (standardseq wtype.DNASequence, err error) {
-
 	var annotated sequences.AnnotatedSeq
 	line := ""
 	genbanklines := make([]string, 0)
-	file, err := os.Open(filename)
+	var file *os.File
+	file, err = os.Open(filename)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	defer file.Close()
 
@@ -79,8 +79,8 @@ func GenbanktoDNASequence(filename string) (standardseq wtype.DNASequence, err e
 		genbanklines = append(genbanklines, line)
 	}
 
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+	if err = scanner.Err(); err != nil {
+		return
 	}
 
 	annotated, err = HandleGenbank(genbanklines)
@@ -88,7 +88,6 @@ func GenbanktoDNASequence(filename string) (standardseq wtype.DNASequence, err e
 	standardseq = annotated.DNASequence
 
 	return
-
 }
 
 func GenbankFeaturetoDNASequence(filename string, featurename string) (standardseq wtype.DNASequence, err error) {
