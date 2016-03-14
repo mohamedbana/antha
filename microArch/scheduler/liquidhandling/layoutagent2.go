@@ -205,6 +205,7 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 				fmt.Println("\t", ccc.CName)
 			}
 
+			fmt.Println("BET THIS IS NIL: ", v.Components[0].Loc)
 			addr := v.Components[0].Loc
 			tx := strings.Split(addr, ":")
 			request.LHInstructions[k].Welladdress = tx[1]

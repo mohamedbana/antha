@@ -350,10 +350,10 @@ func (lhp *LHProperties) TipWastesMounted() int {
 	r := 0
 	for _, pref := range lhp.Tipwaste_preferences {
 		if lhp.PosLookup[pref] != "" {
-			bx, ok := lhp.Tipwastes[lhp.PosLookup[pref]]
+			_, ok := lhp.Tipwastes[lhp.PosLookup[pref]]
 
 			if !ok {
-				logger.Warn(fmt.Sprintf("Position ", pref, " claims to have a tipbox but is empty"))
+				logger.Debug(fmt.Sprintf("Position %s claims to have a tipbox but is empty", pref))
 				continue
 			}
 
@@ -372,7 +372,7 @@ func (lhp *LHProperties) TipSpacesLeft() int {
 			bx, ok := lhp.Tipwastes[lhp.PosLookup[pref]]
 
 			if !ok {
-				logger.Warn(fmt.Sprintf("Position ", pref, " claims to have a tipbox but is empty"))
+				logger.Debug(fmt.Sprintf("Position %s claims to have a tipbox but is empty", pref))
 				continue
 			}
 
