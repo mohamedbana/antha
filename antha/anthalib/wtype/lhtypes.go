@@ -1400,6 +1400,10 @@ type LHTipwaste struct {
 	AsWell     *LHWell
 }
 
+func (tw LHTipwaste) SpaceLeft() int {
+	return tw.Contents - tw.Capacity
+}
+
 func (te LHTipwaste) String() string {
 	return fmt.Sprintf(
 		`LHTipwaste {

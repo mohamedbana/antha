@@ -156,17 +156,26 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 	//	for k, v := range request.LHInstructions {
 	//for _, k := range request.Output_order {
 
+	fmt.Println("ORDER: ", order)
+
 	for _, k := range order {
 		v := request.LHInstructions[k]
+		fmt.Println("INSTRUCTION: ", v.ID, " IS MIX IN PLACE? ", v.IsMixInPlace())
+		for _, xxxx := range v.Components {
+			fmt.Println("\tCOMPONENT: ", xxxx.CName)
+		}
 		if v.PlateID != "" {
 			i := defined(v.PlateID, s)
 
 			if i == -1 {
 				s = append(s, PlateChoice{v.Platetype, []string{v.ID}, v.PlateID, []string{v.Welladdress}})
+				fmt.Println("ALLL")
 			} else {
 				s[i].Assigned = append(s[i].Assigned, v.ID)
 				s[i].Wells = append(s[i].Wells, v.Welladdress)
+				fmt.Println("YOUUU")
 			}
+
 		} else if v.Majorlayoutgroup != -1 {
 			id, ok := m[v.Majorlayoutgroup]
 			if !ok {
@@ -181,13 +190,20 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 
 			if i == -1 {
 				s = append(s, PlateChoice{v.Platetype, []string{v.ID}, id, []string{v.Welladdress}})
+				fmt.Println("DOOO")
 			} else {
 				s[i].Assigned = append(s[i].Assigned, v.ID)
 				s[i].Wells = append(s[i].Wells, v.Welladdress)
+				fmt.Println("TOOO")
 			}
 		} else if v.IsMixInPlace() {
 			// the first component sets the destination
 			// and now it should indeed be set
+
+			fmt.Println("MIXING IN PLACE:::")
+			for _, ccc := range v.Components {
+				fmt.Println("\t", ccc.CName)
+			}
 
 			addr := v.Components[0].Loc
 			tx := strings.Split(addr, ":")
@@ -201,6 +217,8 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 				panic("THIS SHOULD NOT BE POSSIBLE")
 			}
 
+			fmt.Println("MEISTALKTALK")
+
 			for i2, v2 := range s[i].Wells {
 				if v2 == tx[1] {
 					s[i].Assigned[i2] = v.ID
@@ -208,6 +226,8 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 				}
 			}
 
+		} else {
+			fmt.Println("OH YOU KID")
 		}
 	}
 
@@ -283,6 +303,9 @@ func choose_plates(request *LHRequest, pc []PlateChoice, order []string) []Plate
 func modpc(choice PlateChoice, nwell int) []PlateChoice {
 	r := make([]PlateChoice, 0, 1)
 
+	fmt.Println("CHOICE ASSIGNED: ", choice.Assigned)
+	fmt.Println("CHOICE WELLS   : ", choice.Wells)
+
 	for s := 0; s < len(choice.Assigned); s += nwell {
 		e := s + nwell
 		if e > len(choice.Assigned) {
@@ -293,6 +316,7 @@ func modpc(choice PlateChoice, nwell int) []PlateChoice {
 			// new ID
 			ID = wtype.GetUUID()
 		}
+		fmt.Println("S: ", s, " E: ", e)
 		r = append(r, PlateChoice{choice.Platetype, choice.Assigned[s:e], ID, choice.Wells[s:e]})
 	}
 	return r

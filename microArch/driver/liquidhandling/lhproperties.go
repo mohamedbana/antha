@@ -346,6 +346,43 @@ func (lhp *LHProperties) RemoveTipBoxes() {
 	lhp.Tipboxes = make(map[string]*wtype.LHTipbox)
 }
 
+func (lhp *LHProperties) TipWastesMounted() int {
+	r := 0
+	for _, pref := range lhp.Tipwaste_preferences {
+		if lhp.PosLookup[pref] != "" {
+			bx, ok := lhp.Tipwastes[lhp.PosLookup[pref]]
+
+			if !ok {
+				logger.Warn(fmt.Sprintf("Position ", pref, " claims to have a tipbox but is empty"))
+				continue
+			}
+
+			r += 1
+		}
+	}
+
+	return r
+
+}
+
+func (lhp *LHProperties) TipSpacesLeft() int {
+	r := 0
+	for _, pref := range lhp.Tipwaste_preferences {
+		if lhp.PosLookup[pref] != "" {
+			bx, ok := lhp.Tipwastes[lhp.PosLookup[pref]]
+
+			if !ok {
+				logger.Warn(fmt.Sprintf("Position ", pref, " claims to have a tipbox but is empty"))
+				continue
+			}
+
+			r += bx.SpaceLeft()
+		}
+	}
+
+	return r
+}
+
 func (lhp *LHProperties) AddTipWaste(tipwaste *wtype.LHTipwaste) bool {
 	for _, pref := range lhp.Tipwaste_preferences {
 		if lhp.PosLookup[pref] != "" {

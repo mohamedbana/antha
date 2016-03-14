@@ -138,13 +138,14 @@ func set_output_order(rq *LHRequest) {
 	it := NewIChain(nil)
 
 	for _, v := range sorted {
+		fmt.Println(v.Generation())
 		it.Add(v)
 	}
 
 	rq.Output_order = it.Flatten()
 
 	// wha
-	//it.Print()
+	it.Print()
 
 	rq.InstructionChain = it
 }
