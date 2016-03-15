@@ -33,7 +33,7 @@ import (
 	"github.com/antha-lang/antha/microArch/logger"
 )
 
-func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *LHRequest {
+func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties, st *SampleTracker) *LHRequest {
 	// do this multiply based on the order in the chain
 
 	ch := request.InstructionChain
@@ -43,13 +43,13 @@ func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties
 		if ch == nil {
 			break
 		}
-		request, pc, mp = LayoutStage(request, params, ch, pc, mp)
+		request, pc, mp = LayoutStage(request, params, ch, pc, mp, st)
 		ch = ch.Child
 	}
 
 	return request
 }
-func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain *IChain, plate_choices []PlateChoice, mapchoices map[int]string) (*LHRequest, []PlateChoice, map[int]string) {
+func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain *IChain, plate_choices []PlateChoice, mapchoices map[int]string, sampletracker *SampleTracker) (*LHRequest, []PlateChoice, map[int]string) {
 	// we have three kinds of solution
 	// 1- ones going to a specific plate
 	// 2- ones going to a specific plate type
@@ -57,7 +57,7 @@ func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain 
 
 	// find existing assignments
 
-	plate_choices, mapchoices = get_and_complete_assignments(request, chain.ValueIDs(), plate_choices, mapchoices)
+	plate_choices, mapchoices = get_and_complete_assignments(request, chain.ValueIDs(), plate_choices, mapchoices, sampletracker)
 
 	// now we know what remains unassigned, we assign it
 
@@ -121,9 +121,11 @@ func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain 
 
 				if ok {
 					x.Loc = remap[tx[0]] + ":" + tx[1]
+					sampletracker.SetLocationOf(x.ID, x.Loc)
 					logger.Track(fmt.Sprintf("OUTPUT ASSIGNMENT I=%s R=%s A=%s", id, x.ID, x.Loc))
 				} else {
 					x.Loc = tx[0] + ":" + tx[1]
+					sampletracker.SetLocationOf(x.ID, x.Loc)
 				}
 			}
 		}
@@ -148,7 +150,7 @@ type PlateChoice struct {
 	Wells     []string
 }
 
-func get_and_complete_assignments(request *LHRequest, order []string, s []PlateChoice, m map[int]string) ([]PlateChoice, map[int]string) {
+func get_and_complete_assignments(request *LHRequest, order []string, s []PlateChoice, m map[int]string, st *SampleTracker) ([]PlateChoice, map[int]string) {
 	//s := make([]PlateChoice, 0, 3)
 	//m := make(map[int]string)
 
@@ -205,8 +207,14 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 				fmt.Println("\t", ccc.CName)
 			}
 
-			fmt.Println("BET THIS IS NIL: ", v.Components[0].Loc)
-			addr := v.Components[0].Loc
+			//addr := v.Components[0].Loc
+			addr, ok := st.GetLocationOf(v.Components[0].ID)
+
+			if !ok {
+				panic("NO DICE, KINGPIN")
+			}
+
+			v.Components[0].Loc = addr
 			tx := strings.Split(addr, ":")
 			request.LHInstructions[k].Welladdress = tx[1]
 			request.LHInstructions[k].PlateID = tx[0]

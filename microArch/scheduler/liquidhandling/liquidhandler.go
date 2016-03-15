@@ -60,9 +60,10 @@ import (
 type Liquidhandler struct {
 	Properties       *liquidhandling.LHProperties
 	SetupAgent       func(*LHRequest, *liquidhandling.LHProperties) *LHRequest
-	LayoutAgent      func(*LHRequest, *liquidhandling.LHProperties) *LHRequest
+	LayoutAgent      func(*LHRequest, *liquidhandling.LHProperties, *SampleTracker) *LHRequest
 	ExecutionPlanner func(*LHRequest, *liquidhandling.LHProperties) *LHRequest
 	PolicyManager    *LHPolicyManager
+	SampleTracker    *SampleTracker
 	Once             sync.Once
 }
 
@@ -73,6 +74,7 @@ func Init(properties *liquidhandling.LHProperties) *Liquidhandler {
 	lh.LayoutAgent = ImprovedLayoutAgent
 	lh.ExecutionPlanner = ImprovedExecutionPlanner
 	lh.Properties = properties
+	lh.SampleTracker = GetSampleTracker()
 	return &lh
 }
 
@@ -416,7 +418,7 @@ func (this *Liquidhandler) Layout(request *LHRequest) *LHRequest {
 	// assign the results to destinations
 	// again needs to be parameterized
 
-	return this.LayoutAgent(request, this.Properties)
+	return this.LayoutAgent(request, this.Properties, this.SampleTracker)
 }
 
 // make the instructions for executing this request
