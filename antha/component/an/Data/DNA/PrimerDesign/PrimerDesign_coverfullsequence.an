@@ -1,0 +1,64 @@
+protocol PrimerDesign_coverfullsequence
+
+import (
+
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/oligos"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
+	
+)
+// Input parameters for this protocol
+Parameters (
+	GenbankFile   string 
+	Maxtemp    Temperature 
+	Mintemp    Temperature 
+	Maxgc      float64
+	Minlength   int 
+	Maxlength   int 
+	PrimereveryXnucleotides int 
+	Seqstoavoid []string
+	
+)
+
+// Data which is returned from this protocol
+Data (
+	AllPrimers []wtype.DNASequence
+)
+
+// Physical inputs to this protocol
+Inputs (
+
+)
+
+// Physical outputs from this protocol
+Outputs (
+)
+
+Requirements {
+
+}
+
+// Actions to perform before protocol itself
+Setup {
+
+}
+
+// Core process of the protocol: steps to be performed for each input
+Steps {
+
+	plasmid, _ := parser.GenbanktoAnnotatedSeq(GenbankFile)
+
+	allprimers := oligos.DesignFWDPRimerstoCoverFullSequence(plasmid.DNASequence, PrimereveryXnucleotides, Maxgc, Minlength, Maxlength, Mintemp, Maxtemp, Seqstoavoid)
+
+	AllPrimers = allprimers
+
+}
+// Actions to perform after steps block to analyze data
+Analysis {
+
+}
+
+Validation {
+
+}
+

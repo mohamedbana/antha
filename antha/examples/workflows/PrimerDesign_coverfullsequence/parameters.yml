@@ -1,0 +1,16 @@
+{
+    "Parameters": {
+        "PrimerDesign_coverfullseq": {
+            "GenbankFile": "pSEVA521.gb",
+            "Maxtemp": "65C",
+            "Mintemp": "50C",
+            "Maxgc": 0.6,
+            "Minlength": 18,
+			"Maxlength":30,
+			"PrimereveryXnucleotides":800,
+			"Seqstoavoid":[
+			""
+			]
+        }
+    }
+}

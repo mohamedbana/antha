@@ -159,17 +159,26 @@ func DesignFWDPRimerstoCoverFullSequence(seq wtype.DNASequence, sequenceinterval
 
 	primers = make([]wtype.DNASequence, 0)
 
+	avoidthese := make([]string, 0)
+
+	if len(seqstoavoid) != 0 {
+		for _, seq := range seqstoavoid {
+			avoidthese = append(avoidthese, seq)
+		}
+	}
 	for i := 1; i < len(seq.Sequence()); i = i + sequenceinterval {
 
 		region := DNAregion(seq, i, len(seq.Sequence()))
 
-		primer, _, err := FWDOligoSeq(region, maxGCcontent, minlength, maxlength, minmeltingtemp, maxmeltingtemp, seqstoavoid)
+		primer, _, err := FWDOligoSeq(region, maxGCcontent, minlength, maxlength, minmeltingtemp, maxmeltingtemp, avoidthese)
 
 		if err != nil {
 			panic(err.Error() + " for " + region.Nm)
 		}
 
 		primers = append(primers, wtype.MakeSingleStrandedDNASequence("primer_"+seq.Nm+"_"+strconv.Itoa(i)+":"+strconv.Itoa(i-1+sequenceinterval), primer))
+
+		avoidthese = append(avoidthese, primer)
 	}
 	return
 }
