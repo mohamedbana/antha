@@ -4,7 +4,6 @@ import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -16,10 +15,6 @@ import (
 	planner "github.com/antha-lang/antha/microArch/scheduler/liquidhandling"
 	"github.com/antha-lang/antha/target"
 	"github.com/antha-lang/antha/target/human"
-)
-
-var (
-	cannotGetCap = errors.New("cannot get capabilities")
 )
 
 var (
@@ -195,7 +190,7 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 func New(opt Opt, d driver.ExtendedLiquidhandlingDriver) (*Mixer, error) {
 	p, status := d.GetCapabilities()
 	if !status.OK {
-		return nil, cannotGetCap
+		return nil, fmt.Errorf("cannot get capabilities: %s", status.Msg)
 	}
 	p.Driver = d
 	return &Mixer{driver: d, properties: p, opt: opt}, nil
