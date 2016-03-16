@@ -6,6 +6,7 @@ import (
 	"compress/gzip"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -31,7 +32,11 @@ type Mixer struct {
 	opt        Opt
 }
 
-func (a *Mixer) Can(req ast.Request) bool {
+func (a *Mixer) String() string {
+	return "Mixer"
+}
+
+func (a *Mixer) CanCompile(req ast.Request) bool {
 	// TODO: remove when mixers have wait instruction
 	if req.Time != nil {
 		return false
@@ -110,19 +115,22 @@ func (a *Mixer) saveFile(name string) ([]byte, error) {
 	}
 
 	var buf bytes.Buffer
-	w := tar.NewWriter(gzip.NewWriter(&buf))
+	gw := gzip.NewWriter(&buf)
+	tw := tar.NewWriter(gw)
 	bs := []byte(data)
 
-	if err := w.WriteHeader(&tar.Header{
+	if err := tw.WriteHeader(&tar.Header{
 		Name:    name,
 		Mode:    0644,
 		Size:    int64(len(bs)),
 		ModTime: time.Now(),
 	}); err != nil {
 		return nil, err
-	} else if _, err := w.Write(bs); err != nil {
+	} else if _, err := tw.Write(bs); err != nil {
 		return nil, err
-	} else if err := w.Close(); err != nil {
+	} else if err := tw.Close(); err != nil {
+		return nil, err
+	} else if err := gw.Close(); err != nil {
 		return nil, err
 	} else {
 		return buf.Bytes(), nil
@@ -170,10 +178,17 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 		return nil, err
 	}
 
+	var ftype string
+	if a.properties.Mnfr != "" {
+		ftype = fmt.Sprintf("application/%s", strings.ToLower(a.properties.Mnfr))
+	}
 	return &target.Mix{
 		Request:    req,
 		Properties: a.properties,
-		Files:      tarball,
+		Files: target.Files{
+			Tarball: tarball,
+			Type:    ftype,
+		},
 	}, nil
 }
 

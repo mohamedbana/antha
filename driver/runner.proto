@@ -29,17 +29,12 @@ message MessagesRequest {
 }
 
 message MessagesReply {
-  enum Code {
-    INFO = 0;
-    START = 1;
-    STOP = 2;
-    ERROR = 3;
-  }
   message Message {
-    Code code = 1;
+    string code = 1;
     int32 seq = 2;
     bytes data = 3; 
   }
+
   repeated Message values = 1;
 }
 

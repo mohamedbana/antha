@@ -35,12 +35,12 @@ import (
 	"github.com/antha-lang/antha/cmd/antharun/param"
 	"github.com/antha-lang/antha/cmd/antharun/pretty"
 	"github.com/antha-lang/antha/cmd/antharun/spawn"
-	"github.com/antha-lang/antha/driver/lh"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/internal/github.com/spf13/cobra"
 	"github.com/antha-lang/antha/internal/github.com/spf13/viper"
 	"github.com/antha-lang/antha/target"
+	"github.com/antha-lang/antha/target/auto"
 	"github.com/antha-lang/antha/target/human"
 	"github.com/antha-lang/antha/target/mixer"
 )
@@ -100,15 +100,22 @@ type runOpt struct {
 func (a *runOpt) makeTarget(mixerOpt mixer.Opt) (*target.Target, error) {
 	t := target.New()
 	if len(a.Drivers) == 0 {
-		t.AddDevice(human.New(human.Opt{CanMix: true}))
+		if err := t.AddDevice(human.New(human.Opt{CanMix: true})); err != nil {
+			return nil, err
+		}
 	} else {
-		t.AddDevice(human.New(human.Opt{CanMix: false}))
+		if err := t.AddDevice(human.New(human.Opt{CanMix: false})); err != nil {
+			return nil, err
+		}
 	}
 	for _, uri := range a.Drivers {
-		if m, err := mixer.New(mixerOpt, lh.NewDriver(uri)); err != nil {
+		if d, err := auto.New(auto.Opt{
+			Uri:  uri,
+			Opts: []interface{}{mixerOpt},
+		}); err != nil {
 			return nil, err
-		} else {
-			t.AddDevice(m)
+		} else if err := t.AddDevice(d); err != nil {
+			return nil, err
 		}
 	}
 	return t, nil
@@ -156,7 +163,13 @@ func (a *runOpt) Run() error {
 		return err
 	}
 
-	pretty.Timeline(os.Stdout, rout)
+	if err := pretty.Timeline(os.Stdout, rout); err != nil {
+		return err
+	}
+
+	if err := pretty.Run(os.Stdout, rout, t); err != nil {
+		return err
+	}
 
 	return nil
 }

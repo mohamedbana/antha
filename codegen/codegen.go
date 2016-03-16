@@ -72,7 +72,7 @@ func (a *ir) assignDevices(t *target.Target) error {
 		} else {
 			return fmt.Errorf("unknown node %T", n)
 		}
-		colors[n] = t.Can(reqs...)
+		colors[n] = t.CanCompile(reqs...)
 	}
 
 	var devices []target.Device
@@ -236,7 +236,7 @@ func findBestMoveDevice(t *target.Target, from, to ast.Node, fromD, toD *drun) t
 	var minD target.Device
 	minC := -1
 
-	for _, d := range t.Can(req) {
+	for _, d := range t.CanCompile(req) {
 		c := toD.Device.MoveCost(d) + d.MoveCost(fromD.Device)
 		if minC == -1 || c < minC {
 			minC = c
