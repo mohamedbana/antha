@@ -31,7 +31,7 @@ func (a *ir) Print(g graph.Graph, out io.Writer) error {
 				n := x.(ast.Node)
 				drun := a.assignment[n]
 				if drun != nil {
-					return fmt.Sprintf("Run %p Device %p", drun, drun.Device)
+					return fmt.Sprintf("Run %p Device %p %s", drun, drun.Device, drun.Device)
 				}
 				return "NoRun"
 			},
