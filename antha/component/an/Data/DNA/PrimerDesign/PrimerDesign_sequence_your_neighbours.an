@@ -1,0 +1,176 @@
+protocol PrimerDesign_sequence_your_neighbours
+
+import (
+	"fmt"
+	//"math"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/oligos"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
+	"path/filepath"
+	"os"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
+	
+)
+// Input parameters for this protocol
+Parameters (
+	//files     []string = []string{"STAR_0023_VECTOR_BBSI.gb", "STAR_0023_VECTOR_BBSI+Grp7+Grp14+Grp3.gb"}
+	Dirname   string //= "current" // this will check for all .gb files in the folder you select here
+	Maxtemp    Temperature //      = wunit.NewTemperature(60, "C")
+	Mintemp    Temperature //      = wunit.NewTemperature(55, "C")
+	Maxgc      float64 //      = 0.6
+	Minlength   int //     = 20
+	Maxlength   int //     = 25
+	
+)
+
+// Data which is returned from this protocol
+Data (
+	AllOutputs []string
+	AllPrimers []string
+	PrimerPairs []PrimerPair
+	
+)
+
+// Physical inputs to this protocol
+Inputs (
+
+)
+
+// Physical outputs from this protocol
+Outputs (
+)
+
+Requirements {
+
+}
+
+// Actions to perform before protocol itself
+Setup {
+
+}
+
+// Core process of the protocol: steps to be performed for each input
+Steps {
+
+
+
+	//var Start int
+	//var End int
+	var err error
+	var output string
+	var dirname string
+	var alloutputs = make([]string, 0)
+	var allprimers = make([]string, 0)
+	var primerpairs = make([]PrimerPair, 0)
+	var files = make([]string, 0)
+
+	/*	vector, _ := parser.GenbanktoAnnotatedSeq("STAR_0023_VECTOR_BBSI.gb")
+
+		typeIIs := lookup.EnzymeLookup("bbsI")
+
+		fragments, _, _ := enzymes.Digest(vector.DNASequence, typeIIs)
+
+		plasmid, _ := parser.GenbanktoAnnotatedSeq("STAR_0023_VECTOR_BBSI+Grp7+Grp14+Grp3.gb")
+
+		for _, fragment := range fragments {
+
+			Start, End, err = FindPositioninSequence(plasmid.DNASequence, wtype.MakeSingleStrandedDNASequence("fragment", fragment))
+
+			if err == nil {
+				fmt.Println("Found the right fragment!", fragment, "start = ", Start, "End", End)
+				break
+			}
+
+		}
+	*/
+	/*if err != nil {
+		status = err.Error()
+	} else {
+		status = "No error"
+	}*/
+
+	//vectorstart, _, err := FindPositioninSequence(plasmid.DNASequence, vector.DNASequence)
+	/*
+		if err != nil {
+			panic(err.Error())
+
+		}*/
+
+	//region := DNAregion(plasmid.DNASequence, Start, len(plasmid.Sequence()))
+
+	//region := "ATGAGCAAAGGAGAAGAACTTTTCACTGGAGTTGTCCCAATTCTTGTTGAATTAGATGGTGATGTTAATGGGCACAAATTTTCTGTCCGTGGAGAGGGTGAAGGTGATGCTACAAACGGAAAACTCACCCTTAAATTTATTTGCACTACTGGAAAACTACCTGTTCCATGGCCAACACTTGTCACTACTCTGACCTATGGTGTTCAATGCTTTTCCCGTTATCCGGATCACATGAAACGGCATGACTTTTTCAAGAGTGCCATGCCCGAAGGTTATGTACAGGAACGCACTATATCTTTCAAAGATGACGGGACCTACAAGACGCGTGCTGAAGTCAAGTTTGAAGGTGATACCCTTGTTAATCGTATCGAGTTAAAAGGTATTGATTTTAAAGAAGATGGAAACATTCTCGGACACAAACTCGAGTACAACTTTAACTCACACAATGTATACATCACGGCAGACAAACAAAAGAATGGAATCAAAGCTAACTTCAAAATTCGCCACAACGTTGAAGATGGTTCCGTTCAACTAGCAGACCATTATCAACAAAATACTCCAATTGGCGATGGCCCTGTCCTTTTACCAGACAACCATTACCTGTCGACACAATCTGTCCTTTCGAAAGATCCCAACGAAAAGCGTGACCACATGGTCCTTCTTGAGTTTGTAACTGCTGCTGGGATTACACATGGCATGGATGAGCTCTACAAATAA"
+
+	//primer, GCpercent, _ := FWDOligoSeq(region, 0.6, 20, 25, mintemp, maxtemp)
+
+	//fmt.Println(primer, GCpercent)
+
+	//Search for files within current directory
+
+	if Dirname == "current" {
+		dirname = "." + string(filepath.Separator)
+	}else {dirname = Dirname}
+	
+	d, err := os.Open(dirname)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	defer d.Close()
+
+	allfiles, err := d.Readdir(-1)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	fmt.Println("Reading " + dirname)
+
+	//Determine if file extension is ".gb"
+	for _, file := range allfiles {
+		if filepath.Ext(file.Name()) == ".gb" {
+			files = append(files, file.Name())
+		}
+
+	}
+
+	for _, file := range files {
+		file = filepath.Join(dirname,file)
+		sequence, _ := parser.GenbanktoAnnotatedSeq(file)
+
+		primer1, primer2 := oligos.MakeOutwardFacingPrimers(sequence.DNASequence, Maxgc, Minlength, Maxlength, Mintemp, Maxtemp, allprimers)
+
+		bindingsitesinseq1 := oligos.CheckNonSpecificBinding(sequence.DNASequence, wtype.MakeSingleStrandedDNASequence("primer1"+"_"+file, primer1))
+
+		bindingsitesinseq2 := oligos.CheckNonSpecificBinding(sequence.DNASequence, wtype.MakeSingleStrandedDNASequence("primer2"+"_"+file, primer2))
+
+		output = fmt.Sprintln(file, "primer1: ", primer1, "binds at", bindingsitesinseq1, "positions", "primer2: ", primer2, "binds at", bindingsitesinseq2, "positions")
+		alloutputs = append(alloutputs, output)
+		allprimers = append(allprimers, primer1, primer2)
+		
+		primerpairs = append(primerpairs, PrimerPair{primer1,primer2})
+
+		
+
+	}
+
+	fmt.Println(alloutputs, allprimers)
+	
+	AllOutputs = alloutputs
+	AllPrimers = allprimers
+	PrimerPairs = primerpairs
+
+
+}
+// Actions to perform after steps block to analyze data
+Analysis {
+
+}
+
+Validation {
+
+}
+
+type PrimerPair struct {
+	FWD string
+	REV string
+}
