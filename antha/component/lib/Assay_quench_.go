@@ -37,7 +37,7 @@ func _Assay_quenchSteps(_ctx context.Context, _input *Assay_quenchInput, _output
 
 	// MixTo(platetype string, address string, platenum int, components ...*wtype.LHComponent)
 
-	reaction := execute.MixTo(_ctx, _input.OutPlate, "", 0, substrate, enzyme)
+	reaction := execute.MixTo(_ctx, _input.OutPlate, "", 1, substrate, enzyme)
 
 	finishedreaction := execute.Incubate(_ctx, reaction, _input.ReactionTemp, _input.ReactionTime, true)
 

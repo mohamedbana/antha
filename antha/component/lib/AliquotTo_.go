@@ -50,25 +50,43 @@ func _AliquotToSteps(_ctx context.Context, _input *AliquotToInput, _output *Aliq
 		"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
 		"Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"}
 	//k := 0
-	for j := 0; j < _input.OutPlate.WlsY; j++ {
-		for i := 0; i < _input.OutPlate.WlsX; i++ { //countingfrom1iswhatmakesushuman := j + 1
-			//k = k + 1
-			wellposition := string(alphabet[j]) + strconv.Itoa(i+1)
-			//fmt.Println(wellposition, k)
-			wellpositionarray = append(wellpositionarray, wellposition)
-		}
 
+	if _input.ByRow {
+		for j := 0; j < _input.OutPlate.WlsY; j++ {
+			for i := 0; i < _input.OutPlate.WlsX; i++ { //countingfrom1iswhatmakesushuman := j + 1
+				//k = k + 1
+				wellposition := string(alphabet[j]) + strconv.Itoa(i+1)
+				//fmt.Println(wellposition, k)
+				wellpositionarray = append(wellpositionarray, wellposition)
+			}
+
+		}
+	} else {
+		for j := 0; j < _input.OutPlate.WlsX; j++ {
+			for i := 0; i < _input.OutPlate.WlsY; i++ { //countingfrom1iswhatmakesushuman := j + 1
+				//k = k + 1
+				wellposition := string(alphabet[i]) + strconv.Itoa(j+1)
+				//fmt.Println(wellposition, k)
+				wellpositionarray = append(wellpositionarray, wellposition)
+			}
+
+		}
+	}
+	var counter int
+	for _, Solution := range _input.Solutions {
+		for k := 0; k < _input.NumberofAliquots; k++ {
+
+			if Solution.TypeName() == "dna" {
+				Solution.Type = wtype.LTDoNotMix
+			}
+			aliquotSample := mixer.Sample(Solution, _input.VolumePerAliquot)
+			aliquot := execute.MixTo(_ctx, _input.OutPlate.Type, wellpositionarray[counter], 1, aliquotSample)
+			aliquots = append(aliquots, aliquot)
+			counter = counter + 1
+		}
+		_output.Aliquots = aliquots
 	}
 
-	for k := 0; k < _input.NumberofAliquots; k++ {
-		if _input.Solution.TypeName() == "dna" {
-			_input.Solution.Type = wtype.LTDoNotMix
-		}
-		aliquotSample := mixer.Sample(_input.Solution, _input.VolumePerAliquot)
-		aliquot := execute.MixTo(_ctx, _input.OutPlate.Type, wellpositionarray[k], 0, aliquotSample)
-		aliquots = append(aliquots, aliquot)
-	}
-	_output.Aliquots = aliquots
 }
 
 // Run after controls and a steps block are completed to
@@ -130,11 +148,12 @@ type AliquotToElement struct {
 }
 
 type AliquotToInput struct {
+	ByRow            bool
 	InPlate          *wtype.LHPlate
 	NumberofAliquots int
 	OutPlate         *wtype.LHPlate
-	Solution         *wtype.LHComponent
 	SolutionVolume   wunit.Volume
+	Solutions        []*wtype.LHComponent
 	VolumePerAliquot wunit.Volume
 }
 
@@ -157,11 +176,12 @@ func init() {
 			Desc: "Variant of Aliquot where the low level MixTo command is used to pipette by\nrow\n",
 			Path: "antha/component/an/Liquid_handling/Aliquot/AliquotTo.an",
 			Params: []ParamDesc{
+				{Name: "ByRow", Desc: "", Kind: "Parameters"},
 				{Name: "InPlate", Desc: "", Kind: "Inputs"},
 				{Name: "NumberofAliquots", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-				{Name: "Solution", Desc: "", Kind: "Inputs"},
 				{Name: "SolutionVolume", Desc: "", Kind: "Parameters"},
+				{Name: "Solutions", Desc: "", Kind: "Inputs"},
 				{Name: "VolumePerAliquot", Desc: "", Kind: "Parameters"},
 				{Name: "Aliquots", Desc: "", Kind: "Outputs"},
 			},

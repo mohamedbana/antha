@@ -80,7 +80,7 @@ func Handlesnapgenelines(lines []string) (dnaseq string) {
 	seqlines := make([]string, 0)
 	// fmt.Println(originallines)
 	if len(lines) > 0 {
-		for i := 2; i < originallines; i++ {
+		for i := 3; i < originallines; i++ {
 
 			// fmt.Println("lines", lines[i])
 			/*	if len([]byte(lines[0])) > 0 {
@@ -94,12 +94,12 @@ func Handlesnapgenelines(lines []string) (dnaseq string) {
 			// fmt.Println("i+1", i, len(lines))
 			// fmt.Println(lines[i+1])
 			if len([]byte(lines[i])) > 0 {
-				fmt.Println("line:", lines[i])
-				ok, _, badchars := noillegalshere(lines[i])
+				//fmt.Println("line:", lines[i])
+				ok, _, _ := noillegalshere(lines[i])
 
 				if ok != true {
 					templine := removeweirdthings(lines[i])
-					fmt.Println("original line:", lines[i], "templine:", templine, string(badchars))
+					//	fmt.Println("original line:", lines[i], "templine:", templine, string(badchars))
 					seqlines = append(seqlines, templine)
 					break
 				} else {
@@ -113,12 +113,12 @@ func Handlesnapgenelines(lines []string) (dnaseq string) {
 		seq := strings.Join(lines, "")
 		seq = strings.Replace(seq, " ", "", -1)
 
-		ok, badpositions, badcharacters := noillegalshere(seq)
-		fmt.Println("Handling this", ok, badpositions, string(badcharacters))
+		ok, _, _ := noillegalshere(seq)
+		//fmt.Println("Handling this", ok, badpositions, string(badcharacters))
 		if !ok {
-			fmt.Println("seq1", seq)
+			//	fmt.Println("seq1", seq)
 			seq = removeweirdthings(seq)
-			fmt.Println("seq2", seq)
+			//	fmt.Println("seq2", seq)
 		}
 		dnaseq = seq
 
@@ -173,12 +173,12 @@ func removeweirdthings(seq string) (weirdthingfreeseq string) {
 
 	for _, badcharacter := range badcharacters {
 		temp = strings.Replace(temp, string(badcharacter), "", -1)
-		fmt.Println("temp =", temp, "bad character:", string(badcharacter), "all bad characters:", badcharacters)
+		//	fmt.Println("temp =", temp, "bad character:", string(badcharacter), "all bad characters:", badcharacters)
 
 	}
 
 	weirdthingfreeseq = temp
-	fmt.Println("weirdthingfreeseq", weirdthingfreeseq)
+	//	fmt.Println("weirdthingfreeseq", weirdthingfreeseq)
 	return
 }
 

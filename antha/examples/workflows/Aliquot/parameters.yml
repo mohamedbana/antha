@@ -1,20 +1,36 @@
 {
     "Parameters": {
-        "AliquotParams1": {
+        "AliquotParams": {
             "InPlate": "pcrplate_with_cooler",
-            "NumberofAliquots": 300,
-            "OutPlate": "greiner384_riser",
-            "Solution": "PrimerFw",
-            "SolutionVolume": "3100ul",
-            "VolumePerAliquot": "10ul"
+            "NumberofAliquots": 8,
+            "OutPlate": "pcrplate_with_cooler",
+            "Solution": "water",
+            "SolutionVolume": "4000ul",
+            "VolumePerAliquot": "25ul"
         },
         "AliquotParams2": {
             "InPlate": "pcrplate_with_cooler",
-            "NumberofAliquots": 2,
-            "OutPlate": "greiner384",
-            "Solution": "PrimerRev",
-            "SolutionVolume": "100ul",
-            "VolumePerAliquot": "20ul"
+            "NumberofAliquots": 8,
+            "OutPlate": "pcrplate_with_cooler",
+            "Solution": "water",
+            "SolutionVolume": "4000ul",
+            "VolumePerAliquot": "25ul"
+        },
+        "AliquotParams3": {
+            "InPlate": "pcrplate_with_cooler",
+            "NumberofAliquots": 8,
+            "OutPlate": "pcrplate_with_cooler",
+            "Solution": "fluorescein",
+            "SolutionVolume": "4000ul",
+            "VolumePerAliquot": "25ul"
+        },
+        "AliquotParams4": {
+            "InPlate": "pcrplate_with_cooler",
+            "NumberofAliquots": 8,
+            "OutPlate": "pcrplate_with_cooler",
+            "Solution": "fluorescein",
+            "SolutionVolume": "4000ul",
+            "VolumePerAliquot": "25ul"
         }
     }
 }

@@ -26,6 +26,7 @@ type testpair struct {
 	maxGCcontent        float64
 	minlength           int
 	maxlength           int
+	seqstoavoid         []string
 	outputoligoseq      string
 	calculatedGCcontent float64
 }
@@ -45,6 +46,7 @@ var oligotests = []testpair{
 		maxGCcontent:        0.6,
 		minlength:           25,
 		maxlength:           45,
+		seqstoavoid:         []string{""},
 		outputoligoseq:      "ATGAGCAAAGGAGAAGAACTTTTCA",
 		calculatedGCcontent: 0.36},
 }
@@ -65,7 +67,7 @@ func TestBasicMeltingTemp(t *testing.T) {
 
 func TestFWDOligoSeq(t *testing.T) {
 	for _, oligo := range oligotests {
-		oligoseq, gc := FWDOligoSeq(oligo.sequence.Sequence(), oligo.maxGCcontent, oligo.minlength, oligo.maxlength, oligo.mintemp, oligo.maxtemp)
+		oligoseq, gc, _ := FWDOligoSeq(oligo.sequence, oligo.maxGCcontent, oligo.minlength, oligo.maxlength, oligo.mintemp, oligo.maxtemp, oligo.seqstoavoid)
 		if oligoseq != oligo.outputoligoseq {
 			t.Error(
 				"For", oligo.sequence, "/n",

@@ -26,11 +26,12 @@ import (
 	"fmt"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	"math/rand"
+	"strings"
+
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/blast"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	. "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
-	"math/rand"
-	"strings"
 )
 
 // the following are all physical things; we need a way to separate
@@ -506,5 +507,6 @@ func Comp(s string) string {
 
 // Reverse Complement
 func RevComp(s string) string {
+	s = strings.ToUpper(s)
 	return Comp(Rev(s))
 }

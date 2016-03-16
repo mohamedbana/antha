@@ -5,9 +5,9 @@
 		"Notthiscolour":"white",
 	  	"Imagefilename": "ziggy5_384.jpg",
 		"Palettename":"ProteinPaintboxSubset",
-      	"OutPlate": "greiner384_riser",
+      	"OutPlate": "Agarplateforpicking384_riser",
 		"UVimage":false,
-      	"VolumePerWell": "100ul"
+      	"VolumePerWell": "5ul"
     }
   }
 }

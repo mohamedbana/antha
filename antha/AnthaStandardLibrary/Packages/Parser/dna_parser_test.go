@@ -50,10 +50,9 @@ var testpairs = []testpair{
 		sequence: "GCTCTTCTatgacggcattgacggaaggtgcaaaactgtttgagaaagagatcccgtatatcaccgaactggaaggcgacgtcgaaggtatgaaatttatcattaaaggcgagggtaccggtgacgcgaccacgggtaccattaaagcgaaatacatctgcactacgggcgacctgccggtcccgtgggcaaccctggtgagcaccctgagctacggtgttcagtgtttcgccaagtacccgagccacatcaaggatttctttaagagcgccatgccggaaggttatacccaagagcgtaccatcagcttcgaaggcgacggcgtgtacaagacgcgtgctatggttacctacgaacgcggttctatctacaatcgtgtcacgctgactggtgagaactttaagaaagacggtcacattctgcgtaagaacgttgcattccaatgcccgccaagcattctgtatattctgcctgacaccgttaacaatggcatccgcgttgagttcaaccaggcgtacgatattgaaggtgtgaccgaaaaactggttaccaaatgcagccaaatgaatcgtccgttggcgggctccgcggcagtgcatatcccgcgttatcatcacattacctaccacaccaaactgagcaaagaccgcgacgagcgccgtgatcacatgtgtctggtagaggtcgtgaaagcggttgatctggacacgtatcagtaactcgagtaaggatctccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtggGCCTTTCTGCGTTTtactagagtcacactgatgaGGTAGAAGAGC"},
 }
 
-/*
 func TestSnapGenetoSimpleSeq(t *testing.T) {
 	for _, seq := range testpairs {
-		result, err := SnapGenetoSimpleSeq(seq.filename)
+		result, _ := SnapGenetoSimpleSeq(seq.filename)
 		if result != seq.sequence {
 			t.Error(
 				"For", seq.filename, "/n",
@@ -61,14 +60,14 @@ func TestSnapGenetoSimpleSeq(t *testing.T) {
 				"got", result, "\n",
 			)
 		}
-		if err != nil {
+		/*	if err != nil {
 			t.Error(
 				"Error = ", err.Error(), "/n",
 			)
-		}
+		}*/
 	}
 }
-*/
+
 func TestHandlesnapgenelines(t *testing.T) {
 	for _, seq := range testpairs {
 		result := Handlesnapgenelines(seq.lines)
