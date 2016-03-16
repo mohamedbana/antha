@@ -50,12 +50,27 @@ type drun struct {
 // by maximally coalescing ApplyExprs with the same device into the same
 // device run.
 func (a *ir) assignDevices(t *target.Target) error {
+	// A bundle's requests is the sum of its children
+	bundleReqs := func(n *ast.Bundle) (reqs []ast.Request) {
+		for i, inum := 0, a.CommandTree.NumOuts(n); i < inum; i += 1 {
+			kid := a.CommandTree.Out(n, i)
+			if c, ok := kid.(ast.Command); ok {
+				reqs = append(reqs, c.Requests()...)
+			}
+		}
+		return
+
+	}
 	colors := make(map[ast.Node][]target.Device)
 	for i, inum := 0, a.CommandTree.NumNodes(); i < inum; i += 1 {
 		n := a.CommandTree.Node(i).(ast.Node)
 		var reqs []ast.Request
 		if c, ok := n.(ast.Command); ok {
 			reqs = c.Requests()
+		} else if b, ok := n.(*ast.Bundle); ok {
+			reqs = bundleReqs(b)
+		} else {
+			return fmt.Errorf("unknown node %T", n)
 		}
 		colors[n] = t.Can(reqs...)
 	}
