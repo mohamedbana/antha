@@ -1,7 +1,8 @@
 {
     "Parameters": {
         "PrimerDesign_coverfullseq": {
-            "GenbankFile": "pSEVA521.gb",
+            "DNASeqfile": "pSEVA521.gb",
+			"Plasmid":true,
             "Maxtemp": "65C",
             "Mintemp": "50C",
             "Maxgc": 0.6,

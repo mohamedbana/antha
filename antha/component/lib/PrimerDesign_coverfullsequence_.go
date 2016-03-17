@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/oligos"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -29,10 +30,18 @@ func _PrimerDesign_coverfullsequenceSetup(_ctx context.Context, _input *PrimerDe
 
 // Core process of the protocol: steps to be performed for each input
 func _PrimerDesign_coverfullsequenceSteps(_ctx context.Context, _input *PrimerDesign_coverfullsequenceInput, _output *PrimerDesign_coverfullsequenceOutput) {
+	var plasmid wtype.DNASequence
 
-	plasmid, _ := parser.GenbanktoAnnotatedSeq(_input.GenbankFile)
+	plasmids, _ := parser.DNAFiletoDNASequence(_input.DNASeqfile, _input.Plasmid)
 
-	allprimers := oligos.DesignFWDPRimerstoCoverFullSequence(plasmid.DNASequence, _input.PrimereveryXnucleotides, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, _input.Seqstoavoid)
+	if len(plasmids) > 0 {
+		plasmid = plasmids[0]
+	}
+	if len(plasmids) > 1 {
+		_output.Warnings = fmt.Errorf("Warning! more than one sequence in sequence file! Only used first sequence for primer design")
+	}
+
+	allprimers := oligos.DesignFWDPRimerstoCoverFullSequence(plasmid, _input.PrimereveryXnucleotides, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, _input.Seqstoavoid)
 
 	_output.AllPrimers = allprimers
 
@@ -94,23 +103,26 @@ type PrimerDesign_coverfullsequenceElement struct {
 }
 
 type PrimerDesign_coverfullsequenceInput struct {
-	GenbankFile             string
+	DNASeqfile              string
 	Maxgc                   float64
 	Maxlength               int
 	Maxtemp                 wunit.Temperature
 	Minlength               int
 	Mintemp                 wunit.Temperature
+	Plasmid                 bool
 	PrimereveryXnucleotides int
 	Seqstoavoid             []string
 }
 
 type PrimerDesign_coverfullsequenceOutput struct {
 	AllPrimers []wtype.DNASequence
+	Warnings   error
 }
 
 type PrimerDesign_coverfullsequenceSOutput struct {
 	Data struct {
 		AllPrimers []wtype.DNASequence
+		Warnings   error
 	}
 	Outputs struct {
 	}
@@ -123,15 +135,17 @@ func init() {
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/PrimerDesign/PrimerDesign_coverfullsequence.an",
 			Params: []ParamDesc{
-				{Name: "GenbankFile", Desc: "", Kind: "Parameters"},
+				{Name: "DNASeqfile", Desc: "", Kind: "Parameters"},
 				{Name: "Maxgc", Desc: "", Kind: "Parameters"},
 				{Name: "Maxlength", Desc: "", Kind: "Parameters"},
 				{Name: "Maxtemp", Desc: "", Kind: "Parameters"},
 				{Name: "Minlength", Desc: "", Kind: "Parameters"},
 				{Name: "Mintemp", Desc: "", Kind: "Parameters"},
+				{Name: "Plasmid", Desc: "", Kind: "Parameters"},
 				{Name: "PrimereveryXnucleotides", Desc: "", Kind: "Parameters"},
 				{Name: "Seqstoavoid", Desc: "", Kind: "Parameters"},
 				{Name: "AllPrimers", Desc: "", Kind: "Data"},
+				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
 	})

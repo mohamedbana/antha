@@ -101,9 +101,12 @@ Steps {
 		
 		component := componentmap[colourtostringmap[colour]]
 
-		if component.TypeName() == "dna" {
+		/*if component.TypeName() == "dna" {
 			component.Type = wtype.LTDoNotMix // "DoNotMix"
-		}
+		}*/
+		
+		component.Type = wtype.LTCulture
+		
 		fmt.Println(image.Colourcomponentmap[colour])
 		
 		if OnlythisColour !="" {

@@ -87,9 +87,12 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 
 		component := componentmap[colourtostringmap[colour]]
 
-		if component.TypeName() == "dna" {
+		/*if component.TypeName() == "dna" {
 			component.Type = wtype.LTDoNotMix // "DoNotMix"
-		}
+		}*/
+
+		component.Type = wtype.LTCulture
+
 		fmt.Println(image.Colourcomponentmap[colour])
 
 		if _input.OnlythisColour != "" {

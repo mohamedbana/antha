@@ -169,7 +169,7 @@ func MakeFoamyPolicy() LHPolicy {
 }
 func MakeCulturePolicy() LHPolicy {
 	culturepolicy := make(LHPolicy, 10)
-	culturepolicy["PRE_MIX"] = 3
+	culturepolicy["PRE_MIX"] = 2
 	culturepolicy["ASPSPEED"] = 2.0
 	culturepolicy["DSPSPEED"] = 2.0
 	culturepolicy["CAN_MULTI"] = false
