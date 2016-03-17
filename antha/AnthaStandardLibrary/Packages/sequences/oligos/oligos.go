@@ -117,6 +117,7 @@ func DNAregion(sequence wtype.DNASequence, startposition int, endposition int) (
 // function finds oligo by starting at position 0 and making sequence of the minimum length, calculating parameters
 // and if they do not match then adds one basepair to end of sequence until the maximum length is reached.
 // if still unsuccessful, the function begins again at position 1 and cycles through until a matching oligo sequence is found.
+// overlapthresholdwithseqstoavoid allows maximum permissable partial overlap to be specified by the user, if set to -1 any overlap is tolerated
 func FWDOligoSeq(seq wtype.DNASequence, maxGCcontent float64, minlength int, maxlength int, minmeltingtemp wunit.Temperature, maxmeltingtemp wunit.Temperature, seqstoavoid []string, overlapthresholdwithseqstoavoid int) (oligoseq string, GCpercentage float64, err error) {
 
 	//var start int
@@ -144,7 +145,7 @@ func FWDOligoSeq(seq wtype.DNASequence, maxGCcontent float64, minlength int, max
 
 			fmt.Println("binding sites:", bindingsites)
 
-			if len(seqstoavoid) > 0 {
+			if len(seqstoavoid) > 0 && overlapthresholdwithseqstoavoid > 0 {
 				for _, seq := range seqstoavoid {
 					_, overlap, _ := OverlapCheck(tempoligoseq, seq)
 
@@ -203,6 +204,39 @@ func DesignFWDPRimerstoCoverFullSequence(seq wtype.DNASequence, sequenceinterval
 		}
 	}
 	for i := 1; i < len(seq.Sequence()); i = i + sequenceinterval {
+
+		region := DNAregion(seq, i, len(seq.Sequence()))
+
+		primer, _, err := FWDOligoSeq(region, maxGCcontent, minlength, maxlength, minmeltingtemp, maxmeltingtemp, avoidthese, overlapthresholdwithseqstoavoid)
+
+		if err != nil {
+			panic(err.Error() + " for " + region.Nm)
+		}
+
+		primers = append(primers, wtype.MakeSingleStrandedDNASequence("primer_"+seq.Nm+"_"+strconv.Itoa(i)+":"+strconv.Itoa(i-1+sequenceinterval), primer))
+
+		avoidthese = append(avoidthese, primer)
+	}
+	return
+}
+
+func DesignFWDPRimerstoCoverRegion(seq wtype.DNASequence, regionstart, regionend, sequenceinterval int, maxGCcontent float64, minlength int, maxlength int, minmeltingtemp wunit.Temperature, maxmeltingtemp wunit.Temperature, seqstoavoid []string, overlapthresholdwithseqstoavoid int) (primers []wtype.DNASequence) {
+
+	primers = make([]wtype.DNASequence, 0)
+
+	avoidthese := make([]string, 0)
+
+	if len(seqstoavoid) != 0 {
+		for _, seq := range seqstoavoid {
+			avoidthese = append(avoidthese, seq)
+		}
+	}
+
+	if regionstart-100 > 0 {
+		regionstart = regionstart - 100
+	}
+
+	for i := regionstart; i < regionend; i = i + sequenceinterval {
 
 		region := DNAregion(seq, i, len(seq.Sequence()))
 
