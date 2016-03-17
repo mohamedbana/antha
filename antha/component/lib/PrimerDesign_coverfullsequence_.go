@@ -1,3 +1,5 @@
+// This element will design primers to cover the full length of a sequence at the interval specified by the user (e.g. every 800 bp).
+// Design criteria such as maximum gc content, acceptable ranges of melting temperatures and primer length may be specified by the user.
 package lib
 
 import (
@@ -12,6 +14,8 @@ import (
 )
 
 // Input parameters for this protocol
+
+// as a proportion of 1, i.e. 1 == 100%
 
 // Data which is returned from this protocol
 
@@ -44,7 +48,6 @@ func _PrimerDesign_coverfullsequenceSteps(_ctx context.Context, _input *PrimerDe
 	allprimers := oligos.DesignFWDPRimerstoCoverFullSequence(plasmid, _input.PrimereveryXnucleotides, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, _input.Seqstoavoid)
 
 	_output.AllPrimers = allprimers
-
 }
 
 // Actions to perform after steps block to analyze data
@@ -132,11 +135,11 @@ func init() {
 	addComponent(Component{Name: "PrimerDesign_coverfullsequence",
 		Constructor: PrimerDesign_coverfullsequenceNew,
 		Desc: ComponentDesc{
-			Desc: "",
+			Desc: "This element will design primers to cover the full length of a sequence at the interval specified by the user (e.g. every 800 bp).\nDesign criteria such as maximum gc content, acceptable ranges of melting temperatures and primer length may be specified by the user.\n",
 			Path: "antha/component/an/Data/DNA/PrimerDesign/PrimerDesign_coverfullsequence.an",
 			Params: []ParamDesc{
 				{Name: "DNASeqfile", Desc: "", Kind: "Parameters"},
-				{Name: "Maxgc", Desc: "", Kind: "Parameters"},
+				{Name: "Maxgc", Desc: "as a proportion of 1, i.e. 1 == 100%\n", Kind: "Parameters"},
 				{Name: "Maxlength", Desc: "", Kind: "Parameters"},
 				{Name: "Maxtemp", Desc: "", Kind: "Parameters"},
 				{Name: "Minlength", Desc: "", Kind: "Parameters"},

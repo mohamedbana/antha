@@ -1,8 +1,6 @@
 
 // This element will design outward facing primers for all .gb file sequences in a specified folder. 
 // Design criteria such as maximum gc content, acceptable ranges of melting temperatures and primer length may be specified by the user.
-
-
 protocol PrimerDesign_sequence_your_neighbours
 
 import (

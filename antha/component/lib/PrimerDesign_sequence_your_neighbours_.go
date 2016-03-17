@@ -1,3 +1,5 @@
+// This element will design outward facing primers for all .gb file sequences in a specified folder.
+// Design criteria such as maximum gc content, acceptable ranges of melting temperatures and primer length may be specified by the user.
 package lib
 
 import (
@@ -240,7 +242,7 @@ func init() {
 	addComponent(Component{Name: "PrimerDesign_sequence_your_neighbours",
 		Constructor: PrimerDesign_sequence_your_neighboursNew,
 		Desc: ComponentDesc{
-			Desc: "",
+			Desc: "This element will design outward facing primers for all .gb file sequences in a specified folder.\nDesign criteria such as maximum gc content, acceptable ranges of melting temperatures and primer length may be specified by the user.\n",
 			Path: "antha/component/an/Data/DNA/PrimerDesign/PrimerDesign_sequence_your_neighbours.an",
 			Params: []ParamDesc{
 				{Name: "Dirname", Desc: "files     []string = []string{\"STAR_0023_VECTOR_BBSI.gb\", \"STAR_0023_VECTOR_BBSI+Grp7+Grp14+Grp3.gb\"}\n\n= \"current\" // this will check for all .gb files in the folder you select here\n", Kind: "Parameters"},
