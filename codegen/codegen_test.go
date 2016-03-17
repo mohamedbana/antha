@@ -26,7 +26,7 @@ func (a *incubateInst) SetDependsOn(xs []target.Inst) {
 
 type incubator struct{}
 
-func (a *incubator) Can(req ast.Request) bool {
+func (a *incubator) CanCompile(req ast.Request) bool {
 	if req.MixVol != nil {
 		return false
 	}
@@ -80,8 +80,12 @@ func TestWellFormed(t *testing.T) {
 	}
 
 	machine := target.New()
-	machine.AddDevice(human.New(human.Opt{CanMix: true}))
-	machine.AddDevice(&incubator{})
+	if err := machine.AddDevice(human.New(human.Opt{CanMix: true})); err != nil {
+		t.Fatal(err)
+	}
+	if err := machine.AddDevice(&incubator{}); err != nil {
+		t.Fatal(err)
+	}
 
 	if insts, err := Compile(machine, nodes); err != nil {
 		t.Fatal(err)

@@ -20,7 +20,7 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
-package cli
+package driver
 
 import (
 	"bytes"
@@ -115,7 +115,7 @@ type CUI struct {
 	//Exit is a channel to be closed on exit to allow
 	Exit chan interface{}
 	//G reference to the underlying gocui GUI interface
-	G              *gocui.Gui
+	G *gocui.Gui
 	//capturedstdout pointer to saved stdout descriptor so we can reuse it
 	capturedstdout *os.File
 }

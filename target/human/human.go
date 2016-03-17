@@ -18,7 +18,7 @@ type Human struct {
 	opt Opt
 }
 
-func (a *Human) Can(req ast.Request) bool {
+func (a *Human) CanCompile(req ast.Request) bool {
 	if !a.opt.CanMix && req.MixVol != nil {
 		return false
 	}

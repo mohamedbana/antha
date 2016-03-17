@@ -1,4 +1,4 @@
-package client
+package lh
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	wunit "github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc"
-	pb "github.com/antha-lang/antha/driver/lh/pb"
+	pb "github.com/antha-lang/antha/driver/pb/lh"
 	driver "github.com/antha-lang/antha/microArch/driver"
 	liquidhandling "github.com/antha-lang/antha/microArch/driver/liquidhandling"
 )
@@ -1035,7 +1035,12 @@ func (d *Driver) Finalize() driver.CommandStatus {
 }
 func (d *Driver) GetCapabilities() (liquidhandling.LHProperties, driver.CommandStatus) {
 	req := pb.GetCapabilitiesRequest{}
-	ret, _ := d.C.GetCapabilities(context.Background(), &req)
+	ret, err := d.C.GetCapabilities(context.Background(), &req)
+	if err != nil {
+		return liquidhandling.LHProperties{}, driver.CommandStatus{
+			Msg: err.Error(),
+		}
+	}
 	return (liquidhandling.LHProperties)(DecodeLHProperties(ret.Ret_1)), (driver.CommandStatus)(DecodeCommandStatus(ret.Ret_2))
 }
 func (d *Driver) GetCurrentPosition(arg_1 int) (string, driver.CommandStatus) {

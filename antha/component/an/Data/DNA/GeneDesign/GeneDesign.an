@@ -39,12 +39,12 @@ Steps {
 	
 	// Retrieve part seqs from entrez
 	for i, part := range Parts {
-		DNA := entrez.RetrieveSequence(part, "nucleotide")
+		DNA, _ := entrez.RetrieveSequence(part, "nucleotide")
 		PartDNA[i] = DNA
 	}
 	
 	// look up vector sequence
-	VectorSeq := entrez.RetrieveVector(Vector)
+	VectorSeq, _ := entrez.RetrieveVector(Vector)
 
 	// Look up the restriction enzyme
 	EnzymeInf, _ := lookup.TypeIIsLookup(RE)

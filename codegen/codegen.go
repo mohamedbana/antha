@@ -31,7 +31,7 @@ func (a *ir) Print(g graph.Graph, out io.Writer) error {
 				n := x.(ast.Node)
 				drun := a.assignment[n]
 				if drun != nil {
-					return fmt.Sprintf("Run %p Device %p", drun, drun.Device)
+					return fmt.Sprintf("Run %p Device %p %s", drun, drun.Device, drun.Device)
 				}
 				return "NoRun"
 			},
@@ -50,14 +50,29 @@ type drun struct {
 // by maximally coalescing ApplyExprs with the same device into the same
 // device run.
 func (a *ir) assignDevices(t *target.Target) error {
+	// A bundle's requests is the sum of its children
+	bundleReqs := func(n *ast.Bundle) (reqs []ast.Request) {
+		for i, inum := 0, a.CommandTree.NumOuts(n); i < inum; i += 1 {
+			kid := a.CommandTree.Out(n, i)
+			if c, ok := kid.(ast.Command); ok {
+				reqs = append(reqs, c.Requests()...)
+			}
+		}
+		return
+
+	}
 	colors := make(map[ast.Node][]target.Device)
 	for i, inum := 0, a.CommandTree.NumNodes(); i < inum; i += 1 {
 		n := a.CommandTree.Node(i).(ast.Node)
 		var reqs []ast.Request
 		if c, ok := n.(ast.Command); ok {
 			reqs = c.Requests()
+		} else if b, ok := n.(*ast.Bundle); ok {
+			reqs = bundleReqs(b)
+		} else {
+			return fmt.Errorf("unknown node %T", n)
 		}
-		colors[n] = t.Can(reqs...)
+		colors[n] = t.CanCompile(reqs...)
 	}
 
 	var devices []target.Device
@@ -221,7 +236,7 @@ func findBestMoveDevice(t *target.Target, from, to ast.Node, fromD, toD *drun) t
 	var minD target.Device
 	minC := -1
 
-	for _, d := range t.Can(req) {
+	for _, d := range t.CanCompile(req) {
 		c := toD.Device.MoveCost(d) + d.MoveCost(fromD.Device)
 		if minC == -1 || c < minC {
 			minC = c
