@@ -222,19 +222,19 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	plate = wtype.NewLHPlate("reservoir", "unknown", 1, 1, 45, "mm", welltype, 58, 13, 0, 0, 10)
 	plates[plate.Type] = plate
 
-	// Agarplate with colonies on riser
+	// Onewell SBS format Agarplate with colonies on riser (50ml agar) high res
 
 	bottomtype = 0
 	xdim = 2.0 // of well
 	ydim = 2.0
 	zdim = 7.0
-	bottomh = 0.5
+	bottomh = 0
 
 	wellxoffset = 2.5 // centre of well to centre of neighbouring well in x direction
 	wellyoffset = 2.5 //centre of well to centre of neighbouring well in y direction
 	xstart = -2.5     // distance from top left side of plate to first well
 	ystart = -2.5     // distance from top left side of plate to first well
-	zstart = 42       // offset of bottom of deck to bottom of well
+	zstart = 43       // offset of bottom of deck to bottom of well
 
 	square = wtype.NewShape("box", "mm", 2, 2, 7)
 	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
@@ -244,6 +244,8 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	// greiner one well with 50ml of agar in
 	plate = wtype.NewLHPlate("Agarplateforpicking1536_riser", "Unknown", 32, 48, 7, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
+
+	// Onewell SBS format Agarplate with colonies on riser (50ml agar) low res
 
 	bottomtype = 0
 	xdim = 4.0
@@ -255,7 +257,7 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	wellyoffset = 4.5 //centre of well to centre of neighbouring well in y direction
 	xstart = -2.5     // distance from top left side of plate to first well
 	ystart = -2.5     // distance from top left side of plate to first well
-	zstart = 42       // offset of bottom of deck to bottom of well
+	zstart = 43       // offset of bottom of deck to bottom of well
 
 	square = wtype.NewShape("box", "mm", 4, 4, 14)
 	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {

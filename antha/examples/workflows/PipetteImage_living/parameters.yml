@@ -7,7 +7,7 @@
 		"Palettename":"ProteinPaintboxSubset",
       	"OutPlate": "Agarplateforpicking384_riser",
 		"UVimage":false,
-      	"VolumePerWell": "5ul"
+      	"VolumePerWell": "2ul"
     }
   }
 }
