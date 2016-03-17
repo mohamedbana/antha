@@ -26,6 +26,7 @@ import (
 //      = 0.6
 //     = 20
 //     = 25
+// number of nucleotides which primers can overlap by
 
 // Data which is returned from this protocol
 
@@ -130,13 +131,13 @@ func _PrimerDesign_sequence_your_neighboursSteps(_ctx context.Context, _input *P
 		file = filepath.Join(dirname, file)
 		sequence, _ := parser.GenbanktoAnnotatedSeq(file)
 
-		primer1, primer2 := oligos.MakeOutwardFacingPrimers(sequence.DNASequence, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, allprimers)
+		primer1, primer2 := oligos.MakeOutwardFacingPrimers(sequence.DNASequence, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, allprimers, _input.PermittednucleotideOverlapBetweenPrimers)
 
 		bindingsitesinseq1 := oligos.CheckNonSpecificBinding(sequence.DNASequence, wtype.MakeSingleStrandedDNASequence("primer1"+"_"+file, primer1))
 
 		bindingsitesinseq2 := oligos.CheckNonSpecificBinding(sequence.DNASequence, wtype.MakeSingleStrandedDNASequence("primer2"+"_"+file, primer2))
 
-		output = fmt.Sprintln(file, "primer1: ", primer1, "binds at", bindingsitesinseq1, "positions", "primer2: ", primer2, "binds at", bindingsitesinseq2, "positions")
+		output = fmt.Sprintln(file, ",", "primer1: ", ",", primer1, ",", "binds at", ",", bindingsitesinseq1, ",", "positions", ",", "primer2: ", ",", primer2, ",", "binds at", ",", bindingsitesinseq2, ",", "positions", ",")
 		alloutputs = append(alloutputs, output)
 		allprimers = append(allprimers, primer1, primer2)
 
@@ -214,12 +215,13 @@ type PrimerDesign_sequence_your_neighboursElement struct {
 }
 
 type PrimerDesign_sequence_your_neighboursInput struct {
-	Dirname   string
-	Maxgc     float64
-	Maxlength int
-	Maxtemp   wunit.Temperature
-	Minlength int
-	Mintemp   wunit.Temperature
+	Dirname                                  string
+	Maxgc                                    float64
+	Maxlength                                int
+	Maxtemp                                  wunit.Temperature
+	Minlength                                int
+	Mintemp                                  wunit.Temperature
+	PermittednucleotideOverlapBetweenPrimers int
 }
 
 type PrimerDesign_sequence_your_neighboursOutput struct {
@@ -251,6 +253,7 @@ func init() {
 				{Name: "Maxtemp", Desc: "     = wunit.NewTemperature(60, \"C\")\n", Kind: "Parameters"},
 				{Name: "Minlength", Desc: "    = 20\n", Kind: "Parameters"},
 				{Name: "Mintemp", Desc: "     = wunit.NewTemperature(55, \"C\")\n", Kind: "Parameters"},
+				{Name: "PermittednucleotideOverlapBetweenPrimers", Desc: "number of nucleotides which primers can overlap by\n", Kind: "Parameters"},
 				{Name: "AllOutputs", Desc: "", Kind: "Data"},
 				{Name: "AllPrimers", Desc: "", Kind: "Data"},
 				{Name: "PrimerPairs", Desc: "", Kind: "Data"},

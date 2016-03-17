@@ -17,6 +17,8 @@ import (
 
 // as a proportion of 1, i.e. 1 == 100%
 
+// number of nucleotides which primers can overlap by
+
 // Data which is returned from this protocol
 
 // Physical inputs to this protocol
@@ -45,7 +47,7 @@ func _PrimerDesign_coverfullsequenceSteps(_ctx context.Context, _input *PrimerDe
 		_output.Warnings = fmt.Errorf("Warning! more than one sequence in sequence file! Only used first sequence for primer design")
 	}
 
-	allprimers := oligos.DesignFWDPRimerstoCoverFullSequence(plasmid, _input.PrimereveryXnucleotides, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, _input.Seqstoavoid)
+	allprimers := oligos.DesignFWDPRimerstoCoverFullSequence(plasmid, _input.PrimereveryXnucleotides, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, _input.Seqstoavoid, _input.PermittednucleotideOverlapBetweenPrimers)
 
 	_output.AllPrimers = allprimers
 }
@@ -106,15 +108,16 @@ type PrimerDesign_coverfullsequenceElement struct {
 }
 
 type PrimerDesign_coverfullsequenceInput struct {
-	DNASeqfile              string
-	Maxgc                   float64
-	Maxlength               int
-	Maxtemp                 wunit.Temperature
-	Minlength               int
-	Mintemp                 wunit.Temperature
-	Plasmid                 bool
-	PrimereveryXnucleotides int
-	Seqstoavoid             []string
+	DNASeqfile                               string
+	Maxgc                                    float64
+	Maxlength                                int
+	Maxtemp                                  wunit.Temperature
+	Minlength                                int
+	Mintemp                                  wunit.Temperature
+	PermittednucleotideOverlapBetweenPrimers int
+	Plasmid                                  bool
+	PrimereveryXnucleotides                  int
+	Seqstoavoid                              []string
 }
 
 type PrimerDesign_coverfullsequenceOutput struct {
@@ -144,6 +147,7 @@ func init() {
 				{Name: "Maxtemp", Desc: "", Kind: "Parameters"},
 				{Name: "Minlength", Desc: "", Kind: "Parameters"},
 				{Name: "Mintemp", Desc: "", Kind: "Parameters"},
+				{Name: "PermittednucleotideOverlapBetweenPrimers", Desc: "number of nucleotides which primers can overlap by\n", Kind: "Parameters"},
 				{Name: "Plasmid", Desc: "", Kind: "Parameters"},
 				{Name: "PrimereveryXnucleotides", Desc: "", Kind: "Parameters"},
 				{Name: "Seqstoavoid", Desc: "", Kind: "Parameters"},

@@ -11,7 +11,8 @@
 			"PrimereveryXnucleotides":800,
 			"Seqstoavoid":[
 			""
-			]
+			],
+			"PermittednucleotideOverlapBetweenPrimers": 10
         }
     }
 }

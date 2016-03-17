@@ -23,6 +23,8 @@ Parameters (
 	Maxgc      float64 //      = 0.6
 	Minlength   int //     = 20
 	Maxlength   int //     = 25
+	PermittednucleotideOverlapBetweenPrimers int // number of nucleotides which primers can overlap by
+
 	
 )
 
@@ -140,13 +142,13 @@ Steps {
 		file = filepath.Join(dirname,file)
 		sequence, _ := parser.GenbanktoAnnotatedSeq(file)
 
-		primer1, primer2 := oligos.MakeOutwardFacingPrimers(sequence.DNASequence, Maxgc, Minlength, Maxlength, Mintemp, Maxtemp, allprimers)
+		primer1, primer2 := oligos.MakeOutwardFacingPrimers(sequence.DNASequence, Maxgc, Minlength, Maxlength, Mintemp, Maxtemp, allprimers, PermittednucleotideOverlapBetweenPrimers)
 
 		bindingsitesinseq1 := oligos.CheckNonSpecificBinding(sequence.DNASequence, wtype.MakeSingleStrandedDNASequence("primer1"+"_"+file, primer1))
 
 		bindingsitesinseq2 := oligos.CheckNonSpecificBinding(sequence.DNASequence, wtype.MakeSingleStrandedDNASequence("primer2"+"_"+file, primer2))
 
-		output = fmt.Sprintln(file, "primer1: ", primer1, "binds at", bindingsitesinseq1, "positions", "primer2: ", primer2, "binds at", bindingsitesinseq2, "positions")
+		output = fmt.Sprintln(file,",", "primer1: ", ",",primer1,  ",","binds at",  ",",bindingsitesinseq1, ",", "positions", ",", "primer2: ", ",", primer2, ",", "binds at",  ",",bindingsitesinseq2, ",", "positions", ",",)
 		alloutputs = append(alloutputs, output)
 		allprimers = append(allprimers, primer1, primer2)
 		

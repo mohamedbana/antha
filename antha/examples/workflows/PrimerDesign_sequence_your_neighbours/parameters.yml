@@ -6,7 +6,8 @@
             "Mintemp": "55C",
             "Maxgc": 0.6,
             "Minlength": 20,
-			"Maxlength":25
+			"Maxlength":25,
+			"PermittednucleotideOverlapBetweenPrimers":20
         }
     }
 }
