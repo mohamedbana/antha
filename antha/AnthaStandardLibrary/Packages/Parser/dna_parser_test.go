@@ -49,10 +49,11 @@ var testpairs = []testpair{
 		lines:    []string{"|", "GCTCTTCTatgacggcattgacggaaggtgcaaaactgtttgagaaagagatcccgtatatcaccgaactggaaggcgacgtcgaaggtatgaaatttatcattaaaggcgagggtaccggtgacgcgaccacgggtaccattaaagcgaaatacatctgcactacgggcgacctgccggtcccgtgggcaaccctggtgagcaccctgagctacggtgttcagtgtttcgccaagtacccgagccacatcaaggatttctttaagagcgccatgccggaaggttatacccaagagcgtaccatcagcttcgaaggcgacggcgtgtacaagacgcgtgctatggttacctacgaacgcggttctatctacaatcgtgtcacgctgactggtgagaactttaagaaagacggtcacattctgcgtaagaacgttgcattccaatgcccgccaagcattctgtatattctgcctgacaccgttaacaatggcatccgcgttgagttcaaccaggcgtacgatattgaaggtgtgaccgaaaaactggttaccaaatgcagccaaatgaatcgtccgttggcgggctccgcggcagtgcatatcccgcgttatcatcacattacctaccacaccaaactgagcaaagaccgcgacgagcgccgtgatcacatgtgtctggtagaggtcgtgaaagcggttgatctggacacgtatcagtaactcgagtaaggatctccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtggGCCTTTCTGCGTTTtactagagtcacactgatgaGGTAGAAGAGC", "˘"},
 		sequence: "GCTCTTCTatgacggcattgacggaaggtgcaaaactgtttgagaaagagatcccgtatatcaccgaactggaaggcgacgtcgaaggtatgaaatttatcattaaaggcgagggtaccggtgacgcgaccacgggtaccattaaagcgaaatacatctgcactacgggcgacctgccggtcccgtgggcaaccctggtgagcaccctgagctacggtgttcagtgtttcgccaagtacccgagccacatcaaggatttctttaagagcgccatgccggaaggttatacccaagagcgtaccatcagcttcgaaggcgacggcgtgtacaagacgcgtgctatggttacctacgaacgcggttctatctacaatcgtgtcacgctgactggtgagaactttaagaaagacggtcacattctgcgtaagaacgttgcattccaatgcccgccaagcattctgtatattctgcctgacaccgttaacaatggcatccgcgttgagttcaaccaggcgtacgatattgaaggtgtgaccgaaaaactggttaccaaatgcagccaaatgaatcgtccgttggcgggctccgcggcagtgcatatcccgcgttatcatcacattacctaccacaccaaactgagcaaagaccgcgacgagcgccgtgatcacatgtgtctggtagaggtcgtgaaagcggttgatctggacacgtatcagtaactcgagtaaggatctccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtggGCCTTTCTGCGTTTtactagagtcacactgatgaGGTAGAAGAGC"},
 }
+
 /*
 func TestSnapGenetoSimpleSeq(t *testing.T) {
 	for _, seq := range testpairs {
-		result, _ := SnapGenetoSimpleSeq(seq.filename)
+		result, err := SnapGenetoSimpleSeq(seq.filename)
 		if result != seq.sequence {
 			t.Error(
 				"For", seq.filename, "/n",
@@ -60,11 +61,11 @@ func TestSnapGenetoSimpleSeq(t *testing.T) {
 				"got", result, "\n",
 			)
 		}
-		/*	if err != nil {
+			if err != nil {
 			t.Error(
 				"Error = ", err.Error(), "/n",
 			)
-		}*/
+		}
 	}
 }
 */

@@ -58,13 +58,14 @@ func TestAllComboCount(t *testing.T) {
 
 }
 
+/*
 func TestAllCombinations(t *testing.T) {
 
-	/*	defer func() {
+	defer func() {
 		if res := recover(); res != nil {
 			t.Fatalf("caught panic %q at %s", res, string(debug.Stack()))
 		}
-	}()*/
+	}()
 
 	for _, factor := range factorsandlevels {
 		r := AllCombinations(factor.pairs)
@@ -100,7 +101,7 @@ func TestAllCombinations(t *testing.T) {
 		}
 	}
 }
-
+*/
 /*
 type DOEPair struct {
 	Factor string
