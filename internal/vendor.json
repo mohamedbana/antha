@@ -88,26 +88,6 @@
 			"revisionTime": "2015-03-09T11:32:30+11:00"
 		},
 		{
-			"path": "code.google.com/p/go-sqlite/go1/sqlite3",
-			"revision": "6e75c20f8fc4",
-			"revisionTime": "2013-09-15T19:25:44-04:00"
-		},
-		{
-			"path": "code.google.com/p/go-sqlite/go1/sqlite3",
-			"revision": "6e75c20f8fc4",
-			"revisionTime": "2013-09-15T19:25:44-04:00"
-		},
-		{
-			"path": "code.google.com/p/go-sqlite/go1/sqlite3/codec",
-			"revision": "6e75c20f8fc4",
-			"revisionTime": "2013-09-15T19:25:44-04:00"
-		},
-		{
-			"path": "code.google.com/p/go-sqlite/go1/sqlite3/codec",
-			"revision": "6e75c20f8fc4",
-			"revisionTime": "2013-09-15T19:25:44-04:00"
-		},
-		{
 			"path": "code.google.com/p/plotinum/plot",
 			"revision": "6632c5f3e77e",
 			"revisionTime": "2015-01-13T01:15:05-05:00"
