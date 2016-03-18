@@ -234,7 +234,65 @@ func DesignFWDPRimerstoCoverRegion(seq wtype.DNASequence, regionstart, regionend
 
 	if regionstart-100 > 0 {
 		regionstart = regionstart - 100
+	} else {
+		regionstart = 0
 	}
+
+	for i := regionstart; i < regionend; i = i + sequenceinterval {
+
+		region := DNAregion(seq, i, len(seq.Sequence()))
+
+		primer, _, err := FWDOligoSeq(region, maxGCcontent, minlength, maxlength, minmeltingtemp, maxmeltingtemp, avoidthese, overlapthresholdwithseqstoavoid)
+
+		if err != nil {
+			panic(err.Error() + " for " + region.Nm)
+		}
+
+		primers = append(primers, wtype.MakeSingleStrandedDNASequence("primer_"+seq.Nm+"_"+strconv.Itoa(i)+":"+strconv.Itoa(i-1+sequenceinterval), primer))
+
+		avoidthese = append(avoidthese, primer)
+	}
+	return
+}
+
+func DesignFWDPRimerstoCoverSequence(seq wtype.DNASequence, targetseq string, sequenceinterval int, maxGCcontent float64, minlength int, maxlength int, minmeltingtemp wunit.Temperature, maxmeltingtemp wunit.Temperature, seqstoavoid []string, overlapthresholdwithseqstoavoid int) (primers []wtype.DNASequence) {
+
+	primers = make([]wtype.DNASequence, 0)
+
+	avoidthese := make([]string, 0)
+
+	if len(seqstoavoid) != 0 {
+		for _, seq := range seqstoavoid {
+			avoidthese = append(avoidthese, seq)
+		}
+	}
+
+	seqsfound := sequences.FindSeqsinSeqs(seq.Sequence(), []string{targetseq})
+
+	if len(seqsfound) != 1 {
+		panicstatement := fmt.Sprintln("found ", len(seqsfound), " instances of ", targetseq, " in ", seq)
+		panic(panicstatement)
+	}
+	/*
+		if len(seqsfound[0].Positions) != 2 {
+			panicstatement := fmt.Sprintln("positions found == ", len(seqsfound[0].Positions))
+			panic(panicstatement)
+		}*/
+
+	regionstart := seqsfound[0].Positions[0]
+	regionend := regionstart + len(targetseq)
+
+	if regionstart-100 > 0 {
+		regionstart = regionstart - 100
+	} else {
+		regionstart = 0
+	}
+
+	/*if regionstart > regionend {
+		temp := regionstart
+		regionstart = regionend
+		regionend = temp
+	}*/
 
 	for i := regionstart; i < regionend; i = i + sequenceinterval {
 
