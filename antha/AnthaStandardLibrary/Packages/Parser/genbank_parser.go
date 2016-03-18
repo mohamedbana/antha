@@ -362,11 +362,20 @@ func Featureline2(line string) (description string, found bool) {
 				return
 			}
 
-		}
+		} else if strings.Contains(line, `/gene`) {
+			parts := strings.SplitAfterN(line, `="`, 2)
+			if len(parts) == 2 {
+				// fmt.Println("line", line)
+				// fmt.Println("parts", parts)
+				// fmt.Println("len(parts) =2 yes")
+				// fmt.Println("parts[1]", parts[1])
+				description = parts[1] //strings.Replace(parts[1], " ", "_", -1)
+				// fmt.Println("Huh!", description)
+				found = true
+				return
+			}
 
-	}
-	for _, line := range newarray {
-		if strings.Contains(line, `/product`) {
+		} else if strings.Contains(line, `/product`) {
 			parts := strings.SplitAfterN(line, `="`, 2)
 			if len(parts) == 2 {
 				// fmt.Println("line", line)
@@ -382,6 +391,23 @@ func Featureline2(line string) (description string, found bool) {
 		}
 
 	}
+	/*for _, line := range newarray {
+		if strings.Contains(line, `/product`) {
+			parts := strings.SplitAfterN(line, `="`, 2)
+			if len(parts) == 2 {
+				// fmt.Println("line", line)
+				// fmt.Println("parts", parts)
+				// fmt.Println("len(parts) =2 yes")
+				// fmt.Println("parts[1]", parts[1])
+				description = parts[1] //strings.Replace(parts[1], " ", "_", -1)
+				// fmt.Println("Huh!", description)
+				found = true
+				return
+			}
+
+		}
+
+	}*/
 	return
 }
 

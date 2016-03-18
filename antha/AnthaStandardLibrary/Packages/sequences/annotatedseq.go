@@ -76,6 +76,30 @@ func (annotated AnnotatedSeq) FeatureNames() (featurenames []string) {
 	return
 }
 
+func (annotated AnnotatedSeq) FeatureStart(featurename string) (featureStart int) {
+
+	for _, feature := range annotated.Features {
+		if feature.Name == featurename {
+			featureStart = feature.StartPosition
+			return
+		}
+
+	}
+	return
+}
+
+func (annotated AnnotatedSeq) GetFeatureByName(featurename string) (returnedfeature *Feature) {
+
+	for _, feature := range annotated.Features {
+		if strings.Contains(strings.ToUpper(feature.Name), strings.ToUpper(featurename)) {
+			returnedfeature = &feature
+			return
+		}
+
+	}
+	return
+}
+
 func Annotate(dnaseq wtype.DNASequence, features []Feature) (annotated AnnotatedSeq) {
 	annotated.DNASequence = dnaseq
 	annotated.Features = features

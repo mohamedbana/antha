@@ -3,8 +3,9 @@
 package lib
 
 import (
-	"fmt"
+	//"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/oligos"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -15,6 +16,9 @@ import (
 )
 
 // Input parameters for this protocol
+
+// genbank file (.gb)
+//Plasmid 	bool
 
 // as a proportion of 1, i.e. 1 == 100%
 
@@ -39,25 +43,25 @@ func _PrimerDesign_coverRegionSetup(_ctx context.Context, _input *PrimerDesign_c
 
 // Core process of the protocol: steps to be performed for each input
 func _PrimerDesign_coverRegionSteps(_ctx context.Context, _input *PrimerDesign_coverRegionInput, _output *PrimerDesign_coverRegionOutput) {
-	var plasmid wtype.DNASequence
+	var plasmid sequences.AnnotatedSeq
 	var allprimers []wtype.DNASequence
 
-	plasmids, _ := parser.DNAFiletoDNASequence(_input.DNASeqfile, _input.Plasmid)
+	plasmid, _ = parser.GenbanktoAnnotatedSeq(_input.DNASeqfile)
 
-	if len(plasmids) > 0 {
-		plasmid = plasmids[0]
+	/*if len(plasmids)>0 {
+	plasmid = plasmids[0]
 	}
-	if len(plasmids) > 1 {
-		_output.Warnings = fmt.Errorf("Warning! more than one sequence in sequence file! Only used first sequence for primer design")
-	}
+	if len(plasmids)>1{
+		Warnings = fmt.Errorf("Warning! more than one sequence in sequence file! Only used first sequence for primer design")
+	}*/
 
 	if strings.Contains(strings.ToUpper(_input.Method), "POSITIONS") {
-		allprimers = oligos.DesignFWDPRimerstoCoverRegion(plasmid, _input.RegionStart, _input.RegionEnd, _input.PrimereveryXnucleotides, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, _input.Seqstoavoid, _input.PermittednucleotideOverlapBetweenPrimers)
+		allprimers = oligos.DesignFWDPRimerstoCoverRegion(plasmid.DNASequence, _input.RegionStart, _input.RegionEnd, _input.PrimereveryXnucleotides, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, _input.Seqstoavoid, _input.PermittednucleotideOverlapBetweenPrimers)
 	} else if strings.Contains(strings.ToUpper(_input.Method), "NAME") {
-		//		allprimers = oligos.DesignFWDPRimerstoCoverFeature(plasmid, RegionName,PrimereveryXnucleotides, Maxgc, Minlength, Maxlength, Mintemp, Maxtemp, Seqstoavoid,PermittednucleotideOverlapBetweenPrimers)
+		allprimers = oligos.DesignFWDPRimerstoCoverFeature(plasmid, _input.RegionName, _input.PrimereveryXnucleotides, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, _input.Seqstoavoid, _input.PermittednucleotideOverlapBetweenPrimers)
 
 	} else if strings.Contains(strings.ToUpper(_input.Method), "SEQUENCE") {
-		allprimers = oligos.DesignFWDPRimerstoCoverSequence(plasmid, _input.RegionSequence, _input.PrimereveryXnucleotides, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, _input.Seqstoavoid, _input.PermittednucleotideOverlapBetweenPrimers)
+		allprimers = oligos.DesignFWDPRimerstoCoverSequence(plasmid.DNASequence, _input.RegionSequence, _input.PrimereveryXnucleotides, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, _input.Seqstoavoid, _input.PermittednucleotideOverlapBetweenPrimers)
 
 	}
 	_output.AllPrimers = allprimers
@@ -127,7 +131,6 @@ type PrimerDesign_coverRegionInput struct {
 	Minlength                                int
 	Mintemp                                  wunit.Temperature
 	PermittednucleotideOverlapBetweenPrimers int
-	Plasmid                                  bool
 	PrimereveryXnucleotides                  int
 	RegionEnd                                int
 	RegionName                               string
@@ -157,15 +160,14 @@ func init() {
 			Desc: "This element will design primers to cover a specified region of a sequence at the interval specified by the user (e.g. every 800 bp).\nDesign criteria such as maximum gc content, acceptable ranges of melting temperatures and primer length may be specified by the user.\n",
 			Path: "antha/component/an/Data/DNA/PrimerDesign/PrimerDesign_coverRegion.an",
 			Params: []ParamDesc{
-				{Name: "DNASeqfile", Desc: "", Kind: "Parameters"},
+				{Name: "DNASeqfile", Desc: "genbank file (.gb)\n", Kind: "Parameters"},
 				{Name: "Maxgc", Desc: "as a proportion of 1, i.e. 1 == 100%\n", Kind: "Parameters"},
 				{Name: "Maxlength", Desc: "", Kind: "Parameters"},
-				{Name: "Maxtemp", Desc: "", Kind: "Parameters"},
+				{Name: "Maxtemp", Desc: "Plasmid \tbool\n", Kind: "Parameters"},
 				{Name: "Method", Desc: "permissable values: \"byFeaturename\", \"byPositions\", \"bySequence\"\n", Kind: "Parameters"},
 				{Name: "Minlength", Desc: "", Kind: "Parameters"},
 				{Name: "Mintemp", Desc: "", Kind: "Parameters"},
 				{Name: "PermittednucleotideOverlapBetweenPrimers", Desc: "number of nucleotides which primers can overlap by\n", Kind: "Parameters"},
-				{Name: "Plasmid", Desc: "", Kind: "Parameters"},
 				{Name: "PrimereveryXnucleotides", Desc: "", Kind: "Parameters"},
 				{Name: "RegionEnd", Desc: "", Kind: "Parameters"},
 				{Name: "RegionName", Desc: "", Kind: "Parameters"},

@@ -3,17 +3,18 @@
 protocol PrimerDesign_coverRegion
 
 import (
-	"fmt"
+	//"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/oligos"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"strings"
 	
 )
 // Input parameters for this protocol
 Parameters (
-	DNASeqfile   string
-	Plasmid 	bool
+	DNASeqfile   string // genbank file (.gb)
+	//Plasmid 	bool
 	Maxtemp    Temperature 
 	Mintemp    Temperature 
 	Maxgc      float64 // as a proportion of 1, i.e. 1 == 100%
@@ -56,25 +57,25 @@ Setup {
 
 // Core process of the protocol: steps to be performed for each input
 Steps {
-	var plasmid wtype.DNASequence
+	var plasmid sequences.AnnotatedSeq
 	var allprimers []wtype.DNASequence
 
-	plasmids, _ := parser.DNAFiletoDNASequence(DNASeqfile,Plasmid)
+	plasmid, _ = parser.GenbanktoAnnotatedSeq(DNASeqfile)
 	
-	if len(plasmids)>0 {
+	/*if len(plasmids)>0 {
 	plasmid = plasmids[0]
 	}
 	if len(plasmids)>1{
 		Warnings = fmt.Errorf("Warning! more than one sequence in sequence file! Only used first sequence for primer design")
-	}
+	}*/
 
 	if strings.Contains(strings.ToUpper(Method),"POSITIONS"){
-			allprimers = oligos.DesignFWDPRimerstoCoverRegion(plasmid, RegionStart, RegionEnd,PrimereveryXnucleotides, Maxgc, Minlength, Maxlength, Mintemp, Maxtemp, Seqstoavoid,PermittednucleotideOverlapBetweenPrimers)
+			allprimers = oligos.DesignFWDPRimerstoCoverRegion(plasmid.DNASequence, RegionStart, RegionEnd,PrimereveryXnucleotides, Maxgc, Minlength, Maxlength, Mintemp, Maxtemp, Seqstoavoid,PermittednucleotideOverlapBetweenPrimers)
 	}else if strings.Contains(strings.ToUpper(Method),"NAME"){
-	//		allprimers = oligos.DesignFWDPRimerstoCoverFeature(plasmid, RegionName,PrimereveryXnucleotides, Maxgc, Minlength, Maxlength, Mintemp, Maxtemp, Seqstoavoid,PermittednucleotideOverlapBetweenPrimers)
+		allprimers = oligos.DesignFWDPRimerstoCoverFeature(plasmid, RegionName,PrimereveryXnucleotides, Maxgc, Minlength, Maxlength, Mintemp, Maxtemp, Seqstoavoid,PermittednucleotideOverlapBetweenPrimers)
 
 	}else if strings.Contains(strings.ToUpper(Method),"SEQUENCE") {
-			allprimers = oligos.DesignFWDPRimerstoCoverSequence(plasmid,RegionSequence,PrimereveryXnucleotides, Maxgc, Minlength, Maxlength, Mintemp, Maxtemp, Seqstoavoid,PermittednucleotideOverlapBetweenPrimers)
+			allprimers = oligos.DesignFWDPRimerstoCoverSequence(plasmid.DNASequence,RegionSequence,PrimereveryXnucleotides, Maxgc, Minlength, Maxlength, Mintemp, Maxtemp, Seqstoavoid,PermittednucleotideOverlapBetweenPrimers)
 
 	}
 	AllPrimers = allprimers

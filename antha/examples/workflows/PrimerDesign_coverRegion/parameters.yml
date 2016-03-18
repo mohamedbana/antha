@@ -2,7 +2,6 @@
     "Parameters": {
         "PrimerDesign_coverRegion": {
             "DNASeqfile": "pSEVA521.gb",
-			"Plasmid":true,
             "Maxtemp": "65C",
             "Mintemp": "50C",
             "Maxgc": 0.6,
@@ -15,7 +14,8 @@
 			"PermittednucleotideOverlapBetweenPrimers": 10,
 			"RegionStart": 1000,
 			"RegionEnd": 3000,
-			"Method": "bysequence",
+			"Method": "byfeaturename",
+			"RegionName":"tetracycline",
 			"RegionSequence": "atgccggtactgccgggcctcttgcgggatatcgtccattccgacagcatcgccagtcactatggcgtgctgctagcgctatatgcgttgatgcaatttctatgcgcacccgttctcggagcactgtccgaccgctttggccgccgcccagtcctgctcgcttcgctacttggagccactatcgactacgcgatcatggcgaccacacccgtcctgtggattctctacgccggacgcatcgtggccggcatcaccggcgccacaggtgcggttgctggcgcctatatcgccgacatcaccgatggggaagatcgggctcgccacttcgggctcatgagcgcttgtttcggcgtgggtatggtggcaggccccgtggccgggggactgttgggcgccatctccctgcacgcaccattccttgcggcggcggtgctcaacggcctcaacctactactgggctgcttcctaatgcaggagtcgcataagggagagcgccgtccgatgcccttgagagccttcaacccagtcagctccttccggtgggcgcggggcatgaccattgtggccgcacttatgactgtcttctttatcatgcaactcgtaggacaggtgccggcagcgctctgggtcattttcggcgaggaccgctttcgctggagcgcgacgatgatcggcctgtcgcttgcggtattcggaatcttgcacgccctcgctcaagccttcgtcactggtcccgccaccaaacgtttcggcgagaagcaggccattatcgccggcatggcggccgacgcgctgggctacgtcttgctggcgttcgcgacgcgaggctggatggccttccccattatgattcttctcgcttccggcggcatcgggatgcccgcgttgcaggccatgctgtccaggcaggtagatgacgaccatcagggacagcttcaaggatcgctcgcggctcttaccagcctaacttcgatcactggaccgctgatcgtcacggcgatttatgccgcctcggcgagcacatggaacgggttggcatggattgtaggcgccgccctataccttgtctgcctccccgcgttgcgtcgcggtgcatggagccgggccacctcgacctga"
         }
     }
