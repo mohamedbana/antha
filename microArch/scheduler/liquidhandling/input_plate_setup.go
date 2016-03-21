@@ -87,6 +87,8 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 		(*request).Input_platetypes = input_platetypes
 		//debug
 	}
+
+	// we assume that input_plates is set if any locs are set
 	input_plates := (*request).Input_plates
 
 	if len(input_plates) == 0 {
@@ -107,23 +109,36 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 
 	input_volumes := make(map[string]wunit.Volume, len(inputs))
 
-	// we add a little bit to account for extra volumes used
-
 	// aggregate the volumes for the inputs
 	for _, k := range input_order {
 		v := inputs[k]
-		v2 := v[0].Volume()
-		vol := &v2
-		for i := 1; i < len(v); i++ {
-			vv := v[i].Volume()
-			vol.Add(&vv)
+		vol := wunit.NewVolume(0.0, "ul")
+
+		for i := 0; i < len(v); i++ {
+			//		vv := v[i].Volume()
+			// check if the location is set
+			// if so... do nada
+
+			if v[i].Loc != "" {
+				continue
+			}
+			vol.Add(v[i].Volume())
 		}
 		// big hack here
 		// TODO --- remove this for god's sake
-		extravol := wunit.NewVolume(vol.RawValue()*0.2, "ul")
-		vol.Add(&extravol)
-		input_volumes[k] = *vol
+		// DONE --- I don't think we need it now
+		/*
+			extravol := wunit.NewVolume(vol.RawValue()*0.2, "ul")
+			vol.Add(&extravol)
+		*/
+
+		if !vol.IsZero() {
+			input_volumes[k] = vol
+		}
 	}
+
+	// work out what's left
+
 	// sort to make deterministic
 	// we sort by a) volume (descending) b) name (alphabetically)
 
@@ -145,7 +160,12 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 
 	curplaten := 1
 	for _, cname := range input_order {
-		volume := input_volumes[cname]
+		volume, ok := input_volumes[cname]
+
+		if !ok {
+			continue
+		}
+
 		component := inputs[cname][0]
 		//logger.Debug(fmt.Sprintln("Plate_setup - component", cname, ":"))
 
@@ -154,19 +174,15 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 		//logger.Debug(fmt.Sprintln("Well assignments: ", well_assignments))
 
 		var curr_well *wtype.LHWell
-		var ok bool
 		ass := make([]string, 0, 3)
 
 		for platetype, nwells := range well_assignments {
 			for i := 0; i < nwells; i++ {
 				curr_plate = plates_in_play[platetype.Type]
-				// curr_plate = plates_in_play["DWST12"] changing here works!
 
 				if curr_plate == nil {
 					plates_in_play[platetype.Type] = factory.GetPlateByType(platetype.Type)
 					curr_plate = plates_in_play[platetype.Type]
-					// going in here!
-					//curr_plate = plates_in_play["DWST12"]
 					platename := fmt.Sprintf("Input_plate_%d", curplaten)
 					curr_plate.PlateName = platename
 					curplaten += 1
@@ -203,6 +219,18 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 		}
 
 		input_assignments[cname] = ass
+	}
+
+	// add any remaining assignments
+
+	for _, v := range inputs {
+		for _, vv := range v {
+			if vv.Loc != "" {
+				// append it
+
+				input_assignments[vv.CName] = append(input_assignments[vv.CName], vv.Loc)
+			}
+		}
 	}
 
 	(*request).Input_plates = input_plates

@@ -46,6 +46,9 @@ type mixInst struct {
 	Node *ast.Mix
 }
 
+// TODO -- LOC etc. will be passed through OK but what about
+//         the actual plate info?
+//        - two choices here: 1) we upgrade the sample tracker; 2) we pass the plate in somehow
 func mix(ctx context.Context, inst *mixInst) *wtype.LHComponent {
 	// from the protocol POV components need to be passed by value
 	cmps := wtype.CopyComponentArray(inst.Args)
