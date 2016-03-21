@@ -105,19 +105,19 @@ func TestBasicMeltingTemp(t *testing.T) {
 
 func TestFWDOligoSeq(t *testing.T) {
 	for _, oligo := range oligotests {
-		oligoseq, gc, err := FWDOligoSeq(oligo.sequence, oligo.maxGCcontent, oligo.minlength, oligo.maxlength, oligo.mintemp, oligo.maxtemp, oligo.seqstoavoid, oligo.overlapthreshold)
-		if oligoseq != oligo.outputoligoseq {
+		oligoseq, err := FWDOligoSeq(oligo.sequence, oligo.maxGCcontent, oligo.minlength, oligo.maxlength, oligo.mintemp, oligo.maxtemp, oligo.seqstoavoid, oligo.overlapthreshold)
+		if oligoseq.Sequence() != oligo.outputoligoseq {
 			t.Error(
 				"For", oligo.sequence, "/n",
 				"expected", oligo.outputoligoseq, "\n",
 				"got", oligoseq, "\n",
 			)
 		}
-		if gc != oligo.calculatedGCcontent {
+		if oligoseq.GCContent != oligo.calculatedGCcontent {
 			t.Error(
 				"For", oligo.sequence, "/n",
 				"expected", oligo.calculatedGCcontent, "\n",
-				"got", gc, "\n",
+				"got", oligoseq.GCContent, "\n",
 			)
 		}
 		if err != nil {
