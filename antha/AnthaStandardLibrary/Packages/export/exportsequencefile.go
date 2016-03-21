@@ -240,3 +240,31 @@ func ExportFastaSerialfromMultipleAssemblies(dirname string, multipleassemblypar
 
 	return filename, err
 }
+
+func ExporttoTextFile(filename string, data []string) (err error) {
+
+	//filename := fmt.Sprintf("%s%c%s_%s.csv", anthapath.Dirpath(), os.PathSeparator, dir, name)
+
+	//f, _ := os.Create(filepath.Join(anthapath.Dirpath(), "iGem_registry.txt"))
+
+	f, e := os.Create(filename)
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	for _, str := range data {
+
+		fmt.Fprintln(f, str)
+
+		/*	_, err = f.WriteString(str)
+
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
+		*/
+	}
+	f.Close()
+
+	return
+}

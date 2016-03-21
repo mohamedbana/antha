@@ -5,6 +5,7 @@ package lib
 import (
 	"fmt"
 	//"math"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/export"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/oligos"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
@@ -55,46 +56,6 @@ func _PrimerDesign_sequence_your_neighboursSteps(_ctx context.Context, _input *P
 	var allprimers = make([]string, 0)
 	var primerpairs = make([]PrimerPair, 0)
 	var files = make([]string, 0)
-
-	/*	vector, _ := parser.GenbanktoAnnotatedSeq("STAR_0023_VECTOR_BBSI.gb")
-
-		typeIIs := lookup.EnzymeLookup("bbsI")
-
-		fragments, _, _ := enzymes.Digest(vector.DNASequence, typeIIs)
-
-		plasmid, _ := parser.GenbanktoAnnotatedSeq("STAR_0023_VECTOR_BBSI+Grp7+Grp14+Grp3.gb")
-
-		for _, fragment := range fragments {
-
-			Start, End, err = FindPositioninSequence(plasmid.DNASequence, wtype.MakeSingleStrandedDNASequence("fragment", fragment))
-
-			if err == nil {
-				fmt.Println("Found the right fragment!", fragment, "start = ", Start, "End", End)
-				break
-			}
-
-		}
-	*/
-	/*if err != nil {
-		status = err.Error()
-	} else {
-		status = "No error"
-	}*/
-
-	//vectorstart, _, err := FindPositioninSequence(plasmid.DNASequence, vector.DNASequence)
-	/*
-		if err != nil {
-			panic(err.Error())
-
-		}*/
-
-	//region := DNAregion(plasmid.DNASequence, Start, len(plasmid.Sequence()))
-
-	//region := "ATGAGCAAAGGAGAAGAACTTTTCACTGGAGTTGTCCCAATTCTTGTTGAATTAGATGGTGATGTTAATGGGCACAAATTTTCTGTCCGTGGAGAGGGTGAAGGTGATGCTACAAACGGAAAACTCACCCTTAAATTTATTTGCACTACTGGAAAACTACCTGTTCCATGGCCAACACTTGTCACTACTCTGACCTATGGTGTTCAATGCTTTTCCCGTTATCCGGATCACATGAAACGGCATGACTTTTTCAAGAGTGCCATGCCCGAAGGTTATGTACAGGAACGCACTATATCTTTCAAAGATGACGGGACCTACAAGACGCGTGCTGAAGTCAAGTTTGAAGGTGATACCCTTGTTAATCGTATCGAGTTAAAAGGTATTGATTTTAAAGAAGATGGAAACATTCTCGGACACAAACTCGAGTACAACTTTAACTCACACAATGTATACATCACGGCAGACAAACAAAAGAATGGAATCAAAGCTAACTTCAAAATTCGCCACAACGTTGAAGATGGTTCCGTTCAACTAGCAGACCATTATCAACAAAATACTCCAATTGGCGATGGCCCTGTCCTTTTACCAGACAACCATTACCTGTCGACACAATCTGTCCTTTCGAAAGATCCCAACGAAAAGCGTGACCACATGGTCCTTCTTGAGTTTGTAACTGCTGCTGGGATTACACATGGCATGGATGAGCTCTACAAATAA"
-
-	//primer, GCpercent, _ := FWDOligoSeq(region, 0.6, 20, 25, mintemp, maxtemp)
-
-	//fmt.Println(primer, GCpercent)
 
 	//Search for files within current directory
 
@@ -148,6 +109,16 @@ func _PrimerDesign_sequence_your_neighboursSteps(_ctx context.Context, _input *P
 	fmt.Println(alloutputs, allprimers)
 
 	_output.AllOutputs = alloutputs
+
+	if _input.ExportToFile {
+		err = export.ExporttoTextFile("exported_primers.csv", _output.AllOutputs)
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+	}
+
 	_output.AllPrimers = allprimers
 	_output.PrimerPairs = primerpairs
 
@@ -216,6 +187,7 @@ type PrimerDesign_sequence_your_neighboursElement struct {
 
 type PrimerDesign_sequence_your_neighboursInput struct {
 	Dirname                                  string
+	ExportToFile                             bool
 	Maxgc                                    float64
 	Maxlength                                int
 	Maxtemp                                  wunit.Temperature
@@ -248,6 +220,7 @@ func init() {
 			Path: "antha/component/an/Data/DNA/PrimerDesign/PrimerDesign_sequence_your_neighbours.an",
 			Params: []ParamDesc{
 				{Name: "Dirname", Desc: "files     []string = []string{\"STAR_0023_VECTOR_BBSI.gb\", \"STAR_0023_VECTOR_BBSI+Grp7+Grp14+Grp3.gb\"}\n\n= \"current\" // this will check for all .gb files in the folder you select here\n", Kind: "Parameters"},
+				{Name: "ExportToFile", Desc: "", Kind: "Parameters"},
 				{Name: "Maxgc", Desc: "     = 0.6\n", Kind: "Parameters"},
 				{Name: "Maxlength", Desc: "    = 25\n", Kind: "Parameters"},
 				{Name: "Maxtemp", Desc: "     = wunit.NewTemperature(60, \"C\")\n", Kind: "Parameters"},

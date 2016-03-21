@@ -8,6 +8,7 @@ import (
 	//"math"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/oligos"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/export"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"path/filepath"
 	"os"
@@ -24,7 +25,7 @@ Parameters (
 	Minlength   int //     = 20
 	Maxlength   int //     = 25
 	PermittednucleotideOverlapBetweenPrimers int // number of nucleotides which primers can overlap by
-
+	ExportToFile bool
 	
 )
 
@@ -56,9 +57,7 @@ Setup {
 
 // Core process of the protocol: steps to be performed for each input
 Steps {
-
-
-
+ 
 	//var Start int
 	//var End int
 	var err error
@@ -69,45 +68,6 @@ Steps {
 	var primerpairs = make([]PrimerPair, 0)
 	var files = make([]string, 0)
 
-	/*	vector, _ := parser.GenbanktoAnnotatedSeq("STAR_0023_VECTOR_BBSI.gb")
-
-		typeIIs := lookup.EnzymeLookup("bbsI")
-
-		fragments, _, _ := enzymes.Digest(vector.DNASequence, typeIIs)
-
-		plasmid, _ := parser.GenbanktoAnnotatedSeq("STAR_0023_VECTOR_BBSI+Grp7+Grp14+Grp3.gb")
-
-		for _, fragment := range fragments {
-
-			Start, End, err = FindPositioninSequence(plasmid.DNASequence, wtype.MakeSingleStrandedDNASequence("fragment", fragment))
-
-			if err == nil {
-				fmt.Println("Found the right fragment!", fragment, "start = ", Start, "End", End)
-				break
-			}
-
-		}
-	*/
-	/*if err != nil {
-		status = err.Error()
-	} else {
-		status = "No error"
-	}*/
-
-	//vectorstart, _, err := FindPositioninSequence(plasmid.DNASequence, vector.DNASequence)
-	/*
-		if err != nil {
-			panic(err.Error())
-
-		}*/
-
-	//region := DNAregion(plasmid.DNASequence, Start, len(plasmid.Sequence()))
-
-	//region := "ATGAGCAAAGGAGAAGAACTTTTCACTGGAGTTGTCCCAATTCTTGTTGAATTAGATGGTGATGTTAATGGGCACAAATTTTCTGTCCGTGGAGAGGGTGAAGGTGATGCTACAAACGGAAAACTCACCCTTAAATTTATTTGCACTACTGGAAAACTACCTGTTCCATGGCCAACACTTGTCACTACTCTGACCTATGGTGTTCAATGCTTTTCCCGTTATCCGGATCACATGAAACGGCATGACTTTTTCAAGAGTGCCATGCCCGAAGGTTATGTACAGGAACGCACTATATCTTTCAAAGATGACGGGACCTACAAGACGCGTGCTGAAGTCAAGTTTGAAGGTGATACCCTTGTTAATCGTATCGAGTTAAAAGGTATTGATTTTAAAGAAGATGGAAACATTCTCGGACACAAACTCGAGTACAACTTTAACTCACACAATGTATACATCACGGCAGACAAACAAAAGAATGGAATCAAAGCTAACTTCAAAATTCGCCACAACGTTGAAGATGGTTCCGTTCAACTAGCAGACCATTATCAACAAAATACTCCAATTGGCGATGGCCCTGTCCTTTTACCAGACAACCATTACCTGTCGACACAATCTGTCCTTTCGAAAGATCCCAACGAAAAGCGTGACCACATGGTCCTTCTTGAGTTTGTAACTGCTGCTGGGATTACACATGGCATGGATGAGCTCTACAAATAA"
-
-	//primer, GCpercent, _ := FWDOligoSeq(region, 0.6, 20, 25, mintemp, maxtemp)
-
-	//fmt.Println(primer, GCpercent)
 
 	//Search for files within current directory
 
@@ -161,6 +121,17 @@ Steps {
 	fmt.Println(alloutputs, allprimers)
 	
 	AllOutputs = alloutputs
+	
+	
+	if ExportToFile {
+	err = export.ExporttoTextFile("exported_primers.csv", AllOutputs)
+	
+	if err != nil {
+		panic(err.Error())
+	}
+	
+	}
+	
 	AllPrimers = allprimers
 	PrimerPairs = primerpairs
 
@@ -179,3 +150,4 @@ type PrimerPair struct {
 	FWD string
 	REV string
 }
+
