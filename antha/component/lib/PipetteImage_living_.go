@@ -17,9 +17,13 @@ import (
 
 // Input parameters for this protocol (data)
 
+//InoculationVolume Volume
 /*AntibioticVolume Volume
 InducerVolume Volume
 RepressorVolume Volume*/
+
+//IncTemp Temperature
+//IncTime Time
 
 // Data which is returned from this protocol, and data types
 
@@ -83,9 +87,12 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 
 		component := componentmap[colourtostringmap[colour]]
 
-		if component.TypeName() == "dna" {
+		/*if component.TypeName() == "dna" {
 			component.Type = wtype.LTDoNotMix // "DoNotMix"
-		}
+		}*/
+
+		component.Type = wtype.LTCulture
+
 		fmt.Println(image.Colourcomponentmap[colour])
 
 		if _input.OnlythisColour != "" {
@@ -106,9 +113,9 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 				components = append(components,inducerSample)*/
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
 				components = append(components, pixelSample)
-				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 0, components...)
+				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, components...)
 
-				solutions = append(solutions, execute.Incubate(_ctx, solution, _input.IncTemp, _input.IncTime, true))
+				solutions = append(solutions, solution /*Incubate(solution,IncTemp,IncTime,true)*/)
 			}
 
 		} else {
@@ -128,9 +135,9 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 				components = append(components,inducerSample)*/
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
 				components = append(components, pixelSample)
-				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 0, components...)
+				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, components...)
 
-				solutions = append(solutions, execute.Incubate(_ctx, solution, _input.IncTemp, _input.IncTime, true))
+				solutions = append(solutions, solution /*Incubate(solution,IncTemp,IncTime,true)*/)
 			}
 		}
 	}
@@ -204,16 +211,13 @@ type PipetteImage_livingElement struct {
 }
 
 type PipetteImage_livingInput struct {
-	Imagefilename     string
-	IncTemp           wunit.Temperature
-	IncTime           wunit.Time
-	InoculationVolume wunit.Volume
-	Notthiscolour     string
-	OnlythisColour    string
-	OutPlate          *wtype.LHPlate
-	Palettename       string
-	UVimage           bool
-	VolumePerWell     wunit.Volume
+	Imagefilename  string
+	Notthiscolour  string
+	OnlythisColour string
+	OutPlate       *wtype.LHPlate
+	Palettename    string
+	UVimage        bool
+	VolumePerWell  wunit.Volume
 }
 
 type PipetteImage_livingOutput struct {
@@ -239,10 +243,7 @@ func init() {
 			Desc: "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours\n",
 			Path: "antha/component/an/Liquid_handling/PipetteImage/PipetteLivingimage.an",
 			Params: []ParamDesc{
-				{Name: "Imagefilename", Desc: "AntibioticVolume Volume\n\tInducerVolume Volume\n\tRepressorVolume Volume\n", Kind: "Parameters"},
-				{Name: "IncTemp", Desc: "", Kind: "Parameters"},
-				{Name: "IncTime", Desc: "", Kind: "Parameters"},
-				{Name: "InoculationVolume", Desc: "", Kind: "Parameters"},
+				{Name: "Imagefilename", Desc: "InoculationVolume Volume\nAntibioticVolume Volume\n\tInducerVolume Volume\n\tRepressorVolume Volume\n", Kind: "Parameters"},
 				{Name: "Notthiscolour", Desc: "", Kind: "Parameters"},
 				{Name: "OnlythisColour", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\nMedia *wtype.LHComponent\nAntibiotic *wtype.LHComponent\n\tInducer *wtype.LHComponent\n\tRepressor *wtype.LHComponent\n", Kind: "Inputs"},

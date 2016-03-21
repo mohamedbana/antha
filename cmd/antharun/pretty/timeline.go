@@ -16,7 +16,7 @@ func summarize(inst target.Inst) (string, error) {
 	case *target.Manual:
 		return fmt.Sprintf("Manual: %s", inst.Details), nil
 	case *target.Mix:
-		return fmt.Sprintf("Run %p", inst.Dev), nil
+		return fmt.Sprintf("Run file (size: %d)", len(inst.Files.Tarball)), nil
 	case *target.Wait:
 		return "", nil
 	default:

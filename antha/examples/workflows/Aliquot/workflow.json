@@ -1,10 +1,16 @@
 {
     "connections": [],
     "processes": {
-        "AliquotParams1": {
+        "AliquotParams": {
             "component": "Aliquot"
         },
         "AliquotParams2": {
+            "component": "Aliquot"
+        },
+        "AliquotParams3": {
+            "component": "Aliquot"
+        },
+        "AliquotParams4": {
             "component": "Aliquot"
         }
     }

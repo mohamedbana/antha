@@ -1,10 +1,10 @@
 {
     "Parameters": {
         "Assay_quench": {
-            "Quenchingagent": "ethanol",
+            "Quenchingagent": "water",
             "Enzyme": "T4Ligase",
             "EnzymeVolume": "3ul",
-            "OutPlate": "greiner384_riser",
+            "OutPlate": "pcrplate_skirted",
             "Substrate": "dna_part",
             "SubstrateVolume": "3ul",
 			"QuenchingagentVolume": "14ul",

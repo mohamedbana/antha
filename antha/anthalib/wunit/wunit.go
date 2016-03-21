@@ -268,7 +268,7 @@ func (cm *ConcreteMeasurement) EqualToFloat(f float64) bool {
 	return false
 }
 
-func (cm ConcreteMeasurement) ToString() string {
+func (cm *ConcreteMeasurement) ToString() string {
 	return fmt.Sprintf("%-6.3f%s", cm.RawValue(), cm.Unit().PrefixedSymbol())
 }
 

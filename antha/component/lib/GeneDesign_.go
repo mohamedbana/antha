@@ -29,12 +29,12 @@ func _GeneDesignSteps(_ctx context.Context, _input *GeneDesignInput, _output *Ge
 
 	// Retrieve part seqs from entrez
 	for i, part := range _input.Parts {
-		DNA := entrez.RetrieveSequence(part, "nucleotide")
+		DNA, _ := entrez.RetrieveSequence(part, "nucleotide")
 		PartDNA[i] = DNA
 	}
 
 	// look up vector sequence
-	VectorSeq := entrez.RetrieveVector(_input.Vector)
+	VectorSeq, _ := entrez.RetrieveVector(_input.Vector)
 
 	// Look up the restriction enzyme
 	EnzymeInf, _ := lookup.TypeIIsLookup(_input.RE)

@@ -169,8 +169,9 @@ func MakeFoamyPolicy() LHPolicy {
 }
 func MakeCulturePolicy() LHPolicy {
 	culturepolicy := make(LHPolicy, 10)
-	culturepolicy["ASPSPEED"] = 0.5
-	culturepolicy["DSPSPEED"] = 0.5
+	culturepolicy["PRE_MIX"] = 2
+	culturepolicy["ASPSPEED"] = 2.0
+	culturepolicy["DSPSPEED"] = 2.0
 	culturepolicy["CAN_MULTI"] = false
 	culturepolicy["CAN_MSA"] = false
 	culturepolicy["CAN_SDD"] = false

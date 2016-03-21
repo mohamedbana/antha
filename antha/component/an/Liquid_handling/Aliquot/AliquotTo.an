@@ -15,6 +15,7 @@ Parameters (
 	SolutionVolume Volume
 	VolumePerAliquot  Volume
 	NumberofAliquots int
+	ByRow bool
 )
 
 // Data which is returned from this protocol, and data types
@@ -25,7 +26,7 @@ Data (
 
 // Physical Inputs to this protocol with types
 Inputs (
-	Solution *wtype.LHComponent
+	Solutions []*wtype.LHComponent
 	InPlate *wtype.LHPlate
 	OutPlate *wtype.LHPlate
 )
@@ -67,6 +68,8 @@ Steps {
 		"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
 		"Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"}
 	//k := 0
+	
+	if ByRow {
 	for j := 0; j < OutPlate.WlsY; j++ {
 		for i := 0; i < OutPlate.WlsX; i++ { //countingfrom1iswhatmakesushuman := j + 1
 			//k = k + 1
@@ -76,16 +79,32 @@ Steps {
 		}
 
 	}
-	
+	}else {
+		for j := 0; j < OutPlate.WlsX; j++ {
+		for i := 0; i < OutPlate.WlsY; i++ { //countingfrom1iswhatmakesushuman := j + 1
+			//k = k + 1
+			wellposition := string(alphabet[i]) + strconv.Itoa(j+1)
+			//fmt.Println(wellposition, k)
+			wellpositionarray = append(wellpositionarray, wellposition)
+		}
+
+	}
+	}
+	var counter int
+	for _, Solution := range Solutions {
 	for k := 0; k < NumberofAliquots; k++ {
+		
 		if Solution.TypeName() == "dna"{
 		Solution.Type = wtype.LTDoNotMix
 		}
 		aliquotSample := mixer.Sample(Solution, VolumePerAliquot)
-		aliquot := MixTo(OutPlate.Type,wellpositionarray[k], 0, aliquotSample)
+		aliquot := MixTo(OutPlate.Type,wellpositionarray[counter], 1, aliquotSample)
 		aliquots = append(aliquots,aliquot)
+		counter = counter +1
 	}
 	Aliquots = aliquots
+}
+
 }
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results

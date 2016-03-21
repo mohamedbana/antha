@@ -23,7 +23,9 @@
 // Package for interacting with and manipulating dna sequences in extension to methods available in wtype
 package sequences
 
-import ()
+import (
+	"strings"
+)
 
 func Rev(s string) string {
 	r := ""
@@ -66,6 +68,7 @@ func Comp(s string) string {
 
 // Reverse Complement
 func RevComp(s string) string {
+	s = strings.ToUpper(s)
 	return Comp(Rev(s))
 }
 

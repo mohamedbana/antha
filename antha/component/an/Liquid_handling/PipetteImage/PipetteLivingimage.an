@@ -15,7 +15,7 @@ import (
 // Input parameters for this protocol (data)
 Parameters (
 	VolumePerWell  Volume
-	InoculationVolume Volume
+	//InoculationVolume Volume
 	/*AntibioticVolume Volume
 	InducerVolume Volume
 	RepressorVolume Volume*/
@@ -24,8 +24,8 @@ Parameters (
 	OnlythisColour string
 	Notthiscolour string
 	UVimage bool
-	IncTemp Temperature
-	IncTime Time
+	//IncTemp Temperature
+	//IncTime Time
 )
 
 // Data which is returned from this protocol, and data types
@@ -101,9 +101,12 @@ Steps {
 		
 		component := componentmap[colourtostringmap[colour]]
 
-		if component.TypeName() == "dna" {
+		/*if component.TypeName() == "dna" {
 			component.Type = wtype.LTDoNotMix // "DoNotMix"
-		}
+		}*/
+		
+		component.Type = wtype.LTCulture
+		
 		fmt.Println(image.Colourcomponentmap[colour])
 		
 		if OnlythisColour !="" {
@@ -124,9 +127,9 @@ Steps {
 		components = append(components,inducerSample)*/
 		pixelSample := mixer.Sample(component, VolumePerWell)
 		components = append(components,pixelSample)
-		solution := MixTo(OutPlate.Type, locationkey, 0,components...)
+		solution := MixTo(OutPlate.Type, locationkey, 1,components...)
 		
-		solutions = append(solutions, Incubate(solution,IncTemp,IncTime,true))
+		solutions = append(solutions, solution /*Incubate(solution,IncTemp,IncTime,true)*/)
 			}
 			
 		}else{
@@ -146,9 +149,9 @@ Steps {
 		components = append(components,inducerSample)*/
 		pixelSample := mixer.Sample(component, VolumePerWell)
 		components = append(components,pixelSample)
-		solution := MixTo(OutPlate.Type, locationkey, 0, components...)
+		solution := MixTo(OutPlate.Type, locationkey, 1, components...)
 		
-		solutions = append(solutions, Incubate(solution,IncTemp,IncTime,true))
+		solutions = append(solutions, solution /*Incubate(solution,IncTemp,IncTime,true)*/)
 		}
 		}
 	}

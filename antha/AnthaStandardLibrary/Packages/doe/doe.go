@@ -138,7 +138,7 @@ func AllComboCount(pairs []DOEPair) (numberofuniquecombos int) {
 
 func AllCombinations(factors []DOEPair) (runs []Run) {
 	//fmt.Println(factors)
-	descriptors := make([]string, 0)
+	descriptors := make([]string, AllComboCount(factors))
 	setpoints := make([]interface{}, 0)
 	runs = make([]Run, AllComboCount(factors))
 	if AllComboCount(factors) == 0 {
@@ -161,17 +161,29 @@ func AllCombinations(factors []DOEPair) (runs []Run) {
 			//	fmt.Println("factor:", factor, i, j)
 
 			if i-factorswithonelevel < 0 {
+
 				//fmt.Println("factor:", factor, level, i, j /*i+j*/)
-				descriptors = append(descriptors, factor.Factor)
+
+				/*		if len(descriptors) == len(factors) {
+						descriptors[len(descriptors)-1] = factor.Factor
+						setpoints[len(descriptors)-1] = level
+					} else {*/
+				descriptors[i] = factor.Factor
 				setpoints = append(setpoints, level)
+				//		}
+
 				run.Factordescriptors = descriptors
 				run.Setpoints = setpoints
 				fmt.Println(i, j, factorswithonelevel, i+1-factorswithonelevel+j)
 				runs[i+1-factorswithonelevel+j] = run
 			} else {
-				//fmt.Println("factor:", factor, level, i, j /*i+j*/)
-				descriptors = append(descriptors, factor.Factor)
+				/*		if len(descriptors) == len(factors) {
+						descriptors[len(descriptors)-1] = factor.Factor
+						setpoints[len(descriptors)-1] = level
+					} else {*/
+				descriptors[i] = factor.Factor
 				setpoints = append(setpoints, level)
+				//		}
 				run.Factordescriptors = descriptors
 				run.Setpoints = setpoints
 				runs[i-factorswithonelevel+j] = run

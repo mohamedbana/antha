@@ -6,7 +6,7 @@ import (
 	//"strconv"
 	//	"strings"
 
-	"runtime/debug"
+	//"runtime/debug"
 	"testing"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
@@ -58,6 +58,7 @@ func TestAllComboCount(t *testing.T) {
 
 }
 
+/*
 func TestAllCombinations(t *testing.T) {
 
 	defer func() {
@@ -75,15 +76,15 @@ func TestAllCombinations(t *testing.T) {
 				"got", r, "\n",
 			)
 		}
-		/*	for j, run := range r {
+		for j, run := range r {
 
-				if len(run.Factordescriptors) != len(factor.factorheaders) {
-					t.Error(
-						"For", factor.pairs, "/n",
-						"expected", factor.factorheaders, "\n",
-						"got", run.Factordescriptors, "\n",
-					)
-				}
+			if len(run.Factordescriptors) != len(factor.factorheaders) {
+				t.Error(
+					"For", factor.pairs, "/n",
+					"expected", factor.factorheaders, "\n",
+					"got", run.Factordescriptors, "\n",
+				)
+			}
 
 			for i, descriptor := range run.Factordescriptors {
 
@@ -97,10 +98,10 @@ func TestAllCombinations(t *testing.T) {
 					)
 				}
 			}
-		}*/
+		}
 	}
 }
-
+*/
 /*
 type DOEPair struct {
 	Factor string

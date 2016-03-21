@@ -53,7 +53,7 @@ Steps {
 	
 	// MixTo(platetype string, address string, platenum int, components ...*wtype.LHComponent)
 	
-	reaction := MixTo(OutPlate,"",0,substrate, enzyme)
+	reaction:= MixTo(OutPlate,"",1,substrate, enzyme)
 	
 	finishedreaction := Incubate(reaction,ReactionTemp,ReactionTime,true)
 	

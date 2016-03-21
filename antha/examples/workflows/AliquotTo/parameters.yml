@@ -2,11 +2,15 @@
     "Parameters": {
         "AliquotParams": {
             "InPlate": "pcrplate_with_cooler",
-            "NumberofAliquots": 50,
-            "OutPlate": "pcrplate_skirted",
-            "Solution": "PrimerFw",
+            "NumberofAliquots": 16,
+            "OutPlate": "pcrplate_with_cooler",
+            "Solutions": [
+			"water",
+			"fluorescein"
+			],
+			"ByRow": false,
             "SolutionVolume": "4000ul",
-            "VolumePerAliquot": "10ul"
+            "VolumePerAliquot": "25ul"
         }
     }
 }

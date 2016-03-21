@@ -33,29 +33,58 @@ func WithTarget(parent context.Context, t *Target) context.Context {
 // Target machine for execution.
 type Target struct {
 	devices []Device
+	runners map[string][]*Runner
 }
 
 func New() *Target {
-	return &Target{}
+	return &Target{
+		runners: make(map[string][]*Runner),
+	}
 }
 
-func (a *Target) can(d Device, reqs ...ast.Request) bool {
+func (a *Target) canCompile(d Device, reqs ...ast.Request) bool {
 	for _, req := range reqs {
-		if !d.Can(req) {
+		if !d.CanCompile(req) {
 			return false
 		}
 	}
 	return true
 }
-func (a *Target) Can(reqs ...ast.Request) (r []Device) {
+
+func (a *Target) CanCompile(reqs ...ast.Request) (r []Device) {
 	for _, d := range a.devices {
-		if a.can(d, reqs...) {
+		if a.canCompile(d, reqs...) {
 			r = append(r, d)
 		}
 	}
 	return
 }
 
-func (a *Target) AddDevice(d Device) {
+func (a *Target) CanRun(ftype string) []*Runner {
+	return a.runners[ftype]
+}
+
+func (a *Target) Runners() (rs []*Runner) {
+	for _, d := range a.devices {
+		if r, ok := d.(*Runner); ok {
+			rs = append(rs, r)
+		}
+	}
+	return
+}
+
+func (a *Target) AddDevice(d Device) error {
 	a.devices = append(a.devices, d)
+	if r, ok := d.(*Runner); ok {
+		ftypes, err := r.types()
+		if err != nil {
+			return err
+		}
+		for _, ftype := range ftypes {
+			a.runners[ftype] = append(a.runners[ftype], r)
+		}
+	}
+
+	return nil
+
 }

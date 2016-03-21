@@ -63,13 +63,13 @@ func GenbanktoSimpleSeq(filename string) (seq string) {
 }
 
 func GenbanktoDNASequence(filename string) (standardseq wtype.DNASequence, err error) {
-
 	var annotated sequences.AnnotatedSeq
 	line := ""
 	genbanklines := make([]string, 0)
-	file, err := os.Open(filename)
+	var file *os.File
+	file, err = os.Open(filename)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	defer file.Close()
 
@@ -79,8 +79,8 @@ func GenbanktoDNASequence(filename string) (standardseq wtype.DNASequence, err e
 		genbanklines = append(genbanklines, line)
 	}
 
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+	if err = scanner.Err(); err != nil {
+		return
 	}
 
 	annotated, err = HandleGenbank(genbanklines)
@@ -88,7 +88,6 @@ func GenbanktoDNASequence(filename string) (standardseq wtype.DNASequence, err e
 	standardseq = annotated.DNASequence
 
 	return
-
 }
 
 func GenbankFeaturetoDNASequence(filename string, featurename string) (standardseq wtype.DNASequence, err error) {
@@ -363,11 +362,20 @@ func Featureline2(line string) (description string, found bool) {
 				return
 			}
 
-		}
+		} else if strings.Contains(line, `/gene`) {
+			parts := strings.SplitAfterN(line, `="`, 2)
+			if len(parts) == 2 {
+				// fmt.Println("line", line)
+				// fmt.Println("parts", parts)
+				// fmt.Println("len(parts) =2 yes")
+				// fmt.Println("parts[1]", parts[1])
+				description = parts[1] //strings.Replace(parts[1], " ", "_", -1)
+				// fmt.Println("Huh!", description)
+				found = true
+				return
+			}
 
-	}
-	for _, line := range newarray {
-		if strings.Contains(line, `/product`) {
+		} else if strings.Contains(line, `/product`) {
 			parts := strings.SplitAfterN(line, `="`, 2)
 			if len(parts) == 2 {
 				// fmt.Println("line", line)
@@ -383,6 +391,23 @@ func Featureline2(line string) (description string, found bool) {
 		}
 
 	}
+	/*for _, line := range newarray {
+		if strings.Contains(line, `/product`) {
+			parts := strings.SplitAfterN(line, `="`, 2)
+			if len(parts) == 2 {
+				// fmt.Println("line", line)
+				// fmt.Println("parts", parts)
+				// fmt.Println("len(parts) =2 yes")
+				// fmt.Println("parts[1]", parts[1])
+				description = parts[1] //strings.Replace(parts[1], " ", "_", -1)
+				// fmt.Println("Huh!", description)
+				found = true
+				return
+			}
+
+		}
+
+	}*/
 	return
 }
 
