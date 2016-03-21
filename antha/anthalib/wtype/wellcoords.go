@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
 )
 
@@ -60,6 +61,7 @@ func MakeWellCoords(wc string) WellCoords {
 	return r
 }
 
+/*
 // make well coordinates in the "A1" convention
 func MakeWellCoordsA1(a1 string) WellCoords {
 	// only handles 96 well plates
@@ -67,6 +69,14 @@ func MakeWellCoordsA1(a1 string) WellCoords {
 		return WellCoords{-1, -1}
 	}
 	return WellCoords{wutil.ParseInt(a1[1:len(a1)]) - 1, AlphaToNum(string(a1[0])) - 1}
+}
+*/
+// make well coordinates in the "A1" convention
+func MakeWellCoordsA1(a1 string) WellCoords {
+
+	row, col, _ := spreadsheet.A1formattorowcolumn(a1)
+
+	return WellCoords{X: col, Y: row}
 }
 
 // make well coordinates in the "1A" convention
