@@ -105,7 +105,7 @@ func _PrimerDesign_sequence_your_neighboursSteps(_ctx context.Context, _input *P
 
 		bindingsitesinseq2 := oligos.CheckNonSpecificBinding(sequence.DNASequence, primer2.DNASequence)
 
-		output = fmt.Sprintln(file, ",", "primer1: ", ",", primer1.Sequence(), ",", "binds at", ",", bindingsitesinseq1, ",", "positions", ",", "primer2: ", ",", primer2.Sequence(), ",", "binds at", ",", bindingsitesinseq2, ",", "positions", ",")
+		output = fmt.Sprintln(file, ",", "primer1: ", ",", primer1.Sequence(), ",", "melting temp: ", ",", primer1.MeltingTemp.ToString(), ",", "length: ", ",", primer1.Length, ",", "gc content: ", ",", primer1.GCContent, ",", "binds at", ",", bindingsitesinseq1, ",", "positions", ",", "primer2: ", ",", primer2.Sequence(), ",", "melting temp: ", ",", primer2.MeltingTemp.ToString(), ",", "length: ", ",", primer2.Length, ",", "gc content: ", ",", primer2.GCContent, ",", "binds at", ",", bindingsitesinseq2, ",", "positions", ",")
 		alloutputs = append(alloutputs, output)
 		allprimers = append(allprimers, primer1, primer2)
 		allprimerstrings = append(allprimerstrings, primer1.Sequence(), primer2.Sequence())
