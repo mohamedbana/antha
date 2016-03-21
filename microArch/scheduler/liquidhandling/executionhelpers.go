@@ -138,7 +138,6 @@ func set_output_order(rq *LHRequest) {
 	it := NewIChain(nil)
 
 	for _, v := range sorted {
-		fmt.Println(v.Generation())
 		it.Add(v)
 	}
 
@@ -231,6 +230,13 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) 
 
 		// get dem big ole plates out
 		// TODO -- pass them in instead of all this nonsense
+
+		fmt.Println("IX: ", ix, "FPID: ", fromPlateID[ix])
+
+		for k, _ := range robot.PlateLookup {
+			fmt.Println("LLOOK:", k)
+		}
+
 		flhp := robot.PlateLookup[fromPlateID[ix]].(*wtype.LHPlate)
 		tlhp := robot.PlateLookup[insIn.PlateID].(*wtype.LHPlate)
 

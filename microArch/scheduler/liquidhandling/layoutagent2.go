@@ -31,9 +31,10 @@ import (
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
+	"github.com/antha-lang/antha/microArch/sampletracker"
 )
 
-func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties, st *SampleTracker) *LHRequest {
+func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *LHRequest {
 	// do this multiply based on the order in the chain
 
 	ch := request.InstructionChain
@@ -43,13 +44,13 @@ func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties
 		if ch == nil {
 			break
 		}
-		request, pc, mp = LayoutStage(request, params, ch, pc, mp, st)
+		request, pc, mp = LayoutStage(request, params, ch, pc, mp)
 		ch = ch.Child
 	}
 
 	return request
 }
-func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain *IChain, plate_choices []PlateChoice, mapchoices map[int]string, sampletracker *SampleTracker) (*LHRequest, []PlateChoice, map[int]string) {
+func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain *IChain, plate_choices []PlateChoice, mapchoices map[int]string) (*LHRequest, []PlateChoice, map[int]string) {
 	// we have three kinds of solution
 	// 1- ones going to a specific plate
 	// 2- ones going to a specific plate type
@@ -57,7 +58,7 @@ func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain 
 
 	// find existing assignments
 
-	plate_choices, mapchoices = get_and_complete_assignments(request, chain.ValueIDs(), plate_choices, mapchoices, sampletracker)
+	plate_choices, mapchoices = get_and_complete_assignments(request, chain.ValueIDs(), plate_choices, mapchoices)
 
 	// now we know what remains unassigned, we assign it
 
@@ -109,6 +110,8 @@ func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain 
 		lkp[v.ID] = append(lkp[v.ID], v.Result)
 	}
 
+	sampletracker := sampletracker.GetSampleTracker()
+
 	// now map the output assignments in
 	for k, v := range request.Output_assignments {
 		for _, id := range v {
@@ -150,9 +153,11 @@ type PlateChoice struct {
 	Wells     []string
 }
 
-func get_and_complete_assignments(request *LHRequest, order []string, s []PlateChoice, m map[int]string, st *SampleTracker) ([]PlateChoice, map[int]string) {
+func get_and_complete_assignments(request *LHRequest, order []string, s []PlateChoice, m map[int]string) ([]PlateChoice, map[int]string) {
 	//s := make([]PlateChoice, 0, 3)
 	//m := make(map[int]string)
+
+	st := sampletracker.GetSampleTracker()
 
 	// inconsistent plate types will be assigned randomly!
 	//	for k, v := range request.LHInstructions {
@@ -222,7 +227,18 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 			// same as condition 1 except we get the plate id somewhere else
 			i := defined(tx[0], s)
 
+			// we should check for it in OutputPlates as well
+			// this could be a mix in place which has been split
+
+			fmt.Println("I want to find ", tx[0])
+			for _, v := range request.Output_plates {
+				fmt.Println("I know about : ", v.ID)
+			}
+
 			if i == -1 {
+				for _, v := range s {
+					fmt.Println(v.ID)
+				}
 				panic("THIS SHOULD NOT BE POSSIBLE")
 			}
 

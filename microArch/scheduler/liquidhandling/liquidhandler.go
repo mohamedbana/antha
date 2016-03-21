@@ -60,10 +60,9 @@ import (
 type Liquidhandler struct {
 	Properties       *liquidhandling.LHProperties
 	SetupAgent       func(*LHRequest, *liquidhandling.LHProperties) *LHRequest
-	LayoutAgent      func(*LHRequest, *liquidhandling.LHProperties, *SampleTracker) *LHRequest
+	LayoutAgent      func(*LHRequest, *liquidhandling.LHProperties) *LHRequest
 	ExecutionPlanner func(*LHRequest, *liquidhandling.LHProperties) *LHRequest
 	PolicyManager    *LHPolicyManager
-	SampleTracker    *SampleTracker
 	Once             sync.Once
 }
 
@@ -74,14 +73,12 @@ func Init(properties *liquidhandling.LHProperties) *Liquidhandler {
 	lh.LayoutAgent = ImprovedLayoutAgent
 	lh.ExecutionPlanner = ImprovedExecutionPlanner
 	lh.Properties = properties
-	lh.SampleTracker = GetSampleTracker()
 	return &lh
 }
 
 // high-level function which requests planning and execution for an incoming set of
 // solutions
 func (this *Liquidhandler) MakeSolutions(request *LHRequest) *LHRequest {
-	logger.Debug("OK YOU MAKE SOLUTIONS NOW")
 	// the minimal request which is possible defines what solutions are to be made
 	if len(request.LHInstructions) == 0 {
 		return request
@@ -173,10 +170,6 @@ func (this *Liquidhandler) do_setup(rq *LHRequest) {
 // this should be OK since the LHRequest parameterises all state including instructions
 // for asynchronous drivers we have to determine how far the program got before it was
 // paused, which should be tricky but possible.
-//
-// need to find a good way to codify the rules of the system:
-// essentially the question is what happens to inputs pre-defined.
-// I will define this asap
 //
 
 func (this *Liquidhandler) Plan(request *LHRequest) {
@@ -290,7 +283,7 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 	(*request).Input_solutions = requestinputs
 
 	// finally we have to add a waste if there isn't one already
-
+	/// ??? This should not be here
 	// work out if we need to empty soon
 
 	s := this.Properties.TipWastesMounted()
@@ -418,15 +411,15 @@ func (this *Liquidhandler) Layout(request *LHRequest) *LHRequest {
 	// assign the results to destinations
 	// again needs to be parameterized
 
-	return this.LayoutAgent(request, this.Properties, this.SampleTracker)
+	return this.LayoutAgent(request, this.Properties)
 }
 
 // make the instructions for executing this request
 func (this *Liquidhandler) ExecutionPlan(request *LHRequest) *LHRequest {
 	//TODO -- this dup is missing some plate stuff
-	//rbtcpy := this.Properties.Dup()
+	rbtcpy := this.Properties.Dup()
 
-	rbtcpy := this.Properties
+	//rbtcpy := this.Properties
 
 	rq := this.ExecutionPlanner(request, rbtcpy)
 

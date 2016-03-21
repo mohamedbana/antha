@@ -1,22 +1,27 @@
-// sample tracker service... needs to be outside this eventually but at least having one
-// is a good start
-
-package liquidhandling
+package sampletracker
 
 import "fmt"
 
+var st *SampleTracker
+
 type SampleTracker struct {
-	records map[string]string
+	records  map[string]string
+	forwards map[string]string
 }
 
 func newSampleTracker() *SampleTracker {
 	r := make(map[string]string)
-	st := SampleTracker{r}
+	f := make(map[string]string)
+	st := SampleTracker{r, f}
 	return &st
 }
 
 func GetSampleTracker() *SampleTracker {
-	return newSampleTracker()
+	if st == nil {
+		st = newSampleTracker()
+	}
+
+	return st
 }
 
 func (st *SampleTracker) SetLocationOf(ID string, loc string) {
@@ -25,13 +30,32 @@ func (st *SampleTracker) SetLocationOf(ID string, loc string) {
 }
 
 func (st *SampleTracker) GetLocationOf(ID string) (string, bool) {
-	fmt.Println("ASKING FOR LOCATION OF ", ID)
-
-	fmt.Println("HERE'S WHAT I KNOW:")
-	for k, v := range st.records {
-		fmt.Println(k, v)
+	fmt.Println("GET LOCATION OF :", ID)
+	if ID == "" {
+		return "", false
 	}
 
 	s, ok := st.records[ID]
+
+	// look to see if there's a forwarding address
+	// can this lead to an out of date location???
+
+	if !ok {
+		return st.GetLocationOf(st.forwards[ID])
+	}
+
+	fmt.Println("Location found!: ", s)
+
 	return s, ok
+}
+
+func (st *SampleTracker) UpdateIDOf(ID string, newID string) {
+	_, ok := st.records[ID]
+	if ok {
+		st.records[newID] = st.records[ID]
+	} else {
+		// set up a forward
+		// actually a backward...
+		st.forwards[newID] = ID
+	}
 }

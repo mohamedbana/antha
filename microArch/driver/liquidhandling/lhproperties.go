@@ -160,15 +160,15 @@ func (lhp *LHProperties) Dup() *LHProperties {
 	r := NewLHProperties(lhp.Nposns, lhp.Model, lhp.Mnfr, lhp.LHType, lhp.TipType, lo)
 
 	for _, a := range lhp.Adaptors {
-		r.Adaptors = append(r.Adaptors, a)
+		r.Adaptors = append(r.Adaptors, a.Dup())
 	}
 
 	for _, h := range lhp.Heads {
-		r.Heads = append(r.Heads, h)
+		r.Heads = append(r.Heads, h.Dup())
 	}
 
 	for _, hl := range lhp.HeadsLoaded {
-		r.HeadsLoaded = append(r.HeadsLoaded, hl)
+		r.HeadsLoaded = append(r.HeadsLoaded, hl.Dup())
 	}
 
 	for name, pl := range lhp.PosLookup {
@@ -179,24 +179,56 @@ func (lhp *LHProperties) Dup() *LHProperties {
 		r.PlateIDLookup[name] = pl
 	}
 
+	// plate lookup can contain anything
+
+	m := make(map[string]interface{})
 	for name, pt := range lhp.PlateLookup {
-		r.PlateLookup[name] = pt
+		var pt2 interface{}
+		switch pt.(type) {
+		case *wtype.LHTipwaste:
+			tmp := pt.(*wtype.LHTipwaste).Dup()
+			tmp.ID = pt.(*wtype.LHTipwaste).ID
+			pt2 = tmp
+		case *wtype.LHPlate:
+			tmp := pt.(*wtype.LHPlate).Dup()
+			tmp.ID = pt.(*wtype.LHPlate).ID
+			pt2 = tmp
+		case *wtype.LHTipbox:
+			tmp := pt.(*wtype.LHTipbox).Dup()
+			tmp.ID = pt.(*wtype.LHTipbox).ID
+			pt2 = tmp
+		}
+		m[name] = pt2
+		r.PlateLookup[name] = pt2
+	}
+
+	for name, plate := range lhp.Plates {
+		p2 := m[plate.ID]
+		r.Plates[name] = p2.(*wtype.LHPlate)
 	}
 
 	for name, tb := range lhp.Tipboxes {
-		r.Tipboxes[name] = tb.Dup()
+		tb2 := tb.Dup()
+		tb2.ID = tb.ID
+		r.Tipboxes[name] = tb2
 	}
 
 	for name, tw := range lhp.Tipwastes {
-		r.Tipwastes[name] = tw.Dup()
+		tw2 := tw.Dup()
+		tw2.ID = tw.ID
+		r.Tipwastes[name] = tw2
 	}
 
 	for name, waste := range lhp.Wastes {
-		r.Wastes[name] = waste.Dup()
+		w2 := waste.Dup()
+		w2.ID = waste.ID
+		r.Wastes[name] = w2
 	}
 
 	for name, wash := range lhp.Washes {
-		r.Washes[name] = wash.Dup()
+		w2 := wash.Dup()
+		w2.ID = wash.ID
+		r.Washes[name] = w2
 	}
 
 	for name, dev := range lhp.Devices {

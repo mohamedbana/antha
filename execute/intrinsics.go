@@ -6,6 +6,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/ast"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/microArch/sampletracker"
 	"github.com/antha-lang/antha/trace"
 )
 
@@ -16,9 +17,11 @@ type incubateInst struct {
 }
 
 func Incubate(ctx context.Context, in *wtype.LHComponent, temp wunit.Temperature, time wunit.Time, shaking bool) *wtype.LHComponent {
+	st := sampletracker.GetSampleTracker()
 	comp := in.Dup()
 	comp.ID = wtype.GetUUID()
 	comp.BlockID = wtype.NewBlockID(getId(ctx))
+	st.UpdateIDOf(in.ID, comp.ID)
 
 	trace.Issue(ctx, &incubateInst{
 		Arg:  in,
