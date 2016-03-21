@@ -16,6 +16,7 @@ import (
 	"github.com/antha-lang/antha/inject"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // Input parameters for this protocol
@@ -136,9 +137,83 @@ func _PrimerDesign_sequence_your_neighboursSteps(_ctx context.Context, _input *P
 func _PrimerDesign_sequence_your_neighboursAnalysis(_ctx context.Context, _input *PrimerDesign_sequence_your_neighboursInput, _output *PrimerDesign_sequence_your_neighboursOutput) {
 
 }
-
 func _PrimerDesign_sequence_your_neighboursValidation(_ctx context.Context, _input *PrimerDesign_sequence_your_neighboursInput, _output *PrimerDesign_sequence_your_neighboursOutput) {
 
+	// check each sequence for binding to other sequences in folder:
+
+	//var Start int
+	//var End int
+	var err error
+	var output string
+	var dirname string
+
+	var files = make([]string, 0)
+
+	//Search for files within current directory
+
+	if _input.Dirname == "current" {
+		dirname = "." + string(filepath.Separator)
+	} else {
+		dirname = _input.Dirname
+	}
+
+	d, err := os.Open(dirname)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	defer d.Close()
+
+	allfiles, err := d.Readdir(-1)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	fmt.Println("Reading " + dirname)
+
+	//Determine if file extension is ".gb"
+	for _, file := range allfiles {
+		if filepath.Ext(file.Name()) == ".gb" {
+			files = append(files, file.Name())
+		}
+
+	}
+
+	var nonspecificbinding = make([]string, 0)
+
+	for _, file := range files {
+		file = filepath.Join(dirname, file)
+		sequence, _ := parser.GenbanktoAnnotatedSeq(file)
+
+		for _, primer := range _output.AllPrimers {
+
+			// only check other files
+			if strings.Contains(primer.Nm, file) == false {
+
+				bindingsites := oligos.CheckNonSpecificBinding(sequence.DNASequence, primer.DNASequence)
+
+				// if binding found add to output file:
+
+				if bindingsites > 0 {
+					output = fmt.Sprintln(file, ",", "primer: ", ",", primer.Nm, ", ", primer.Sequence(), ",", "binds at", ",", bindingsites, ",", "positions")
+
+					nonspecificbinding = append(nonspecificbinding, output)
+
+				}
+			}
+		}
+
+	}
+
+	if _input.ExportToFile {
+		err = export.ExporttoTextFile("exported_primers_bindingReport.csv", nonspecificbinding)
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+	}
 }
 
 type PrimerPair struct {
