@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
@@ -130,7 +131,79 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 	return nil
 }
 
+func (this *Liquidhandler) revise_volumes(rq *LHRequest) {
+	// just count up the volumes... add a fudge for additional volume perhaps
+
+	// XXX -- HARD CODE 8 here
+	lastPlate := make([]string, 8)
+	lastWell := make([]string, 8)
+
+	vols := make(map[string]map[string]wunit.Volume)
+
+	for _, ins := range rq.Instructions {
+		if ins.InstructionType() == liquidhandling.MOV {
+			lastPlate = make([]string, 8)
+			lastPos := ins.GetParameter("POSTO").([]string)
+
+			for i, p := range lastPos {
+				lastPlate[i] = this.Properties.PosLookup[p]
+			}
+
+			lastWell = ins.GetParameter("WELLTO").([]string)
+		} else if ins.InstructionType() == liquidhandling.ASP {
+			for i, _ := range lastPlate {
+				if i >= len(lastWell) {
+					break
+				}
+				lp := lastPlate[i]
+				lw := lastWell[i]
+
+				_, ok := vols[lp]
+
+				if !ok {
+					vols[lp] = make(map[string]wunit.Volume)
+				}
+
+				v, ok := vols[lp][lw]
+
+				if !ok {
+					v = wunit.NewVolume(0.0, "ul")
+					vols[lp][lw] = v
+				}
+				//v.Add(ins.Volume[i])
+
+				vols := ins.GetParameter("VOLUME").([]wunit.Volume)
+				v.Add(vols[i])
+			}
+		}
+	}
+
+	// now go through and set the plates up appropriately
+
+	for plateID, wellmap := range vols {
+		plate, ok := this.Properties.Plates[this.Properties.PlateIDLookup[plateID]]
+
+		if !ok {
+			//	panic(fmt.Sprint("NO SUCH PLATE: ", plateID))
+			logger.Fatal(fmt.Sprint("NO SUCH PLATE: ", plateID))
+		}
+
+		for crd, vol := range wellmap {
+			well := plate.Wellcoords[crd]
+			vol.Add(well.ResidualVolume())
+			well.WContents.SetVolume(vol)
+		}
+	}
+
+	// all done
+
+}
+
 func (this *Liquidhandler) do_setup(rq *LHRequest) {
+	// revise the volumes etc
+
+	this.revise_volumes(rq)
+
 	this.Properties.Driver.RemoveAllPlates()
 	for position, plateid := range this.Properties.PosLookup {
 		if plateid == "" {
@@ -416,10 +489,7 @@ func (this *Liquidhandler) Layout(request *LHRequest) *LHRequest {
 
 // make the instructions for executing this request
 func (this *Liquidhandler) ExecutionPlan(request *LHRequest) *LHRequest {
-	//TODO -- this dup is missing some plate stuff
 	rbtcpy := this.Properties.Dup()
-
-	//rbtcpy := this.Properties
 
 	rq := this.ExecutionPlanner(request, rbtcpy)
 
