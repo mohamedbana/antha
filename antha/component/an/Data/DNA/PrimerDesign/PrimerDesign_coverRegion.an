@@ -4,7 +4,7 @@ protocol PrimerDesign_coverRegion
 
 import (
 	//"fmt"
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	//"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/oligos"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
@@ -33,7 +33,7 @@ Parameters (
 
 // Data which is returned from this protocol
 Data (
-	AllPrimers []wtype.DNASequence
+	AllPrimers []oligos.Primer
 	Warnings error
 )
 
@@ -58,7 +58,7 @@ Setup {
 // Core process of the protocol: steps to be performed for each input
 Steps {
 	var plasmid sequences.AnnotatedSeq
-	var allprimers []wtype.DNASequence
+	var allprimers []oligos.Primer
 
 	plasmid, _ = parser.GenbanktoAnnotatedSeq(DNASeqfile)
 	

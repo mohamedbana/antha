@@ -5,9 +5,9 @@ package lib
 import (
 	"fmt"
 	//"math"
+	//"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/export"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/oligos"
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -31,6 +31,8 @@ import (
 
 // Data which is returned from this protocol
 
+//PrimerData []oligos.Primer
+
 // Physical inputs to this protocol
 
 // Physical outputs from this protocol
@@ -53,7 +55,8 @@ func _PrimerDesign_sequence_your_neighboursSteps(_ctx context.Context, _input *P
 	var output string
 	var dirname string
 	var alloutputs = make([]string, 0)
-	var allprimers = make([]string, 0)
+	var allprimers = make([]oligos.Primer, 0)
+	var allprimerstrings = make([]string, 0)
 	var primerpairs = make([]PrimerPair, 0)
 	var files = make([]string, 0)
 
@@ -92,17 +95,22 @@ func _PrimerDesign_sequence_your_neighboursSteps(_ctx context.Context, _input *P
 		file = filepath.Join(dirname, file)
 		sequence, _ := parser.GenbanktoAnnotatedSeq(file)
 
-		primer1, primer2 := oligos.MakeOutwardFacingPrimers(sequence.DNASequence, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, allprimers, _input.PermittednucleotideOverlapBetweenPrimers)
+		primer1, primer2 := oligos.MakeOutwardFacingPrimers(sequence.DNASequence, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, allprimerstrings, _input.PermittednucleotideOverlapBetweenPrimers)
 
-		bindingsitesinseq1 := oligos.CheckNonSpecificBinding(sequence.DNASequence, wtype.MakeSingleStrandedDNASequence("primer1"+"_"+file, primer1))
+		primer1.Nm = "primer1" + "_" + file
 
-		bindingsitesinseq2 := oligos.CheckNonSpecificBinding(sequence.DNASequence, wtype.MakeSingleStrandedDNASequence("primer2"+"_"+file, primer2))
+		bindingsitesinseq1 := oligos.CheckNonSpecificBinding(sequence.DNASequence, primer1.DNASequence)
 
-		output = fmt.Sprintln(file, ",", "primer1: ", ",", primer1, ",", "binds at", ",", bindingsitesinseq1, ",", "positions", ",", "primer2: ", ",", primer2, ",", "binds at", ",", bindingsitesinseq2, ",", "positions", ",")
+		primer2.Nm = "primer2" + "_" + file
+
+		bindingsitesinseq2 := oligos.CheckNonSpecificBinding(sequence.DNASequence, primer2.DNASequence)
+
+		output = fmt.Sprintln(file, ",", "primer1: ", ",", primer1.Sequence(), ",", "binds at", ",", bindingsitesinseq1, ",", "positions", ",", "primer2: ", ",", primer2.Sequence(), ",", "binds at", ",", bindingsitesinseq2, ",", "positions", ",")
 		alloutputs = append(alloutputs, output)
 		allprimers = append(allprimers, primer1, primer2)
+		allprimerstrings = append(allprimerstrings, primer1.Sequence(), primer2.Sequence())
 
-		primerpairs = append(primerpairs, PrimerPair{primer1, primer2})
+		primerpairs = append(primerpairs, PrimerPair{primer1.Sequence(), primer2.Sequence()})
 
 	}
 
@@ -198,14 +206,14 @@ type PrimerDesign_sequence_your_neighboursInput struct {
 
 type PrimerDesign_sequence_your_neighboursOutput struct {
 	AllOutputs  []string
-	AllPrimers  []string
+	AllPrimers  []oligos.Primer
 	PrimerPairs []PrimerPair
 }
 
 type PrimerDesign_sequence_your_neighboursSOutput struct {
 	Data struct {
 		AllOutputs  []string
-		AllPrimers  []string
+		AllPrimers  []oligos.Primer
 		PrimerPairs []PrimerPair
 	}
 	Outputs struct {

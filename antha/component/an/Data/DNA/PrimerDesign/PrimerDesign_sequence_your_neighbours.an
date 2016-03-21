@@ -6,7 +6,7 @@ protocol PrimerDesign_sequence_your_neighbours
 import (
 	"fmt"
 	//"math"
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	//"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/oligos"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/export"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
@@ -32,8 +32,9 @@ Parameters (
 // Data which is returned from this protocol
 Data (
 	AllOutputs []string
-	AllPrimers []string
+	AllPrimers []oligos.Primer
 	PrimerPairs []PrimerPair
+	//PrimerData []oligos.Primer
 	
 )
 
@@ -64,7 +65,8 @@ Steps {
 	var output string
 	var dirname string
 	var alloutputs = make([]string, 0)
-	var allprimers = make([]string, 0)
+	var allprimers = make([]oligos.Primer, 0)
+	var allprimerstrings = make ([]string,0)
 	var primerpairs = make([]PrimerPair, 0)
 	var files = make([]string, 0)
 
@@ -102,17 +104,23 @@ Steps {
 		file = filepath.Join(dirname,file)
 		sequence, _ := parser.GenbanktoAnnotatedSeq(file)
 
-		primer1, primer2 := oligos.MakeOutwardFacingPrimers(sequence.DNASequence, Maxgc, Minlength, Maxlength, Mintemp, Maxtemp, allprimers, PermittednucleotideOverlapBetweenPrimers)
+		primer1, primer2 := oligos.MakeOutwardFacingPrimers(sequence.DNASequence, Maxgc, Minlength, Maxlength, Mintemp, Maxtemp, allprimerstrings, PermittednucleotideOverlapBetweenPrimers)
 
-		bindingsitesinseq1 := oligos.CheckNonSpecificBinding(sequence.DNASequence, wtype.MakeSingleStrandedDNASequence("primer1"+"_"+file, primer1))
+		
+		primer1.Nm = "primer1"+"_"+file
+		
+		bindingsitesinseq1 := oligos.CheckNonSpecificBinding(sequence.DNASequence, primer1.DNASequence)
 
-		bindingsitesinseq2 := oligos.CheckNonSpecificBinding(sequence.DNASequence, wtype.MakeSingleStrandedDNASequence("primer2"+"_"+file, primer2))
+		primer2.Nm = "primer2"+"_"+file
 
-		output = fmt.Sprintln(file,",", "primer1: ", ",",primer1,  ",","binds at",  ",",bindingsitesinseq1, ",", "positions", ",", "primer2: ", ",", primer2, ",", "binds at",  ",",bindingsitesinseq2, ",", "positions", ",",)
+		bindingsitesinseq2 := oligos.CheckNonSpecificBinding(sequence.DNASequence, primer2.DNASequence)
+
+		output = fmt.Sprintln(file,",", "primer1: ", ",",primer1.Sequence(),  ",","binds at",  ",",bindingsitesinseq1, ",", "positions", ",", "primer2: ", ",", primer2.Sequence(), ",", "binds at",  ",",bindingsitesinseq2, ",", "positions", ",",)
 		alloutputs = append(alloutputs, output)
 		allprimers = append(allprimers, primer1, primer2)
+		allprimerstrings = append(allprimerstrings, primer1.Sequence(),primer2.Sequence())
 		
-		primerpairs = append(primerpairs, PrimerPair{primer1,primer2})
+		primerpairs = append(primerpairs, PrimerPair{primer1.Sequence(),primer2.Sequence()})
 
 		
 

@@ -4,10 +4,10 @@ package lib
 
 import (
 	//"fmt"
+	//"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/oligos"
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
@@ -44,7 +44,7 @@ func _PrimerDesign_coverRegionSetup(_ctx context.Context, _input *PrimerDesign_c
 // Core process of the protocol: steps to be performed for each input
 func _PrimerDesign_coverRegionSteps(_ctx context.Context, _input *PrimerDesign_coverRegionInput, _output *PrimerDesign_coverRegionOutput) {
 	var plasmid sequences.AnnotatedSeq
-	var allprimers []wtype.DNASequence
+	var allprimers []oligos.Primer
 
 	plasmid, _ = parser.GenbanktoAnnotatedSeq(_input.DNASeqfile)
 
@@ -140,13 +140,13 @@ type PrimerDesign_coverRegionInput struct {
 }
 
 type PrimerDesign_coverRegionOutput struct {
-	AllPrimers []wtype.DNASequence
+	AllPrimers []oligos.Primer
 	Warnings   error
 }
 
 type PrimerDesign_coverRegionSOutput struct {
 	Data struct {
-		AllPrimers []wtype.DNASequence
+		AllPrimers []oligos.Primer
 		Warnings   error
 	}
 	Outputs struct {
