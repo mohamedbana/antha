@@ -232,7 +232,8 @@ func findComps(g graph.Graph, from, to ast.Node) []*ast.UseComp {
 
 // Find best device to move a component between two devices
 func findBestMoveDevice(t *target.Target, from, to ast.Node, fromD, toD *drun) target.Device {
-	req := ast.Request{Move: &ast.Movement{}}
+	// TODO: add movement constraints
+	var req ast.Request
 	var minD target.Device
 	minC := -1
 
