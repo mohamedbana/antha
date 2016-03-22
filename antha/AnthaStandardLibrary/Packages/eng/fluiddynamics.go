@@ -24,6 +24,7 @@
 package eng
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -40,23 +41,25 @@ func CentripetalForce(mass wunit.Mass, angularfrequency float64, radius wunit.Le
 func Angularfrequency(frequency float64) (angularfrequency float64) {
 	return 2 * math.Pi * frequency
 }
-
+/*
 func KLa_squaremicrowell(D float64, dv float64, ai float64, RE float64, a float64, froude float64, b float64) float64 {
 
 	log := math.Log((3.94E-4)) + math.Log((D / dv)) + math.Log(math.Pow(RE, 1.91)) + (a * (math.Pow(froude, b)))
+
+	fmt.Println("e ^", log)
 
 	kla := math.Exp(log)
 
 	return kla
 } // a little unclear whether exp is e to (afr^b) from paper but assumed this is the case
+*/
 
-/*
 func KLa_squaremicrowell(D float64, dv float64, ai float64, RE float64, a float64, froude float64, b float64) float64 {
 	return ((3.94E-4) * (D / dv) * ai * (math.Pow(RE, 1.91)) * (math.Pow(math.E, (a * (math.Pow(froude, b))))))
 } // a little unclear whether exp is e to (afr^b) from paper but assumed this is the case
 */
 
-/*
+
 func KLa_squaremicrowell(D float64, dv float64, ai float64, RE float64, a float64, froude float64, b float64) float64 {
 
 	part1 := ((3.94E-4) * (D / dv) * ai * (math.Pow(RE, 1.91)))
