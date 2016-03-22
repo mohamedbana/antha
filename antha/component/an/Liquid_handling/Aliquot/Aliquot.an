@@ -12,6 +12,7 @@ Parameters (
 	SolutionVolume Volume
 	VolumePerAliquot  Volume
 	NumberofAliquots int
+	OutPlatetype string
 )
 
 // Data which is returned from this protocol, and data types
@@ -23,8 +24,7 @@ Data (
 // Physical Inputs to this protocol with types
 Inputs (
 	Solution *wtype.LHComponent
-	InPlate *wtype.LHPlate
-	OutPlate *wtype.LHPlate
+	
 )
 
 // Physical outputs from this protocol with types
@@ -60,7 +60,7 @@ Steps {
 		Solution.Type = wtype.LTDoNotMix
 		}
 		aliquotSample := mixer.Sample(Solution, VolumePerAliquot)
-		aliquot := MixInto(OutPlate, "", aliquotSample)
+		aliquot := MixTo(OutPlatetype, "",1, aliquotSample)
 		aliquots = append(aliquots,aliquot)
 	}
 	Aliquots = aliquots

@@ -8,7 +8,7 @@
             "ParameterVariablestring": "Hello World!"
         },
         "EnterNameForYourParameters2": {
-            "InputVariable": "component:Some component in factory",
+            "InputVariable": "Some component in factory",
             "OutPlate": "greiner384",
             "ParameterVariableAsValuewithunit": "100ul",
             "ParameterVariableAsint": 2,

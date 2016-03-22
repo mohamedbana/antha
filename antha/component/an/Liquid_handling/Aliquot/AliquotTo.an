@@ -27,7 +27,6 @@ Data (
 // Physical Inputs to this protocol with types
 Inputs (
 	Solutions []*wtype.LHComponent
-	InPlate *wtype.LHPlate
 	OutPlate *wtype.LHPlate
 )
 
@@ -66,7 +65,7 @@ Steps {
 	//alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	alphabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
 		"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
-		"Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"}
+		"Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF"}
 	//k := 0
 	
 	if ByRow {

@@ -30,15 +30,15 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Liquidclasses"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/devices"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/eng"
+	//"github.com/antha-lang/antha/antha/anthalib/wunit"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Setpoints"
+	//"github.com/montanaflynn/stats"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"math"
 )
-
-//"github.com/antha-lang/antha/antha/anthalib/wunit"
-//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Setpoints"
-//"github.com/montanaflynn/stats"
 
 //float64
 
@@ -105,7 +105,15 @@ func _KlaSteps(_ctx context.Context, _input *KlaInput, _output *KlaOutput) {
 
 	//klainputs :=fmt.Sprintln("D",D,"dv", dv,"ai", ai,"Re", Re,"a", a,"Fr", Fr,"b", b)
 
+	fmt.Println("D, dv, ai, Re, a, Fr, b", _input.D, dv, ai, Re, a, Fr, b)
+
+	fmt.Println("math.Pow(RE, 1.91)", math.Pow(Re, 1.91), "math.Pow(froude, b)", math.Pow(Fr, b), "(math.Pow(math.E, (a * (math.Pow(froude, b)))))", (math.Exp(a * (math.Pow(Fr, b)))), "a * (math.Pow(froude, b))", a*(math.Pow(Fr, b)))
+
 	_output.CalculatedKla = eng.KLa_squaremicrowell(_input.D, dv, ai, Re, a, Fr, b)
+
+	//if CalculatedKla ==  {
+	//	CalculatedKla = 0
+	//	}
 
 	_output.Status = fmt.Sprintln("TargetRE = ", _input.TargetRE, "Calculated Reynolds number = ", Re, "shakerspeedrequired for targetRE= ", _output.Necessaryshakerspeed.ToString() /* *60 */, "Froude number = ", Fr, "kla =", _output.CalculatedKla, "/h", "Ncrit	=", _output.Ncrit.ToString() /*,"/S"*/)
 	//CalculatedKla = setpoints.CalculateKlasquaremicrowell(Platetype, Liquid, Rpm, Shakertype, TargetRE, D)
@@ -116,8 +124,7 @@ func _KlaAnalysis(_ctx context.Context, _input *KlaInput, _output *KlaOutput) {
 } // works in either analysis or steps sections
 
 func _KlaValidation(_ctx context.Context, _input *KlaInput, _output *KlaOutput) {
-	/*if Evaporatedliquid > Volumeperwell {
-	panic("not enough liquid") */
+
 }
 func _KlaRun(_ctx context.Context, input *KlaInput) *KlaOutput {
 	output := &KlaOutput{}

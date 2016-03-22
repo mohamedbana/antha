@@ -17,7 +17,7 @@ Inputs (
 
 // Physical outputs from this protocol with types
 Outputs (
-	Components []wtype.LHComponent
+	Components []*wtype.LHComponent
 )
 
 // Data which is returned from this protocol, and data types
@@ -35,16 +35,16 @@ Setup {}
 Steps {
 	// Element with mock synthesises DNA. Converts DNA sequence type to LHComponent.
 	var dna wtype.LHComponent
-	Components = make([]wtype.LHComponent, 4)
+	components := make([]*wtype.LHComponent, 4)
 	
 	for i, part := range PartsWithOverhangs {
 		dna.CName = part.Nm
-		Components[i] = dna
+		components[i] = &dna
 		}
-
-	}
+Components = components
+}
 	
-
+	
 
 
 Analysis {

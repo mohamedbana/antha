@@ -179,6 +179,11 @@ func MakeCulturePolicy() LHPolicy {
 	culturepolicy["DSPZOFFSET"] = 0.5
 	culturepolicy["TIP_REUSE_LIMIT"] = 0
 	culturepolicy["NO_AIR_DISPENSE"] = true
+
+	culturepolicy["BLOWOUTVOLUME"] = 0.0
+	culturepolicy["BLOWOUTVOLUMEUNIT"] = "ul"
+	culturepolicy["TOUCHOFF"] = false
+
 	return culturepolicy
 }
 func MakeGlycerolPolicy() LHPolicy {

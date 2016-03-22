@@ -32,6 +32,7 @@ import (
 	//"github.com/antha-lang/antha/antha/anthalib/wunit"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Setpoints"
 	//"github.com/montanaflynn/stats"
+	"math"
 
 )
 Parameters (
@@ -119,7 +120,15 @@ Steps {
 	
 	//klainputs :=fmt.Sprintln("D",D,"dv", dv,"ai", ai,"Re", Re,"a", a,"Fr", Fr,"b", b)
 	
+	fmt.Println("D, dv, ai, Re, a, Fr, b",D, dv, ai, Re, a, Fr, b)
+	
+	fmt.Println("math.Pow(RE, 1.91)",math.Pow(Re, 1.91),"math.Pow(froude, b)",math.Pow(Fr, b),"(math.Pow(math.E, (a * (math.Pow(froude, b)))))",(math.Exp(a * (math.Pow(Fr, b)))),"a * (math.Pow(froude, b))",a * (math.Pow(Fr, b)))
+	
 	CalculatedKla = eng.KLa_squaremicrowell(D, dv, ai, Re, a, Fr, b)
+	
+	//if CalculatedKla ==  {
+	//	CalculatedKla = 0
+//	}
 	
 	Status = fmt.Sprintln("TargetRE = ", TargetRE,"Calculated Reynolds number = ", Re,"shakerspeedrequired for targetRE= ", Necessaryshakerspeed.ToString() /* *60 */,"Froude number = ", Fr,"kla =", CalculatedKla, "/h", "Ncrit	=", Ncrit.ToString()/*,"/S"*/)
 	//CalculatedKla = setpoints.CalculateKlasquaremicrowell(Platetype, Liquid, Rpm, Shakertype, TargetRE, D)
@@ -131,14 +140,7 @@ Analysis {
 } // works in either analysis or steps sections
 
 Validation {
-	/*if Evaporatedliquid > Volumeperwell {
-	panic("not enough liquid") */
-	}
+
+}
 
 
-
-
-
-
-
-	

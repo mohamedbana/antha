@@ -24,7 +24,7 @@ Parameters (
 	DNAgelrunvolume Volume
 	
 	
-	Mixingpolicy wtype.LiquidType
+	Mixingpolicy string //wtype.LiquidType
 	
 	//DNAladder Volume // or should this be a concentration?
 
@@ -128,7 +128,7 @@ Steps {
 	DNAgelloadmix.CName = Samplenames[0]//[i] //originalname + strconv.Itoa(i)
 	
 	// replacing following line with temporary hard code whilst developing protocol:
-	DNAgelloadmix.Type = Mixingpolicy	
+	DNAgelloadmix.Type = wtype.LiquidTypeFromString(Mixingpolicy)	
 	//DNAgelloadmix.Type = "loadwater"
 	
 	loadedsample := MixInto(

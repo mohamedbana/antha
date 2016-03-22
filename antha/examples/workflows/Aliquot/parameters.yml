@@ -1,33 +1,29 @@
 {
     "Parameters": {
         "AliquotParams": {
-            "InPlate": "pcrplate_with_cooler",
             "NumberofAliquots": 8,
-            "OutPlate": "pcrplate_with_cooler",
+            "OutPlatetype": "pcrplate_with_cooler",
             "Solution": "water",
             "SolutionVolume": "4000ul",
             "VolumePerAliquot": "25ul"
         },
         "AliquotParams2": {
-            "InPlate": "pcrplate_with_cooler",
             "NumberofAliquots": 8,
-            "OutPlate": "pcrplate_with_cooler",
+            "OutPlatetype": "pcrplate_with_cooler",
             "Solution": "water",
             "SolutionVolume": "4000ul",
             "VolumePerAliquot": "25ul"
         },
         "AliquotParams3": {
-            "InPlate": "pcrplate_with_cooler",
             "NumberofAliquots": 8,
-            "OutPlate": "pcrplate_with_cooler",
+            "OutPlatetype": "pcrplate_with_cooler",
             "Solution": "fluorescein",
             "SolutionVolume": "4000ul",
             "VolumePerAliquot": "25ul"
         },
         "AliquotParams4": {
-            "InPlate": "pcrplate_with_cooler",
             "NumberofAliquots": 8,
-            "OutPlate": "pcrplate_with_cooler",
+            "OutPlatetype": "pcrplate_with_cooler",
             "Solution": "fluorescein",
             "SolutionVolume": "4000ul",
             "VolumePerAliquot": "25ul"
