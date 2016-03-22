@@ -10,6 +10,7 @@ import (
 	"github.com/antha-lang/antha/ast"
 	"github.com/antha-lang/antha/graph"
 	"github.com/antha-lang/antha/target"
+	"github.com/antha-lang/antha/target/human"
 )
 
 // Intermediate representation.
@@ -59,20 +60,33 @@ func (a *ir) assignDevices(t *target.Target) error {
 			}
 		}
 		return
-
 	}
+
 	colors := make(map[ast.Node][]target.Device)
 	for i, inum := 0, a.CommandTree.NumNodes(); i < inum; i += 1 {
 		n := a.CommandTree.Node(i).(ast.Node)
 		var reqs []ast.Request
+		isBundle := false
 		if c, ok := n.(ast.Command); ok {
 			reqs = c.Requests()
 		} else if b, ok := n.(*ast.Bundle); ok {
+			// Try to find device that can do everything
 			reqs = bundleReqs(b)
+			isBundle = true
 		} else {
 			return fmt.Errorf("unknown node %T", n)
 		}
-		colors[n] = t.CanCompile(reqs...)
+		devices := t.CanCompile(reqs...)
+
+		if len(devices) == 0 {
+			// Otherwise fall back to manual
+			if isBundle {
+				devices = append(devices, human.New(human.Opt{CanMix: true}))
+			} else {
+				return fmt.Errorf("no device in target %T can handle constraints %s", n, ast.Meet(reqs))
+			}
+		}
+		colors[n] = devices
 	}
 
 	var devices []target.Device
@@ -519,7 +533,7 @@ func Compile(t *target.Target, roots []ast.Node) ([]target.Inst, error) {
 	} else if ir, err := build(root); err != nil {
 		return nil, fmt.Errorf("invalid program: %s", err)
 	} else if err := ir.assignDevices(t); err != nil {
-		return nil, fmt.Errorf("error assigning devices: %s", err)
+		return nil, fmt.Errorf("error assigning devices with target configuration %s: %s", t, err)
 	} else if err := ir.tryPlan(); err != nil {
 		return nil, fmt.Errorf("error planning: %s", err)
 	} else if err := ir.addMoves(t); err != nil {
