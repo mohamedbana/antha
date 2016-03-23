@@ -19,18 +19,6 @@ import (
 
 //Plateoutdilution float64
 
-/*ReactionVolume wunit.Volume
-PartConc wunit.Concentration
-VectorConc wunit.Concentration
-AtpVol wunit.Volume
-ReVol wunit.Volume
-LigVol wunit.Volume
-ReactionTemp wunit.Temperature
-ReactionTime wunit.Time
-InactivationTemp wunit.Temperature
-InactivationTime wunit.Time
-*/
-
 // Data which is returned from this protocol, and data types
 
 // Physical Inputs to this protocol with types
@@ -55,22 +43,22 @@ func _Transformation_completeSteps(_ctx context.Context, _input *Transformation_
 
 	readycompetentcellsComp := execute.Incubate(_ctx, readycompetentcells, _input.Preplasmidtemp, _input.Preplasmidtime, false) // we can incubate an LHComponent so this is fine
 
-	competetentcellmix := mixer.Sample(readycompetentcellsComp, _input.CompetentCellvolumeperassembly) // ERROR! mixer.Sample needs a liquid, not an LHComponent! however, the typeIIs method worked with a *wtype.LHComponent from inputs!
-	transformationmix := make([]*wtype.LHComponent, 0)
-	transformationmix = append(transformationmix, competetentcellmix)
+	//competetentcellmix := mixer.Sample(readycompetentcellsComp, CompetentCellvolumeperassembly) // ERROR! mixer.Sample needs a liquid, not an LHComponent! however, the typeIIs method worked with a *wtype.LHComponent from inputs!
+	//transformationmix := make([]*wtype.LHComponent, 0)
+	//transformationmix = append(transformationmix, competetentcellmix)
 	DNAsample := mixer.Sample(_input.Reaction, _input.Reactionvolume)
-	transformationmix = append(transformationmix, DNAsample)
+	//transformationmix = append(transformationmix, DNAsample)
 
-	transformedcells := execute.MixInto(_ctx, _input.OutPlate, "", transformationmix...)
+	transformedcells := execute.Mix(_ctx, readycompetentcellsComp, DNAsample)
 
 	transformedcellsComp := execute.Incubate(_ctx, transformedcells, _input.Postplasmidtemp, _input.Postplasmidtime, false)
 
-	recoverymix := make([]*wtype.LHComponent, 0)
+	//recoverymix := make([]*wtype.LHComponent, 0)
 	recoverymixture := mixer.Sample(_input.Recoverymedium, _input.Recoveryvolume)
 
-	recoverymix = append(recoverymix, transformedcellsComp) // ERROR! transformedcells is now an LHComponent, not a liquid, so can't be used here
-	recoverymix = append(recoverymix, recoverymixture)
-	recoverymix2 := execute.MixInto(_ctx, _input.OutPlate, "", recoverymix...)
+	//recoverymix = append(recoverymix,transformedcellsComp) // ERROR! transformedcells is now an LHComponent, not a liquid, so can't be used here
+	//recoverymix = append(recoverymix,recoverymixture)
+	recoverymix2 := execute.Mix(_ctx, transformedcellsComp, recoverymixture)
 
 	recoverymix2Comp := execute.Incubate(_ctx, recoverymix2, _input.Recoverytemp, _input.Recoverytime, true)
 
@@ -79,45 +67,6 @@ func _Transformation_completeSteps(_ctx context.Context, _input *Transformation_
 
 	_output.Platedculture = platedculture
 
-	/*atpSample := mixer.Sample(Atp, AtpVol)
-	samples = append(samples, atpSample)
-	vectorSample := mixer.SampleForConcentration(Vector, VectorConc)
-	samples = append(samples, vectorSample)
-
-	for _, part := range Parts {
-		partSample := mixer.SampleForConcentration(part, PartConc)
-		samples = append(samples, partSample)
-	}
-
-	reSample := mixer.Sample(RestrictionEnzyme, ReVol)
-	samples = append(samples, reSample)
-	ligSample := mixer.Sample(Ligase, LigVol)
-	samples = append(samples, ligSample)
-
-
-	// incubate the reaction mixture
-
-	Incubate(reaction, ReactionTemp, ReactionTime, false)
-
-	// inactivate
-
-	Incubate(reaction, InactivationTemp, InactivationTime, false)
-
-	// all done
-	Reaction = reaction
-
-	readycompetentcells := Incubate (CompetentCells,Preplasmidtemp, Preplasmidtime, false)
-
-
-	product := Mix (Reaction(ReactionVolume), readycompetentcells(CompetentCellvolumeperassembly))
-	transformedcells := Incubate (product, Postplasmidtime,Postplasmidtemp,false)
-	recoverymixture := Mix (transformedcells, Recoverymedium (Recoveryvolume)) // or alternative recovery medium
-	Incubate (recoverymixture, Recoverytime, Recoverytemp, Shakerspeed)
-	platedculture := MixInto(AgarPlate, Plateoutvolume)
-
-	Platedculture = platedculture
-
-	*/
 }
 
 // Run after controls and a steps block are completed to

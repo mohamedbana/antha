@@ -73,8 +73,10 @@ Steps {
 
 	var n float64 //shaking frequency per second
 	
+	fmt.Println("Rpm.Unit().RawSymbol()",Rpm.Unit().RawSymbol())
 	if Rpm.Unit().RawSymbol() == `/s`{
 		n = Rpm.RawValue()
+		fmt.Println("n = Rpm.RawValue()", Rpm.RawValue())
 	}else if Rpm.Unit().RawSymbol() == `/min`{
 		n = Rpm.RawValue()/60
 	}
@@ -123,6 +125,10 @@ Steps {
 	fmt.Println("D, dv, ai, Re, a, Fr, b",D, dv, ai, Re, a, Fr, b)
 	
 	fmt.Println("math.Pow(RE, 1.91)",math.Pow(Re, 1.91),"math.Pow(froude, b)",math.Pow(Fr, b),"(math.Pow(math.E, (a * (math.Pow(froude, b)))))",(math.Exp(a * (math.Pow(Fr, b)))),"a * (math.Pow(froude, b))",a * (math.Pow(Fr, b)))
+	
+	
+	fmt.Println("e", math.E,"power",(a * (math.Pow(Fr, b))) )
+
 	
 	CalculatedKla = eng.KLa_squaremicrowell(D, dv, ai, Re, a, Fr, b)
 	

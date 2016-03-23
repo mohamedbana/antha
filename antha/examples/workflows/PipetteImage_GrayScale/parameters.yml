@@ -3,6 +3,8 @@
     "PipetteImage": {
 		"Imagefilename":"ziggy3_384.jpg",
 		"Diluent":"water",
+		"MinimumBlackpercentagethreshold":0.25,
+		"OnlyHighVolumetips": true,
 	"Black": "Black",
       "OutPlate": "greiner384_riser",
       "VolumeForFullcolour": "150ul"

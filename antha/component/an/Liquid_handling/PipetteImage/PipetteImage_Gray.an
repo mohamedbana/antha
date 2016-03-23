@@ -13,6 +13,8 @@ import (
 Parameters (
 	VolumeForFullcolour  Volume
 	Imagefilename string
+	MinimumBlackpercentagethreshold float64 // as a proportion of 1 i.e. 0.5 == 50%
+	OnlyHighVolumetips bool
 )
 
 // Data which is returned from this protocol, and data types
@@ -47,8 +49,9 @@ Setup {
 // for every input
 Steps {
 	
-	chosencolourpalette := image.AvailablePalettes["Gray"]
+	var blackvol Volume
 	
+	chosencolourpalette := image.AvailablePalettes["Gray"]
 	
 	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette) 
 	
@@ -62,29 +65,44 @@ Steps {
 
 		gray := image.ColourtoGrayscale(colour)
 		
-		var maxuint8 uint8 = 255		
+		var maxuint8 uint8 = 255	
 		
-		if gray.Y == 0 {
+		var minuint8 uint8 
 		
+		minuint8 = uint8(MinimumBlackpercentagethreshold * float64(maxuint8))
+		
+		fmt.Println("minuint8",minuint8)
+		
+		if gray.Y < minuint8 {
+		fmt.Println("skipping well:", locationkey)
 		continue
 			
 			}else{
 			
 		counter = counter + 1
 			
-			if gray.Y < maxuint8 {
+			if gray.Y <= maxuint8 {
 			watervol := wunit.NewVolume((float64(maxuint8-gray.Y)/float64(maxuint8) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
 			fmt.Println(watervol)
-			if watervol.RawValue() < 10 && watervol.Unit().PrefixedSymbol() == "ul"{
-				watervol.SetValue(10)
+			// force hv tip choice
+			if OnlyHighVolumetips && watervol.RawValue() < 21 && watervol.Unit().PrefixedSymbol() == "ul"{
+				watervol.SetValue(21)
 			}
 			waterSample := mixer.Sample(Diluent, watervol)
 			components = append(components, waterSample)
 		}
-		blackvol := wunit.NewVolume((float64(gray.Y/maxuint8) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
-		fmt.Println("blackvol",blackvol)
-		if blackvol.RawValue() < 10 && blackvol.Unit().PrefixedSymbol() == "ul"{
-				blackvol.SetValue(10)
+		
+		if gray.Y == maxuint8 {
+			blackvol = VolumeForFullcolour
+		}else {
+		blackvol = wunit.NewVolume((float64(gray.Y)/float64(maxuint8) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
+		}
+		
+		Black.Type = wtype.LiquidTypeFromString("NeedToMix")
+		
+		fmt.Println("blackvol2",blackvol.ToString())
+		if OnlyHighVolumetips && blackvol.RawValue() < 21 && blackvol.Unit().PrefixedSymbol() == "ul"{
+				blackvol.SetValue(21)
 			}
 		blackSample := mixer.Sample(Black, blackvol)
 		components = append(components, blackSample)

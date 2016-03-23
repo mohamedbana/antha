@@ -23,7 +23,7 @@ Data (
 Inputs (
 	Transformedcells *wtype.LHComponent
     Recoverymedium *wtype.LHComponent
-	OutPlate *wtype.LHPlate
+	//OutPlate *wtype.LHPlate
 
 )
 
@@ -43,18 +43,18 @@ Setup {
 // for every input
 Steps {
 	
-	recoverymix := make([]*wtype.LHComponent, 0)
+	//recoverymix := make([]*wtype.LHComponent, 0)
 	
 	transformedcellsComp := mixer.Sample(Transformedcells,TransformedcellVolume)
 	
 	recoverymixture := mixer.Sample(Recoverymedium, Recoveryvolume)
 
-	recoverymix = append(recoverymix,transformedcellsComp)
-	recoverymix = append(recoverymix,recoverymixture)
+	//recoverymix = append(recoverymix,transformedcellsComp)
+	//recoverymix = append(recoverymix,recoverymixture)
 
 	//recoverymix = append(recoverymix,transformedcellsComp,recoverymixture)
 	//recoverymix = append(recoverymix,transformedcellsComp)
-	recoverymix2 := MixInto(OutPlate, "", recoverymix...)
+	recoverymix2 := Mix(transformedcellsComp, recoverymixture)
 	
 	RecoveredCells = Incubate (recoverymix2,  Recoverytemp, Recoverytime, true)
 	
