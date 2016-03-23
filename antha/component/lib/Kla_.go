@@ -62,8 +62,10 @@ func _KlaSteps(_ctx context.Context, _input *KlaInput, _output *KlaOutput) {
 
 	var n float64 //shaking frequency per second
 
+	fmt.Println("Rpm.Unit().RawSymbol()", _input.Rpm.Unit().RawSymbol())
 	if _input.Rpm.Unit().RawSymbol() == `/s` {
 		n = _input.Rpm.RawValue()
+		fmt.Println("n = Rpm.RawValue()", _input.Rpm.RawValue())
 	} else if _input.Rpm.Unit().RawSymbol() == `/min` {
 		n = _input.Rpm.RawValue() / 60
 	}
@@ -108,6 +110,8 @@ func _KlaSteps(_ctx context.Context, _input *KlaInput, _output *KlaOutput) {
 	fmt.Println("D, dv, ai, Re, a, Fr, b", _input.D, dv, ai, Re, a, Fr, b)
 
 	fmt.Println("math.Pow(RE, 1.91)", math.Pow(Re, 1.91), "math.Pow(froude, b)", math.Pow(Fr, b), "(math.Pow(math.E, (a * (math.Pow(froude, b)))))", (math.Exp(a * (math.Pow(Fr, b)))), "a * (math.Pow(froude, b))", a*(math.Pow(Fr, b)))
+
+	fmt.Println("e", math.E, "power", (a * (math.Pow(Fr, b))))
 
 	_output.CalculatedKla = eng.KLa_squaremicrowell(_input.D, dv, ai, Re, a, Fr, b)
 

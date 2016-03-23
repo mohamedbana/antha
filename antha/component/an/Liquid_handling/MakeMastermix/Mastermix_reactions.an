@@ -12,7 +12,7 @@ Parameters (
 	VolumetoLeaveforDNAperreaction Volume
 	Reactionspermastermix int
 	ComponentVolumesperReaction []Volume
-	NumberofMastermixes int // add as many as possible option
+	NumberofMastermixes int // add as many as possible option e.g. if == -1
 	AliquotbyRow bool
 )
 

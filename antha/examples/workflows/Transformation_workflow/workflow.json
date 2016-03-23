@@ -1,0 +1,34 @@
+{
+  
+    "processes": {
+        "Transformation1": {
+            "component": "Transformation"
+        },
+        "Recovery1": {
+            "component": "Recovery"
+        },
+        "PlateOut1": {
+            "component": "PlateOut"
+        }
+    },
+	  "connections": [
+		  {
+          "src": {
+              "process": "Transformation1",
+              "port": "Transformedcells"
+          },
+          "tgt": {
+              "process": "Recovery1",
+              "port": "Transformedcells"
+          },
+          "src": {
+              "process": "Recovery1",
+              "port": "RecoveredCells"
+          },
+          "tgt": {
+              "process": "PlateOut1",
+              "port": "RecoveredCells"
+          }	  
+	  }
+   ]
+}

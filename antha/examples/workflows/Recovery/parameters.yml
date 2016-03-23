@@ -1,7 +1,6 @@
 {
     "Parameters": {
        "Recovery": {
-            "OutPlate": "DSW96",
 			"TransformedcellVolume":"50ul",
             "Recoverymedium": "LB",
             "Recoverytemp": "25C",

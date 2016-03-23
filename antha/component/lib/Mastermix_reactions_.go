@@ -13,7 +13,7 @@ import (
 
 // if buffer is being added
 
-// add as many as possible option
+// add as many as possible option e.g. if == -1
 
 // Data which is returned from this protocol, and data types
 
@@ -175,7 +175,7 @@ func init() {
 				{Name: "ComponentVolumesperReaction", Desc: "", Kind: "Parameters"},
 				{Name: "Components", Desc: "", Kind: "Inputs"},
 				{Name: "Inplate", Desc: "", Kind: "Inputs"},
-				{Name: "NumberofMastermixes", Desc: "add as many as possible option\n", Kind: "Parameters"},
+				{Name: "NumberofMastermixes", Desc: "add as many as possible option e.g. if == -1\n", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "Reactionspermastermix", Desc: "", Kind: "Parameters"},
 				{Name: "TopUpBuffer", Desc: "optional if nil this is ignored\n", Kind: "Inputs"},

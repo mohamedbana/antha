@@ -17,6 +17,8 @@ import (
 
 // Physical Inputs to this protocol with types
 
+//OutPlate *wtype.LHPlate
+
 // Physical outputs from this protocol with types
 
 func _RecoveryRequirements() {
@@ -30,18 +32,18 @@ func _RecoverySetup(_ctx context.Context, _input *RecoveryInput) {
 // for every input
 func _RecoverySteps(_ctx context.Context, _input *RecoveryInput, _output *RecoveryOutput) {
 
-	recoverymix := make([]*wtype.LHComponent, 0)
+	//recoverymix := make([]*wtype.LHComponent, 0)
 
 	transformedcellsComp := mixer.Sample(_input.Transformedcells, _input.TransformedcellVolume)
 
 	recoverymixture := mixer.Sample(_input.Recoverymedium, _input.Recoveryvolume)
 
-	recoverymix = append(recoverymix, transformedcellsComp)
-	recoverymix = append(recoverymix, recoverymixture)
+	//recoverymix = append(recoverymix,transformedcellsComp)
+	//recoverymix = append(recoverymix,recoverymixture)
 
 	//recoverymix = append(recoverymix,transformedcellsComp,recoverymixture)
 	//recoverymix = append(recoverymix,transformedcellsComp)
-	recoverymix2 := execute.MixInto(_ctx, _input.OutPlate, "", recoverymix...)
+	recoverymix2 := execute.Mix(_ctx, transformedcellsComp, recoverymixture)
 
 	_output.RecoveredCells = execute.Incubate(_ctx, recoverymix2, _input.Recoverytemp, _input.Recoverytime, true)
 
@@ -105,7 +107,6 @@ type RecoveryElement struct {
 }
 
 type RecoveryInput struct {
-	OutPlate              *wtype.LHPlate
 	Recoverymedium        *wtype.LHComponent
 	Recoverytemp          wunit.Temperature
 	Recoverytime          wunit.Time
@@ -133,7 +134,6 @@ func init() {
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/Transformation/Recovery.an",
 			Params: []ParamDesc{
-				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "Recoverymedium", Desc: "", Kind: "Inputs"},
 				{Name: "Recoverytemp", Desc: "", Kind: "Parameters"},
 				{Name: "Recoverytime", Desc: "= 2 (hours)\n", Kind: "Parameters"},
