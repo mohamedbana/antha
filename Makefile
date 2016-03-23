@@ -24,7 +24,7 @@ compile:
 test_workflows: compile
 	for d in `find antha/examples -type d -o -name '*.yml'`; do \
 	  if [[ -f "$$d/workflow.json" && -f "$$d/parameters.yml" ]]; then \
-	    (cd "$$d" && antharun --workflow workflow.json --parameters parameters.yml > /dev/null); \
+	    (cd "$$d" && antharun --workflow workflow.json --parameters parameters.yml $(ANTHA_ARGS) > /dev/null); \
 	    if [[ $$? == 0 ]]; then \
 	      echo "OK $$d"; \
 	    else \

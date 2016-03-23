@@ -5,8 +5,9 @@ package lib
 import (
 	"fmt"
 	//"math"
+	//"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/export"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/oligos"
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -15,6 +16,7 @@ import (
 	"github.com/antha-lang/antha/inject"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // Input parameters for this protocol
@@ -29,6 +31,8 @@ import (
 // number of nucleotides which primers can overlap by
 
 // Data which is returned from this protocol
+
+//PrimerData []oligos.Primer
 
 // Physical inputs to this protocol
 
@@ -52,49 +56,10 @@ func _PrimerDesign_sequence_your_neighboursSteps(_ctx context.Context, _input *P
 	var output string
 	var dirname string
 	var alloutputs = make([]string, 0)
-	var allprimers = make([]string, 0)
+	var allprimers = make([]oligos.Primer, 0)
+	var allprimerstrings = make([]string, 0)
 	var primerpairs = make([]PrimerPair, 0)
 	var files = make([]string, 0)
-
-	/*	vector, _ := parser.GenbanktoAnnotatedSeq("STAR_0023_VECTOR_BBSI.gb")
-
-		typeIIs := lookup.EnzymeLookup("bbsI")
-
-		fragments, _, _ := enzymes.Digest(vector.DNASequence, typeIIs)
-
-		plasmid, _ := parser.GenbanktoAnnotatedSeq("STAR_0023_VECTOR_BBSI+Grp7+Grp14+Grp3.gb")
-
-		for _, fragment := range fragments {
-
-			Start, End, err = FindPositioninSequence(plasmid.DNASequence, wtype.MakeSingleStrandedDNASequence("fragment", fragment))
-
-			if err == nil {
-				fmt.Println("Found the right fragment!", fragment, "start = ", Start, "End", End)
-				break
-			}
-
-		}
-	*/
-	/*if err != nil {
-		status = err.Error()
-	} else {
-		status = "No error"
-	}*/
-
-	//vectorstart, _, err := FindPositioninSequence(plasmid.DNASequence, vector.DNASequence)
-	/*
-		if err != nil {
-			panic(err.Error())
-
-		}*/
-
-	//region := DNAregion(plasmid.DNASequence, Start, len(plasmid.Sequence()))
-
-	//region := "ATGAGCAAAGGAGAAGAACTTTTCACTGGAGTTGTCCCAATTCTTGTTGAATTAGATGGTGATGTTAATGGGCACAAATTTTCTGTCCGTGGAGAGGGTGAAGGTGATGCTACAAACGGAAAACTCACCCTTAAATTTATTTGCACTACTGGAAAACTACCTGTTCCATGGCCAACACTTGTCACTACTCTGACCTATGGTGTTCAATGCTTTTCCCGTTATCCGGATCACATGAAACGGCATGACTTTTTCAAGAGTGCCATGCCCGAAGGTTATGTACAGGAACGCACTATATCTTTCAAAGATGACGGGACCTACAAGACGCGTGCTGAAGTCAAGTTTGAAGGTGATACCCTTGTTAATCGTATCGAGTTAAAAGGTATTGATTTTAAAGAAGATGGAAACATTCTCGGACACAAACTCGAGTACAACTTTAACTCACACAATGTATACATCACGGCAGACAAACAAAAGAATGGAATCAAAGCTAACTTCAAAATTCGCCACAACGTTGAAGATGGTTCCGTTCAACTAGCAGACCATTATCAACAAAATACTCCAATTGGCGATGGCCCTGTCCTTTTACCAGACAACCATTACCTGTCGACACAATCTGTCCTTTCGAAAGATCCCAACGAAAAGCGTGACCACATGGTCCTTCTTGAGTTTGTAACTGCTGCTGGGATTACACATGGCATGGATGAGCTCTACAAATAA"
-
-	//primer, GCpercent, _ := FWDOligoSeq(region, 0.6, 20, 25, mintemp, maxtemp)
-
-	//fmt.Println(primer, GCpercent)
 
 	//Search for files within current directory
 
@@ -131,23 +96,38 @@ func _PrimerDesign_sequence_your_neighboursSteps(_ctx context.Context, _input *P
 		file = filepath.Join(dirname, file)
 		sequence, _ := parser.GenbanktoAnnotatedSeq(file)
 
-		primer1, primer2 := oligos.MakeOutwardFacingPrimers(sequence.DNASequence, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, allprimers, _input.PermittednucleotideOverlapBetweenPrimers)
+		primer1, primer2 := oligos.MakeOutwardFacingPrimers(sequence.DNASequence, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, allprimerstrings, _input.PermittednucleotideOverlapBetweenPrimers)
 
-		bindingsitesinseq1 := oligos.CheckNonSpecificBinding(sequence.DNASequence, wtype.MakeSingleStrandedDNASequence("primer1"+"_"+file, primer1))
+		primer1.Nm = "primer1" + "_" + file
 
-		bindingsitesinseq2 := oligos.CheckNonSpecificBinding(sequence.DNASequence, wtype.MakeSingleStrandedDNASequence("primer2"+"_"+file, primer2))
+		bindingsitesinseq1 := oligos.CheckNonSpecificBinding(sequence.DNASequence, primer1.DNASequence)
 
-		output = fmt.Sprintln(file, ",", "primer1: ", ",", primer1, ",", "binds at", ",", bindingsitesinseq1, ",", "positions", ",", "primer2: ", ",", primer2, ",", "binds at", ",", bindingsitesinseq2, ",", "positions", ",")
+		primer2.Nm = "primer2" + "_" + file
+
+		bindingsitesinseq2 := oligos.CheckNonSpecificBinding(sequence.DNASequence, primer2.DNASequence)
+
+		output = fmt.Sprintln(file, ",", "primer1: ", ",", primer1.Sequence(), ",", "melting temp: ", ",", primer1.MeltingTemp.ToString(), ",", "length: ", ",", primer1.Length, ",", "gc content: ", ",", primer1.GCContent, ",", "binds at", ",", bindingsitesinseq1, ",", "positions", ",", "primer2: ", ",", primer2.Sequence(), ",", "melting temp: ", ",", primer2.MeltingTemp.ToString(), ",", "length: ", ",", primer2.Length, ",", "gc content: ", ",", primer2.GCContent, ",", "binds at", ",", bindingsitesinseq2, ",", "positions", ",")
 		alloutputs = append(alloutputs, output)
 		allprimers = append(allprimers, primer1, primer2)
+		allprimerstrings = append(allprimerstrings, primer1.Sequence(), primer2.Sequence())
 
-		primerpairs = append(primerpairs, PrimerPair{primer1, primer2})
+		primerpairs = append(primerpairs, PrimerPair{primer1.Sequence(), primer2.Sequence()})
 
 	}
 
 	fmt.Println(alloutputs, allprimers)
 
 	_output.AllOutputs = alloutputs
+
+	if _input.ExportToFile {
+		err = export.ExporttoTextFile("exported_primers.csv", _output.AllOutputs)
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+	}
+
 	_output.AllPrimers = allprimers
 	_output.PrimerPairs = primerpairs
 
@@ -157,9 +137,83 @@ func _PrimerDesign_sequence_your_neighboursSteps(_ctx context.Context, _input *P
 func _PrimerDesign_sequence_your_neighboursAnalysis(_ctx context.Context, _input *PrimerDesign_sequence_your_neighboursInput, _output *PrimerDesign_sequence_your_neighboursOutput) {
 
 }
-
 func _PrimerDesign_sequence_your_neighboursValidation(_ctx context.Context, _input *PrimerDesign_sequence_your_neighboursInput, _output *PrimerDesign_sequence_your_neighboursOutput) {
 
+	// check each sequence for binding to other sequences in folder:
+
+	//var Start int
+	//var End int
+	var err error
+	var output string
+	var dirname string
+
+	var files = make([]string, 0)
+
+	//Search for files within current directory
+
+	if _input.Dirname == "current" {
+		dirname = "." + string(filepath.Separator)
+	} else {
+		dirname = _input.Dirname
+	}
+
+	d, err := os.Open(dirname)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	defer d.Close()
+
+	allfiles, err := d.Readdir(-1)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	fmt.Println("Reading " + dirname)
+
+	//Determine if file extension is ".gb"
+	for _, file := range allfiles {
+		if filepath.Ext(file.Name()) == ".gb" {
+			files = append(files, file.Name())
+		}
+
+	}
+
+	var nonspecificbinding = make([]string, 0)
+
+	for _, file := range files {
+		file = filepath.Join(dirname, file)
+		sequence, _ := parser.GenbanktoAnnotatedSeq(file)
+
+		for _, primer := range _output.AllPrimers {
+
+			// only check other files
+			if strings.Contains(primer.Nm, file) == false {
+
+				bindingsites := oligos.CheckNonSpecificBinding(sequence.DNASequence, primer.DNASequence)
+
+				// if binding found add to output file:
+
+				if bindingsites > 0 {
+					output = fmt.Sprintln(file, ",", "primer: ", ",", primer.Nm, ", ", primer.Sequence(), ",", "binds at", ",", bindingsites, ",", "positions")
+
+					nonspecificbinding = append(nonspecificbinding, output)
+
+				}
+			}
+		}
+
+	}
+
+	if _input.ExportToFile {
+		err = export.ExporttoTextFile("exported_primers_bindingReport.csv", nonspecificbinding)
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+	}
 }
 
 type PrimerPair struct {
@@ -216,6 +270,7 @@ type PrimerDesign_sequence_your_neighboursElement struct {
 
 type PrimerDesign_sequence_your_neighboursInput struct {
 	Dirname                                  string
+	ExportToFile                             bool
 	Maxgc                                    float64
 	Maxlength                                int
 	Maxtemp                                  wunit.Temperature
@@ -226,14 +281,14 @@ type PrimerDesign_sequence_your_neighboursInput struct {
 
 type PrimerDesign_sequence_your_neighboursOutput struct {
 	AllOutputs  []string
-	AllPrimers  []string
+	AllPrimers  []oligos.Primer
 	PrimerPairs []PrimerPair
 }
 
 type PrimerDesign_sequence_your_neighboursSOutput struct {
 	Data struct {
 		AllOutputs  []string
-		AllPrimers  []string
+		AllPrimers  []oligos.Primer
 		PrimerPairs []PrimerPair
 	}
 	Outputs struct {
@@ -248,6 +303,7 @@ func init() {
 			Path: "antha/component/an/Data/DNA/PrimerDesign/PrimerDesign_sequence_your_neighbours.an",
 			Params: []ParamDesc{
 				{Name: "Dirname", Desc: "files     []string = []string{\"STAR_0023_VECTOR_BBSI.gb\", \"STAR_0023_VECTOR_BBSI+Grp7+Grp14+Grp3.gb\"}\n\n= \"current\" // this will check for all .gb files in the folder you select here\n", Kind: "Parameters"},
+				{Name: "ExportToFile", Desc: "", Kind: "Parameters"},
 				{Name: "Maxgc", Desc: "     = 0.6\n", Kind: "Parameters"},
 				{Name: "Maxlength", Desc: "    = 25\n", Kind: "Parameters"},
 				{Name: "Maxtemp", Desc: "     = wunit.NewTemperature(60, \"C\")\n", Kind: "Parameters"},

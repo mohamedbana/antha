@@ -25,7 +25,7 @@ Parameters (
 
 // Data which is returned from this protocol
 Data (
-	AllPrimers []wtype.DNASequence
+	AllPrimers []oligos.Primer
 	Warnings error
 )
 

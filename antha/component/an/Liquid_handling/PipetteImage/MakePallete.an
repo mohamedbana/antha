@@ -54,12 +54,14 @@ Steps {
 	//var chosencolourpalette color.Palette
 	
 	// make pallette of colours from image
-	chosencolourpalette := image.MakePalleteFromImage(Imagefilename, OutPlate) 
+	chosencolourpalette := image.MakeSmallPalleteFromImage(Imagefilename, OutPlate) 
 	
 	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette) 
 	
 	// remove duplicates
-	positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
+	//positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
+	
+	fmt.Println("positions", positiontocolourmap)
 	
 	solutions := make([]*wtype.LHComponent, 0)
 
@@ -69,6 +71,7 @@ Steps {
 
 	for _, colour := range positiontocolourmap {
 		
+		if colour != nil {
 		components := make([]*wtype.LHComponent, 0)
 
 		cmyk := image.ColourtoCMYK(colour)
@@ -86,30 +89,53 @@ Steps {
 		if cmyk.C > 0{
 			
 		cyanvol := wunit.NewVolume(((float64(cmyk.C)/float64(maxuint8)) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
+		
+		if cyanvol.RawValue() < 10 && cyanvol.Unit().PrefixedSymbol() == "ul"{
+				cyanvol.SetValue(10)
+			}
+		
+		
 		cyanSample := mixer.Sample(Cyan, cyanvol)
 		components = append(components, cyanSample)
 		}
 		
 		if cmyk.Y > 0{
 		yellowvol := wunit.NewVolume(((float64(cmyk.Y)/float64(maxuint8)) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
+		
+		if yellowvol.RawValue() < 10 && yellowvol.Unit().PrefixedSymbol() == "ul"{
+				yellowvol.SetValue(10)
+			}
+		
 		yellowSample := mixer.Sample(Yellow, yellowvol)
 		components = append(components, yellowSample)
 		}
 		
 		if cmyk.M > 0{
 		magentavol := wunit.NewVolume(((float64(cmyk.M)/float64(maxuint8)) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
+		
+		if magentavol.RawValue() < 10 && magentavol.Unit().PrefixedSymbol() == "ul"{
+				magentavol.SetValue(10)
+			}
+		
 		magentaSample := mixer.Sample(Magenta, magentavol)
 		components = append(components, magentaSample)
 		}
 		
 		if cmyk.K > 0{
 		blackvol := wunit.NewVolume(((float64(cmyk.K)/float64(maxuint8)) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
+		
+		if blackvol.RawValue() < 10 && blackvol.Unit().PrefixedSymbol() == "ul"{
+				blackvol.SetValue(10)
+			}
+		
 		blackSample := mixer.Sample(Black, blackvol)
 		components = append(components, blackSample)
 		}
 		
 		solution := MixInto(OutPlate, "", components...)
 		solutions = append(solutions, solution)
+		
+		}
 		
 		}
 	}

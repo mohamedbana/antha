@@ -89,7 +89,7 @@ Steps {
 		blackSample := mixer.Sample(Black, blackvol)
 		components = append(components, blackSample)
 		
-		solution := MixTo(OutPlate.Type, locationkey,0, components...)
+		solution := MixTo(OutPlate.Type, locationkey,1, components...)
 		solutions = append(solutions, solution)
 		
 		}

@@ -121,13 +121,13 @@ type PrimerDesign_coverfullsequenceInput struct {
 }
 
 type PrimerDesign_coverfullsequenceOutput struct {
-	AllPrimers []wtype.DNASequence
+	AllPrimers []oligos.Primer
 	Warnings   error
 }
 
 type PrimerDesign_coverfullsequenceSOutput struct {
 	Data struct {
-		AllPrimers []wtype.DNASequence
+		AllPrimers []oligos.Primer
 		Warnings   error
 	}
 	Outputs struct {

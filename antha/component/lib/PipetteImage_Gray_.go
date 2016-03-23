@@ -76,7 +76,7 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 			blackSample := mixer.Sample(_input.Black, blackvol)
 			components = append(components, blackSample)
 
-			solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 0, components...)
+			solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, components...)
 			solutions = append(solutions, solution)
 
 		}

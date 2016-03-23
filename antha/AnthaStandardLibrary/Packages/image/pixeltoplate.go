@@ -44,6 +44,7 @@ var Visibleequivalentmaps = map[string]map[color.Color]string{
 }
 
 func ColourtoCMYK(colour color.Color) (cmyk color.CMYK) {
+	fmt.Println("colour", colour)
 	r, g, b, _ := colour.RGBA()
 	cmyk.C, cmyk.M, cmyk.Y, cmyk.K = color.RGBToCMYK(uint8(r), uint8(g), uint8(b))
 	return
@@ -313,7 +314,49 @@ func ResizeImagetoPlate(imagefilename string, plate *wtype.LHPlate, algorithm im
 
 func MakePalleteFromImage(imagefilename string, plate *wtype.LHPlate) (newpallette color.Palette) {
 	plateimage := ResizeImagetoPlate(imagefilename, plate, imaging.CatmullRom)
+
 	colourarray := make([]color.Color, 0)
+
+	// Find out colour at each position:
+	for y := 0; y < plateimage.Bounds().Dy(); y++ {
+		for x := 0; x < plateimage.Bounds().Dx(); x++ {
+			// colour or pixel in RGB
+			colour := plateimage.At(x, y)
+			colourarray = append(colourarray, colour)
+
+		}
+	}
+
+	return
+}
+
+func MakeSmallPalleteFromImage(imagefilename string, plate *wtype.LHPlate) (newpallette color.Palette) {
+	plateimage := ResizeImagetoPlate(imagefilename, plate, imaging.CatmullRom)
+
+	// use Plan9 as pallette for first round to keep number of colours down to a manageable level
+
+	chosencolourpalette := AvailablePalettes["Plan9"]
+
+	colourarray := make([]color.Color, 0)
+
+	// Find out colour at each position:
+	for y := 0; y < plateimage.Bounds().Dy(); y++ {
+		for x := 0; x < plateimage.Bounds().Dx(); x++ {
+			// colour or pixel in RGB
+			colour := plateimage.At(x, y)
+
+			if colour != nil {
+
+				// change colour to colour from a palette
+				colour = chosencolourpalette.Convert(colour)
+
+				plateimage.Set(x, y, colour)
+
+				colourarray = append(colourarray, colour)
+			}
+		}
+	}
+	colourarray = make([]color.Color, 0)
 
 	// Find out colour at each position:
 	for y := 0; y < plateimage.Bounds().Dy(); y++ {
@@ -349,19 +392,24 @@ func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolour
 		for x := 0; x < plateimage.Bounds().Dx(); x++ {
 			// colour or pixel in RGB
 			colour := plateimage.At(x, y)
-			colourarray = append(colourarray, colour)
+			fmt.Println("x,y,colour, palette", x, y, colour, chosencolourpalette)
 
-			if chosencolourpalette != nil && chosencolourpalette != &Emptycolourarray {
-				// change colour to colour from a palette
-				colour = chosencolourpalette.Convert(colour)
-				plateimage.Set(x, y, colour)
-				fmt.Println("HELLOOOOO")
+			if colour != nil {
+				colourarray = append(colourarray, colour)
+
+				if chosencolourpalette != nil && chosencolourpalette != &Emptycolourarray && len([]color.Color(*chosencolourpalette)) > 0 {
+					// change colour to colour from a palette
+					colour = chosencolourpalette.Convert(colour)
+					fmt.Println("x,y,colour", x, y, colour)
+					plateimage.Set(x, y, colour)
+					fmt.Println("HELLOOOOO")
+				}
+				// equivalent well position
+				wellposition := alphabet[y] + strconv.Itoa(x+1)
+				fmt.Println(wellposition)
+				wellpositionarray = append(wellpositionarray, wellposition)
+				wellpositiontocolourmap[wellposition] = colour
 			}
-			// equivalent well position
-			wellposition := alphabet[y] + strconv.Itoa(x+1)
-			fmt.Println(wellposition)
-			wellpositionarray = append(wellpositionarray, wellposition)
-			wellpositiontocolourmap[wellposition] = colour
 		}
 	}
 

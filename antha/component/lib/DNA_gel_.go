@@ -20,6 +20,8 @@ import (
 
 // Input parameters for this protocol (data)
 
+//wtype.LiquidType
+
 //DNAladder Volume // or should this be a concentration?
 
 //DNAgelruntime time.Duration
@@ -117,7 +119,7 @@ func _DNA_gelSteps(_ctx context.Context, _input *DNA_gelInput, _output *DNA_gelO
 		DNAgelloadmix.CName = _input.Samplenames[0] //[i] //originalname + strconv.Itoa(i)
 
 		// replacing following line with temporary hard code whilst developing protocol:
-		DNAgelloadmix.Type = _input.Mixingpolicy
+		DNAgelloadmix.Type = wtype.LiquidTypeFromString(_input.Mixingpolicy)
 		//DNAgelloadmix.Type = "loadwater"
 
 		loadedsample := execute.MixInto(_ctx, _input.DNAgel,
@@ -235,7 +237,7 @@ type DNA_gelInput struct {
 	Loadingdye         *wtype.LHComponent
 	Loadingdyeinsample bool
 	Loadingdyevolume   wunit.Volume
-	Mixingpolicy       wtype.LiquidType
+	Mixingpolicy       string
 	Samplenames        []string
 	Samplenumber       int
 	Sampletotest       *wtype.LHComponent
@@ -268,7 +270,7 @@ func init() {
 				{Name: "Loadingdye", Desc: "WaterSolution //Chemspiderlink // not correct link but similar desirable\n", Kind: "Inputs"},
 				{Name: "Loadingdyeinsample", Desc: "", Kind: "Parameters"},
 				{Name: "Loadingdyevolume", Desc: "", Kind: "Parameters"},
-				{Name: "Mixingpolicy", Desc: "", Kind: "Parameters"},
+				{Name: "Mixingpolicy", Desc: "wtype.LiquidType\n", Kind: "Parameters"},
 				{Name: "Samplenames", Desc: "", Kind: "Parameters"},
 				{Name: "Samplenumber", Desc: "", Kind: "Parameters"},
 				{Name: "Sampletotest", Desc: "WaterSolution\n", Kind: "Inputs"},

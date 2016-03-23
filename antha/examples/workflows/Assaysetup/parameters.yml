@@ -3,13 +3,12 @@
         "Assaysetup": {
             "Buffer": "water",
             "Enzyme": "T4Ligase",
-            "EnzymeVolume": "30ul",
+            "EnzymeVolume": "1ul",
             "NumberofReactions": 1,
-            "OutPlate": "reservoir",
+            "OutPlate": "pcrplate_skirted",
             "Substrate": "CutsmartBuffer",
-            "SubstrateVolume": "30ul",
-            "TipType": "Gilson200",
-            "TotalVolume": "100ul"
+            "SubstrateVolume": "2ul",
+            "TotalVolume": "10ul"
         }
     }
 }

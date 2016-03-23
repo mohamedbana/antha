@@ -4,6 +4,7 @@ package target
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/antha-lang/antha/ast"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
@@ -40,6 +41,14 @@ func New() *Target {
 	return &Target{
 		runners: make(map[string][]*Runner),
 	}
+}
+
+func (a *Target) String() string {
+	var r []string
+	for _, d := range a.devices {
+		r = append(r, fmt.Sprint(d))
+	}
+	return fmt.Sprint(r)
 }
 
 func (a *Target) canCompile(d Device, reqs ...ast.Request) bool {

@@ -1,16 +1,15 @@
 {
     "Parameters": {
         "AliquotParams": {
-            "InPlate": "pcrplate_with_cooler",
-            "NumberofAliquots": 16,
-            "OutPlate": "pcrplate_with_cooler",
+            "NumberofAliquots": 160,
+            "OutPlate": "nunc1536_riser",
             "Solutions": [
 			"water",
 			"fluorescein"
 			],
 			"ByRow": false,
             "SolutionVolume": "4000ul",
-            "VolumePerAliquot": "25ul"
+            "VolumePerAliquot": "5ul"
         }
     }
 }

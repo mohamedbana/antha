@@ -48,7 +48,7 @@ func _AliquotToSteps(_ctx context.Context, _input *AliquotToInput, _output *Aliq
 	//alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	alphabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
 		"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
-		"Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"}
+		"Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF"}
 	//k := 0
 
 	if _input.ByRow {
@@ -149,7 +149,6 @@ type AliquotToElement struct {
 
 type AliquotToInput struct {
 	ByRow            bool
-	InPlate          *wtype.LHPlate
 	NumberofAliquots int
 	OutPlate         *wtype.LHPlate
 	SolutionVolume   wunit.Volume
@@ -177,7 +176,6 @@ func init() {
 			Path: "antha/component/an/Liquid_handling/Aliquot/AliquotTo.an",
 			Params: []ParamDesc{
 				{Name: "ByRow", Desc: "", Kind: "Parameters"},
-				{Name: "InPlate", Desc: "", Kind: "Inputs"},
 				{Name: "NumberofAliquots", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "SolutionVolume", Desc: "", Kind: "Parameters"},
