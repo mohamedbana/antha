@@ -15,6 +15,7 @@ import (
 // Input parameters for this protocol (data)
 
 // as a proportion of 1 i.e. 0.5 == 50%
+//SkipBlackforlowervol bool
 
 // Data which is returned from this protocol, and data types
 
@@ -39,6 +40,10 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 
 	var blackvol wunit.Volume
 
+	var maxuint8 uint8 = 255
+
+	var minuint8 uint8
+
 	chosencolourpalette := image.AvailablePalettes["Gray"]
 
 	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette)
@@ -53,13 +58,13 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 
 		gray := image.ColourtoGrayscale(colour)
 
-		var maxuint8 uint8 = 255
-
-		var minuint8 uint8
+		if _input.Negative == false {
+			gray.Y = maxuint8 - gray.Y
+		}
 
 		minuint8 = uint8(_input.MinimumBlackpercentagethreshold * float64(maxuint8))
 
-		fmt.Println("minuint8", minuint8)
+		fmt.Println("brand new minuint8", minuint8)
 
 		if gray.Y < minuint8 {
 			fmt.Println("skipping well:", locationkey)
@@ -69,26 +74,28 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 
 			counter = counter + 1
 
-			if gray.Y <= maxuint8 {
+			if gray.Y < maxuint8 {
 				watervol := wunit.NewVolume((float64(maxuint8-gray.Y) / float64(maxuint8) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
-				fmt.Println(watervol)
+				fmt.Println("new well", locationkey, "water vol", watervol.ToString())
 				// force hv tip choice
 				if _input.OnlyHighVolumetips && watervol.RawValue() < 21 && watervol.Unit().PrefixedSymbol() == "ul" {
 					watervol.SetValue(21)
 				}
 				waterSample := mixer.Sample(_input.Diluent, watervol)
 				components = append(components, waterSample)
-			}
 
+			}
 			if gray.Y == maxuint8 {
 				blackvol = _input.VolumeForFullcolour
 			} else {
 				blackvol = wunit.NewVolume((float64(gray.Y) / float64(maxuint8) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
 			}
 
-			_input.Black.Type = wtype.LiquidTypeFromString("NeedToMix")
+			fmt.Println("new well", locationkey, "black vol", blackvol.ToString())
 
-			fmt.Println("blackvol2", blackvol.ToString())
+			_input.Black.Type = wtype.LiquidTypeFromString("glycerol")
+
+			//fmt.Println("blackvol2",blackvol.ToString())
 			if _input.OnlyHighVolumetips && blackvol.RawValue() < 21 && blackvol.Unit().PrefixedSymbol() == "ul" {
 				blackvol.SetValue(21)
 			}
@@ -170,6 +177,7 @@ type PipetteImage_GrayInput struct {
 	Diluent                         *wtype.LHComponent
 	Imagefilename                   string
 	MinimumBlackpercentagethreshold float64
+	Negative                        bool
 	OnlyHighVolumetips              bool
 	OutPlate                        *wtype.LHPlate
 	VolumeForFullcolour             wunit.Volume
@@ -200,7 +208,8 @@ func init() {
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
 				{Name: "MinimumBlackpercentagethreshold", Desc: "as a proportion of 1 i.e. 0.5 == 50%\n", Kind: "Parameters"},
-				{Name: "OnlyHighVolumetips", Desc: "", Kind: "Parameters"},
+				{Name: "Negative", Desc: "", Kind: "Parameters"},
+				{Name: "OnlyHighVolumetips", Desc: "SkipBlackforlowervol bool\n", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\n", Kind: "Inputs"},
 				{Name: "VolumeForFullcolour", Desc: "", Kind: "Parameters"},
 				{Name: "Numberofpixels", Desc: "", Kind: "Data"},

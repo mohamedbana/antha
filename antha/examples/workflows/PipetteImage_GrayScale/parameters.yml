@@ -1,13 +1,14 @@
 {
   "Parameters": {
     "PipetteImage": {
-		"Imagefilename":"ziggy3_384.jpg",
+		"Imagefilename":"AIbEiAIAAABECIXbpIDIzOTYngEiC3ZjYXJkX3Bob3RvKig3ZjhhM2M0ODUxMTFjNzc3M2E4OWViZTNlYWJlMTQxOTU0ODFhMzk1MAHd1lIEFK6yDxxud4Ed7QXSMoKIgA.jpg",
 		"Diluent":"water",
-		"MinimumBlackpercentagethreshold":0.25,
+		"MinimumBlackpercentagethreshold":0.20,
 		"OnlyHighVolumetips": true,
+		"Negative": false,
 	"Black": "Black",
       "OutPlate": "greiner384_riser",
-      "VolumeForFullcolour": "150ul"
+      "VolumeForFullcolour": "100ul"
     }
   }
 }

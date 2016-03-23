@@ -30,7 +30,7 @@ func LiquidTypeFromString(s string) LiquidType {
 
 		runnumber, err := strconv.Atoi(fields[1])
 		if err != nil {
-			panic(err.Error())
+			panic("for Liguid type " + s + err.Error())
 		}
 		liquid := LiquidType(100 + runnumber)
 
