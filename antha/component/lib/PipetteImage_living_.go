@@ -13,6 +13,7 @@ import (
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/microArch/factory"
+	"image/color"
 )
 
 // Input parameters for this protocol (data)
@@ -22,8 +23,6 @@ import (
 InducerVolume Volume
 RepressorVolume Volume*/
 
-//Subset bool
-//Subsetnames []string
 //IncTemp Temperature
 //IncTime Time
 
@@ -52,9 +51,16 @@ func _PipetteImage_livingSetup(_ctx context.Context, _input *PipetteImage_living
 // for every input
 func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_livingInput, _output *PipetteImage_livingOutput) {
 
-	_output.UniqueComponents = make([]string, 0)
+	// make sub pallete if necessary
+	var chosencolourpalette color.Palette
 
-	chosencolourpalette := image.AvailablePalettes[_input.Palettename]
+	if _input.Subset {
+		chosencolourpalette = image.MakeSubPallette(_input.Palettename, _input.Subsetnames)
+	} else {
+		chosencolourpalette = image.AvailablePalettes[_input.Palettename]
+	}
+
+	_output.UniqueComponents = make([]string, 0)
 
 	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate)
 
@@ -219,6 +225,8 @@ type PipetteImage_livingInput struct {
 	OutPlate       *wtype.LHPlate
 	Palettename    string
 	Rotate         bool
+	Subset         bool
+	Subsetnames    []string
 	UVimage        bool
 	VolumePerWell  wunit.Volume
 }
@@ -252,6 +260,8 @@ func init() {
 				{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\nMedia *wtype.LHComponent\nAntibiotic *wtype.LHComponent\n\tInducer *wtype.LHComponent\n\tRepressor *wtype.LHComponent\n", Kind: "Inputs"},
 				{Name: "Palettename", Desc: "", Kind: "Parameters"},
 				{Name: "Rotate", Desc: "", Kind: "Parameters"},
+				{Name: "Subset", Desc: "", Kind: "Parameters"},
+				{Name: "Subsetnames", Desc: "", Kind: "Parameters"},
 				{Name: "UVimage", Desc: "", Kind: "Parameters"},
 				{Name: "VolumePerWell", Desc: "", Kind: "Parameters"},
 				{Name: "Numberofpixels", Desc: "", Kind: "Data"},

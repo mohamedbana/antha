@@ -9,6 +9,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/microArch/factory"
 	"fmt"
+	 "image/color"
 )
 
 
@@ -25,8 +26,8 @@ Parameters (
 	Notthiscolour string
 	UVimage bool
 	Rotate bool
-	//Subset bool
-	//Subsetnames []string
+	Subset bool
+	Subsetnames []string
 	//IncTemp Temperature
 	//IncTime Time
 )
@@ -66,9 +67,17 @@ Setup {
 // for every input
 Steps {
 	
-	UniqueComponents = make([]string,0)
+	// make sub pallete if necessary
+	var chosencolourpalette color.Palette
 	
-	chosencolourpalette := image.AvailablePalettes[Palettename]
+	if Subset {
+		chosencolourpalette = image.MakeSubPallette(Palettename, Subsetnames)
+	}else {
+		chosencolourpalette = image.AvailablePalettes[Palettename]
+	}
+	
+	
+	UniqueComponents = make([]string,0)
 	
 	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette,Rotate) 
 	
@@ -158,13 +167,15 @@ Steps {
 		}
 	}
 	
-	Numberofpixels = len(Pixels)
-	fmt.Println("Pixels =",Numberofpixels)
+	
 
 	UniqueComponents = search.RemoveDuplicates(UniqueComponents)
 	fmt.Println("Unique Components:",UniqueComponents)
 	fmt.Println("number of unique components",len(UniqueComponents))
 	Pixels = solutions
+	
+	Numberofpixels = len(Pixels)
+	fmt.Println("Pixels =",Numberofpixels)
 	
 }
 
