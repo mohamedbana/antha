@@ -81,19 +81,27 @@ Steps {
 	
 	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette,Rotate) 
 	
+	colourtostringmap := image.AvailableComponentmaps[Palettename]
+	
 	if UVimage {
 		uvmap := image.AvailableComponentmaps[Palettename]
 		visiblemap := image.Visibleequivalentmaps[Palettename]
 		
+		if Subset {
+		uvmap = image.MakeSubMapfromMap(colourtostringmap, Subsetnames)
+		visiblemap = image.MakeSubMapfromMap(colourtostringmap, Subsetnames)
+		}
 		image.PrintFPImagePreview(Imagefilename,OutPlate, Rotate, visiblemap, uvmap)
 	}
 
 	// get components from factory
 	componentmap := make(map[string]*wtype.LHComponent, 0)
+	
+	if Subset {
+	colourtostringmap = image.MakeSubMapfromMap(colourtostringmap, Subsetnames)
+	}
 
-	colourtostringmap := image.AvailableComponentmaps[Palettename]
-
-	for _, colourname := range chosencolourpalette {
+	for colourname, _ := range colourtostringmap {
 
 		componentname := colourtostringmap[colourname]
 

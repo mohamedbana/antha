@@ -2,15 +2,17 @@
   "Parameters": {
     "PipetteImage": {
 		"OnlythisColour":"",
-		"Notthiscolour":"white",
+		"Notthiscolour":"verywhite",
 	  	"Imagefilename": "ziggy5_384.jpg",
+		"Rotate": false,
 		"Palettename":"ProteinPaintboxVisible",
-		"Subset": true,
+		"Subset": false,
 		"Subsetnames": [
 		"DreidelTeal",
 		"TinselPurple",
 		"CupidPink",
-		"LeorOrange"
+		"LeorOrange",
+		"verywhite"
 		],
       	"OutPlate": "Agarplateforpicking384_riser",
 		"UVimage":false,

@@ -64,19 +64,27 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 
 	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate)
 
+	colourtostringmap := image.AvailableComponentmaps[_input.Palettename]
+
 	if _input.UVimage {
 		uvmap := image.AvailableComponentmaps[_input.Palettename]
 		visiblemap := image.Visibleequivalentmaps[_input.Palettename]
 
+		if _input.Subset {
+			uvmap = image.MakeSubMapfromMap(colourtostringmap, _input.Subsetnames)
+			visiblemap = image.MakeSubMapfromMap(colourtostringmap, _input.Subsetnames)
+		}
 		image.PrintFPImagePreview(_input.Imagefilename, _input.OutPlate, _input.Rotate, visiblemap, uvmap)
 	}
 
 	// get components from factory
 	componentmap := make(map[string]*wtype.LHComponent, 0)
 
-	colourtostringmap := image.AvailableComponentmaps[_input.Palettename]
+	if _input.Subset {
+		colourtostringmap = image.MakeSubMapfromMap(colourtostringmap, _input.Subsetnames)
+	}
 
-	for _, colourname := range chosencolourpalette {
+	for colourname := range colourtostringmap {
 
 		componentname := colourtostringmap[colourname]
 
@@ -150,13 +158,13 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 		}
 	}
 
-	_output.Numberofpixels = len(_output.Pixels)
-	fmt.Println("Pixels =", _output.Numberofpixels)
-
 	_output.UniqueComponents = search.RemoveDuplicates(_output.UniqueComponents)
 	fmt.Println("Unique Components:", _output.UniqueComponents)
 	fmt.Println("number of unique components", len(_output.UniqueComponents))
 	_output.Pixels = solutions
+
+	_output.Numberofpixels = len(_output.Pixels)
+	fmt.Println("Pixels =", _output.Numberofpixels)
 
 }
 
