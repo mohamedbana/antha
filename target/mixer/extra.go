@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -30,6 +31,7 @@ func parseInputPlateFile(filename string) (*wtype.LHPlate, error) {
 	defer f.Close()
 
 	csvr := csv.NewReader(f)
+	csvr.FieldsPerRecord = -1
 
 	// first line must be one cell, just the plate type name
 	// e.g.
@@ -56,6 +58,10 @@ func parseInputPlateFile(filename string) (*wtype.LHPlate, error) {
 	//for rec, err := range csvr.Read() {
 	for {
 		rec, err := csvr.Read()
+		if err == io.EOF {
+			break
+		}
+
 		if err != nil {
 			logger.Info(fmt.Sprint("parseInputPlate ERRROR here: ", err))
 			continue
