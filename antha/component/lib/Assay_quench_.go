@@ -1,8 +1,6 @@
 package lib
 
 import (
-	"fmt"
-
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -42,8 +40,6 @@ func _Assay_quenchSteps(_ctx context.Context, _input *Assay_quenchInput, _output
 	reaction := execute.MixTo(_ctx, _input.OutPlate, "", 1, substrate, enzyme)
 
 	finishedreaction := execute.Incubate(_ctx, reaction, _input.ReactionTemp, _input.ReactionTime, true)
-
-	fmt.Println("FINISHED REACTION LOCATION: ", finishedreaction.Loc)
 
 	quench := mixer.Sample(_input.Quenchingagent, _input.QuenchingagentVolume)
 

@@ -60,7 +60,20 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 	output_plates := request.Output_plates
 
 	// tips
-	//	tips := request.Tips
+	tips := request.Tips
+
+	// just need to set the tip types
+	// these should be distinct... we should check really
+	// ...eventually
+	if len(tips) != 0 {
+		for _, tb := range tips {
+			if tb == nil {
+				continue
+			}
+			params.Tips = append(params.Tips, tb.Tips[0][0])
+		}
+	}
+
 	setup := make(map[string]interface{})
 	// make sure anything in setup is in synch
 
@@ -72,23 +85,6 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 
 	}
 
-	/*
-		for _, tb := range tips {
-			// get the first available position from the preferences
-			position := get_first_available_preference(tip_preferences, setup)
-			if position == "" {
-				RaiseError("No positions left for tipbox")
-			}
-
-			setup[position] = tb
-			plate_lookup[tb.ID] = position
-			tip_lookup = append(tip_lookup, tb)
-
-			logger.Info(fmt.Sprintf("Tip box of type %s in position %s", tb.Type, position))
-		}
-
-		setup["tip_lookup"] = tip_lookup
-	*/
 	// this logic may not transfer well but I expect that outputs are more constrained
 	// than inputs for the simple reason that most output takes place to single wells
 	// while input (sometimes) takes place from reservoirs

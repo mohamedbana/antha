@@ -72,6 +72,8 @@ func makeMixerOpt() mixer.Opt {
 	}
 	opt.InputPlateType = GetStringSlice("inputPlateType")
 	opt.OutputPlateType = GetStringSlice("outputPlateType")
+	opt.TipType = GetStringSlice("tipType")
+	opt.InputPlateFiles = GetStringSlice("inputPlates")
 	return opt
 }
 
@@ -229,4 +231,6 @@ func init() {
 	flags.Float64("residualVolumeWeight", 0.0, "Residual volume weight")
 	flags.StringSlice("inputPlateType", nil, "Default input plate types (in order of preference)")
 	flags.StringSlice("outputPlateType", nil, "Default output plate types (in order of preference)")
+	flags.StringSlice("inputPlates", nil, "File containing input plates")
+	flags.StringSlice("tipType", nil, "Names of permitted tip types")
 }
