@@ -13,14 +13,6 @@
 	"NotthisColour":"white",
 	  "Imagefilename": "apple.jpg",
 		"Palettename":"Palette1",
-		"AvailableColours":[
-		"red",
-		"white",
-		"blue",
-		"green",
-		"yellow",
-		"black"
-		],
       "OutPlate": "greiner384_riser",
       "VolumePerWell": "100ul"
     }

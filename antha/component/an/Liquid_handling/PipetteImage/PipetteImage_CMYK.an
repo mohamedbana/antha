@@ -14,6 +14,7 @@ import (
 Parameters (
 	VolumeForFullcolour  Volume
 	Imagefilename string
+	Rotate bool
 )
 
 // Data which is returned from this protocol, and data types
@@ -52,7 +53,7 @@ Steps {
 	
 	//var chosencolourpalette color.Palette
 	chosencolourpalette := image.AvailablePalettes["Plan9"]
-	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette) 
+	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate) 
 	
 	solutions := make([]*wtype.LHComponent, 0)
 
@@ -101,7 +102,7 @@ Steps {
 		components = append(components, blackSample)
 		}
 		
-		solution := MixTo(OutPlate.Type, locationkey,0, components...)
+		solution := MixTo(OutPlate.Type, locationkey,1, components...)
 		solutions = append(solutions, solution)
 		
 		}

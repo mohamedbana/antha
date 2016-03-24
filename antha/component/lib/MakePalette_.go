@@ -41,9 +41,9 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 	//var chosencolourpalette color.Palette
 
 	// make pallette of colours from image
-	chosencolourpalette := image.MakeSmallPalleteFromImage(_input.Imagefilename, _input.OutPlate)
+	chosencolourpalette := image.MakeSmallPalleteFromImage(_input.Imagefilename, _input.OutPlate, _input.Rotate)
 
-	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette)
+	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate)
 
 	// remove duplicates
 	//positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
@@ -196,6 +196,7 @@ type MakePaletteInput struct {
 	Imagefilename       string
 	Magenta             *wtype.LHComponent
 	OutPlate            *wtype.LHPlate
+	Rotate              bool
 	VolumeForFullcolour wunit.Volume
 	Yellow              *wtype.LHComponent
 }
@@ -226,6 +227,7 @@ func init() {
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
 				{Name: "Magenta", Desc: "", Kind: "Inputs"},
 				{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\n", Kind: "Inputs"},
+				{Name: "Rotate", Desc: "", Kind: "Parameters"},
 				{Name: "VolumeForFullcolour", Desc: "", Kind: "Parameters"},
 				{Name: "Yellow", Desc: "", Kind: "Inputs"},
 				{Name: "Colours", Desc: "", Kind: "Outputs"},

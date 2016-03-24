@@ -40,8 +40,10 @@ func _ScreenLHPolicies_AwesomeSetup(_ctx context.Context, _input *ScreenLHPolici
 // for every input
 func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolicies_AwesomeInput, _output *ScreenLHPolicies_AwesomeOutput) {
 
+	var rotate = false
+
 	chosencolourpalette := image.AvailablePalettes["Palette1"]
-	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette)
+	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, rotate)
 
 	_output.Runtowelllocationmap = make([]string, 0)
 	perconditionuntowelllocationmap := make([]string, 0)

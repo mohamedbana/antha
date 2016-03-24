@@ -22,6 +22,8 @@ import (
 InducerVolume Volume
 RepressorVolume Volume*/
 
+//Subset bool
+//Subsetnames []string
 //IncTemp Temperature
 //IncTime Time
 
@@ -54,13 +56,13 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 
 	chosencolourpalette := image.AvailablePalettes[_input.Palettename]
 
-	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette)
+	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate)
 
 	if _input.UVimage {
 		uvmap := image.AvailableComponentmaps[_input.Palettename]
 		visiblemap := image.Visibleequivalentmaps[_input.Palettename]
 
-		image.PrintFPImagePreview(_input.Imagefilename, _input.OutPlate, visiblemap, uvmap)
+		image.PrintFPImagePreview(_input.Imagefilename, _input.OutPlate, _input.Rotate, visiblemap, uvmap)
 	}
 
 	// get components from factory
@@ -216,6 +218,7 @@ type PipetteImage_livingInput struct {
 	OnlythisColour string
 	OutPlate       *wtype.LHPlate
 	Palettename    string
+	Rotate         bool
 	UVimage        bool
 	VolumePerWell  wunit.Volume
 }
@@ -248,6 +251,7 @@ func init() {
 				{Name: "OnlythisColour", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\nMedia *wtype.LHComponent\nAntibiotic *wtype.LHComponent\n\tInducer *wtype.LHComponent\n\tRepressor *wtype.LHComponent\n", Kind: "Inputs"},
 				{Name: "Palettename", Desc: "", Kind: "Parameters"},
+				{Name: "Rotate", Desc: "", Kind: "Parameters"},
 				{Name: "UVimage", Desc: "", Kind: "Parameters"},
 				{Name: "VolumePerWell", Desc: "", Kind: "Parameters"},
 				{Name: "Numberofpixels", Desc: "", Kind: "Data"},

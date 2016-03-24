@@ -24,6 +24,9 @@ Parameters (
 	OnlythisColour string
 	Notthiscolour string
 	UVimage bool
+	Rotate bool
+	//Subset bool
+	//Subsetnames []string
 	//IncTemp Temperature
 	//IncTime Time
 )
@@ -67,14 +70,13 @@ Steps {
 	
 	chosencolourpalette := image.AvailablePalettes[Palettename]
 	
-	
-	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette) 
+	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette,Rotate) 
 	
 	if UVimage {
 		uvmap := image.AvailableComponentmaps[Palettename]
 		visiblemap := image.Visibleequivalentmaps[Palettename]
 		
-		image.PrintFPImagePreview(Imagefilename,OutPlate, visiblemap, uvmap)
+		image.PrintFPImagePreview(Imagefilename,OutPlate, Rotate, visiblemap, uvmap)
 	}
 
 	// get components from factory

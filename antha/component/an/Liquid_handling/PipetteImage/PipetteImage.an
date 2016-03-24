@@ -5,6 +5,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
+	"github.com/antha-lang/antha/microArch/factory"
 	"fmt"
 )
 
@@ -14,9 +15,10 @@ Parameters (
 	VolumePerWell  Volume
 	Imagefilename string
 	Palettename string
-	AvailableColours []string
+	//AvailableColours []string
 	OnlythisColour string
 	NotthisColour string
+	Rotate bool
 )
 
 // Data which is returned from this protocol, and data types
@@ -50,16 +52,42 @@ Setup {
 // for every input
 Steps {
 	
+	availableColours := make([]string,0)
 	
-	chosencolourpalette := image.AvailablePalettes[Palettename]
-	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette) 
+	for _, component := range Colourcomponents {
+		availableColours = append(availableColours, component.CName)
+	}
+
+	//chosencolourpalette := image.AvailableComponentmaps[Palettename]
+	//
+	
+	subpalette := image.MakeSubPallette(Palettename, availableColours)
+	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &subpalette, Rotate) 
 	
 	//Pixels = image.PipetteImagetoPlate(OutPlate, positiontocolourmap, AvailableColours, Colourcomponents, VolumePerWell)
-
+/*
 	componentmap, err := image.MakestringtoComponentMap(AvailableColours, Colourcomponents)
 	if err != nil {
 		panic(err)
 	}
+*/
+	
+
+// get components from factory
+	componentmap := make(map[string]*wtype.LHComponent, 0)
+
+	colourtostringmap := image.AvailableComponentmaps[Palettename]
+	
+	submap := image.MakeSubMapfromMap(colourtostringmap, availableColours)
+
+	for colourname, _ := range submap {
+
+		componentname := colourtostringmap[colourname]
+
+		componentmap[componentname] = factory.GetComponentByType(componentname)
+
+	}
+
 
 	solutions := make([]*wtype.LHComponent, 0)
 
@@ -80,7 +108,7 @@ Steps {
 			counter = counter + 1
 			fmt.Println("wells",counter)
 		pixelSample := mixer.Sample(component, VolumePerWell)
-		solution := MixTo(OutPlate.Type, locationkey, 0, pixelSample)
+		solution := MixTo(OutPlate.Type, locationkey, 1, pixelSample)
 		solutions = append(solutions, solution)
 			}
 			
@@ -89,7 +117,7 @@ Steps {
 			counter = counter + 1
 			fmt.Println("wells",counter)
 		pixelSample := mixer.Sample(component, VolumePerWell)
-		solution := MixTo(OutPlate.Type, locationkey, 0, pixelSample)
+		solution := MixTo(OutPlate.Type, locationkey, 1, pixelSample)
 		solutions = append(solutions, solution)
 		}
 		}

@@ -10,9 +10,12 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"github.com/antha-lang/antha/microArch/factory"
 )
 
 // Input parameters for this protocol (data)
+
+//AvailableColours []string
 
 // Data which is returned from this protocol, and data types
 
@@ -35,14 +38,39 @@ func _PipetteImageSetup(_ctx context.Context, _input *PipetteImageInput) {
 // for every input
 func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output *PipetteImageOutput) {
 
-	chosencolourpalette := image.AvailablePalettes[_input.Palettename]
-	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette)
+	availableColours := make([]string, 0)
+
+	for _, component := range _input.Colourcomponents {
+		availableColours = append(availableColours, component.CName)
+	}
+
+	//chosencolourpalette := image.AvailableComponentmaps[Palettename]
+	//
+
+	subpalette := image.MakeSubPallette(_input.Palettename, availableColours)
+	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &subpalette, _input.Rotate)
 
 	//Pixels = image.PipetteImagetoPlate(OutPlate, positiontocolourmap, AvailableColours, Colourcomponents, VolumePerWell)
+	/*
+		componentmap, err := image.MakestringtoComponentMap(AvailableColours, Colourcomponents)
+		if err != nil {
+			panic(err)
+		}
+	*/
 
-	componentmap, err := image.MakestringtoComponentMap(_input.AvailableColours, _input.Colourcomponents)
-	if err != nil {
-		panic(err)
+	// get components from factory
+	componentmap := make(map[string]*wtype.LHComponent, 0)
+
+	colourtostringmap := image.AvailableComponentmaps[_input.Palettename]
+
+	submap := image.MakeSubMapfromMap(colourtostringmap, availableColours)
+
+	for colourname := range submap {
+
+		componentname := colourtostringmap[colourname]
+
+		componentmap[componentname] = factory.GetComponentByType(componentname)
+
 	}
 
 	solutions := make([]*wtype.LHComponent, 0)
@@ -64,7 +92,7 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 				counter = counter + 1
 				fmt.Println("wells", counter)
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
-				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 0, pixelSample)
+				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, pixelSample)
 				solutions = append(solutions, solution)
 			}
 
@@ -73,7 +101,7 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 				counter = counter + 1
 				fmt.Println("wells", counter)
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
-				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 0, pixelSample)
+				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, pixelSample)
 				solutions = append(solutions, solution)
 			}
 		}
@@ -144,13 +172,13 @@ type PipetteImageElement struct {
 }
 
 type PipetteImageInput struct {
-	AvailableColours []string
 	Colourcomponents []*wtype.LHComponent
 	Imagefilename    string
 	NotthisColour    string
 	OnlythisColour   string
 	OutPlate         *wtype.LHPlate
 	Palettename      string
+	Rotate           bool
 	VolumePerWell    wunit.Volume
 }
 
@@ -175,13 +203,13 @@ func init() {
 			Desc: "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours\n",
 			Path: "antha/component/an/Liquid_handling/PipetteImage/PipetteImage.an",
 			Params: []ParamDesc{
-				{Name: "AvailableColours", Desc: "", Kind: "Parameters"},
 				{Name: "Colourcomponents", Desc: "", Kind: "Inputs"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
 				{Name: "NotthisColour", Desc: "", Kind: "Parameters"},
-				{Name: "OnlythisColour", Desc: "", Kind: "Parameters"},
+				{Name: "OnlythisColour", Desc: "AvailableColours []string\n", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\n", Kind: "Inputs"},
 				{Name: "Palettename", Desc: "", Kind: "Parameters"},
+				{Name: "Rotate", Desc: "", Kind: "Parameters"},
 				{Name: "VolumePerWell", Desc: "", Kind: "Parameters"},
 				{Name: "Numberofpixels", Desc: "", Kind: "Data"},
 				{Name: "Pixels", Desc: "", Kind: "Outputs"},

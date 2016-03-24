@@ -1,12 +1,12 @@
 {
   "Parameters": {
     "PipetteImage": {
-		"Imagefilename":"rainbow1.png",
+		"Imagefilename":"ziggy5_384.jpg",
       "Cyan": "Cyan",
 	"Magenta": "Magenta",
 	"Yellow": "Yellow_ink",
 	"Black": "Black",
-      "OutPlate": "DSW96_riser",
+      "OutPlate": "greiner384_riser",
       "VolumeForFullcolour": "150ul"
     }
   }

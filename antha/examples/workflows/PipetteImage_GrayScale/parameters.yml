@@ -1,11 +1,12 @@
 {
   "Parameters": {
     "PipetteImage": {
-		"Imagefilename":"AIbEiAIAAABECIXbpIDIzOTYngEiC3ZjYXJkX3Bob3RvKig3ZjhhM2M0ODUxMTFjNzc3M2E4OWViZTNlYWJlMTQxOTU0ODFhMzk1MAHd1lIEFK6yDxxud4Ed7QXSMoKIgA.jpg",
+		"Imagefilename":"imgres.jpg",
+		"Rotate": true,
 		"Diluent":"water",
 		"MinimumBlackpercentagethreshold":0.20,
 		"OnlyHighVolumetips": true,
-		"Negative": false,
+		"Negative": true,
 	"Black": "Black",
       "OutPlate": "greiner384_riser",
       "VolumeForFullcolour": "100ul"

@@ -15,6 +15,7 @@ import (
 Parameters (
 	VolumeForFullcolour  Volume
 	Imagefilename string
+	Rotate bool
 )
 
 // Data which is returned from this protocol, and data types
@@ -54,9 +55,9 @@ Steps {
 	//var chosencolourpalette color.Palette
 	
 	// make pallette of colours from image
-	chosencolourpalette := image.MakeSmallPalleteFromImage(Imagefilename, OutPlate) 
+	chosencolourpalette := image.MakeSmallPalleteFromImage(Imagefilename, OutPlate,Rotate) 
 	
-	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette) 
+	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate) 
 	
 	// remove duplicates
 	//positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
