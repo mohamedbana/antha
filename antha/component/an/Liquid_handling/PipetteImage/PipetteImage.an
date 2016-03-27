@@ -30,13 +30,12 @@ Data (
 // Physical Inputs to this protocol with types
 Inputs (
 	Colourcomponents []*wtype.LHComponent
-	//InPlate *wtype.LHPlate
 	OutPlate *wtype.LHPlate
 )
 
 // Physical outputs from this protocol with types
 Outputs (
-	 Pixels[]*wtype.LHComponent
+	Pixels[]*wtype.LHComponent
 )
 
 Requirements {
@@ -59,20 +58,10 @@ Steps {
 	}
 
 	//chosencolourpalette := image.AvailableComponentmaps[Palettename]
-	//
 	
 	subpalette := image.MakeSubPallette(Palettename, availableColours)
 	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &subpalette, Rotate) 
-	
-	//Pixels = image.PipetteImagetoPlate(OutPlate, positiontocolourmap, AvailableColours, Colourcomponents, VolumePerWell)
-/*
-	componentmap, err := image.MakestringtoComponentMap(AvailableColours, Colourcomponents)
-	if err != nil {
-		panic(err)
-	}
-*/
-	
-
+		
 // get components from factory
 	componentmap := make(map[string]*wtype.LHComponent, 0)
 
@@ -88,11 +77,10 @@ Steps {
 
 	}
 
-
 	solutions := make([]*wtype.LHComponent, 0)
 
 	counter := 0
-	// currently set up to only pipette if yellow (to make visualisation easier in trilution simulator
+	
 	for locationkey, colour := range positiontocolourmap {
 		
 		component := componentmap[image.Colourcomponentmap[colour]]

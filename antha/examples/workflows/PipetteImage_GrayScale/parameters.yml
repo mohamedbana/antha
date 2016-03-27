@@ -1,12 +1,12 @@
 {
   "Parameters": {
     "PipetteImage": {
-		"Imagefilename":"imgres.jpg",
-		"Rotate": true,
+		"Imagefilename":"carmen.jpeg",
+		"Rotate": false,
 		"Diluent":"water",
-		"MinimumBlackpercentagethreshold":0.20,
+		"MinimumBlackpercentagethreshold":0.21,
 		"OnlyHighVolumetips": true,
-		"Negative": true,
+		"Negative": false,
 	"Black": "Black",
       "OutPlate": "greiner384_riser",
       "VolumeForFullcolour": "100ul"

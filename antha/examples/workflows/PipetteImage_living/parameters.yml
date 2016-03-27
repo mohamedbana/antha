@@ -2,10 +2,10 @@
   "Parameters": {
     "PipetteImage": {
 		"OnlythisColour":"",
-		"Notthiscolour":"verywhite",
+		"Notthiscolour":"BlazeYFP",
 	  	"Imagefilename": "ziggy5_384.jpg",
 		"Rotate": false,
-		"Palettename":"ProteinPaintboxVisible",
+		"Palettename":"ProteinPaintboxUV",
 		"Subset": false,
 		"Subsetnames": [
 		"DreidelTeal",
@@ -15,7 +15,7 @@
 		"verywhite"
 		],
       	"OutPlate": "Agarplateforpicking384_riser",
-		"UVimage":false,
+		"UVimage":true,
       	"VolumePerWell": "2ul"
     }
   }

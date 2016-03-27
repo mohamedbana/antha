@@ -50,6 +50,7 @@ func MakePolicies() map[string]LHPolicy {
 	pols["DoNotMix"] = MakeDefaultPolicy()
 	pols["NeedToMix"] = MakeNeedToMixPolicy()
 	pols["viscous"] = MakeViscousPolicy()
+	pols["Paint"] = MakePaintPolicy()
 
 	//      pols["lysate"] = MakeLysatePolicy()
 	pols["protein"] = MakeProteinPolicy()
@@ -149,6 +150,22 @@ func PolicyMakerfromRuns(runs []Run, nameprepend string, concatfactorlevelsinnam
 //        proteinpolicy["CAN_MSA"] = false
 //        return proteinpolicy
 //}
+
+func MakePaintPolicy() LHPolicy {
+
+	policy := make(LHPolicy, 6)
+	policy["ASP_SPEED"] = 1.5
+	policy["DSP_SPEED"] = 1.5
+	policy["ASP_WAIT"] = 1.0
+	policy["DSP_WAIT"] = 1.0
+	policy["POST_MIX"] = 3
+	policy["BLOWOUTVOLUME"] = 0.0
+	policy["BLOWOUTVOLUMEUNIT"] = "ul"
+	policy["TOUCHOFF"] = true
+
+	return policy
+}
+
 func MakeWaterPolicy() LHPolicy {
 	waterpolicy := make(LHPolicy, 6)
 	waterpolicy["DSPREFERENCE"] = 0

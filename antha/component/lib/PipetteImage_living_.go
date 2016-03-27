@@ -1,4 +1,4 @@
-// Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours
+// Generates instructions to pipette out a defined image onto a defined plate using a defined palette of coloured bacteria
 package lib
 
 import (
@@ -60,11 +60,13 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 		chosencolourpalette = image.AvailablePalettes[_input.Palettename]
 	}
 
-	_output.UniqueComponents = make([]string, 0)
-
+	// resize image to fit dimensions of plate and change each pixel to match closest colour from chosen palette
+	// theoutput of this is a map of well positions to colours needed
 	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate)
 
 	colourtostringmap := image.AvailableComponentmaps[_input.Palettename]
+
+	// if the image will be printed using fluorescent proteins, 2 previews will be generated for the image (i) under UV light (ii) under visible light
 
 	if _input.UVimage {
 		uvmap := image.AvailableComponentmaps[_input.Palettename]
@@ -96,21 +98,21 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 	solutions := make([]*wtype.LHComponent, 0)
 
 	counter := 0
+	_output.UniqueComponents = make([]string, 0)
 
+	// loop through the position to colour map pipeting the correct coloured protein into each well
 	for locationkey, colour := range positiontocolourmap {
 
 		components := make([]*wtype.LHComponent, 0)
 
 		component := componentmap[colourtostringmap[colour]]
 
-		/*if component.TypeName() == "dna" {
-			component.Type = wtype.LTDoNotMix // "DoNotMix"
-		}*/
-
+		// make sure liquid class is appropriate for cell culture in case this is not set elsewhere
 		component.Type = wtype.LTCulture
 
 		fmt.Println(image.Colourcomponentmap[colour])
 
+		// if the option to only print a single colour is not selected then the pipetting actions for all colours (apart from if not this colour is not empty) will follow
 		if _input.OnlythisColour != "" {
 
 			if image.Colourcomponentmap[colour] == _input.OnlythisColour {
@@ -259,7 +261,7 @@ func init() {
 	addComponent(Component{Name: "PipetteImage_living",
 		Constructor: PipetteImage_livingNew,
 		Desc: ComponentDesc{
-			Desc: "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours\n",
+			Desc: "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of coloured bacteria\n",
 			Path: "antha/component/an/Liquid_handling/PipetteImage/PipetteLivingimage.an",
 			Params: []ParamDesc{
 				{Name: "Imagefilename", Desc: "InoculationVolume Volume\nAntibioticVolume Volume\n\tInducerVolume Volume\n\tRepressorVolume Volume\n", Kind: "Parameters"},

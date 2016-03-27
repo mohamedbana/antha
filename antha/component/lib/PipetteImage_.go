@@ -21,8 +21,6 @@ import (
 
 // Physical Inputs to this protocol with types
 
-//InPlate *wtype.LHPlate
-
 // Physical outputs from this protocol with types
 
 func _PipetteImageRequirements() {
@@ -45,18 +43,9 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 	}
 
 	//chosencolourpalette := image.AvailableComponentmaps[Palettename]
-	//
 
 	subpalette := image.MakeSubPallette(_input.Palettename, availableColours)
 	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &subpalette, _input.Rotate)
-
-	//Pixels = image.PipetteImagetoPlate(OutPlate, positiontocolourmap, AvailableColours, Colourcomponents, VolumePerWell)
-	/*
-		componentmap, err := image.MakestringtoComponentMap(AvailableColours, Colourcomponents)
-		if err != nil {
-			panic(err)
-		}
-	*/
 
 	// get components from factory
 	componentmap := make(map[string]*wtype.LHComponent, 0)
@@ -76,7 +65,7 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 	solutions := make([]*wtype.LHComponent, 0)
 
 	counter := 0
-	// currently set up to only pipette if yellow (to make visualisation easier in trilution simulator
+
 	for locationkey, colour := range positiontocolourmap {
 
 		component := componentmap[image.Colourcomponentmap[colour]]
@@ -207,7 +196,7 @@ func init() {
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
 				{Name: "NotthisColour", Desc: "", Kind: "Parameters"},
 				{Name: "OnlythisColour", Desc: "AvailableColours []string\n", Kind: "Parameters"},
-				{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\n", Kind: "Inputs"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "Palettename", Desc: "", Kind: "Parameters"},
 				{Name: "Rotate", Desc: "", Kind: "Parameters"},
 				{Name: "VolumePerWell", Desc: "", Kind: "Parameters"},

@@ -1,4 +1,4 @@
-// Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours
+// Generates instructions to pipette out a defined image onto a defined plate using a defined palette of coloured bacteria
 protocol PipetteImage_living
 
 import (
@@ -76,12 +76,14 @@ Steps {
 		chosencolourpalette = image.AvailablePalettes[Palettename]
 	}
 	
-	
-	UniqueComponents = make([]string,0)
-	
+	// resize image to fit dimensions of plate and change each pixel to match closest colour from chosen palette
+	// theoutput of this is a map of well positions to colours needed
 	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette,Rotate) 
 	
 	colourtostringmap := image.AvailableComponentmaps[Palettename]
+	
+	
+	// if the image will be printed using fluorescent proteins, 2 previews will be generated for the image (i) under UV light (ii) under visible light 
 	
 	if UVimage {
 		uvmap := image.AvailableComponentmaps[Palettename]
@@ -113,21 +115,22 @@ Steps {
 	solutions := make([]*wtype.LHComponent, 0)
 
 	counter := 0
+	UniqueComponents = make([]string,0)
 
+
+// loop through the position to colour map pipeting the correct coloured protein into each well
 	for locationkey, colour := range positiontocolourmap {
 		
 		components := make([]*wtype.LHComponent, 0)
 		
 		component := componentmap[colourtostringmap[colour]]
 
-		/*if component.TypeName() == "dna" {
-			component.Type = wtype.LTDoNotMix // "DoNotMix"
-		}*/
-		
+		// make sure liquid class is appropriate for cell culture in case this is not set elsewhere
 		component.Type = wtype.LTCulture
 		
 		fmt.Println(image.Colourcomponentmap[colour])
 		
+		// if the option to only print a single colour is not selected then the pipetting actions for all colours (apart from if not this colour is not empty) will follow
 		if OnlythisColour !="" {
 	
 		if image.Colourcomponentmap[colour] == OnlythisColour{
@@ -174,8 +177,6 @@ Steps {
 		}
 		}
 	}
-	
-	
 
 	UniqueComponents = search.RemoveDuplicates(UniqueComponents)
 	fmt.Println("Unique Components:",UniqueComponents)

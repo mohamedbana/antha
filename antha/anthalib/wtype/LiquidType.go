@@ -22,6 +22,8 @@ const (
 	LTDoNotMix
 	LTloadwater
 	LTNeedToMix
+	LTVISCOUS
+	LTPAINT
 )
 
 func LiquidTypeFromString(s string) LiquidType {
@@ -61,6 +63,10 @@ func LiquidTypeFromString(s string) LiquidType {
 			return LTloadwater
 		case "NeedToMix":
 			return LTNeedToMix
+		case "viscous":
+			return LTVISCOUS
+		case "Paint":
+			return LTPAINT
 		default:
 			return LTWater
 		}

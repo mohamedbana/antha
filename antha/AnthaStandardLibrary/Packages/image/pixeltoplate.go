@@ -13,6 +13,10 @@ import (
 
 	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
 
+	"path/filepath"
+
+	"os"
+
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -218,11 +222,13 @@ var ProteinPaintboxmap = map[color.Color]string{
 	color.RGBA{R: uint8(0), G: uint8(0), B: uint8(0), A: uint8(255)}: "E.coli pUC19 on sgal",
 
 	// plus white as a blank (or comment out to use EiraCFP)
-	//color.RGBA{R: uint8(242), G: uint8(243), B: uint8(242), A: uint8(255)}: "verywhite",
+	color.RGBA{R: uint8(242), G: uint8(243), B: uint8(242), A: uint8(255)}: "verywhite",
 }
 
 var UVProteinPaintboxmap = map[color.Color]string{
 	// under UV
+
+	// fluorescent
 	//	color.RGBA{R: uint8(0), G: uint8(255), B: uint8(255), A: uint8(255)}:  "CindylouCFP",
 	color.RGBA{R: uint8(0), G: uint8(255), B: uint8(255), A: uint8(255)}: "FrostyCFP",
 	color.RGBA{R: uint8(27), G: uint8(79), B: uint8(146), A: uint8(255)}: "TwinkleCFP",
@@ -350,6 +356,7 @@ func ResizeImagetoPlate(imagefilename string, plate *wtype.LHPlate, algorithm im
 func CheckAllResizealgorithms(imagefilename string, plate *wtype.LHPlate, rotate bool, algorithms map[string]imaging.ResampleFilter) {
 	// input files (just 1 in this case)
 	files := []string{imagefilename}
+	var dir string
 
 	var plateimage *goimage.NRGBA
 
@@ -382,7 +389,13 @@ func CheckAllResizealgorithms(imagefilename string, plate *wtype.LHPlate, rotate
 		// rename file
 		splitfilename := strings.Split(imagefilename, `.`)
 
-		newname := fmt.Sprint(splitfilename[0], "_", key, "_plateformat", `.`, splitfilename[1])
+		dir = splitfilename[0]
+
+		// make dir
+
+		os.MkdirAll(dir, 0777)
+
+		newname := filepath.Join(dir, fmt.Sprint(splitfilename[0], "_", key, "_plateformat", `.`, splitfilename[1]))
 		// save
 		err = imaging.Save(plateimage, newname)
 		if err != nil {
