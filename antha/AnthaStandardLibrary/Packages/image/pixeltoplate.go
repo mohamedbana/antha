@@ -325,7 +325,7 @@ var ProteinPaintboxSubsetmap = map[color.Color]string{
 func Posterize(imagefilename string, levels int) (posterized *goimage.NRGBA, newfilename string) {
 
 	var newcolor color.NRGBA
-	numberofAreas := 256 / levels
+	numberofAreas := 256 / (levels)
 	numberofValues := 255 / (levels - 1)
 
 	img, err := imaging.Open(imagefilename)
@@ -337,31 +337,66 @@ func Posterize(imagefilename string, levels int) (posterized *goimage.NRGBA, new
 
 	for x := 0; x < img.Bounds().Dx(); x++ {
 		for y := 0; y < img.Bounds().Dy(); y++ {
+			var rnew float64
+			var gnew float64
+			var bnew float64
+
 			rgb := img.At(x, y)
 			r, g, b, a := rgb.RGBA()
 
-			rnew := (float64(r) / float64(numberofAreas)) * float64(numberofValues)
-			gnew := (float64(g) / float64(numberofAreas)) * float64(numberofValues)
-			bnew := (float64(b) / float64(numberofAreas)) * float64(numberofValues)
+			if r == 0 {
+				rnew = 0
+			} else {
+				rfloat := (float64(r/256) / float64(numberofAreas))
 
+				rinttemp, err := wutil.RoundDown(rfloat)
+				if err != nil {
+					panic(err)
+				}
+				rnew = float64(rinttemp) * float64(numberofValues)
+			}
+			if g == 0 {
+				gnew = 0
+			} else {
+				gfloat := (float64(g/256) / float64(numberofAreas))
+
+				ginttemp, err := wutil.RoundDown(gfloat)
+				if err != nil {
+					panic(err)
+				}
+				gnew = float64(ginttemp) * float64(numberofValues)
+			}
+			if b == 0 {
+				bnew = 0
+			} else {
+				bfloat := (float64(b/256) / float64(numberofAreas))
+
+				binttemp, err := wutil.RoundDown(bfloat)
+				if err != nil {
+					panic(err)
+				}
+				bnew = float64(binttemp) * float64(numberofValues)
+			}
 			newcolor.A = uint8(a)
 
-			rint := wutil.RoundInt(rnew)
+			rint, err := wutil.RoundDown(rnew)
 
 			if err != nil {
 				panic(err)
 			}
 			newcolor.R = uint8(rint)
-			gint := wutil.RoundInt(gnew)
+			gint, err := wutil.RoundDown(gnew)
 			if err != nil {
 				panic(err)
 			}
 			newcolor.G = uint8(gint)
-			bint := wutil.RoundInt(bnew)
+			bint, err := wutil.RoundDown(bnew)
 			if err != nil {
 				panic(err)
 			}
 			newcolor.B = uint8(bint)
+
+			fmt.Println("x,y", x, y, "r,g,b,a", r, g, b, a, "newcolour", newcolor)
 
 			posterized.Set(x, y, newcolor)
 
