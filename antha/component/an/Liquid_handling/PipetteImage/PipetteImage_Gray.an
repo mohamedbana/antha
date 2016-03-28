@@ -19,6 +19,8 @@ Parameters (
 	OnlyHighVolumetips bool
 	Negative bool
 	Rotate bool
+	PosterizeImage bool
+	PosterizeLevels int
 )
 
 // Data which is returned from this protocol, and data types
@@ -60,6 +62,10 @@ Steps {
 	var minuint8 uint8 
 	
 	chosencolourpalette := image.AvailablePalettes["Gray"]
+	
+	if PosterizeImage{
+		_, Imagefilename = image.Posterize(Imagefilename, PosterizeLevels)
+	}
 	
 	image.CheckAllResizealgorithms(Imagefilename,OutPlate,Rotate,imaging.AllResampleFilters)
 	

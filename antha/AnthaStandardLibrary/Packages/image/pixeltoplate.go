@@ -20,6 +20,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
 )
 
 // Colour palette to use // this would relate to a map of components of these available colours in factor
@@ -319,6 +320,62 @@ var ProteinPaintboxSubsetmap = map[color.Color]string{
 
 	// plus white as a blank (or comment out to use EiraCFP)
 	color.RGBA{R: uint8(242), G: uint8(243), B: uint8(242), A: uint8(255)}: "verywhite",
+}
+
+func Posterize(imagefilename string, levels int) (posterized *goimage.NRGBA, newfilename string) {
+
+	var newcolor color.NRGBA
+	numberofAreas := 256 / levels
+	numberofValues := 255 / (levels - 1)
+
+	img, err := imaging.Open(imagefilename)
+	if err != nil {
+		panic(err)
+	}
+
+	posterized = imaging.Clone(img)
+
+	for x := 0; x < img.Bounds().Dx(); x++ {
+		for y := 0; y < img.Bounds().Dy(); y++ {
+			rgb := img.At(x, y)
+			r, g, b, a := rgb.RGBA()
+
+			rnew := (float64(r) / float64(numberofAreas)) * float64(numberofValues)
+			gnew := (float64(g) / float64(numberofAreas)) * float64(numberofValues)
+			bnew := (float64(b) / float64(numberofAreas)) * float64(numberofValues)
+
+			newcolor.A = uint8(a)
+
+			rint := wutil.RoundInt(rnew)
+
+			if err != nil {
+				panic(err)
+			}
+			newcolor.R = uint8(rint)
+			gint := wutil.RoundInt(gnew)
+			if err != nil {
+				panic(err)
+			}
+			newcolor.G = uint8(gint)
+			bint := wutil.RoundInt(bnew)
+			if err != nil {
+				panic(err)
+			}
+			newcolor.B = uint8(bint)
+
+			posterized.Set(x, y, newcolor)
+
+		}
+	}
+
+	// rename file
+	splitfilename := strings.Split(imagefilename, `.`)
+
+	newfilename = filepath.Join(fmt.Sprint(splitfilename[0], "_posterized", `.`, splitfilename[1]))
+	// save
+
+	imaging.Save(posterized, newfilename)
+	return
 }
 
 func ResizeImagetoPlate(imagefilename string, plate *wtype.LHPlate, algorithm imaging.ResampleFilter, rotate bool) (plateimage *goimage.NRGBA) {
