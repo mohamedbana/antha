@@ -1,4 +1,4 @@
-// liquidhandling/lhtypes.Go: Part of the Antha language
+// liquidhandling/lhrequest.Go: Part of the Antha language
 // Copyright (C) 2014 the Antha authors. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
