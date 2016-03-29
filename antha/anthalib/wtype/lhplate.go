@@ -261,6 +261,19 @@ func (lhp *LHPlate) Dup() *LHPlate {
 
 	return ret
 }
+
+func (p *LHPlate) ProtectAllWells() {
+	for _, v := range p.Wellcoords {
+		v.Protect()
+	}
+}
+
+func (p *LHPlate) UnProtectAllWells() {
+	for _, v := range p.Wellcoords {
+		v.UnProtect()
+	}
+}
+
 func New_Plate(platetype *LHPlate) *LHPlate {
 	new_plate := NewLHPlate(platetype.Type, platetype.Mnfr, platetype.WlsY, platetype.WlsX, platetype.Height, platetype.Hunit, platetype.Welltype, platetype.WellXOffset, platetype.WellYOffset, platetype.WellXStart, platetype.WellYStart, platetype.WellZStart)
 	Initialize_Wells(new_plate)

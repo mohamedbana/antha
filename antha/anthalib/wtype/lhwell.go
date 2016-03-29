@@ -98,6 +98,35 @@ Plate     : %v,
 	)
 }
 
+func (w *LHWell) Protected() bool {
+	if w.Extra == nil {
+		return false
+	}
+
+	p, ok := w.Extra["protected"]
+
+	if !ok || !(p.(bool)) {
+		return false
+	}
+
+	return true
+}
+
+func (w *LHWell) Protect() {
+	if w.Extra == nil {
+		w.Extra = make(map[string]interface{}, 3)
+	}
+
+	w.Extra["protected"] = true
+}
+
+func (w *LHWell) UnProtect() {
+	if w.Extra == nil {
+		w.Extra = make(map[string]interface{}, 3)
+	}
+	w.Extra["protected"] = false
+}
+
 func (w *LHWell) Contents() *LHComponent {
 	// be careful
 	if w == nil {

@@ -183,6 +183,14 @@ func (cm *ConcreteMeasurement) Subtract(m Measurement) {
 
 // define a zero
 
+func (cm *ConcreteMeasurement) IsNil() bool {
+	if cm == nil || cm.Munit == nil {
+		return true
+	}
+
+	return false
+}
+
 func (cm *ConcreteMeasurement) IsZero() bool {
 	if cm == nil || cm.Munit == nil || cm.Mvalue < 0.00000000001 {
 		return true

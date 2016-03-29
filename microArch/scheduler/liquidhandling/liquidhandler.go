@@ -288,6 +288,8 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 	order := make(map[string]map[string]int, 3)
 	vmap := make(map[string]wunit.Volume)
 
+	allinputs := make([]string, 0, 10)
+
 	for _, instruction := range instructions {
 		components := instruction.Components
 
@@ -301,6 +303,7 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 			cmps, ok := inputs[component.CName]
 			if !ok {
 				cmps = make([]*wtype.LHComponent, 0, 3)
+				allinputs = append(allinputs, component.CName)
 			}
 
 			cmps = append(cmps, component)
@@ -309,6 +312,10 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 			// similarly add the volumes up
 
 			vol := vmap[component.CName]
+
+			if vol.IsNil() {
+				vol = wunit.NewVolume(0.0, "ul")
+			}
 
 			v2a := wunit.NewVolume(component.Vol, component.Vunit)
 
@@ -355,6 +362,36 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 		requestinputs = make(map[string][]*wtype.LHComponent, 5)
 	}
 
+	// work out how much we have and how much we need
+
+	vmap2 := make(map[string]wunit.Volume, len(vmap))
+	vmap3 := make(map[string]wunit.Volume, len(vmap))
+
+	//	for k, ar := range requestinputs {
+	for _, k := range allinputs {
+		// vola: how much comes in
+		ar := requestinputs[k]
+		vola := wunit.NewVolume(0.00, "ul")
+		for _, cmp := range ar {
+			vold := wunit.NewVolume(cmp.Vol, cmp.Vunit)
+			vola.Add(vold)
+		}
+		// volb: how much we asked for
+		volb := vmap[k].Dup()
+		volb.Subtract(vola)
+		vmap2[k] = vola
+		if volb.GreaterThanFloat(0.0001) {
+			vmap3[k] = volb
+		}
+		volc := vmap[k]
+		fmt.Println("COMPONENT ", k, " HAVE : ", vola.ToString(), " WANT: ", volc.ToString(), " DIFF: ", volb.ToString())
+
+	}
+
+	(*request).Input_vols_required = vmap
+	(*request).Input_vols_supplied = vmap2
+	(*request).Input_vols_wanting = vmap3
+
 	// add any new inputs
 
 	for k, v := range inputs {
@@ -363,32 +400,6 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 		}
 	}
 
-	// work out how much we have and how much we need
-
-	vmap2 := make(map[string]wunit.Volume, len(vmap))
-	vmap3 := make(map[string]wunit.Volume, len(vmap))
-
-	for k, ar := range requestinputs {
-		vola := vmap2[k]
-		for _, cmp := range ar {
-			vold := wunit.NewVolume(cmp.Vol, cmp.Vunit)
-			vola.Add(vold)
-		}
-		volb := vmap[k]
-		volb.Subtract(vola)
-		vmap2[k] = vola
-		if !volb.IsZero() {
-			vmap3[k] = volb
-		}
-
-		// good to check here
-		volc := vmap[k]
-		fmt.Println("COMPONENT ", k, " HAVE : ", vola.ToString(), " WANT: ", volc.ToString(), " DIFF: ", volb.ToString())
-	}
-
-	(*request).Input_vols_required = vmap
-	(*request).Input_vols_supplied = vmap2
-	(*request).Input_vols_wanting = vmap3
 	(*request).Input_solutions = requestinputs
 
 	// finally we have to add a waste if there isn't one already
