@@ -10,6 +10,7 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
 )
 
 // Input parameters for this protocol (data)
@@ -46,7 +47,13 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 
 	chosencolourpalette := image.AvailablePalettes["Gray"]
 
-	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette)
+	if _input.PosterizeImage {
+		_, _input.Imagefilename = image.Posterize(_input.Imagefilename, _input.PosterizeLevels)
+	}
+
+	image.CheckAllResizealgorithms(_input.Imagefilename, _input.OutPlate, _input.Rotate, imaging.AllResampleFilters)
+
+	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate)
 
 	solutions := make([]*wtype.LHComponent, 0)
 
@@ -180,6 +187,9 @@ type PipetteImage_GrayInput struct {
 	Negative                        bool
 	OnlyHighVolumetips              bool
 	OutPlate                        *wtype.LHPlate
+	PosterizeImage                  bool
+	PosterizeLevels                 int
+	Rotate                          bool
 	VolumeForFullcolour             wunit.Volume
 }
 
@@ -211,6 +221,9 @@ func init() {
 				{Name: "Negative", Desc: "", Kind: "Parameters"},
 				{Name: "OnlyHighVolumetips", Desc: "SkipBlackforlowervol bool\n", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\n", Kind: "Inputs"},
+				{Name: "PosterizeImage", Desc: "", Kind: "Parameters"},
+				{Name: "PosterizeLevels", Desc: "", Kind: "Parameters"},
+				{Name: "Rotate", Desc: "", Kind: "Parameters"},
 				{Name: "VolumeForFullcolour", Desc: "", Kind: "Parameters"},
 				{Name: "Numberofpixels", Desc: "", Kind: "Data"},
 				{Name: "Pixels", Desc: "", Kind: "Outputs"},

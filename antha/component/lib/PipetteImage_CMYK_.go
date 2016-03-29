@@ -39,7 +39,7 @@ func _PipetteImage_CMYKSteps(_ctx context.Context, _input *PipetteImage_CMYKInpu
 
 	//var chosencolourpalette color.Palette
 	chosencolourpalette := image.AvailablePalettes["Plan9"]
-	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette)
+	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate)
 
 	solutions := make([]*wtype.LHComponent, 0)
 
@@ -88,7 +88,7 @@ func _PipetteImage_CMYKSteps(_ctx context.Context, _input *PipetteImage_CMYKInpu
 				components = append(components, blackSample)
 			}
 
-			solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 0, components...)
+			solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, components...)
 			solutions = append(solutions, solution)
 
 		}
@@ -164,6 +164,7 @@ type PipetteImage_CMYKInput struct {
 	Imagefilename       string
 	Magenta             *wtype.LHComponent
 	OutPlate            *wtype.LHPlate
+	Rotate              bool
 	VolumeForFullcolour wunit.Volume
 	Yellow              *wtype.LHComponent
 }
@@ -194,6 +195,7 @@ func init() {
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
 				{Name: "Magenta", Desc: "", Kind: "Inputs"},
 				{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\n", Kind: "Inputs"},
+				{Name: "Rotate", Desc: "", Kind: "Parameters"},
 				{Name: "VolumeForFullcolour", Desc: "", Kind: "Parameters"},
 				{Name: "Yellow", Desc: "", Kind: "Inputs"},
 				{Name: "Numberofpixels", Desc: "", Kind: "Data"},

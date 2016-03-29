@@ -1,4 +1,4 @@
-// Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours
+// Generates instructions to pipette out a defined image onto a defined plate using a defined palette of coloured bacteria
 protocol PipetteImage_living
 
 import (
@@ -9,6 +9,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/microArch/factory"
 	"fmt"
+	 "image/color"
 )
 
 
@@ -24,6 +25,9 @@ Parameters (
 	OnlythisColour string
 	Notthiscolour string
 	UVimage bool
+	Rotate bool
+	Subset bool
+	Subsetnames []string
 	//IncTemp Temperature
 	//IncTime Time
 )
@@ -63,26 +67,43 @@ Setup {
 // for every input
 Steps {
 	
-	UniqueComponents = make([]string,0)
+	// make sub pallete if necessary
+	var chosencolourpalette color.Palette
 	
-	chosencolourpalette := image.AvailablePalettes[Palettename]
+	if Subset {
+		chosencolourpalette = image.MakeSubPallette(Palettename, Subsetnames)
+	}else {
+		chosencolourpalette = image.AvailablePalettes[Palettename]
+	}
+	
+	// resize image to fit dimensions of plate and change each pixel to match closest colour from chosen palette
+	// theoutput of this is a map of well positions to colours needed
+	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette,Rotate) 
+	
+	colourtostringmap := image.AvailableComponentmaps[Palettename]
 	
 	
-	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette) 
+	// if the image will be printed using fluorescent proteins, 2 previews will be generated for the image (i) under UV light (ii) under visible light 
 	
 	if UVimage {
 		uvmap := image.AvailableComponentmaps[Palettename]
 		visiblemap := image.Visibleequivalentmaps[Palettename]
 		
-		image.PrintFPImagePreview(Imagefilename,OutPlate, visiblemap, uvmap)
+		if Subset {
+		uvmap = image.MakeSubMapfromMap(colourtostringmap, Subsetnames)
+		visiblemap = image.MakeSubMapfromMap(colourtostringmap, Subsetnames)
+		}
+		image.PrintFPImagePreview(Imagefilename,OutPlate, Rotate, visiblemap, uvmap)
 	}
 
 	// get components from factory
 	componentmap := make(map[string]*wtype.LHComponent, 0)
+	
+	if Subset {
+	colourtostringmap = image.MakeSubMapfromMap(colourtostringmap, Subsetnames)
+	}
 
-	colourtostringmap := image.AvailableComponentmaps[Palettename]
-
-	for _, colourname := range chosencolourpalette {
+	for colourname, _ := range colourtostringmap {
 
 		componentname := colourtostringmap[colourname]
 
@@ -94,21 +115,22 @@ Steps {
 	solutions := make([]*wtype.LHComponent, 0)
 
 	counter := 0
+	UniqueComponents = make([]string,0)
 
+
+// loop through the position to colour map pipeting the correct coloured protein into each well
 	for locationkey, colour := range positiontocolourmap {
 		
 		components := make([]*wtype.LHComponent, 0)
 		
 		component := componentmap[colourtostringmap[colour]]
 
-		/*if component.TypeName() == "dna" {
-			component.Type = wtype.LTDoNotMix // "DoNotMix"
-		}*/
-		
+		// make sure liquid class is appropriate for cell culture in case this is not set elsewhere
 		component.Type = wtype.LTCulture
 		
 		fmt.Println(image.Colourcomponentmap[colour])
 		
+		// if the option to only print a single colour is not selected then the pipetting actions for all colours (apart from if not this colour is not empty) will follow
 		if OnlythisColour !="" {
 	
 		if image.Colourcomponentmap[colour] == OnlythisColour{
@@ -155,14 +177,14 @@ Steps {
 		}
 		}
 	}
-	
-	Numberofpixels = len(Pixels)
-	fmt.Println("Pixels =",Numberofpixels)
 
 	UniqueComponents = search.RemoveDuplicates(UniqueComponents)
 	fmt.Println("Unique Components:",UniqueComponents)
 	fmt.Println("number of unique components",len(UniqueComponents))
 	Pixels = solutions
+	
+	Numberofpixels = len(Pixels)
+	fmt.Println("Pixels =",Numberofpixels)
 	
 }
 

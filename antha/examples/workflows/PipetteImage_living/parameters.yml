@@ -4,7 +4,16 @@
 		"OnlythisColour":"",
 		"Notthiscolour":"white",
 	  	"Imagefilename": "ziggy5_384.jpg",
-		"Palettename":"ProteinPaintboxSubset",
+		"Rotate": false,
+		"Palettename":"ProteinPaintboxVisible",
+		"Subset": true,
+		"Subsetnames": [
+		"DreidelTeal",
+		"TinselPurple",
+		"CupidPink",
+		"LeorOrange",
+		"white"
+		],
       	"OutPlate": "Agarplateforpicking384_riser",
 		"UVimage":false,
       	"VolumePerWell": "2ul"

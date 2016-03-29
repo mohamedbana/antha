@@ -7,14 +7,20 @@ import (
 	goimage "image"
 	"image/color"
 	"image/color/palette"
+
 	"strconv"
 	"strings"
 
 	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
 
+	"path/filepath"
+
+	"os"
+
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
 )
 
 // Colour palette to use // this would relate to a map of components of these available colours in factor
@@ -134,6 +140,35 @@ func reversepalettemap(colourmap map[color.Color]string) (stringmap map[string]c
 	return
 }
 
+func MakeSubMapfromMap(existingmap map[color.Color]string, colournames []string) (newmap map[color.Color]string) {
+
+	newmap = make(map[color.Color]string, 0)
+
+	reversedmap, err := reversepalettemap(existingmap)
+
+	if err != nil {
+		panic("can't reverse this colour map" + err.Error())
+	}
+
+	for _, colourname := range colournames {
+		colour := reversedmap[colourname]
+		newmap[colour] = colourname
+	}
+
+	return
+}
+
+func MakeSubPallette(palettename string, colournames []string) (subpalette color.Palette) {
+	palettemap := AvailableComponentmaps[palettename]
+
+	submap := MakeSubMapfromMap(palettemap, colournames)
+
+	subpalette = palettefromMap(submap)
+
+	return
+
+}
+
 var ProteinPaintboxmap = map[color.Color]string{
 	// under visible light
 
@@ -176,7 +211,7 @@ var ProteinPaintboxmap = map[color.Color]string{
 	color.RGBA{R: uint8(241), G: uint8(84), B: uint8(152), A: uint8(255)}:  "GuajilloRFP",
 	color.RGBA{R: uint8(247), G: uint8(132), B: uint8(179), A: uint8(255)}: "PaprikaRFP",
 	color.RGBA{R: uint8(248), G: uint8(84), B: uint8(149), A: uint8(255)}:  "SerranoRFP",
-	color.RGBA{R: uint8(254), G: uint8(253), B: uint8(252), A: uint8(255)}: "EiraCFP",
+	//color.RGBA{R: uint8(254), G: uint8(253), B: uint8(252), A: uint8(255)}: "EiraCFP",
 	color.RGBA{R: uint8(255), G: uint8(255), B: uint8(146), A: uint8(255)}: "BlazeYFP",
 	color.RGBA{R: uint8(194), G: uint8(164), B: uint8(72), A: uint8(255)}:  "JuniperGFP",
 	color.RGBA{R: uint8(243), G: uint8(138), B: uint8(112), A: uint8(255)}: "TannenGFP",
@@ -188,11 +223,13 @@ var ProteinPaintboxmap = map[color.Color]string{
 	color.RGBA{R: uint8(0), G: uint8(0), B: uint8(0), A: uint8(255)}: "E.coli pUC19 on sgal",
 
 	// plus white as a blank (or comment out to use EiraCFP)
-	//color.RGBA{R: uint8(242), G: uint8(243), B: uint8(242), A: uint8(255)}: "verywhite",
+	color.RGBA{R: uint8(242), G: uint8(243), B: uint8(242), A: uint8(255)}: "verywhite",
 }
 
 var UVProteinPaintboxmap = map[color.Color]string{
 	// under UV
+
+	// fluorescent
 	//	color.RGBA{R: uint8(0), G: uint8(255), B: uint8(255), A: uint8(255)}:  "CindylouCFP",
 	color.RGBA{R: uint8(0), G: uint8(255), B: uint8(255), A: uint8(255)}: "FrostyCFP",
 	color.RGBA{R: uint8(27), G: uint8(79), B: uint8(146), A: uint8(255)}: "TwinkleCFP",
@@ -211,14 +248,14 @@ var UVProteinPaintboxmap = map[color.Color]string{
 	color.RGBA{R: uint8(255), G: uint8(0), B: uint8(166), A: uint8(255)}:  "FresnoRFP",
 
 	// Extended fluorescent proteins
-	color.RGBA{R: uint8(255), G: uint8(24), B: uint8(138), A: uint8(255)}:  "CayenneRFP",
-	color.RGBA{R: uint8(255), G: uint8(8), B: uint8(138), A: uint8(255)}:   "GuajilloRFP",
-	color.RGBA{R: uint8(252), G: uint8(65), B: uint8(136), A: uint8(255)}:  "PaprikaRFP",
-	color.RGBA{R: uint8(254), G: uint8(23), B: uint8(127), A: uint8(255)}:  "SerranoRFP",
-	color.RGBA{R: uint8(173), G: uint8(253), B: uint8(218), A: uint8(255)}: "EiraCFP",
-	color.RGBA{R: uint8(254), G: uint8(255), B: uint8(83), A: uint8(255)}:  "BlazeYFP",
-	color.RGBA{R: uint8(0), G: uint8(231), B: uint8(162), A: uint8(255)}:   "JuniperGFP",
-	color.RGBA{R: uint8(179), G: uint8(119), B: uint8(57), A: uint8(255)}:  "TannenGFP",
+	color.RGBA{R: uint8(255), G: uint8(24), B: uint8(138), A: uint8(255)}: "CayenneRFP",
+	color.RGBA{R: uint8(255), G: uint8(8), B: uint8(138), A: uint8(255)}:  "GuajilloRFP",
+	color.RGBA{R: uint8(252), G: uint8(65), B: uint8(136), A: uint8(255)}: "PaprikaRFP",
+	color.RGBA{R: uint8(254), G: uint8(23), B: uint8(127), A: uint8(255)}: "SerranoRFP",
+	//color.RGBA{R: uint8(173), G: uint8(253), B: uint8(218), A: uint8(255)}: "EiraCFP",
+	color.RGBA{R: uint8(254), G: uint8(255), B: uint8(83), A: uint8(255)}: "BlazeYFP",
+	color.RGBA{R: uint8(0), G: uint8(231), B: uint8(162), A: uint8(255)}:  "JuniperGFP",
+	color.RGBA{R: uint8(179), G: uint8(119), B: uint8(57), A: uint8(255)}: "TannenGFP",
 
 	// conventional E.coli colour is black under UV ??
 	color.RGBA{R: uint8(0), G: uint8(0), B: uint8(0), A: uint8(255)}: "E.coli",
@@ -282,10 +319,101 @@ var ProteinPaintboxSubsetmap = map[color.Color]string{
 	//color.RGBA{R: uint8(0), G: uint8(0), B: uint8(0), A: uint8(255)}: "black",
 
 	// plus white as a blank (or comment out to use EiraCFP)
-	color.RGBA{R: uint8(242), G: uint8(243), B: uint8(242), A: uint8(255)}: "white",
+	color.RGBA{R: uint8(242), G: uint8(243), B: uint8(242), A: uint8(255)}: "verywhite",
 }
 
-func ResizeImagetoPlate(imagefilename string, plate *wtype.LHPlate, algorithm imaging.ResampleFilter) (plateimage *goimage.NRGBA) {
+func Posterize(imagefilename string, levels int) (posterized *goimage.NRGBA, newfilename string) {
+
+	var newcolor color.NRGBA
+	numberofAreas := 256 / (levels)
+	numberofValues := 255 / (levels - 1)
+
+	img, err := imaging.Open(imagefilename)
+	if err != nil {
+		panic(err)
+	}
+
+	posterized = imaging.Clone(img)
+
+	for x := 0; x < img.Bounds().Dx(); x++ {
+		for y := 0; y < img.Bounds().Dy(); y++ {
+			var rnew float64
+			var gnew float64
+			var bnew float64
+
+			rgb := img.At(x, y)
+			r, g, b, a := rgb.RGBA()
+
+			if r == 0 {
+				rnew = 0
+			} else {
+				rfloat := (float64(r/256) / float64(numberofAreas))
+
+				rinttemp, err := wutil.RoundDown(rfloat)
+				if err != nil {
+					panic(err)
+				}
+				rnew = float64(rinttemp) * float64(numberofValues)
+			}
+			if g == 0 {
+				gnew = 0
+			} else {
+				gfloat := (float64(g/256) / float64(numberofAreas))
+
+				ginttemp, err := wutil.RoundDown(gfloat)
+				if err != nil {
+					panic(err)
+				}
+				gnew = float64(ginttemp) * float64(numberofValues)
+			}
+			if b == 0 {
+				bnew = 0
+			} else {
+				bfloat := (float64(b/256) / float64(numberofAreas))
+
+				binttemp, err := wutil.RoundDown(bfloat)
+				if err != nil {
+					panic(err)
+				}
+				bnew = float64(binttemp) * float64(numberofValues)
+			}
+			newcolor.A = uint8(a)
+
+			rint, err := wutil.RoundDown(rnew)
+
+			if err != nil {
+				panic(err)
+			}
+			newcolor.R = uint8(rint)
+			gint, err := wutil.RoundDown(gnew)
+			if err != nil {
+				panic(err)
+			}
+			newcolor.G = uint8(gint)
+			bint, err := wutil.RoundDown(bnew)
+			if err != nil {
+				panic(err)
+			}
+			newcolor.B = uint8(bint)
+
+			fmt.Println("x,y", x, y, "r,g,b,a", r, g, b, a, "newcolour", newcolor)
+
+			posterized.Set(x, y, newcolor)
+
+		}
+	}
+
+	// rename file
+	splitfilename := strings.Split(imagefilename, `.`)
+
+	newfilename = filepath.Join(fmt.Sprint(splitfilename[0], "_posterized", `.`, splitfilename[1]))
+	// save
+
+	imaging.Save(posterized, newfilename)
+	return
+}
+
+func ResizeImagetoPlate(imagefilename string, plate *wtype.LHPlate, algorithm imaging.ResampleFilter, rotate bool) (plateimage *goimage.NRGBA) {
 
 	// input files (just 1 in this case)
 	files := []string{imagefilename}
@@ -299,9 +427,14 @@ func ResizeImagetoPlate(imagefilename string, plate *wtype.LHPlate, algorithm im
 	if err != nil {
 		panic(err)
 	}
+
 	if img.Bounds().Dy() != plate.WellsY() {
 		fmt.Println("hey we're not so different", img.Bounds().Dy(), plate.WellsY())
 		// have the option of changing the resize algorithm here
+
+		if rotate {
+			img = imaging.Rotate270(img)
+		}
 		plateimage = imaging.Resize(img, 0, plate.WlsY, algorithm)
 		//plateimages = append(plateimages,plateimage)
 	} else {
@@ -312,8 +445,61 @@ func ResizeImagetoPlate(imagefilename string, plate *wtype.LHPlate, algorithm im
 
 }
 
-func MakePalleteFromImage(imagefilename string, plate *wtype.LHPlate) (newpallette color.Palette) {
-	plateimage := ResizeImagetoPlate(imagefilename, plate, imaging.CatmullRom)
+func CheckAllResizealgorithms(imagefilename string, plate *wtype.LHPlate, rotate bool, algorithms map[string]imaging.ResampleFilter) {
+	// input files (just 1 in this case)
+	files := []string{imagefilename}
+	var dir string
+
+	var plateimage *goimage.NRGBA
+
+	// Colour palette to use // this would relate to a map of components of these available colours in factory
+	//availablecolours := chosencolourpalette //palette.WebSafe
+
+	//var plateimages []image.Image
+
+	for key, algorithm := range algorithms {
+
+		img, err := imaging.Open(files[0])
+		if err != nil {
+			panic(err)
+		}
+
+		if rotate {
+			img = imaging.Rotate270(img)
+		}
+
+		if img.Bounds().Dy() != plate.WellsY() {
+			fmt.Println("hey we're not so different", img.Bounds().Dy(), plate.WellsY())
+			// have the option of changing the resize algorithm here
+			plateimage = imaging.Resize(img, 0, plate.WlsY, algorithm)
+			//plateimages = append(plateimages,plateimage)
+		} else {
+			fmt.Println("i'm the same!!!")
+			plateimage = toNRGBA(img)
+		}
+
+		// rename file
+		splitfilename := strings.Split(imagefilename, `.`)
+
+		dir = splitfilename[0]
+
+		// make dir
+
+		os.MkdirAll(dir, 0777)
+
+		newname := filepath.Join(dir, fmt.Sprint(splitfilename[0], "_", key, "_plateformat", `.`, splitfilename[1]))
+		// save
+		err = imaging.Save(plateimage, newname)
+		if err != nil {
+			panic(err)
+		}
+
+	}
+}
+
+func MakePalleteFromImage(imagefilename string, plate *wtype.LHPlate, rotate bool) (newpallette color.Palette) {
+
+	plateimage := ResizeImagetoPlate(imagefilename, plate, imaging.CatmullRom, rotate)
 
 	colourarray := make([]color.Color, 0)
 
@@ -330,8 +516,8 @@ func MakePalleteFromImage(imagefilename string, plate *wtype.LHPlate) (newpallet
 	return
 }
 
-func MakeSmallPalleteFromImage(imagefilename string, plate *wtype.LHPlate) (newpallette color.Palette) {
-	plateimage := ResizeImagetoPlate(imagefilename, plate, imaging.CatmullRom)
+func MakeSmallPalleteFromImage(imagefilename string, plate *wtype.LHPlate, rotate bool) (newpallette color.Palette) {
+	plateimage := ResizeImagetoPlate(imagefilename, plate, imaging.CatmullRom, rotate)
 
 	// use Plan9 as pallette for first round to keep number of colours down to a manageable level
 
@@ -373,9 +559,9 @@ func MakeSmallPalleteFromImage(imagefilename string, plate *wtype.LHPlate) (newp
 
 // create a map of pixel to plate position from processing a given image with a chosen colour palette.
 // It's recommended to use at least 384 well plate
-func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolourpalette *color.Palette) (wellpositiontocolourmap map[string]color.Color, numberofpixels int) {
+func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolourpalette *color.Palette, rotate bool) (wellpositiontocolourmap map[string]color.Color, numberofpixels int) {
 
-	plateimage := ResizeImagetoPlate(imagefilename, plate, imaging.CatmullRom)
+	plateimage := ResizeImagetoPlate(imagefilename, plate, imaging.CatmullRom, rotate)
 
 	// make map of well position to colour: (array for time being)
 
@@ -444,9 +630,9 @@ func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolour
 	return
 }
 
-func PrintFPImagePreview(imagefile string, plate *wtype.LHPlate, visiblemap, uvmap map[color.Color]string) {
+func PrintFPImagePreview(imagefile string, plate *wtype.LHPlate, rotate bool, visiblemap, uvmap map[color.Color]string) {
 
-	plateimage := ResizeImagetoPlate(imagefile, plate, imaging.CatmullRom)
+	plateimage := ResizeImagetoPlate(imagefile, plate, imaging.CatmullRom, rotate)
 
 	uvpalette := palettefromMap(uvmap)
 

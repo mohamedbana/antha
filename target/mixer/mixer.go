@@ -198,6 +198,7 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 		ftype = fmt.Sprintf("application/%s", strings.ToLower(a.properties.Mnfr))
 	}
 	return &target.Mix{
+		Dev:        a,
 		Request:    req,
 		Properties: a.properties,
 		Files: target.Files{

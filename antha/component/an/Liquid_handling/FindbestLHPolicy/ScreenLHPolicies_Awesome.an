@@ -58,8 +58,10 @@ Setup {
 // for every input
 Steps {
 	
+	var rotate = false
+	
 	chosencolourpalette := image.AvailablePalettes["Palette1"]
-	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette) 
+	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, rotate) 
 	
 	Runtowelllocationmap = make([]string,0)
 	perconditionuntowelllocationmap := make([]string,0)
