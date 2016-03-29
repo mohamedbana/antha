@@ -25,6 +25,7 @@ package liquidhandling
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 )
 
@@ -56,6 +57,35 @@ type LHRequest struct {
 	Order_instructions_added []string
 	OutputIteratorFactory    func(*wtype.LHPlate) wtype.PlateIterator
 	InstructionChain         *IChain
+	Input_vols_supplied      map[string]wunit.Volume
+	Input_vols_required      map[string]wunit.Volume
+	Input_vols_wanting       map[string]wunit.Volume
+}
+
+func (req *LHRequest) ConfigureYourself() error {
+	// ensures input solutions is populated
+	// once input plates are specified
+	// more to happen later
+	inputs := req.Input_solutions
+
+	if inputs == nil {
+		inputs = make(map[string][]*wtype.LHComponent)
+	}
+
+	for _, v := range req.Input_plates {
+		for _, w := range v.Wellcoords {
+			if w.Empty() {
+				continue
+			}
+			c := w.Contents()
+			ar := inputs[c.CName]
+			ar = append(ar, c)
+			inputs[c.CName] = ar
+		}
+	}
+
+	req.Input_solutions = inputs
+	return nil
 }
 
 // this function checks requests so we can see early on whether or not they
@@ -97,6 +127,9 @@ func NewLHRequest() *LHRequest {
 	lhr.Input_assignments = make(map[string][]string)
 	lhr.Order_instructions_added = make([]string, 0, 1)
 	lhr.InstructionSet = liquidhandling.NewRobotInstructionSet(nil)
+	lhr.Input_vols_required = make(map[string]wunit.Volume)
+	lhr.Input_vols_supplied = make(map[string]wunit.Volume)
+	lhr.Input_vols_wanting = make(map[string]wunit.Volume)
 	return &lhr
 }
 

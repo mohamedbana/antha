@@ -84,8 +84,8 @@ func parseInputPlateFile(filename string) (*wtype.LHPlate, error) {
 			continue
 		}
 
-		if well.X >= p.WellsY() || well.Y >= p.WellsX() {
-			logger.Info(fmt.Sprint("parseInputPlate ERROR (line ", lineNo, "): well coord does not exist on plate type ", platetype))
+		if well.X >= p.WellsX() || well.Y >= p.WellsY() {
+			logger.Info(fmt.Sprint("parseInputPlate ERROR (line ", lineNo, "): well coord ", rec[0], " does not exist on plate type ", platetype))
 			continue
 		}
 

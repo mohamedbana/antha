@@ -102,6 +102,21 @@ func (a *Mixer) makeReq() (*planner.LHRequest, *planner.Liquidhandler) {
 		}
 	}
 
+	// mechanism to specify input plates directly
+
+	if ip := a.opt.InputPlates; len(ip) != 0 {
+		for _, v := range ip {
+			req.Input_plates[v.ID] = v
+		}
+	}
+
+	err := req.ConfigureYourself()
+
+	if err != nil {
+		logger.Debug("ERROR in request configuration")
+		return nil, nil
+	}
+
 	return req, p
 }
 

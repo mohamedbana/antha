@@ -74,6 +74,7 @@ func (is InputSorter) Less(i, j int) bool {
 //OUTPUT: 	"input_plates"      -- these each have components in wells
 //		"input_assignments" -- map with arrays of assignment strings, i.e. {tea: [plate1:A:1, plate1:A:2...] }etc.
 func input_plate_setup(request *LHRequest) *LHRequest {
+	// I think this might need moving too
 	logger.Debug("in input plate setup")
 	input_platetypes := (*request).Input_platetypes
 	if input_platetypes == nil || len(input_platetypes) == 0 {
@@ -107,40 +108,15 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 		input_order[i] = v
 	}
 
-	input_volumes := make(map[string]wunit.Volume, len(inputs))
-
-	// aggregate the volumes for the inputs
-	for _, k := range input_order {
-		v := inputs[k]
-		vol := wunit.NewVolume(0.0, "ul")
-
-		for i := 0; i < len(v); i++ {
-			//		vv := v[i].Volume()
-			// check if the location is set
-			// if so... do nada
-
-			if v[i].Loc != "" {
-				continue
-			}
-			vol.Add(v[i].Volume())
-		}
-		// big hack here
-		// TODO --- remove this for god's sake
-		// DONE --- I don't think we need it now
-		/*
-			extravol := wunit.NewVolume(vol.RawValue()*0.2, "ul")
-			vol.Add(&extravol)
-		*/
-
-		if !vol.IsZero() {
-			input_volumes[k] = vol
-		}
-	}
-
-	// work out what's left
+	// this needs to be passed in via the request... must specify how much of inputs cannot
+	// be satisfied by what's already passed in
+	//	input_volumes := make(map[string]wunit.Volume, len(inputs))
+	input_volumes := request.Input_vols_wanting
 
 	// sort to make deterministic
 	// we sort by a) volume (descending) b) name (alphabetically)
+	// this is a bit of a pickle... input_volumes no longer contains everything
+	// still this shouldn't be an issue since we're only talking about new things
 
 	isrt := InputSorter{input_order, input_volumes}
 
