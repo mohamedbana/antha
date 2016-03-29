@@ -26,7 +26,6 @@ package wtype
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 )
