@@ -115,8 +115,6 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 
 	// sort to make deterministic
 	// we sort by a) volume (descending) b) name (alphabetically)
-	// this is a bit of a pickle... input_volumes no longer contains everything
-	// still this shouldn't be an issue since we're only talking about new things
 
 	isrt := InputSorter{input_order, input_volumes}
 
@@ -152,8 +150,9 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 		var curr_well *wtype.LHWell
 		ass := make([]string, 0, 3)
 
+		// best hack so far: add an extra well of everything
 		for platetype, nwells := range well_assignments {
-			for i := 0; i < nwells; i++ {
+			for i := 0; i < nwells+1; i++ {
 				curr_plate = plates_in_play[platetype.Type]
 
 				if curr_plate == nil {
@@ -162,6 +161,7 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 					platename := fmt.Sprintf("Input_plate_%d", curplaten)
 					curr_plate.PlateName = platename
 					curplaten += 1
+					curr_plate.DeclareTemporary()
 				}
 
 				// find somewhere to put it

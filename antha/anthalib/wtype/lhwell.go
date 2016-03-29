@@ -183,6 +183,7 @@ func (w *LHWell) Remove(v wunit.Volume) *LHComponent {
 	ret := w.Contents().Dup()
 	ret.Vol = v.ConvertToString(w.Vunit)
 
+	w.Contents().Remove(v)
 	return ret
 }
 
@@ -225,6 +226,10 @@ func (lhw *LHWell) Shape() *Shape {
 
 func (w *LHWell) ContainerType() string {
 	return w.Platetype
+}
+
+func (w *LHWell) Clear() {
+	w.WContents = NewLHComponent()
 }
 
 func (w *LHWell) Empty() bool {
@@ -358,4 +363,46 @@ func get_vol_left(well *LHWell) float64 {
 	rvol := well.Rvol
 	vol := well.MaxVol
 	return vol - (Currvol() + total_carry_vol + rvol)
+}
+
+func (well *LHWell) DeclareTemporary() {
+	if well != nil {
+
+		if well.Extra == nil {
+			well.Extra = make(map[string]interface{})
+		}
+
+		well.Extra["temporary"] = true
+	} else {
+		logger.Debug("Warning: Attempt to access nil well in DeclareTemporary()")
+	}
+}
+
+func (well *LHWell) DeclareNotTemporary() {
+	if well != nil {
+		if well.Extra == nil {
+			well.Extra = make(map[string]interface{})
+		}
+		well.Extra["temporary"] = false
+	} else {
+		logger.Debug("Warning: Attempt to access nil well in DeclareTemporary()")
+	}
+}
+
+func (well *LHWell) IsTemporary() bool {
+	if well != nil {
+		if well.Extra == nil {
+			return false
+		}
+
+		t, ok := well.Extra["temporary"]
+
+		if !ok || !t.(bool) {
+			return false
+		}
+		return true
+	} else {
+		logger.Debug("Warning: Attempt to access nil well in DeclareTemporary()")
+	}
+	return false
 }

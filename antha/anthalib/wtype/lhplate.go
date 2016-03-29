@@ -27,6 +27,7 @@ import (
 	"fmt"
 
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/microArch/logger"
 )
 
 // structure describing a microplate
@@ -113,17 +114,27 @@ func (lhp *LHPlate) GetComponent(cmp *LHComponent, exact bool) ([]WellCoords, bo
 	ret := make([]WellCoords, 0, 1)
 
 	it := NewOneTimeColumnWiseIterator(lhp)
-	volGot := wunit.NewVolume(0.0, "ul")
+
+	var volGot wunit.Volume
+	volGot = wunit.NewVolume(0.0, "ul")
+
+	x := 0
 
 	for wc := it.Curr(); it.Valid(); wc = it.Next() {
 		w := lhp.Wellcoords[wc.FormatA1()]
 		//	logger.Debug(fmt.Sprint("WANT$$$: ", cmp.CName, " :: ", wc.FormatA1(), " ", w.Contents().CName))
+
 		if w.Contents().CName == cmp.CName {
 			if exact && w.Contents().ID != cmp.ID {
 				continue
 			}
+			x += 1
 
 			v := w.WorkingVolume()
+			if v.LessThan(cmp.Volume()) {
+				fmt.Println("SKIPPING WELL ", x)
+				continue
+			}
 			volGot.Add(v)
 			ret = append(ret, wc)
 
@@ -132,6 +143,8 @@ func (lhp *LHPlate) GetComponent(cmp *LHComponent, exact bool) ([]WellCoords, bo
 			}
 		}
 	}
+
+	fmt.Println("FOUND: ", cmp.CName, " WANT ", cmp.Volume().ToString(), " GOT ", volGot.ToString(), "  ", ret)
 
 	if !volGot.GreaterThan(cmp.Volume()) {
 		return ret, false
@@ -293,4 +306,33 @@ func Initialize_Wells(plate *LHPlate) {
 	}
 	(*plate).HWells = newwells
 	(*plate).Wellcoords = wellcrds
+}
+
+func (p *LHPlate) RemoveComponent(well string, vol wunit.Volume) *LHComponent {
+	w := p.Wellcoords[well]
+
+	if w == nil {
+		logger.Debug(fmt.Sprint("RemoveComponent (plate) ERROR: ", well, " ", vol.ToString(), " Can't find well"))
+		return nil
+	}
+
+	err := w.Remove(vol)
+
+	return err
+}
+
+func (p *LHPlate) DeclareTemporary() {
+	for _, w := range p.Wellcoords {
+		w.DeclareTemporary()
+	}
+}
+
+func (p *LHPlate) IsTemporary() bool {
+	for _, w := range p.Wellcoords {
+		if !w.IsTemporary() {
+			return false
+		}
+	}
+
+	return true
 }

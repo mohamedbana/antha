@@ -184,7 +184,6 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) {
 		plate, ok := this.Properties.Plates[this.Properties.PlateIDLookup[plateID]]
 
 		if !ok {
-			//	panic(fmt.Sprint("NO SUCH PLATE: ", plateID))
 			logger.Fatal(fmt.Sprint("NO SUCH PLATE: ", plateID))
 		}
 
@@ -192,8 +191,13 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) {
 			well := plate.Wellcoords[crd]
 			vol.Add(well.ResidualVolume())
 			well.WContents.SetVolume(vol)
+			well.DeclareNotTemporary()
 		}
 	}
+
+	// finally get rid of any temporary stuff
+
+	this.Properties.RemoveTemporaryComponents()
 
 	// all done
 

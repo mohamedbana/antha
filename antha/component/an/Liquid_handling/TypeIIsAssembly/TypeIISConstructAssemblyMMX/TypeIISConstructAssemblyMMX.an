@@ -45,7 +45,6 @@ Setup {}
 // for every input
 Steps {
 	samples := make([]*wtype.LHComponent, 0)
-//	waterSample := mixer.SampleForTotalVolume(Water, ReactionVolume)
 	mmxSample:=mixer.SampleForTotalVolume(MasterMix,ReactionVolume)
 	samples = append(samples, mmxSample)
 

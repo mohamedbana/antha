@@ -29,6 +29,7 @@ import (
 
 	"github.com/antha-lang/antha/antha/anthalib/material"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
 )
@@ -474,6 +475,24 @@ func (lhp *LHProperties) AddPlate(pos string, plate *wtype.LHPlate) bool {
 	return true
 }
 
+// reverse the above
+
+func (lhp *LHProperties) RemovePlateWithID(id string) {
+	pos := lhp.PlateIDLookup[id]
+	delete(lhp.PosLookup, pos)
+	delete(lhp.PlateIDLookup, id)
+	delete(lhp.PlateLookup, id)
+	delete(lhp.Plates, pos)
+}
+
+func (lhp *LHProperties) RemovePlateAtPosition(pos string) {
+	id := lhp.PosLookup[pos]
+	delete(lhp.PosLookup, pos)
+	delete(lhp.PlateIDLookup, id)
+	delete(lhp.PlateLookup, id)
+	delete(lhp.Plates, pos)
+}
+
 func (lhp *LHProperties) addWaste(waste *wtype.LHPlate) bool {
 	for _, pref := range lhp.Waste_preferences {
 		if lhp.PosLookup[pref] != "" {
@@ -531,19 +550,29 @@ func (lhp *LHProperties) AddWashTo(pos string, wash *wtype.LHPlate) bool {
 	return true
 }
 
+// of necessity, this must be destructive of state so we have to work on a copy
+// NB this is not properly specified yet
 func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []string) {
 	r1 := make([]string, len(cmps))
 	r2 := make([]string, len(cmps))
+
+	fudgevol := wunit.NewVolume(0.5, "ul")
 
 	for i, v := range cmps {
 		foundIt := false
 
 		if v.HasAnyParent() {
 			//fmt.Println("Trying to get component ", v.CName, v.ParentID)
+			// this means it was already made with a previous call
 			tx := strings.Split(v.Loc, ":")
 
 			r1[i] = tx[0]
 			r2[i] = tx[1]
+
+			vol := v.Volume().Dup()
+			vol.Add(fudgevol)
+			lhp.RemoveComponent(tx[0], tx[1], vol)
+
 			foundIt = true
 
 		} else {
@@ -562,7 +591,15 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []s
 						foundIt = true
 						// update r1 and r2
 						r1[i] = p.ID
+						// XXX XXX XXX FFS this should aggregate
+						// TODO -- fix this
 						r2[i] = wcarr[0].FormatA1()
+
+						vol := v.Volume().Dup()
+						vol.Add(fudgevol)
+
+						lhp.RemoveComponent(r1[i], r2[i], vol)
+
 						break
 					}
 				}
@@ -685,4 +722,65 @@ func (lhp *LHProperties) GetChannelScoreFunc() ChannelScoreFunc {
 	sc := DefaultChannelScoreFunc{}
 
 	return sc
+}
+
+// convenience method
+
+func (lhp *LHProperties) RemoveComponent(plateID string, well string, volume wunit.Volume) bool {
+	p := lhp.Plates[lhp.PlateIDLookup[plateID]]
+
+	if p == nil {
+		logger.Info(fmt.Sprint("RemoveComponent ", plateID, " ", well, " ", volume.ToString(), " can't find plate"))
+		return false
+	}
+
+	r := p.RemoveComponent(well, volume)
+
+	if r == nil {
+		logger.Info(fmt.Sprint("CAN'T REMOVE COMPONENT ", plateID, " ", well, " ", volume.ToString()))
+		return false
+	}
+
+	/*
+		w := p.Wellcoords[well]
+
+		if w == nil {
+			logger.Info(fmt.Sprint("RemoveComponent ", plateID, " ", well, " ", volume.ToString(), " can't find well"))
+			return false
+		}
+
+		c:=w.Remove(volume)
+
+		if c==nil{
+			logger.Info(fmt.Sprint("RemoveComponent ", plateID, " ", well, " ", volume.ToString(), " can't find well"))
+			return false
+		}
+	*/
+
+	return true
+}
+
+func (lhp *LHProperties) RemoveTemporaryComponents() {
+	ids := make([]string, 0, 1)
+	for _, p := range lhp.Plates {
+		// if the whole plate is temporary we can just delete the whole thing
+		if p.IsTemporary() {
+			ids = append(ids, p.ID)
+			continue
+		}
+
+		// now remove any components in wells still marked temporary
+
+		for _, w := range p.Wellcoords {
+			if w.IsTemporary() {
+				w.Clear()
+			}
+		}
+	}
+
+	for _, id := range ids {
+		lhp.RemovePlateWithID(id)
+	}
+
+	// good
 }

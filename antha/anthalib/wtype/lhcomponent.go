@@ -104,6 +104,10 @@ func (lhc *LHComponent) Volume() wunit.Volume {
 func (lhc *LHComponent) Remove(v wunit.Volume) {
 	///TODO -- catch errors
 	lhc.Vol -= v.ConvertToString(lhc.Vunit)
+
+	if lhc.Vol < 0.0 {
+		lhc.Vol = 0.0
+	}
 }
 
 func (lhc *LHComponent) Dup() *LHComponent {

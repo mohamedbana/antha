@@ -51,6 +51,15 @@ func parseInputPlateFile(filename string) (*wtype.LHPlate, error) {
 		return nil, err
 	}
 
+	pn := fmt.Sprint("input_plate_", p.ID)
+	if len(line) > 1 {
+		if len(line[1]) > 0 {
+			pn = line[1]
+		}
+	}
+
+	p.PlateName = pn
+
 	// now we know the plate, just need to make the relevant components
 
 	lineNo := 2
