@@ -19,6 +19,8 @@ import (
 
 // Data which is returned from this protocol, and data types
 
+//Palette color.Palette
+
 // Physical Inputs to this protocol with types
 
 //InPlate *wtype.LHPlate
@@ -43,18 +45,18 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 	// make pallette of colours from image
 	chosencolourpalette := image.MakeSmallPalleteFromImage(_input.Imagefilename, _input.OutPlate, _input.Rotate)
 
+	//chosencolourpalette := image.AvailablePalettes["Plan9"]
+
 	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate)
 
 	// remove duplicates
-	//positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
+	positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
 
 	fmt.Println("positions", positiontocolourmap)
 
 	solutions := make([]*wtype.LHComponent, 0)
 
 	counter := 0
-
-	//solutions := image.PipetteImagebyBlending(OutPlate, positiontocolourmap,Cyan, Magenta, Yellow,Black, VolumeForFullcolour)
 
 	for _, colour := range positiontocolourmap {
 
@@ -127,8 +129,9 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 	}
 
 	_output.Colours = solutions
-	_output.Numberofcolours = len(_output.Colours)
-	fmt.Println("Unique Colours =", _output.Numberofcolours)
+	_output.Numberofcolours = len(chosencolourpalette)
+	//Palette = chosencolourpalette
+	fmt.Println("Unique Colours =", _output.Numberofcolours, "from palette:", chosencolourpalette)
 
 }
 

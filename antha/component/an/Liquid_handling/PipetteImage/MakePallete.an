@@ -21,6 +21,7 @@ Parameters (
 // Data which is returned from this protocol, and data types
 Data (
 	Numberofcolours int
+	//Palette color.Palette
 )
 
 
@@ -56,11 +57,14 @@ Steps {
 	
 	// make pallette of colours from image
 	chosencolourpalette := image.MakeSmallPalleteFromImage(Imagefilename, OutPlate,Rotate) 
+
+	//chosencolourpalette := image.AvailablePalettes["Plan9"] 
 	
+
 	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate) 
 	
 	// remove duplicates
-	//positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
+	positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
 	
 	fmt.Println("positions", positiontocolourmap)
 	
@@ -68,7 +72,6 @@ Steps {
 
 	counter := 0
 
-	//solutions := image.PipetteImagebyBlending(OutPlate, positiontocolourmap,Cyan, Magenta, Yellow,Black, VolumeForFullcolour) 
 
 	for _, colour := range positiontocolourmap {
 		
@@ -142,8 +145,9 @@ Steps {
 	}
 
 	Colours = solutions
-	Numberofcolours = len(Colours)
-	fmt.Println("Unique Colours =",Numberofcolours)
+	Numberofcolours = len(chosencolourpalette)
+	//Palette = chosencolourpalette
+	fmt.Println("Unique Colours =",Numberofcolours,"from palette:", chosencolourpalette)
 
 }
 // Run after controls and a steps block are completed to
