@@ -138,6 +138,23 @@ func (ins *TransferInstruction) InstructionType() int {
 	return ins.Type
 }
 
+func (ins *TransferInstruction) MergeWith(ins2 *TransferInstruction) {
+	ins.What = append(ins.What, ins2.What...)
+	ins.PltFrom = append(ins.PltFrom, ins2.PltFrom...)
+	ins.PltTo = append(ins.PltTo, ins2.PltTo...)
+	ins.WellFrom = append(ins.WellFrom, ins2.WellFrom...)
+	ins.WellTo = append(ins.WellTo, ins2.WellTo...)
+	ins.Volume = append(ins.Volume, ins2.Volume...)
+	ins.FPlateType = append(ins.FPlateType, ins2.FPlateType...)
+	ins.TPlateType = append(ins.TPlateType, ins2.TPlateType...)
+	ins.FPlateWX = append(ins.FPlateWX, ins2.FPlateWX...)
+	ins.FPlateWY = append(ins.FPlateWY, ins2.FPlateWY...)
+	ins.TPlateWX = append(ins.TPlateWX, ins2.TPlateWX...)
+	ins.TPlateWY = append(ins.TPlateWY, ins2.TPlateWY...)
+	ins.FVolume = append(ins.FVolume, ins2.FVolume...)
+	ins.TVolume = append(ins.TVolume, ins2.TVolume...)
+}
+
 func (ins *TransferInstruction) GetParameter(name string) interface{} {
 	switch name {
 	case "LIQUIDCLASS":
@@ -691,6 +708,8 @@ func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms
 
 	last_thing = nil
 
+	var dirty bool
+
 	for t := 0; t < len(ins.Volume); t++ {
 		newchannel, newtiptype := ChooseChannel(ins.Volume[t], prms)
 		tvs := TransferVolumes(ins.Volume[t], channel.Minvol, channel.Maxvol)
@@ -701,11 +720,19 @@ func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms
 			change_tips = change_tips || channel != newchannel
 			change_tips = change_tips || newtiptype != tiptype
 
-			if pol["DONT_BE_DIRTY"].(bool) && last_thing != nil {
-				// check
+			this_thing := prms.Plates[ins.PltFrom[t]].Wellcoords[ins.WellFrom[t]].Contents()
+
+			if last_thing != nil {
+				if this_thing.CName != last_thing.CName {
+					change_tips = true
+				}
 			}
 
-			//	if n_tip_uses > pol["TIP_REUSE_LIMIT"].(int) || channel != newchannel || newtiptype != tiptype {
+			// finally ensure we don't contaminate sources
+			if dirty {
+				change_tips = true
+			}
+
 			if change_tips {
 				// maybe wrap this as a ChangeTips function call
 				// these need parameters
@@ -715,6 +742,7 @@ func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms
 				channel = newchannel
 				n_tip_uses = 0
 				last_thing = nil
+				dirty = false
 			}
 
 			stci := NewSingleChannelTransferInstruction()
@@ -732,6 +760,18 @@ func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms
 			stci.Prms = channel
 
 			ret = append(ret, stci)
+			last_thing = this_thing
+
+			// finally check if we are touching a bad liquid
+			// in future we will do this properly, for now we assume
+			// touching any liquid is bad
+
+			npre, premix := pol["PRE_MIX"]
+			npost, postmix := pol["POST_MIX"]
+
+			if pol["DSPREFERENCE"].(int) == 0 && !ins.TVolume[t].IsZero() || premix && npre.(int) > 0 || postmix && npost.(int) > 0 {
+				dirty = true
+			}
 
 			ins.FVolume[t].Subtract(vol)
 			ins.TVolume[t].Add(vol)

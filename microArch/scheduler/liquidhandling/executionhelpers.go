@@ -133,7 +133,7 @@ func (bg ByGeneration) Less(i, j int) bool {
 
 func set_output_order(rq *LHRequest) {
 	// sort into equivalence classes by generation
-	// nb that this basically means the below is a bit pointless
+	// nb that this basically means the ichain stuff is a bit pointless
 	// however for now it will be maintained to test whether
 	// parent-child relationships are working OK
 
@@ -154,6 +154,8 @@ func set_output_order(rq *LHRequest) {
 
 	rq.InstructionChain = it
 }
+
+/*
 
 func optimize_runs(rq *LHRequest, chain *IChain, newoutputorder []string) {
 	// go through instructions on the same level and see if any might be candidates for
@@ -179,22 +181,65 @@ func optimize_runs(rq *LHRequest, chain *IChain, newoutputorder []string) {
 }
 
 func groupByComponents(instructions []*wtype.LHInstruction) []*wtype.LHInstruction {
-	/*
-		hsh := make(map[string][]*LHInstruction, len(instructions))
+	hsh := make(map[string][]*wtype.LHInstruction, len(instructions))
 
-		for _, ins := range instructions {
-			hsh[ins.Result.CName] = append(hsh[ins.Result.CName], ins)
+	for _, ins := range instructions {
+		hsh[ins.Result.CName] = append(hsh[ins.Result.CName], ins)
+	}
+
+	// component ordering should not really be an issue here
+
+	r := make([]*wtype.LHInstruction, 0, 3)
+	return r
+}
+*/
+type ByOrdinal [][]int
+
+func (bo ByOrdinal) Len() int      { return len(bo) }
+func (bo ByOrdinal) Swap(i, j int) { bo[i], bo[j] = bo[j], bo[i] }
+func (bo ByOrdinal) Less(i, j int) bool {
+	// just compare the first one
+
+	return bo[i][0] < bo[j][0]
+}
+
+func flatten_aggregates(agg map[string][]int) [][]int {
+	ret := make([][]int, 0, len(agg))
+
+	for _, v := range agg {
+		ret = append(ret, v)
+	}
+
+	sort.Sort(ByOrdinal(ret))
+
+	return ret
+}
+
+func merge_transfers(insIn []driver.RobotInstruction, aggregates [][]int) []driver.RobotInstruction {
+	ret := make([]driver.RobotInstruction, 0, len(insIn))
+
+	for _, ar := range aggregates {
+		if len(ar) == 1 {
+			// just push it in and move on
+			ret = append(ret, insIn[ar[0]])
+			continue
 		}
 
-		// component ordering needs deciding here... as a general rule it's
-		// best to stick with higher volumes first
-	*/
-	r := make([]*wtype.LHInstruction, 0, 1)
-	return r
+		// otherwise more than one here
+
+		newtfr := insIn[ar[0]].(*driver.TransferInstruction)
+
+		for k := 1; k < len(ar); k++ {
+			newtfr.MergeWith(insIn[ar[k]].(*driver.TransferInstruction))
+		}
+
+		ret = append(ret, newtfr)
+	}
+
+	return ret
 }
 
 func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) (insOut *driver.TransferInstruction) {
-
 	cmps := insIn.Components
 
 	lenToMake := len(insIn.Components)
