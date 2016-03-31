@@ -1,6 +1,7 @@
 package param
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -33,8 +34,25 @@ func TestBadExpand(t *testing.T) {
 		{"Parameters": { "TheAlpha": { "Key": "Value" } }, "Config": { "A": "B" } }, 
 		{"Parameters": { "TheAlpha": { "Key": "Value" } } }
 	]`)
-	if _, _, err := TryExpand(wdata, pdata); err == nil {
-		t.Errorf("expecting error but got success")
+	if _, p, err := TryExpand(wdata, pdata); err == nil {
+		t.Errorf("expecting error but got success, output %+v", p)
+	}
+}
+
+func TestInvalidInput(t *testing.T) {
+	wdata := []byte(`{"processes": { "TheAlpha1": { "component": "Alpha" }, "TheAlpha2": { "component": "Alpha" } } }`)
+	pdataOk := []byte(`{
+		"Parameters": {
+			"TheAlpha1": { "Key": "Value", "invalid": false },
+			"TheAlpha2": { "Key": "Value" } 
+		} 
+	}`)
+	pdataBad := []byte(strings.Replace(string(pdataOk), `"invalid":`, `"invalid",`, 1))
+
+	if _, _, err := TryExpand(wdata, pdataOk); err != nil {
+		t.Error(err)
+	} else if _, p, err := TryExpand(wdata, pdataBad); err == nil {
+		t.Errorf("expecting error but got success, output: %+v", p)
 	}
 }
 

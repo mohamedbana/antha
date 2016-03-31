@@ -8,8 +8,8 @@ Antha v0.0.2
 
 ### OSX
 
-First step is to install go. Follow the instructions at the
-[Golang](http://golang.org/doc/install) site.
+First step is to install or upgrade to go 1.5. Follow the instructions at the
+[Golang](http://golang.org/doc/install) site. 
 
 After you install go, if you don't have [Homebrew](http://brew.sh/), please
 install it. Then, follow these steps to setup a working antha development
@@ -48,8 +48,8 @@ replacing the go binary with one that corresponds to your platform and
 replacing ``apt-get`` with your package manager.
 ```sh
 # Install go
-curl -O https://storage.googleapis.com/golang/go1.4.2.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.4.2.linux-amd64.tar.gz
+curl -O https://storage.googleapis.com/golang/go1.5.3.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.5.3.linux-amd64.tar.gz
 
 # Setup environment variables
 cat<<EOF>>$HOME/.bash_profile
