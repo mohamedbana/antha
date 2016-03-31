@@ -32,6 +32,20 @@ type Coordinates struct {
 	Z float64
 }
 
+// Value for dimension
+func (a Coordinates) Dim(x int) float64 {
+	switch x {
+	case 0:
+		return a.X
+	case 1:
+		return a.Y
+	case 2:
+		return a.Z
+	default:
+		return 0.0
+	}
+}
+
 // interface to 3D geometry
 type Geometry interface {
 	Height() wunit.Length
