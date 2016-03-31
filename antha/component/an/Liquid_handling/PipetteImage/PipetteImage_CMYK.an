@@ -15,6 +15,7 @@ Parameters (
 	VolumeForFullcolour  Volume
 	Imagefilename string
 	Rotate bool
+	AutoRotate bool
 )
 
 // Data which is returned from this protocol, and data types
@@ -53,7 +54,7 @@ Steps {
 	
 	//var chosencolourpalette color.Palette
 	chosencolourpalette := image.AvailablePalettes["Plan9"]
-	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate) 
+	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate, AutoRotate) 
 	
 	solutions := make([]*wtype.LHComponent, 0)
 

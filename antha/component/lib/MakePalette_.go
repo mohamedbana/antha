@@ -6,18 +6,20 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"image/color"
+	"strconv"
 )
-
-//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
-//"image/color"
 
 // Input parameters for this protocol (data)
 
 // Data which is returned from this protocol, and data types
+
+//Colournames []string
 
 // Physical Inputs to this protocol with types
 
@@ -40,10 +42,14 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 
 	//var chosencolourpalette color.Palette
 
+	//chosencolourpalette := image.AvailablePalettes["Plan9"]
+
+	//positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate)
+
 	// make pallette of colours from image
 	chosencolourpalette := image.MakeSmallPalleteFromImage(_input.Imagefilename, _input.OutPlate, _input.Rotate)
 
-	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate)
+	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
 
 	// remove duplicates
 	//positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
@@ -51,12 +57,13 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 	fmt.Println("positions", positiontocolourmap)
 
 	solutions := make([]*wtype.LHComponent, 0)
+	colourtoComponentMap := make(map[string]*wtype.LHComponent)
 
 	counter := 0
 
-	//solutions := image.PipetteImagebyBlending(OutPlate, positiontocolourmap,Cyan, Magenta, Yellow,Black, VolumeForFullcolour)
-
 	for _, colour := range positiontocolourmap {
+
+		colourindex := chosencolourpalette.Index(colour)
 
 		if colour != nil {
 			components := make([]*wtype.LHComponent, 0)
@@ -118,8 +125,9 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 					components = append(components, blackSample)
 				}
 
-				solution := execute.MixInto(_ctx, _input.OutPlate, "", components...)
+				solution := execute.MixInto(_ctx, _input.PalettePlate, "", components...)
 				solutions = append(solutions, solution)
+				colourtoComponentMap[strconv.Itoa(colourindex)] = solution
 
 			}
 
@@ -127,8 +135,10 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 	}
 
 	_output.Colours = solutions
-	_output.Numberofcolours = len(_output.Colours)
-	fmt.Println("Unique Colours =", _output.Numberofcolours)
+	_output.Numberofcolours = len(chosencolourpalette)
+	_output.Palette = chosencolourpalette
+	_output.ColourtoComponentMap = colourtoComponentMap
+	fmt.Println("Unique Colours =", _output.Numberofcolours, "from palette:", chosencolourpalette)
 
 }
 
@@ -191,24 +201,30 @@ type MakePaletteElement struct {
 }
 
 type MakePaletteInput struct {
+	AutoRotate          bool
 	Black               *wtype.LHComponent
 	Cyan                *wtype.LHComponent
 	Imagefilename       string
 	Magenta             *wtype.LHComponent
 	OutPlate            *wtype.LHPlate
+	PalettePlate        *wtype.LHPlate
 	Rotate              bool
 	VolumeForFullcolour wunit.Volume
 	Yellow              *wtype.LHComponent
 }
 
 type MakePaletteOutput struct {
-	Colours         []*wtype.LHComponent
-	Numberofcolours int
+	Colours              []*wtype.LHComponent
+	ColourtoComponentMap map[string]*wtype.LHComponent
+	Numberofcolours      int
+	Palette              color.Palette
 }
 
 type MakePaletteSOutput struct {
 	Data struct {
-		Numberofcolours int
+		ColourtoComponentMap map[string]*wtype.LHComponent
+		Numberofcolours      int
+		Palette              color.Palette
 	}
 	Outputs struct {
 		Colours []*wtype.LHComponent
@@ -222,16 +238,20 @@ func init() {
 			Desc: "Generates instructions to make a pallette of all colours in an image\n",
 			Path: "antha/component/an/Liquid_handling/PipetteImage/MakePallete.an",
 			Params: []ParamDesc{
+				{Name: "AutoRotate", Desc: "", Kind: "Parameters"},
 				{Name: "Black", Desc: "", Kind: "Inputs"},
 				{Name: "Cyan", Desc: "", Kind: "Inputs"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
 				{Name: "Magenta", Desc: "", Kind: "Inputs"},
 				{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\n", Kind: "Inputs"},
+				{Name: "PalettePlate", Desc: "", Kind: "Inputs"},
 				{Name: "Rotate", Desc: "", Kind: "Parameters"},
 				{Name: "VolumeForFullcolour", Desc: "", Kind: "Parameters"},
 				{Name: "Yellow", Desc: "", Kind: "Inputs"},
 				{Name: "Colours", Desc: "", Kind: "Outputs"},
+				{Name: "ColourtoComponentMap", Desc: "", Kind: "Data"},
 				{Name: "Numberofcolours", Desc: "", Kind: "Data"},
+				{Name: "Palette", Desc: "Colournames []string\n", Kind: "Data"},
 			},
 		},
 	})

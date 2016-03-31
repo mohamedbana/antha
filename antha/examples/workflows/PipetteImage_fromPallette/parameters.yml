@@ -1,0 +1,27 @@
+{
+  "Parameters": {
+    "MakePalette1": {
+		"Imagefilename":"cmyk3.jpg",
+		"Rotate": false,
+		"AutoRotate": true,
+      "Cyan": "Cyan",
+	"Magenta": "Magenta",
+	"Yellow": "Yellow_ink",
+	"Black": "Black",
+      "OutPlate": "greiner384_riser",
+	  "PalettePlate": "DSW96_riser",
+      "VolumeForFullcolour": "300ul"
+    },
+	"Pipette1": {
+       "VolumePerWell": "60ul",
+	   "Imagefilename":"cmyk3.jpg",
+	   "OnlythisColour": "",
+	   "NotthisColour": "",
+	   "Rotate": false,
+	   "AutoRotate": true,
+       "OutPlate": "greiner384_riser"
+		}
+  }
+}
+
+

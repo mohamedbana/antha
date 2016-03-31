@@ -3,17 +3,19 @@
     "PipetteImage": {
 		"Imagefilename":"ziggy3_384.jpg",
 		"Rotate": false,
+		"AutoRotate": true,
 		"Diluent":"water",
-		"MinimumBlackpercentagethreshold":0.0,
-		"OnlyHighVolumetips": false,
-		"Negative": false,
-		"PosterizeImage": false,
-		"PosterizeLevels": 2,
-	"Black": "Black",
+		"MinimumBlackpercentagethreshold":0.2,
+		"OnlyHighVolumetips": true,
+		"Negative": true,
+		"PosterizeImage": true,
+		"PosterizeLevels": 4,
+		"Black": "Black",
       "OutPlate": "greiner384_riser",
       "VolumeForFullcolour": "100ul"
     }
   }
 }
+
 
 

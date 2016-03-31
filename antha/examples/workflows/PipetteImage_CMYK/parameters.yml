@@ -2,6 +2,8 @@
   "Parameters": {
     "PipetteImage": {
 		"Imagefilename":"ziggy5_384.jpg",
+		"Rotate": false,
+		"AutoRotate": true,
       "Cyan": "Cyan",
 	"Magenta": "Magenta",
 	"Yellow": "Yellow_ink",

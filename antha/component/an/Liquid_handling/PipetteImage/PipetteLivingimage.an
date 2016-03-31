@@ -26,6 +26,7 @@ Parameters (
 	Notthiscolour string
 	UVimage bool
 	Rotate bool
+	AutoRotate bool
 	Subset bool
 	Subsetnames []string
 	//IncTemp Temperature
@@ -77,11 +78,10 @@ Steps {
 	}
 	
 	// resize image to fit dimensions of plate and change each pixel to match closest colour from chosen palette
-	// theoutput of this is a map of well positions to colours needed
-	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette,Rotate) 
+	// the output of this is a map of well positions to colours needed
+	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette,Rotate,AutoRotate) 
 	
 	colourtostringmap := image.AvailableComponentmaps[Palettename]
-	
 	
 	// if the image will be printed using fluorescent proteins, 2 previews will be generated for the image (i) under UV light (ii) under visible light 
 	

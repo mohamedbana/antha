@@ -1,12 +1,14 @@
 {
   "Parameters": {
     "PipetteImage": {
-		"Imagefilename":"kirby_8_bits_by_sumomogirl2.jpg",
+		"Imagefilename":"imgres_posterized.jpg",
+		"Rotate": false,
+		"AutoRotate": true,
       "Cyan": "Cyan",
 	"Magenta": "Magenta",
 	"Yellow": "Yellow_ink",
 	"Black": "Black",
-      "OutPlate": "DSW96_riser",
+      "OutPlate": "greiner384_riser",
       "VolumeForFullcolour": "150ul"
     }
   }

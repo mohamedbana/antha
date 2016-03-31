@@ -7,7 +7,8 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"fmt"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
-	//"image/color"
+	"image/color"
+	"strconv"
 )
 
 
@@ -16,11 +17,15 @@ Parameters (
 	VolumeForFullcolour  Volume
 	Imagefilename string
 	Rotate bool
+	AutoRotate bool
 )
 
 // Data which is returned from this protocol, and data types
 Data (
 	Numberofcolours int
+	//Colournames []string
+	Palette color.Palette
+	ColourtoComponentMap map[string]*wtype.LHComponent
 )
 
 
@@ -32,6 +37,7 @@ Inputs (
 	Black *wtype.LHComponent
 	//InPlate *wtype.LHPlate
 	OutPlate *wtype.LHPlate
+	PalettePlate *wtype.LHPlate
 )
 
 // Physical outputs from this protocol with types
@@ -54,10 +60,14 @@ Steps {
 	
 	//var chosencolourpalette color.Palette
 	
+	//chosencolourpalette := image.AvailablePalettes["Plan9"] 
+	
+	//positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate) 
+	
 	// make pallette of colours from image
 	chosencolourpalette := image.MakeSmallPalleteFromImage(Imagefilename, OutPlate,Rotate) 
 	
-	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate) 
+	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate, AutoRotate) 
 	
 	// remove duplicates
 	//positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
@@ -65,12 +75,14 @@ Steps {
 	fmt.Println("positions", positiontocolourmap)
 	
 	solutions := make([]*wtype.LHComponent, 0)
+	colourtoComponentMap := make(map[string]*wtype.LHComponent)
 
 	counter := 0
 
-	//solutions := image.PipetteImagebyBlending(OutPlate, positiontocolourmap,Cyan, Magenta, Yellow,Black, VolumeForFullcolour) 
 
 	for _, colour := range positiontocolourmap {
+		
+		colourindex := chosencolourpalette.Index(colour)
 		
 		if colour != nil {
 		components := make([]*wtype.LHComponent, 0)
@@ -133,8 +145,11 @@ Steps {
 		components = append(components, blackSample)
 		}
 		
-		solution := MixInto(OutPlate, "", components...)
+		solution := MixInto(PalettePlate, "", components...)
 		solutions = append(solutions, solution)
+		colourtoComponentMap[strconv.Itoa(colourindex)] = solution
+		
+		
 		
 		}
 		
@@ -142,8 +157,10 @@ Steps {
 	}
 
 	Colours = solutions
-	Numberofcolours = len(Colours)
-	fmt.Println("Unique Colours =",Numberofcolours)
+	Numberofcolours = len(chosencolourpalette)
+	Palette = chosencolourpalette
+	ColourtoComponentMap = colourtoComponentMap
+	fmt.Println("Unique Colours =",Numberofcolours,"from palette:", chosencolourpalette)
 
 }
 // Run after controls and a steps block are completed to

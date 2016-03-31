@@ -4,6 +4,7 @@ protocol PipetteImage_Gray
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"fmt"
 	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
@@ -19,6 +20,7 @@ Parameters (
 	OnlyHighVolumetips bool
 	Negative bool
 	Rotate bool
+	AutoRotate bool
 	PosterizeImage bool
 	PosterizeLevels int
 )
@@ -26,6 +28,8 @@ Parameters (
 // Data which is returned from this protocol, and data types
 Data (
 	Numberofpixels int
+	ShadesofGrey []int
+	NumberofShadesofGrey int
 )
 
 
@@ -61,6 +65,8 @@ Steps {
 		
 	var minuint8 uint8 
 	
+	ShadesofGrey = make([]int,0)
+	
 	chosencolourpalette := image.AvailablePalettes["Gray"]
 	
 	if PosterizeImage{
@@ -69,7 +75,7 @@ Steps {
 	
 	image.CheckAllResizealgorithms(Imagefilename,OutPlate,Rotate,imaging.AllResampleFilters)
 	
-	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate) 
+	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate,AutoRotate) 
 	
 	solutions := make([]*wtype.LHComponent, 0)
 
@@ -98,6 +104,15 @@ Steps {
 			}else{
 			
 		counter = counter + 1
+		
+		// check if shade of grey has already been used in image
+		greyindexinpalette := chosencolourpalette.Index(colour)
+		
+		alreadythere := search.Contains(ShadesofGrey,greyindexinpalette)
+		
+		if alreadythere == false{
+			ShadesofGrey = append(ShadesofGrey,greyindexinpalette)
+		}
 			
 			if gray.Y < maxuint8 {
 			watervol := wunit.NewVolume((float64(maxuint8-gray.Y)/float64(maxuint8) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
@@ -118,7 +133,7 @@ Steps {
 		
 		fmt.Println("new well", locationkey, "black vol", blackvol.ToString())
 		
-		Black.Type = wtype.LiquidTypeFromString("glycerol")
+		Black.Type = wtype.LiquidTypeFromString("NeedToMix")
 		
 		//fmt.Println("blackvol2",blackvol.ToString())
 		if OnlyHighVolumetips && blackvol.RawValue() < 21 && blackvol.Unit().PrefixedSymbol() == "ul"{
@@ -133,6 +148,7 @@ Steps {
 		}
 	}
 
+	NumberofShadesofGrey = len(ShadesofGrey)
 	Pixels = solutions
 	Numberofpixels = len(Pixels)
 	fmt.Println("Pixels =",Numberofpixels)

@@ -1,13 +1,16 @@
 // Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours
-protocol PipetteImage
+protocol PipetteImage_fromPalette
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
-	"github.com/antha-lang/antha/microArch/factory"
+	//"github.com/antha-lang/antha/microArch/factory"
 	"fmt"
 	"image/color"
+	"strconv"
+	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
+
 )
 
 
@@ -15,12 +18,13 @@ import (
 Parameters (
 	VolumePerWell  Volume
 	Imagefilename string
-	Palettename string
+	Palette color.Palette
+	ColourIndextoComponentMap map[string]*wtype.LHComponent
 	//AvailableColours []string
 	OnlythisColour string
 	NotthisColour string
-	AutoRotate bool
 	Rotate bool
+	AutoRotate bool
 )
 
 // Data which is returned from this protocol, and data types
@@ -53,18 +57,14 @@ Setup {
 // for every input
 Steps {
 	
-	var positiontocolourmap map[string]color.Color
 	
-	availableColours := make([]string,0)
+	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &Palette, Rotate,AutoRotate) 
 	
-	for _, component := range Colourcomponents {
-		availableColours = append(availableColours, component.CName)
-	}
 	
-	subpalette := image.MakeSubPallette(Palettename, availableColours)
+	image.CheckAllResizealgorithms(Imagefilename,OutPlate,Rotate,imaging.AllResampleFilters)
+
 	
-	positiontocolourmap, _ = image.ImagetoPlatelayout(Imagefilename, OutPlate, &subpalette, Rotate, AutoRotate) 
-		
+	/*	
 	// get components from factory
 	componentmap := make(map[string]*wtype.LHComponent, 0)
 
@@ -79,19 +79,22 @@ Steps {
 		componentmap[componentname] = factory.GetComponentByType(componentname)
 
 	}
-
+*/
 	solutions := make([]*wtype.LHComponent, 0)
 
 	counter := 0
 	
 	for locationkey, colour := range positiontocolourmap {
 		
-		component := componentmap[image.Colourcomponentmap[colour]]
-
-		if component.TypeName() == "dna" {
-			component.Type = wtype.LTDoNotMix//"DoNotMix"
-		}
-		fmt.Println(image.Colourcomponentmap[colour])
+		colourindex := strconv.Itoa(Palette.Index(colour))
+		
+		component, componentpresent := ColourIndextoComponentMap[colourindex]
+		fmt.Println("Am I a component", component, "key:", colourindex, "from map:", ColourIndextoComponentMap)
+		
+		if componentpresent {
+		component.Type = wtype.LTDoNotMix//"DoNotMix"
+		
+		//fmt.Println(image.Colourcomponentmap[colour])
 		
 		if OnlythisColour !="" {
 	
@@ -112,11 +115,13 @@ Steps {
 		solutions = append(solutions, solution)
 		}
 		}
+		
 	}
-
+	
+	}
+	Pixels = solutions
 	Numberofpixels = len(Pixels)
 	fmt.Println("Pixels =",Numberofpixels)
-	Pixels = solutions
 	
 }
 // Run after controls and a steps block are completed to

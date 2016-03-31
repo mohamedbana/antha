@@ -2,9 +2,10 @@
   "Parameters": {
     "PipetteImage": {
 		"OnlythisColour":"",
-		"Notthiscolour":"white",
-	  	"Imagefilename": "ziggy5_384.jpg",
+		"Notthiscolour":"verywhite",
+	  	"Imagefilename": "git.png",
 		"Rotate": false,
+		"AutoRotate": true,
 		"Palettename":"ProteinPaintboxVisible",
 		"Subset": true,
 		"Subsetnames": [
@@ -12,7 +13,9 @@
 		"TinselPurple",
 		"CupidPink",
 		"LeorOrange",
-		"white"
+		"verywhite",
+		"E.coli",
+		"E.coli pUC19 on sgal"
 		],
       	"OutPlate": "Agarplateforpicking384_riser",
 		"UVimage":false,
