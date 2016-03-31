@@ -86,7 +86,7 @@ func flattenList(pdata []byte, param *execute.RawParams) error {
 
 // Parse parameters and workflow. If there are multiple input parameters and
 // workflow is just one element, modify workflow to take multiple parameters.
-func TryExpand(wdata, pdata []byte) (desc *workflow.Desc, param *execute.RawParams, err error) {
+func TryExpand(wdata, pdata []byte) (*workflow.Desc, *execute.RawParams, error) {
 	getFirstProcess := func(desc *workflow.Desc) *workflow.Process {
 		for _, p := range desc.Processes {
 			return &p
@@ -94,13 +94,22 @@ func TryExpand(wdata, pdata []byte) (desc *workflow.Desc, param *execute.RawPara
 		return nil
 	}
 
-	if err = unmarshal(wdata, &desc); err != nil {
-		return
+	var desc *workflow.Desc
+	var param *execute.RawParams
+
+	if err := unmarshal(wdata, &desc); err != nil {
+		return nil, nil, err
 	}
 
 	// Try to parse parameters as is
-	if err = unmarshal(pdata, &param); err == nil {
-		return
+	var origErr error
+	if err := unmarshal(pdata, &param); err == nil {
+		if len(param.Parameters) > 0 {
+			return desc, param, nil
+		}
+		origErr = fmt.Errorf("did not find any parameters")
+	} else {
+		origErr = err
 	}
 
 	// Update parameters
@@ -108,17 +117,19 @@ func TryExpand(wdata, pdata []byte) (desc *workflow.Desc, param *execute.RawPara
 		Parameters: make(map[string]map[string]json.RawMessage),
 	}
 	if len(desc.Connections) > 0 {
-		err = fmt.Errorf("cannot extend workflow with connections")
+		// Cannot extend workflow with connections
 	} else if len(desc.Processes) != 1 {
-		err = fmt.Errorf("can only expand workflows with one process")
-	} else if err = flattenList(pdata, param); err == nil {
-	} else if err = flattenSList(pdata, param); err == nil {
+		// Can only expand workflows with one process
+	} else if err := flattenList(pdata, param); err == nil && len(param.Parameters) > 0 {
+		origErr = nil
+	} else if err := flattenSList(pdata, param); err == nil && len(param.Parameters) > 0 {
 		// ^ This should be last as most parameters will match
+		origErr = nil
 	} else {
-		err = fmt.Errorf("exhausted methods for expanding workflow")
+		origErr = fmt.Errorf("exhausted methods for expanding workflow")
 	}
-	if err != nil {
-		return
+	if origErr != nil {
+		return nil, nil, origErr
 	}
 
 	// Update workflow
@@ -130,5 +141,5 @@ func TryExpand(wdata, pdata []byte) (desc *workflow.Desc, param *execute.RawPara
 		desc.Processes[k] = *process
 	}
 
-	return
+	return desc, param, nil
 }
