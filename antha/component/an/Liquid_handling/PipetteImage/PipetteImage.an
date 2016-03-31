@@ -7,6 +7,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/microArch/factory"
 	"fmt"
+	"image/color"
 )
 
 
@@ -18,6 +19,7 @@ Parameters (
 	//AvailableColours []string
 	OnlythisColour string
 	NotthisColour string
+	AutoRotate bool
 	Rotate bool
 )
 
@@ -51,18 +53,19 @@ Setup {
 // for every input
 Steps {
 	
+	var positiontocolourmap map[string]color.Color
+	
 	availableColours := make([]string,0)
 	
 	for _, component := range Colourcomponents {
 		availableColours = append(availableColours, component.CName)
 	}
-
-	//chosencolourpalette := image.AvailableComponentmaps[Palettename]
 	
 	subpalette := image.MakeSubPallette(Palettename, availableColours)
-	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &subpalette, Rotate) 
+	
+	positiontocolourmap, _ = image.ImagetoPlatelayout(Imagefilename, OutPlate, &subpalette, Rotate, AutoRotate) 
 		
-// get components from factory
+	// get components from factory
 	componentmap := make(map[string]*wtype.LHComponent, 0)
 
 	colourtostringmap := image.AvailableComponentmaps[Palettename]

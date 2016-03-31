@@ -7,7 +7,8 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"fmt"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
-	//"image/color"
+	"image/color"
+	"strconv"
 )
 
 
@@ -16,12 +17,15 @@ Parameters (
 	VolumeForFullcolour  Volume
 	Imagefilename string
 	Rotate bool
+	AutoRotate bool
 )
 
 // Data which is returned from this protocol, and data types
 Data (
 	Numberofcolours int
-	//Palette color.Palette
+	//Colournames []string
+	Palette color.Palette
+	ColourtoComponentMap map[string]*wtype.LHComponent
 )
 
 
@@ -55,25 +59,29 @@ Steps {
 	
 	//var chosencolourpalette color.Palette
 	
-	// make pallette of colours from image
-	chosencolourpalette := image.MakeSmallPalleteFromImage(Imagefilename, OutPlate,Rotate) 
-
 	//chosencolourpalette := image.AvailablePalettes["Plan9"] 
 	
-
-	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate) 
+	//positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate) 
+	
+	// make pallette of colours from image
+	chosencolourpalette := image.MakeSmallPalleteFromImage(Imagefilename, OutPlate,Rotate) 
+	
+	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate, AutoRotate) 
 	
 	// remove duplicates
-	positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
+	//positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
 	
 	fmt.Println("positions", positiontocolourmap)
 	
 	solutions := make([]*wtype.LHComponent, 0)
+	colourtoComponentMap := make(map[string]*wtype.LHComponent)
 
 	counter := 0
 
 
 	for _, colour := range positiontocolourmap {
+		
+		colourindex := chosencolourpalette.Index(colour)
 		
 		if colour != nil {
 		components := make([]*wtype.LHComponent, 0)
@@ -138,6 +146,9 @@ Steps {
 		
 		solution := MixInto(OutPlate, "", components...)
 		solutions = append(solutions, solution)
+		colourtoComponentMap[strconv.Itoa(colourindex)] = solution
+		
+		
 		
 		}
 		
@@ -146,7 +157,8 @@ Steps {
 
 	Colours = solutions
 	Numberofcolours = len(chosencolourpalette)
-	//Palette = chosencolourpalette
+	Palette = chosencolourpalette
+	ColourtoComponentMap = colourtoComponentMap
 	fmt.Println("Unique Colours =",Numberofcolours,"from palette:", chosencolourpalette)
 
 }

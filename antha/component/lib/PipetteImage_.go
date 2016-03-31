@@ -11,6 +11,7 @@ import (
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/microArch/factory"
+	"image/color"
 )
 
 // Input parameters for this protocol (data)
@@ -36,16 +37,17 @@ func _PipetteImageSetup(_ctx context.Context, _input *PipetteImageInput) {
 // for every input
 func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output *PipetteImageOutput) {
 
+	var positiontocolourmap map[string]color.Color
+
 	availableColours := make([]string, 0)
 
 	for _, component := range _input.Colourcomponents {
 		availableColours = append(availableColours, component.CName)
 	}
 
-	//chosencolourpalette := image.AvailableComponentmaps[Palettename]
-
 	subpalette := image.MakeSubPallette(_input.Palettename, availableColours)
-	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &subpalette, _input.Rotate)
+
+	positiontocolourmap, _ = image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &subpalette, _input.Rotate, _input.AutoRotate)
 
 	// get components from factory
 	componentmap := make(map[string]*wtype.LHComponent, 0)
@@ -161,6 +163,7 @@ type PipetteImageElement struct {
 }
 
 type PipetteImageInput struct {
+	AutoRotate       bool
 	Colourcomponents []*wtype.LHComponent
 	Imagefilename    string
 	NotthisColour    string
@@ -192,6 +195,7 @@ func init() {
 			Desc: "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours\n",
 			Path: "antha/component/an/Liquid_handling/PipetteImage/PipetteImage.an",
 			Params: []ParamDesc{
+				{Name: "AutoRotate", Desc: "", Kind: "Parameters"},
 				{Name: "Colourcomponents", Desc: "", Kind: "Inputs"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
 				{Name: "NotthisColour", Desc: "", Kind: "Parameters"},

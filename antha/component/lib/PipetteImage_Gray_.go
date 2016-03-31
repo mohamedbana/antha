@@ -4,6 +4,7 @@ package lib
 import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -45,6 +46,8 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 
 	var minuint8 uint8
 
+	_output.ShadesofGrey = make([]int, 0)
+
 	chosencolourpalette := image.AvailablePalettes["Gray"]
 
 	if _input.PosterizeImage {
@@ -53,7 +56,7 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 
 	image.CheckAllResizealgorithms(_input.Imagefilename, _input.OutPlate, _input.Rotate, imaging.AllResampleFilters)
 
-	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate)
+	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
 
 	solutions := make([]*wtype.LHComponent, 0)
 
@@ -81,6 +84,15 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 
 			counter = counter + 1
 
+			// check if shade of grey has already been used in image
+			greyindexinpalette := chosencolourpalette.Index(colour)
+
+			alreadythere := search.Contains(_output.ShadesofGrey, greyindexinpalette)
+
+			if alreadythere == false {
+				_output.ShadesofGrey = append(_output.ShadesofGrey, greyindexinpalette)
+			}
+
 			if gray.Y < maxuint8 {
 				watervol := wunit.NewVolume((float64(maxuint8-gray.Y) / float64(maxuint8) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
 				fmt.Println("new well", locationkey, "water vol", watervol.ToString())
@@ -100,7 +112,7 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 
 			fmt.Println("new well", locationkey, "black vol", blackvol.ToString())
 
-			_input.Black.Type = wtype.LiquidTypeFromString("glycerol")
+			_input.Black.Type = wtype.LiquidTypeFromString("NeedToMix")
 
 			//fmt.Println("blackvol2",blackvol.ToString())
 			if _input.OnlyHighVolumetips && blackvol.RawValue() < 21 && blackvol.Unit().PrefixedSymbol() == "ul" {
@@ -115,6 +127,7 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 		}
 	}
 
+	_output.NumberofShadesofGrey = len(_output.ShadesofGrey)
 	_output.Pixels = solutions
 	_output.Numberofpixels = len(_output.Pixels)
 	fmt.Println("Pixels =", _output.Numberofpixels)
@@ -180,6 +193,7 @@ type PipetteImage_GrayElement struct {
 }
 
 type PipetteImage_GrayInput struct {
+	AutoRotate                      bool
 	Black                           *wtype.LHComponent
 	Diluent                         *wtype.LHComponent
 	Imagefilename                   string
@@ -194,13 +208,17 @@ type PipetteImage_GrayInput struct {
 }
 
 type PipetteImage_GrayOutput struct {
-	Numberofpixels int
-	Pixels         []*wtype.LHComponent
+	NumberofShadesofGrey int
+	Numberofpixels       int
+	Pixels               []*wtype.LHComponent
+	ShadesofGrey         []int
 }
 
 type PipetteImage_GraySOutput struct {
 	Data struct {
-		Numberofpixels int
+		NumberofShadesofGrey int
+		Numberofpixels       int
+		ShadesofGrey         []int
 	}
 	Outputs struct {
 		Pixels []*wtype.LHComponent
@@ -214,6 +232,7 @@ func init() {
 			Desc: "Generates instructions to pipette out a defined image onto a defined plate by blending cyan magenta yellow and black dyes\n",
 			Path: "antha/component/an/Liquid_handling/PipetteImage/PipetteImage_Gray.an",
 			Params: []ParamDesc{
+				{Name: "AutoRotate", Desc: "", Kind: "Parameters"},
 				{Name: "Black", Desc: "", Kind: "Inputs"},
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
@@ -225,8 +244,10 @@ func init() {
 				{Name: "PosterizeLevels", Desc: "", Kind: "Parameters"},
 				{Name: "Rotate", Desc: "", Kind: "Parameters"},
 				{Name: "VolumeForFullcolour", Desc: "", Kind: "Parameters"},
+				{Name: "NumberofShadesofGrey", Desc: "", Kind: "Data"},
 				{Name: "Numberofpixels", Desc: "", Kind: "Data"},
 				{Name: "Pixels", Desc: "", Kind: "Outputs"},
+				{Name: "ShadesofGrey", Desc: "", Kind: "Data"},
 			},
 		},
 	})

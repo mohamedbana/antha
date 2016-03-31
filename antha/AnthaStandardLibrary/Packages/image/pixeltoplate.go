@@ -445,6 +445,39 @@ func ResizeImagetoPlate(imagefilename string, plate *wtype.LHPlate, algorithm im
 
 }
 
+func ResizeImagetoPlateAutoRotate(imagefilename string, plate *wtype.LHPlate, algorithm imaging.ResampleFilter) (plateimage *goimage.NRGBA) {
+
+	// input files (just 1 in this case)
+	files := []string{imagefilename}
+
+	// Colour palette to use // this would relate to a map of components of these available colours in factory
+	//availablecolours := chosencolourpalette //palette.WebSafe
+
+	//var plateimages []image.Image
+
+	img, err := imaging.Open(files[0])
+	if err != nil {
+		panic(err)
+	}
+
+	if img.Bounds().Dy() != plate.WellsY() {
+		fmt.Println("hey we're not so different", img.Bounds().Dy(), plate.WellsY())
+		// have the option of changing the resize algorithm here
+
+		if img.Bounds().Dy() > img.Bounds().Dx() {
+			fmt.Println("Auto Rotating image")
+			img = imaging.Rotate270(img)
+		}
+		plateimage = imaging.Resize(img, 0, plate.WlsY, algorithm)
+		//plateimages = append(plateimages,plateimage)
+	} else {
+		fmt.Println("i'm the same!!!")
+		plateimage = toNRGBA(img)
+	}
+	return
+
+}
+
 func CheckAllResizealgorithms(imagefilename string, plate *wtype.LHPlate, rotate bool, algorithms map[string]imaging.ResampleFilter) {
 	// input files (just 1 in this case)
 	files := []string{imagefilename}
@@ -563,10 +596,16 @@ func MakeSmallPalleteFromImage(imagefilename string, plate *wtype.LHPlate, rotat
 
 // create a map of pixel to plate position from processing a given image with a chosen colour palette.
 // It's recommended to use at least 384 well plate
-func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolourpalette *color.Palette, rotate bool) (wellpositiontocolourmap map[string]color.Color, numberofpixels int) {
+// if autorotate == true, rotate is overridden
+func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolourpalette *color.Palette, rotate bool, autorotate bool) (wellpositiontocolourmap map[string]color.Color, numberofpixels int) {
 
-	plateimage := ResizeImagetoPlate(imagefilename, plate, imaging.CatmullRom, rotate)
+	var plateimage *goimage.NRGBA
 
+	if autorotate {
+		plateimage = ResizeImagetoPlateAutoRotate(imagefilename, plate, imaging.CatmullRom)
+	} else {
+		plateimage = ResizeImagetoPlate(imagefilename, plate, imaging.CatmullRom, rotate)
+	}
 	// make map of well position to colour: (array for time being)
 
 	wellpositionarray := make([]string, 0)
@@ -592,7 +631,6 @@ func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolour
 					colour = chosencolourpalette.Convert(colour)
 					fmt.Println("x,y,colour", x, y, colour)
 					plateimage.Set(x, y, colour)
-					fmt.Println("HELLOOOOO")
 				}
 				// equivalent well position
 				wellposition := alphabet[y] + strconv.Itoa(x+1)
