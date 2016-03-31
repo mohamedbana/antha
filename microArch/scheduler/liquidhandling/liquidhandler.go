@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
@@ -79,7 +80,6 @@ func Init(properties *liquidhandling.LHProperties) *Liquidhandler {
 // high-level function which requests planning and execution for an incoming set of
 // solutions
 func (this *Liquidhandler) MakeSolutions(request *LHRequest) *LHRequest {
-	logger.Debug("OK YOU MAKE SOLUTIONS NOW")
 	// the minimal request which is possible defines what solutions are to be made
 	if len(request.LHInstructions) == 0 {
 		return request
@@ -131,7 +131,83 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 	return nil
 }
 
+func (this *Liquidhandler) revise_volumes(rq *LHRequest) {
+	// just count up the volumes... add a fudge for additional volume perhaps
+
+	// XXX -- HARD CODE 8 here
+	lastPlate := make([]string, 8)
+	lastWell := make([]string, 8)
+
+	vols := make(map[string]map[string]wunit.Volume)
+
+	for _, ins := range rq.Instructions {
+		if ins.InstructionType() == liquidhandling.MOV {
+			lastPlate = make([]string, 8)
+			lastPos := ins.GetParameter("POSTO").([]string)
+
+			for i, p := range lastPos {
+				lastPlate[i] = this.Properties.PosLookup[p]
+			}
+
+			lastWell = ins.GetParameter("WELLTO").([]string)
+		} else if ins.InstructionType() == liquidhandling.ASP {
+			for i, _ := range lastPlate {
+				if i >= len(lastWell) {
+					break
+				}
+				lp := lastPlate[i]
+				lw := lastWell[i]
+
+				_, ok := vols[lp]
+
+				if !ok {
+					vols[lp] = make(map[string]wunit.Volume)
+				}
+
+				v, ok := vols[lp][lw]
+
+				if !ok {
+					v = wunit.NewVolume(0.0, "ul")
+					vols[lp][lw] = v
+				}
+				//v.Add(ins.Volume[i])
+
+				vols := ins.GetParameter("VOLUME").([]wunit.Volume)
+				v.Add(vols[i])
+			}
+		}
+	}
+
+	// now go through and set the plates up appropriately
+
+	for plateID, wellmap := range vols {
+		plate, ok := this.Properties.Plates[this.Properties.PlateIDLookup[plateID]]
+
+		if !ok {
+			logger.Fatal(fmt.Sprint("NO SUCH PLATE: ", plateID))
+		}
+
+		for crd, vol := range wellmap {
+			well := plate.Wellcoords[crd]
+			vol.Add(well.ResidualVolume())
+			well.WContents.SetVolume(vol)
+			well.DeclareNotTemporary()
+		}
+	}
+
+	// finally get rid of any temporary stuff
+
+	this.Properties.RemoveTemporaryComponents()
+
+	// all done
+
+}
+
 func (this *Liquidhandler) do_setup(rq *LHRequest) {
+	// revise the volumes etc
+
+	this.revise_volumes(rq)
+
 	this.Properties.Driver.RemoveAllPlates()
 	for position, plateid := range this.Properties.PosLookup {
 		if plateid == "" {
@@ -172,10 +248,6 @@ func (this *Liquidhandler) do_setup(rq *LHRequest) {
 // for asynchronous drivers we have to determine how far the program got before it was
 // paused, which should be tricky but possible.
 //
-// need to find a good way to codify the rules of the system:
-// essentially the question is what happens to inputs pre-defined.
-// I will define this asap
-//
 
 func (this *Liquidhandler) Plan(request *LHRequest) {
 	// convert requests to volumes and determine required stock concentrations
@@ -187,8 +259,7 @@ func (this *Liquidhandler) Plan(request *LHRequest) {
 
 	set_output_order(request)
 
-	// looks at components, determines what inputs are required and
-	// requests them
+	// looks at components, determines what inputs are required
 	request = this.GetInputs(request)
 
 	// define the input plates
@@ -219,6 +290,9 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 	instructions := (*request).LHInstructions
 	inputs := make(map[string][]*wtype.LHComponent, 3)
 	order := make(map[string]map[string]int, 3)
+	vmap := make(map[string]wunit.Volume)
+
+	allinputs := make([]string, 0, 10)
 
 	for _, instruction := range instructions {
 		components := instruction.Components
@@ -233,10 +307,25 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 			cmps, ok := inputs[component.CName]
 			if !ok {
 				cmps = make([]*wtype.LHComponent, 0, 3)
+				allinputs = append(allinputs, component.CName)
 			}
 
 			cmps = append(cmps, component)
 			inputs[component.CName] = cmps
+
+			// similarly add the volumes up
+
+			vol := vmap[component.CName]
+
+			if vol.IsNil() {
+				vol = wunit.NewVolume(0.0, "ul")
+			}
+
+			v2a := wunit.NewVolume(component.Vol, component.Vunit)
+
+			vol.Add(v2a)
+
+			vmap[component.CName] = vol
 
 			for j := 0; j < len(components); j++ {
 				// again exempt those parented components
@@ -277,6 +366,36 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 		requestinputs = make(map[string][]*wtype.LHComponent, 5)
 	}
 
+	// work out how much we have and how much we need
+
+	vmap2 := make(map[string]wunit.Volume, len(vmap))
+	vmap3 := make(map[string]wunit.Volume, len(vmap))
+
+	//	for k, ar := range requestinputs {
+	for _, k := range allinputs {
+		// vola: how much comes in
+		ar := requestinputs[k]
+		vola := wunit.NewVolume(0.00, "ul")
+		for _, cmp := range ar {
+			vold := wunit.NewVolume(cmp.Vol, cmp.Vunit)
+			vola.Add(vold)
+		}
+		// volb: how much we asked for
+		volb := vmap[k].Dup()
+		volb.Subtract(vola)
+		vmap2[k] = vola
+		if volb.GreaterThanFloat(0.0001) {
+			vmap3[k] = volb
+		}
+		volc := vmap[k]
+		fmt.Println("COMPONENT ", k, " HAVE : ", vola.ToString(), " WANT: ", volc.ToString(), " DIFF: ", volb.ToString())
+
+	}
+
+	(*request).Input_vols_required = vmap
+	(*request).Input_vols_supplied = vmap2
+	(*request).Input_vols_wanting = vmap3
+
 	// add any new inputs
 
 	for k, v := range inputs {
@@ -287,18 +406,24 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 
 	(*request).Input_solutions = requestinputs
 
-	// finally we have to add a waste
+	// finally we have to add a waste if there isn't one already
+	/// ??? This should not be here
+	// work out if we need to empty soon
 
-	var waste *wtype.LHTipwaste
-	// this should be added to the automagic config setup... however it will require adding to the
-	// representation of the liquid handler
-	if this.Properties.Model == "Pipetmax" {
-		waste = factory.GetTipwasteByType("Gilsontipwaste")
-	} else { //if this.Properties.Model == "GeneTheatre" { //TODO handle general case differently
-		waste = factory.GetTipwasteByType("CyBiotipwaste")
+	s := this.Properties.TipWastesMounted()
+
+	if s == 0 {
+		var waste *wtype.LHTipwaste
+		// this should be added to the automagic config setup... however it will require adding to the
+		// representation of the liquid handler
+		if this.Properties.Model == "Pipetmax" {
+			waste = factory.GetTipwasteByType("Gilsontipwaste")
+		} else { //if this.Properties.Model == "GeneTheatre" { //TODO handle general case differently
+			waste = factory.GetTipwasteByType("CyBiotipwaste")
+		}
+
+		this.Properties.AddTipWaste(waste)
 	}
-
-	this.Properties.AddTipWaste(waste)
 
 	return request
 }
@@ -415,10 +540,7 @@ func (this *Liquidhandler) Layout(request *LHRequest) *LHRequest {
 
 // make the instructions for executing this request
 func (this *Liquidhandler) ExecutionPlan(request *LHRequest) *LHRequest {
-	//TODO -- this dup is missing some plate stuff
-	//rbtcpy := this.Properties.Dup()
-
-	rbtcpy := this.Properties
+	rbtcpy := this.Properties.Dup()
 
 	rq := this.ExecutionPlanner(request, rbtcpy)
 

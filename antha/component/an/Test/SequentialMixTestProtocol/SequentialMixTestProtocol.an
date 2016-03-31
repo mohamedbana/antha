@@ -1,9 +1,8 @@
-protocol TypeIISConstructAssemblyMMX
+protocol SequentialMixTestProtocol
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"fmt"
 )
 
 // Input parameters for this protocol (data)
@@ -44,19 +43,20 @@ Setup {}
 // The core process for this protocol, with the steps to be performed
 // for every input
 Steps {
-	samples := make([]*wtype.LHComponent, 0)
 	mmxSample:=mixer.SampleForTotalVolume(MasterMix,ReactionVolume)
-	samples = append(samples, mmxSample)
+	mixture:=MixTo(OutPlate.Type, OutputLocation, OutputPlateNum, mmxSample)
 
 	for k, part := range Parts {
-		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", PartNames[k], " vol ", PartVols[k])
 		partSample := mixer.Sample(part, PartVols[k])
 		partSample.CName = PartNames[k]
-		samples = append(samples, partSample)
+		mixture = Mix(mixture, partSample)				// mix in place
 	}
+	
+	Reaction = mixture
 
-	Reaction = MixTo(OutPlate.Type, OutputLocation, OutputPlateNum, samples...)
+	//Reaction = MixTo(OutPlate.Type, OutputLocation, OutputPlateNum, samples...)
 
+	
 	// incubate the reaction mixture
 	// commented out pending changes to incubate
 	//Incubate(Reaction, ReactionTemp, ReactionTime, false)

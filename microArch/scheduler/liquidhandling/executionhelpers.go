@@ -121,9 +121,15 @@ func insSliceFromMap(m map[string]*wtype.LHInstruction) []*wtype.LHInstruction {
 
 type ByGeneration []*wtype.LHInstruction
 
-func (bg ByGeneration) Len() int           { return len(bg) }
-func (bg ByGeneration) Swap(i, j int)      { bg[i], bg[j] = bg[j], bg[i] }
-func (bg ByGeneration) Less(i, j int) bool { return bg[i].Generation() < bg[j].Generation() }
+func (bg ByGeneration) Len() int      { return len(bg) }
+func (bg ByGeneration) Swap(i, j int) { bg[i], bg[j] = bg[j], bg[i] }
+func (bg ByGeneration) Less(i, j int) bool {
+	if bg[i].Generation() == bg[j].Generation() {
+		strings.Compare(bg[i].Welladdress, bg[j].Welladdress)
+	}
+
+	return bg[i].Generation() == bg[j].Generation()
+}
 
 func set_output_order(rq *LHRequest) {
 	// sort into equivalence classes by generation
@@ -144,7 +150,7 @@ func set_output_order(rq *LHRequest) {
 	rq.Output_order = it.Flatten()
 
 	// wha
-	//it.Print()
+	it.Print()
 
 	rq.InstructionChain = it
 }
@@ -230,6 +236,7 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) 
 
 		// get dem big ole plates out
 		// TODO -- pass them in instead of all this nonsense
+
 		flhp := robot.PlateLookup[fromPlateID[ix]].(*wtype.LHPlate)
 		tlhp := robot.PlateLookup[insIn.PlateID].(*wtype.LHPlate)
 
@@ -256,7 +263,8 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) 
 		}
 
 		vf[ix] = wlf.CurrVolume()
-		wlf.Remove(va[ix])
+		//wlf.Remove(va[ix])
+
 		pf[ix] = robot.PlateIDLookup[fromPlateID[ix]]
 		wf[ix] = fromWells[ix]
 		pfwx[ix] = flhp.WellsX()

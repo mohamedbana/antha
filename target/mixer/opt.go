@@ -1,5 +1,7 @@
 package mixer
 
+import "github.com/antha-lang/antha/antha/anthalib/wtype"
+
 var (
 	defaultMaxPlates            = 4.5
 	defaultMaxWells             = 278.0
@@ -10,6 +12,9 @@ var (
 		ResidualVolumeWeight: &defaultResidualVolumeWeight,
 		InputPlateType:       []string{"pcrplate_skirted"},
 		OutputPlateType:      []string{"pcrplate_skirted"},
+		TipType:              []string{},
+		InputPlateFiles:      []string{},
+		InputPlates:          []*wtype.LHPlate{},
 	}
 )
 
@@ -19,6 +24,9 @@ type Opt struct {
 	ResidualVolumeWeight *float64
 	InputPlateType       []string
 	OutputPlateType      []string
+	TipType              []string
+	InputPlateFiles      []string
+	InputPlates          []*wtype.LHPlate
 	PlanningVersion      *int
 }
 
@@ -42,6 +50,15 @@ func (a Opt) Merge(x *Opt) Opt {
 	}
 	if len(x.OutputPlateType) != 0 {
 		a.OutputPlateType = x.OutputPlateType
+	}
+	if len(x.TipType) != 0 {
+		a.TipType = x.TipType
+	}
+	if len(x.InputPlateFiles) != 0 {
+		a.InputPlateFiles = x.InputPlateFiles
+	}
+	if len(x.InputPlates) != 0 {
+		a.InputPlates = x.InputPlates
 	}
 
 	return a

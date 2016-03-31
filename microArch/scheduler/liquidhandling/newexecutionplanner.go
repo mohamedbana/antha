@@ -23,6 +23,8 @@
 package liquidhandling
 
 import (
+	"fmt"
+
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/logger"
 )
@@ -30,12 +32,6 @@ import (
 // robot here should be a copy... this routine will be destructive of state
 func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProperties) *LHRequest {
 	logger.Info("Improved execution planner YEAH")
-	/*
-		// this volume correction needs to be removed asap
-		// essentially its purpose is to account for extra volume lost
-		// while clinging to outside of tips
-		volume_correction := 0.5
-	*/
 
 	// 1 -- set output order, this is based on dependencies
 	//set_output_order(request)
@@ -59,6 +55,7 @@ func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProper
 	inx := request.InstructionSet.Generate(request.Policies, robot)
 	instrx := make([]liquidhandling.TerminalRobotInstruction, len(inx))
 	for i := 0; i < len(inx); i++ {
+		fmt.Println(liquidhandling.InsToString(inx[i]))
 		instrx[i] = inx[i].(liquidhandling.TerminalRobotInstruction)
 	}
 	request.Instructions = instrx

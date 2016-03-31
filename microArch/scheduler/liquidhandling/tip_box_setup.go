@@ -36,18 +36,14 @@ import (
 // INPUT: 	instructions
 //OUTPUT: 	arrays of tip boxes
 func (lh *Liquidhandler) Tip_box_setup(request *LHRequest) *LHRequest {
-	// MIS XXX TODO TODO TODO --- this whole thing needs re-thinking very carefully
-	tip_boxes := (*request).Tips
-	if len(tip_boxes) == 0 {
-		tip_boxes = make([]*wtype.LHTipbox, 0)
-	}
+	tip_boxes := make([]*wtype.LHTipbox, 0)
 
 	// the instructions have been generated at this point so we just need to go through and count the tips used
 	// of each type
 	instrx := request.Instructions
 	ntips := make(map[string]int)
 
-	// aide memoire: ultimately these tip types derive from the LHParams object which was passed into
+	// aide memoire: ultimately these tip types derive from the LHProperties object which was passed into
 	// the call to generating concrete instructions
 	// there is a "tips" field which is just an array of LHTip objects. The Name field from one of these
 	// is passed through to TIPTYPE
@@ -80,8 +76,16 @@ func (lh *Liquidhandler) Tip_box_setup(request *LHRequest) *LHRequest {
 
 		logger.Info(fmt.Sprintf("Block %s Tips of type %s used: %d", request.BlockID, actualtiptype, ntip))
 
+		// how many tips remain on the platform?
+
+		newtips_needed := ntip - lh.Properties.TipsLeftOfType(actualtiptype)
+
+		if newtips_needed < 1 {
+			continue
+		}
+
 		tbt := factory.GetTipByType(actualtiptype)
-		ntbx := (ntip-1)/tbt.NTips + 1
+		ntbx := (newtips_needed-1)/tbt.NTips + 1
 
 		for i := 0; i < ntbx; i++ {
 			tbt2 := factory.GetTipByType(actualtiptype)

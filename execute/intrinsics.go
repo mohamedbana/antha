@@ -6,6 +6,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/ast"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/microArch/sampletracker"
 	"github.com/antha-lang/antha/trace"
 )
 
@@ -16,9 +17,11 @@ type incubateInst struct {
 }
 
 func Incubate(ctx context.Context, in *wtype.LHComponent, temp wunit.Temperature, time wunit.Time, shaking bool) *wtype.LHComponent {
+	st := sampletracker.GetSampleTracker()
 	comp := in.Dup()
 	comp.ID = wtype.GetUUID()
 	comp.BlockID = wtype.NewBlockID(getId(ctx))
+	st.UpdateIDOf(in.ID, comp.ID)
 
 	trace.Issue(ctx, &incubateInst{
 		Arg:  in,
@@ -43,6 +46,9 @@ type mixInst struct {
 	Node *ast.Mix
 }
 
+// TODO -- LOC etc. will be passed through OK but what about
+//         the actual plate info?
+//        - two choices here: 1) we upgrade the sample tracker; 2) we pass the plate in somehow
 func mix(ctx context.Context, inst *mixInst) *wtype.LHComponent {
 	// from the protocol POV components need to be passed by value
 	cmps := wtype.CopyComponentArray(inst.Args)

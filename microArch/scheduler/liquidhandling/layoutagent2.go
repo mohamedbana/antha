@@ -24,13 +24,13 @@ package liquidhandling
 
 import (
 	"fmt"
-	"strings"
-
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
+	"github.com/antha-lang/antha/microArch/sampletracker"
+	"strings"
 )
 
 func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *LHRequest {
@@ -109,6 +109,8 @@ func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain 
 		lkp[v.ID] = append(lkp[v.ID], v.Result)
 	}
 
+	sampletracker := sampletracker.GetSampleTracker()
+
 	// now map the output assignments in
 	for k, v := range request.Output_assignments {
 		for _, id := range v {
@@ -121,9 +123,11 @@ func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain 
 
 				if ok {
 					x.Loc = remap[tx[0]] + ":" + tx[1]
+					sampletracker.SetLocationOf(x.ID, x.Loc)
 					logger.Track(fmt.Sprintf("OUTPUT ASSIGNMENT I=%s R=%s A=%s", id, x.ID, x.Loc))
 				} else {
 					x.Loc = tx[0] + ":" + tx[1]
+					sampletracker.SetLocationOf(x.ID, x.Loc)
 				}
 			}
 		}
@@ -152,6 +156,8 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 	//s := make([]PlateChoice, 0, 3)
 	//m := make(map[int]string)
 
+	st := sampletracker.GetSampleTracker()
+
 	// inconsistent plate types will be assigned randomly!
 	//	for k, v := range request.LHInstructions {
 	//for _, k := range request.Output_order {
@@ -167,6 +173,7 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 				s[i].Assigned = append(s[i].Assigned, v.ID)
 				s[i].Wells = append(s[i].Wells, v.Welladdress)
 			}
+
 		} else if v.Majorlayoutgroup != -1 {
 			id, ok := m[v.Majorlayoutgroup]
 			if !ok {
@@ -188,8 +195,14 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 		} else if v.IsMixInPlace() {
 			// the first component sets the destination
 			// and now it should indeed be set
+			addr, ok := st.GetLocationOf(v.Components[0].ID)
 
-			addr := v.Components[0].Loc
+			if !ok {
+				//panic("NO DICE, KINGPIN")
+				logger.Fatal("MIX IN PLACE WITH NO LOCATION SET")
+			}
+
+			v.Components[0].Loc = addr
 			tx := strings.Split(addr, ":")
 			request.LHInstructions[k].Welladdress = tx[1]
 			request.LHInstructions[k].PlateID = tx[0]
@@ -197,8 +210,11 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 			// same as condition 1 except we get the plate id somewhere else
 			i := defined(tx[0], s)
 
+			// we should check for it in OutputPlates as well
+			// this could be a mix in place which has been split
+
 			if i == -1 {
-				panic("THIS SHOULD NOT BE POSSIBLE")
+				logger.Debug("CONTRADICTORY PLATE ID SITUATION ", v)
 			}
 
 			for i2, v2 := range s[i].Wells {
@@ -208,6 +224,8 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 				}
 			}
 
+		} else {
+			//fmt.Println("OH YOU KID")
 		}
 	}
 

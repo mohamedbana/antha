@@ -12,6 +12,7 @@ import (
 	"github.com/antha-lang/antha/ast"
 	driver "github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
+	"github.com/antha-lang/antha/microArch/logger"
 	planner "github.com/antha-lang/antha/microArch/scheduler/liquidhandling"
 	"github.com/antha-lang/antha/target"
 	"github.com/antha-lang/antha/target/human"
@@ -70,6 +71,8 @@ func (a *Mixer) makeReq() (*planner.LHRequest, *planner.Liquidhandler) {
 		req.Input_setup_weights["RESIDUAL_VOLUME_WEIGHT"] = *p
 	}
 
+	// TODO -- error check here to prevent nil values
+
 	if p := a.opt.InputPlateType; len(p) != 0 {
 		for _, v := range p {
 			req.Input_platetypes = append(req.Input_platetypes, factory.GetPlateByType(v))
@@ -80,6 +83,38 @@ func (a *Mixer) makeReq() (*planner.LHRequest, *planner.Liquidhandler) {
 		for _, v := range p {
 			req.Output_platetypes = append(req.Output_platetypes, factory.GetPlateByType(v))
 		}
+	}
+
+	if p := a.opt.TipType; len(p) != 0 {
+		for _, v := range p {
+			req.Tips = append(req.Tips, factory.GetTipByType(v))
+		}
+	}
+
+	if ipf := a.opt.InputPlateFiles; len(ipf) != 0 {
+		for _, v := range ipf {
+			ip, err := parseInputPlateFile(v)
+
+			if err != nil {
+				logger.Fatal(fmt.Sprint("Error parsing input plate file ", v, " : "), err)
+			}
+			req.Input_plates[ip.ID] = ip
+		}
+	}
+
+	// mechanism to specify input plates directly
+
+	if ip := a.opt.InputPlates; len(ip) != 0 {
+		for _, v := range ip {
+			req.Input_plates[v.ID] = v
+		}
+	}
+
+	err := req.ConfigureYourself()
+
+	if err != nil {
+		logger.Debug("ERROR in request configuration")
+		return nil, nil
 	}
 
 	return req, p

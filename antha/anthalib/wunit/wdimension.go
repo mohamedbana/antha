@@ -76,6 +76,10 @@ type Volume struct {
 
 // make a volume
 func NewVolume(v float64, unit string) (o Volume) {
+	if unit == "" {
+		return NewVolume(0.0, "ul")
+	}
+
 	if len(strings.TrimSpace(unit)) == 0 {
 		panic("Can't make Volumes without unit")
 	}
@@ -90,6 +94,11 @@ func NewVolume(v float64, unit string) (o Volume) {
 }
 
 func CopyVolume(v Volume) Volume {
+	ret := NewVolume(v.RawValue(), v.Unit().PrefixedSymbol())
+	return ret
+}
+
+func (v Volume) Dup() Volume {
 	ret := NewVolume(v.RawValue(), v.Unit().PrefixedSymbol())
 	return ret
 }
