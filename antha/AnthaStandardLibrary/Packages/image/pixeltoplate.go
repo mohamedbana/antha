@@ -624,7 +624,6 @@ func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolour
 			fmt.Println("x,y,colour, palette", x, y, colour, chosencolourpalette)
 
 			if colour != nil {
-				colourarray = append(colourarray, colour)
 
 				if chosencolourpalette != nil && chosencolourpalette != &Emptycolourarray && len([]color.Color(*chosencolourpalette)) > 0 {
 					// change colour to colour from a palette
@@ -637,6 +636,8 @@ func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolour
 				fmt.Println(wellposition)
 				wellpositionarray = append(wellpositionarray, wellposition)
 				wellpositiontocolourmap[wellposition] = colour
+
+				colourarray = append(colourarray, colour)
 			}
 		}
 	}
