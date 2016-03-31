@@ -125,7 +125,7 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 					components = append(components, blackSample)
 				}
 
-				solution := execute.MixInto(_ctx, _input.OutPlate, "", components...)
+				solution := execute.MixInto(_ctx, _input.PalettePlate, "", components...)
 				solutions = append(solutions, solution)
 				colourtoComponentMap[strconv.Itoa(colourindex)] = solution
 
@@ -207,6 +207,7 @@ type MakePaletteInput struct {
 	Imagefilename       string
 	Magenta             *wtype.LHComponent
 	OutPlate            *wtype.LHPlate
+	PalettePlate        *wtype.LHPlate
 	Rotate              bool
 	VolumeForFullcolour wunit.Volume
 	Yellow              *wtype.LHComponent
@@ -243,6 +244,7 @@ func init() {
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
 				{Name: "Magenta", Desc: "", Kind: "Inputs"},
 				{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\n", Kind: "Inputs"},
+				{Name: "PalettePlate", Desc: "", Kind: "Inputs"},
 				{Name: "Rotate", Desc: "", Kind: "Parameters"},
 				{Name: "VolumeForFullcolour", Desc: "", Kind: "Parameters"},
 				{Name: "Yellow", Desc: "", Kind: "Inputs"},

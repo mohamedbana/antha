@@ -553,10 +553,10 @@ func MakePalleteFromImage(imagefilename string, plate *wtype.LHPlate, rotate boo
 
 func MakeSmallPalleteFromImage(imagefilename string, plate *wtype.LHPlate, rotate bool) (newpallette color.Palette) {
 
-	//plateimage := ResizeImagetoPlate(imagefilename, plate, imaging.CatmullRom, rotate)
-	image, _ := imaging.Open(imagefilename)
+	plateimage := ResizeImagetoPlate(imagefilename, plate, imaging.CatmullRom, rotate)
+	//image, _ := imaging.Open(imagefilename)
 
-	plateimage := imaging.Clone(image)
+	//plateimage := imaging.Clone(image)
 
 	// use Plan9 as pallette for first round to keep number of colours down to a manageable level
 
