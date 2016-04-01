@@ -64,7 +64,10 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 
 	for locationkey, colour := range positiontocolourmap {
 
-		components := make([]*wtype.LHComponent, 0)
+		//components := make([]*wtype.LHComponent, 0)
+
+		var solution *wtype.LHComponent
+		var mixedsolution *wtype.LHComponent
 
 		gray := image.ColourtoGrayscale(colour)
 
@@ -101,8 +104,8 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 					watervol.SetValue(21)
 				}
 				waterSample := mixer.Sample(_input.Diluent, watervol)
-				components = append(components, waterSample)
-
+				//components = append(components, waterSample)
+				solution = execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, waterSample)
 			}
 			if gray.Y == maxuint8 {
 				blackvol = _input.VolumeForFullcolour
@@ -112,17 +115,28 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 
 			fmt.Println("new well", locationkey, "black vol", blackvol.ToString())
 
-			_input.Black.Type = wtype.LiquidTypeFromString("NeedToMix")
+			//Black.Type = wtype.LiquidTypeFromString("NeedToMix")
+
+			if _input.DontMix {
+				_input.Black.Type = wtype.LTDISPENSEABOVE
+			} else {
+				_input.Black.Type = wtype.LiquidTypeFromString("NeedToMix")
+			}
 
 			//fmt.Println("blackvol2",blackvol.ToString())
 			if _input.OnlyHighVolumetips && blackvol.RawValue() < 21 && blackvol.Unit().PrefixedSymbol() == "ul" {
 				blackvol.SetValue(21)
 			}
-			blackSample := mixer.Sample(_input.Black, blackvol)
-			components = append(components, blackSample)
 
-			solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, components...)
-			solutions = append(solutions, solution)
+			blackSample := mixer.Sample(_input.Black, blackvol)
+			//components = append(components, blackSample)
+
+			if solution != nil {
+				mixedsolution = execute.Mix(_ctx, solution, blackSample)
+			} else {
+				mixedsolution = execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, blackSample)
+			}
+			solutions = append(solutions, mixedsolution)
 
 		}
 	}
@@ -196,6 +210,7 @@ type PipetteImage_GrayInput struct {
 	AutoRotate                      bool
 	Black                           *wtype.LHComponent
 	Diluent                         *wtype.LHComponent
+	DontMix                         bool
 	Imagefilename                   string
 	MinimumBlackpercentagethreshold float64
 	Negative                        bool
@@ -235,6 +250,7 @@ func init() {
 				{Name: "AutoRotate", Desc: "", Kind: "Parameters"},
 				{Name: "Black", Desc: "", Kind: "Inputs"},
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
+				{Name: "DontMix", Desc: "", Kind: "Parameters"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
 				{Name: "MinimumBlackpercentagethreshold", Desc: "as a proportion of 1 i.e. 0.5 == 50%\n", Kind: "Parameters"},
 				{Name: "Negative", Desc: "", Kind: "Parameters"},

@@ -23,6 +23,7 @@ Parameters (
 	AutoRotate bool
 	PosterizeImage bool
 	PosterizeLevels int
+	DontMix bool
 )
 
 // Data which is returned from this protocol, and data types
@@ -83,7 +84,10 @@ Steps {
 
 	for locationkey, colour := range positiontocolourmap {
 		
-		components := make([]*wtype.LHComponent, 0)
+		//components := make([]*wtype.LHComponent, 0)
+
+		var solution *wtype.LHComponent
+		var mixedsolution *wtype.LHComponent
 
 		gray := image.ColourtoGrayscale(colour)
 		
@@ -122,8 +126,8 @@ Steps {
 				watervol.SetValue(21)
 			}
 			waterSample := mixer.Sample(Diluent, watervol)
-			components = append(components, waterSample)
-			
+			//components = append(components, waterSample)
+			solution = MixTo(OutPlate.Type, locationkey,1, waterSample)
 		} 
 		if gray.Y == maxuint8 {
 			blackvol = VolumeForFullcolour
@@ -133,17 +137,30 @@ Steps {
 		
 		fmt.Println("new well", locationkey, "black vol", blackvol.ToString())
 		
-		Black.Type = wtype.LiquidTypeFromString("NeedToMix")
+		//Black.Type = wtype.LiquidTypeFromString("NeedToMix")
+		
+		if DontMix {
+		Black.Type = wtype.LTDISPENSEABOVE
+		}else{
+			Black.Type = wtype.LiquidTypeFromString("NeedToMix")
+		}
 		
 		//fmt.Println("blackvol2",blackvol.ToString())
 		if OnlyHighVolumetips && blackvol.RawValue() < 21 && blackvol.Unit().PrefixedSymbol() == "ul"{
 				blackvol.SetValue(21)
 			}
+			
+			
+			
 		blackSample := mixer.Sample(Black, blackvol)
-		components = append(components, blackSample)
+		//components = append(components, blackSample)
 		
-		solution := MixTo(OutPlate.Type, locationkey,1, components...)
-		solutions = append(solutions, solution)
+		if solution != nil {
+		mixedsolution = Mix(solution, blackSample)
+		}else {
+			mixedsolution = MixTo(OutPlate.Type, locationkey,1, blackSample)
+		}
+		solutions = append(solutions, mixedsolution)
 		
 		}
 	}
