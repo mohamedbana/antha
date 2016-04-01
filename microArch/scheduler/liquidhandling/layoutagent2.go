@@ -198,7 +198,6 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 			addr, ok := st.GetLocationOf(v.Components[0].ID)
 
 			if !ok {
-				//panic("NO DICE, KINGPIN")
 				logger.Fatal("MIX IN PLACE WITH NO LOCATION SET")
 			}
 

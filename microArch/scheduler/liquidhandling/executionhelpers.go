@@ -128,7 +128,7 @@ func (bg ByGeneration) Less(i, j int) bool {
 		strings.Compare(bg[i].Welladdress, bg[j].Welladdress)
 	}
 
-	return bg[i].Generation() == bg[j].Generation()
+	return bg[i].Generation() < bg[j].Generation()
 }
 
 func set_output_order(rq *LHRequest) {
@@ -155,44 +155,6 @@ func set_output_order(rq *LHRequest) {
 	rq.InstructionChain = it
 }
 
-/*
-
-func optimize_runs(rq *LHRequest, chain *IChain, newoutputorder []string) {
-	// go through instructions on the same level and see if any might be candidates for
-	// aggregation
-
-	// this will replace both the instructions and the order, since the instructions now have new IDs
-
-	// might as well make this recursive
-
-	if chain == nil {
-		rq.Output_order = newoutputorder
-		return
-	}
-
-	arrIns := groupByComponents(chain.Values)
-
-	for _, ins := range arrIns {
-		newoutputorder = append(newoutputorder, ins.ID)
-		rq.LHInstructions[ins.ID] = ins
-	}
-
-	optimize_runs(rq, chain.Child, newoutputorder)
-}
-
-func groupByComponents(instructions []*wtype.LHInstruction) []*wtype.LHInstruction {
-	hsh := make(map[string][]*wtype.LHInstruction, len(instructions))
-
-	for _, ins := range instructions {
-		hsh[ins.Result.CName] = append(hsh[ins.Result.CName], ins)
-	}
-
-	// component ordering should not really be an issue here
-
-	r := make([]*wtype.LHInstruction, 0, 3)
-	return r
-}
-*/
 type ByOrdinal [][]int
 
 func (bo ByOrdinal) Len() int      { return len(bo) }

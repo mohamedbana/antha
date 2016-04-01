@@ -1,7 +1,7 @@
 {
   "Parameters": {
     "MakePalette1": {
-		"Imagefilename":"cmyk3.jpg",
+		"Imagefilename":"jenkins_plateformat.jpg",
 		"Rotate": false,
 		"AutoRotate": true,
       "Cyan": "Cyan",
@@ -14,7 +14,7 @@
     },
 	"Pipette1": {
        "VolumePerWell": "60ul",
-	   "Imagefilename":"cmyk3.jpg",
+	   "Imagefilename":"jenkins_plateformat.jpg",
 	   "OnlythisColour": "",
 	   "NotthisColour": "",
 	   "Rotate": false,

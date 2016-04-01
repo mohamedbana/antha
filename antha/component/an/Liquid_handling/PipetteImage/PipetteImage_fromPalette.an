@@ -89,7 +89,7 @@ Steps {
 		colourindex := strconv.Itoa(Palette.Index(colour))
 		
 		component, componentpresent := ColourIndextoComponentMap[colourindex]
-		fmt.Println("Am I a component", component, "key:", colourindex, "from map:", ColourIndextoComponentMap)
+//		fmt.Println("Am I a component", component, "key:", colourindex, "from map:", ColourIndextoComponentMap)
 		
 		if componentpresent {
 		component.Type = wtype.LTDoNotMix//"DoNotMix"

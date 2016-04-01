@@ -200,8 +200,6 @@ func TransferVolumes(Vol, Min, Max wunit.Volume) []wunit.Volume {
 	min := Min.RawValue()
 	max := Max.RawValue()
 
-	fmt.Println("TRANSFER VOLUMES: VOL: ", vol, " MIN: ", min, " MAX: ", max)
-
 	if vol < min {
 		logger.Fatal(fmt.Sprintf("Error: %f below min vol %f", vol, min))
 		panic(errors.New(fmt.Sprintf("Error: %f below min vol %f", vol, min)))
