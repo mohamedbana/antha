@@ -46,6 +46,28 @@ func (a *Graph) Out(n graph.Node, i int) graph.Node {
 	return n.(Inst).DependsOn()[i]
 }
 
+type Incubate struct {
+	Dev     Device
+	Depends []Inst
+	Files   Files
+}
+
+func (a *Incubate) Data() Files {
+	return a.Files
+}
+
+func (a *Incubate) Device() Device {
+	return a.Dev
+}
+
+func (a *Incubate) DependsOn() []Inst {
+	return a.Depends
+}
+
+func (a *Incubate) SetDependsOn(x []Inst) {
+	a.Depends = x
+}
+
 type Mix struct {
 	Dev        Device
 	Depends    []Inst
