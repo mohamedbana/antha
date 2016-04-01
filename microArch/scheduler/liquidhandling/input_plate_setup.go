@@ -126,7 +126,13 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 
 	// get the assignment
 
-	well_count_assignments := choose_plate_assignments(input_volumes, input_platetypes, weights_constraints)
+	//well_count_assignments := choose_plate_assignments(input_volumes, input_platetypes, weights_constraints)
+
+	var well_count_assignments map[string]map[*wtype.LHPlate]int
+
+	if len(input_volumes) != 0 {
+		well_count_assignments = choose_plate_assignments(input_volumes, input_platetypes, weights_constraints)
+	}
 
 	input_assignments := make(map[string][]string, len(well_count_assignments))
 
@@ -143,7 +149,11 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 		component := inputs[cname][0]
 		//logger.Debug(fmt.Sprintln("Plate_setup - component", cname, ":"))
 
-		well_assignments := well_count_assignments[cname]
+		well_assignments, ok := well_count_assignments[cname]
+
+		if !ok {
+			continue
+		}
 
 		//logger.Debug(fmt.Sprintln("Well assignments: ", well_assignments))
 
@@ -151,6 +161,7 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 		ass := make([]string, 0, 3)
 
 		// best hack so far: add an extra well of everything
+		// except we should do this at the end
 		for platetype, nwells := range well_assignments {
 			for i := 0; i < nwells+1; i++ {
 				curr_plate = plates_in_play[platetype.Type]

@@ -18,7 +18,7 @@ import (
 // one file per plate
 // here's the format:
 // csv, first line MUST be
-// platetype,_some_plate_type_,
+// _some_plate_type_,
 // other lines are then
 // well,component name, component type (string for now I think),
 func parseInputPlateFile(filename string) (*wtype.LHPlate, error) {
