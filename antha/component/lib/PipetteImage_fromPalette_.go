@@ -68,7 +68,7 @@ func _PipetteImage_fromPaletteSteps(_ctx context.Context, _input *PipetteImage_f
 		colourindex := strconv.Itoa(_input.Palette.Index(colour))
 
 		component, componentpresent := _input.ColourIndextoComponentMap[colourindex]
-		fmt.Println("Am I a component", component, "key:", colourindex, "from map:", _input.ColourIndextoComponentMap)
+		//		fmt.Println("Am I a component", component, "key:", colourindex, "from map:", ColourIndextoComponentMap)
 
 		if componentpresent {
 			component.Type = wtype.LTDoNotMix //"DoNotMix"

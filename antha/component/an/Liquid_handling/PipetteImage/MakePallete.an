@@ -195,8 +195,6 @@ Steps {
 		solutions = append(solutions, solution)
 		colourtoComponentMap[strconv.Itoa(colourindex)] = solution
 		
-		
-		
 		}
 		
 		}

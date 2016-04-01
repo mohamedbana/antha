@@ -87,7 +87,7 @@ Steps {
 		//components := make([]*wtype.LHComponent, 0)
 
 		var solution *wtype.LHComponent
-		var mixedsolution *wtype.LHComponent
+		//var mixedsolution *wtype.LHComponent
 
 		gray := image.ColourtoGrayscale(colour)
 		
@@ -156,11 +156,11 @@ Steps {
 		//components = append(components, blackSample)
 		
 		if solution != nil {
-		mixedsolution = Mix(solution, blackSample)
+		solution = Mix(solution, blackSample)
 		}else {
-			mixedsolution = MixTo(OutPlate.Type, locationkey,1, blackSample)
+			solution = MixTo(OutPlate.Type, locationkey,1, blackSample)
 		}
-		solutions = append(solutions, mixedsolution)
+		solutions = append(solutions, solution)
 		
 		}
 	}

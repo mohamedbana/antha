@@ -67,7 +67,7 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 		//components := make([]*wtype.LHComponent, 0)
 
 		var solution *wtype.LHComponent
-		var mixedsolution *wtype.LHComponent
+		//var mixedsolution *wtype.LHComponent
 
 		gray := image.ColourtoGrayscale(colour)
 
@@ -132,11 +132,11 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 			//components = append(components, blackSample)
 
 			if solution != nil {
-				mixedsolution = execute.Mix(_ctx, solution, blackSample)
+				solution = execute.Mix(_ctx, solution, blackSample)
 			} else {
-				mixedsolution = execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, blackSample)
+				solution = execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, blackSample)
 			}
-			solutions = append(solutions, mixedsolution)
+			solutions = append(solutions, solution)
 
 		}
 	}
