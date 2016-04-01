@@ -59,7 +59,7 @@ Steps {
 
 	// incubate the reaction mixture
 	// commented out pending changes to incubate
-	//Incubate(Reaction, ReactionTemp, ReactionTime, false)
+	Incubate(Reaction, ReactionTemp, ReactionTime, false)
 	// inactivate
 	//Incubate(Reaction, InactivationTemp, InactivationTime, false)
 }

@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -18,57 +17,58 @@ import (
 
 // Data which is returned from this protocol, and data types
 
-func _TypeIISConstructAssemblyMMXRequirements() {}
+func _PartiallySequentialMixTestProtocolRequirements() {}
 
 // Conditions to run on startup
-func _TypeIISConstructAssemblyMMXSetup(_ctx context.Context, _input *TypeIISConstructAssemblyMMXInput) {
+func _PartiallySequentialMixTestProtocolSetup(_ctx context.Context, _input *PartiallySequentialMixTestProtocolInput) {
 }
 
 // The core process for this protocol, with the steps to be performed
 // for every input
-func _TypeIISConstructAssemblyMMXSteps(_ctx context.Context, _input *TypeIISConstructAssemblyMMXInput, _output *TypeIISConstructAssemblyMMXOutput) {
-	samples := make([]*wtype.LHComponent, 0)
+func _PartiallySequentialMixTestProtocolSteps(_ctx context.Context, _input *PartiallySequentialMixTestProtocolInput, _output *PartiallySequentialMixTestProtocolOutput) {
 	mmxSample := mixer.SampleForTotalVolume(_input.MasterMix, _input.ReactionVolume)
-	samples = append(samples, mmxSample)
+	mixture := execute.MixTo(_ctx, _input.OutPlate.Type, _input.OutputLocation, _input.OutputPlateNum, mmxSample)
+
+	samples := make([]*wtype.LHComponent, 0, 1)
+	samples = append(samples, mixture)
 
 	for k, part := range _input.Parts {
-		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", _input.PartNames[k], " vol ", _input.PartVols[k])
 		partSample := mixer.Sample(part, _input.PartVols[k])
 		partSample.CName = _input.PartNames[k]
 		samples = append(samples, partSample)
 	}
 
-	_output.Reaction = execute.MixTo(_ctx, _input.OutPlate.Type, _input.OutputLocation, _input.OutputPlateNum, samples...)
+	_output.Reaction = execute.Mix(_ctx, samples...)
 
 	// incubate the reaction mixture
 	// commented out pending changes to incubate
-	execute.Incubate(_ctx, _output.Reaction, _input.ReactionTemp, _input.ReactionTime, false)
+	//Incubate(Reaction, ReactionTemp, ReactionTime, false)
 	// inactivate
 	//Incubate(Reaction, InactivationTemp, InactivationTime, false)
 }
 
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
-func _TypeIISConstructAssemblyMMXAnalysis(_ctx context.Context, _input *TypeIISConstructAssemblyMMXInput, _output *TypeIISConstructAssemblyMMXOutput) {
+func _PartiallySequentialMixTestProtocolAnalysis(_ctx context.Context, _input *PartiallySequentialMixTestProtocolInput, _output *PartiallySequentialMixTestProtocolOutput) {
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
-func _TypeIISConstructAssemblyMMXValidation(_ctx context.Context, _input *TypeIISConstructAssemblyMMXInput, _output *TypeIISConstructAssemblyMMXOutput) {
+func _PartiallySequentialMixTestProtocolValidation(_ctx context.Context, _input *PartiallySequentialMixTestProtocolInput, _output *PartiallySequentialMixTestProtocolOutput) {
 }
-func _TypeIISConstructAssemblyMMXRun(_ctx context.Context, input *TypeIISConstructAssemblyMMXInput) *TypeIISConstructAssemblyMMXOutput {
-	output := &TypeIISConstructAssemblyMMXOutput{}
-	_TypeIISConstructAssemblyMMXSetup(_ctx, input)
-	_TypeIISConstructAssemblyMMXSteps(_ctx, input, output)
-	_TypeIISConstructAssemblyMMXAnalysis(_ctx, input, output)
-	_TypeIISConstructAssemblyMMXValidation(_ctx, input, output)
+func _PartiallySequentialMixTestProtocolRun(_ctx context.Context, input *PartiallySequentialMixTestProtocolInput) *PartiallySequentialMixTestProtocolOutput {
+	output := &PartiallySequentialMixTestProtocolOutput{}
+	_PartiallySequentialMixTestProtocolSetup(_ctx, input)
+	_PartiallySequentialMixTestProtocolSteps(_ctx, input, output)
+	_PartiallySequentialMixTestProtocolAnalysis(_ctx, input, output)
+	_PartiallySequentialMixTestProtocolValidation(_ctx, input, output)
 	return output
 }
 
-func TypeIISConstructAssemblyMMXRunSteps(_ctx context.Context, input *TypeIISConstructAssemblyMMXInput) *TypeIISConstructAssemblyMMXSOutput {
-	soutput := &TypeIISConstructAssemblyMMXSOutput{}
-	output := _TypeIISConstructAssemblyMMXRun(_ctx, input)
+func PartiallySequentialMixTestProtocolRunSteps(_ctx context.Context, input *PartiallySequentialMixTestProtocolInput) *PartiallySequentialMixTestProtocolSOutput {
+	soutput := &PartiallySequentialMixTestProtocolSOutput{}
+	output := _PartiallySequentialMixTestProtocolRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
 		panic(err)
 	}
@@ -78,19 +78,19 @@ func TypeIISConstructAssemblyMMXRunSteps(_ctx context.Context, input *TypeIISCon
 	return soutput
 }
 
-func TypeIISConstructAssemblyMMXNew() interface{} {
-	return &TypeIISConstructAssemblyMMXElement{
+func PartiallySequentialMixTestProtocolNew() interface{} {
+	return &PartiallySequentialMixTestProtocolElement{
 		inject.CheckedRunner{
 			RunFunc: func(_ctx context.Context, value inject.Value) (inject.Value, error) {
-				input := &TypeIISConstructAssemblyMMXInput{}
+				input := &PartiallySequentialMixTestProtocolInput{}
 				if err := inject.Assign(value, input); err != nil {
 					return nil, err
 				}
-				output := _TypeIISConstructAssemblyMMXRun(_ctx, input)
+				output := _PartiallySequentialMixTestProtocolRun(_ctx, input)
 				return inject.MakeValue(output), nil
 			},
-			In:  &TypeIISConstructAssemblyMMXInput{},
-			Out: &TypeIISConstructAssemblyMMXOutput{},
+			In:  &PartiallySequentialMixTestProtocolInput{},
+			Out: &PartiallySequentialMixTestProtocolOutput{},
 		},
 	}
 }
@@ -100,11 +100,11 @@ var (
 	_ = wunit.Make_units
 )
 
-type TypeIISConstructAssemblyMMXElement struct {
+type PartiallySequentialMixTestProtocolElement struct {
 	inject.CheckedRunner
 }
 
-type TypeIISConstructAssemblyMMXInput struct {
+type PartiallySequentialMixTestProtocolInput struct {
 	InactivationTemp   wunit.Temperature
 	InactivationTime   wunit.Time
 	MasterMix          *wtype.LHComponent
@@ -120,11 +120,11 @@ type TypeIISConstructAssemblyMMXInput struct {
 	ReactionVolume     wunit.Volume
 }
 
-type TypeIISConstructAssemblyMMXOutput struct {
+type PartiallySequentialMixTestProtocolOutput struct {
 	Reaction *wtype.LHComponent
 }
 
-type TypeIISConstructAssemblyMMXSOutput struct {
+type PartiallySequentialMixTestProtocolSOutput struct {
 	Data struct {
 	}
 	Outputs struct {
@@ -133,11 +133,11 @@ type TypeIISConstructAssemblyMMXSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "TypeIISConstructAssemblyMMX",
-		Constructor: TypeIISConstructAssemblyMMXNew,
+	addComponent(Component{Name: "PartiallySequentialMixTestProtocol",
+		Constructor: PartiallySequentialMixTestProtocolNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/Liquid_handling/TypeIIsAssembly/TypeIISConstructAssemblyMMX/TypeIISConstructAssemblyMMX.an",
+			Path: "antha/component/an/Test/PartiallySequentialMixTestProtocol/PartiallySequentialMixTestProtocol.an",
 			Params: []ParamDesc{
 				{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
 				{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
