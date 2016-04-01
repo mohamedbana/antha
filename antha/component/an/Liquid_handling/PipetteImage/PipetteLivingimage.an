@@ -28,6 +28,7 @@ Parameters (
 	Rotate bool
 	AutoRotate bool
 	Subset bool
+	UseLiquidClass string
 	Subsetnames []string
 	//IncTemp Temperature
 	//IncTime Time
@@ -121,12 +122,12 @@ Steps {
 // loop through the position to colour map pipeting the correct coloured protein into each well
 	for locationkey, colour := range positiontocolourmap {
 		
-		components := make([]*wtype.LHComponent, 0)
+		//components := make([]*wtype.LHComponent, 0)
 		
 		component := componentmap[colourtostringmap[colour]]
 
 		// make sure liquid class is appropriate for cell culture in case this is not set elsewhere
-		component.Type = wtype.LTCulture
+		component.Type = wtype.LiquidTypeFromString(UseLiquidClass)//wtype.LTCulture
 		
 		fmt.Println(image.Colourcomponentmap[colour])
 		
@@ -148,8 +149,8 @@ Steps {
 		inducerSample := mixer.Sample(Inducer, InducerVolume)
 		components = append(components,inducerSample)*/
 		pixelSample := mixer.Sample(component, VolumePerWell)
-		components = append(components,pixelSample)
-		solution := MixTo(OutPlate.Type, locationkey, 1,components...)
+		//components = append(components,pixelSample)
+		solution := MixTo(OutPlate.Type, locationkey, 1,pixelSample)
 		
 		solutions = append(solutions, solution /*Incubate(solution,IncTemp,IncTime,true)*/)
 			}
@@ -169,9 +170,11 @@ Steps {
 		components = append(components,repressorSample)
 		inducerSample := mixer.Sample(Inducer, InducerVolume)
 		components = append(components,inducerSample)*/
+		
+		component.Type = wtype.LiquidTypeFromString(UseLiquidClass)//wtype.LTCulture
 		pixelSample := mixer.Sample(component, VolumePerWell)
-		components = append(components,pixelSample)
-		solution := MixTo(OutPlate.Type, locationkey, 1, components...)
+		//components = append(components,pixelSample)
+		solution := MixTo(OutPlate.Type, locationkey, 1, pixelSample)
 		
 		solutions = append(solutions, solution /*Incubate(solution,IncTemp,IncTime,true)*/)
 		}

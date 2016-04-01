@@ -103,12 +103,12 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 	// loop through the position to colour map pipeting the correct coloured protein into each well
 	for locationkey, colour := range positiontocolourmap {
 
-		components := make([]*wtype.LHComponent, 0)
+		//components := make([]*wtype.LHComponent, 0)
 
 		component := componentmap[colourtostringmap[colour]]
 
 		// make sure liquid class is appropriate for cell culture in case this is not set elsewhere
-		component.Type = wtype.LTCulture
+		component.Type = wtype.LiquidTypeFromString(_input.UseLiquidClass) //wtype.LTCulture
 
 		fmt.Println(image.Colourcomponentmap[colour])
 
@@ -130,8 +130,8 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 				inducerSample := mixer.Sample(Inducer, InducerVolume)
 				components = append(components,inducerSample)*/
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
-				components = append(components, pixelSample)
-				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, components...)
+				//components = append(components,pixelSample)
+				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, pixelSample)
 
 				solutions = append(solutions, solution /*Incubate(solution,IncTemp,IncTime,true)*/)
 			}
@@ -151,9 +151,11 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 				components = append(components,repressorSample)
 				inducerSample := mixer.Sample(Inducer, InducerVolume)
 				components = append(components,inducerSample)*/
+
+				component.Type = wtype.LiquidTypeFromString(_input.UseLiquidClass) //wtype.LTCulture
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
-				components = append(components, pixelSample)
-				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, components...)
+				//components = append(components,pixelSample)
+				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, pixelSample)
 
 				solutions = append(solutions, solution /*Incubate(solution,IncTemp,IncTime,true)*/)
 			}
@@ -239,6 +241,7 @@ type PipetteImage_livingInput struct {
 	Subset         bool
 	Subsetnames    []string
 	UVimage        bool
+	UseLiquidClass string
 	VolumePerWell  wunit.Volume
 }
 
@@ -275,6 +278,7 @@ func init() {
 				{Name: "Subset", Desc: "", Kind: "Parameters"},
 				{Name: "Subsetnames", Desc: "", Kind: "Parameters"},
 				{Name: "UVimage", Desc: "", Kind: "Parameters"},
+				{Name: "UseLiquidClass", Desc: "", Kind: "Parameters"},
 				{Name: "VolumePerWell", Desc: "", Kind: "Parameters"},
 				{Name: "Numberofpixels", Desc: "", Kind: "Data"},
 				{Name: "Pixels", Desc: "", Kind: "Outputs"},

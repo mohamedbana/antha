@@ -118,6 +118,7 @@ Steps {
 		cyanSample := mixer.Sample(Cyan, cyanvol)
 		
 		solution = MixInto(PalettePlate, "",cyanSample)
+		//solution = MixTo(PalettePlate.Type, position,1,cyanSample)
 		
 		//components = append(components, cyanSample)
 		}
@@ -141,6 +142,7 @@ Steps {
 		solution = Mix(solution, yellowSample)
 		}else {
 			solution = MixInto(PalettePlate, "", yellowSample)
+			//solution = MixTo(PalettePlate.Type, position,1,yellowSample)
 		}
 		
 		
@@ -166,6 +168,7 @@ Steps {
 		solution = Mix(solution, magentaSample)
 		}else {
 			solution = MixInto(PalettePlate, "", magentaSample)
+			//solution = MixTo(PalettePlate.Type, position,1,magentaSample)
 		}
 		
 		//components = append(components, magentaSample)
@@ -186,6 +189,7 @@ Steps {
 		solution = Mix(solution, blackSample)
 		}else {
 			solution = MixInto(PalettePlate, "", blackSample)
+			//solution = MixTo(PalettePlate.Type, position,1,blackSample)
 		}
 		
 		//components = append(components, blackSample)

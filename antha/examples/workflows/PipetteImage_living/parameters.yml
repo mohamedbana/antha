@@ -17,9 +17,10 @@
 		"E.coli",
 		"E.coli pUC19 on sgal"
 		],
-      	"OutPlate": "Agarplateforpicking384_riser",
+		"UseLiquidClass":"culture",
+      	"OutPlate": "greiner384_riser",
 		"UVimage":false,
-      	"VolumePerWell": "2ul"
+      	"VolumePerWell": "20ul"
     }
   }
 }

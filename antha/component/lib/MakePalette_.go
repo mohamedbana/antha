@@ -99,6 +99,7 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 					cyanSample := mixer.Sample(_input.Cyan, cyanvol)
 
 					solution = execute.MixInto(_ctx, _input.PalettePlate, "", cyanSample)
+					//solution = MixTo(PalettePlate.Type, position,1,cyanSample)
 
 					//components = append(components, cyanSample)
 				}
@@ -121,6 +122,7 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 						solution = execute.Mix(_ctx, solution, yellowSample)
 					} else {
 						solution = execute.MixInto(_ctx, _input.PalettePlate, "", yellowSample)
+						//solution = MixTo(PalettePlate.Type, position,1,yellowSample)
 					}
 
 					//components = append(components, yellowSample)
@@ -145,6 +147,7 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 						solution = execute.Mix(_ctx, solution, magentaSample)
 					} else {
 						solution = execute.MixInto(_ctx, _input.PalettePlate, "", magentaSample)
+						//solution = MixTo(PalettePlate.Type, position,1,magentaSample)
 					}
 
 					//components = append(components, magentaSample)
@@ -165,6 +168,7 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 						solution = execute.Mix(_ctx, solution, blackSample)
 					} else {
 						solution = execute.MixInto(_ctx, _input.PalettePlate, "", blackSample)
+						//solution = MixTo(PalettePlate.Type, position,1,blackSample)
 					}
 
 					//components = append(components, blackSample)
