@@ -92,3 +92,15 @@ func (ins *LHInstruction) ParentString() string {
 	}
 
 }
+
+func (ins *LHInstruction) ComponentsMoving() string {
+	sa := make([]string, 0, 1)
+	for i, v := range ins.Components {
+		// ignore component 1 if this is a mix-in-place
+		if i == 0 && !v.IsSample() {
+			continue
+		}
+		sa = append(sa, v.CName)
+	}
+	return strings.Join(sa, "+")
+}

@@ -22,32 +22,39 @@
 
 package liquidhandling
 
-import (
-	"fmt"
-
-	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
-	"github.com/antha-lang/antha/microArch/logger"
-)
+import "github.com/antha-lang/antha/microArch/driver/liquidhandling"
 
 // robot here should be a copy... this routine will be destructive of state
 func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProperties) *LHRequest {
-	logger.Info("Improved execution planner YEAH")
+	// 1 -- generate high level instructions
+	// also work out which ones can be aggregated
+	agg := make(map[string][]int)
+	transfers := make([]liquidhandling.RobotInstruction, 0, len(request.LHInstructions))
+	for ix, insID := range request.Output_order {
+		//	request.InstructionSet.Add(ConvertInstruction(request.LHInstructions[insID], robot))
+		transfers = append(transfers, ConvertInstruction(request.LHInstructions[insID], robot))
+		cmp := request.LHInstructions[insID].ComponentsMoving()
+		ar, ok := agg[cmp]
+		if !ok {
+			ar = make([]int, 0, 1)
+		}
 
-	// 1 -- set output order, this is based on dependencies
-	//set_output_order(request)
-	// this now happens waaaaaay at the beginning
+		ar = append(ar, ix)
+		agg[cmp] = ar
+	}
 
-	// 2 -- we might optimize at this point: for instance grouping components
-	//      or generating stages of execution
-	/*
-		newoutputorder := make([]string, 0, 1)
-		optimize_runs(request, request.InstructionChain, newoutputorder)
-		request.Output_order = newoutputorder
-	*/
-	// 3 -- generate top-level instructions
+	// sort the above out
 
-	for _, insID := range request.Output_order {
-		request.InstructionSet.Add(ConvertInstruction(request.LHInstructions[insID], robot))
+	aggregates := flatten_aggregates(agg)
+
+	// 2 -- see if any of the above can be aggregated, if so we merge them
+
+	transfers = merge_transfers(transfers, aggregates)
+
+	// 3 -- add them to the instruction set
+
+	for _, tfr := range transfers {
+		request.InstructionSet.Add(tfr)
 	}
 
 	// 4 -- make the low-level instructions
@@ -55,10 +62,11 @@ func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProper
 	inx := request.InstructionSet.Generate(request.Policies, robot)
 	instrx := make([]liquidhandling.TerminalRobotInstruction, len(inx))
 	for i := 0; i < len(inx); i++ {
-		fmt.Println(liquidhandling.InsToString(inx[i]))
+		//		fmt.Println(liquidhandling.InsToString(inx[i]))
 		instrx[i] = inx[i].(liquidhandling.TerminalRobotInstruction)
 	}
 	request.Instructions = instrx
+	//	fmt.Println(request.InstructionSet.ToString(1))
 
 	return request
 }
