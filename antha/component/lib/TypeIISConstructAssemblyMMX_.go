@@ -42,7 +42,7 @@ func _TypeIISConstructAssemblyMMXSteps(_ctx context.Context, _input *TypeIISCons
 
 	// incubate the reaction mixture
 	// commented out pending changes to incubate
-	//Incubate(Reaction, ReactionTemp, ReactionTime, false)
+	execute.Incubate(_ctx, _output.Reaction, _input.ReactionTemp, _input.ReactionTime, false)
 	// inactivate
 	//Incubate(Reaction, InactivationTemp, InactivationTime, false)
 }

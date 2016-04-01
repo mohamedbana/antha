@@ -22,7 +22,11 @@
 
 package liquidhandling
 
-import "github.com/antha-lang/antha/microArch/driver/liquidhandling"
+import (
+	"fmt"
+
+	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
+)
 
 // robot here should be a copy... this routine will be destructive of state
 func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProperties) *LHRequest {
@@ -33,7 +37,7 @@ func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProper
 	for ix, insID := range request.Output_order {
 		//	request.InstructionSet.Add(ConvertInstruction(request.LHInstructions[insID], robot))
 		transfers = append(transfers, ConvertInstruction(request.LHInstructions[insID], robot))
-		cmp := request.LHInstructions[insID].ComponentsMoving()
+		cmp := fmt.Sprintf("%s_%s", request.LHInstructions[insID].ComponentsMoving(), request.LHInstructions[insID].Generation())
 		ar, ok := agg[cmp]
 		if !ok {
 			ar = make([]int, 0, 1)
