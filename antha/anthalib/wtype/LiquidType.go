@@ -24,6 +24,7 @@ const (
 	LTNeedToMix
 	LTVISCOUS
 	LTPAINT
+	LTDISPENSEABOVE
 )
 
 func LiquidTypeFromString(s string) LiquidType {
@@ -67,6 +68,8 @@ func LiquidTypeFromString(s string) LiquidType {
 			return LTVISCOUS
 		case "Paint":
 			return LTPAINT
+		case "DispenseAboveLiquid":
+			return LTDISPENSEABOVE
 		default:
 			return LTWater
 		}
@@ -104,6 +107,10 @@ func LiquidTypeName(lt LiquidType) string {
 		return "loadwater"
 	case LTNeedToMix:
 		return "NeedToMix"
+	case LTPAINT:
+		return "Paint"
+	case LTDISPENSEABOVE:
+		return "DispenseAboveLiquid"
 	default:
 		return "water"
 	}
