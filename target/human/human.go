@@ -19,7 +19,17 @@ type Human struct {
 }
 
 func (a *Human) CanCompile(req ast.Request) bool {
-	if !a.opt.CanMix && req.MixVol != nil {
+	canMove := true
+	mov := len(req.Move) > 0
+	mix := req.MixVol != nil
+	inc := req.Temp != nil || req.Time != nil
+
+	switch {
+	case !canMove && mov:
+		return false
+	case !a.opt.CanMix && mix:
+		return false
+	case !a.opt.CanIncubate && inc:
 		return false
 	}
 	return true
@@ -80,7 +90,8 @@ func (a *Human) Compile(cmds []ast.Command) ([]target.Inst, error) {
 }
 
 type Opt struct {
-	CanMix bool
+	CanMix      bool
+	CanIncubate bool
 }
 
 func New(opt Opt) *Human {
