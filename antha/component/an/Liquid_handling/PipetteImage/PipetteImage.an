@@ -114,9 +114,11 @@ Steps {
 		}
 	}
 
+	
+	Pixels = solutions
+	
 	Numberofpixels = len(Pixels)
 	fmt.Println("Pixels =",Numberofpixels)
-	Pixels = solutions
 	
 }
 // Run after controls and a steps block are completed to

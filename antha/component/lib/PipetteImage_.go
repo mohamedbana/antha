@@ -98,9 +98,10 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 		}
 	}
 
+	_output.Pixels = solutions
+
 	_output.Numberofpixels = len(_output.Pixels)
 	fmt.Println("Pixels =", _output.Numberofpixels)
-	_output.Pixels = solutions
 
 }
 

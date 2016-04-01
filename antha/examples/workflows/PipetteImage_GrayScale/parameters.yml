@@ -1,14 +1,15 @@
 {
   "Parameters": {
     "PipetteImage": {
-		"Imagefilename":"ziggy3_384.jpg",
+		"Imagefilename":"git.png",
 		"Rotate": false,
 		"AutoRotate": true,
 		"Diluent":"water",
 		"MinimumBlackpercentagethreshold":0.2,
 		"OnlyHighVolumetips": true,
-		"Negative": true,
-		"PosterizeImage": true,
+		"DontMix":false,
+		"Negative": false,
+		"PosterizeImage": false,
 		"PosterizeLevels": 4,
 		"Black": "Black",
       "OutPlate": "greiner384_riser",
