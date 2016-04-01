@@ -58,6 +58,7 @@ func MakePolicies() map[string]LHPolicy {
 	pols["load"] = MakeLoadPolicy()
 	pols["loadlow"] = MakeLoadPolicy()
 	pols["loadwater"] = MakeLoadWaterPolicy()
+	pols["DispenseAboveLiquid"] = MakeDispenseAboveLiquidPolicy()
 	//      pols["lysate"] = MakeLysatePolicy()
 
 	/*policies, names := PolicyMaker(Allpairs, "DOE_run", false)
@@ -162,6 +163,21 @@ func MakePaintPolicy() LHPolicy {
 	policy["BLOWOUTVOLUME"] = 0.0
 	policy["BLOWOUTVOLUMEUNIT"] = "ul"
 	policy["TOUCHOFF"] = true
+
+	return policy
+}
+
+func MakeDispenseAboveLiquidPolicy() LHPolicy {
+
+	policy := make(LHPolicy, 7)
+	policy["DSPREFERENCE"] = 1 // 1 indicates dispense at top of well
+	policy["ASP_SPEED"] = 1.5
+	policy["DSP_SPEED"] = 1.5
+	policy["ASP_WAIT"] = 1.0
+	policy["DSP_WAIT"] = 1.0
+	policy["BLOWOUTVOLUME"] = 0.0
+	policy["BLOWOUTVOLUMEUNIT"] = "ul"
+	policy["TOUCHOFF"] = false
 
 	return policy
 }
@@ -324,10 +340,10 @@ func MakeLoadlowPolicy() LHPolicy {
 
 func MakeNeedToMixPolicy() LHPolicy {
 	dnapolicy := make(LHPolicy, 10)
-	dnapolicy["POST_MIX"] = 3
-	dnapolicy["POST_MIX_VOLUME"] = 50
-	dnapolicy["ASPSPEED"] = 2.0
-	dnapolicy["DSPSPEED"] = 2.0
+	dnapolicy["POST_MIX"] = 4
+	dnapolicy["POST_MIX_VOLUME"] = 75
+	dnapolicy["ASPSPEED"] = 4.0
+	dnapolicy["DSPSPEED"] = 4.0
 	dnapolicy["CAN_MULTI"] = false
 	dnapolicy["CAN_MSA"] = false
 	dnapolicy["CAN_SDD"] = false
