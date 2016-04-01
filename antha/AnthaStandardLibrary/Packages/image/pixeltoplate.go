@@ -92,7 +92,7 @@ var Colourcomponentmap = map[color.Color]string{
 	color.RGBA{R: uint8(245), G: uint8(205), B: uint8(47), A: uint8(255)}:  "yellow",
 	color.RGBA{R: uint8(75), G: uint8(151), B: uint8(74), A: uint8(255)}:   "green",
 	color.RGBA{R: uint8(196), G: uint8(40), B: uint8(27), A: uint8(255)}:   "red",
-	color.RGBA{R: uint8(0), G: uint8(0), B: uint8(0), A: uint8(0)}:         "black",
+	color.RGBA{R: uint8(0), G: uint8(0), B: uint8(0), A: uint8(255)}:       "black",
 }
 
 func palettefromMap(colourmap map[color.Color]string) (palette color.Palette) {
