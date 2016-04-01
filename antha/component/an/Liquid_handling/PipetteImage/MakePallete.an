@@ -82,10 +82,12 @@ Steps {
 
 	for _, colour := range positiontocolourmap {
 		
+		var solution *wtype.LHComponent
+		
 		colourindex := chosencolourpalette.Index(colour)
 		
 		if colour != nil {
-		components := make([]*wtype.LHComponent, 0)
+		//components := make([]*wtype.LHComponent, 0)
 
 		cmyk := image.ColourtoCMYK(colour)
 		
@@ -107,9 +109,17 @@ Steps {
 				cyanvol.SetValue(10)
 			}
 		
+		if cmyk.K == 0 && cmyk.M == 0 && cmyk.Y == 0{
+		Cyan.Type  =	wtype.LTNeedToMix
+		}else {
+		Cyan.Type = wtype.LTDISPENSEABOVE
+		}
 		
 		cyanSample := mixer.Sample(Cyan, cyanvol)
-		components = append(components, cyanSample)
+		
+		solution = MixInto(PalettePlate, "",cyanSample)
+		
+		//components = append(components, cyanSample)
 		}
 		
 		if cmyk.Y > 0{
@@ -118,9 +128,23 @@ Steps {
 		if yellowvol.RawValue() < 10 && yellowvol.Unit().PrefixedSymbol() == "ul"{
 				yellowvol.SetValue(10)
 			}
+		if cmyk.K == 0 && cmyk.M == 0{
+		Yellow.Type  =	wtype.LTNeedToMix
+		}else {
+		Yellow.Type = wtype.LTDISPENSEABOVE
+		}
+		
 		
 		yellowSample := mixer.Sample(Yellow, yellowvol)
-		components = append(components, yellowSample)
+		
+		if solution != nil {
+		solution = Mix(solution, yellowSample)
+		}else {
+			solution = MixInto(PalettePlate, "", yellowSample)
+		}
+		
+		
+		//components = append(components, yellowSample)
 		}
 		
 		if cmyk.M > 0{
@@ -130,8 +154,21 @@ Steps {
 				magentavol.SetValue(10)
 			}
 		
+		if cmyk.K == 0 {
+		Magenta.Type  =	wtype.LTNeedToMix
+		}else {
+		Magenta.Type = wtype.LTDISPENSEABOVE
+		}
+		
 		magentaSample := mixer.Sample(Magenta, magentavol)
-		components = append(components, magentaSample)
+		
+		if solution != nil {
+		solution = Mix(solution, magentaSample)
+		}else {
+			solution = MixInto(PalettePlate, "", magentaSample)
+		}
+		
+		//components = append(components, magentaSample)
 		}
 		
 		if cmyk.K > 0{
@@ -141,11 +178,20 @@ Steps {
 				blackvol.SetValue(10)
 			}
 		
+		Black.Type = wtype.LTNeedToMix
+		
 		blackSample := mixer.Sample(Black, blackvol)
-		components = append(components, blackSample)
+		
+		if solution != nil {
+		solution = Mix(solution, blackSample)
+		}else {
+			solution = MixInto(PalettePlate, "", blackSample)
 		}
 		
-		solution := MixInto(PalettePlate, "", components...)
+		//components = append(components, blackSample)
+		}
+		
+		//solution := MixInto(PalettePlate, "", components...)
 		solutions = append(solutions, solution)
 		colourtoComponentMap[strconv.Itoa(colourindex)] = solution
 		

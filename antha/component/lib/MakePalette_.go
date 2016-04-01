@@ -63,10 +63,12 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 
 	for _, colour := range positiontocolourmap {
 
+		var solution *wtype.LHComponent
+
 		colourindex := chosencolourpalette.Index(colour)
 
 		if colour != nil {
-			components := make([]*wtype.LHComponent, 0)
+			//components := make([]*wtype.LHComponent, 0)
 
 			cmyk := image.ColourtoCMYK(colour)
 
@@ -88,8 +90,17 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 						cyanvol.SetValue(10)
 					}
 
+					if cmyk.K == 0 && cmyk.M == 0 && cmyk.Y == 0 {
+						_input.Cyan.Type = wtype.LTNeedToMix
+					} else {
+						_input.Cyan.Type = wtype.LTDISPENSEABOVE
+					}
+
 					cyanSample := mixer.Sample(_input.Cyan, cyanvol)
-					components = append(components, cyanSample)
+
+					solution = execute.MixInto(_ctx, _input.PalettePlate, "", cyanSample)
+
+					//components = append(components, cyanSample)
 				}
 
 				if cmyk.Y > 0 {
@@ -98,9 +109,21 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 					if yellowvol.RawValue() < 10 && yellowvol.Unit().PrefixedSymbol() == "ul" {
 						yellowvol.SetValue(10)
 					}
+					if cmyk.K == 0 && cmyk.M == 0 {
+						_input.Yellow.Type = wtype.LTNeedToMix
+					} else {
+						_input.Yellow.Type = wtype.LTDISPENSEABOVE
+					}
 
 					yellowSample := mixer.Sample(_input.Yellow, yellowvol)
-					components = append(components, yellowSample)
+
+					if solution != nil {
+						solution = execute.Mix(_ctx, solution, yellowSample)
+					} else {
+						solution = execute.MixInto(_ctx, _input.PalettePlate, "", yellowSample)
+					}
+
+					//components = append(components, yellowSample)
 				}
 
 				if cmyk.M > 0 {
@@ -110,8 +133,21 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 						magentavol.SetValue(10)
 					}
 
+					if cmyk.K == 0 {
+						_input.Magenta.Type = wtype.LTNeedToMix
+					} else {
+						_input.Magenta.Type = wtype.LTDISPENSEABOVE
+					}
+
 					magentaSample := mixer.Sample(_input.Magenta, magentavol)
-					components = append(components, magentaSample)
+
+					if solution != nil {
+						solution = execute.Mix(_ctx, solution, magentaSample)
+					} else {
+						solution = execute.MixInto(_ctx, _input.PalettePlate, "", magentaSample)
+					}
+
+					//components = append(components, magentaSample)
 				}
 
 				if cmyk.K > 0 {
@@ -121,11 +157,20 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 						blackvol.SetValue(10)
 					}
 
+					_input.Black.Type = wtype.LTNeedToMix
+
 					blackSample := mixer.Sample(_input.Black, blackvol)
-					components = append(components, blackSample)
+
+					if solution != nil {
+						solution = execute.Mix(_ctx, solution, blackSample)
+					} else {
+						solution = execute.MixInto(_ctx, _input.PalettePlate, "", blackSample)
+					}
+
+					//components = append(components, blackSample)
 				}
 
-				solution := execute.MixInto(_ctx, _input.PalettePlate, "", components...)
+				//solution := MixInto(PalettePlate, "", components...)
 				solutions = append(solutions, solution)
 				colourtoComponentMap[strconv.Itoa(colourindex)] = solution
 
