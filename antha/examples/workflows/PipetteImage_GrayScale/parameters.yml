@@ -1,7 +1,7 @@
 {
   "Parameters": {
     "PipetteImage": {
-		"Imagefilename":"vader_plateformat.jpeg",
+		"Imagefilename":"vader.jpeg",
 		"Rotate": false,
 		"AutoRotate": true,
 		"Diluent":"water",
