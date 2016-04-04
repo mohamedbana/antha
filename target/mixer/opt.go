@@ -12,8 +12,6 @@ var (
 		ResidualVolumeWeight: &defaultResidualVolumeWeight,
 		InputPlateType:       []string{"pcrplate_skirted"},
 		OutputPlateType:      []string{"pcrplate_skirted"},
-		TipType:              []string{},
-		InputPlateFiles:      []string{},
 		InputPlates:          []*wtype.LHPlate{},
 	}
 )
@@ -25,9 +23,11 @@ type Opt struct {
 	InputPlateType       []string
 	OutputPlateType      []string
 	TipType              []string
-	InputPlateFiles      []string
-	InputPlates          []*wtype.LHPlate
-	PlanningVersion      *int
+	// Three methods of populating Opt.InputPlates
+	InputPlateFiles []string         // From filenames
+	InputPlateData  [][]byte         // From contents of files
+	InputPlates     []*wtype.LHPlate // Directly
+	PlanningVersion *int
 }
 
 // Merge two configs together and return the result. Values in the argument
@@ -57,8 +57,14 @@ func (a Opt) Merge(x *Opt) Opt {
 	if len(x.InputPlateFiles) != 0 {
 		a.InputPlateFiles = x.InputPlateFiles
 	}
+	if len(x.InputPlateData) != 0 {
+		a.InputPlateData = x.InputPlateData
+	}
 	if len(x.InputPlates) != 0 {
 		a.InputPlates = x.InputPlates
+	}
+	if x.PlanningVersion != nil {
+		a.PlanningVersion = x.PlanningVersion
 	}
 
 	return a
