@@ -5,6 +5,7 @@
 package trace
 
 import (
+	"runtime/debug"
 	"sync"
 
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
@@ -165,12 +166,18 @@ func (a *trace) signal(lockedPool *poolCtx) error {
 	return a.signalWithLock(lockedPool)
 }
 
-func (a *trace) signalWithLock(lockedPool *poolCtx) error {
+func (a *trace) signalWithLock(lockedPool *poolCtx) (err error) {
+	defer func() {
+		if res := recover(); res != nil {
+			err = &goError{BaseError: res, Stack: debug.Stack()}
+		}
+	}()
+
 	// Don't execute until all active all blocked
 	if lockedPool.alive == len(lockedPool.blocked) {
-		return a.execute(lockedPool.Context)
+		err = a.execute(lockedPool.Context)
 	}
-	return nil
+	return
 }
 
 func (a *trace) execute(ctx context.Context) error {
