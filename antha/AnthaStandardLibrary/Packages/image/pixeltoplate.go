@@ -522,11 +522,7 @@ func CheckAllResizealgorithms(imagefilename string, plate *wtype.LHPlate, rotate
 
 		newname := filepath.Join(dir, fmt.Sprint(splitfilename[0], "_", key, "_plateformat", `.`, splitfilename[1]))
 		// save
-		err = imaging.Save(plateimage, newname)
-		if err != nil {
-			panic(err)
-		}
-
+		imaging.Save(plateimage, newname)
 	}
 }
 
