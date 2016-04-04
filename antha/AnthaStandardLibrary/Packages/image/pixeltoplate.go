@@ -27,7 +27,8 @@ import (
 
 var AvailablePalettes = map[string]color.Palette{
 	"Palette1":               palettefromMap(Colourcomponentmap), //Chosencolourpalette,
-	"WebSafe":                palette.WebSafe,                    //websafe,
+	"Neon":                   palettefromMap(Neon),
+	"WebSafe":                palette.WebSafe, //websafe,
 	"Plan9":                  palette.Plan9,
 	"ProteinPaintboxVisible": palettefromMap(ProteinPaintboxmap),
 	"ProteinPaintboxUV":      palettefromMap(UVProteinPaintboxmap),
@@ -39,7 +40,8 @@ var AvailablePalettes = map[string]color.Palette{
 var Emptycolourarray color.Palette
 
 var AvailableComponentmaps = map[string]map[color.Color]string{
-	"Palette1":               Colourcomponentmap, //Chosencolourpalette,
+	"Palette1": Colourcomponentmap,
+	"Neon":     Neon,
 	"ProteinPaintboxVisible": ProteinPaintboxmap,
 	"ProteinPaintboxUV":      UVProteinPaintboxmap,
 	"ProteinPaintboxSubset":  ProteinPaintboxSubsetmap,
@@ -93,6 +95,19 @@ var Colourcomponentmap = map[color.Color]string{
 	color.RGBA{R: uint8(75), G: uint8(151), B: uint8(74), A: uint8(255)}:   "green",
 	color.RGBA{R: uint8(196), G: uint8(40), B: uint8(27), A: uint8(255)}:   "red",
 	color.RGBA{R: uint8(0), G: uint8(0), B: uint8(0), A: uint8(255)}:       "black",
+}
+
+// map of RGB colour to description for use as key in crossreferencing colour to component in other maps
+var Neon = map[color.Color]string{
+	color.RGBA{R: uint8(0), G: uint8(0), B: uint8(0), A: uint8(255)}:       "black",
+	color.RGBA{R: uint8(77), G: uint8(11), B: uint8(137), A: uint8(255)}:   "purple",
+	color.RGBA{R: uint8(13), G: uint8(105), B: uint8(171), A: uint8(255)}:  "blue",
+	color.RGBA{R: uint8(75), G: uint8(151), B: uint8(74), A: uint8(255)}:   "green",
+	color.RGBA{R: uint8(245), G: uint8(205), B: uint8(47), A: uint8(255)}:  "yellow",
+	color.RGBA{R: uint8(228), G: uint8(110), B: uint8(104), A: uint8(255)}: "orange",
+	color.RGBA{R: uint8(196), G: uint8(40), B: uint8(27), A: uint8(255)}:   "red",
+	color.RGBA{R: uint8(159), G: uint8(25), B: uint8(103), A: uint8(255)}:  "pink",
+	color.RGBA{R: uint8(242), G: uint8(243), B: uint8(242), A: uint8(255)}: "white",
 }
 
 func palettefromMap(colourmap map[color.Color]string) (palette color.Palette) {
