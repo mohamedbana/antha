@@ -122,7 +122,7 @@ Steps {
 			watervol := wunit.NewVolume((float64(maxuint8-gray.Y)/float64(maxuint8) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
 			fmt.Println("new well", locationkey, "water vol", watervol.ToString())
 			// force hv tip choice
-			if  OnlyHighVolumetips && watervol.RawValue() < 21 && watervol.Unit().PrefixedSymbol() == "ul"{
+			if  OnlyHighVolumetips && watervol.RawValue() < 21	 && watervol.Unit().PrefixedSymbol() == "ul"{
 				watervol.SetValue(21)
 			}
 			waterSample := mixer.Sample(Diluent, watervol)

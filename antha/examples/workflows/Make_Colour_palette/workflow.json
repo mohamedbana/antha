@@ -2,7 +2,7 @@
     "connections": [],
     "processes": {
         "PipetteImage": {
-            "component": "MakePalette"
+            "component": "MakePalette_OneByOne"
         }
     }
 }

@@ -274,6 +274,15 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	plate = wtype.NewLHPlate("Agarplateforpicking384_riser", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
 
+	// Onewell SBS format Agarplate with colonies on riser (30ml agar) low res
+
+	zstart = 41 // offset of bottom of deck to bottom of well
+
+	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
+	// greiner one well with 50ml of agar in
+	plate = wtype.NewLHPlate("30mlAgarplateforpicking384_riser", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+	plates[plate.Type] = plate
+
 	/*
 		rwshp = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
 		welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 250, 5, rwshp, 0, 5.5, 5.5, 20.4, 1.4, "mm")

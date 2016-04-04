@@ -25,6 +25,7 @@ const (
 	LTVISCOUS
 	LTPAINT
 	LTDISPENSEABOVE
+	LTCulutureReuse
 )
 
 func LiquidTypeFromString(s string) LiquidType {
@@ -52,6 +53,8 @@ func LiquidTypeFromString(s string) LiquidType {
 			return LTDetergent
 		case "culture":
 			return LTCulture
+		case "culturereuse":
+			return LTCulutureReuse
 		case "protein":
 			return LTProtein
 		case "dna":
@@ -95,6 +98,8 @@ func LiquidTypeName(lt LiquidType) string {
 		return "detergent"
 	case LTCulture:
 		return "culture"
+	case LTCulutureReuse:
+		return "culturereuse"
 	case LTProtein:
 		return "protein"
 	case LTDNA:

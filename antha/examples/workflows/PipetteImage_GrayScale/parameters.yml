@@ -1,11 +1,11 @@
 {
   "Parameters": {
     "PipetteImage": {
-		"Imagefilename":"git.png",
+		"Imagefilename":"vader_plateformat.jpeg",
 		"Rotate": false,
 		"AutoRotate": true,
 		"Diluent":"water",
-		"MinimumBlackpercentagethreshold":0.2,
+		"MinimumBlackpercentagethreshold":0.1,
 		"OnlyHighVolumetips": true,
 		"DontMix":false,
 		"Negative": false,

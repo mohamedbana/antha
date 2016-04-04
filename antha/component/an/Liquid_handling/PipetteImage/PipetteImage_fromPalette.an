@@ -25,6 +25,8 @@ Parameters (
 	NotthisColour string
 	Rotate bool
 	AutoRotate bool
+	PosterizeImage bool
+	PosterizeLevels int
 )
 
 // Data which is returned from this protocol, and data types
@@ -58,6 +60,10 @@ Setup {
 Steps {
 	
 	
+	if PosterizeImage{
+		_, Imagefilename = image.Posterize(Imagefilename, PosterizeLevels)
+	}
+	
 	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &Palette, Rotate,AutoRotate) 
 	
 	
@@ -89,10 +95,10 @@ Steps {
 		colourindex := strconv.Itoa(Palette.Index(colour))
 		
 		component, componentpresent := ColourIndextoComponentMap[colourindex]
-//		fmt.Println("Am I a component", component, "key:", colourindex, "from map:", ColourIndextoComponentMap)
+		fmt.Println("Am I a component", component, "key:", colourindex, "from map:", ColourIndextoComponentMap)
 		
 		if componentpresent {
-		component.Type = wtype.LTDoNotMix//"DoNotMix"
+		component.Type = wtype.LTDISPENSEABOVE//"DoNotMix"
 		
 		//fmt.Println(image.Colourcomponentmap[colour])
 		

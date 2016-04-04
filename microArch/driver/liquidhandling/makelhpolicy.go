@@ -42,6 +42,7 @@ func MakePolicies() map[string]LHPolicy {
 	// what policies do we need?
 	pols["water"] = MakeWaterPolicy()
 	pols["culture"] = MakeCulturePolicy()
+	pols["culturereuse"] = MakeCultureReusePolicy()
 	pols["glycerol"] = MakeGlycerolPolicy()
 	pols["solvent"] = MakeSolventPolicy()
 	pols["default"] = MakeDefaultPolicy()
@@ -212,13 +213,31 @@ func MakeCulturePolicy() LHPolicy {
 	culturepolicy["DSPZOFFSET"] = 0.5
 	culturepolicy["TIP_REUSE_LIMIT"] = 0
 	culturepolicy["NO_AIR_DISPENSE"] = true
-
 	culturepolicy["BLOWOUTVOLUME"] = 0.0
 	culturepolicy["BLOWOUTVOLUMEUNIT"] = "ul"
 	culturepolicy["TOUCHOFF"] = false
 
 	return culturepolicy
 }
+
+func MakeCultureReusePolicy() LHPolicy {
+	culturepolicy := make(LHPolicy, 10)
+	culturepolicy["PRE_MIX"] = 2
+	culturepolicy["ASPSPEED"] = 2.0
+	culturepolicy["DSPSPEED"] = 2.0
+	culturepolicy["CAN_MULTI"] = true
+	culturepolicy["CAN_MSA"] = true
+	culturepolicy["CAN_SDD"] = true
+	culturepolicy["DSPREFERENCE"] = 0
+	culturepolicy["DSPZOFFSET"] = 0.5
+	culturepolicy["NO_AIR_DISPENSE"] = true
+	culturepolicy["BLOWOUTVOLUME"] = 0.0
+	culturepolicy["BLOWOUTVOLUMEUNIT"] = "ul"
+	culturepolicy["TOUCHOFF"] = false
+
+	return culturepolicy
+}
+
 func MakeGlycerolPolicy() LHPolicy {
 	glycerolpolicy := make(LHPolicy, 5)
 	glycerolpolicy["ASP_SPEED"] = 1.5

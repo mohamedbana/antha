@@ -70,7 +70,7 @@ Steps {
 	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate, AutoRotate) 
 	
 	// remove duplicates
-	//positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
+	positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
 	
 	fmt.Println("positions", positiontocolourmap)
 	

@@ -3,24 +3,24 @@
     "PipetteImage": {
 		"OnlythisColour":"",
 		"Notthiscolour":"verywhite",
-	  	"Imagefilename": "git.png",
+	  	"Imagefilename": "helloworld_funky_cropped2_plateformat.png",
 		"Rotate": false,
 		"AutoRotate": true,
 		"Palettename":"ProteinPaintboxVisible",
 		"Subset": true,
 		"Subsetnames": [
-		"DreidelTeal",
-		"TinselPurple",
-		"CupidPink",
-		"LeorOrange",
-		"verywhite",
-		"E.coli",
-		"E.coli pUC19 on sgal"
-		],
-		"UseLiquidClass":"culture",
-      	"OutPlate": "greiner384_riser",
+				"DreidelTeal",
+				"TinselPurple",
+				"CupidPink",
+				"LeorOrange",
+				"verywhite",
+				"E.coli",
+				"E.coli pUC19 on sgal"
+				],
+		"UseLiquidClass":"water",
+      	"OutPlate": "Agarplateforpicking384_riser",
 		"UVimage":false,
-      	"VolumePerWell": "20ul"
+      	"VolumePerWell": "2ul"
     }
   }
 }
