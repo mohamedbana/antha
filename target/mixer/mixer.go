@@ -12,7 +12,6 @@ import (
 	"github.com/antha-lang/antha/ast"
 	driver "github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
-	"github.com/antha-lang/antha/microArch/logger"
 	planner "github.com/antha-lang/antha/microArch/scheduler/liquidhandling"
 	"github.com/antha-lang/antha/target"
 	"github.com/antha-lang/antha/target/human"
@@ -54,10 +53,24 @@ func (a *Mixer) MoveCost(from target.Device) int {
 	return human.HumanByXCost + 1
 }
 
-func (a *Mixer) makeReq() (*planner.LHRequest, *planner.Liquidhandler) {
+type lhreq struct {
+	*planner.LHRequest     // A request
+	*planner.Liquidhandler // ... and its associated planner
+}
+
+func (a *Mixer) makeLhreq() (*lhreq, error) {
+	addPlate := func(req *planner.LHRequest, ip *wtype.LHPlate) error {
+		if _, seen := req.Input_plates[ip.ID]; seen {
+			return fmt.Errorf("plate %q already added", ip.ID)
+		} else {
+			req.Input_plates[ip.ID] = ip
+			return nil
+		}
+	}
+
 	req := planner.NewLHRequest()
 	req.Policies = driver.GetLHPolicyForTest()
-	p := planner.Init(&a.properties)
+	plan := planner.Init(&a.properties)
 
 	if p := a.opt.MaxPlates; p != nil {
 		req.Input_setup_weights["MAX_N_PLATES"] = *p
@@ -91,33 +104,48 @@ func (a *Mixer) makeReq() (*planner.LHRequest, *planner.Liquidhandler) {
 		}
 	}
 
-	if ipf := a.opt.InputPlateFiles; len(ipf) != 0 {
-		for _, v := range ipf {
-			ip, err := parseInputPlateFile(v)
-
+	if p := a.opt.InputPlateFiles; len(p) != 0 {
+		for _, filename := range p {
+			ip, err := parseInputPlateFile(filename)
 			if err != nil {
-				logger.Fatal(fmt.Sprint("Error parsing input plate file ", v, " : "), err)
+				return nil, fmt.Errorf("cannot parse file %q: %s", filename, err)
 			}
-			req.Input_plates[ip.ID] = ip
+			if err := addPlate(req, ip); err != nil {
+				return nil, err
+			}
 		}
 	}
 
-	// mechanism to specify input plates directly
+	if p := a.opt.InputPlateData; len(p) != 0 {
+		for idx, bs := range p {
+			buf := bytes.NewBuffer(bs)
+			ip, err := parseInputPlateData(buf)
+			if err != nil {
+				return nil, fmt.Errorf("cannot parse data at idx %d: %s", idx, err)
+			}
+			if err := addPlate(req, ip); err != nil {
+				return nil, err
+			}
+		}
+	}
 
-	if ip := a.opt.InputPlates; len(ip) != 0 {
-		for _, v := range ip {
-			req.Input_plates[v.ID] = v
+	if ips := a.opt.InputPlates; len(ips) != 0 {
+		for _, ip := range ips {
+			if err := addPlate(req, ip); err != nil {
+				return nil, err
+			}
 		}
 	}
 
 	err := req.ConfigureYourself()
-
 	if err != nil {
-		logger.Debug("ERROR in request configuration")
-		return nil, nil
+		return nil, err
 	}
 
-	return req, p
+	return &lhreq{
+		LHRequest:     req,
+		Liquidhandler: plan,
+	}, nil
 }
 
 func (a *Mixer) Compile(cmds []ast.Command) ([]target.Inst, error) {
@@ -189,19 +217,22 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 		return
 	}
 
-	req, p := a.makeReq()
-	req.BlockID = getId(mixes)
+	r, err := a.makeLhreq()
+	if err != nil {
+		return nil, err
+	}
+	r.LHRequest.BlockID = getId(mixes)
 
 	for _, mix := range mixes {
-		if len(mix.Platetype) != 0 && !hasPlate(req.Output_platetypes, mix.Platetype, mix.PlateID) {
+		if len(mix.Platetype) != 0 && !hasPlate(r.LHRequest.Output_platetypes, mix.Platetype, mix.PlateID) {
 			p := factory.GetPlateByType(mix.Platetype)
 			p.ID = mix.PlateID
-			req.Output_platetypes = append(req.Output_platetypes, p)
+			r.LHRequest.Output_platetypes = append(r.LHRequest.Output_platetypes, p)
 		}
-		req.Add_instruction(mix)
+		r.LHRequest.Add_instruction(mix)
 	}
 
-	p.MakeSolutions(req)
+	r.Liquidhandler.MakeSolutions(r.LHRequest)
 
 	tarball, err := a.saveFile("input")
 	if err != nil {
@@ -214,7 +245,7 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 	}
 	return &target.Mix{
 		Dev:        a,
-		Request:    req,
+		Request:    r.LHRequest,
 		Properties: a.properties,
 		Files: target.Files{
 			Tarball: tarball,
