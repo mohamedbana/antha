@@ -3,11 +3,11 @@
     "PipetteImage": {
 		"OnlythisColour":"",
 		"Notthiscolour":"verywhite",
-	  	"Imagefilename": "helloworld_funky_cropped2_plateformat.png",
+	  	"Imagefilename": "pipetmax.jpeg",
 		"Rotate": false,
 		"AutoRotate": true,
-		"Palettename":"ProteinPaintboxVisible",
-		"Subset": true,
+		"Palettename":"Neon",
+		"Subset": false,
 		"Subsetnames": [
 				"DreidelTeal",
 				"TinselPurple",
