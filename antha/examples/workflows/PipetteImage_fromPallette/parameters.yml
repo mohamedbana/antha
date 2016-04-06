@@ -1,7 +1,7 @@
 {
   "Parameters": {
     "MakePalette1": {
-		"Imagefilename":"500x_darksidesmall.jpg",
+		"Imagefilename":"41_3133-sgt-peppers4.jpg",
 		"Rotate": false,
 		"AutoRotate": true,
 		"PosterizeImage":false,
@@ -11,12 +11,12 @@
 	"Yellow": "Yellow_ink",
 	"Black": "Black",
       "OutPlate": "greiner384_riser",
-	  "PalettePlate": "DWST12_riser",
-      "VolumeForFullcolour": "1500ul"
+	  "PalettePlate": "DSW96_riser",
+      "VolumeForFullcolour": "550ul"
     },
 	"Pipette1": {
        "VolumePerWell": "20ul",
-	   "Imagefilename":"500x_darksidesmall.jpg",
+	   "Imagefilename":"41_3133-sgt-peppers4.jpg",
 	   "OnlythisColour": "",
 	   "NotthisColour": "",
 	   "Rotate": false,

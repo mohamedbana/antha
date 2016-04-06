@@ -3,6 +3,9 @@
     "processes": {
         "ConstructAssembly": {
             "component": "TypeIISConstructAssembly"
+        },
+        "ConstructAssembly2": {
+            "component": "TypeIISConstructAssembly"
         }
     }
 }

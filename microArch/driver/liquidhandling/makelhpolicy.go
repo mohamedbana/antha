@@ -155,11 +155,14 @@ func PolicyMakerfromRuns(runs []Run, nameprepend string, concatfactorlevelsinnam
 
 func MakePaintPolicy() LHPolicy {
 
-	policy := make(LHPolicy, 6)
+	policy := make(LHPolicy, 12)
+	policy["DSPREFERENCE"] = 0
+	policy["DSPZOFFSET"] = 0.5
 	policy["ASP_SPEED"] = 1.5
 	policy["DSP_SPEED"] = 1.5
 	policy["ASP_WAIT"] = 1.0
 	policy["DSP_WAIT"] = 1.0
+	policy["PRE_MIX"] = 3
 	policy["POST_MIX"] = 3
 	policy["BLOWOUTVOLUME"] = 0.0
 	policy["BLOWOUTVOLUMEUNIT"] = "ul"

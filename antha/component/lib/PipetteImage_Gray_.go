@@ -16,7 +16,8 @@ import (
 
 // Input parameters for this protocol (data)
 
-// as a proportion of 1 i.e. 0.5 == 50%
+// as a proportion of 1 i.e. 0.5 == 50%. Below this it will be considered white
+// above this value pure black will be dispensed
 //SkipBlackforlowervol bool
 
 // Data which is returned from this protocol, and data types
@@ -46,21 +47,28 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 
 	var minuint8 uint8
 
+	var fullblackuint8 uint8
+
 	_output.ShadesofGrey = make([]int, 0)
 
 	chosencolourpalette := image.AvailablePalettes["Gray"]
 
-	if _input.PosterizeImage {
-		_, _input.Imagefilename = image.Posterize(_input.Imagefilename, _input.PosterizeLevels)
-	}
-
 	image.CheckAllResizealgorithms(_input.Imagefilename, _input.OutPlate, _input.Rotate, imaging.AllResampleFilters)
 
-	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
+	positiontocolourmap, _, newimagename := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
+
+	// if posterize rerun
+	if _input.PosterizeImage {
+		_, _input.Imagefilename = image.Posterize(newimagename, _input.PosterizeLevels)
+
+		positiontocolourmap, _, _ = image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
+	}
 
 	solutions := make([]*wtype.LHComponent, 0)
 
 	counter := 0
+	skipped := 0
+	fullblack := 0
 
 	for locationkey, colour := range positiontocolourmap {
 
@@ -75,12 +83,16 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 			gray.Y = maxuint8 - gray.Y
 		}
 
+		// adjust thresholds for mixing black and white based on user parameters
 		minuint8 = uint8(_input.MinimumBlackpercentagethreshold * float64(maxuint8))
 
-		fmt.Println("brand new minuint8", minuint8)
+		fullblackuint8 = uint8(_input.MaxBlackPercentagethreshold * float64(maxuint8))
+
+		fmt.Println("brand new minuint8 ", minuint8, "fullblackuint8 ", fullblackuint8)
 
 		if gray.Y < minuint8 {
-			fmt.Println("skipping well:", locationkey)
+			skipped = skipped + 1
+			fmt.Println("skipping well:", skipped, locationkey)
 			continue
 
 		} else {
@@ -96,7 +108,7 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 				_output.ShadesofGrey = append(_output.ShadesofGrey, greyindexinpalette)
 			}
 
-			if gray.Y < maxuint8 {
+			if gray.Y < fullblackuint8 /*&& gray.Y >= minuint8*/ {
 				watervol := wunit.NewVolume((float64(maxuint8-gray.Y) / float64(maxuint8) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
 				fmt.Println("new well", locationkey, "water vol", watervol.ToString())
 				// force hv tip choice
@@ -107,7 +119,9 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 				//components = append(components, waterSample)
 				solution = execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, waterSample)
 			}
-			if gray.Y == maxuint8 {
+			if gray.Y >= fullblackuint8 {
+				fullblack = fullblack + 1
+				fmt.Println("full colours:", fullblack)
 				blackvol = _input.VolumeForFullcolour
 			} else {
 				blackvol = wunit.NewVolume((float64(gray.Y) / float64(maxuint8) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
@@ -118,6 +132,8 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 			//Black.Type = wtype.LiquidTypeFromString("NeedToMix")
 
 			if _input.DontMix {
+				_input.Black.Type = wtype.LTDISPENSEABOVE
+			} else if gray.Y == maxuint8 {
 				_input.Black.Type = wtype.LTDISPENSEABOVE
 			} else {
 				_input.Black.Type = wtype.LiquidTypeFromString("NeedToMix")
@@ -145,6 +161,8 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 	_output.Pixels = solutions
 	_output.Numberofpixels = len(_output.Pixels)
 	fmt.Println("Pixels =", _output.Numberofpixels)
+	_output.Fullblack = fullblack
+	_output.Skipped = skipped
 
 }
 
@@ -212,6 +230,7 @@ type PipetteImage_GrayInput struct {
 	Diluent                         *wtype.LHComponent
 	DontMix                         bool
 	Imagefilename                   string
+	MaxBlackPercentagethreshold     float64
 	MinimumBlackpercentagethreshold float64
 	Negative                        bool
 	OnlyHighVolumetips              bool
@@ -223,17 +242,21 @@ type PipetteImage_GrayInput struct {
 }
 
 type PipetteImage_GrayOutput struct {
+	Fullblack            int
 	NumberofShadesofGrey int
 	Numberofpixels       int
 	Pixels               []*wtype.LHComponent
 	ShadesofGrey         []int
+	Skipped              int
 }
 
 type PipetteImage_GraySOutput struct {
 	Data struct {
+		Fullblack            int
 		NumberofShadesofGrey int
 		Numberofpixels       int
 		ShadesofGrey         []int
+		Skipped              int
 	}
 	Outputs struct {
 		Pixels []*wtype.LHComponent
@@ -252,7 +275,8 @@ func init() {
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "DontMix", Desc: "", Kind: "Parameters"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
-				{Name: "MinimumBlackpercentagethreshold", Desc: "as a proportion of 1 i.e. 0.5 == 50%\n", Kind: "Parameters"},
+				{Name: "MaxBlackPercentagethreshold", Desc: "above this value pure black will be dispensed\n", Kind: "Parameters"},
+				{Name: "MinimumBlackpercentagethreshold", Desc: "as a proportion of 1 i.e. 0.5 == 50%. Below this it will be considered white\n", Kind: "Parameters"},
 				{Name: "Negative", Desc: "", Kind: "Parameters"},
 				{Name: "OnlyHighVolumetips", Desc: "SkipBlackforlowervol bool\n", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\n", Kind: "Inputs"},
@@ -260,10 +284,12 @@ func init() {
 				{Name: "PosterizeLevels", Desc: "", Kind: "Parameters"},
 				{Name: "Rotate", Desc: "", Kind: "Parameters"},
 				{Name: "VolumeForFullcolour", Desc: "", Kind: "Parameters"},
+				{Name: "Fullblack", Desc: "", Kind: "Data"},
 				{Name: "NumberofShadesofGrey", Desc: "", Kind: "Data"},
 				{Name: "Numberofpixels", Desc: "", Kind: "Data"},
 				{Name: "Pixels", Desc: "", Kind: "Outputs"},
 				{Name: "ShadesofGrey", Desc: "", Kind: "Data"},
+				{Name: "Skipped", Desc: "", Kind: "Data"},
 			},
 		},
 	})

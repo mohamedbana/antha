@@ -1,16 +1,17 @@
 {
   "Parameters": {
     "PipetteImage": {
-		"Imagefilename":"vader.jpeg",
+		"Imagefilename":"darwin.png",
 		"Rotate": false,
 		"AutoRotate": true,
 		"Diluent":"water",
 		"MinimumBlackpercentagethreshold":0.1,
+		"MaxBlackPercentagethreshold": 0.9,
 		"OnlyHighVolumetips": true,
 		"DontMix":false,
-		"Negative": false,
-		"PosterizeImage": false,
-		"PosterizeLevels": 4,
+		"Negative": true,
+		"PosterizeImage": true,
+		"PosterizeLevels": 8,
 		"Black": "Black",
       "OutPlate": "greiner384_riser",
       "VolumeForFullcolour": "100ul"

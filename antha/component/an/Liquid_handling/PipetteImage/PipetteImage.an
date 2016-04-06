@@ -63,7 +63,7 @@ Steps {
 	
 	subpalette := image.MakeSubPallette(Palettename, availableColours)
 	
-	positiontocolourmap, _ = image.ImagetoPlatelayout(Imagefilename, OutPlate, &subpalette, Rotate, AutoRotate) 
+	positiontocolourmap, _,_ = image.ImagetoPlatelayout(Imagefilename, OutPlate, &subpalette, Rotate, AutoRotate) 
 		
 	// get components from factory
 	componentmap := make(map[string]*wtype.LHComponent, 0)
