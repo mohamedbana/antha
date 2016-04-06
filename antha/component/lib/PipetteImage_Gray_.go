@@ -133,10 +133,10 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 
 			if _input.DontMix {
 				_input.Black.Type = wtype.LTDISPENSEABOVE
-			} else if gray.Y == maxuint8 {
+			} else if gray.Y >= fullblackuint8 {
 				_input.Black.Type = wtype.LTDISPENSEABOVE
 			} else {
-				_input.Black.Type = wtype.LiquidTypeFromString("NeedToMix")
+				_input.Black.Type = wtype.LiquidTypeFromString(_input.MixingLiquidClass)
 			}
 
 			//fmt.Println("blackvol2",blackvol.ToString())
@@ -232,6 +232,7 @@ type PipetteImage_GrayInput struct {
 	Imagefilename                   string
 	MaxBlackPercentagethreshold     float64
 	MinimumBlackpercentagethreshold float64
+	MixingLiquidClass               string
 	Negative                        bool
 	OnlyHighVolumetips              bool
 	OutPlate                        *wtype.LHPlate
@@ -277,6 +278,7 @@ func init() {
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
 				{Name: "MaxBlackPercentagethreshold", Desc: "above this value pure black will be dispensed\n", Kind: "Parameters"},
 				{Name: "MinimumBlackpercentagethreshold", Desc: "as a proportion of 1 i.e. 0.5 == 50%. Below this it will be considered white\n", Kind: "Parameters"},
+				{Name: "MixingLiquidClass", Desc: "", Kind: "Parameters"},
 				{Name: "Negative", Desc: "", Kind: "Parameters"},
 				{Name: "OnlyHighVolumetips", Desc: "SkipBlackforlowervol bool\n", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\n", Kind: "Inputs"},

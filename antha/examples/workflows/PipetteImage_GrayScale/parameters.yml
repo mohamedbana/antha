@@ -1,20 +1,21 @@
 {
   "Parameters": {
     "PipetteImage": {
-		"Imagefilename":"darwin.png",
+		"Imagefilename":"IMG_4153.JPG",
 		"Rotate": false,
 		"AutoRotate": true,
 		"Diluent":"water",
-		"MinimumBlackpercentagethreshold":0.1,
-		"MaxBlackPercentagethreshold": 0.9,
+		"MinimumBlackpercentagethreshold":0.3,
+		"MaxBlackPercentagethreshold": 0.7,
 		"OnlyHighVolumetips": true,
+		"MixingLiquidClass": "NeedToMix",
 		"DontMix":false,
-		"Negative": true,
+		"Negative": false,
 		"PosterizeImage": true,
 		"PosterizeLevels": 8,
 		"Black": "Black",
       "OutPlate": "greiner384_riser",
-      "VolumeForFullcolour": "100ul"
+      "VolumeForFullcolour": "120ul"
     }
   }
 }

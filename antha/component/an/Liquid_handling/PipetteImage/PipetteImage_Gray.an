@@ -19,6 +19,7 @@ Parameters (
 	MaxBlackPercentagethreshold float64 // above this value pure black will be dispensed
 	//SkipBlackforlowervol bool
 	OnlyHighVolumetips bool
+	MixingLiquidClass string
 	Negative bool
 	Rotate bool
 	AutoRotate bool
@@ -158,10 +159,10 @@ Steps {
 		
 		if DontMix {
 		Black.Type = wtype.LTDISPENSEABOVE
-		}else if gray.Y == maxuint8 {
+		}else if gray.Y >= fullblackuint8 {
 		Black.Type = wtype.LTDISPENSEABOVE
 		}else{
-			Black.Type = wtype.LiquidTypeFromString("NeedToMix")
+			Black.Type = wtype.LiquidTypeFromString(MixingLiquidClass)
 		}
 		
 		//fmt.Println("blackvol2",blackvol.ToString())
