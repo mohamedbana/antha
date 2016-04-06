@@ -9,13 +9,14 @@
 		"MaxBlackPercentagethreshold": 0.7,
 		"OnlyHighVolumetips": true,
 		"MixingLiquidClass": "NeedToMix",
+		"NonMixingClass": "water",
 		"DontMix":false,
 		"Negative": false,
 		"PosterizeImage": true,
 		"PosterizeLevels": 8,
 		"Black": "Black",
       "OutPlate": "greiner384_riser",
-      "VolumeForFullcolour": "120ul"
+      "VolumeForFullcolour": "100ul"
     }
   }
 }

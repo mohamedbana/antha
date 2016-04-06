@@ -134,7 +134,7 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 			if _input.DontMix {
 				_input.Black.Type = wtype.LTDISPENSEABOVE
 			} else if gray.Y >= fullblackuint8 {
-				_input.Black.Type = wtype.LTDISPENSEABOVE
+				_input.Black.Type = wtype.LiquidTypeFromString(_input.NonMixingClass)
 			} else {
 				_input.Black.Type = wtype.LiquidTypeFromString(_input.MixingLiquidClass)
 			}
@@ -234,6 +234,7 @@ type PipetteImage_GrayInput struct {
 	MinimumBlackpercentagethreshold float64
 	MixingLiquidClass               string
 	Negative                        bool
+	NonMixingClass                  string
 	OnlyHighVolumetips              bool
 	OutPlate                        *wtype.LHPlate
 	PosterizeImage                  bool
@@ -280,6 +281,7 @@ func init() {
 				{Name: "MinimumBlackpercentagethreshold", Desc: "as a proportion of 1 i.e. 0.5 == 50%. Below this it will be considered white\n", Kind: "Parameters"},
 				{Name: "MixingLiquidClass", Desc: "", Kind: "Parameters"},
 				{Name: "Negative", Desc: "", Kind: "Parameters"},
+				{Name: "NonMixingClass", Desc: "", Kind: "Parameters"},
 				{Name: "OnlyHighVolumetips", Desc: "SkipBlackforlowervol bool\n", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\n", Kind: "Inputs"},
 				{Name: "PosterizeImage", Desc: "", Kind: "Parameters"},
