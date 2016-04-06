@@ -2,29 +2,25 @@
   "Parameters": {
     "PipetteImage": {
 		"OnlythisColour":"",
-		"Notthiscolour":"white",
-	  	"Imagefilename": "41_3133-sgt-peppers4.jpg",
+		"Notthiscolour":"verywhite",
+	  	"Imagefilename": "helloworld_funky_cropped2_plateformat.png",
 		"Rotate": false,
 		"AutoRotate": true,
-		"Palettename":"Neon",
+		"Palettename":"ProteinPaintboxVisible",
 		"Subset": true,
 		"Subsetnames": [
-				"blue",
-				
-				"yellow",
-				"pink",
-				
-				"orange",
-				"green",
-				
-				"red",
-				"black",
-				"white"
+				"DreidelTeal",
+				"TinselPurple",
+				"CupidPink",
+				"LeorOrange",
+				"verywhite",
+				"E.coli",
+				"E.coli pUC19 on sgal"
 				],
-		"UseLiquidClass":"paint",
-      	"OutPlate": "greiner384_riser",
+		"UseLiquidClass":"water",
+      	"OutPlate": "Agarplateforpicking384_riser",
 		"UVimage":false,
-      	"VolumePerWell": "100ul"
+      	"VolumePerWell": "2ul"
     }
   }
 }
