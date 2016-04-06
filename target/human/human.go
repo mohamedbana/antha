@@ -1,7 +1,10 @@
 package human
 
 import (
+	"reflect"
+
 	"github.com/antha-lang/antha/ast"
+	"github.com/antha-lang/antha/graph"
 	"github.com/antha-lang/antha/target"
 )
 
@@ -63,15 +66,40 @@ func (a *Human) Compile(cmds []ast.Command) ([]target.Inst, error) {
 	inst := make(map[ast.Node]target.Inst)
 
 	insts = append(insts, entry)
-	for i, inum := 0, g.NumNodes(); i < inum; i += 1 {
-		n := g.Node(i).(ast.Node)
-		in, err := a.makeInst(n.(ast.Command))
-		if err != nil {
-			return nil, err
+
+	// Maximally coalesce repeated commands
+	dag := graph.Schedule(g)
+	for len(dag.Roots) > 0 {
+		var next []graph.Node
+		// Gather
+		same := make(map[reflect.Type][]graph.Node)
+		for _, r := range dag.Roots {
+			n := r.(ast.Node)
+			tn := reflect.TypeOf(n)
+			same[tn] = append(same[tn], n)
+			next = append(next, dag.Visit(r)...)
 		}
-		insts = append(insts, in)
-		inst[n] = in
+		// Apply
+		for _, nodes := range same {
+			var ins []*target.Manual
+			for _, n := range nodes {
+				in, err := a.makeInst(n.(ast.Command))
+				if err != nil {
+					return nil, err
+				}
+				ins = append(ins, in)
+			}
+			min := a.makeFromManual(ins)
+			insts = append(insts, min)
+
+			for _, n := range nodes {
+				inst[n.(ast.Node)] = min
+			}
+		}
+
+		dag.Roots = next
 	}
+
 	insts = append(insts, exit)
 
 	for i, inum := 0, g.NumNodes(); i < inum; i += 1 {

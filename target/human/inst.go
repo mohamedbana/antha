@@ -35,7 +35,7 @@ func extractFromNodes(nodes ...ast.Node) string {
 	return strings.Join(vs, ",")
 }
 
-func (a *Human) makeFromMove(c *ast.Move) target.Inst {
+func (a *Human) makeFromMove(c *ast.Move) *target.Manual {
 	from := extractFromUseNodes(c.From...)
 	return &target.Manual{
 		Dev:     a,
@@ -44,7 +44,7 @@ func (a *Human) makeFromMove(c *ast.Move) target.Inst {
 	}
 }
 
-func (a *Human) makeFromMix(c *ast.Mix) target.Inst {
+func (a *Human) makeFromMix(c *ast.Mix) *target.Manual {
 	from := extractFromNodes(c.From...)
 	return &target.Manual{
 		Dev:     a,
@@ -53,7 +53,7 @@ func (a *Human) makeFromMix(c *ast.Mix) target.Inst {
 	}
 }
 
-func (a *Human) makeFromIncubate(c *ast.Incubate) target.Inst {
+func (a *Human) makeFromIncubate(c *ast.Incubate) *target.Manual {
 	from := extractFromNodes(c.From...)
 	return &target.Manual{
 		Dev:     a,
@@ -62,7 +62,23 @@ func (a *Human) makeFromIncubate(c *ast.Incubate) target.Inst {
 	}
 }
 
-func (a *Human) makeInst(cmd ast.Command) (target.Inst, error) {
+func (a *Human) makeFromManual(ms []*target.Manual) target.Inst {
+	m := ms[0]
+	if len(ms) == 1 {
+		return m
+	}
+	var details []string
+	for _, m := range ms {
+		details = append(details, m.Details)
+	}
+	return &target.Manual{
+		Dev:     m.Dev,
+		Label:   m.Label,
+		Details: strings.Join(details, "\n"),
+	}
+}
+
+func (a *Human) makeInst(cmd ast.Command) (*target.Manual, error) {
 	switch cmd := cmd.(type) {
 	case *ast.Move:
 		return a.makeFromMove(cmd), nil

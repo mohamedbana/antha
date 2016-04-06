@@ -93,7 +93,7 @@ func TestWellFormed(t *testing.T) {
 		t.Errorf("expected > %d instructions found %d", 0, l)
 	} else if last, ok := insts[l-1].(*incubateInst); !ok {
 		t.Errorf("expected incubateInst found %T", insts[l-1])
-	} else if n := len(last.Depends); n != 4 {
-		t.Errorf("expected %d dependencies found %d", 4, n)
+	} else if n := len(last.Depends); n != 1 {
+		t.Errorf("expected %d dependencies found %d", 1, n)
 	}
 }
