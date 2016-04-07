@@ -88,8 +88,8 @@ func (it *IChain) HasChildOf(ins *wtype.LHInstruction) bool {
 func (it *IChain) Print() {
 	fmt.Println("****")
 	fmt.Println("\tPARENT NIL: ", it.Parent == nil)
-	fmt.Println("\tINPUTS: ", it.InputIDs())
-	fmt.Println("\tPRODUCTS: ", it.ProductIDs())
+	fmt.Println("\tINPUTS: ", len(it.InputIDs()))
+	fmt.Println("\tPRODUCTS: ", len(it.ProductIDs()))
 	if it.Child != nil {
 		it.Child.Print()
 	}

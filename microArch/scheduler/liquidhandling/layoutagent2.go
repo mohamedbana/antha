@@ -58,12 +58,11 @@ func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain 
 	// find existing assignments
 
 	plate_choices, mapchoices = get_and_complete_assignments(request, chain.ValueIDs(), plate_choices, mapchoices)
-
 	// now we know what remains unassigned, we assign it
 
 	plate_choices = choose_plates(request, plate_choices, chain.ValueIDs())
 
-	// now we have plates of type 1 & 2
+	// now we have solutions of type 1 & 2
 
 	// make specific plates... this may mean splitting stuff out into multiple plates
 
@@ -87,12 +86,16 @@ func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain 
 	lk2 := make(map[string]string)
 	// fix the output locations correctly
 
-	for _, v := range request.LHInstructions {
+	//for _, v := range request.LHInstructions {
+	order := chain.ValueIDs()
+	for _, id := range order {
+		v := request.LHInstructions[id]
 		lkp[v.ID] = make([]*wtype.LHComponent, 0, 1) //v.Result
 		lk2[v.Result.ID] = v.ID
 	}
 
-	for _, v := range request.LHInstructions {
+	for _, id := range order {
+		v := request.LHInstructions[id]
 		for _, c := range v.Components {
 			// if this component has the same ID
 			// as the result of another instruction
@@ -215,6 +218,9 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 			if i == -1 {
 				logger.Debug("CONTRADICTORY PLATE ID SITUATION ", v)
 			}
+
+			// v2 is not always set - this isn't safe... why did we do it this way?
+			// i think this whole mechanism is pretty shady
 
 			for i2, v2 := range s[i].Wells {
 				if v2 == tx[1] {
@@ -437,6 +443,7 @@ func make_layouts(request *LHRequest, pc []PlateChoice) {
 				plat.Cols[wc.X][wc.Y].Add(dummycmp)
 				request.LHInstructions[sID].Welladdress = wc.FormatA1()
 				assignment = c.ID + ":" + wc.FormatA1()
+				c.Wells[i] = wc.FormatA1()
 			} else {
 				assignment = c.ID + ":" + well
 			}
