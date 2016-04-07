@@ -10,12 +10,16 @@ type IChain struct {
 	Parent *IChain
 	Child  *IChain
 	Values []*wtype.LHInstruction
+	Depth  int
 }
 
 func NewIChain(parent *IChain) *IChain {
 	var it IChain
 	it.Parent = parent
 	it.Values = make([]*wtype.LHInstruction, 0, 1)
+	if parent != nil {
+		it.Depth = parent.Depth + 1
+	}
 	return &it
 }
 
@@ -29,8 +33,11 @@ func (it *IChain) ValueIDs() []string {
 }
 
 func (it *IChain) Add(ins *wtype.LHInstruction) {
-	p := it.FindNodeFor(ins)
-	p.Values = append(p.Values, ins)
+	if it.Depth < ins.Generation() {
+		it.GetChild().Add(ins)
+	} else {
+		it.Values = append(it.Values, ins)
+	}
 }
 
 func (it *IChain) GetChild() *IChain {
@@ -38,51 +45,6 @@ func (it *IChain) GetChild() *IChain {
 		it.Child = NewIChain(it)
 	}
 	return it.Child
-}
-
-func (it *IChain) FindNodeFor(ins *wtype.LHInstruction) *IChain {
-	// having now done this above it's pretty trivial
-
-	if ins.ParentString() == "" {
-		if it.Parent == nil {
-			// this is the root, and we are in the right place
-			return it
-		}
-	}
-
-	if it.HasParentOf(ins) {
-		return it.GetChild()
-	}
-
-	// if we're at the end, return it
-
-	if len(it.Values) == 0 {
-		return it
-	}
-
-	return it.GetChild().FindNodeFor(ins)
-}
-
-func (it *IChain) HasParentOf(ins *wtype.LHInstruction) bool {
-	for _, v := range it.Values {
-		for _, cmp := range v.Components {
-			if ins.HasParent(cmp.ID) {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
-func (it *IChain) HasChildOf(ins *wtype.LHInstruction) bool {
-	for _, v := range it.Values {
-		if v.HasParent(v.ProductID) {
-			return true
-		}
-	}
-
-	return false
 }
 
 func (it *IChain) Print() {

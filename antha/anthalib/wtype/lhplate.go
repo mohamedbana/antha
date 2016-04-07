@@ -132,7 +132,6 @@ func (lhp *LHPlate) GetComponent(cmp *LHComponent, exact bool) ([]WellCoords, bo
 
 			v := w.WorkingVolume()
 			if v.LessThan(cmp.Volume()) {
-				fmt.Println("SKIPPING WELL ", x)
 				continue
 			}
 			volGot.Add(v)

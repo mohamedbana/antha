@@ -1,7 +1,5 @@
 package sampletracker
 
-import "fmt"
-
 var st *SampleTracker
 
 type SampleTracker struct {
@@ -25,12 +23,12 @@ func GetSampleTracker() *SampleTracker {
 }
 
 func (st *SampleTracker) SetLocationOf(ID string, loc string) {
-	fmt.Println("LOCATION OF ", ID, " SET TO ", loc)
+	//fmt.Println("LOCATION OF ", ID, " SET TO ", loc)
 	st.records[ID] = loc
 }
 
 func (st *SampleTracker) GetLocationOf(ID string) (string, bool) {
-	fmt.Println("GET LOCATION OF :", ID)
+	//fmt.Println("GET LOCATION OF :", ID)
 	if ID == "" {
 		return "", false
 	}
@@ -44,7 +42,7 @@ func (st *SampleTracker) GetLocationOf(ID string) (string, bool) {
 		return st.GetLocationOf(st.forwards[ID])
 	}
 
-	fmt.Println("Location found!: ", s)
+	//fmt.Println("Location found!: ", s)
 
 	return s, ok
 }
