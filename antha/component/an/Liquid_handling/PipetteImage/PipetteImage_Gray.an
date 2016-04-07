@@ -17,8 +17,8 @@ Parameters (
 	Imagefilename string
 	MinimumBlackpercentagethreshold float64 // as a proportion of 1 i.e. 0.5 == 50%. Below this it will be considered white
 	MaxBlackPercentagethreshold float64 // above this value pure black will be dispensed
-	//SkipBlackforlowervol bool
 	OnlyHighVolumetips bool
+	SkipWhite bool
 	MixingLiquidClass string
 	NonMixingClass string
 	Negative bool
@@ -118,8 +118,17 @@ Steps {
 		fmt.Println("brand new minuint8 ",minuint8,"fullblackuint8 ", fullblackuint8)
 		
 		if gray.Y < minuint8 {
+			if SkipWhite {
 			skipped = skipped + 1
 		fmt.Println("skipping well:", skipped,locationkey)
+		}else{
+			whitevol := VolumeForFullcolour
+			Diluent.Type = wtype.LiquidTypeFromString(NonMixingClass)
+			
+			waterSample := mixer.Sample(Diluent,whitevol)
+			solution = MixTo(OutPlate.Type, locationkey,1, waterSample)
+			solutions = append(solutions, solution)
+		}
 		continue
 			
 			}else{

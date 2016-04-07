@@ -1,13 +1,14 @@
 {
   "Parameters": {
     "PipetteImage": {
-		"Imagefilename":"vader.jpeg",
+		"Imagefilename":"8-Bit-Pixel-Handlebar-Moustache.png",
 		"Rotate": false,
 		"AutoRotate": true,
 		"Diluent":"water",
-		"MinimumBlackpercentagethreshold":0.3,
+		"MinimumBlackpercentagethreshold":0.02,
 		"MaxBlackPercentagethreshold": 0.7,
-		"OnlyHighVolumetips": true,
+		"OnlyHighVolumetips": false,
+		"SkipWhite": true,
 		"MixingLiquidClass": "NeedToMix",
 		"NonMixingClass": "water",
 		"DontMix":false,
@@ -16,7 +17,7 @@
 		"PosterizeLevels": 8,
 		"Black": "Black",
       "OutPlate": "greiner384_riser",
-      "VolumeForFullcolour": "100ul"
+      "VolumeForFullcolour": "25ul"
     }
   }
 }

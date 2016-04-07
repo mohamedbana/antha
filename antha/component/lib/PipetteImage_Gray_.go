@@ -18,7 +18,6 @@ import (
 
 // as a proportion of 1 i.e. 0.5 == 50%. Below this it will be considered white
 // above this value pure black will be dispensed
-//SkipBlackforlowervol bool
 
 // Data which is returned from this protocol, and data types
 
@@ -91,8 +90,17 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 		fmt.Println("brand new minuint8 ", minuint8, "fullblackuint8 ", fullblackuint8)
 
 		if gray.Y < minuint8 {
-			skipped = skipped + 1
-			fmt.Println("skipping well:", skipped, locationkey)
+			if _input.SkipWhite {
+				skipped = skipped + 1
+				fmt.Println("skipping well:", skipped, locationkey)
+			} else {
+				whitevol := _input.VolumeForFullcolour
+				_input.Diluent.Type = wtype.LiquidTypeFromString(_input.NonMixingClass)
+
+				waterSample := mixer.Sample(_input.Diluent, whitevol)
+				solution = execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, waterSample)
+				solutions = append(solutions, solution)
+			}
 			continue
 
 		} else {
@@ -240,6 +248,7 @@ type PipetteImage_GrayInput struct {
 	PosterizeImage                  bool
 	PosterizeLevels                 int
 	Rotate                          bool
+	SkipWhite                       bool
 	VolumeForFullcolour             wunit.Volume
 }
 
@@ -282,11 +291,12 @@ func init() {
 				{Name: "MixingLiquidClass", Desc: "", Kind: "Parameters"},
 				{Name: "Negative", Desc: "", Kind: "Parameters"},
 				{Name: "NonMixingClass", Desc: "", Kind: "Parameters"},
-				{Name: "OnlyHighVolumetips", Desc: "SkipBlackforlowervol bool\n", Kind: "Parameters"},
+				{Name: "OnlyHighVolumetips", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "InPlate *wtype.LHPlate\n", Kind: "Inputs"},
 				{Name: "PosterizeImage", Desc: "", Kind: "Parameters"},
 				{Name: "PosterizeLevels", Desc: "", Kind: "Parameters"},
 				{Name: "Rotate", Desc: "", Kind: "Parameters"},
+				{Name: "SkipWhite", Desc: "", Kind: "Parameters"},
 				{Name: "VolumeForFullcolour", Desc: "", Kind: "Parameters"},
 				{Name: "Fullblack", Desc: "", Kind: "Data"},
 				{Name: "NumberofShadesofGrey", Desc: "", Kind: "Data"},
