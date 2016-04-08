@@ -196,13 +196,6 @@ type LHSolution struct {
 	Minorlayoutgroup int
 }
 
-func NewLHInstruction() *LHInstruction {
-	var lhi LHInstruction
-	lhi.ID = GetUUID()
-	lhi.Majorlayoutgroup = -1
-	return &lhi
-}
-
 func NewLHSolution() *LHSolution {
 	var lhs LHSolution
 	lhs.ID = GetUUID()
