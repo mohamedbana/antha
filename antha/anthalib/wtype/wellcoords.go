@@ -152,10 +152,16 @@ func (wc WellCoords) RowLettString() string {
 // comparison operators
 
 func (wc WellCoords) RowLessThan(wc2 WellCoords) bool {
+	if wc.Y == wc2.Y {
+		return wc.X < wc2.Y
+	}
 	return wc.Y < wc2.Y
 }
 
 func (wc WellCoords) ColLessThan(wc2 WellCoords) bool {
+	if wc.X == wc2.X {
+		return wc.Y < wc2.Y
+	}
 	return wc.X < wc2.X
 }
 
@@ -165,9 +171,9 @@ type WellCoordArrayCol []WellCoords
 type WellCoordArrayRow []WellCoords
 
 func (wca WellCoordArrayCol) Len() int           { return len(wca) }
-func (wca WellCoordArrayCol) Swap(i, j int) bool { t := wca[i]; wca[i] = wca[j]; wca[j] = t }
+func (wca WellCoordArrayCol) Swap(i, j int)      { t := wca[i]; wca[i] = wca[j]; wca[j] = t }
 func (wca WellCoordArrayCol) Less(i, j int) bool { return wca[i].RowLessThan(wca[j]) }
 
 func (wca WellCoordArrayRow) Len() int           { return len(wca) }
-func (wca WellCoordArrayRow) Swap(i, j int) bool { t := wca[i]; wca[i] = wca[j]; wca[j] = t }
+func (wca WellCoordArrayRow) Swap(i, j int)      { t := wca[i]; wca[i] = wca[j]; wca[j] = t }
 func (wca WellCoordArrayRow) Less(i, j int) bool { return wca[i].ColLessThan(wca[j]) }

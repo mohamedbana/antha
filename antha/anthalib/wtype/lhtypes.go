@@ -67,6 +67,10 @@ func (lhmcc LHMultiChannelConstraint) SatisfiedV(awc1, awc2 []WellCoords) bool {
 	return true
 }
 
+func (lhmcc LHMultiChannelConstraint) Equals(lhmcc2 LHMultiChannelConstraint) bool {
+	return lhmcc.X == lhmcc2.X && lhmcc.Y == lhmcc2.Y && lhmcc.M == lhmcc2.M
+}
+
 // describes sets of parameters which can be used to create a configuration
 type LHChannelParameter struct {
 	ID          string
