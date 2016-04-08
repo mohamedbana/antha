@@ -23,10 +23,12 @@
 package wtype
 
 import (
-	"fmt"
 	"testing"
+
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 )
 
+/*
 func testBS(bs BioSequence) {
 	fmt.Println(bs.Sequence())
 }
@@ -72,6 +74,7 @@ func TestWellCoords(*testing.T) {
 	fmt.Println(wc.X, " ", wc.Y)
 	fmt.Println("Finished Testing Well Coords")
 }
+*/
 
 func TestLHComponentSampleStuff(t *testing.T) {
 	var c LHComponent
@@ -210,4 +213,23 @@ func TestParent(t *testing.T) {
 		t.Error("LHComponent.HasParent() must return false for values not set")
 	}
 
+}
+
+func testLHCP() LHChannelParameter {
+	return LHChannelParameter{
+		ID:          "dummydummy",
+		Name:        "mrdummy",
+		Minvol:      wunit.NewVolume(1.0, "ul"),
+		Maxvol:      wunit.NewVolume(1.0, "ul"),
+		Minspd:      wunit.NewFlowRate(0.5, "ul/s"),
+		Maxspd:      wunit.NewFlowRate(0.6, "ul/s"),
+		Multi:       8,
+		Independent: false,
+		Orientation: LHVChannel,
+		Head:        0,
+	}
+}
+
+func TestLHMultiConstraint(t *testing.T) {
+	params := testLHCP()
 }
