@@ -231,16 +231,16 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	// Onewell SBS format Agarplate with colonies on riser (50ml agar) high res
 
 	bottomtype = 0
-	xdim = 1.5 // of well
-	ydim = 1.5
+	xdim = 2.0 // of well
+	ydim = 2.0
 	zdim = 7.0
 	bottomh = 0.5
 
-	wellxoffset = 2.0 // centre of well to centre of neighbouring well in x direction
-	wellyoffset = 2.0 //centre of well to centre of neighbouring well in y direction
-	xstart = -2.5     // distance from top left side of plate to first well
-	ystart = -2.5     // distance from top left side of plate to first well
-	zstart = 43       // offset of bottom of deck to bottom of well
+	wellxoffset = 2.25  // centre of well to centre of neighbouring well in x direction
+	wellyoffset = 2.250 //centre of well to centre of neighbouring well in y direction
+	xstart = -2.5       // distance from top left side of plate to first well
+	ystart = -2.5       // distance from top left side of plate to first well
+	zstart = 43         // offset of bottom of deck to bottom of well
 
 	square = wtype.NewShape("box", "mm", 2, 2, 7)
 	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
