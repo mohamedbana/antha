@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -9,6 +8,8 @@ import (
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 )
+
+//	"fmt"
 
 // Input parameters for this protocol (data)
 
@@ -41,15 +42,15 @@ func _Ligation_2partsintovectorSteps(_ctx context.Context, _input *Ligation_2par
 	samples = append(samples, vectorSample)
 
 	// part 1
-	fmt.Println("creating dna part 1 ", " comp ", _input.Part1.CName, " renamed to ", _input.PartNames[0], " vol ", _input.PartVols[0])
+	//fmt.Println("creating dna part 1 ", " comp ", Part1.CName, " renamed to ", PartNames[0], " vol ", PartVols[0])
 	partSample := mixer.Sample(_input.Part1, _input.PartVols[0])
-	partSample.CName = _input.PartNames[0]
+	//partSample.CName = PartNames[0]
 	samples = append(samples, partSample)
 
 	// part 2
-	fmt.Println("creating dna part 2 ", " comp ", _input.Part2.CName, " renamed to ", _input.PartNames[1], " vol ", _input.PartVols[1])
+	//fmt.Println("creating dna part 2 ", " comp ", Part2.CName, " renamed to ", PartNames[1], " vol ", PartVols[1])
 	partSample = mixer.Sample(_input.Part2, _input.PartVols[1])
-	partSample.CName = _input.PartNames[1]
+	//partSample.CName = PartNames[1]
 	samples = append(samples, partSample)
 
 	ligSample := mixer.Sample(_input.Ligase, _input.LigVol)
@@ -134,7 +135,6 @@ type Ligation_2partsintovectorInput struct {
 	OutputReactionName string
 	Part1              *wtype.LHComponent
 	Part2              *wtype.LHComponent
-	PartNames          []string
 	PartVols           []wunit.Volume
 	ReactionTemp       wunit.Temperature
 	ReactionTime       wunit.Time
@@ -176,7 +176,6 @@ func init() {
 				{Name: "OutputReactionName", Desc: "", Kind: "Parameters"},
 				{Name: "Part1", Desc: "", Kind: "Inputs"},
 				{Name: "Part2", Desc: "", Kind: "Inputs"},
-				{Name: "PartNames", Desc: "", Kind: "Parameters"},
 				{Name: "PartVols", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionTemp", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionTime", Desc: "", Kind: "Parameters"},

@@ -112,13 +112,9 @@
 		            "LigVol": "1ul",
 		            "Ligase": "T4Ligase",
 		            "OutPlate": "pcrplate_with_cooler",
-		            "PartNames": [
-		                "dna1",
-		                "dna2"
-		            ],
 		            "PartVols": [
 		                "3ul",
-		                "3ul", 
+		                "3ul"
 		            ],
 		            "ReactionTemp": "16C",
 		            "ReactionTime": "600s",

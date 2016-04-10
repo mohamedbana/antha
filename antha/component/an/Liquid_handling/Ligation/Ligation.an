@@ -3,14 +3,13 @@ protocol Ligation_2partsintovector
 import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"fmt"
+//	"fmt"
 )
 
 // Input parameters for this protocol (data)
 Parameters (
 	ReactionVolume 				Volume
 	PartVols 					[]Volume
-	PartNames					[]string
 	VectorVol 					Volume
 	BufferVol 					Volume
 	AtpVol 						Volume
@@ -69,15 +68,15 @@ Steps {
 	samples = append(samples, vectorSample)
 
 	// part 1
-		fmt.Println("creating dna part 1 ", " comp ", Part1.CName, " renamed to ", PartNames[0], " vol ", PartVols[0])
+		//fmt.Println("creating dna part 1 ", " comp ", Part1.CName, " renamed to ", PartNames[0], " vol ", PartVols[0])
 		partSample := mixer.Sample(Part1, PartVols[0])
-		partSample.CName = PartNames[0]
+		//partSample.CName = PartNames[0]
 		samples = append(samples, partSample)
 		
 	// part 2	
-		fmt.Println("creating dna part 2 ", " comp ", Part2.CName, " renamed to ", PartNames[1], " vol ", PartVols[1])
+		//fmt.Println("creating dna part 2 ", " comp ", Part2.CName, " renamed to ", PartNames[1], " vol ", PartVols[1])
 		partSample = mixer.Sample(Part2, PartVols[1])
-		partSample.CName = PartNames[1]
+		//partSample.CName = PartNames[1]
 		samples = append(samples, partSample)
 	
 
