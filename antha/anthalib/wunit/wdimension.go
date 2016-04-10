@@ -76,13 +76,19 @@ type Volume struct {
 
 // make a volume
 func NewVolume(v float64, unit string) (o Volume) {
-	if unit == "" {
+	if unit == "" && v == 0 {
 		return NewVolume(0.0, "ul")
 	}
 
 	if len(strings.TrimSpace(unit)) == 0 {
-		panic("Can't make Volumes without unit")
+		fmt.Println("warning no units found so returned 0.0 ul")
+		return NewVolume(0.0, "ul")
+
 	}
+	/*if len(strings.TrimSpace(unit)) == 0 {
+		panic("Can't make Volumes without unit")
+	}*/
+
 	if len(strings.TrimSpace(unit)) == 1 {
 		o = Volume{NewMeasurement(v, "", unit)}
 	}
