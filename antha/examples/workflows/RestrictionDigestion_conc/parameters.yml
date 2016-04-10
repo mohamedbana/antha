@@ -22,6 +22,7 @@
             "InactivationTemp": "65C",
             "InactivationTime": "900s",
             "OutPlate": "pcrplate_with_cooler",
+			"Platenumber":1,
             "ReactionTemp": "37C",
             "ReactionTime": "3600s",
             "ReactionVolume": "20ul",
