@@ -292,12 +292,12 @@ func (ins *TransferInstruction) GetParallelSetsFor(channel *wtype.LHChannelParam
 		a, ok := tfrs[hashkey]
 
 		if !ok {
-			a := make([]string, 0, channel.Multi)
-			tfrs[hashkey] = a
+			a = make([]string, 0, channel.Multi)
 		}
 
 		val := fmt.Sprintf("%d,%d,%d", fc2, tc2, i)
 		a = append(a, val)
+		tfrs[hashkey] = a
 	}
 
 	ret := make([][]int, 0, len(ins.What))
@@ -315,6 +315,8 @@ func (ins *TransferInstruction) GetParallelSetsFor(channel *wtype.LHChannelParam
 		if len(a) >= channel.Multi {
 			// could be
 			mss := GetMultiSet(a, channel.Multi, pmf, pmt)
+
+			fmt.Println("Multiset length: ", len(mss))
 
 			if len(mss) != 0 {
 				for _, ms := range mss {
@@ -364,15 +366,16 @@ func GetNextSet(a []string, channelmulti int, fromplatemulti int, toplatemulti i
 		j, _ := strconv.Atoi(tx[1])
 		k, _ := strconv.Atoi(tx[2])
 
-		if r[i][j] != -1 {
-			r[i][j] = k
-		}
+		r[i][j] = k
 	}
 	// now we just take the first one we find
 
 	ret := getset(r, channelmulti)
+	censa := censoredcopy(a, ret)
 
-	return ret, censoredcopy(a, ret)
+	fmt.Println("RET: ", ret, " CENSA: ", censa)
+
+	return ret, censa
 }
 
 func getset(a [][]int, mx int) []int {
@@ -417,9 +420,9 @@ func censoredcopy(a []string, b []int) []string {
 	r := make([]string, 0, len(a)-len(b))
 
 	for _, x := range a {
-		tx := strings.Split(",", x)
-		i, _ := strconv.Atoi(tx[0])
-		if isin(i, b) {
+		tx := strings.Split(x, ",")
+		i, _ := strconv.Atoi(tx[2])
+		if IsIn(i, b) {
 			continue
 		}
 		r = append(r, x)
@@ -428,7 +431,7 @@ func censoredcopy(a []string, b []int) []string {
 	return r
 }
 
-func isin(i int, a []int) bool {
+func IsIn(i int, a []int) bool {
 	for _, x := range a {
 		if i == x {
 			return true

@@ -50,8 +50,7 @@ func (it *IChain) GetChild() *IChain {
 func (it *IChain) Print() {
 	fmt.Println("****")
 	fmt.Println("\tPARENT NIL: ", it.Parent == nil)
-	fmt.Println("\tINPUTS: ", len(it.InputIDs()))
-	fmt.Println("\tPRODUCTS: ", len(it.ProductIDs()))
+	fmt.Println("\tINPUTS: ", len(it.Values))
 	if it.Child != nil {
 		it.Child.Print()
 	}
