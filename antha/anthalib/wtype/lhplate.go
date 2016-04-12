@@ -34,25 +34,25 @@ import (
 type LHPlate struct {
 	ID          string
 	Inst        string
-	Loc         string
-	PlateName   string
-	Type        string
-	Mnfr        string
-	WlsX        int
-	WlsY        int
-	Nwells      int
-	HWells      map[string]*LHWell
-	Height      float64
-	Hunit       string
+	Loc         string             // location of plate
+	PlateName   string             // user-definable plate name
+	Type        string             // plate type
+	Mnfr        string             // manufacturer
+	WlsX        int                // wells along long axis
+	WlsY        int                // wells along short axis
+	Nwells      int                // total number of wells
+	HWells      map[string]*LHWell // map of well IDs to well
+	Height      float64            // plate height (unit below)
+	Hunit       string             // unit of plate height
 	Rows        [][]*LHWell
 	Cols        [][]*LHWell
 	Welltype    *LHWell
-	Wellcoords  map[string]*LHWell
-	WellXOffset float64
-	WellYOffset float64
-	WellXStart  float64
-	WellYStart  float64
-	WellZStart  float64
+	Wellcoords  map[string]*LHWell // map of coords in A1 format to wells
+	WellXOffset float64            // distance (mm) between well centres in X direction
+	WellYOffset float64            // distance (mm) between well centres in Y direction
+	WellXStart  float64            // offset (mm) to first well in X direction
+	WellYStart  float64            // offset (mm) to first well in Y direction
+	WellZStart  float64            // offset (mm) to bottom of well in Z direction
 }
 
 func (lhp LHPlate) Name() string {

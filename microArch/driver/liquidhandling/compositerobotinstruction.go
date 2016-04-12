@@ -877,6 +877,7 @@ func (ins *MultiChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms 
 	pol := policy.GetPolicyFor(ins)
 	ret := make([]RobotInstruction, 0)
 	// get some tips
+
 	channel, tiptype := ChooseChannel(ins.Volume[0][0], prms)
 	ret = append(ret, GetTips(tiptype, prms, channel, ins.Multi, false))
 	n_tip_uses := 0
@@ -892,23 +893,58 @@ func (ins *MultiChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms 
 
 		// choose tips
 		newchannel, newtiptype := ChooseChannel(ins.Volume[0][0], prms)
-
+		var last_thing *wtype.LHComponent
+		last_thing = nil
+		var dirty bool
 		// load tips
 
 		// split the transfer up
 		// NB we assume all volumes are equal here;
+		// oof we need to do some work here -- this needs to be in sync with singlechannel block
 		tvs := TransferVolumes(ins.Volume[t][0], newchannel.Minvol, newchannel.Maxvol)
 
 		for _, vol := range tvs {
-			// enforce tip usage policy
+			// determine whether to change tips
+			change_tips := false
+			change_tips = n_tip_uses > pol["TIP_REUSE_LIMIT"].(int)
+			change_tips = change_tips || channel != newchannel
+			change_tips = change_tips || newtiptype != tiptype
 
-			if n_tip_uses > pol["TIP_REUSE_LIMIT"].(int) || newchannel != channel || newtiptype != tiptype {
+			// big dangerous assumption here: we need to check if anything is different
+			this_thing := prms.Plates[ins.PltFrom[t][0]].Wellcoords[ins.WellFrom[t][0]].Contents()
+
+			if last_thing != nil {
+				if this_thing.CName != last_thing.CName {
+					change_tips = true
+				}
+			}
+
+			// finally ensure we don't contaminate sources
+			if dirty {
+				change_tips = true
+			}
+
+			if change_tips {
+				// maybe wrap this as a ChangeTips function call
 				// these need parameters
 				ret = append(ret, DropTips(tiptype, prms, channel, ins.Multi))
 				ret = append(ret, GetTips(newtiptype, prms, newchannel, ins.Multi, false))
+				tiptype = newtiptype
+				channel = newchannel
 				n_tip_uses = 0
+				last_thing = nil
+				dirty = false
 			}
+			/*
+				// enforce tip usage policy
 
+				if n_tip_uses > pol["TIP_REUSE_LIMIT"].(int) || newchannel != channel || newtiptype != tiptype {
+					// these need parameters
+					ret = append(ret, DropTips(tiptype, prms, channel, ins.Multi))
+					ret = append(ret, GetTips(newtiptype, prms, newchannel, ins.Multi, false))
+					n_tip_uses = 0
+				}
+			*/
 			mci := NewMultiChannelTransferInstruction()
 			vols.SetEqualTo(vol)
 			mci.What = ins.What[t]
@@ -921,6 +957,7 @@ func (ins *MultiChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms 
 			mci.WellTo = ins.WellTo[t]
 			mci.FPlateType = ins.FPlateType[t]
 			mci.TPlateType = ins.TPlateType[t]
+			mci.Multi = ins.Multi
 			mci.Prms = ins.Prms
 
 			ret = append(ret, mci)
