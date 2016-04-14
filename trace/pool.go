@@ -2,9 +2,10 @@ package trace
 
 import (
 	"errors"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"runtime/debug"
 	"sync"
+
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 )
 
 type poolKey int

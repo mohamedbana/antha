@@ -31,6 +31,7 @@ func _AliquotSetup(_ctx context.Context, _input *AliquotInput) {
 // for every input
 func _AliquotSteps(_ctx context.Context, _input *AliquotInput, _output *AliquotOutput) {
 
+	// check there's enough liquid for the aliquots
 	number := _input.SolutionVolume.SIValue() / _input.VolumePerAliquot.SIValue()
 	possiblenumberofAliquots, _ := wutil.RoundDown(number)
 	if possiblenumberofAliquots < _input.NumberofAliquots {

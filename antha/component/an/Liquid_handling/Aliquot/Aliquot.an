@@ -34,6 +34,8 @@ Outputs (
 
 Requirements {
 	
+	
+	
 }
 
 // Conditions to run on startup
@@ -45,11 +47,14 @@ Setup {
 // for every input
 Steps {
 	
+	
+	// check there's enough liquid for the aliquots
 	number := SolutionVolume.SIValue()/VolumePerAliquot.SIValue()
 	possiblenumberofAliquots, _ := wutil.RoundDown(number)
 	if possiblenumberofAliquots < NumberofAliquots {
 		panic("Not enough solution for this many aliquots")
 	}
+	
 	
 	
 	aliquots := make([]*wtype.LHComponent,0)

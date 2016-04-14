@@ -15,9 +15,12 @@ import (
 Parameters (
 	VolumeForFullcolour  Volume
 	Imagefilename string
-	MinimumBlackpercentagethreshold float64 // as a proportion of 1 i.e. 0.5 == 50%
-	//SkipBlackforlowervol bool
+	MinimumBlackpercentagethreshold float64 // as a proportion of 1 i.e. 0.5 == 50%. Below this it will be considered white
+	MaxBlackPercentagethreshold float64 // above this value pure black will be dispensed
 	OnlyHighVolumetips bool
+	SkipWhite bool
+	MixingLiquidClass string
+	NonMixingClass string
 	Negative bool
 	Rotate bool
 	AutoRotate bool
@@ -31,6 +34,8 @@ Data (
 	Numberofpixels int
 	ShadesofGrey []int
 	NumberofShadesofGrey int
+	Skipped int
+	Fullblack int
 )
 
 
@@ -66,21 +71,30 @@ Steps {
 		
 	var minuint8 uint8 
 	
+	var fullblackuint8 uint8
+	
 	ShadesofGrey = make([]int,0)
 	
 	chosencolourpalette := image.AvailablePalettes["Gray"]
 	
-	if PosterizeImage{
-		_, Imagefilename = image.Posterize(Imagefilename, PosterizeLevels)
-	}
 	
 	image.CheckAllResizealgorithms(Imagefilename,OutPlate,Rotate,imaging.AllResampleFilters)
 	
-	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate,AutoRotate) 
+	positiontocolourmap, _, newimagename := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate,AutoRotate) 
+	
+	// if posterize rerun 
+	if PosterizeImage{
+		_, Imagefilename = image.Posterize(newimagename, PosterizeLevels)
+		
+		positiontocolourmap, _, _ = image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate,AutoRotate)
+	}
+	
 	
 	solutions := make([]*wtype.LHComponent, 0)
 
 	counter := 0
+	skipped := 0
+	fullblack := 0
 
 	for locationkey, colour := range positiontocolourmap {
 		
@@ -96,13 +110,25 @@ Steps {
 		}
 		
 		
-		
+		// adjust thresholds for mixing black and white based on user parameters
 		minuint8 = uint8(MinimumBlackpercentagethreshold * float64(maxuint8))
 		
-		fmt.Println("brand new minuint8",minuint8)
+		fullblackuint8 = uint8(MaxBlackPercentagethreshold * float64(maxuint8))
+		
+		fmt.Println("brand new minuint8 ",minuint8,"fullblackuint8 ", fullblackuint8)
 		
 		if gray.Y < minuint8 {
-		fmt.Println("skipping well:", locationkey)
+			if SkipWhite {
+			skipped = skipped + 1
+		fmt.Println("skipping well:", skipped,locationkey)
+		}else{
+			whitevol := VolumeForFullcolour
+			Diluent.Type = wtype.LiquidTypeFromString(NonMixingClass)
+			
+			waterSample := mixer.Sample(Diluent,whitevol)
+			solution = MixTo(OutPlate.Type, locationkey,1, waterSample)
+			solutions = append(solutions, solution)
+		}
 		continue
 			
 			}else{
@@ -118,18 +144,20 @@ Steps {
 			ShadesofGrey = append(ShadesofGrey,greyindexinpalette)
 		}
 			
-			if gray.Y < maxuint8 {
+			if gray.Y < fullblackuint8 /*&& gray.Y >= minuint8*/{
 			watervol := wunit.NewVolume((float64(maxuint8-gray.Y)/float64(maxuint8) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
 			fmt.Println("new well", locationkey, "water vol", watervol.ToString())
 			// force hv tip choice
-			if  OnlyHighVolumetips && watervol.RawValue() < 21 && watervol.Unit().PrefixedSymbol() == "ul"{
+			if  OnlyHighVolumetips && watervol.RawValue() < 21	 && watervol.Unit().PrefixedSymbol() == "ul"{
 				watervol.SetValue(21)
 			}
 			waterSample := mixer.Sample(Diluent, watervol)
 			//components = append(components, waterSample)
 			solution = MixTo(OutPlate.Type, locationkey,1, waterSample)
 		} 
-		if gray.Y == maxuint8 {
+		if gray.Y >= fullblackuint8{
+			fullblack = fullblack + 1
+			fmt.Println("full colours:", fullblack)
 			blackvol = VolumeForFullcolour
 		}else {
 		blackvol = wunit.NewVolume((float64(gray.Y)/float64(maxuint8) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
@@ -141,8 +169,10 @@ Steps {
 		
 		if DontMix {
 		Black.Type = wtype.LTDISPENSEABOVE
+		}else if gray.Y >= fullblackuint8 {
+		Black.Type = wtype.LiquidTypeFromString(NonMixingClass)
 		}else{
-			Black.Type = wtype.LiquidTypeFromString("NeedToMix")
+			Black.Type = wtype.LiquidTypeFromString(MixingLiquidClass)
 		}
 		
 		//fmt.Println("blackvol2",blackvol.ToString())
@@ -169,6 +199,8 @@ Steps {
 	Pixels = solutions
 	Numberofpixels = len(Pixels)
 	fmt.Println("Pixels =",Numberofpixels)
+	Fullblack = fullblack
+	Skipped = skipped
 
 }
 // Run after controls and a steps block are completed to

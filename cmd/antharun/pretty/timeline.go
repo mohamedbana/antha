@@ -13,15 +13,14 @@ import (
 
 func summarize(inst target.Inst) (string, error) {
 	switch inst := inst.(type) {
+	case target.RunInst:
+		return fmt.Sprintf("Run file (size: %d)", len(inst.Data().Tarball)), nil
 	case *target.Manual:
 		return fmt.Sprintf("Manual: %s", inst.Details), nil
-	case *target.Mix:
-		return fmt.Sprintf("Run file (size: %d)", len(inst.Files.Tarball)), nil
 	case *target.Wait:
 		return "", nil
 	default:
 		return "", fmt.Errorf("unknown inst %T", inst)
-
 	}
 }
 

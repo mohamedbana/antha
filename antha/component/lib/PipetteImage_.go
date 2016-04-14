@@ -47,7 +47,7 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 
 	subpalette := image.MakeSubPallette(_input.Palettename, availableColours)
 
-	positiontocolourmap, _ = image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &subpalette, _input.Rotate, _input.AutoRotate)
+	positiontocolourmap, _, _ = image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &subpalette, _input.Rotate, _input.AutoRotate)
 
 	// get components from factory
 	componentmap := make(map[string]*wtype.LHComponent, 0)
@@ -72,9 +72,11 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 
 		component := componentmap[image.Colourcomponentmap[colour]]
 
-		if component.TypeName() == "dna" {
-			component.Type = wtype.LTDoNotMix //"DoNotMix"
-		}
+		fmt.Println("component:", image.Colourcomponentmap[colour], "colour:", colour)
+
+		//if component.TypeName() == "dna" {
+		component.Type = wtype.LTDISPENSEABOVE //"DoNotMix"
+		//}
 		fmt.Println(image.Colourcomponentmap[colour])
 
 		if _input.OnlythisColour != "" {

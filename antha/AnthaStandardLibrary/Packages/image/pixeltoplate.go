@@ -27,7 +27,8 @@ import (
 
 var AvailablePalettes = map[string]color.Palette{
 	"Palette1":               palettefromMap(Colourcomponentmap), //Chosencolourpalette,
-	"WebSafe":                palette.WebSafe,                    //websafe,
+	"Neon":                   palettefromMap(Neon),
+	"WebSafe":                palette.WebSafe, //websafe,
 	"Plan9":                  palette.Plan9,
 	"ProteinPaintboxVisible": palettefromMap(ProteinPaintboxmap),
 	"ProteinPaintboxUV":      palettefromMap(UVProteinPaintboxmap),
@@ -39,7 +40,8 @@ var AvailablePalettes = map[string]color.Palette{
 var Emptycolourarray color.Palette
 
 var AvailableComponentmaps = map[string]map[color.Color]string{
-	"Palette1":               Colourcomponentmap, //Chosencolourpalette,
+	"Palette1": Colourcomponentmap,
+	"Neon":     Neon,
 	"ProteinPaintboxVisible": ProteinPaintboxmap,
 	"ProteinPaintboxUV":      UVProteinPaintboxmap,
 	"ProteinPaintboxSubset":  ProteinPaintboxSubsetmap,
@@ -93,6 +95,24 @@ var Colourcomponentmap = map[color.Color]string{
 	color.RGBA{R: uint8(75), G: uint8(151), B: uint8(74), A: uint8(255)}:   "green",
 	color.RGBA{R: uint8(196), G: uint8(40), B: uint8(27), A: uint8(255)}:   "red",
 	color.RGBA{R: uint8(0), G: uint8(0), B: uint8(0), A: uint8(255)}:       "black",
+}
+
+// map of RGB colour to description for use as key in crossreferencing colour to component in other maps
+var Neon = map[color.Color]string{
+	color.RGBA{R: uint8(0), G: uint8(0), B: uint8(0), A: uint8(255)}:       "black",
+	color.RGBA{R: uint8(149), G: uint8(156), B: uint8(161), A: uint8(255)}: "grey",
+	color.RGBA{R: uint8(117), G: uint8(51), B: uint8(127), A: uint8(255)}:  "purple",
+	color.RGBA{R: uint8(25), G: uint8(60), B: uint8(152), A: uint8(255)}:   "darkblue",
+	color.RGBA{R: uint8(0), G: uint8(125), B: uint8(200), A: uint8(255)}:   "blue",
+	color.RGBA{R: uint8(0), G: uint8(177), B: uint8(94), A: uint8(255)}:    "green",
+	color.RGBA{R: uint8(244), G: uint8(231), B: uint8(0), A: uint8(255)}:   "yellow",
+	color.RGBA{R: uint8(255), G: uint8(118), B: uint8(0), A: uint8(255)}:   "orange",
+	color.RGBA{R: uint8(255), G: uint8(39), B: uint8(51), A: uint8(255)}:   "red",
+	color.RGBA{R: uint8(235), G: uint8(41), B: uint8(123), A: uint8(255)}:  "pink",
+	color.RGBA{R: uint8(242), G: uint8(243), B: uint8(242), A: uint8(255)}: "white",
+	color.RGBA{R: uint8(0), G: uint8(174), B: uint8(239), A: uint8(255)}:   "Cyan",
+	color.RGBA{R: uint8(236), G: uint8(0), B: uint8(140), A: uint8(255)}:   "Magenta",
+	//color.RGBA{R: uint8(251), G: uint8(156), B: uint8(110), A: uint8(255)}: "skin",
 }
 
 func palettefromMap(colourmap map[color.Color]string) (palette color.Palette) {
@@ -320,6 +340,16 @@ var ProteinPaintboxSubsetmap = map[color.Color]string{
 
 	// plus white as a blank (or comment out to use EiraCFP)
 	color.RGBA{R: uint8(242), G: uint8(243), B: uint8(242), A: uint8(255)}: "verywhite",
+}
+
+func MakeGoimageNRGBA(imagefilename string) (nrgba *goimage.NRGBA) {
+	img, err := imaging.Open(imagefilename)
+	if err != nil {
+		panic(err)
+	}
+
+	nrgba = imaging.Clone(img)
+	return
 }
 
 func Posterize(imagefilename string, levels int) (posterized *goimage.NRGBA, newfilename string) {
@@ -597,7 +627,7 @@ func MakeSmallPalleteFromImage(imagefilename string, plate *wtype.LHPlate, rotat
 // create a map of pixel to plate position from processing a given image with a chosen colour palette.
 // It's recommended to use at least 384 well plate
 // if autorotate == true, rotate is overridden
-func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolourpalette *color.Palette, rotate bool, autorotate bool) (wellpositiontocolourmap map[string]color.Color, numberofpixels int) {
+func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolourpalette *color.Palette, rotate bool, autorotate bool) (wellpositiontocolourmap map[string]color.Color, numberofpixels int, newname string) {
 
 	var plateimage *goimage.NRGBA
 
@@ -645,7 +675,7 @@ func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolour
 	// rename file
 	splitfilename := strings.Split(imagefilename, `.`)
 
-	newname := splitfilename[0] + "_plateformat" + `.` + splitfilename[1]
+	newname = splitfilename[0] + "_plateformat" + `.` + splitfilename[1]
 	// save
 	err := imaging.Save(plateimage, newname)
 	if err != nil {

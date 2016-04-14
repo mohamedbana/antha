@@ -39,7 +39,7 @@ func _PipetteImage_CMYKSteps(_ctx context.Context, _input *PipetteImage_CMYKInpu
 
 	//var chosencolourpalette color.Palette
 	chosencolourpalette := image.AvailablePalettes["Plan9"]
-	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
+	positiontocolourmap, _, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
 
 	solutions := make([]*wtype.LHComponent, 0)
 
@@ -49,7 +49,8 @@ func _PipetteImage_CMYKSteps(_ctx context.Context, _input *PipetteImage_CMYKInpu
 
 	for locationkey, colour := range positiontocolourmap {
 
-		components := make([]*wtype.LHComponent, 0)
+		//components := make([]*wtype.LHComponent, 0)
+		var solution *wtype.LHComponent
 
 		cmyk := image.ColourtoCMYK(colour)
 
@@ -66,29 +67,86 @@ func _PipetteImage_CMYKSteps(_ctx context.Context, _input *PipetteImage_CMYKInpu
 			if cmyk.C > 0 {
 
 				cyanvol := wunit.NewVolume(((float64(cmyk.C) / float64(maxuint8)) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
-				cyanSample := mixer.Sample(_input.Cyan, cyanvol)
-				components = append(components, cyanSample)
-			}
 
+				if cyanvol.RawValue() < 10 && cyanvol.Unit().PrefixedSymbol() == "ul" {
+					cyanvol.SetValue(10)
+				}
+
+				if cmyk.K == 0 && cmyk.M == 0 && cmyk.Y == 0 {
+					_input.Cyan.Type = wtype.LTNeedToMix
+				} else {
+					_input.Cyan.Type = wtype.LTDISPENSEABOVE
+				}
+
+				cyanSample := mixer.Sample(_input.Cyan, cyanvol)
+
+				solution = execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, cyanSample)
+			}
 			if cmyk.Y > 0 {
 				yellowvol := wunit.NewVolume(((float64(cmyk.Y) / float64(maxuint8)) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
-				yellowSample := mixer.Sample(_input.Yellow, yellowvol)
-				components = append(components, yellowSample)
-			}
 
+				if yellowvol.RawValue() < 10 && yellowvol.Unit().PrefixedSymbol() == "ul" {
+					yellowvol.SetValue(10)
+				}
+				if cmyk.K == 0 && cmyk.M == 0 {
+					_input.Yellow.Type = wtype.LTNeedToMix
+				} else {
+					_input.Yellow.Type = wtype.LTDISPENSEABOVE
+				}
+
+				yellowSample := mixer.Sample(_input.Yellow, yellowvol)
+
+				if solution != nil {
+					solution = execute.Mix(_ctx, solution, yellowSample)
+				} else {
+					//solution = MixInto(PalettePlate, "", yellowSample)
+					solution = execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, yellowSample)
+				}
+			}
 			if cmyk.M > 0 {
 				magentavol := wunit.NewVolume(((float64(cmyk.M) / float64(maxuint8)) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
-				magentaSample := mixer.Sample(_input.Magenta, magentavol)
-				components = append(components, magentaSample)
-			}
 
+				if magentavol.RawValue() < 10 && magentavol.Unit().PrefixedSymbol() == "ul" {
+					magentavol.SetValue(10)
+				}
+
+				if cmyk.K == 0 {
+					_input.Magenta.Type = wtype.LTNeedToMix
+				} else {
+					_input.Magenta.Type = wtype.LTDISPENSEABOVE
+				}
+
+				magentaSample := mixer.Sample(_input.Magenta, magentavol)
+
+				if solution != nil {
+					solution = execute.Mix(_ctx, solution, magentaSample)
+				} else {
+					//solution = MixInto(PalettePlate, "", magentaSample)
+					solution = execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, magentaSample)
+				}
+			}
 			if cmyk.K > 0 {
 				blackvol := wunit.NewVolume(((float64(cmyk.K) / float64(maxuint8)) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
+
+				if blackvol.RawValue() < 10 && blackvol.Unit().PrefixedSymbol() == "ul" {
+					blackvol.SetValue(10)
+				}
+
+				_input.Black.Type = wtype.LTNeedToMix
+
 				blackSample := mixer.Sample(_input.Black, blackvol)
-				components = append(components, blackSample)
+
+				if solution != nil {
+					solution = execute.Mix(_ctx, solution, blackSample)
+				} else {
+					//solution = MixInto(PalettePlate, "", blackSample)
+					solution = execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, blackSample)
+				}
+
+				//components = append(components, blackSample)
 			}
 
-			solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, components...)
+			//solution := MixTo(OutPlate.Type, locationkey,1, components...)
 			solutions = append(solutions, solution)
 
 		}

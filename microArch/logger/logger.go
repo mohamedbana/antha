@@ -82,6 +82,11 @@ func Fatal(message string, extra ...interface{}) {
 	for _, h := range getMiddlewareList() {
 		h.Log(FATAL, time.Now().Unix(), getSource(), message, extra...)
 	}
+
+	pargs := []interface{}{"logger.Fatal", message}
+	pargs = append(pargs, extra...)
+	// Die if none of our middlewares dies first
+	panic(fmt.Sprint(pargs...))
 }
 
 //telemetry and sensors functions

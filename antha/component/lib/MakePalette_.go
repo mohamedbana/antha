@@ -49,10 +49,10 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 	// make pallette of colours from image
 	chosencolourpalette := image.MakeSmallPalleteFromImage(_input.Imagefilename, _input.OutPlate, _input.Rotate)
 
-	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
+	positiontocolourmap, _, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
 
 	// remove duplicates
-	//positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
+	positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
 
 	fmt.Println("positions", positiontocolourmap)
 
@@ -99,6 +99,7 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 					cyanSample := mixer.Sample(_input.Cyan, cyanvol)
 
 					solution = execute.MixInto(_ctx, _input.PalettePlate, "", cyanSample)
+					//solution = MixTo(PalettePlate.Type, position,1,cyanSample)
 
 					//components = append(components, cyanSample)
 				}
@@ -121,6 +122,7 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 						solution = execute.Mix(_ctx, solution, yellowSample)
 					} else {
 						solution = execute.MixInto(_ctx, _input.PalettePlate, "", yellowSample)
+						//solution = MixTo(PalettePlate.Type, position,1,yellowSample)
 					}
 
 					//components = append(components, yellowSample)
@@ -145,6 +147,7 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 						solution = execute.Mix(_ctx, solution, magentaSample)
 					} else {
 						solution = execute.MixInto(_ctx, _input.PalettePlate, "", magentaSample)
+						//solution = MixTo(PalettePlate.Type, position,1,magentaSample)
 					}
 
 					//components = append(components, magentaSample)
@@ -165,6 +168,7 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 						solution = execute.Mix(_ctx, solution, blackSample)
 					} else {
 						solution = execute.MixInto(_ctx, _input.PalettePlate, "", blackSample)
+						//solution = MixTo(PalettePlate.Type, position,1,blackSample)
 					}
 
 					//components = append(components, blackSample)

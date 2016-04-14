@@ -1,19 +1,23 @@
 {
   "Parameters": {
     "PipetteImage": {
-		"Imagefilename":"git.png",
+		"Imagefilename":"8-Bit-Pixel-Handlebar-Moustache.png",
 		"Rotate": false,
 		"AutoRotate": true,
 		"Diluent":"water",
-		"MinimumBlackpercentagethreshold":0.2,
-		"OnlyHighVolumetips": true,
+		"MinimumBlackpercentagethreshold":0.02,
+		"MaxBlackPercentagethreshold": 0.7,
+		"OnlyHighVolumetips": false,
+		"SkipWhite": true,
+		"MixingLiquidClass": "NeedToMix",
+		"NonMixingClass": "water",
 		"DontMix":false,
 		"Negative": false,
-		"PosterizeImage": false,
-		"PosterizeLevels": 4,
+		"PosterizeImage": true,
+		"PosterizeLevels": 8,
 		"Black": "Black",
       "OutPlate": "greiner384_riser",
-      "VolumeForFullcolour": "100ul"
+      "VolumeForFullcolour": "25ul"
     }
   }
 }

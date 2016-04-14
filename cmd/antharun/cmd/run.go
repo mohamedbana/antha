@@ -102,11 +102,11 @@ type runOpt struct {
 func (a *runOpt) makeTarget(mixerOpt mixer.Opt) (*target.Target, error) {
 	t := target.New()
 	if len(a.Drivers) == 0 {
-		if err := t.AddDevice(human.New(human.Opt{CanMix: true})); err != nil {
+		if err := t.AddDevice(human.New(human.Opt{CanMix: true, CanIncubate: true})); err != nil {
 			return nil, err
 		}
 	} else {
-		if err := t.AddDevice(human.New(human.Opt{CanMix: false})); err != nil {
+		if err := t.AddDevice(human.New(human.Opt{CanIncubate: true})); err != nil {
 			return nil, err
 		}
 	}

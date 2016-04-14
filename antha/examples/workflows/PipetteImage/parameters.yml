@@ -2,17 +2,20 @@
   "Parameters": {
     "PipetteImage": {
       "Colourcomponents": [
-	"red",
+	"black",
 	"white",
+	"purple",
 	"blue",
 	"green",
 	"yellow",
-	"black"
+	"orange",
+	"red",
+	"pink"
 	],
 	"OnlythisColour":"",
 	"NotthisColour":"white",
 	  "Imagefilename": "jenkins.jpeg",
-		"Palettename":"Palette1",
+		"Palettename":"Neon",
       "OutPlate": "greiner384_riser",
       "VolumePerWell": "100ul"
     }

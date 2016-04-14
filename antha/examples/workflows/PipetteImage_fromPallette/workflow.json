@@ -34,7 +34,7 @@
     ],
     "processes": {
         "MakePalette1": {
-            "component": "MakePalette"
+            "component": "MakePalette_OneByOne"
         },
         "Pipette1": {
             "component": "PipetteImage_fromPalette"

@@ -298,7 +298,7 @@ func Exists(filename string) bool {
 	return true
 }
 
-func FilterRegistry(keystrings []string) (listofpartIDs []string) {
+func FilterRegistry(partype string, keystrings []string) (listofpartIDs []string) {
 	if anthapath.Anthafileexists("iGem_registry.txt") == false {
 		err := UpdateRegistryfile()
 		if err != nil {
@@ -327,7 +327,7 @@ func FilterRegistry(keystrings []string) (listofpartIDs []string) {
 		seqtype := "DNA"
 		class := "not specified"*/
 
-		if search.Containsallthings(record.Desc, keystrings) && record.Seq_data != "" {
+		if search.Containsallthings(record.Desc, keystrings) && strings.Contains(strings.ToUpper(record.Part_type), strings.ToUpper(partype)) && record.Seq_data != "" {
 			fmt.Println(record.Part_name)
 			listofpartIDs = append(listofpartIDs, record.Part_name)
 		}

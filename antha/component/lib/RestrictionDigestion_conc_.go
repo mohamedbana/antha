@@ -77,7 +77,7 @@ func _RestrictionDigestion_concSteps(_ctx context.Context, _input *RestrictionDi
 	}
 
 	// incubate the reaction mixture
-	r1 := execute.Incubate(_ctx, execute.MixInto(_ctx, _input.OutPlate, "", samples...), _input.ReactionTemp, _input.ReactionTime, false)
+	r1 := execute.Incubate(_ctx, execute.MixTo(_ctx, _input.OutPlate.Type, "", _input.Platenumber, samples...), _input.ReactionTemp, _input.ReactionTime, false)
 	// inactivate
 	_output.Reaction = execute.Incubate(_ctx, r1, _input.InactivationTemp, _input.InactivationTime, false)
 }
@@ -155,6 +155,7 @@ type RestrictionDigestion_concInput struct {
 	InactivationTemp    wunit.Temperature
 	InactivationTime    wunit.Time
 	OutPlate            *wtype.LHPlate
+	Platenumber         int
 	ReactionTemp        wunit.Temperature
 	ReactionTime        wunit.Time
 	ReactionVolume      wunit.Volume
@@ -196,6 +197,7 @@ func init() {
 				{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
 				{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "Platenumber", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionTemp", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionTime", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionVolume", Desc: "", Kind: "Parameters"},

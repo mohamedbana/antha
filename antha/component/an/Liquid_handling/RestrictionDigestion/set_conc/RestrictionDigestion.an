@@ -24,6 +24,7 @@ Parameters (
 	ReactionTime 				Time
 	InactivationTemp 			Temperature
 	InactivationTime 			Time
+	Platenumber int
 )
 
 // Physical Inputs to this protocol with types
@@ -105,7 +106,7 @@ Steps {
 	}
 
 	// incubate the reaction mixture
-	r1 := Incubate(MixInto(OutPlate, "", samples...), ReactionTemp, ReactionTime, false)
+	r1 := Incubate(MixTo(OutPlate.Type, "", Platenumber, samples...), ReactionTemp, ReactionTime, false)
 	// inactivate
 	Reaction = Incubate(r1, InactivationTemp, InactivationTime, false)
 }
