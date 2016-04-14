@@ -42,6 +42,7 @@ func (lh *Liquidhandler) Tip_box_setup(request *LHRequest) *LHRequest {
 	// of each type
 	instrx := request.Instructions
 	ntips := make(map[string]int)
+	tiplocs := make(map[string]map[string]int)
 
 	// aide memoire: ultimately these tip types derive from the LHProperties object which was passed into
 	// the call to generating concrete instructions
@@ -59,6 +60,14 @@ func (lh *Liquidhandler) Tip_box_setup(request *LHRequest) *LHRequest {
 		if ins.InstructionType() == lhdriver.LOD {
 			ttype := ins.GetParameter("TIPTYPE").([]string)[0]
 			ntips[ttype] += ins.GetParameter("MULTI").(int)
+			hs, ok := tiplocs[ttype]
+
+			if !ok {
+				hs = make(map[string]int, 2)
+				tiplocs[ttype] = hs
+			}
+
+			hs[ins.GetParameter("POS").([]string)[0]] += ins.GetParameter("MULTI").(int)
 		}
 	}
 
@@ -69,9 +78,18 @@ func (lh *Liquidhandler) Tip_box_setup(request *LHRequest) *LHRequest {
 		tx := strings.Split(tiptype, "_")
 		actualtiptype := tx[0]
 		h[actualtiptype] += ntip
+		tiplocs[actualtiptype] = tiplocs[tiptype]
 	}
 
+	tiplocs2 := make([]string, 0, 1)
+
 	for actualtiptype, ntip := range h {
+		ar := tiplocs[actualtiptype]
+		ar2 := make([]string, 0, 1)
+		for k, _ := range ar {
+			ar2 = append(ar2, k)
+		}
+
 		logger.Debug(fmt.Sprintln("TIPS OF TYPE ", actualtiptype, " USED: ", ntip))
 
 		logger.Info(fmt.Sprintf("Block %s Tips of type %s used: %d", request.BlockID, actualtiptype, ntip))
@@ -90,6 +108,7 @@ func (lh *Liquidhandler) Tip_box_setup(request *LHRequest) *LHRequest {
 		for i := 0; i < ntbx; i++ {
 			tbt2 := factory.GetTipByType(actualtiptype)
 			tip_boxes = append(tip_boxes, tbt2)
+			tiplocs2 = append(tiplocs2, ar2[i])
 		}
 	}
 
@@ -98,8 +117,8 @@ func (lh *Liquidhandler) Tip_box_setup(request *LHRequest) *LHRequest {
 	// need to fix the tip situation in the properties structure
 
 	lh.Properties.RemoveTipBoxes()
-	for _, tb := range tip_boxes {
-		lh.Properties.AddTipBox(tb)
+	for i, tb := range tip_boxes {
+		lh.Properties.AddTipBoxTo(tiplocs2[i], tb)
 	}
 
 	return request
