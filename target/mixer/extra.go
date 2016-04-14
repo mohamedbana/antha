@@ -15,22 +15,8 @@ import (
 	"github.com/antha-lang/antha/microArch/logger"
 )
 
-// one file per plate
-// here's the format:
-// csv, first line MUST be
-// _some_plate_type_,
-// other lines are then
-// well,component name, component type (string for now I think),
-func parseInputPlateFile(filename string) (*wtype.LHPlate, error) {
-	f, err := os.Open(filename)
-
-	if err != nil {
-		return nil, err
-	}
-
-	defer f.Close()
-
-	csvr := csv.NewReader(f)
+func parseInputPlateData(inData io.Reader) (*wtype.LHPlate, error) {
+	csvr := csv.NewReader(inData)
 	csvr.FieldsPerRecord = -1
 
 	// first line must be one cell, just the plate type name
@@ -161,4 +147,22 @@ func parseInputPlateFile(filename string) (*wtype.LHPlate, error) {
 	// all done!
 
 	return p, nil
+
+}
+
+// one file per plate
+// here's the format:
+// csv, first line MUST be
+// _some_plate_type_,
+// other lines are then
+// well,component name, component type (string for now I think),
+func parseInputPlateFile(filename string) (*wtype.LHPlate, error) {
+	f, err := os.Open(filename)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer f.Close()
+	return parseInputPlateData(f)
 }

@@ -4,10 +4,10 @@
             "OnlyreturnAvailableParts": true,
             "OnlyreturnWorkingparts": true,
             "Partdescriptions": [
-                "Double"
+                "strong"
             ],
             "Parttypes": [
-                "Terminator"
+                "RBS"
             ]
         }
     }

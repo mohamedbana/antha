@@ -81,7 +81,7 @@ func (a *ir) assignDevices(t *target.Target) error {
 		if len(devices) == 0 {
 			// Otherwise fall back to manual
 			if isBundle {
-				devices = append(devices, human.New(human.Opt{CanMix: true}))
+				devices = append(devices, human.New(human.Opt{CanMix: true, CanIncubate: true}))
 			} else {
 				return fmt.Errorf("no device in target %T can handle constraints %s", n, ast.Meet(reqs))
 			}

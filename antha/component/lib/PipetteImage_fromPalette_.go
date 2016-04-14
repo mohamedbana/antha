@@ -39,7 +39,11 @@ func _PipetteImage_fromPaletteSetup(_ctx context.Context, _input *PipetteImage_f
 // for every input
 func _PipetteImage_fromPaletteSteps(_ctx context.Context, _input *PipetteImage_fromPaletteInput, _output *PipetteImage_fromPaletteOutput) {
 
-	positiontocolourmap, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &_input.Palette, _input.Rotate, _input.AutoRotate)
+	if _input.PosterizeImage {
+		_, _input.Imagefilename = image.Posterize(_input.Imagefilename, _input.PosterizeLevels)
+	}
+
+	positiontocolourmap, _, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &_input.Palette, _input.Rotate, _input.AutoRotate)
 
 	image.CheckAllResizealgorithms(_input.Imagefilename, _input.OutPlate, _input.Rotate, imaging.AllResampleFilters)
 
@@ -68,10 +72,10 @@ func _PipetteImage_fromPaletteSteps(_ctx context.Context, _input *PipetteImage_f
 		colourindex := strconv.Itoa(_input.Palette.Index(colour))
 
 		component, componentpresent := _input.ColourIndextoComponentMap[colourindex]
-		//		fmt.Println("Am I a component", component, "key:", colourindex, "from map:", ColourIndextoComponentMap)
+		fmt.Println("Am I a component", component, "key:", colourindex, "from map:", _input.ColourIndextoComponentMap)
 
 		if componentpresent {
-			component.Type = wtype.LTDoNotMix //"DoNotMix"
+			component.Type = wtype.LTDISPENSEABOVE //"DoNotMix"
 
 			//fmt.Println(image.Colourcomponentmap[colour])
 
@@ -171,6 +175,8 @@ type PipetteImage_fromPaletteInput struct {
 	OnlythisColour            string
 	OutPlate                  *wtype.LHPlate
 	Palette                   color.Palette
+	PosterizeImage            bool
+	PosterizeLevels           int
 	Rotate                    bool
 	VolumePerWell             wunit.Volume
 }
@@ -204,6 +210,8 @@ func init() {
 				{Name: "OnlythisColour", Desc: "AvailableColours []string\n", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "Palette", Desc: "", Kind: "Parameters"},
+				{Name: "PosterizeImage", Desc: "", Kind: "Parameters"},
+				{Name: "PosterizeLevels", Desc: "", Kind: "Parameters"},
 				{Name: "Rotate", Desc: "", Kind: "Parameters"},
 				{Name: "VolumePerWell", Desc: "", Kind: "Parameters"},
 				{Name: "Numberofpixels", Desc: "", Kind: "Data"},

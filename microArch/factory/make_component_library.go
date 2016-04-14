@@ -134,28 +134,28 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	A = wtype.NewLHComponent()
 	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "Yellow_ink"
-	A.Type = wtype.LTWater
+	A.Type = wtype.LTPAINT
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
 	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "Cyan"
-	A.Type = wtype.LTWater
+	A.Type = wtype.LTPAINT
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
 	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "Magenta"
-	A.Type = wtype.LTWater
+	A.Type = wtype.LTPAINT
 	A.Smax = 9999
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
 	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "Black"
-	A.Type = wtype.LTWater
+	A.Type = wtype.LTPAINT
 	A.Smax = 9999
 	cmap[A.CName] = A
 
@@ -169,6 +169,20 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	A = wtype.NewLHComponent()
 	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "blue"
+	A.Type = wtype.LTWater
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	//A.GenericMatter = matter[wtype.LTWater]
+	A.CName = "darkblue"
+	A.Type = wtype.LTWater
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	//A.GenericMatter = matter[wtype.LTWater]
+	A.CName = "grey"
 	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
@@ -197,6 +211,27 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	A = wtype.NewLHComponent()
 	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "black"
+	A.Type = wtype.LTWater
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	//A.GenericMatter = matter[wtype.LTWater]
+	A.CName = "purple"
+	A.Type = wtype.LTWater
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	//A.GenericMatter = matter[wtype.LTWater]
+	A.CName = "pink"
+	A.Type = wtype.LTWater
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	//A.GenericMatter = matter[wtype.LTWater]
+	A.CName = "orange"
 	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A

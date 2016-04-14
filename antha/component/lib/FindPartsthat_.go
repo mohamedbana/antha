@@ -17,6 +17,7 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"strconv"
 	"strings"
 )
 
@@ -57,7 +58,10 @@ func _FindPartsthatSteps(_ctx context.Context, _input *FindPartsthatInput, _outp
 	// Look up parts from registry according to properties (this will take a couple of minutes the first time)
 
 	parts := make([][]string, 0)
+	_output.PartMap = make(map[string][]string)
+	_output.BiobrickDescriptions = make(map[string]string)
 	subparts := make([]string, 0)
+	var highestrating int
 
 	partstatus := ""
 
@@ -68,10 +72,11 @@ func _FindPartsthatSteps(_ctx context.Context, _input *FindPartsthatInput, _outp
 	// first we'll parse the igem registry based on the short description contained in the fasta header for each part sequence
 	for _, desc := range _input.Parttypes {
 
-		subparts = igem.FilterRegistry([]string{desc, partstatus})
+		subparts = igem.FilterRegistry(desc, []string{desc, partstatus})
 		status = text.Print(desc+" :", subparts)
 		joinedstatus = append(joinedstatus, status)
 		parts = append(parts, subparts)
+		_output.PartMap[desc] = subparts
 	}
 
 	othercriteria := ""
@@ -79,7 +84,9 @@ func _FindPartsthatSteps(_ctx context.Context, _input *FindPartsthatInput, _outp
 		othercriteria = "WORKS"
 	}
 
-	for i, subparts := range parts {
+	var i int
+
+	for desc, subparts := range _output.PartMap {
 
 		partdetails := igem.LookUp(subparts)
 		// now we can get detailed information of all of those records to interrogate further
@@ -87,13 +94,24 @@ func _FindPartsthatSteps(_ctx context.Context, _input *FindPartsthatInput, _outp
 
 		for _, subpart := range subparts {
 
-			if strings.Contains(partdetails.Description(subpart), _input.Partdescriptions[i]) &&
+			if strings.Contains(strings.ToUpper(partdetails.Description(subpart)), strings.ToUpper(_input.Partdescriptions[i])) &&
 				strings.Contains(partdetails.Results(subpart), othercriteria) {
 				BackupParts = append(BackupParts, subpart)
+				_output.BiobrickDescriptions[subpart] = partdetails.Description(subpart)
 
+				rating, err := strconv.Atoi(partdetails.Rating(subpart))
+
+				if err == nil && rating > highestrating {
+					_output.HighestRatedMatch = subpart
+				}
 			}
+
+			delete(_output.PartMap, desc)
+			_output.PartMap[desc] = BackupParts
+
 			_output.FulllistBackupParts = append(_output.FulllistBackupParts, BackupParts)
 		}
+		i = i + 1
 	}
 	/*
 		if len(warnings) != 0 {
@@ -183,16 +201,22 @@ type FindPartsthatInput struct {
 }
 
 type FindPartsthatOutput struct {
-	FulllistBackupParts [][]string
-	Status              string
-	Warnings            error
+	BiobrickDescriptions map[string]string
+	FulllistBackupParts  [][]string
+	HighestRatedMatch    string
+	PartMap              map[string][]string
+	Status               string
+	Warnings             error
 }
 
 type FindPartsthatSOutput struct {
 	Data struct {
-		FulllistBackupParts [][]string
-		Status              string
-		Warnings            error
+		BiobrickDescriptions map[string]string
+		FulllistBackupParts  [][]string
+		HighestRatedMatch    string
+		PartMap              map[string][]string
+		Status               string
+		Warnings             error
 	}
 	Outputs struct {
 	}
@@ -210,7 +234,10 @@ func init() {
 				{Name: "Partdescriptions", Desc: "e.g. arsenic, reporter, alkane, logic gate\n", Kind: "Parameters"},
 				{Name: "Parts", Desc: "", Kind: "Parameters"},
 				{Name: "Parttypes", Desc: "Constructname \t\t\t\tstring\n\ne.g. promoter\n", Kind: "Parameters"},
+				{Name: "BiobrickDescriptions", Desc: "", Kind: "Data"},
 				{Name: "FulllistBackupParts", Desc: "Partsfound\t[]wtype.DNASequence // map[string]wtype.DNASequence\n\nmap[string][]string\n", Kind: "Data"},
+				{Name: "HighestRatedMatch", Desc: "", Kind: "Data"},
+				{Name: "PartMap", Desc: "", Kind: "Data"},
 				{Name: "Status", Desc: "", Kind: "Data"},
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},

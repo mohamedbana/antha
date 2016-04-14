@@ -54,7 +54,7 @@ Steps {
 	
 	//var chosencolourpalette color.Palette
 	chosencolourpalette := image.AvailablePalettes["Plan9"]
-	positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate, AutoRotate) 
+	positiontocolourmap, _,_ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate, AutoRotate) 
 	
 	solutions := make([]*wtype.LHComponent, 0)
 
@@ -64,7 +64,8 @@ Steps {
 
 	for locationkey, colour := range positiontocolourmap {
 		
-		components := make([]*wtype.LHComponent, 0)
+		//components := make([]*wtype.LHComponent, 0)
+		var solution *wtype.LHComponent
 
 		cmyk := image.ColourtoCMYK(colour)
 		
@@ -81,29 +82,87 @@ Steps {
 		if cmyk.C > 0{
 			
 		cyanvol := wunit.NewVolume(((float64(cmyk.C)/float64(maxuint8)) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
-		cyanSample := mixer.Sample(Cyan, cyanvol)
-		components = append(components, cyanSample)
+		
+		if cyanvol.RawValue() < 10 && cyanvol.Unit().PrefixedSymbol() == "ul"{
+				cyanvol.SetValue(10)
+			}
+		
+		if cmyk.K == 0 && cmyk.M == 0 && cmyk.Y == 0{
+		Cyan.Type  =	wtype.LTNeedToMix
+		}else {
+		Cyan.Type = wtype.LTDISPENSEABOVE
 		}
 		
+		cyanSample := mixer.Sample(Cyan, cyanvol)
+		
+		solution = MixTo(OutPlate.Type, locationkey,1,cyanSample)
+		}
 		if cmyk.Y > 0{
 		yellowvol := wunit.NewVolume(((float64(cmyk.Y)/float64(maxuint8)) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
-		yellowSample := mixer.Sample(Yellow, yellowvol)
-		components = append(components, yellowSample)
+		
+		if yellowvol.RawValue() < 10 && yellowvol.Unit().PrefixedSymbol() == "ul"{
+				yellowvol.SetValue(10)
+			}
+		if cmyk.K == 0 && cmyk.M == 0{
+		Yellow.Type  =	wtype.LTNeedToMix
+		}else {
+		Yellow.Type = wtype.LTDISPENSEABOVE
 		}
 		
+		
+		yellowSample := mixer.Sample(Yellow, yellowvol)
+		
+		if solution != nil {
+		solution = Mix(solution, yellowSample)
+		}else {
+			//solution = MixInto(PalettePlate, "", yellowSample)
+			solution = MixTo(OutPlate.Type, locationkey,1,yellowSample)
+		}
+		}
 		if cmyk.M > 0{
 		magentavol := wunit.NewVolume(((float64(cmyk.M)/float64(maxuint8)) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
-		magentaSample := mixer.Sample(Magenta, magentavol)
-		components = append(components, magentaSample)
+		
+		if magentavol.RawValue() < 10 && magentavol.Unit().PrefixedSymbol() == "ul"{
+				magentavol.SetValue(10)
+			}
+		
+		if cmyk.K == 0 {
+		Magenta.Type  =	wtype.LTNeedToMix
+		}else {
+		Magenta.Type = wtype.LTDISPENSEABOVE
 		}
 		
+		magentaSample := mixer.Sample(Magenta, magentavol)
+		
+		if solution != nil {
+		solution = Mix(solution, magentaSample)
+		}else {
+			//solution = MixInto(PalettePlate, "", magentaSample)
+			solution = MixTo(OutPlate.Type, locationkey,1,magentaSample)
+		}
+		}
 		if cmyk.K > 0{
 		blackvol := wunit.NewVolume(((float64(cmyk.K)/float64(maxuint8)) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
+		
+		if blackvol.RawValue() < 10 && blackvol.Unit().PrefixedSymbol() == "ul"{
+				blackvol.SetValue(10)
+			}
+		
+		Black.Type = wtype.LTNeedToMix
+		
 		blackSample := mixer.Sample(Black, blackvol)
-		components = append(components, blackSample)
+		
+		if solution != nil {
+		solution = Mix(solution, blackSample)
+		}else {
+			//solution = MixInto(PalettePlate, "", blackSample)
+			solution = MixTo(OutPlate.Type, locationkey,1,blackSample)
 		}
 		
-		solution := MixTo(OutPlate.Type, locationkey,1, components...)
+		//components = append(components, blackSample)
+		}
+		
+		//solution := MixTo(OutPlate.Type, locationkey,1, components...)
 		solutions = append(solutions, solution)
 		
 		}

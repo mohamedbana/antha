@@ -3,20 +3,21 @@
     "PipetteImage": {
 		"OnlythisColour":"",
 		"Notthiscolour":"verywhite",
-	  	"Imagefilename": "git.png",
+	  	"Imagefilename": "pipetmax.jpeg",
 		"Rotate": false,
 		"AutoRotate": true,
-		"Palettename":"ProteinPaintboxVisible",
-		"Subset": true,
+		"Palettename":"Neon",
+		"Subset": false,
 		"Subsetnames": [
-		"DreidelTeal",
-		"TinselPurple",
-		"CupidPink",
-		"LeorOrange",
-		"verywhite",
-		"E.coli",
-		"E.coli pUC19 on sgal"
-		],
+				"DreidelTeal",
+				"TinselPurple",
+				"CupidPink",
+				"LeorOrange",
+				"verywhite",
+				"E.coli",
+				"E.coli pUC19 on sgal"
+				],
+		"UseLiquidClass":"water",
       	"OutPlate": "Agarplateforpicking384_riser",
 		"UVimage":false,
       	"VolumePerWell": "2ul"
