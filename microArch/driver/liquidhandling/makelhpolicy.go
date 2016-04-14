@@ -59,6 +59,8 @@ func MakePolicies() map[string]LHPolicy {
 	pols["loadlow"] = MakeLoadPolicy()
 	pols["loadwater"] = MakeLoadWaterPolicy()
 	pols["DispenseAboveLiquid"] = MakeDispenseAboveLiquidPolicy()
+	pols["PEG"] = MakePEGPolicy()
+	pols["Protoplasts"] = MakeProtoplastPolicy()
 	//      pols["lysate"] = MakeLysatePolicy()
 
 	/*policies, names := PolicyMaker(Allpairs, "DOE_run", false)
@@ -151,6 +153,30 @@ func PolicyMakerfromRuns(runs []Run, nameprepend string, concatfactorlevelsinnam
 //        proteinpolicy["CAN_MSA"] = false
 //        return proteinpolicy
 //}
+
+func MakePEGPolicy() LHPolicy {
+	policy := make(LHPolicy, 6)
+	policy["ASP_SPEED"] = 1.5
+	policy["DSP_SPEED"] = 1.5
+	policy["ASP_WAIT"] = 2.0
+	policy["DSP_WAIT"] = 2.0
+	policy["POST_MIX"] = 3
+	policy["BLOWOUTVOLUME"] = 0.0
+	policy["BLOWOUTVOLUMEUNIT"] = "ul"
+	policy["TOUCHOFF"] = true
+	return policy
+}
+
+func MakeProtoplastPolicy() LHPolicy {
+	policy := make(LHPolicy, 6)
+	policy["ASP_SPEED"] = 0.15
+	policy["DSP_SPEED"] = 0.15
+	policy["BLOWOUTVOLUME"] = 0.0
+	policy["BLOWOUTVOLUMEUNIT"] = "ul"
+	policy["TOUCHOFF"] = true
+	policy["TIP_REUSE_LIMIT"] = 5
+	return policy
+}
 
 func MakePaintPolicy() LHPolicy {
 
