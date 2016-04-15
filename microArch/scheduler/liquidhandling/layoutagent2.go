@@ -56,7 +56,6 @@ func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain 
 	// 3- ones going to a plate of our choosing
 
 	// find existing assignments
-
 	plate_choices, mapchoices = get_and_complete_assignments(request, chain.ValueIDs(), plate_choices, mapchoices)
 	// now we know what remains unassigned, we assign it
 
