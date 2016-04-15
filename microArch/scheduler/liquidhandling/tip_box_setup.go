@@ -78,7 +78,17 @@ func (lh *Liquidhandler) Tip_box_setup(request *LHRequest) *LHRequest {
 		tx := strings.Split(tiptype, "_")
 		actualtiptype := tx[0]
 		h[actualtiptype] += ntip
-		tiplocs[actualtiptype] = tiplocs[tiptype]
+
+		ar, ok := tiplocs[actualtiptype]
+
+		if !ok {
+			tiplocs[actualtiptype] = tiplocs[tiptype]
+		} else {
+			for k, _ := range tiplocs[tiptype] {
+				ar[k] += 1
+			}
+			tiplocs[actualtiptype] = ar
+		}
 	}
 
 	tiplocs2 := make([]string, 0, 1)
