@@ -203,7 +203,22 @@ func NewAngle(v float64, unit string) Angle {
 	return a
 }
 
-// this is really Mass(Length/Time)^2
+// angular velocity (one way or another)
+
+type AngularVelocity struct {
+	*ConcreteMeasurement
+}
+
+func NewAngularVelocity(v float64, unit string) AngularVelocity {
+	if unit != "rpm" {
+		panic("Can't make angular velicities which aren't in rpm")
+	}
+
+	r := AngularVelocity{NewMeasurement(v, "", unit)}
+	return r
+}
+
+// this is really Mass Length/Time^2
 type Energy struct {
 	*ConcreteMeasurement
 }
