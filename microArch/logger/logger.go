@@ -106,6 +106,14 @@ func Sensor(message string, extra ...interface{}) {
 	}
 }
 
+func Data(data interface{}, extra ...interface{}) {
+	_middlewares_mutex.Lock()
+	defer _middlewares_mutex.Unlock()
+	for _, h := range getMiddlewareList() {
+		h.Data(time.Now().Unix(), data, append(extra, getSource()))
+	}
+}
+
 var (
 	middlewares        []LoggerMiddleware
 	_defaultmw         *DefaultMiddleware //only used if none other available
@@ -155,6 +163,9 @@ type LoggerMiddleware interface {
 	Measure(ts int64, source, msg string, extra ...interface{})
 	//Sensor react to specific sensor readouts
 	Sensor(ts int64, source, msg string, extra ...interface{})
+	//Data saves data to database witha  timestamp and a set of extra fields in order to localise
+	// it is an upper level log call that allows to dump unstructured data into our backend
+	Data(ts int64, data interface{}, extra ...interface{})
 }
 
 //getSource returns a string representing the line of code that the preceeding call was generated.
