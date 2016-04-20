@@ -1,0 +1,39 @@
+protocol InoculateDOE
+
+import (
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/mixer"
+)
+
+Parameters (
+	InoculumVolume Volume
+)
+
+Data (
+)
+
+Inputs (
+	Inoculum *wtype.LHComponent
+	Medium *wtype.LHComponent
+)
+
+Outputs (
+	Seed *wtype.LHComponent
+)
+
+Requirements {
+}
+
+Setup {
+}
+
+Steps {
+	inocsample:=mixer.Sample(Inoculum, InoculumVolume)
+	Seed=Mix(Medium, inocsample)
+}
+
+Analysis {
+}
+
+Validation {
+}

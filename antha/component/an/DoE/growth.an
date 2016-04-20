@@ -1,0 +1,39 @@
+protocol GrowthDOE 
+
+import (
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+)
+
+Parameters (
+	Growthtemp Temperature
+	Growthtime Time
+	ShakingSpeed AngularVelocity
+)
+
+Data (
+)
+
+Inputs (
+	StrainInMedium *wtype.LHComponent
+)
+
+Outputs (
+	Culture *wtype.LHComponent
+)
+
+Requirements {
+}
+
+Setup {
+}
+
+Steps {
+	// TODO add RPM here
+	Culture = Incubate(StrainInMedium, Growthtemp, Growthtime, true)
+}
+
+Analysis {
+}
+
+Validation {
+}
