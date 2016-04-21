@@ -7,13 +7,12 @@ import (
 )
 
 Parameters (
-)
-
-Data (
 	Stream1Vol Volume
 	Stream2Vol Volume
 	Stream1PlateType string
 	Stream2PlateType string
+)
+Data (
 )
 
 Inputs (
