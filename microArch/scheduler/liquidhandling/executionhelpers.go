@@ -144,6 +144,8 @@ func set_output_order(rq *LHRequest) {
 	it := NewIChain(nil)
 
 	for _, v := range sorted {
+		//fmt.Println("V: ", v.Result.CName, " PARENTS: ", v.ParentString(), " RESULT : ", v.Result.ID, " GENERATION: ", v.Generation())
+
 		it.Add(v)
 	}
 

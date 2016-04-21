@@ -292,12 +292,12 @@ func (ins *TransferInstruction) GetParallelSetsFor(channel *wtype.LHChannelParam
 		a, ok := tfrs[hashkey]
 
 		if !ok {
-			a := make([]string, 0, channel.Multi)
-			tfrs[hashkey] = a
+			a = make([]string, 0, channel.Multi)
 		}
 
 		val := fmt.Sprintf("%d,%d,%d", fc2, tc2, i)
 		a = append(a, val)
+		tfrs[hashkey] = a
 	}
 
 	ret := make([][]int, 0, len(ins.What))
@@ -311,9 +311,12 @@ func (ins *TransferInstruction) GetParallelSetsFor(channel *wtype.LHChannelParam
 		pmf, _ := strconv.Atoi(tx[5])
 		pmt, _ := strconv.Atoi(tx[6])
 
+		fmt.Println("transfer ", k, " len : ", len(a))
 		if len(a) >= channel.Multi {
 			// could be
 			mss := GetMultiSet(a, channel.Multi, pmf, pmt)
+
+			fmt.Println("Multiset length: ", len(mss))
 
 			if len(mss) != 0 {
 				for _, ms := range mss {
@@ -363,15 +366,16 @@ func GetNextSet(a []string, channelmulti int, fromplatemulti int, toplatemulti i
 		j, _ := strconv.Atoi(tx[1])
 		k, _ := strconv.Atoi(tx[2])
 
-		if r[i][j] != -1 {
-			r[i][j] = k
-		}
+		r[i][j] = k
 	}
 	// now we just take the first one we find
 
 	ret := getset(r, channelmulti)
+	censa := censoredcopy(a, ret)
 
-	return ret, censoredcopy(a, ret)
+	fmt.Println("RET: ", ret, " CENSA: ", censa)
+
+	return ret, censa
 }
 
 func getset(a [][]int, mx int) []int {
@@ -416,9 +420,9 @@ func censoredcopy(a []string, b []int) []string {
 	r := make([]string, 0, len(a)-len(b))
 
 	for _, x := range a {
-		tx := strings.Split(",", x)
-		i, _ := strconv.Atoi(tx[0])
-		if isin(i, b) {
+		tx := strings.Split(x, ",")
+		i, _ := strconv.Atoi(tx[2])
+		if IsIn(i, b) {
 			continue
 		}
 		r = append(r, x)
@@ -427,7 +431,7 @@ func censoredcopy(a []string, b []int) []string {
 	return r
 }
 
-func isin(i int, a []int) bool {
+func IsIn(i int, a []int) bool {
 	for _, x := range a {
 		if i == x {
 			return true
@@ -495,6 +499,9 @@ func (ins *TransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProper
 		// this is a bit problematic: we need to define head choice here partly on the
 		// basis of its multi, partly based on volume range
 		parallelsets := ins.GetParallelSetsFor(prms.HeadsLoaded[0].Params)
+
+		fmt.Println("PARALLEL SETS FOUND: ", parallelsets)
+
 		mci := NewMultiChannelBlockInstruction()
 		mci.Multi = prms.HeadsLoaded[0].Params.Multi // TODO Remove Hard code here
 		mci.Prms = prms.HeadsLoaded[0].Params        // TODO Remove Hard code here
@@ -870,6 +877,7 @@ func (ins *MultiChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms 
 	pol := policy.GetPolicyFor(ins)
 	ret := make([]RobotInstruction, 0)
 	// get some tips
+
 	channel, tiptype := ChooseChannel(ins.Volume[0][0], prms)
 	ret = append(ret, GetTips(tiptype, prms, channel, ins.Multi, false))
 	n_tip_uses := 0
@@ -885,23 +893,58 @@ func (ins *MultiChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms 
 
 		// choose tips
 		newchannel, newtiptype := ChooseChannel(ins.Volume[0][0], prms)
-
+		var last_thing *wtype.LHComponent
+		last_thing = nil
+		var dirty bool
 		// load tips
 
 		// split the transfer up
 		// NB we assume all volumes are equal here;
+		// oof we need to do some work here -- this needs to be in sync with singlechannel block
 		tvs := TransferVolumes(ins.Volume[t][0], newchannel.Minvol, newchannel.Maxvol)
 
 		for _, vol := range tvs {
-			// enforce tip usage policy
+			// determine whether to change tips
+			change_tips := false
+			change_tips = n_tip_uses > pol["TIP_REUSE_LIMIT"].(int)
+			change_tips = change_tips || channel != newchannel
+			change_tips = change_tips || newtiptype != tiptype
 
-			if n_tip_uses > pol["TIP_REUSE_LIMIT"].(int) || newchannel != channel || newtiptype != tiptype {
+			// big dangerous assumption here: we need to check if anything is different
+			this_thing := prms.Plates[ins.PltFrom[t][0]].Wellcoords[ins.WellFrom[t][0]].Contents()
+
+			if last_thing != nil {
+				if this_thing.CName != last_thing.CName {
+					change_tips = true
+				}
+			}
+
+			// finally ensure we don't contaminate sources
+			if dirty {
+				change_tips = true
+			}
+
+			if change_tips {
+				// maybe wrap this as a ChangeTips function call
 				// these need parameters
 				ret = append(ret, DropTips(tiptype, prms, channel, ins.Multi))
 				ret = append(ret, GetTips(newtiptype, prms, newchannel, ins.Multi, false))
+				tiptype = newtiptype
+				channel = newchannel
 				n_tip_uses = 0
+				last_thing = nil
+				dirty = false
 			}
+			/*
+				// enforce tip usage policy
 
+				if n_tip_uses > pol["TIP_REUSE_LIMIT"].(int) || newchannel != channel || newtiptype != tiptype {
+					// these need parameters
+					ret = append(ret, DropTips(tiptype, prms, channel, ins.Multi))
+					ret = append(ret, GetTips(newtiptype, prms, newchannel, ins.Multi, false))
+					n_tip_uses = 0
+				}
+			*/
 			mci := NewMultiChannelTransferInstruction()
 			vols.SetEqualTo(vol)
 			mci.What = ins.What[t]
@@ -914,6 +957,7 @@ func (ins *MultiChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms 
 			mci.WellTo = ins.WellTo[t]
 			mci.FPlateType = ins.FPlateType[t]
 			mci.TPlateType = ins.TPlateType[t]
+			mci.Multi = ins.Multi
 			mci.Prms = ins.Prms
 
 			ret = append(ret, mci)

@@ -24,9 +24,13 @@ package wtype
 
 import (
 	"fmt"
+	"sort"
 	"testing"
+
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 )
 
+/*
 func testBS(bs BioSequence) {
 	fmt.Println(bs.Sequence())
 }
@@ -72,6 +76,7 @@ func TestWellCoords(*testing.T) {
 	fmt.Println(wc.X, " ", wc.Y)
 	fmt.Println("Finished Testing Well Coords")
 }
+*/
 
 func TestLHComponentSampleStuff(t *testing.T) {
 	var c LHComponent
@@ -210,4 +215,56 @@ func TestParent(t *testing.T) {
 		t.Error("LHComponent.HasParent() must return false for values not set")
 	}
 
+}
+
+func testLHCP() LHChannelParameter {
+	return LHChannelParameter{
+		ID:          "dummydummy",
+		Name:        "mrdummy",
+		Minvol:      wunit.NewVolume(1.0, "ul"),
+		Maxvol:      wunit.NewVolume(1.0, "ul"),
+		Minspd:      wunit.NewFlowRate(0.5, "ml/min"),
+		Maxspd:      wunit.NewFlowRate(0.6, "ml/min"),
+		Multi:       8,
+		Independent: false,
+		Orientation: LHVChannel,
+		Head:        0,
+	}
+}
+
+func TestLHMultiConstraint(t *testing.T) {
+	params := testLHCP()
+
+	cnst := params.GetConstraint(8)
+
+	expected := LHMultiChannelConstraint{0, 1, 8}
+
+	if !cnst.Equals(expected) {
+		t.Fatal(fmt.Sprint("Expected: ", expected, " GOT: ", cnst))
+	}
+
+}
+
+func TestWCSorting(t *testing.T) {
+	v := make([]WellCoords, 0, 1)
+
+	v = append(v, WellCoords{0, 2})
+	v = append(v, WellCoords{4, 2})
+	v = append(v, WellCoords{0, 1})
+	v = append(v, WellCoords{8, 9})
+	v = append(v, WellCoords{1, 3})
+	v = append(v, WellCoords{3, 6})
+	v = append(v, WellCoords{8, 0})
+
+	sort.Sort(WellCoordArrayRow(v))
+
+	if v[0].FormatA1() != "B1" {
+		t.Fatal(fmt.Sprint("Row-first sort incorrect: expected B1 first, got ", v[0].FormatA1()))
+	}
+
+	sort.Sort(WellCoordArrayCol(v))
+
+	if v[0].FormatA1() != "A9" {
+		t.Fatal("Col-first sort incorrect: expected A9 first, got ", v[0].FormatA1())
+	}
 }

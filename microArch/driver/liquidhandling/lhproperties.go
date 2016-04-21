@@ -32,6 +32,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
+	"github.com/antha-lang/antha/microArch/sampletracker"
 )
 
 // describes a liquid handler, its capabilities and current state
@@ -565,6 +566,14 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []s
 			//fmt.Println("Trying to get component ", v.CName, v.ParentID)
 			// this means it was already made with a previous call
 			tx := strings.Split(v.Loc, ":")
+
+			// maybe we can look it up?
+
+			if len(tx) < 2 || len(v.Loc) == 0 {
+				st := sampletracker.GetSampleTracker()
+				loc, _ := st.GetLocationOf(v.ID)
+				tx = strings.Split(loc, ":")
+			}
 
 			r1[i] = tx[0]
 			r2[i] = tx[1]

@@ -35,6 +35,42 @@ const (
 	LHHChannel        // horizontal orientation
 )
 
+// what constraints apply to adjacent channels
+type LHMultiChannelConstraint struct {
+	X int
+	Y int
+	M int
+}
+
+func (lhmcc LHMultiChannelConstraint) Satisfied(wc1, wc2 WellCoords) bool {
+	// this is ordered, it is assumed wc1 > wc2
+	x := wc1.X - wc2.X
+	y := wc1.Y - wc2.Y
+	return x == lhmcc.X && y == lhmcc.Y
+}
+
+func (lhmcc LHMultiChannelConstraint) SatisfiedV(awc1, awc2 []WellCoords) bool {
+	// check we have fewer than the maximum
+	if len(awc1) != len(awc2) || len(awc1) > lhmcc.M {
+		return false
+	}
+
+	// we assume the sets are ordered
+	for i, wc1 := range awc1 {
+		wc2 := awc2[i]
+
+		if !lhmcc.Satisfied(wc1, wc2) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (lhmcc LHMultiChannelConstraint) Equals(lhmcc2 LHMultiChannelConstraint) bool {
+	return lhmcc.X == lhmcc2.X && lhmcc.Y == lhmcc2.Y && lhmcc.M == lhmcc2.M
+}
+
 // describes sets of parameters which can be used to create a configuration
 type LHChannelParameter struct {
 	ID          string
@@ -47,6 +83,32 @@ type LHChannelParameter struct {
 	Independent bool
 	Orientation int
 	Head        int
+}
+
+// given the dimension of the plate, what is the constraint
+// on multichannel access?
+func (lhcp LHChannelParameter) GetConstraint(n int) LHMultiChannelConstraint {
+	// this is initially quite simple, may get more complicated over time
+	// as it stands this cannot be entirely fully specified but for most of
+	// the cases we can deal with it's not an issue
+
+	if lhcp.Multi == 1 {
+		return LHMultiChannelConstraint{0, 0, 1}
+	}
+
+	pitch := lhcp.Multi / n
+	max := lhcp.Multi
+	var x, y int
+
+	if lhcp.Orientation == LHVChannel {
+		x = 0
+		y = pitch
+	} else {
+		x = pitch
+		y = 0
+	}
+
+	return LHMultiChannelConstraint{x, y, max}
 }
 
 func (lhcp LHChannelParameter) MarshalJSON() ([]byte, error) {
@@ -194,13 +256,6 @@ type LHSolution struct {
 	Tvol             float64
 	Majorlayoutgroup int
 	Minorlayoutgroup int
-}
-
-func NewLHInstruction() *LHInstruction {
-	var lhi LHInstruction
-	lhi.ID = GetUUID()
-	lhi.Majorlayoutgroup = -1
-	return &lhi
 }
 
 func NewLHSolution() *LHSolution {

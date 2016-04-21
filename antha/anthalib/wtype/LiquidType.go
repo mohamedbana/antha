@@ -25,6 +25,8 @@ const (
 	LTVISCOUS
 	LTPAINT
 	LTDISPENSEABOVE
+	LTPEG
+	LTProtoplasts
 	LTCulutureReuse
 )
 
@@ -73,6 +75,10 @@ func LiquidTypeFromString(s string) LiquidType {
 			return LTPAINT
 		case "DispenseAboveLiquid":
 			return LTDISPENSEABOVE
+		case "PEG":
+			return LTPEG
+		case "Protoplasts":
+			return LTProtoplasts
 		default:
 			return LTWater
 		}
@@ -116,6 +122,10 @@ func LiquidTypeName(lt LiquidType) string {
 		return "Paint"
 	case LTDISPENSEABOVE:
 		return "DispenseAboveLiquid"
+	case LTProtoplasts:
+		return "Protoplasts"
+	case LTPEG:
+		return "PEG"
 	default:
 		return "water"
 	}
@@ -146,6 +156,9 @@ func mergeTypes(c1, c2 *LHComponent) LiquidType {
 	}
 
 	if c1.Type == LTCulture || c2.Type == LTCulture {
+		return LTCulture
+	} else if c1.Type == LTProtoplasts || c2.Type == LTProtoplasts {
+		return LTProtoplasts
 	} else if c1.Type == LTDNA || c2.Type == LTDNA {
 		return LTDNA
 	} else if c1.Type == LTProtein || c2.Type == LTProtein {

@@ -24,6 +24,12 @@ type LHInstruction struct {
 	gen              int
 }
 
+func NewLHInstruction() *LHInstruction {
+	var lhi LHInstruction
+	lhi.ID = GetUUID()
+	lhi.Majorlayoutgroup = -1
+	return &lhi
+}
 func (inst *LHInstruction) AddProduct(cmp *LHComponent) {
 	inst.Result = cmp
 	inst.ProductID = cmp.ID
