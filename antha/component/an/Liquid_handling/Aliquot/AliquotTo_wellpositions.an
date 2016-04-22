@@ -1,0 +1,119 @@
+// Variant of Aliquot where the low level MixTo command is used to pipette by
+// row  
+protocol AliquotTo
+
+import (
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
+	"github.com/antha-lang/antha/antha/anthalib/mixer"
+	"strconv"
+)
+
+
+// Input parameters for this protocol (data)
+Parameters (
+	SolutionVolume Volume
+	VolumePerAliquot  Volume
+	NumberofAliquots int
+	ByRow bool
+)
+
+// Data which is returned from this protocol, and data types
+Data (
+	
+)
+
+
+// Physical Inputs to this protocol with types
+Inputs (
+	Solutions []*wtype.LHComponent
+	OutPlate *wtype.LHPlate
+)
+
+// Physical outputs from this protocol with types
+Outputs (
+	Aliquots []*wtype.LHComponent
+)
+
+Requirements {
+	
+}
+
+// Conditions to run on startup
+Setup {
+	
+}
+
+// The core process for this protocol, with the steps to be performed
+// for every input
+Steps {
+	
+	number := SolutionVolume.SIValue()/VolumePerAliquot.SIValue()
+	possiblenumberofAliquots, _ := wutil.RoundDown(number)
+	if possiblenumberofAliquots < NumberofAliquots {
+		panic("Not enough solution for this many aliquots")
+	}
+	
+	
+	aliquots := make([]*wtype.LHComponent,0)
+	
+	
+	// work out well coordinates for any plate
+	wellpositionarray := make([]string, 0)
+
+	
+	//alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	alphabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+		"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
+		"Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF"}
+	//k := 0
+	
+	if ByRow {
+	for j := 0; j < OutPlate.WlsY; j++ {
+		for i := 0; i < OutPlate.WlsX; i++ { //countingfrom1iswhatmakesushuman := j + 1
+			//k = k + 1
+			wellposition := string(alphabet[j]) + strconv.Itoa(i+1)
+			//fmt.Println(wellposition, k)
+			wellpositionarray = append(wellpositionarray, wellposition)
+		}
+
+	}
+	}else {
+		for j := 0; j < OutPlate.WlsX; j++ {
+		for i := 0; i < OutPlate.WlsY; i++ { //countingfrom1iswhatmakesushuman := j + 1
+			//k = k + 1
+			wellposition := string(alphabet[i]) + strconv.Itoa(j+1)
+			//fmt.Println(wellposition, k)
+			wellpositionarray = append(wellpositionarray, wellposition)
+		}
+
+	}
+	}
+	var counter int
+	for _, Solution := range Solutions {
+	for k := 0; k < NumberofAliquots; k++ {
+		
+		if Solution.TypeName() == "dna"{
+		Solution.Type = wtype.LTDoNotMix
+		}
+		aliquotSample := mixer.Sample(Solution, VolumePerAliquot)
+		aliquot := MixTo(OutPlate.Type,wellpositionarray[counter], 1, aliquotSample)
+		aliquots = append(aliquots,aliquot)
+		counter = counter +1
+	}
+	Aliquots = aliquots
+}
+
+}
+// Run after controls and a steps block are completed to
+// post process any data and provide downstream results
+Analysis {
+}
+
+// A block of tests to perform to validate that the sample was processed correctly
+// Optionally, destructive tests can be performed to validate results on a
+// dipstick basis
+Validation {
+	
+}
+
