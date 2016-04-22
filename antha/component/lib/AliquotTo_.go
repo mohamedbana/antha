@@ -173,7 +173,7 @@ func init() {
 		Constructor: AliquotToNew,
 		Desc: ComponentDesc{
 			Desc: "Variant of Aliquot where the low level MixTo command is used to pipette by\nrow\n",
-			Path: "antha/component/an/Liquid_handling/Aliquot/AliquotTo.an",
+			Path: "antha/component/an/Liquid_handling/Aliquot/AliquotTo_wellpositions.an",
 			Params: []ParamDesc{
 				{Name: "ByRow", Desc: "", Kind: "Parameters"},
 				{Name: "NumberofAliquots", Desc: "", Kind: "Parameters"},

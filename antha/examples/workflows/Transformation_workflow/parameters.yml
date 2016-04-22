@@ -6,7 +6,7 @@
             "Postplasmidtemp": "2C",
             "Postplasmidtime": "300s",
             "Reaction": "dna_part",
-            "Reactionvolume": "10ul",
+            "Reactionvolume": "2ul",
             "ReadyCompCells": "neb5compcells"
 			},
 		"Recovery1": {  

@@ -44,7 +44,7 @@ func _Aliquot_SpecificPlateSteps(_ctx context.Context, _input *Aliquot_SpecificP
 			_input.Solution.Type = wtype.LTDoNotMix
 		}
 		aliquotSample := mixer.Sample(_input.Solution, _input.VolumePerAliquot)
-		aliquot := execute.MixInto(_ctx, _input.OutPlate, "", aliquotSample)
+		aliquot := execute.MixTo(_ctx, _input.OutPlate, "", 1, aliquotSample)
 		aliquots = append(aliquots, aliquot)
 	}
 	_output.Aliquots = aliquots
@@ -110,7 +110,7 @@ type Aliquot_SpecificPlateElement struct {
 
 type Aliquot_SpecificPlateInput struct {
 	NumberofAliquots int
-	OutPlate         *wtype.LHPlate
+	OutPlate         string
 	Solution         *wtype.LHComponent
 	SolutionVolume   wunit.Volume
 	VolumePerAliquot wunit.Volume
@@ -133,10 +133,10 @@ func init() {
 		Constructor: Aliquot_SpecificPlateNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/Liquid_handling/Aliquot/AliquotIntoSpecificPlate.an",
+			Path: "antha/component/an/Liquid_handling/Aliquot/AliquotTo_PlateType.an",
 			Params: []ParamDesc{
 				{Name: "NumberofAliquots", Desc: "", Kind: "Parameters"},
-				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "OutPlate", Desc: "", Kind: "Parameters"},
 				{Name: "Solution", Desc: "", Kind: "Inputs"},
 				{Name: "SolutionVolume", Desc: "", Kind: "Parameters"},
 				{Name: "VolumePerAliquot", Desc: "", Kind: "Parameters"},
