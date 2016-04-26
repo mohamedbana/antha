@@ -3,20 +3,25 @@ protocol AbsorbanceMeasurement
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/platereader"
 )
 
 Parameters (
 	Wavelength Length
 	DilutionVolume Volume
+	ExtinctionCoefficient float64
 )
 
 Data (
 	AbsorbanceMeasurement float64
+	ActualConcentration Concentration
+	
 )
 
 Inputs (
 	SampleForReading *wtype.LHComponent
 	Diluent *wtype.LHComponent
+	Plate *wtype.LHPlate
 )
 
 Outputs (
@@ -29,11 +34,37 @@ Setup {
 }
 
 Steps {
+	
+	// dilute sample
 	diluentSample:=mixer.Sample(Diluent, DilutionVolume)
 	Mix(SampleForReading, diluentSample)
-	//dilutedSample:=Mix(SampleForReading, diluentSample)
-	//AbsorbanceMeasurement = ReadEM(dilutedSample, Wavelength, wunit.NilWavelength)
-	AbsorbanceMeasurement = 0.5
+	
+	dilutedSample:=Mix(SampleForReading, diluentSample)
+	
+	// read
+	abs := platereader.ReadAbsorbance(*Plate, *dilutedSample, Wavelength.RawValue())
+	
+	// prepare blank and read
+	blankSample := MixInto(Plate,"",diluentSample)
+	
+	blankabs := platereader.ReadAbsorbance(*Plate, *blankSample, Wavelength.RawValue())
+	
+	// blank correct
+	blankcorrected := platereader.Blankcorrect(blankabs,abs)
+	
+	// estimate pathlength
+	pathlength,_ := platereader.EstimatePathLength(Plate,dilutedSample.Volume())
+	
+	// pathlength correct
+    pathlengthcorrected := platereader.PathlengthCorrect(pathlength, blankcorrected)
+
+	// calculate actual conc based on extinction coefficient
+	actualconc := platereader.Concentration(pathlengthcorrected, ExtinctionCoefficient)
+
+	ActualConcentration = actualconc
+	
+	AbsorbanceMeasurement = abs.Reading
+	
 }
 
 Analysis {
@@ -41,3 +72,4 @@ Analysis {
 
 Validation {
 }
+

@@ -164,7 +164,7 @@ func init() {
 		Constructor: Mastermix_oneNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/Liquid_handling/MakeMastermix/Mastermix_reactions.an",
+			Path: "antha/component/an/Liquid_handling/MakeMastermix/Mastermix_one.an",
 			Params: []ParamDesc{
 				{Name: "AliquotbyRow", Desc: "NumberofMastermixes int // add as many as possible option e.g. if == -1\n", Kind: "Parameters"},
 				{Name: "ComponentVolumesperReaction", Desc: "", Kind: "Parameters"},
