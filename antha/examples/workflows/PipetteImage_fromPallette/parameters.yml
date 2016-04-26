@@ -12,7 +12,7 @@
 	"Black": "Black",
       "OutPlate": "greiner384_riser",
 	  "PalettePlate": "DSW96_riser",
-      "VolumeForFullcolour": "550ul"
+      "VolumeForFullcolour": "300ul"
     },
 	"Pipette1": {
        "VolumePerWell": "20ul",
