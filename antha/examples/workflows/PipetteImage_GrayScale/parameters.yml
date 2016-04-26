@@ -5,18 +5,18 @@
 		"Rotate": false,
 		"AutoRotate": true,
 		"Diluent":"water",
-		"MinimumBlackpercentagethreshold":0.02,
+		"MinimumBlackpercentagethreshold":0.3,
 		"MaxBlackPercentagethreshold": 0.7,
 		"OnlyHighVolumetips": false,
 		"SkipWhite": true,
 		"MixingLiquidClass": "NeedToMix",
 		"NonMixingClass": "water",
-		"DontMix":false,
+		"DontMix":true,
 		"Negative": false,
 		"PosterizeImage": true,
-		"PosterizeLevels": 8,
+		"PosterizeLevels": 2,
 		"Black": "Black",
-      "OutPlate": "greiner384_riser",
+      "OutPlate": "greiner384",
       "VolumeForFullcolour": "25ul"
     }
   }

@@ -33,6 +33,7 @@ var (
 	logCounter     int
 	measureCounter int
 	sensorCounter  int
+	dataCounter    int
 )
 
 type testMiddleware struct{}
@@ -40,6 +41,7 @@ type testMiddleware struct{}
 func (t testMiddleware) Log(l LogLevel, ts int64, s string, m string, e ...interface{}) { logCounter++ }
 func (t testMiddleware) Measure(ts int64, s, m string, e ...interface{})                { measureCounter++ }
 func (t testMiddleware) Sensor(ts int64, s, m string, e ...interface{})                 { sensorCounter++ }
+func (t testMiddleware) Data(ts int64, d interface{}, e ...interface{})                 { dataCounter++ }
 
 func TestRegisterMiddleware(t *testing.T) {
 	midCount := len(middlewares)

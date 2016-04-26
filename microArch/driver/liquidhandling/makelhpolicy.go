@@ -201,10 +201,10 @@ func MakeDispenseAboveLiquidPolicy() LHPolicy {
 
 	policy := make(LHPolicy, 7)
 	policy["DSPREFERENCE"] = 1 // 1 indicates dispense at top of well
-	policy["ASP_SPEED"] = 1.5
-	policy["DSP_SPEED"] = 1.5
-	policy["ASP_WAIT"] = 1.0
-	policy["DSP_WAIT"] = 1.0
+	policy["ASP_SPEED"] = 3.0
+	policy["DSP_SPEED"] = 3.0
+	//policy["ASP_WAIT"] = 1.0
+	//policy["DSP_WAIT"] = 1.0
 	policy["BLOWOUTVOLUME"] = 0.0
 	policy["BLOWOUTVOLUMEUNIT"] = "ul"
 	policy["TOUCHOFF"] = false

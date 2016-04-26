@@ -62,6 +62,8 @@ func (a *middleware) Measure(ts int64, source, msg string, extra ...interface{})
 
 func (a *middleware) Sensor(ts int64, source, msg string, extra ...interface{}) {}
 
+func (a *middleware) Data(ts int64, data interface{}, extra ...interface{}) {}
+
 func New(opt Opt) (*Frontend, error) {
 	mw := &middleware{out: os.Stdout}
 	logger.RegisterMiddleware(mw)
