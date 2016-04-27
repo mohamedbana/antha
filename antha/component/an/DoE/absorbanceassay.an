@@ -7,7 +7,7 @@ import (
 )
 
 Parameters (
-	Wavelength Length
+	AbsorbanceWavelength Length
 	DilutionVolume Volume
 	ExtinctionCoefficient float64
 )
@@ -42,12 +42,12 @@ Steps {
 	dilutedSample:=Mix(SampleForReading, diluentSample)
 	
 	// read
-	abs := platereader.ReadAbsorbance(*Plate, *dilutedSample, Wavelength.RawValue())
+	abs := platereader.ReadAbsorbance(*Plate, *dilutedSample, AbsorbanceWavelength.RawValue())
 	
 	// prepare blank and read
 	blankSample := MixInto(Plate,"",diluentSample)
 	
-	blankabs := platereader.ReadAbsorbance(*Plate, *blankSample, Wavelength.RawValue())
+	blankabs := platereader.ReadAbsorbance(*Plate, *blankSample, AbsorbanceWavelength.RawValue())
 	
 	// blank correct
 	blankcorrected := platereader.Blankcorrect(blankabs,abs)

@@ -2,6 +2,7 @@ protocol GrowthDOE
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"fmt"
 )
 
 Parameters (
@@ -29,7 +30,9 @@ Setup {
 
 Steps {
 	// TODO add RPM here
+	fmt.Println("StrainInMedium =", StrainInMedium, "growthtime = ", Growthtime.ToString())
 	Culture = Incubate(StrainInMedium, Growthtemp, Growthtime, true)
+	fmt.Println("Culture =", Culture, "StrainInMedium =", StrainInMedium)
 }
 
 Analysis {

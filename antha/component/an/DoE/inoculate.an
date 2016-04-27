@@ -3,6 +3,7 @@ protocol InoculateDOE
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
+	"fmt"
 )
 
 Parameters (
@@ -29,6 +30,7 @@ Setup {
 
 Steps {
 	inocsample:=mixer.Sample(Inoculum, InoculumVolume)
+	fmt.Println("Inoculum ", Inoculum.CName, "Inoculum Volume ", InoculumVolume.ToString(), "Medium", Medium.CName)
 	Seed=Mix(Medium, inocsample)
 }
 
