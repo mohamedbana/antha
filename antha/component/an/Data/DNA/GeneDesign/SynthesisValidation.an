@@ -1,0 +1,48 @@
+protocol Synthesis_validation
+
+import (
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	
+)
+
+Parameters (
+
+	PartsWithOverhangs []wtype.DNASequence
+	Vector wtype.DNASequence
+	SynthesisProvider string
+)
+Data (
+	
+	Validated bool
+	ValiadationStatus string
+)
+
+Inputs (
+)
+
+Outputs (
+)
+
+Requirements {
+}
+
+Setup {
+} 
+
+Steps {
+	
+	// check if sequence meets requirements for synthesis
+	ValiadationStatus, Validated = sequences.ValidateSynthesis(PartsWithOverhangs, Vector.Name(), "GenScript")
+	
+
+}
+	
+Analysis {
+	
+} 
+
+Validation {
+
+}
+
