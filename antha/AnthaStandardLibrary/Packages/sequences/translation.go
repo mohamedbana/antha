@@ -26,8 +26,9 @@ package sequences
 import (
 	"fmt"
 	//. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"strings"
+
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 )
 
 func RevtranslatetoN(aa wtype.ProteinSequence) (NNN wtype.DNASequence) {

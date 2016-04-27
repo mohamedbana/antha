@@ -1,0 +1,79 @@
+protocol GeneDesign_seq
+
+import (
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/export"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/entrez"
+	"strconv"
+)
+
+Parameters (
+	Parts []string
+	Vector string
+	RE string
+	SynthesisProvider string
+)
+Data (
+	// input seq
+	Sequence string
+	// output parts with correct overhangs
+	PartsWithOverhangs []wtype.DNASequence
+	SimulationStatus string
+	Validated bool
+	ValiadationStatus string
+)
+
+Inputs (
+)
+
+Outputs (
+)
+
+Requirements {
+}
+
+Setup {
+} 
+
+Steps {
+	PartDNA := make([]wtype.DNASequence, 0)
+	
+	// Retrieve part seqs from entrez
+	for i, part := range Parts {
+		DNA := wtype.MakeLinearDNASequence("part" + strconv.Itoa(i),part)
+		PartDNA = append(PartDNA,DNA)
+	}
+	
+	// look up vector sequence
+	VectorSeq := wtype.MakePlasmidDNASequence("Vector",Vector)
+
+	// Look up the restriction enzyme
+	EnzymeInf, _ := lookup.TypeIIsLookup(RE)
+	
+	// Add overhangs
+	PartsWithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(PartDNA, VectorSeq, EnzymeInf)
+	
+	// validation
+	assembly := enzymes.Assemblyparameters{"NewConstruct", RE, VectorSeq, PartsWithOverhangs}
+	SimulationStatus, _, _, _, _ = enzymes.Assemblysimulator(assembly)
+	
+	
+	// check if sequence meets requirements for synthesis
+	ValiadationStatus, Validated = sequences.ValidateSynthesis(PartsWithOverhangs, Vector, SynthesisProvider)
+	
+	// export sequence to fasta
+	export.Makefastaserial2("NewConstruct", PartsWithOverhangs)
+	
+}
+	
+Analysis {
+	
+} 
+
+Validation {
+
+}
+

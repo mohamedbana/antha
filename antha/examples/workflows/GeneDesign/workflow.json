@@ -1,6 +1,6 @@
 {
     "processes": {
-        "Design1": { "component": "GeneDesign" },
+        "Design1": { "component": "GeneDesign_seq" },
         "Synthesis1": { "component": "Synthesis" },
 		"Mix1": { "component": "ReactionMix" }
        
