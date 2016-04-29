@@ -13,7 +13,7 @@ Parameters (
 	SynthesisProvider string
 )
 Data (
-	
+	ValidatedPartsWithOverhangs []wtype.DNASequence
 	Validated bool
 	ValiadationStatus string
 )
@@ -34,6 +34,10 @@ Steps {
 	
 	// check if sequence meets requirements for synthesis
 	ValiadationStatus, Validated = sequences.ValidateSynthesis(PartsWithOverhangs, Vector.Name(), "GenScript")
+	
+	if Validated {
+		ValidatedPartsWithOverhangs = PartsWithOverhangs
+	}
 	
 
 }

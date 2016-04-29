@@ -20,6 +20,10 @@ func _Synthesis_validationSteps(_ctx context.Context, _input *Synthesis_validati
 	// check if sequence meets requirements for synthesis
 	_output.ValiadationStatus, _output.Validated = sequences.ValidateSynthesis(_input.PartsWithOverhangs, _input.Vector.Name(), "GenScript")
 
+	if _output.Validated {
+		_output.ValidatedPartsWithOverhangs = _input.PartsWithOverhangs
+	}
+
 }
 
 func _Synthesis_validationAnalysis(_ctx context.Context, _input *Synthesis_validationInput, _output *Synthesis_validationOutput) {
@@ -83,14 +87,16 @@ type Synthesis_validationInput struct {
 }
 
 type Synthesis_validationOutput struct {
-	ValiadationStatus string
-	Validated         bool
+	ValiadationStatus           string
+	Validated                   bool
+	ValidatedPartsWithOverhangs []wtype.DNASequence
 }
 
 type Synthesis_validationSOutput struct {
 	Data struct {
-		ValiadationStatus string
-		Validated         bool
+		ValiadationStatus           string
+		Validated                   bool
+		ValidatedPartsWithOverhangs []wtype.DNASequence
 	}
 	Outputs struct {
 	}
@@ -108,6 +114,7 @@ func init() {
 				{Name: "Vector", Desc: "", Kind: "Parameters"},
 				{Name: "ValiadationStatus", Desc: "", Kind: "Data"},
 				{Name: "Validated", Desc: "", Kind: "Data"},
+				{Name: "ValidatedPartsWithOverhangs", Desc: "", Kind: "Data"},
 			},
 		},
 	})
