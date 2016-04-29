@@ -3,15 +3,12 @@
 // see the igem package ("github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem")
 // and igem website for more details about how to make the most of this http://parts.igem.org/Registry_API
 
-protocol FindPartsthat
+protocol FindIGemPartsthat
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"fmt"
-	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
-//	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
-	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 	"strings"
 	"strconv"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
@@ -40,8 +37,8 @@ Data (
 	Warnings error
 	Status string
 	FulllistBackupParts [][]string 
-	PartMap map[string][]string
-	BiobrickDescriptions map[string]string
+	PartMap map[string][]string // i.e. map[description]list of parts matching description
+	BiobrickDescriptions map[string]string // i.e. map[biobrickID]description
 	HighestRatedMatch string
 	HighestRatedMatchDNASequence wtype.DNASequence
 )
