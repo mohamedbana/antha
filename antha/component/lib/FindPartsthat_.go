@@ -6,8 +6,8 @@
 package lib
 
 import (
-	//"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"fmt"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	//	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
@@ -23,20 +23,14 @@ import (
 
 // Input parameters for this protocol (data)
 
-//Constructname 				string
-// e.g. promoter
-// e.g. arsenic, reporter, alkane, logic gate
-
-//RestrictionsitetoAvoid		[]string
+// e.g. rbs, reporter
+// e.g. strong, arsenic, fluorescent, alkane, logic gate
 
 // Physical Inputs to this protocol with types
 
 // Physical outputs from this protocol with types
 
 // Data which is returned from this protocol, and data types
-
-//Partsfound	[]wtype.DNASequence // map[string]wtype.DNASequence
-//map[string][]string
 
 // Input Requirement specification
 func _FindPartsthatRequirements() {
@@ -49,9 +43,7 @@ func _FindPartsthatSetup(_ctx context.Context, _input *FindPartsthatInput) {}
 // The core process for this protocol, with the steps to be performed
 // for every input
 func _FindPartsthatSteps(_ctx context.Context, _input *FindPartsthatInput, _output *FindPartsthatOutput) {
-	//var msg string
-	// set warnings reported back to user to none initially
-	//	warnings := make([]string,0)
+
 	BackupParts := make([]string, 0)
 	status := ""
 	joinedstatus := make([]string, 0)
@@ -89,6 +81,7 @@ func _FindPartsthatSteps(_ctx context.Context, _input *FindPartsthatInput, _outp
 	for desc, subparts := range _output.PartMap {
 
 		partdetails := igem.LookUp(subparts)
+
 		// now we can get detailed information of all of those records to interrogate further
 		// this can be slow if there are many parts to check (~2 seconds per block of 14 parts)
 
@@ -103,6 +96,10 @@ func _FindPartsthatSteps(_ctx context.Context, _input *FindPartsthatInput, _outp
 
 				if err == nil && rating > highestrating {
 					_output.HighestRatedMatch = subpart
+
+					seq := partdetails.Sequence(_output.HighestRatedMatch)
+
+					_output.HighestRatedMatchDNASequence = wtype.MakeLinearDNASequence(_output.HighestRatedMatch, seq)
 				}
 			}
 
@@ -113,11 +110,6 @@ func _FindPartsthatSteps(_ctx context.Context, _input *FindPartsthatInput, _outp
 		}
 		i = i + 1
 	}
-	/*
-		if len(warnings) != 0 {
-		Warnings = fmt.Errorf(strings.Join(warnings,";"))
-		}else{Warnings = nil}
-	*/
 
 	_output.FulllistBackupParts = parts
 	_output.Status = strings.Join(joinedstatus, " ; ")
@@ -128,7 +120,6 @@ func _FindPartsthatSteps(_ctx context.Context, _input *FindPartsthatInput, _outp
 	} else {
 		_output.Status = fmt.Sprintln(
 			"Warnings:", _output.Warnings.Error(),
-			"Back up parts found (Reported to work!)", _input.Parts,
 			"Back up parts found (Reported to work!)", _output.FulllistBackupParts,
 		)
 	}
@@ -196,27 +187,28 @@ type FindPartsthatInput struct {
 	OnlyreturnAvailableParts bool
 	OnlyreturnWorkingparts   bool
 	Partdescriptions         []string
-	Parts                    [][]string
 	Parttypes                []string
 }
 
 type FindPartsthatOutput struct {
-	BiobrickDescriptions map[string]string
-	FulllistBackupParts  [][]string
-	HighestRatedMatch    string
-	PartMap              map[string][]string
-	Status               string
-	Warnings             error
+	BiobrickDescriptions         map[string]string
+	FulllistBackupParts          [][]string
+	HighestRatedMatch            string
+	HighestRatedMatchDNASequence wtype.DNASequence
+	PartMap                      map[string][]string
+	Status                       string
+	Warnings                     error
 }
 
 type FindPartsthatSOutput struct {
 	Data struct {
-		BiobrickDescriptions map[string]string
-		FulllistBackupParts  [][]string
-		HighestRatedMatch    string
-		PartMap              map[string][]string
-		Status               string
-		Warnings             error
+		BiobrickDescriptions         map[string]string
+		FulllistBackupParts          [][]string
+		HighestRatedMatch            string
+		HighestRatedMatchDNASequence wtype.DNASequence
+		PartMap                      map[string][]string
+		Status                       string
+		Warnings                     error
 	}
 	Outputs struct {
 	}
@@ -231,12 +223,12 @@ func init() {
 			Params: []ParamDesc{
 				{Name: "OnlyreturnAvailableParts", Desc: "", Kind: "Parameters"},
 				{Name: "OnlyreturnWorkingparts", Desc: "", Kind: "Parameters"},
-				{Name: "Partdescriptions", Desc: "e.g. arsenic, reporter, alkane, logic gate\n", Kind: "Parameters"},
-				{Name: "Parts", Desc: "", Kind: "Parameters"},
-				{Name: "Parttypes", Desc: "Constructname \t\t\t\tstring\n\ne.g. promoter\n", Kind: "Parameters"},
+				{Name: "Partdescriptions", Desc: "e.g. strong, arsenic, fluorescent, alkane, logic gate\n", Kind: "Parameters"},
+				{Name: "Parttypes", Desc: "e.g. rbs, reporter\n", Kind: "Parameters"},
 				{Name: "BiobrickDescriptions", Desc: "", Kind: "Data"},
-				{Name: "FulllistBackupParts", Desc: "Partsfound\t[]wtype.DNASequence // map[string]wtype.DNASequence\n\nmap[string][]string\n", Kind: "Data"},
+				{Name: "FulllistBackupParts", Desc: "", Kind: "Data"},
 				{Name: "HighestRatedMatch", Desc: "", Kind: "Data"},
+				{Name: "HighestRatedMatchDNASequence", Desc: "", Kind: "Data"},
 				{Name: "PartMap", Desc: "", Kind: "Data"},
 				{Name: "Status", Desc: "", Kind: "Data"},
 				{Name: "Warnings", Desc: "", Kind: "Data"},
