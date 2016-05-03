@@ -46,6 +46,8 @@ Setup {
 // Core process of the protocol: steps to be performed for each input
 Steps {
 	
+	var err error
+	
 		if EntrezID  {
 		
 			if DNAID {

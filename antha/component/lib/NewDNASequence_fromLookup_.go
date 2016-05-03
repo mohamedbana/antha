@@ -34,6 +34,8 @@ func _NewDNASequence_fromLookupSetup(_ctx context.Context, _input *NewDNASequenc
 // Core process of the protocol: steps to be performed for each input
 func _NewDNASequence_fromLookupSteps(_ctx context.Context, _input *NewDNASequence_fromLookupInput, _output *NewDNASequence_fromLookupOutput) {
 
+	var err error
+
 	if _input.EntrezID {
 
 		if _input.DNAID {
