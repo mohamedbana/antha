@@ -9,6 +9,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
 )
 
@@ -462,10 +463,12 @@ func DXXLSXFilefromRuns(runs []Run, outputfilename string) (xlsxfile *xlsx.File)
 	cell.Value = "Run"
 
 	// then add subheadings and descriptors
-	for _, descriptor := range runs[0].Factordescriptors {
+	for i, descriptor := range runs[0].Factordescriptors {
+
+		letter := strings.ToUpper(wutil.Alphabet[i])
 
 		cell = row.AddCell()
-		cell.Value = descriptor
+		cell.Value = letter + ":" + descriptor
 
 	}
 	for _, descriptor := range runs[0].Responsedescriptors {
@@ -494,6 +497,221 @@ func DXXLSXFilefromRuns(runs []Run, outputfilename string) (xlsxfile *xlsx.File)
 		// Run
 		cell = row.AddCell()
 		cell.SetValue(run.RunNumber)
+
+		// factors
+		for _, factor := range run.Setpoints {
+
+			cell = row.AddCell()
+
+			dna, amIdna := factor.(wtype.DNASequence)
+			if amIdna {
+				cell.SetValue(dna.Nm)
+			} else {
+				cell.SetValue(factor) //= factor.(string)
+			}
+
+		}
+
+		// responses
+		for _, response := range run.ResponseValues {
+			cell = row.AddCell()
+			cell.SetValue(response)
+		}
+
+		// additional
+		for _, additional := range run.AdditionalValues {
+			cell = row.AddCell()
+			cell.SetValue(additional)
+		}
+	}
+	err = xlsxfile.Save(outputfilename)
+	if err != nil {
+		fmt.Printf(err.Error())
+	}
+	return
+}
+
+// jmp
+
+func RunsFromJMPDesign(xlsx string, factorcolumns []int, intfactors []string) (runs []Run, err error) {
+	file, err := spreadsheet.OpenFile(xlsx)
+	if err != nil {
+		return runs, err
+	}
+	sheet := spreadsheet.Sheet(file, 0)
+
+	runs = make([]Run, 0)
+	var run Run
+
+	var setpoint interface{}
+	var descriptor string
+	for i := 1; i < sheet.MaxRow; i++ {
+		//maxfactorcol := 2
+		factordescriptors := make([]string, 0)
+		responsedescriptors := make([]string, 0)
+		setpoints := make([]interface{}, 0)
+		responsevalues := make([]interface{}, 0)
+		otherheaders := make([]string, 0)
+		othersubheaders := make([]string, 0)
+		otherresponsevalues := make([]interface{}, 0)
+
+		run.RunNumber = i //sheet.Cell(i, 1).Int()
+
+		run.StdNumber = i //sheet.Cell(i, 0).Int()
+
+		for j := 0; j < sheet.MaxCol; j++ {
+
+			var factororresponse string
+
+			if search.Contains(factorcolumns, j) {
+				factororresponse = "Factor"
+			} else {
+				factororresponse = "Response"
+			}
+			//fmt.Println(i, j, factororresponse)
+			if strings.Contains(factororresponse, "Factor") {
+				//	maxfactorcol = j
+				descriptor = sheet.Cell(0, j).String()
+				factrodescriptor := descriptor
+				fmt.Println(i, j, descriptor)
+
+				cell := sheet.Cell(i, j)
+
+				celltype := cell.Type()
+
+				_, err := cell.Float()
+
+				if err == nil || celltype == 1 {
+					setpoint, _ = cell.Float()
+					if search.InSlice(descriptor, intfactors) {
+						setpoint, err = cell.Int()
+						if err != nil {
+							return runs, err
+						}
+					}
+				} else {
+					setpoint = cell.String()
+				}
+
+				if celltype == 3 {
+					setpoint = cell.Bool()
+				}
+				factordescriptors = append(factordescriptors, factrodescriptor)
+				setpoints = append(setpoints, setpoint)
+
+			} else if strings.Contains(factororresponse, "Response") {
+				descriptor = sheet.Cell(0, j).String()
+				responsedescriptor := descriptor
+				//fmt.Println("response", i, j, descriptor)
+				responsedescriptors = append(responsedescriptors, responsedescriptor)
+
+				cell := sheet.Cell(i, j)
+
+				if cell == nil {
+
+					break
+				}
+
+				celltype := cell.Type()
+
+				if celltype == 1 {
+					responsevalue, err := cell.Float()
+					if err != nil {
+						return runs, err
+					}
+					responsevalues = append(responsevalues, responsevalue)
+				} else {
+					responsevalue := cell.String()
+					responsevalues = append(responsevalues, responsevalue)
+				}
+
+			} else {
+				descriptor = sheet.Cell(0, j).String()
+				responsedescriptor := descriptor
+				//fmt.Println("Additional SubHeader", i, j, factororresponse)
+				//fmt.Println("Additional SubHeader", i, j, descriptor)
+				otherheaders = append(otherheaders, factororresponse)
+				othersubheaders = append(othersubheaders, responsedescriptor)
+
+				cell := sheet.Cell(i, j)
+
+				if cell == nil {
+
+					break
+				}
+
+				celltype := cell.Type()
+
+				if celltype == 1 {
+					responsevalue, err := cell.Float()
+					if err != nil {
+						return runs, err
+					}
+					otherresponsevalues = append(otherresponsevalues, responsevalue)
+				} else {
+					responsevalue := cell.String()
+					otherresponsevalues = append(otherresponsevalues, responsevalue)
+				}
+
+			}
+		}
+		run.Factordescriptors = factordescriptors
+		run.Responsedescriptors = responsedescriptors
+		run.Setpoints = setpoints
+		run.ResponseValues = responsevalues
+		run.AdditionalHeaders = otherheaders
+		run.AdditionalSubheaders = othersubheaders
+		run.AdditionalValues = otherresponsevalues
+
+		runs = append(runs, run)
+		factordescriptors = make([]string, 0)
+		responsedescriptors = make([]string, 0)
+
+		// assuming this is necessary too
+		otherheaders = make([]string, 0)
+		othersubheaders = make([]string, 0)
+	}
+
+	return
+}
+
+func JMPXLSXFilefromRuns(runs []Run, outputfilename string) (xlsxfile *xlsx.File) {
+
+	// if output is a struct look for a sensible field to print
+
+	//var file *xlsx.File
+	var sheet *xlsx.Sheet
+	var row *xlsx.Row
+	var cell *xlsx.Cell
+	var err error
+
+	xlsxfile = xlsx.NewFile()
+	sheet = xlsxfile.AddSheet("Sheet1")
+
+	// new row
+	row = sheet.AddRow()
+
+	// then add subheadings and descriptors
+	for _, descriptor := range runs[0].Factordescriptors {
+
+		cell = row.AddCell()
+		cell.Value = descriptor
+
+	}
+	for _, descriptor := range runs[0].Responsedescriptors {
+		cell = row.AddCell()
+		cell.Value = descriptor
+
+	}
+	for _, descriptor := range runs[0].AdditionalSubheaders {
+		cell = row.AddCell()
+		cell.Value = descriptor
+
+	}
+	//add data 1 row per run
+	for _, run := range runs {
+
+		row = sheet.AddRow()
 
 		// factors
 		for _, factor := range run.Setpoints {
