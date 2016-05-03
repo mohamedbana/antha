@@ -40,8 +40,8 @@ import (
 )
 
 var (
-	email   = "m.greenwood@synthace.com"
-	tool    = "AnthaDev"
+	email   = "no-reply@antha-lang.com"
+	tool    = "entrez-biogo-antha"
 	retries = 5
 )
 
