@@ -22,26 +22,26 @@ type testpair struct {
 
 var factorsandlevels = []testpair{
 
-	{pairs: []DOEPair{Pair("Level 1", []interface{}{1})},
-		combocount: 1, factorheaders: []string{"Level 1"}},
-	{pairs: []DOEPair{Pair("Level 1", []interface{}{1}), Pair("Level 2", []interface{}{1})},
-		combocount: 1, factorheaders: []string{"Level 1", "Level 2"}},
-	{pairs: []DOEPair{Pair("Level 1", []interface{}{1}), Pair("Level 2", []interface{}{1, 2})},
-		combocount: 2, factorheaders: []string{"Level 1", "Level 2"}},
-	{pairs: []DOEPair{Pair("Level 1", []interface{}{1, 2}), Pair("Level 2", []interface{}{1})},
-		combocount: 2, factorheaders: []string{"Level 1", "Level 2"}},
-	{pairs: []DOEPair{Pair("Level 1", []interface{}{1, 2}), Pair("Level 2", []interface{}{1, 2})},
-		combocount: 4, factorheaders: []string{"Level 1", "Level 2"}},
-	{pairs: []DOEPair{Pair("Level 1", []interface{}{1}), Pair("Level 2", []interface{}{1}), Pair("Level 3", []interface{}{1})},
-		combocount: 1, factorheaders: []string{"Level 1", "Level 2", "Level 3"}},
-	{pairs: []DOEPair{Pair("Level 1", []interface{}{1, 2}), Pair("Level 2", []interface{}{1, 2}), Pair("Level 3", []interface{}{1, 2})},
-		combocount: 8, factorheaders: []string{"Level 1", "Level 2", "Level 3"}},
-	{pairs: []DOEPair{Pair("Level 1", []interface{}{1}), Pair("Level 2", []interface{}{1, 2}), Pair("Level 3", []interface{}{1, 2})},
-		combocount: 4, factorheaders: []string{"Level 1", "Level 2", "Level 3"}},
-	{pairs: []DOEPair{Pair("Level 1", []interface{}{1}), Pair("Level 2", []interface{}{1, 2}), Pair("Level 3", []interface{}{1})},
-		combocount: 2, factorheaders: []string{"Level 1", "Level 2", "Level 3"}},
-	{pairs: []DOEPair{Pair("Level 1", []interface{}{1, 2}), Pair("Level 2", []interface{}{1, 2}), Pair("Level 3", []interface{}{1})},
-		combocount: 4, factorheaders: []string{"Level 1", "Level 2", "Level 3"}},
+	{pairs: []DOEPair{Pair("Factor 1", []interface{}{1})},
+		combocount: 1, factorheaders: []string{"Factor 1"}},
+	{pairs: []DOEPair{Pair("Factor 1", []interface{}{1}), Pair("Factor 2", []interface{}{1})},
+		combocount: 1, factorheaders: []string{"Factor 1", "Factor 2"}},
+	{pairs: []DOEPair{Pair("Factor 1", []interface{}{1}), Pair("Factor 2", []interface{}{1, 2})},
+		combocount: 2, factorheaders: []string{"Factor 1", "Factor 2"}},
+	{pairs: []DOEPair{Pair("Factor 1", []interface{}{1, 2}), Pair("Factor 2", []interface{}{1})},
+		combocount: 2, factorheaders: []string{"Factor 1", "Factor 2"}},
+	{pairs: []DOEPair{Pair("Factor 1", []interface{}{1, 2}), Pair("Factor 2", []interface{}{1, 2})},
+		combocount: 4, factorheaders: []string{"Factor 1", "Factor 2"}},
+	{pairs: []DOEPair{Pair("Factor 1", []interface{}{1}), Pair("Factor 2", []interface{}{1}), Pair("Factor 3", []interface{}{1})},
+		combocount: 1, factorheaders: []string{"Factor 1", "Factor 2", "Factor 3"}},
+	{pairs: []DOEPair{Pair("Factor 1", []interface{}{1, 2}), Pair("Factor 2", []interface{}{1, 2}), Pair("Factor 3", []interface{}{1, 2})},
+		combocount: 8, factorheaders: []string{"Factor 1", "Factor 2", "Factor 3"}},
+	{pairs: []DOEPair{Pair("Factor 1", []interface{}{1}), Pair("Factor 2", []interface{}{1, 2}), Pair("Factor 3", []interface{}{1, 2})},
+		combocount: 4, factorheaders: []string{"Factor 1", "Factor 2", "Factor 3"}},
+	{pairs: []DOEPair{Pair("Factor 1", []interface{}{1}), Pair("Factor 2", []interface{}{1, 2}), Pair("Factor 3", []interface{}{1})},
+		combocount: 2, factorheaders: []string{"Factor 1", "Factor 2", "Factor 3"}},
+	{pairs: []DOEPair{Pair("Factor 1", []interface{}{1, 2}), Pair("Factor 2", []interface{}{1, 2}), Pair("Factor 3", []interface{}{1})},
+		combocount: 4, factorheaders: []string{"Factor 1", "Factor 2", "Factor 3"}},
 }
 
 func TestAllComboCount(t *testing.T) {
@@ -72,7 +72,7 @@ func TestAllCombinations(t *testing.T) {
 			t.Error(
 				"For", factor.pairs, "/n",
 				"expected", factor.combocount, "\n",
-				"got", r, "\n",
+				"got", len(r), "\n",
 			)
 		}
 		for j, run := range r {
@@ -134,10 +134,10 @@ func AllComboCount(pairs []DOEPair) (numberofuniquecombos int) {
 	fmt.Println("In AllComboCount", "len(pairs)", len(pairs))
 	var movingcount int
 	movingcount = (pairs[0]).LevelCount()
-	fmt.Println("levelcount", movingcount)
+	fmt.Println("Factorcount", movingcount)
 	fmt.Println("len(levels)", len(pairs[0].Levels))
 	for i := 1; i < len(pairs); i++ {
-		fmt.Println("levelcount", movingcount)
+		fmt.Println("Factorcount", movingcount)
 		movingcount = movingcount * (pairs[i]).LevelCount()
 	}
 	numberofuniquecombos = movingcount
