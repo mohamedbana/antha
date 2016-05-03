@@ -90,7 +90,7 @@ Steps {
 			/*annotated,_ := parser.GenbanktoAnnotatedSeq(part)
 			partDNA = annotated.DNASequence */
 
-			partDNA, _ = parser.GenbanktoDNASequence(part)
+			partDNA, _ = parser.GenbanktoAnnotatedSeq(part)
 		} else {
 
 			if strings.Contains(part, "BBa_") {
@@ -176,7 +176,7 @@ Steps {
 	
 		if strings.Contains(Vector, ".gb") {
 	
-			vectordata, _ = parser.GenbanktoDNASequence(Vector)
+			vectordata, _ = parser.GenbanktoAnnotatedSeq(Vector)
 			vectordata.Plasmid = true
 		}else {
 		

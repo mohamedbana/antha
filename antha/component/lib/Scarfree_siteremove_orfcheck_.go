@@ -79,7 +79,7 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 			/*annotated,_ := parser.GenbanktoAnnotatedSeq(part)
 			partDNA = annotated.DNASequence */
 
-			partDNA, _ = parser.GenbanktoDNASequence(part)
+			partDNA, _ = parser.GenbanktoAnnotatedSeq(part)
 		} else {
 
 			if strings.Contains(part, "BBa_") {
@@ -165,7 +165,7 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 
 	if strings.Contains(_input.Vector, ".gb") {
 
-		vectordata, _ = parser.GenbanktoDNASequence(_input.Vector)
+		vectordata, _ = parser.GenbanktoAnnotatedSeq(_input.Vector)
 		vectordata.Plasmid = true
 	} else {
 

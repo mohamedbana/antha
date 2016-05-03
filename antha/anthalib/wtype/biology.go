@@ -121,6 +121,7 @@ type DNASequence struct {
 	Overhang5prime Overhang
 	Overhang3prime Overhang
 	Methylation    string // add histones etc?
+	Features       []Feature
 }
 
 func MakeDNASequence(name string, seqstring string, properties []string) (seq DNASequence, err error) {
@@ -447,13 +448,14 @@ func random_char(chars string) string {
 
 func makeABunchaRandomSeqs(n_seq_sets, seqs_per_set, min_len, len_var int) [][]DNASequence {
 	var seqs [][]DNASequence
+	var features []Feature
 
 	seqs = make([][]DNASequence, n_seq_sets)
 
 	for i := 0; i < n_seq_sets; i++ {
 		seqs[i] = make([]DNASequence, seqs_per_set)
 		for j := 0; j < seqs_per_set; j++ {
-			seqs[i][j] = DNASequence{fmt.Sprintf("SEQ%04d", i*seqs_per_set+j+1), random_dna_seq(rand.Intn(len_var) + min_len), false, false, Overhang{0, 0, 0, "", false}, Overhang{0, 0, 0, "", false}, ""}
+			seqs[i][j] = DNASequence{fmt.Sprintf("SEQ%04d", i*seqs_per_set+j+1), random_dna_seq(rand.Intn(len_var) + min_len), false, false, Overhang{0, 0, 0, "", false}, Overhang{0, 0, 0, "", false}, "", features}
 		}
 	}
 	return seqs

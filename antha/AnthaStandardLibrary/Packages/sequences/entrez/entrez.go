@@ -131,7 +131,7 @@ func RetrieveSequence(id string, database string) (wtype.DNASequence, error) {
 		return wtype.DNASequence{}, err
 	}
 	file := fmt.Sprintf("%s%c%s", anthapath.Dirpath(), os.PathSeparator, "temp.gb")
-	seq, err := parser.GenbanktoDNASequence(file)
+	seq, err := parser.GenbanktoFeaturelessDNASequence(file)
 	if err != nil {
 		return wtype.DNASequence{}, err
 	}

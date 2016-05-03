@@ -7,15 +7,16 @@ import (
 	goimage "image"
 	"image/color"
 	"image/color/palette"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
-	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
-	"path/filepath"
-	"os"
+
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
+	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
 )
 
 // Colour palette to use // this would relate to a map of components of these available colours in factor

@@ -56,7 +56,7 @@ func DNAFiletoDNASequence(filename string, plasmid bool) (sequences []wtype.DNAS
 		}
 	case strings.HasSuffix(fn, ".gb"):
 
-		seq, err = GenbanktoDNASequence(filename)
+		seq, err = GenbanktoFeaturelessDNASequence(filename)
 
 		sequences = append(sequences, seq)
 	default:

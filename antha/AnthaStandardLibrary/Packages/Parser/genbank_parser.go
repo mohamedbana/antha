@@ -62,8 +62,8 @@ func GenbanktoSimpleSeq(filename string) (seq string) {
 
 }
 
-func GenbanktoDNASequence(filename string) (standardseq wtype.DNASequence, err error) {
-	var annotated sequences.AnnotatedSeq
+func GenbanktoFeaturelessDNASequence(filename string) (standardseq wtype.DNASequence, err error) {
+	var annotated wtype.DNASequence
 	line := ""
 	genbanklines := make([]string, 0)
 	var file *os.File
@@ -85,14 +85,14 @@ func GenbanktoDNASequence(filename string) (standardseq wtype.DNASequence, err e
 
 	annotated, err = HandleGenbank(genbanklines)
 
-	standardseq = annotated.DNASequence
+	standardseq = annotated
 
 	return
 }
 
 func GenbankFeaturetoDNASequence(filename string, featurename string) (standardseq wtype.DNASequence, err error) {
 
-	var annotated sequences.AnnotatedSeq
+	var annotated wtype.DNASequence
 	line := ""
 	genbanklines := make([]string, 0)
 	file, err := os.Open(filename)
@@ -127,7 +127,7 @@ func GenbankFeaturetoDNASequence(filename string, featurename string) (standards
 
 }
 
-func GenbanktoAnnotatedSeq(filename string) (annotated sequences.AnnotatedSeq, err error) {
+func GenbanktoAnnotatedSeq(filename string) (annotated wtype.DNASequence, err error) {
 	line := ""
 	genbanklines := make([]string, 0)
 	file, err := os.Open(filename)
@@ -152,7 +152,7 @@ func GenbanktoAnnotatedSeq(filename string) (annotated sequences.AnnotatedSeq, e
 
 }
 
-func ParseGenbankfile(file *os.File) (annotated sequences.AnnotatedSeq, err error) {
+func ParseGenbankfile(file *os.File) (annotated wtype.DNASequence, err error) {
 	line := ""
 	genbanklines := make([]string, 0)
 	defer file.Close()
@@ -172,7 +172,7 @@ func ParseGenbankfile(file *os.File) (annotated sequences.AnnotatedSeq, err erro
 	return
 
 }
-func HandleGenbank(lines []string) (annotatedseq sequences.AnnotatedSeq, err error) {
+func HandleGenbank(lines []string) (annotatedseq wtype.DNASequence, err error) {
 
 	if lines[0][0:5] == `LOCUS` {
 		// fmt.Println("in Locus")
@@ -191,7 +191,7 @@ func HandleGenbank(lines []string) (annotatedseq sequences.AnnotatedSeq, err err
 
 		features := HandleFeatures(lines, seq, "DNA")
 		// // fmt.Println("found these features", features)
-		annotatedseq, err = sequences.MakeAnnotatedSeq(name, seq, circular, features)
+		annotatedseq, err = wtype.MakeAnnotatedSeq(name, seq, circular, features)
 		// // fmt.Println("annotated", annotatedseq)
 	} else {
 		err = fmt.Errorf("no LOCUS found on first line")
@@ -457,7 +457,7 @@ func DetectFeature(lines []string) (detected bool, startlineindex int, endlinein
 
 	return
 }
-func HandleFeatures(lines []string, seq string, seqtype string) (features []sequences.Feature) {
+func HandleFeatures(lines []string, seq string, seqtype string) (features []wtype.Feature) {
 
 	featurespresent := false
 	for _, line := range lines {
@@ -468,8 +468,8 @@ func HandleFeatures(lines []string, seq string, seqtype string) (features []sequ
 	if featurespresent != true {
 		return
 	}
-	features = make([]sequences.Feature, 0)
-	var feature sequences.Feature
+	features = make([]wtype.Feature, 0)
+	var feature wtype.Feature
 
 	for i := 0; i < len(lines); i++ { //, line := range lines {
 		//	// fmt.Println(lines)
