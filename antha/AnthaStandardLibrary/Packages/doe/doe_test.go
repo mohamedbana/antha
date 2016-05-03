@@ -6,7 +6,7 @@ import (
 	//"strconv"
 	//	"strings"
 
-	//"runtime/debug"
+	"runtime/debug"
 	"testing"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
@@ -58,7 +58,6 @@ func TestAllComboCount(t *testing.T) {
 
 }
 
-/*
 func TestAllCombinations(t *testing.T) {
 
 	defer func() {
@@ -101,7 +100,7 @@ func TestAllCombinations(t *testing.T) {
 		}
 	}
 }
-*/
+
 /*
 type DOEPair struct {
 	Factor string
