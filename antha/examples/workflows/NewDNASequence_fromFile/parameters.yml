@@ -1,0 +1,9 @@
+{
+    "Parameters": {
+        "NewDNASequence1": {
+            "Filename": "test.gb",
+            "Gene_name": "TheUnkownSequence",
+            "Plasmid": true
+        }
+    }
+}

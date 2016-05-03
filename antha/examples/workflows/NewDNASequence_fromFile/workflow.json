@@ -1,0 +1,9 @@
+{
+    "connections": [],
+    "processes": {
+        "NewDNASequence1": {
+            "component": "NewDNASequence_fromfile"
+        }
+	}
+       
+}
