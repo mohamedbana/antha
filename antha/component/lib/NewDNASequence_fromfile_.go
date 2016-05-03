@@ -1,8 +1,8 @@
+// Protocol for creating a DNASequence from a sequence file format. // Supported formats: .gdx .fasta .gb
 package lib
 
 import (
 	"fmt"
-	//"math"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
@@ -44,13 +44,16 @@ func _NewDNASequence_fromfileSteps(_ctx context.Context, _input *NewDNASequence_
 	}
 
 	orfs := sequences.FindallORFs(_output.DNA.Seq)
-	features := sequences.ORFs2Features(orfs)
 
-	_output.DNA = wtype.Annotate(_output.DNA, features)
+	if len(_output.DNA.Features) == 0 {
+		features := sequences.ORFs2Features(orfs)
+
+		_output.DNA = wtype.Annotate(_output.DNA, features)
+	}
 
 	_output.Status = fmt.Sprintln(
 		text.Print("DNA_Seq: ", _output.DNA),
-		text.Print("ORFs: ", _output.DNA.Features),
+		text.Print("ORFs: ", orfs),
 	)
 
 	_output.Warnings = err
@@ -140,7 +143,7 @@ func init() {
 	addComponent(Component{Name: "NewDNASequence_fromfile",
 		Constructor: NewDNASequence_fromfileNew,
 		Desc: ComponentDesc{
-			Desc: "",
+			Desc: "Protocol for creating a DNASequence from a sequence file format. // Supported formats: .gdx .fasta .gb\n",
 			Path: "antha/component/an/Data/DNA/NewDNASequence/NewDNASequence_fromfile.an",
 			Params: []ParamDesc{
 				{Name: "Filename", Desc: "", Kind: "Parameters"},

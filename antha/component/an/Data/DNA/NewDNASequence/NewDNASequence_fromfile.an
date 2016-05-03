@@ -1,8 +1,8 @@
+// Protocol for creating a DNASequence from a sequence file format. // Supported formats: .gdx .fasta .gb
 protocol NewDNASequence_fromfile
 
 import (
 	"fmt"
-	//"math"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
@@ -57,15 +57,19 @@ Steps {
 	DNA.Nm = Gene_name
 	
 	} 
+			
 									
 	orfs := sequences.FindallORFs(DNA.Seq)
+	
+	if len(DNA.Features) == 0 {
 	features := sequences.ORFs2Features(orfs)
 	
 	DNA = wtype.Annotate(DNA,features)
+	}
 	
 	Status = fmt.Sprintln(
 		text.Print("DNA_Seq: ",DNA),
-		text.Print("ORFs: ", DNA.Features),
+		text.Print("ORFs: ", orfs),
 	)
 	
 	Warnings = err
