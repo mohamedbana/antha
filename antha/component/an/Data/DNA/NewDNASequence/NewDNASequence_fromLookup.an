@@ -22,6 +22,7 @@ Parameters (
 Data (
 	DNA wtype.DNASequence
 	Status string
+	Warnings error
 )
 
 // Physical inputs to this protocol
@@ -49,7 +50,7 @@ Steps {
 		
 			if DNAID {
 			
-			DNA,_ = entrez.RetrieveSequence(ID, "nucleotide")
+			DNA, err = entrez.RetrieveSequence(ID, "nucleotide")
 			
 			}
 		} else if BiobrickID {
@@ -71,7 +72,7 @@ Steps {
 		text.Print("DNA_Seq: ",DNA),
 		text.Print("ORFs: ", DNA.Features),
 	)
-	
+	Warnings = err
 }
 
 

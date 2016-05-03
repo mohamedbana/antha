@@ -22,6 +22,7 @@ Parameters (
 Data (
 	DNA wtype.DNASequence
 	Status string
+	Warnings error
 )
 
 // Physical inputs to this protocol
@@ -46,6 +47,7 @@ Setup {
 Steps {
 	
 	
+	
 	seqs, err := parser.DNAFiletoDNASequence(Filename, Plasmid) 
 	
 	if len(seqs) == 1 && err == nil {
@@ -65,6 +67,8 @@ Steps {
 		text.Print("DNA_Seq: ",DNA),
 		text.Print("ORFs: ", DNA.Features),
 	)
+	
+	Warnings = err
 	
 } //else {Status = fmt.Sprintln("correct conditions not met")}
 

@@ -38,7 +38,7 @@ func _NewDNASequence_fromLookupSteps(_ctx context.Context, _input *NewDNASequenc
 
 		if _input.DNAID {
 
-			_output.DNA, _ = entrez.RetrieveSequence(_input.ID, "nucleotide")
+			_output.DNA, err = entrez.RetrieveSequence(_input.ID, "nucleotide")
 
 		}
 	} else if _input.BiobrickID {
@@ -60,7 +60,7 @@ func _NewDNASequence_fromLookupSteps(_ctx context.Context, _input *NewDNASequenc
 		text.Print("DNA_Seq: ", _output.DNA),
 		text.Print("ORFs: ", _output.DNA.Features),
 	)
-
+	_output.Warnings = err
 }
 
 // Actions to perform after steps block to analyze data
@@ -126,14 +126,16 @@ type NewDNASequence_fromLookupInput struct {
 }
 
 type NewDNASequence_fromLookupOutput struct {
-	DNA    wtype.DNASequence
-	Status string
+	DNA      wtype.DNASequence
+	Status   string
+	Warnings error
 }
 
 type NewDNASequence_fromLookupSOutput struct {
 	Data struct {
-		DNA    wtype.DNASequence
-		Status string
+		DNA      wtype.DNASequence
+		Status   string
+		Warnings error
 	}
 	Outputs struct {
 	}
@@ -152,6 +154,7 @@ func init() {
 				{Name: "ID", Desc: "", Kind: "Parameters"},
 				{Name: "DNA", Desc: "", Kind: "Data"},
 				{Name: "Status", Desc: "", Kind: "Data"},
+				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
 	})

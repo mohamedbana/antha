@@ -53,6 +53,8 @@ func _NewDNASequence_fromfileSteps(_ctx context.Context, _input *NewDNASequence_
 		text.Print("ORFs: ", _output.DNA.Features),
 	)
 
+	_output.Warnings = err
+
 } //else {Status = fmt.Sprintln("correct conditions not met")}
 
 // Actions to perform after steps block to analyze data
@@ -119,14 +121,16 @@ type NewDNASequence_fromfileInput struct {
 }
 
 type NewDNASequence_fromfileOutput struct {
-	DNA    wtype.DNASequence
-	Status string
+	DNA      wtype.DNASequence
+	Status   string
+	Warnings error
 }
 
 type NewDNASequence_fromfileSOutput struct {
 	Data struct {
-		DNA    wtype.DNASequence
-		Status string
+		DNA      wtype.DNASequence
+		Status   string
+		Warnings error
 	}
 	Outputs struct {
 	}
@@ -146,6 +150,7 @@ func init() {
 				{Name: "SingleStranded", Desc: "", Kind: "Parameters"},
 				{Name: "DNA", Desc: "", Kind: "Data"},
 				{Name: "Status", Desc: "", Kind: "Data"},
+				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
 	})
