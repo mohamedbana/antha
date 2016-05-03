@@ -8,6 +8,7 @@ import (
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
 )
 
@@ -64,6 +65,7 @@ func (run Run) AddNewResponseFieldandValue(responsedescriptor string, responseva
 	run.ResponseValues = responsevalues
 	fmt.Println(run)
 }
+
 func (run Run) AddAdditionalValue(additionalsubheader string, additionalvalue interface{}) {
 
 	for i, descriptor := range run.AdditionalSubheaders {
@@ -414,6 +416,8 @@ func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) 
 
 func DXXLSXFilefromRuns(runs []Run, outputfilename string) (xlsxfile *xlsx.File) {
 
+	// if output is a struct look for a sensible field to print
+
 	//var file *xlsx.File
 	var sheet *xlsx.Sheet
 	var row *xlsx.Row
@@ -459,6 +463,7 @@ func DXXLSXFilefromRuns(runs []Run, outputfilename string) (xlsxfile *xlsx.File)
 
 	// then add subheadings and descriptors
 	for _, descriptor := range runs[0].Factordescriptors {
+
 		cell = row.AddCell()
 		cell.Value = descriptor
 
@@ -492,9 +497,16 @@ func DXXLSXFilefromRuns(runs []Run, outputfilename string) (xlsxfile *xlsx.File)
 
 		// factors
 		for _, factor := range run.Setpoints {
+
 			cell = row.AddCell()
 
-			cell.SetValue(factor) //= factor.(string)
+			dna, amIdna := factor.(wtype.DNASequence)
+			if amIdna {
+				cell.SetValue(dna.Nm)
+			} else {
+				cell.SetValue(factor) //= factor.(string)
+			}
+
 		}
 
 		// responses
