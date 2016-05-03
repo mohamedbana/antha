@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
 )
 
@@ -82,7 +83,7 @@ func HeaderandDataMap(sheet *xlsx.Sheet, headera1format string, dataminmaxcellco
 }
 
 func RowIntToCharacter(row int) (character string) {
-	alphabetarray := Makealphabet(alphabet)
+	alphabetarray := wutil.MakeAlphabetArray()
 	character = alphabetarray[row]
 	return
 }
@@ -91,7 +92,7 @@ func RowIntToCharacter(row int) (character string) {
 // note that 1 is subtracted from the column number in accordance with the go convention of counting from 0
 func A1formattorowcolumn(a1 string) (row, column int, err error) {
 
-	alphabetarray := Makealphabet(alphabet)
+	alphabetarray := wutil.MakeAlphabetArray()
 
 	a1 = strings.ToUpper(a1)
 
@@ -132,7 +133,7 @@ func A1formattorowcolumn(a1 string) (row, column int, err error) {
 // from a pair of cell coordinates an aray of all entrires between the pair will be returned (e.g. a1:a12 or a1:e1)
 func ConvertMinMaxtoArray(minmax []string) (array []string, err error) {
 
-	alphabetarray := Makealphabet(alphabet)
+	alphabetarray := wutil.MakeAlphabetArray()
 
 	if len(minmax) != 2 {
 		err = fmt.Errorf("can only make array from a pair of values")
@@ -174,26 +175,4 @@ func ConvertMinMaxtoArray(minmax []string) (array []string, err error) {
 	}
 	return
 
-}
-
-var (
-	alphabet string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-)
-
-func Makealphabet(alphabet string) (alphabetarray []string) {
-
-	alphabetarray = make([]string, 0)
-	startercharacter := ""
-
-	for j := 0; j < (len(alphabet)); j++ {
-
-		for i := 0; i < (len(alphabet)); i++ {
-			character := startercharacter + string(alphabet[i])
-
-			alphabetarray = append(alphabetarray, character)
-		}
-		startercharacter = string(alphabet[j])
-
-	}
-	return
 }
