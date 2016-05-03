@@ -125,6 +125,65 @@ func (run Run) GetAdditionalInfo(subheader string) (value interface{}, err error
 	return value, fmt.Errorf("header not found")
 }
 
+func AddFixedFactors(runs []Run, fixedfactors []DOEPair) (runswithfixedfactors []Run) {
+
+	if len(runs) > 0 {
+		for _, run := range runs {
+			descriptors := make([]string, len(run.Factordescriptors))
+			setpoints := make([]interface{}, len(run.Setpoints))
+
+			for i, descriptor := range run.Factordescriptors {
+				descriptors[i] = descriptor
+			}
+
+			for i, setpoint := range run.Setpoints {
+				setpoints[i] = setpoint
+			}
+
+			for _, fixed := range fixedfactors {
+
+				descriptors = append(descriptors, fixed.Factor)
+				setpoints = append(setpoints, fixed.Levels[0])
+
+			}
+			run.Factordescriptors = descriptors
+			run.Setpoints = setpoints
+
+		}
+
+	} else {
+		runs = RunsFromFixedFactors(fixedfactors)
+	}
+
+	runswithfixedfactors = runs
+
+	return
+}
+
+func RunsFromFixedFactors(fixedfactors []DOEPair) (runswithfixedfactors []Run) {
+
+	var run Run
+	var descriptors = make([]string, 0)
+	var setpoints = make([]interface{}, 0)
+
+	for _, factor := range fixedfactors {
+
+		descriptors = append(descriptors, factor.Factor)
+		setpoints = append(setpoints, factor.Levels[0])
+
+	}
+
+	run.Factordescriptors = descriptors
+	run.Setpoints = setpoints
+
+	runswithfixedfactors = make([]Run, 1)
+
+	runswithfixedfactors[0] = run
+
+	return
+
+}
+
 func AllComboCount(pairs []DOEPair) (numberofuniquecombos int) {
 	fmt.Println("In AllComboCount", "len(pairs)", len(pairs))
 	var movingcount int
@@ -139,6 +198,86 @@ func AllComboCount(pairs []DOEPair) (numberofuniquecombos int) {
 	return
 }
 
+func FixedAndNonFixed(factors []DOEPair) (fixedfactors []DOEPair, nonfixed []DOEPair) {
+
+	fixedfactors = make([]DOEPair, 0)
+	nonfixed = make([]DOEPair, 0)
+
+	for _, factor := range factors {
+		if len(factor.Levels) == 1 {
+			fixedfactors = append(fixedfactors, factor)
+		} else if len(factor.Levels) > 1 {
+			nonfixed = append(nonfixed, factor)
+		}
+	}
+	return
+}
+
+func IsFixedFactor(factor DOEPair) (yesorno bool) {
+	if len(factor.Levels) == 1 {
+		yesorno = true
+	}
+	return
+}
+
+func AllCombinations(factors []DOEPair) (runs []Run) {
+
+	fixed, nonfixed := FixedAndNonFixed(factors)
+
+	//fmt.Println(factors)
+	descriptors := make([]string, 0) //AllComboCount(factors))
+	//fixedfactors := make([]DOEPair, 0)
+	// range through factors and get annotation info first
+	for _, factor := range factors {
+		descriptors = append(descriptors, factor.Factor)
+
+	}
+
+	setpoints := make([]interface{}, 0)
+	//runs = make([]Run, AllComboCount(factors))
+	runs = make([]Run, 0)
+
+	if AllComboCount(factors) == 0 {
+		return
+		//	panic("all combo count == 0")
+		//	fmt.Println(factors)
+	}
+
+	for i, factor := range nonfixed {
+
+		//setpoints = make([]interface{}, 0)
+
+		fmt.Println("factor", i, "of", AllComboCount(factors), factor.Factor, factor.Levels)
+
+		//descriptors = append(descriptors, factor.Factor)
+
+		for j, level := range factor.Levels {
+
+			fmt.Println("factor", i, "of", AllComboCount(factors), factor.Factor, "levels ", j, factor.Levels)
+
+			var run Run
+
+			setpoints = append(setpoints, level)
+
+			//		}
+			run.Factordescriptors = descriptors
+			run.Setpoints = setpoints
+
+			run.StdNumber = len(runs) + 1
+			run.RunNumber = len(runs) + 1
+			//runs[i+j] = run
+			runs = append(runs, run)
+
+		}
+
+	}
+
+	runs = AddFixedFactors(runs, fixed)
+
+	return
+}
+
+/*
 func AllCombinations(factors []DOEPair) (runs []Run) {
 	//fmt.Println(factors)
 	descriptors := make([]string, AllComboCount(factors))
@@ -165,12 +304,12 @@ func AllCombinations(factors []DOEPair) (runs []Run) {
 
 			if i-factorswithonelevel < 0 {
 
-				//fmt.Println("factor:", factor, level, i, j /*i+j*/)
+				//fmt.Println("factor:", factor, level, i, j) //, i+j)
 
-				/*		if len(descriptors) == len(factors) {
-						descriptors[len(descriptors)-1] = factor.Factor
-						setpoints[len(descriptors)-1] = level
-					} else {*/
+			//			if len(descriptors) == len(factors) {
+			//			descriptors[len(descriptors)-1] = factor.Factor
+			//			setpoints[len(descriptors)-1] = level
+			//		} else {
 				descriptors[i] = factor.Factor
 				setpoints = append(setpoints, level)
 				//		}
@@ -180,10 +319,10 @@ func AllCombinations(factors []DOEPair) (runs []Run) {
 				fmt.Println(i, j, factorswithonelevel, i+1-factorswithonelevel+j)
 				runs[i+1-factorswithonelevel+j] = run
 			} else {
-				/*		if len(descriptors) == len(factors) {
-						descriptors[len(descriptors)-1] = factor.Factor
-						setpoints[len(descriptors)-1] = level
-					} else {*/
+				//		if len(descriptors) == len(factors) {
+				//		descriptors[len(descriptors)-1] = factor.Factor
+				//		setpoints[len(descriptors)-1] = level
+				//	} else {
 				descriptors[i] = factor.Factor
 				setpoints = append(setpoints, level)
 				//		}
@@ -196,6 +335,7 @@ func AllCombinations(factors []DOEPair) (runs []Run) {
 	}
 	return
 }
+*/
 
 func ParseRunWellPair(pair string, nameappendage string) (runnumber int, well string, err error) {
 	split := strings.Split(pair, ":")
