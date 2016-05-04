@@ -2,7 +2,6 @@ protocol AssemblySimulation
 
 import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
-		"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 
 )
@@ -38,16 +37,17 @@ Setup {
 
 Steps {
 	
-	
-	typeiis,_ := lookup.TypeIIsLookup(RE)
 
 	// Assembly parameters
-	assembly := enzymes.Assemblyparameters{"Simulated", typeiis, VectorSeq, PartsWithOverhangs}
+	assembly := enzymes.Assemblyparameters{"Simulated", RE, VectorSeq, PartsWithOverhangs}
 	
 	// Simulation
 	SimulationStatus, NumberofSuccessfulAssemblies, RestrictionSitesFound, SimulatedSequence, Warnings = enzymes.Assemblysimulator(assembly)
 	
-
+	
+	
+	
+	
 }
 	
 Analysis {

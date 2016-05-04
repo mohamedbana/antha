@@ -8,7 +8,6 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 )
@@ -85,10 +84,8 @@ Steps {
 	partsinorder = append(partsinorder,partDNA)
 	}
 	
-	enzyme,_ := lookup.TypeIIsLookup(RestrictionEnzyme.CName)
-	
 	vectordata := Inventory.Partslist[Vectordata]
-	assembly := enzymes.Assemblyparameters{Constructname, enzyme,vectordata,partsinorder}
+	assembly := enzymes.Assemblyparameters{Constructname, RestrictionEnzyme.CName,vectordata,partsinorder}
 	status,numberofassemblies,sitesfound,newDNASequence,_ := enzymes.Assemblysimulator(assembly)
 	
 	NewDNASequence = newDNASequence

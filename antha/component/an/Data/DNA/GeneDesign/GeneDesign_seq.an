@@ -64,7 +64,7 @@ Steps {
 	}
 	
 	// validation
-	assembly := enzymes.Assemblyparameters{ConstructName, EnzymeInf, VectorSeq, PartsWithOverhangs}
+	assembly := enzymes.Assemblyparameters{ConstructName, RE, VectorSeq, PartsWithOverhangs}
 	SimulationStatus, _, _, _, _ = enzymes.Assemblysimulator(assembly)
 	
 	

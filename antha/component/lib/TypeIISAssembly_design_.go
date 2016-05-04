@@ -116,7 +116,7 @@ func _TypeIISAssembly_designSteps(_ctx context.Context, _input *TypeIISAssembly_
 	_, stickyends5, stickyends3 := enzymes.TypeIIsdigest(vectordata, restrictionenzyme)
 
 	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
-	assembly := enzymes.Assemblyparameters{_input.Constructname, restrictionenzyme, vectordata, _output.PartswithOverhangs}
+	assembly := enzymes.Assemblyparameters{_input.Constructname, restrictionenzyme.Name, vectordata, _output.PartswithOverhangs}
 	status, numberofassemblies, sitesfound, newDNASequence, _ := enzymes.Assemblysimulator(assembly)
 
 	// The default sitesfound produced from the assembly simulator only checks to SapI and BsaI so we'll repeat with the enzymes declared in parameters

@@ -43,7 +43,7 @@ func _GeneDesignSteps(_ctx context.Context, _input *GeneDesignInput, _output *Ge
 	_output.PartsWithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(PartDNA, VectorSeq, EnzymeInf)
 
 	// validation
-	assembly := enzymes.Assemblyparameters{"MarksConstruct", EnzymeInf, VectorSeq, _output.PartsWithOverhangs}
+	assembly := enzymes.Assemblyparameters{"MarksConstruct", _input.RE, VectorSeq, _output.PartsWithOverhangs}
 	Status, _, _, _, _ := enzymes.Assemblysimulator(assembly)
 	fmt.Println(Status)
 

@@ -26,14 +26,11 @@ package parser
 import (
 	"encoding/csv"
 	"fmt"
-	"os"
-	"strings"
-
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"os"
+	"strings"
 )
 
 func ReadDesign(filename string) [][]string {
@@ -178,23 +175,10 @@ func Assemblyfromcsv(designfile string, partsfile string) (assemblyparameters []
 
 	assemblyparameters = make([]enzymes.Assemblyparameters, 0)
 
-	var enzymenamelist = make([]string, 0)
-	var enzymemap = make(map[string]wtype.TypeIIs)
-	var typeiis wtype.TypeIIs
-
 	for _, c := range designedconstructs {
 		var newassemblyparameters enzymes.Assemblyparameters
 		newassemblyparameters.Constructname = c[0]
-
-		if search.InSlice(c[1], enzymenamelist) == false {
-			typeiis, _ = lookup.TypeIIsLookup(c[1])
-			enzymemap[c[1]] = typeiis
-			enzymenamelist = append(enzymenamelist, c[1])
-			newassemblyparameters.Enzyme = typeiis
-		} else {
-			newassemblyparameters.Enzyme = enzymemap[c[1]]
-		}
-
+		newassemblyparameters.Enzymename = c[1]
 		newassemblyparameters.Vector = definedparts[c[2]]
 		var nextpart wtype.DNASequence
 

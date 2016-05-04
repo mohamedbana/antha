@@ -137,7 +137,7 @@ Steps {
 	
 	
 	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
-	assembly := enzymes.Assemblyparameters{Constructname, restrictionenzyme,vectordata,PartswithOverhangs}
+	assembly := enzymes.Assemblyparameters{Constructname, restrictionenzyme.Name,vectordata,PartswithOverhangs}
 		status,numberofassemblies,sitesfound,newDNASequence,_ := enzymes.Assemblysimulator(assembly)
 	
 	// The default sitesfound produced from the assembly simulator only checks to SapI and BsaI so we'll repeat with the enzymes declared in parameters
