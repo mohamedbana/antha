@@ -67,6 +67,30 @@ func (run Run) AddNewResponseFieldandValue(responsedescriptor string, responseva
 	fmt.Println(run)
 }
 
+func AddNewFactorFieldandValue(run Run, factordescriptor string, factorvalue interface{}) (newrun Run) {
+
+	//var newrun Run
+
+	factordescriptors := make([]string, len(run.Factordescriptors))
+	factorvalues := make([]interface{}, len(run.Setpoints))
+
+	factordescriptors = run.Factordescriptors
+	factorvalues = run.Setpoints
+
+	factordescriptors = append(factordescriptors, factordescriptor)
+	factorvalues = append(factorvalues, factorvalue)
+
+	//newrun = run
+
+	newrun.Factordescriptors = factordescriptors
+	newrun.Setpoints = factorvalues
+
+	//run = newrun
+	fmt.Println(run)
+
+	return
+}
+
 func (run Run) AddAdditionalValue(additionalsubheader string, additionalvalue interface{}) {
 
 	for i, descriptor := range run.AdditionalSubheaders {
@@ -224,6 +248,55 @@ func AllCombinations(factors []DOEPair) (runs []Run) {
 
 	fixed, nonfixed := FixedAndNonFixed(factors)
 
+	fmt.Println("fixed:", fixed, "nonfixed: ", nonfixed)
+	numberofruns := AllComboCount(factors)
+	//numberoffactors := len(factors)
+
+	runs = make([]Run, numberofruns)
+	//setpoints := make([]interface{}, 0)
+	//descriptors := make([]string, 0)
+
+	//for i := 0; i < numberofruns; i++ {
+	var swapevery int
+	var numberofswaps int
+	for i, factor := range factors {
+
+		counter := 0
+		runswitheachlevelforthisfactor := numberofruns / factor.LevelCount()
+
+		if i == 0 {
+			swapevery = runswitheachlevelforthisfactor
+			numberofswaps = runswitheachlevelforthisfactor / swapevery
+		} else {
+			swapevery = swapevery / factor.LevelCount()
+			numberofswaps = runswitheachlevelforthisfactor / swapevery
+		}
+
+		for j := 0; j < numberofswaps; j++ {
+			for _, level := range factor.Levels {
+				for k := 0; k < swapevery; k++ {
+
+					runs[counter] = AddNewFactorFieldandValue(runs[counter], factor.Factor, level)
+					runs[counter].RunNumber = counter + 1
+					runs[counter].StdNumber = counter + 1
+					counter++
+					fmt.Println("counter: ", counter, "i: ", i, "Swapevery: ", swapevery, "numberofswaps: ", numberofswaps)
+				}
+			}
+		}
+
+	}
+
+	//runs = AddFixedFactors(runs, fixed)
+	//}
+	return
+}
+
+/*
+func AllCombinations(factors []DOEPair) (runs []Run) {
+
+	fixed, nonfixed := FixedAndNonFixed(factors)
+
 	//fmt.Println(factors)
 	descriptors := make([]string, 0) //AllComboCount(factors))
 	//fixedfactors := make([]DOEPair, 0)
@@ -276,7 +349,35 @@ func AllCombinations(factors []DOEPair) (runs []Run) {
 
 	return
 }
+*/
+/*
+// original
+func AllCombinations(factors []DOEPair) (runs []Run) {
+	fmt.Println(factors)
 
+	fixed, nonfixed := FixedAndNonFixed(factors)
+
+	descriptors := make([]string, 0)
+	setpoints := make([]interface{}, 0)
+	runs = make([]Run, AllComboCount(factors))
+	var run Run
+	for i, factor := range nonfixed {
+		fmt.Println(factor, i, "of", AllComboCount(factors))
+		for j, level := range factor.Levels {
+			fmt.Println(factor, level, i, j, i+j)
+			descriptors = append(descriptors, factor.Factor)
+			setpoints = append(setpoints, level)
+			run.Factordescriptors = descriptors
+			run.Setpoints = setpoints
+			runs[i+j] = run
+		}
+	}
+
+	runs = AddFixedFactors(runs, fixed)
+
+	return
+}
+*/
 /*
 func AllCombinations(factors []DOEPair) (runs []Run) {
 	//fmt.Println(factors)
