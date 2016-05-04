@@ -47,7 +47,7 @@ func _GeneDesign_seqSteps(_ctx context.Context, _input *GeneDesign_seqInput, _ou
 	}
 
 	// validation
-	assembly := enzymes.Assemblyparameters{_input.ConstructName, _input.RE, VectorSeq, _output.PartsWithOverhangs}
+	assembly := enzymes.Assemblyparameters{_input.ConstructName, EnzymeInf, VectorSeq, _output.PartsWithOverhangs}
 	_output.SimulationStatus, _, _, _, _ = enzymes.Assemblysimulator(assembly)
 
 	// check if sequence meets requirements for synthesis

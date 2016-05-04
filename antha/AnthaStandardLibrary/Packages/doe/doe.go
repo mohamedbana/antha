@@ -250,6 +250,7 @@ func AllCombinations(factors []DOEPair) (runs []Run) {
 
 	fmt.Println("fixed:", fixed, "nonfixed: ", nonfixed)
 	numberofruns := AllComboCount(factors)
+	fmt.Println("Allcombocount: ", numberofruns, "Factors: ", factors)
 	//numberoffactors := len(factors)
 
 	runs = make([]Run, numberofruns)
