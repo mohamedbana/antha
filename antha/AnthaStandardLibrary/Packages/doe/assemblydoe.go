@@ -10,7 +10,7 @@ import (
 
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/export"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -62,12 +62,10 @@ func AssemblyparametersfromRuns(runs []Run, enzymename string) (assemblyparamete
 	parts := make([]wtype.DNASequence, 0)
 	var parameters enzymes.Assemblyparameters
 
-	enzyme, _ := lookup.TypeIIsLookup(enzymename)
-
 	for j, run := range runs {
 
 		parameters.Constructname = "run" + strconv.Itoa(j)
-		parameters.Enzyme = enzyme
+		parameters.Enzymename = enzymename
 
 		for i, _ := range run.Setpoints {
 

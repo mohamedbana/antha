@@ -2,7 +2,6 @@ package lib
 
 import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
@@ -18,10 +17,8 @@ func _AssemblySimulationSetup(_ctx context.Context, _input *AssemblySimulationIn
 
 func _AssemblySimulationSteps(_ctx context.Context, _input *AssemblySimulationInput, _output *AssemblySimulationOutput) {
 
-	typeiis, _ := lookup.TypeIIsLookup(_input.RE)
-
 	// Assembly parameters
-	assembly := enzymes.Assemblyparameters{"Simulated", typeiis, _input.VectorSeq, _input.PartsWithOverhangs}
+	assembly := enzymes.Assemblyparameters{"Simulated", _input.RE, _input.VectorSeq, _input.PartsWithOverhangs}
 
 	// Simulation
 	_output.SimulationStatus, _output.NumberofSuccessfulAssemblies, _output.RestrictionSitesFound, _output.SimulatedSequence, _output.Warnings = enzymes.Assemblysimulator(assembly)

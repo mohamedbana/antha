@@ -30,7 +30,6 @@ import (
 	"strings"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 )
 
@@ -105,8 +104,7 @@ func stringToAssemblyParameters(str []byte) ([]enzymes.Assemblyparameters, error
 		var newconstruct enzymes.Assemblyparameters
 		newconstruct.Constructname = a.Label
 		if strings.Contains(a.Notes, "Enzyme:") == true {
-			typeiis, _ := lookup.TypeIIsLookup(strings.TrimSpace(strings.TrimPrefix(a.Notes, "Enzyme:"))) // add trim function to trim after space
-			newconstruct.Enzyme = typeiis
+			newconstruct.Enzymename = strings.TrimSpace(strings.TrimPrefix(a.Notes, "Enzyme:")) // add trim function to trim after space
 		}
 		for _, b := range a.DNAElements {
 			var newseq wtype.DNASequence

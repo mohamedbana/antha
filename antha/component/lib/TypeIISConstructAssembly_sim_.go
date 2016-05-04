@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -45,10 +44,8 @@ func _TypeIISConstructAssembly_simSteps(_ctx context.Context, _input *TypeIISCon
 		partsinorder = append(partsinorder, partDNA)
 	}
 
-	enzyme, _ := lookup.TypeIIsLookup(_input.RestrictionEnzyme.CName)
-
 	vectordata := Inventory.Partslist[_input.Vectordata]
-	assembly := enzymes.Assemblyparameters{_input.Constructname, enzyme, vectordata, partsinorder}
+	assembly := enzymes.Assemblyparameters{_input.Constructname, _input.RestrictionEnzyme.CName, vectordata, partsinorder}
 	status, numberofassemblies, sitesfound, newDNASequence, _ := enzymes.Assemblysimulator(assembly)
 
 	_output.NewDNASequence = newDNASequence

@@ -118,7 +118,7 @@ func _Scarfree_designSteps(_ctx context.Context, _input *Scarfree_designInput, _
 	}
 
 	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
-	assembly := enzymes.Assemblyparameters{_input.Constructname, restrictionenzyme, vectordata, _output.PartswithOverhangs}
+	assembly := enzymes.Assemblyparameters{_input.Constructname, restrictionenzyme.Name, vectordata, _output.PartswithOverhangs}
 	status, numberofassemblies, _, newDNASequence, err := enzymes.Assemblysimulator(assembly)
 
 	endreport := "Endreport only run in the event of assembly simulation failure"

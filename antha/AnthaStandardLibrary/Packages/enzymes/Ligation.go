@@ -170,7 +170,7 @@ func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequen
 // struct containing all information required to use AssemblySimulator function
 type Assemblyparameters struct {
 	Constructname string
-	Enzyme        wtype.TypeIIs //string
+	Enzymename    string
 	Vector        wtype.DNASequence
 	Partsinorder  []wtype.DNASequence
 }
@@ -187,22 +187,21 @@ func Assemblysimulator(assemblyparameters Assemblyparameters) (s string, success
 
 	// fetch enzyme properties from map (this is basically a look up table for those who don't know)
 	successfulassemblies = 0
-	//enzymename := strings.ToUpper(assemblyparameters.Enzymename)
+	enzymename := strings.ToUpper(assemblyparameters.Enzymename)
 
-	enzymename := assemblyparameters.Enzyme.Name
 	// should change this to rebase lookup; what happens if this fails?
 	//enzyme := TypeIIsEnzymeproperties[enzymename]
-	//enzyme, _ := lookup.TypeIIsLookup(enzymename)
+	enzyme, _ := lookup.TypeIIsLookup(enzymename)
 
 	// need to expand this to include other enzyme possibilities
-	if assemblyparameters.Enzyme.Class != "TypeIIs" { // enzyme.Name != "SapI" && enzyme.Name != "BsaI" && enzyme.Name != "BpiI" {
-		s = fmt.Sprint(assemblyparameters.Enzyme.Name, ": Incorrect Enzyme or no enzyme specified")
+	if enzyme.Class != "TypeIIs" { // enzyme.Name != "SapI" && enzyme.Name != "BsaI" && enzyme.Name != "BpiI" {
+		s = fmt.Sprint(enzymename, ": Incorrect Enzyme or no enzyme specified")
 		err = fmt.Errorf(s)
 		return s, successfulassemblies, sites, newDNASequence, err
 	}
 
 	//assemble (note that sapIenz is found in package enzymes)
-	failedassemblies, plasmidproductsfromXprimaryseq, err := JoinXnumberofparts(assemblyparameters.Vector, assemblyparameters.Partsinorder, assemblyparameters.Enzyme)
+	failedassemblies, plasmidproductsfromXprimaryseq, err := JoinXnumberofparts(assemblyparameters.Vector, assemblyparameters.Partsinorder, enzyme)
 
 	if err != nil {
 		//s = "Failure Joining fragments after digestion" //
@@ -283,7 +282,7 @@ func MultipleAssemblies(parameters []Assemblyparameters) (s string, successfulas
 			constructsitesstring := make([]string, 0)
 			constructsitesstring = append(constructsitesstring, output)
 			sitestring := ""
-			enzyme := lookup.EnzymeLookup(construct.Enzyme.Name)
+			enzyme := lookup.EnzymeLookup(construct.Enzymename)
 			sitesperpart = Restrictionsitefinder(construct.Vector, []wtype.RestrictionEnzyme{enzyme})
 
 			if sitesperpart[0].Numberofsites != 2 {
