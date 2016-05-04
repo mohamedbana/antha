@@ -53,7 +53,7 @@ Steps {
 	PartsWithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(PartDNA, VectorSeq, EnzymeInf)
 	
 	// validation
-	assembly := enzymes.Assemblyparameters{"MarksConstruct", RE, VectorSeq, PartsWithOverhangs}
+	assembly := enzymes.Assemblyparameters{"MarksConstruct", EnzymeInf, VectorSeq, PartsWithOverhangs}
 	Status, _, _, _, _ := enzymes.Assemblysimulator(assembly)
 	fmt.Println(Status)
 	

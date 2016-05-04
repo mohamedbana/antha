@@ -140,7 +140,7 @@ Steps {
 	PartswithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(partsinorder, vectordata, restrictionenzyme)
 	
 	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
-	assembly := enzymes.Assemblyparameters{Constructname, restrictionenzyme.Name,vectordata,PartswithOverhangs}
+	assembly := enzymes.Assemblyparameters{Constructname, restrictionenzyme,vectordata,PartswithOverhangs}
 		status,numberofassemblies,_,newDNASequence, err := enzymes.Assemblysimulator(assembly)
 	
 	endreport := "Endreport only run in the event of assembly simulation failure"

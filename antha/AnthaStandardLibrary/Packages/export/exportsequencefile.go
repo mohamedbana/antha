@@ -174,7 +174,7 @@ func Makefastaserial2(dir string, seqs []wtype.DNASequence) string {
 
 func ExportFastaandSummaryforEachSeq(assemblyparameters enzymes.Assemblyparameters) (err error) {
 
-	enzymename := strings.ToUpper(assemblyparameters.Enzymename)
+	enzymename := strings.ToUpper(assemblyparameters.Enzyme.Name)
 
 	// should change this to rebase lookup; what happens if this fails?
 	//enzyme := TypeIIsEnzymeproperties[enzymename]
@@ -207,7 +207,7 @@ func ExportFastaSerialfromMultipleAssemblies(dirname string, multipleassemblypar
 
 	for _, assemblyparameters := range multipleassemblyparameters {
 
-		enzymename := strings.ToUpper(assemblyparameters.Enzymename)
+		enzymename := strings.ToUpper(assemblyparameters.Enzyme.Name)
 
 		// should change this to rebase lookup; what happens if this fails?
 		//enzyme := TypeIIsEnzymeproperties[enzymename]

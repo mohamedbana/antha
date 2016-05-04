@@ -23,13 +23,14 @@
 package enzymes
 
 import (
+	"sort"
+	"strconv"
+	"strings"
+
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"sort"
-	"strconv"
-	"strings"
 )
 
 //should expand to be more general, i.e. 3prime overhangs
@@ -800,7 +801,7 @@ func TypeIIsdigest(sequence wtype.DNASequence, typeIIsenzyme wtype.TypeIIs) (Fin
 func Digestionsimulator(assemblyparameters Assemblyparameters) (digestedfragementarray [][]Digestedfragment) {
 	// fetch enzyme properties from map (this is basically a look up table for those who don't know)
 	digestedfragementarray = make([][]Digestedfragment, 0)
-	enzymename := strings.ToUpper(assemblyparameters.Enzymename)
+	enzymename := strings.ToUpper(assemblyparameters.Enzyme.Name)
 	enzyme := TypeIIsEnzymeproperties[enzymename]
 	//assemble (note that sapIenz is found in package enzymes)
 	doublestrandedvector := MakedoublestrandedDNA(assemblyparameters.Vector)
