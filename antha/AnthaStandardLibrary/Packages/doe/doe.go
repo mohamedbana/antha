@@ -1,4 +1,4 @@
-// doe.go
+// Package for facilitating DOE methodology in antha
 package doe
 
 import (
@@ -50,10 +50,7 @@ func (run Run) AddResponseValue(responsedescriptor string, responsevalue interfa
 
 }
 
-// refactor as method
-func AddNewResponseFieldandValue(run Run, responsedescriptor string, responsevalue interface{}) {
-
-	var newrun Run
+func AddNewResponseFieldandValue(run Run, responsedescriptor string, responsevalue interface{}) (newrun Run) {
 
 	newrun = run
 
@@ -68,12 +65,11 @@ func AddNewResponseFieldandValue(run Run, responsedescriptor string, responseval
 
 	newrun.Responsedescriptors = responsedescriptors
 	newrun.ResponseValues = responsevalues
-	fmt.Println(newrun)
+
+	return
 }
 
 func AddNewFactorFieldandValue(run Run, factordescriptor string, factorvalue interface{}) (newrun Run) {
-
-	//var newrun Run
 
 	factordescriptors := make([]string, len(run.Factordescriptors))
 	factorvalues := make([]interface{}, len(run.Setpoints))
@@ -84,13 +80,8 @@ func AddNewFactorFieldandValue(run Run, factordescriptor string, factorvalue int
 	factordescriptors = append(factordescriptors, factordescriptor)
 	factorvalues = append(factorvalues, factorvalue)
 
-	//newrun = run
-
 	newrun.Factordescriptors = factordescriptors
 	newrun.Setpoints = factorvalues
-
-	//run = newrun
-	fmt.Println(run)
 
 	return
 }
