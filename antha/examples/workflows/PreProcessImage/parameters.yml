@@ -2,6 +2,7 @@
   "Parameters": {
     "PreProcess": {
 		"Imagefilename":"nyancat.jpg",
+		"CheckAllResizeAlgorithms": false,
 		"Rotate": false,
 		"AutoRotate": true,
 		"PosterizeImage":false,

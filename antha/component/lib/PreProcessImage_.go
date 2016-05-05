@@ -33,8 +33,9 @@ func _PreProcessImageSteps(_ctx context.Context, _input *PreProcessImageInput, _
 
 	chosencolourpalette := image.AvailablePalettes[_input.Palette]
 
-	image.CheckAllResizealgorithms(_input.Imagefilename, _input.OutPlate, _input.Rotate, imaging.AllResampleFilters)
-
+	if _input.CheckAllResizeAlgorithms {
+		image.CheckAllResizealgorithms(_input.Imagefilename, _input.OutPlate, _input.Rotate, imaging.AllResampleFilters)
+	}
 	_, _, newimagename := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
 
 	// if posterize rerun
@@ -107,14 +108,15 @@ type PreProcessImageElement struct {
 }
 
 type PreProcessImageInput struct {
-	AutoRotate      bool
-	Imagefilename   string
-	Negative        bool
-	OutPlate        *wtype.LHPlate
-	Palette         string
-	PosterizeImage  bool
-	PosterizeLevels int
-	Rotate          bool
+	AutoRotate               bool
+	CheckAllResizeAlgorithms bool
+	Imagefilename            string
+	Negative                 bool
+	OutPlate                 *wtype.LHPlate
+	Palette                  string
+	PosterizeImage           bool
+	PosterizeLevels          int
+	Rotate                   bool
 }
 
 type PreProcessImageOutput struct {
@@ -137,6 +139,7 @@ func init() {
 			Path: "antha/component/an/Liquid_handling/PipetteImage/PreProcessImage.an",
 			Params: []ParamDesc{
 				{Name: "AutoRotate", Desc: "", Kind: "Parameters"},
+				{Name: "CheckAllResizeAlgorithms", Desc: "", Kind: "Parameters"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
 				{Name: "Negative", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},

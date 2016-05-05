@@ -17,6 +17,7 @@ Parameters (
 	PosterizeImage bool
 	PosterizeLevels int
 	Palette string
+	CheckAllResizeAlgorithms bool
 )
 
 // Data which is returned from this protocol, and data types
@@ -52,9 +53,9 @@ Steps {
 
 	chosencolourpalette := image.AvailablePalettes[Palette]
 	
-
-	image.CheckAllResizealgorithms(Imagefilename,OutPlate,Rotate,imaging.AllResampleFilters)
-	
+	if CheckAllResizeAlgorithms {
+			image.CheckAllResizealgorithms(Imagefilename,OutPlate,Rotate,imaging.AllResampleFilters)
+	}
 	_, _, newimagename := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate,AutoRotate) 
 	
 	// if posterize rerun 
