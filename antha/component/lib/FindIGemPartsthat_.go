@@ -33,16 +33,16 @@ import (
 // i.e. map[biobrickID]description
 
 // Input Requirement specification
-func _FindIGemPartsthatRequirements() {
+func _FindIGemPartsThatRequirements() {
 
 }
 
 // Conditions to run on startup
-func _FindIGemPartsthatSetup(_ctx context.Context, _input *FindIGemPartsthatInput) {}
+func _FindIGemPartsThatSetup(_ctx context.Context, _input *FindIGemPartsThatInput) {}
 
 // The core process for this protocol, with the steps to be performed
 // for every input
-func _FindIGemPartsthatSteps(_ctx context.Context, _input *FindIGemPartsthatInput, _output *FindIGemPartsthatOutput) {
+func _FindIGemPartsThatSteps(_ctx context.Context, _input *FindIGemPartsThatInput, _output *FindIGemPartsThatOutput) {
 
 	BackupParts := make([]string, 0)
 	status := ""
@@ -128,26 +128,26 @@ func _FindIGemPartsthatSteps(_ctx context.Context, _input *FindIGemPartsthatInpu
 
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
-func _FindIGemPartsthatAnalysis(_ctx context.Context, _input *FindIGemPartsthatInput, _output *FindIGemPartsthatOutput) {
+func _FindIGemPartsThatAnalysis(_ctx context.Context, _input *FindIGemPartsThatInput, _output *FindIGemPartsThatOutput) {
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
-func _FindIGemPartsthatValidation(_ctx context.Context, _input *FindIGemPartsthatInput, _output *FindIGemPartsthatOutput) {
+func _FindIGemPartsThatValidation(_ctx context.Context, _input *FindIGemPartsThatInput, _output *FindIGemPartsThatOutput) {
 }
-func _FindIGemPartsthatRun(_ctx context.Context, input *FindIGemPartsthatInput) *FindIGemPartsthatOutput {
-	output := &FindIGemPartsthatOutput{}
-	_FindIGemPartsthatSetup(_ctx, input)
-	_FindIGemPartsthatSteps(_ctx, input, output)
-	_FindIGemPartsthatAnalysis(_ctx, input, output)
-	_FindIGemPartsthatValidation(_ctx, input, output)
+func _FindIGemPartsThatRun(_ctx context.Context, input *FindIGemPartsThatInput) *FindIGemPartsThatOutput {
+	output := &FindIGemPartsThatOutput{}
+	_FindIGemPartsThatSetup(_ctx, input)
+	_FindIGemPartsThatSteps(_ctx, input, output)
+	_FindIGemPartsThatAnalysis(_ctx, input, output)
+	_FindIGemPartsThatValidation(_ctx, input, output)
 	return output
 }
 
-func FindIGemPartsthatRunSteps(_ctx context.Context, input *FindIGemPartsthatInput) *FindIGemPartsthatSOutput {
-	soutput := &FindIGemPartsthatSOutput{}
-	output := _FindIGemPartsthatRun(_ctx, input)
+func FindIGemPartsThatRunSteps(_ctx context.Context, input *FindIGemPartsThatInput) *FindIGemPartsThatSOutput {
+	soutput := &FindIGemPartsThatSOutput{}
+	output := _FindIGemPartsThatRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
 		panic(err)
 	}
@@ -157,19 +157,19 @@ func FindIGemPartsthatRunSteps(_ctx context.Context, input *FindIGemPartsthatInp
 	return soutput
 }
 
-func FindIGemPartsthatNew() interface{} {
-	return &FindIGemPartsthatElement{
+func FindIGemPartsThatNew() interface{} {
+	return &FindIGemPartsThatElement{
 		inject.CheckedRunner{
 			RunFunc: func(_ctx context.Context, value inject.Value) (inject.Value, error) {
-				input := &FindIGemPartsthatInput{}
+				input := &FindIGemPartsThatInput{}
 				if err := inject.Assign(value, input); err != nil {
 					return nil, err
 				}
-				output := _FindIGemPartsthatRun(_ctx, input)
+				output := _FindIGemPartsThatRun(_ctx, input)
 				return inject.MakeValue(output), nil
 			},
-			In:  &FindIGemPartsthatInput{},
-			Out: &FindIGemPartsthatOutput{},
+			In:  &FindIGemPartsThatInput{},
+			Out: &FindIGemPartsThatOutput{},
 		},
 	}
 }
@@ -179,18 +179,18 @@ var (
 	_ = wunit.Make_units
 )
 
-type FindIGemPartsthatElement struct {
+type FindIGemPartsThatElement struct {
 	inject.CheckedRunner
 }
 
-type FindIGemPartsthatInput struct {
+type FindIGemPartsThatInput struct {
 	OnlyreturnAvailableParts bool
 	OnlyreturnWorkingparts   bool
 	Partdescriptions         []string
 	Parttypes                []string
 }
 
-type FindIGemPartsthatOutput struct {
+type FindIGemPartsThatOutput struct {
 	BiobrickDescriptions         map[string]string
 	FulllistBackupParts          [][]string
 	HighestRatedMatch            string
@@ -200,7 +200,7 @@ type FindIGemPartsthatOutput struct {
 	Warnings                     error
 }
 
-type FindIGemPartsthatSOutput struct {
+type FindIGemPartsThatSOutput struct {
 	Data struct {
 		BiobrickDescriptions         map[string]string
 		FulllistBackupParts          [][]string
@@ -215,8 +215,8 @@ type FindIGemPartsthatSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "FindIGemPartsthat",
-		Constructor: FindIGemPartsthatNew,
+	addComponent(Component{Name: "FindIGemPartsThat",
+		Constructor: FindIGemPartsThatNew,
 		Desc: ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/FindPartsthat/Findpartsthat.an",

@@ -3,7 +3,7 @@
 // see the igem package ("github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem")
 // and igem website for more details about how to make the most of this http://parts.igem.org/Registry_API
 
-protocol FindIGemPartsthat
+protocol FindIGemPartsThat
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"

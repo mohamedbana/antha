@@ -1,6 +1,6 @@
 {
     "Parameters": {
-        "FindPartsthat": {
+        "FindPartsThat": {
             "OnlyreturnAvailableParts": true,
             "OnlyreturnWorkingparts": true,
             "Partdescriptions": [
