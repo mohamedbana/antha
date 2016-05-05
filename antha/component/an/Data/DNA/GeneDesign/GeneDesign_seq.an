@@ -13,8 +13,11 @@ import (
 Parameters (
 	Parts []string
 	Vector string
+	ConstructName string
 	RE string
+	EndsAlreadyAdded bool
 	SynthesisProvider string
+	ExporttoFastaFile bool
 )
 Data (
 	// input seq
@@ -23,7 +26,7 @@ Data (
 	PartsWithOverhangs []wtype.DNASequence
 	SimulationStatus string
 	Validated bool
-	ValiadationStatus string
+	ValidationStatus string
 )
 
 Inputs (
@@ -54,19 +57,24 @@ Steps {
 	EnzymeInf, _ := lookup.TypeIIsLookup(RE)
 	
 	// Add overhangs
+	if EndsAlreadyAdded {
+		PartsWithOverhangs = PartDNA
+	}else {
 	PartsWithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(PartDNA, VectorSeq, EnzymeInf)
+	}
 	
 	// validation
-	assembly := enzymes.Assemblyparameters{"NewConstruct", RE, VectorSeq, PartsWithOverhangs}
+	assembly := enzymes.Assemblyparameters{ConstructName, RE, VectorSeq, PartsWithOverhangs}
 	SimulationStatus, _, _, _, _ = enzymes.Assemblysimulator(assembly)
 	
 	
 	// check if sequence meets requirements for synthesis
-	ValiadationStatus, Validated = sequences.ValidateSynthesis(PartsWithOverhangs, Vector, SynthesisProvider)
+	ValidationStatus, Validated = sequences.ValidateSynthesis(PartsWithOverhangs, Vector, SynthesisProvider)
 	
 	// export sequence to fasta
-	export.Makefastaserial2("NewConstruct", PartsWithOverhangs)
-	
+	if ExporttoFastaFile {
+	export.Makefastaserial2(ConstructName, PartsWithOverhangs)
+	}
 }
 	
 Analysis {

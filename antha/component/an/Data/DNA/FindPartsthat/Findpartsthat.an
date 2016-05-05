@@ -3,15 +3,12 @@
 // see the igem package ("github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem")
 // and igem website for more details about how to make the most of this http://parts.igem.org/Registry_API
 
-protocol FindPartsthat
+protocol FindIGemPartsThat
 
 import (
-	//"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"fmt"
-	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
-//	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
-	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 	"strings"
 	"strconv"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
@@ -19,13 +16,10 @@ import (
 
 // Input parameters for this protocol (data)
 Parameters (
-	//Constructname 				string
-	Parttypes			[]string // e.g. promoter
-	Partdescriptions	[]string  // e.g. arsenic, reporter, alkane, logic gate
-	Parts [][]string
+	Parttypes			[]string // e.g. rbs, reporter
+	Partdescriptions	[]string  // e.g. strong, arsenic, fluorescent, alkane, logic gate
 	OnlyreturnAvailableParts bool
 	OnlyreturnWorkingparts bool
-	//RestrictionsitetoAvoid		[]string
 )
 
 // Physical Inputs to this protocol with types
@@ -42,11 +36,11 @@ Outputs (
 Data (
 	Warnings error
 	Status string
-	//Partsfound	[]wtype.DNASequence // map[string]wtype.DNASequence
-	FulllistBackupParts [][]string //map[string][]string
-	PartMap map[string][]string
-	BiobrickDescriptions map[string]string
+	FulllistBackupParts [][]string 
+	PartMap map[string][]string // i.e. map[description]list of parts matching description
+	BiobrickDescriptions map[string]string // i.e. map[biobrickID]description
 	HighestRatedMatch string
+	HighestRatedMatchDNASequence wtype.DNASequence
 )
 // Input Requirement specification
 Requirements {
@@ -59,9 +53,8 @@ Setup {}
 // The core process for this protocol, with the steps to be performed
 // for every input
 Steps {
-	//var msg string
-	// set warnings reported back to user to none initially
-//	warnings := make([]string,0)
+
+
 	BackupParts := make([]string,0)
 	status := ""
 	joinedstatus := make([]string,0)
@@ -101,6 +94,8 @@ Steps {
 	for desc,subparts := range PartMap {
 	
 	partdetails := igem.LookUp(subparts)
+	
+	
 	// now we can get detailed information of all of those records to interrogate further
 	// this can be slow if there are many parts to check (~2 seconds per block of 14 parts)
 	
@@ -116,6 +111,10 @@ Steps {
 			
 			if err == nil && rating >highestrating{
 			HighestRatedMatch = subpart
+			
+			seq := partdetails.Sequence(HighestRatedMatch)
+			
+			HighestRatedMatchDNASequence = wtype.MakeLinearDNASequence(HighestRatedMatch,seq)
 			}
 		}
 		
@@ -127,13 +126,8 @@ Steps {
 	}
 	i = i + 1
 	}
-	/*
-	if len(warnings) != 0 {
-	Warnings = fmt.Errorf(strings.Join(warnings,";"))
-	}else{Warnings = nil}
-	*/
 	
-	
+
 	FulllistBackupParts = parts
 	Status = strings.Join(joinedstatus," ; ")
 	
@@ -143,7 +137,6 @@ Steps {
 		Status = fmt.Sprintln(Status)
 	} else {Status = fmt.Sprintln(
 		"Warnings:", Warnings.Error(),
-		"Back up parts found (Reported to work!)", Parts,
 		"Back up parts found (Reported to work!)", FulllistBackupParts,
 		)
 		}
