@@ -1,0 +1,16 @@
+{
+  "Parameters": {
+    "PreProcess": {
+		"Imagefilename":"nyancat.jpg",
+		"Rotate": false,
+		"AutoRotate": true,
+		"PosterizeImage":false,
+		"PosterizeLevels":8,
+      "Palette":"Neon",
+	  "Negative":false,
+	  "OutPlate":"greiner384_riser"
+    }
+  }
+}
+
+
