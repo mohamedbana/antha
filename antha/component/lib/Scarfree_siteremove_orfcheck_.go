@@ -51,12 +51,14 @@ func _Scarfree_siteremove_orfcheckSetup(_ctx context.Context, _input *Scarfree_s
 // The core process for this protocol, with the steps to be performed
 // for every input
 func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_siteremove_orfcheckInput, _output *Scarfree_siteremove_orfcheckOutput) {
-	//var msg string
+
 	// set warnings reported back to user to none initially
 	warnings := make([]string, 0)
 
+	// declare some temporary variables to be used later
 	var warning string
 	var err error
+
 	// make an empty array of DNA Sequences ready to fill
 	partsinorder := make([]wtype.DNASequence, 0)
 
@@ -75,9 +77,6 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 
 			partDNA, _ = parser.GenbankFeaturetoDNASequence(file, feature)
 		} else if strings.Contains(part, ".gb") {
-
-			/*annotated,_ := parser.GenbanktoAnnotatedSeq(part)
-			partDNA = annotated.DNASequence */
 
 			partDNA, _ = parser.GenbanktoAnnotatedSeq(part)
 		} else {
@@ -100,7 +99,7 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 		warnings = append(warnings, warning)
 
 		for _, part := range partsinorder {
-			fmt.Println("PARRRTS:", part)
+
 			info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
 
 			for _, anysites := range info {
@@ -153,7 +152,7 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 						//	}
 					}
 				}
-				//part.Seq = ""
+
 				newparts = append(newparts, part)
 
 				partsinorder = newparts
@@ -279,7 +278,7 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 		// export data to file
 		//anthapath.ExporttoFile("Report"+"_"+Constructname+".txt",[]byte(Status))
 		//anthapath.ExportTextFile("Report"+"_"+Constructname+".txt",Status)
-
+		fmt.Println(_output.Status)
 	}
 
 }

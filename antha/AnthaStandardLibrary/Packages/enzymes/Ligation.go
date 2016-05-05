@@ -132,6 +132,7 @@ func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequen
 		//for _, newfragments := range assembledfragments {
 		assembledfragments, plasmidproducts, newerr = jointwoparts(assembledfragments, digestedpart)
 		//err = newerr
+
 		if newerr != nil {
 			//	if err != nil {
 			message := fmt.Sprint(partsinorder[i-1].Nm, " and ", partsinorder[i].Nm, ": ", newerr.Error())
@@ -144,6 +145,18 @@ func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequen
 		}
 		//}
 	}
+
+	partnames := make([]string, 0)
+
+	for _, part := range partsinorder {
+		partnames = append(partnames, part.Nm)
+	}
+
+	for _, plasmidproduct := range plasmidproducts {
+
+		plasmidproduct.Nm = vector.Nm + "_" + strings.Join(partnames, "_")
+	}
+
 	return assembledfragments, plasmidproducts, err
 }
 

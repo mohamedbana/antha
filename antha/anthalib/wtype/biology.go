@@ -274,6 +274,10 @@ func (dna *DNASequence) Name() string {
 	return dna.Nm
 }
 
+func (dna *DNASequence) ReName(newname string) {
+	dna.Nm = newname
+}
+
 func (dna *DNASequence) Append(s string) {
 	dna.Seq = dna.Seq + s
 }
