@@ -50,8 +50,12 @@ func (run Run) AddResponseValue(responsedescriptor string, responsevalue interfa
 
 }
 
-// inexplicably not working
-func (run Run) AddNewResponseFieldandValue(responsedescriptor string, responsevalue interface{}) {
+// refactor as method
+func AddNewResponseFieldandValue(run Run, responsedescriptor string, responsevalue interface{}) {
+
+	var newrun Run
+
+	newrun = run
 
 	responsedescriptors := make([]string, len(run.Responsedescriptors))
 	responsevalues := make([]interface{}, len(run.ResponseValues))
@@ -62,9 +66,9 @@ func (run Run) AddNewResponseFieldandValue(responsedescriptor string, responseva
 	responsedescriptors = append(responsedescriptors, responsedescriptor)
 	responsevalues = append(responsevalues, responsevalue)
 
-	run.Responsedescriptors = responsedescriptors
-	run.ResponseValues = responsevalues
-	fmt.Println(run)
+	newrun.Responsedescriptors = responsedescriptors
+	newrun.ResponseValues = responsevalues
+	fmt.Println(newrun)
 }
 
 func AddNewFactorFieldandValue(run Run, factordescriptor string, factorvalue interface{}) (newrun Run) {
@@ -246,17 +250,12 @@ func IsFixedFactor(factor DOEPair) (yesorno bool) {
 
 func AllCombinations(factors []DOEPair) (runs []Run) {
 
-	fixed, nonfixed := FixedAndNonFixed(factors)
+	//fixed, nonfixed := FixedAndNonFixed(factors)
 
-	fmt.Println("fixed:", fixed, "nonfixed: ", nonfixed)
 	numberofruns := AllComboCount(factors)
-	//numberoffactors := len(factors)
 
 	runs = make([]Run, numberofruns)
-	//setpoints := make([]interface{}, 0)
-	//descriptors := make([]string, 0)
 
-	//for i := 0; i < numberofruns; i++ {
 	var swapevery int
 	var numberofswaps int
 	for i, factor := range factors {
@@ -280,172 +279,20 @@ func AllCombinations(factors []DOEPair) (runs []Run) {
 					runs[counter].RunNumber = counter + 1
 					runs[counter].StdNumber = counter + 1
 					counter++
-					fmt.Println("counter: ", counter, "i: ", i, "Swapevery: ", swapevery, "numberofswaps: ", numberofswaps)
 				}
 			}
 		}
 
 	}
-
 	//runs = AddFixedFactors(runs, fixed)
-	//}
 	return
 }
-
-/*
-func AllCombinations(factors []DOEPair) (runs []Run) {
-
-	fixed, nonfixed := FixedAndNonFixed(factors)
-
-	//fmt.Println(factors)
-	descriptors := make([]string, 0) //AllComboCount(factors))
-	//fixedfactors := make([]DOEPair, 0)
-	// range through factors and get annotation info first
-	for _, factor := range factors {
-		descriptors = append(descriptors, factor.Factor)
-
-	}
-
-	setpoints := make([]interface{}, 0)
-	//runs = make([]Run, AllComboCount(factors))
-	runs = make([]Run, 0)
-
-	if AllComboCount(factors) == 0 {
-		return
-		//	panic("all combo count == 0")
-		//	fmt.Println(factors)
-	}
-
-	for i, factor := range nonfixed {
-
-		//setpoints = make([]interface{}, 0)
-
-		fmt.Println("factor", i, "of", AllComboCount(factors), factor.Factor, factor.Levels)
-
-		//descriptors = append(descriptors, factor.Factor)
-
-		for j, level := range factor.Levels {
-
-			fmt.Println("factor", i, "of", AllComboCount(factors), factor.Factor, "levels ", j, factor.Levels)
-
-			var run Run
-
-			setpoints = append(setpoints, level)
-
-			//		}
-			run.Factordescriptors = descriptors
-			run.Setpoints = setpoints
-
-			run.StdNumber = len(runs) + 1
-			run.RunNumber = len(runs) + 1
-			//runs[i+j] = run
-			runs = append(runs, run)
-
-		}
-
-	}
-
-	runs = AddFixedFactors(runs, fixed)
-
-	return
-}
-*/
-/*
-// original
-func AllCombinations(factors []DOEPair) (runs []Run) {
-	fmt.Println(factors)
-
-	fixed, nonfixed := FixedAndNonFixed(factors)
-
-	descriptors := make([]string, 0)
-	setpoints := make([]interface{}, 0)
-	runs = make([]Run, AllComboCount(factors))
-	var run Run
-	for i, factor := range nonfixed {
-		fmt.Println(factor, i, "of", AllComboCount(factors))
-		for j, level := range factor.Levels {
-			fmt.Println(factor, level, i, j, i+j)
-			descriptors = append(descriptors, factor.Factor)
-			setpoints = append(setpoints, level)
-			run.Factordescriptors = descriptors
-			run.Setpoints = setpoints
-			runs[i+j] = run
-		}
-	}
-
-	runs = AddFixedFactors(runs, fixed)
-
-	return
-}
-*/
-/*
-func AllCombinations(factors []DOEPair) (runs []Run) {
-	//fmt.Println(factors)
-	descriptors := make([]string, AllComboCount(factors))
-	setpoints := make([]interface{}, 0)
-	runs = make([]Run, AllComboCount(factors))
-	if AllComboCount(factors) == 0 {
-		return
-		//	panic("all combo count == 0")
-		//	fmt.Println(factors)
-	}
-	var run Run
-	var factorswithonelevel int
-	for i, factor := range factors {
-
-		fmt.Println("factor", i, "of", AllComboCount(factors), factor.Factor, factor.Levels)
-
-		if len(factor.Levels) == 1 {
-			factorswithonelevel = factorswithonelevel + 1
-		}
-
-		for j, level := range factor.Levels {
-
-			//	fmt.Println("factor:", factor, i, j)
-
-			if i-factorswithonelevel < 0 {
-
-				//fmt.Println("factor:", factor, level, i, j) //, i+j)
-
-			//			if len(descriptors) == len(factors) {
-			//			descriptors[len(descriptors)-1] = factor.Factor
-			//			setpoints[len(descriptors)-1] = level
-			//		} else {
-				descriptors[i] = factor.Factor
-				setpoints = append(setpoints, level)
-				//		}
-
-				run.Factordescriptors = descriptors
-				run.Setpoints = setpoints
-				fmt.Println(i, j, factorswithonelevel, i+1-factorswithonelevel+j)
-				runs[i+1-factorswithonelevel+j] = run
-			} else {
-				//		if len(descriptors) == len(factors) {
-				//		descriptors[len(descriptors)-1] = factor.Factor
-				//		setpoints[len(descriptors)-1] = level
-				//	} else {
-				descriptors[i] = factor.Factor
-				setpoints = append(setpoints, level)
-				//		}
-				run.Factordescriptors = descriptors
-				run.Setpoints = setpoints
-				runs[i-factorswithonelevel+j] = run
-			}
-		}
-
-	}
-	return
-}
-*/
 
 func ParseRunWellPair(pair string, nameappendage string) (runnumber int, well string, err error) {
 	split := strings.Split(pair, ":")
 
 	numberstring := strings.SplitAfter(split[0], nameappendage)
 
-	//numberstring := split[0]
-	fmt.Println("Pair", pair, "SPLIT", split /*string(numberstring[0])*/)
-	fmt.Println("NUMBERSTRING!!", numberstring /*string(numberstring[0])*/)
 	runnumber, err = strconv.Atoi(string(numberstring[1]))
 	if err != nil {
 		err = fmt.Errorf(err.Error(), "+ Failed at", pair, nameappendage)
@@ -486,8 +333,6 @@ func AddWelllocations(xlsxfile string, oldsheet int, runnumbertowellcombos []str
 	fmt.Println("CEllll added succesfully", sheet.Cell(0, extracolumn).String())
 	xlsxcell = sheet.Rows[1].AddCell()
 	xlsxcell.Value = "Well ID"
-	//	sheet.Cell(0, extracolumn).SetString("Location")
-	//	sheet.Cell(1, extracolumn).SetString("Well")
 
 	for i := 3; i < sheet.MaxRow; i++ {
 		for _, pair := range runnumbertowellcombos {
@@ -529,7 +374,7 @@ func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) 
 	var setpoint interface{}
 	var descriptor string
 	for i := 3; i < sheet.MaxRow; i++ {
-		//maxfactorcol := 2
+
 		factordescriptors := make([]string, 0)
 		responsedescriptors := make([]string, 0)
 		setpoints := make([]interface{}, 0)
@@ -549,9 +394,9 @@ func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) 
 
 		for j := 2; j < sheet.MaxCol; j++ {
 			factororresponse := sheet.Cell(0, j).String()
-			//fmt.Println(i, j, factororresponse)
+
 			if strings.Contains(factororresponse, "Factor") {
-				//	maxfactorcol = j
+
 				descriptor = strings.Split(sheet.Cell(1, j).String(), ":")[1]
 				factrodescriptor := descriptor
 				fmt.Println(i, j, descriptor)
@@ -609,8 +454,7 @@ func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) 
 			} else {
 				descriptor = sheet.Cell(1, j).String()
 				responsedescriptor := descriptor
-				//fmt.Println("Additional SubHeader", i, j, factororresponse)
-				//fmt.Println("Additional SubHeader", i, j, descriptor)
+
 				otherheaders = append(otherheaders, factororresponse)
 				othersubheaders = append(othersubheaders, responsedescriptor)
 
@@ -660,7 +504,6 @@ func DXXLSXFilefromRuns(runs []Run, outputfilename string) (xlsxfile *xlsx.File)
 
 	// if output is a struct look for a sensible field to print
 
-	//var file *xlsx.File
 	var sheet *xlsx.Sheet
 	var row *xlsx.Row
 	var cell *xlsx.Cell
@@ -809,9 +652,9 @@ func RunsFromJMPDesign(xlsx string, factorcolumns []int, intfactors []string) (r
 			} else {
 				factororresponse = "Response"
 			}
-			//fmt.Println(i, j, factororresponse)
+
 			if strings.Contains(factororresponse, "Factor") {
-				//	maxfactorcol = j
+
 				descriptor = sheet.Cell(0, j).String()
 				factrodescriptor := descriptor
 				fmt.Println(i, j, descriptor)
@@ -843,7 +686,7 @@ func RunsFromJMPDesign(xlsx string, factorcolumns []int, intfactors []string) (r
 			} else if strings.Contains(factororresponse, "Response") {
 				descriptor = sheet.Cell(0, j).String()
 				responsedescriptor := descriptor
-				//fmt.Println("response", i, j, descriptor)
+
 				responsedescriptors = append(responsedescriptors, responsedescriptor)
 
 				cell := sheet.Cell(i, j)
@@ -869,8 +712,7 @@ func RunsFromJMPDesign(xlsx string, factorcolumns []int, intfactors []string) (r
 			} else {
 				descriptor = sheet.Cell(0, j).String()
 				responsedescriptor := descriptor
-				//fmt.Println("Additional SubHeader", i, j, factororresponse)
-				//fmt.Println("Additional SubHeader", i, j, descriptor)
+
 				otherheaders = append(otherheaders, factororresponse)
 				othersubheaders = append(othersubheaders, responsedescriptor)
 
