@@ -53,7 +53,7 @@ Steps {
 	PartsWithOverhangs = enzymes.MakeScarfreeCustomTypeIIsassemblyParts(PartDNA, VectorSeq, EnzymeInf)
 	
 	// validation
-	assembly := enzymes.Assemblyparameters{"MarksConstruct", RE, VectorSeq, PartsWithOverhangs}
+	assembly := enzymes.Assemblyparameters{"NewConstruct", RE, VectorSeq, PartsWithOverhangs}
 	Status, _, _, _, _ := enzymes.Assemblysimulator(assembly)
 	fmt.Println(Status)
 	
@@ -61,7 +61,7 @@ Steps {
 	sequences.ValidateSynthesis(PartsWithOverhangs, Vector, "GenScript")
 	
 	// export sequence to fasta
-	export.Makefastaserial2("MarksConstruct", PartsWithOverhangs)
+	export.Makefastaserial2("NewConstruct", PartsWithOverhangs)
 	
 }
 	

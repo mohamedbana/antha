@@ -1,15 +1,16 @@
-protocol NewDNASequence
+// Protocol for creating a DNASequence from a sequence file format. // Supported formats: .gdx .fasta .gb
+protocol NewDNASequence_fromfile
 
 import (
 	"fmt"
-	//"math"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 )
 // Input parameters for this protocol
 Parameters (
-	DNA_seq string
+	Filename string
 	Gene_name string
 	Plasmid bool
 	Linear bool
@@ -20,8 +21,8 @@ Parameters (
 // Data which is returned from this protocol
 Data (
 	DNA wtype.DNASequence
-	DNAwithORFs wtype.DNASequence
 	Status string
+	Warnings error
 )
 
 // Physical inputs to this protocol
@@ -44,29 +45,38 @@ Setup {
 
 // Core process of the protocol: steps to be performed for each input
 Steps {
-	fmt.Println("In steps!")
-	if Plasmid != Linear {
-		if Plasmid  {
-			DNA = wtype.MakePlasmidDNASequence(Gene_name,DNA_seq)
-					}else if Linear {
-						DNA = wtype.MakeLinearDNASequence(Gene_name,DNA_seq)
-							} else if SingleStranded {
-									DNA = wtype.MakeSingleStrandedDNASequence(Gene_name,DNA_seq)	
-									} 
+	
+	
+	
+	seqs, err := parser.DNAFiletoDNASequence(Filename, Plasmid) 
+	
+	if len(seqs) == 1 && err == nil {
+		
+	DNA = seqs[0]
+	
+	DNA.Nm = Gene_name
+	
+	} 
+			
 									
 	orfs := sequences.FindallORFs(DNA.Seq)
+	
+	if len(DNA.Features) == 0 {
 	features := sequences.ORFs2Features(orfs)
 	
-	DNAwithORFs = wtype.Annotate(DNA,features)
+	DNA = wtype.Annotate(DNA,features)
+	}
 	
 	Status = fmt.Sprintln(
-		text.Print("DNA_Seq: ",DNA_seq),
-		text.Print("ORFs: ", DNAwithORFs.Features),
+		text.Print("DNA_Seq: ",DNA),
+		text.Print("ORFs: ", orfs),
 	)
 	
-}else {Status = fmt.Sprintln("correct conditions not met")}
+	Warnings = err
+	
+} //else {Status = fmt.Sprintln("correct conditions not met")}
 
-}
+
 // Actions to perform after steps block to analyze data
 Analysis {
 
