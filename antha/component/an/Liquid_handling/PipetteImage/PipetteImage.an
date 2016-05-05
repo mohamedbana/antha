@@ -1,13 +1,15 @@
-// Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours
+// Generates instructions to pipette out a defined image onto a defined plate using a defined palette of coloured bacteria
 protocol PipetteImage
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/microArch/factory"
 	"fmt"
-	"image/color"
+	 "image/color"
 )
 
 
@@ -16,28 +18,33 @@ Parameters (
 	VolumePerWell  Volume
 	Imagefilename string
 	Palettename string
-	//AvailableColours []string
 	OnlythisColour string
-	NotthisColour string
-	AutoRotate bool
+	Notthiscolour string
+	UVimage bool
 	Rotate bool
+	AutoRotate bool
+	Subset bool
+	UseLiquidClass string
+	Subsetnames []string
+
 )
 
 // Data which is returned from this protocol, and data types
 Data (
 	Numberofpixels int
+	UniqueComponents []string
 )
 
 
 // Physical Inputs to this protocol with types
 Inputs (
-	Colourcomponents []*wtype.LHComponent
+
 	OutPlate *wtype.LHPlate
 )
 
 // Physical outputs from this protocol with types
 Outputs (
-	Pixels[]*wtype.LHComponent
+	 Pixels[]*wtype.LHComponent
 )
 
 Requirements {
@@ -53,76 +60,114 @@ Setup {
 // for every input
 Steps {
 	
-	var positiontocolourmap map[string]color.Color
+	// make sub pallete if necessary
+	var chosencolourpalette color.Palette
 	
-	availableColours := make([]string,0)
-	
-	for _, component := range Colourcomponents {
-		availableColours = append(availableColours, component.CName)
+	if Subset {
+		chosencolourpalette = image.MakeSubPallette(Palettename, Subsetnames)
+	}else {
+		chosencolourpalette = image.AvailablePalettes[Palettename]
 	}
 	
-	subpalette := image.MakeSubPallette(Palettename, availableColours)
+	// resize image to fit dimensions of plate and change each pixel to match closest colour from chosen palette
+	// the output of this is a map of well positions to colours needed
+	positiontocolourmap, _,_ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette,Rotate,AutoRotate) 
 	
-	positiontocolourmap, _,_ = image.ImagetoPlatelayout(Imagefilename, OutPlate, &subpalette, Rotate, AutoRotate) 
-		
-	// get components from factory
-	componentmap := make(map[string]*wtype.LHComponent, 0)
-
 	colourtostringmap := image.AvailableComponentmaps[Palettename]
 	
-	submap := image.MakeSubMapfromMap(colourtostringmap, availableColours)
+	// if the image will be printed using fluorescent proteins, 2 previews will be generated for the image (i) under UV light (ii) under visible light 
+	
+	if UVimage {
+		uvmap := image.AvailableComponentmaps[Palettename]
+		visiblemap := image.Visibleequivalentmaps[Palettename]
+		
+		if Subset {
+		uvmap = image.MakeSubMapfromMap(colourtostringmap, Subsetnames)
+		visiblemap = image.MakeSubMapfromMap(colourtostringmap, Subsetnames)
+		}
+		image.PrintFPImagePreview(Imagefilename,OutPlate, Rotate, visiblemap, uvmap)
+	}
 
-	for colourname, _ := range submap {
+	// get components from factory
+	componentmap := make(map[string]*wtype.LHComponent, 0)
+	
+	if Subset {
+	colourtostringmap = image.MakeSubMapfromMap(colourtostringmap, Subsetnames)
+	}
+
+	for colourname, _ := range colourtostringmap {
 
 		componentname := colourtostringmap[colourname]
 
 		componentmap[componentname] = factory.GetComponentByType(componentname)
 
 	}
+	fmt.Println(componentmap)
 
 	solutions := make([]*wtype.LHComponent, 0)
 
 	counter := 0
-	
+	UniqueComponents = make([]string,0)
+
+
+// loop through the position to colour map pipeting the correct coloured protein into each well
 	for locationkey, colour := range positiontocolourmap {
 		
-		component := componentmap[image.Colourcomponentmap[colour]]
+		component := componentmap[colourtostringmap[colour]]
 
-		fmt.Println("component:",image.Colourcomponentmap[colour], "colour:", colour)
+		// make sure liquid class is appropriate for cell culture in case this is not set elsewhere
+		component.Type = wtype.LiquidTypeFromString(UseLiquidClass)//wtype.LTCulture
 		
-		//if component.TypeName() == "dna" {
-			component.Type = wtype.LTDISPENSEABOVE//"DoNotMix"
-		//}
 		fmt.Println(image.Colourcomponentmap[colour])
 		
+		// if the option to only print a single colour is not selected then the pipetting actions for all colours (apart from if not this colour is not empty) will follow
 		if OnlythisColour !="" {
 	
 		if image.Colourcomponentmap[colour] == OnlythisColour{
+			
+			UniqueComponents = append(UniqueComponents,component.CName)
+			
 			counter = counter + 1
-			fmt.Println("wells",counter)
+			fmt.Println("wells",OnlythisColour, counter)
+	
 		pixelSample := mixer.Sample(component, VolumePerWell)
-		solution := MixTo(OutPlate.Type, locationkey, 1, pixelSample)
+	
+		solution := MixTo(OutPlate.Type, locationkey, 1,pixelSample)
+		
 		solutions = append(solutions, solution)
 			}
 			
 		}else{
-			if component.CName != NotthisColour{
+			if component.CName !=Notthiscolour{
+				
+			UniqueComponents = append(UniqueComponents,component.CName)
+			
 			counter = counter + 1
-			fmt.Println("wells",counter)
+			fmt.Println("wells not ",Notthiscolour,counter)
+	
+		component.Type = wtype.LiquidTypeFromString(UseLiquidClass)
 		pixelSample := mixer.Sample(component, VolumePerWell)
+	
 		solution := MixTo(OutPlate.Type, locationkey, 1, pixelSample)
+		
 		solutions = append(solutions, solution)
 		}
 		}
 	}
 
-	
+	UniqueComponents = search.RemoveDuplicates(UniqueComponents)
+	fmt.Println("Unique Components:",UniqueComponents)
+	fmt.Println("number of unique components",len(UniqueComponents))
 	Pixels = solutions
 	
 	Numberofpixels = len(Pixels)
 	fmt.Println("Pixels =",Numberofpixels)
 	
 }
+
+
+
+
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 Analysis {

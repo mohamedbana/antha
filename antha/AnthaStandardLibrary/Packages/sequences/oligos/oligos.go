@@ -328,7 +328,7 @@ func DesignFWDPRimerstoCoverSequence(seq wtype.DNASequence, targetseq string, se
 	return
 }
 
-func DesignFWDPRimerstoCoverFeature(seq sequences.AnnotatedSeq, targetfeaturename string, sequenceinterval int, maxGCcontent float64, minlength int, maxlength int, minmeltingtemp wunit.Temperature, maxmeltingtemp wunit.Temperature, seqstoavoid []string, overlapthresholdwithseqstoavoid int) (primers []Primer) {
+func DesignFWDPRimerstoCoverFeature(seq wtype.DNASequence, targetfeaturename string, sequenceinterval int, maxGCcontent float64, minlength int, maxlength int, minmeltingtemp wunit.Temperature, maxmeltingtemp wunit.Temperature, seqstoavoid []string, overlapthresholdwithseqstoavoid int) (primers []Primer) {
 
 	primers = make([]Primer, 0)
 
@@ -400,7 +400,7 @@ func DesignFWDPRimerstoCoverFeature(seq sequences.AnnotatedSeq, targetfeaturenam
 
 	for i := regionstart; i < regionend; i = i + sequenceinterval {
 
-		region := DNAregion(seq.DNASequence, i, len(seq.Sequence()))
+		region := DNAregion(seq, i, len(seq.Sequence()))
 
 		primer, err := FWDOligoSeq(region, maxGCcontent, minlength, maxlength, minmeltingtemp, maxmeltingtemp, avoidthese, overlapthresholdwithseqstoavoid)
 

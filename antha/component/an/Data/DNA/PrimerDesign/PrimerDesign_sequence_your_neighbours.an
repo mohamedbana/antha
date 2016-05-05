@@ -105,16 +105,16 @@ Steps {
 		file = filepath.Join(dirname,file)
 		sequence, _ := parser.GenbanktoAnnotatedSeq(file)
 
-		primer1, primer2 := oligos.MakeOutwardFacingPrimers(sequence.DNASequence, Maxgc, Minlength, Maxlength, Mintemp, Maxtemp, allprimerstrings, PermittednucleotideOverlapBetweenPrimers)
+		primer1, primer2 := oligos.MakeOutwardFacingPrimers(sequence, Maxgc, Minlength, Maxlength, Mintemp, Maxtemp, allprimerstrings, PermittednucleotideOverlapBetweenPrimers)
 
 		
 		primer1.Nm = "primer1"+"_"+file
 		
-		bindingsitesinseq1 := oligos.CheckNonSpecificBinding(sequence.DNASequence, primer1.DNASequence)
+		bindingsitesinseq1 := oligos.CheckNonSpecificBinding(sequence, primer1.DNASequence)
 
 		primer2.Nm = "primer2"+"_"+file
 
-		bindingsitesinseq2 := oligos.CheckNonSpecificBinding(sequence.DNASequence, primer2.DNASequence)
+		bindingsitesinseq2 := oligos.CheckNonSpecificBinding(sequence, primer2.DNASequence)
 
 		output = fmt.Sprintln(file,",", "primer1: ", ",",primer1.Sequence(),  ",", "melting temp: ", ",", primer1.MeltingTemp.ToString(),",","length: ", ",", primer1.Length ,",","gc content: ", ",", primer1.GCContent,",","binds at",  ",",bindingsitesinseq1, ",", "positions", ",", "primer2: ", ",", primer2.Sequence(),  ",", "melting temp: ", ",", primer2.MeltingTemp.ToString(),",","length: ", ",", primer2.Length ,",","gc content: ", ",", primer2.GCContent,",", "binds at",  ",",bindingsitesinseq2, ",", "positions", ",",)
 		alloutputs = append(alloutputs, output)
@@ -206,7 +206,7 @@ for _, file := range files {
 		// only check other files
 		if strings.Contains(primer.Nm,file) == false {
 		
-		bindingsites := oligos.CheckNonSpecificBinding(sequence.DNASequence, primer.DNASequence)
+		bindingsites := oligos.CheckNonSpecificBinding(sequence, primer.DNASequence)
 
 
 		

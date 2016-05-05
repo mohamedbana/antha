@@ -44,6 +44,9 @@ type Fasta struct {
 
 // This will retrieve seq from FASTA file
 func RetrieveSeqFromFASTA(id string, filename string) (seq wtype.DNASequence, err error) {
+
+	var nofeatures []wtype.Feature
+
 	allparts, err := ioutil.ReadFile(filename)
 	if err != nil {
 		fmt.Println("error:", err)
@@ -55,12 +58,12 @@ func RetrieveSeqFromFASTA(id string, filename string) (seq wtype.DNASequence, er
 	// then retrieve the particular record
 	for record := range FastaParse(fastaFh) {
 		if strings.Contains(record.Id, id) {
-			seq = wtype.DNASequence{record.Id, record.Seq, true, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, ""}
+			seq = wtype.DNASequence{record.Id, record.Seq, true, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, "", nofeatures}
 			return
 		}
 	}
 
-	seq = wtype.DNASequence{"", "", true, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, ""} // blank seq
+	seq = wtype.DNASequence{"", "", true, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, "", nofeatures} // blank seq
 	if seq.Seq == "" {
 		err = errors.New("Record not found in file")
 		return
@@ -70,6 +73,8 @@ func RetrieveSeqFromFASTA(id string, filename string) (seq wtype.DNASequence, er
 
 // This will retrieve seq from FASTA file
 func FASTAtoLinearDNASeqs(filename string) (seqs []wtype.DNASequence, err error) {
+
+	var nofeatures []wtype.Feature
 
 	seqs = make([]wtype.DNASequence, 0)
 
@@ -86,7 +91,7 @@ func FASTAtoLinearDNASeqs(filename string) (seqs []wtype.DNASequence, err error)
 	// then retrieve the particular record
 	for record := range FastaParse(fastaFh) {
 		//if strings.Contains(record.Id, id) {
-		seq = wtype.DNASequence{record.Id, record.Seq, false, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, ""}
+		seq = wtype.DNASequence{record.Id, record.Seq, false, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, "", nofeatures}
 
 		seqs = append(seqs, seq)
 
@@ -98,6 +103,8 @@ func FASTAtoLinearDNASeqs(filename string) (seqs []wtype.DNASequence, err error)
 // This will retrieve seq from FASTA file
 func FASTAtoPlasmidDNASeqs(filename string) (seqs []wtype.DNASequence, err error) {
 
+	var nofeatures []wtype.Feature
+
 	seqs = make([]wtype.DNASequence, 0)
 
 	var seq wtype.DNASequence
@@ -113,7 +120,7 @@ func FASTAtoPlasmidDNASeqs(filename string) (seqs []wtype.DNASequence, err error
 	// then retrieve the particular record
 	for record := range FastaParse(fastaFh) {
 		//if strings.Contains(record.Id, id) {
-		seq = wtype.DNASequence{record.Id, record.Seq, true, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, ""}
+		seq = wtype.DNASequence{record.Id, record.Seq, true, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, "", nofeatures}
 
 		seqs = append(seqs, seq)
 

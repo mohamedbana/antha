@@ -32,91 +32,9 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 )
 
-/*
-const (
-	orf = iota
-	Promoter
-	Ribosomebindingsite
-	TranslationInitSite
-	Origin
-	Marker
-	Misc
-)
-*/
-type Feature struct {
-	Name          string
-	Class         string //int // defined by constants above
-	Reverse       bool
-	StartPosition int
-	EndPosition   int
-	DNASeq        string
-	Protseq       string
-	//Status        string
-}
+func ORFs2Features(orfs []ORF) (features []wtype.Feature) {
 
-func (feat *Feature) Coordinates() (pair []int) {
-	pair[0] = feat.StartPosition
-	pair[1] = feat.EndPosition
-	return
-}
-
-type AnnotatedSeq struct {
-	//Nm string
-	wtype.DNASequence
-	Features []Feature
-}
-
-func (annotated AnnotatedSeq) FeatureNames() (featurenames []string) {
-
-	featurenames = make([]string, 0)
-
-	for _, feature := range annotated.Features {
-		featurenames = append(featurenames, feature.Name)
-	}
-	return
-}
-
-func (annotated AnnotatedSeq) FeatureStart(featurename string) (featureStart int) {
-
-	for _, feature := range annotated.Features {
-		if feature.Name == featurename {
-			featureStart = feature.StartPosition
-			return
-		}
-
-	}
-	return
-}
-
-func (annotated AnnotatedSeq) GetFeatureByName(featurename string) (returnedfeature *Feature) {
-
-	for _, feature := range annotated.Features {
-		if strings.Contains(strings.ToUpper(feature.Name), strings.ToUpper(featurename)) {
-			returnedfeature = &feature
-			return
-		}
-
-	}
-	return
-}
-
-func Annotate(dnaseq wtype.DNASequence, features []Feature) (annotated AnnotatedSeq) {
-	annotated.DNASequence = dnaseq
-	annotated.Features = features
-	return
-}
-
-func AddFeatures(annotated AnnotatedSeq, features []Feature) (updated AnnotatedSeq) {
-
-	for _, feature := range features {
-		annotated.Features = append(annotated.Features, feature)
-	}
-	return
-}
-
-func ORFs2Features(orfs []ORF) (features []Feature) {
-
-	features = make([]Feature, 0)
+	features = make([]wtype.Feature, 0)
 
 	for i, orf := range orfs {
 		// currently just names each orf + number of orf. Add Rename orf function and sort by struct field function to run first to put orfs in order
@@ -124,13 +42,13 @@ func ORFs2Features(orfs []ORF) (features []Feature) {
 		if strings.ToUpper(orf.Direction) == strings.ToUpper("REVERSE") {
 			reverse = true
 		}
-		feature := Feature{"orf" + strconv.Itoa(i), "orf", reverse, orf.StartPosition, orf.EndPosition, orf.DNASeq, orf.ProtSeq}
+		feature := wtype.Feature{"orf" + strconv.Itoa(i), "orf", reverse, orf.StartPosition, orf.EndPosition, orf.DNASeq, orf.ProtSeq}
 		features = append(features, feature)
 	}
 	return
 }
 
-func MakeFeature(name string, seq string, sequencetype string, class string, reverse string) (feature Feature) {
+func MakeFeature(name string, seq string, sequencetype string, class string, reverse string) (feature wtype.Feature) {
 
 	feature.Name = name
 	feature.DNASeq = strings.ToUpper(seq)
@@ -165,43 +83,4 @@ func MakeFeature(name string, seq string, sequencetype string, class string, rev
 		}
 	}
 	return feature
-}
-
-func MakeAnnotatedSeq(name string, seq string, circular bool, features []Feature) (annotated AnnotatedSeq, err error) {
-	annotated.Nm = name
-	//annotated.Seq.Nm = name
-	annotated.Seq = seq //.Seq = seq
-	annotated.Plasmid = circular
-
-	for _, feature := range features {
-		if strings.Contains(seq, feature.DNASeq) {
-			feature.StartPosition = strings.Index(seq, feature.DNASeq)
-			feature.EndPosition = feature.EndPosition + feature.StartPosition
-		} else if strings.Contains(seq, RevComp(feature.DNASeq)) {
-			feature.StartPosition = strings.Index(seq, feature.DNASeq)
-			feature.EndPosition = feature.EndPosition + feature.StartPosition
-			err = fmt.Errorf(feature.Name, " Feature only found in reverse direction")
-		} else {
-			err = fmt.Errorf(feature.Name, " not found in sequence")
-		}
-	}
-	annotated.Features = features
-	return
-}
-
-func ConcatenateFeatures(name string, featuresinorder []Feature) (annotated AnnotatedSeq) {
-
-	annotated.Nm = name
-	//annotated.Seq.Nm = name
-	annotated.Seq = featuresinorder[0].DNASeq
-	annotated.Features = make([]Feature, 0)
-	annotated.Features = append(annotated.Features, featuresinorder[0])
-	for i := 1; i < len(featuresinorder); i++ {
-		nextfeature := featuresinorder[i]
-		nextfeature.StartPosition = nextfeature.StartPosition + annotated.Features[i-1].EndPosition
-		nextfeature.EndPosition = nextfeature.EndPosition + annotated.Features[i-1].EndPosition
-		annotated.Seq = annotated.Seq + featuresinorder[i].DNASeq
-		annotated.Features = append(annotated.Features, nextfeature)
-	}
-	return annotated
 }
