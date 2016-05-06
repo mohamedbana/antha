@@ -36,6 +36,9 @@ import (
 	"github.com/antha-lang/antha/internal/github.com/ghodss/yaml"
 )
 
+var DOEliquidhandlingFile = "FullFactorial.xlsx" // "ScreenLHPolicyDOE2.xlsx"
+var DXORJMP = "JMP"                              //"DX"
+
 func MakePolicies() map[string]LHPolicy {
 	pols := make(map[string]LHPolicy)
 
@@ -69,9 +72,6 @@ func MakePolicies() map[string]LHPolicy {
 		pols[names[i]] = policy
 	}
 	*/
-
-	var DOEliquidhandlingFile = "FullFactorial.xlsx" // "ScreenLHPolicyDOE2.xlsx"
-	var DXORJMP = "JMP"                              //"DX"
 
 	if antha.Anthafileexists(DOEliquidhandlingFile) {
 		fmt.Println("found lhpolicy doe file", DOEliquidhandlingFile)

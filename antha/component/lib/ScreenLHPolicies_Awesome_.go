@@ -40,6 +40,13 @@ func _ScreenLHPolicies_AwesomeSetup(_ctx context.Context, _input *ScreenLHPolici
 // for every input
 func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolicies_AwesomeInput, _output *ScreenLHPolicies_AwesomeOutput) {
 
+	if antha.Anthafileexists(_input.LHDOEFile) == false {
+		fmt.Println("This DOE file ", _input.LHDOEFile, " was not found in anthapath ~.antha. Please move it there, change file name and type in antha-lang/antha/microarch/driver/makelhpolicy.go and recompile antha to use this liquidhandling doe design")
+		fmt.Println("currently set to ", liquidhandling.DOEliquidhandlingFile, " type ", liquidhandling.DXORJMP)
+	} else {
+		fmt.Println("found lhpolicy doe file", _input.LHDOEFile)
+	}
+
 	var rotate = false
 	var autorotate = true
 

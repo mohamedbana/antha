@@ -2,6 +2,7 @@ package lib
 
 import (
 	"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -31,6 +32,13 @@ func _ScreenLHPoliciesSetup(_ctx context.Context, _input *ScreenLHPoliciesInput)
 // The core process for this protocol, with the steps to be performed
 // for every input
 func _ScreenLHPoliciesSteps(_ctx context.Context, _input *ScreenLHPoliciesInput, _output *ScreenLHPoliciesOutput) {
+
+	if anthapath.Anthafileexists(_input.LHDOEFile) == false {
+		fmt.Println("This DOE file ", _input.LHDOEFile, " was not found in anthapath ~.antha. Please move it there, change file name and type in antha-lang/antha/microarch/driver/makelhpolicy.go and recompile antha to use this liquidhandling doe design")
+		fmt.Println("currently set to ", liquidhandling.DOEliquidhandlingFile, " type ", liquidhandling.DXORJMP)
+	} else {
+		fmt.Println("found lhpolicy doe file", _input.LHDOEFile)
+	}
 
 	reactions := make([]*wtype.LHComponent, 0)
 
