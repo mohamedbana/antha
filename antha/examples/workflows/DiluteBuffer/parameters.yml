@@ -1,0 +1,14 @@
+{
+    "Parameters": {
+        "DiluteBuffer": {
+            "Buffername": "tartrazine",
+            "Diluentname": "water",
+            "Bufferstockconc": "0.006M/l",
+            "BufferVolumeAdded": "1ml",
+            "Diluent": "water",
+            "Diluentvolume": "45ml",
+           "InPlate": "pcrplate_with_cooler",
+            "OutPlate": "pcrplate_with_cooler"
+        }
+    }
+}

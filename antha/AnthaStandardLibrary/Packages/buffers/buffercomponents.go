@@ -10,7 +10,7 @@ import (
 	"fmt"
 )
 
-func StockConcentration(nameofmolecule string, massofmoleculeactuallyaddedinG float64, diluent string, volumeofdiluentinL float64) (actualconc wunit.Concentration) {
+func StockConcentration(nameofmolecule string, massofmoleculeactuallyaddedinG wunit.Mass, diluent string, volumeofdiluentinL wunit.Volume) (actualconc wunit.Concentration) {
 
 	molecule := pubchem.MakeMolecule(nameofmolecule)
 
@@ -21,7 +21,7 @@ func StockConcentration(nameofmolecule string, massofmoleculeactuallyaddedinG fl
 
 	fmt.Println(diluentmolecule)
 
-	actualconcfloat := massofmoleculeactuallyaddedinG / (molecularweight * volumeofdiluentinL)
+	actualconcfloat := (massofmoleculeactuallyaddedinG.SIValue() / 1000) / (molecularweight * volumeofdiluentinL.SIValue())
 
 	actualconc = wunit.NewConcentration(actualconcfloat, "M/l")
 
@@ -45,6 +45,24 @@ func Dilute(moleculename string, stockconc wunit.Concentration, stockvolume wuni
 	return
 }
 
+/*
+func DiluteToTargetConc(moleculename string, stockconc wunit.Concentration, targetconc wunit.Concentration, diluentname string, targetVolume wunit.Volume) (diluentvolume wunit.Volume, stockvolumetouse wunit.Volume) {
+
+	molecule := pubchem.MakeMolecule(moleculename)
+
+	stockMperL := stockconc.MolPerL(molecule.MolecularWeight)
+
+	diluentSI := diluentvoladded.SIValue()
+
+	//stockSI := stockvolume.SIValue()
+
+	dilutedconcMperL := stockMperL.SIValue() * stockSI / (stockSI + diluentSI)
+
+	dilutedconc = wunit.NewConcentration(dilutedconcMperL, "M/l")
+	fmt.Println(diluentname)
+	return
+}
+*/
 /*
 From pubchem...
 type Molecule struct {
