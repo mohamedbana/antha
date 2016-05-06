@@ -75,7 +75,7 @@ func MakePolicies() map[string]LHPolicy {
 
 	if antha.Anthafileexists(DOEliquidhandlingFile) {
 		fmt.Println("found lhpolicy doe file", DOEliquidhandlingFile)
-		policies, names, err := PolicyMakerfromDesign(DXORJMP, DOEliquidhandlingFile, "DOE_run")
+		policies, names, _, err := PolicyMakerfromDesign(DXORJMP, DOEliquidhandlingFile, "DOE_run")
 
 		for i, policy := range policies {
 			pols[names[i]] = policy
@@ -90,15 +90,13 @@ func MakePolicies() map[string]LHPolicy {
 
 }
 
-func PolicyMakerfromDesign(DXORJMP string, dxdesignfilename string, prepend string) (policies []LHPolicy, names []string, err error) {
-
-	var runs []Run
+func PolicyMakerfromDesign(DXORJMP string, dxdesignfilename string, prepend string) (policies []LHPolicy, names []string, runs []Run, err error) {
 
 	if DXORJMP == "DX" {
 
 		runs, err = RunsFromDXDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), []string{"Pre_MIX", "POST_MIX"})
 		if err != nil {
-			return policies, names, err
+			return policies, names, runs, err
 		}
 
 	} else if DXORJMP == "JMP" {
@@ -108,13 +106,13 @@ func PolicyMakerfromDesign(DXORJMP string, dxdesignfilename string, prepend stri
 
 		runs, err = RunsFromJMPDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), patterncolumn, factorcolumns, []string{"PRE_MIX", "POST_MIX"})
 		if err != nil {
-			return policies, names, err
+			return policies, names, runs, err
 		}
 	} else {
-		return policies, names, fmt.Errorf("only JMP or DX allowed as valid inputs for DXORJMP variable")
+		return policies, names, runs, fmt.Errorf("only JMP or DX allowed as valid inputs for DXORJMP variable")
 	}
 	policies, names = PolicyMakerfromRuns(runs, prepend, false)
-	return
+	return policies, names, runs, err
 }
 
 func PolicyMaker(factors []DOEPair, nameprepend string, concatfactorlevelsinname bool) (policies []LHPolicy, names []string) {

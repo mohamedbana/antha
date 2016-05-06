@@ -5,6 +5,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
+		"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
 	"fmt"
 	//"strconv"
 )
@@ -23,6 +24,7 @@ Parameters (
 // Data which is returned from this protocol, and data types
 Data (
 	Status string
+	Runs []doe.Run
 )
 
 
@@ -63,7 +65,7 @@ Steps {
 	//policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run",false)
 	
 	//intfactors := []string{"Pre_MIX","POST_MIX"}
-	policies, names,err := liquidhandling.PolicyMakerfromDesign(DXORJMP,LHDOEFile, "DOE_run")
+	policies, names, runs, err := liquidhandling.PolicyMakerfromDesign(DXORJMP,LHDOEFile, "DOE_run")
 	if err != nil{
 		panic(err)
 	}
@@ -89,6 +91,8 @@ Steps {
 	}
 	}
 	Reactions = reactions
+	
+	Runs = runs
 	
 }
 

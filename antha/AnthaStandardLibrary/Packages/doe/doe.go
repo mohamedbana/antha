@@ -71,6 +71,8 @@ func AddNewResponseFieldandValue(run Run, responsedescriptor string, responseval
 
 func AddNewFactorFieldandValue(run Run, factordescriptor string, factorvalue interface{}) (newrun Run) {
 
+	newrun = run
+
 	factordescriptors := make([]string, len(run.Factordescriptors))
 	factorvalues := make([]interface{}, len(run.Setpoints))
 
@@ -86,19 +88,32 @@ func AddNewFactorFieldandValue(run Run, factordescriptor string, factorvalue int
 	return
 }
 
-func (run Run) AddAdditionalValue(additionalsubheader string, additionalvalue interface{}) {
+func AddAdditionalValue(run Run, additionalsubheader string, additionalvalue interface{}) (newrun Run) {
 
-	for i, descriptor := range run.AdditionalSubheaders {
+	newrun = run
+
+	values := make([]interface{}, 0)
+
+	for _, value := range run.AdditionalValues {
+		values = append(values, value)
+	}
+
+	for _, descriptor := range run.AdditionalSubheaders {
 		if strings.ToUpper(descriptor) == strings.ToUpper(additionalsubheader) {
-			run.AdditionalValues[i] = additionalvalue
+			values = append(values, additionalvalue)
 		}
 	}
 
+	newrun.AdditionalValues = values
+
+	return
 }
 
-func (run Run) AddAdditionalHeaders(additionalheader string, additionalsubheader string) {
+func AddAdditionalHeaders(run Run, additionalheader string, additionalsubheader string) (newrun Run) {
 
-	headers := make([]string, len(run.AdditionalHeaders))
+	newrun = run
+
+	headers := make([]string, 0)
 
 	for _, header := range run.AdditionalHeaders {
 		headers = append(headers, header)
@@ -106,7 +121,7 @@ func (run Run) AddAdditionalHeaders(additionalheader string, additionalsubheader
 
 	headers = append(headers, additionalheader)
 
-	subheaders := make([]string, len(run.AdditionalSubheaders))
+	subheaders := make([]string, 0)
 
 	for _, subheader := range run.AdditionalSubheaders {
 		subheaders = append(subheaders, subheader)
@@ -114,12 +129,19 @@ func (run Run) AddAdditionalHeaders(additionalheader string, additionalsubheader
 
 	subheaders = append(subheaders, additionalsubheader)
 
+	newrun.AdditionalHeaders = headers
+	newrun.AdditionalSubheaders = subheaders
+
+	fmt.Println("newrun: ", newrun)
+	return
+
 }
 
-func (run Run) AddAdditionalHeaderandValue(additionalheader string, additionalsubheader string, additionalvalue interface{}) {
-	run.AddAdditionalHeaders(additionalheader, additionalsubheader)
-	run.AddAdditionalValue(additionalsubheader, additionalvalue)
-
+func AddAdditionalHeaderandValue(run Run, additionalheader string, additionalsubheader string, additionalvalue interface{}) (newrun Run) {
+	midrun := AddAdditionalHeaders(run, additionalheader, additionalsubheader)
+	fmt.Println("midrun: ", midrun)
+	newrun = AddAdditionalValue(midrun, additionalsubheader, additionalvalue)
+	return
 }
 
 func (run Run) CheckAdditionalInfo(subheader string, value interface{}) bool {
@@ -292,7 +314,7 @@ func ParseRunWellPair(pair string, nameappendage string) (runnumber int, well st
 	return
 }
 
-func AddWelllocations(xlsxfile string, oldsheet int, runnumbertowellcombos []string, nameappendage string, pathtosave string, extracolumnheaders []string, extracolumnvalues []interface{}) error {
+func AddWelllocations(DXORJMP string, xlsxfile string, oldsheet int, runnumbertowellcombos []string, nameappendage string, pathtosave string, extracolumnheaders []string, extracolumnvalues []interface{}) error {
 
 	var xlsxcell *xlsx.Cell
 

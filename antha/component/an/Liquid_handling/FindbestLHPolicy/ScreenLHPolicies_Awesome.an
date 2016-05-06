@@ -24,16 +24,18 @@ Parameters (
 	NumberofBlanks int
 	LHDOEFile string
 	DXORJMP string
+	OutputFilename string
 
 )
 
 // Data which is returned from this protocol, and data types
 Data (
-	Runtowelllocationmap []string //map[string]string
+	Runtowelllocationmap map[string]string //[]string //map[string]string
 	Runcount int
 	Pixelcount int
 	Errors []error
 	Blankwells []string
+	Runs []doe.Run
 	//NeatSamplewells []string 
 )
 
@@ -61,6 +63,8 @@ Setup {
 // for every input
 Steps {
 	
+	
+	// validate presence of doe design file in anthapath
 	if antha.Anthafileexists(LHDOEFile) == false {
 		fmt.Println("This DOE file ", LHDOEFile, " was not found in anthapath ~.antha. Please move it there, change file name and type in antha-lang/antha/microarch/driver/makelhpolicy.go and recompile antha to use this liquidhandling doe design")
 		fmt.Println("currently set to ", liquidhandling.DOEliquidhandlingFile, " type ", liquidhandling.DXORJMP)
@@ -68,24 +72,26 @@ Steps {
 		fmt.Println("found lhpolicy doe file", LHDOEFile)
 	}
 	
-	var rotate = false
-	var autorotate = true
 	
 	
 	// declare some global variables for use later
-	wellpositionarray := make([]string, 0)
-	perconditionuntowelllocationmap := make([]string,0)
-	alphabet := wutil.MakeAlphabetArray() 
+	var rotate = false
+	var autorotate = true
+	var wellpositionarray = make([]string, 0)
+	var perconditionuntowelllocationmap = make([]string,0)
+	var alphabet = wutil.MakeAlphabetArray() 
+	Runtowelllocationmap = make(map[string]string)
+	
+	
+	
+	// work out plate layou based on picture or just in order
 	
 	if Printasimage {
 	chosencolourpalette := image.AvailablePalettes["Palette1"]
 	positiontocolourmap, _,_ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, rotate,autorotate) 
 	
-	Runtowelllocationmap = make([]string,0)
+	//Runtowelllocationmap = make([]string,0)
 	
-		//Runtowelllocationmap = make(map[string]string)
-
-
 	for location, colour := range positiontocolourmap {
 		R,G,B,A := colour.RGBA()
 	
@@ -95,10 +101,8 @@ Steps {
 		}
 	}
 	
-	
 	}else{
-		
-		
+			
 		for j := 0; j < OutPlate.WlsY; j++ {
 		for i := 0; i < OutPlate.WlsX; i++ { //countingfrom1iswhatmakesushuman := j + 1
 			//k = k + 1
@@ -114,20 +118,18 @@ Steps {
 	//policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run",false)
 	
 	//intfactors := []string{"Pre_MIX","POST_MIX"}
-	policies, names,err := liquidhandling.PolicyMakerfromDesign(DXORJMP,LHDOEFile, "DOE_run")
+	_, names, runs, err := liquidhandling.PolicyMakerfromDesign(DXORJMP,LHDOEFile, "DOE_run")
 	if err != nil{
 		panic(err)
 	}
 	
-	
+	//newruns := make([]doe.Run,len(runs))
 	
 	counter := 0
 	for l := 0; l < len(TestSolVolumes); l++ {
 	for k := 0; k< len(TestSols);k++{
 	for j:= 0; j< NumberofReplicates;j++{
-	for i := 0; i < len(policies); i++ {
-		
-		
+	for i := 0; i < len(runs); i++ {
 		
 		eachreaction := make([]*wtype.LHComponent, 0)
 		
@@ -144,17 +146,35 @@ Steps {
 		eachreaction = append(eachreaction,testSample)
 		reaction := MixTo(OutPlate.Type,wellpositionarray[counter],0, eachreaction...)
 		fmt.Println("where am I?",wellpositionarray[counter])
-		Runtowelllocationmap= append(Runtowelllocationmap,wtype.LiquidTypeName(TestSols[k].Type) +":" + wellpositionarray[counter])
+		
 		perconditionuntowelllocationmap = append(perconditionuntowelllocationmap,wtype.LiquidTypeName(TestSols[k].Type) +":" + wellpositionarray[counter])
-		//Runtowelllocationmap[Diluent.Type]= wellpositionarray[counter]
+		
+		
+		doerun := wtype.LiquidTypeName(TestSols[k].Type)
+		volume := strconv.Itoa(wutil.RoundInt(TestSolVolumes[l].RawValue()))+"ul"
+		solutionname := TestSols[k].CName
+		
+		description := volume+"_"+solutionname+"_replicate"+strconv.Itoa(j+1)
+		
+		Runtowelllocationmap[doerun+"_"+description]= wellpositionarray[counter]
 		reactions = append(reactions,reaction)
 	counter = counter + 1
+	
+	
+	// add additional info for each run
+	runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","Location: "+ description, wellpositionarray[counter])
+	//runs[i].AddAdditionalValue("Replicate", strconv.Itoa(j+1))
+	//runs[i].AddAdditionalValue("Solution name", TestSols[k].CName)
+	//runs[i].AddAdditionalValue("Volume", strconv.Itoa(wutil.RoundInt(TestSolVolumes[l].RawValue()))+"ul)
+	
 	}
 	
 	outputsandwich := strconv.Itoa(wutil.RoundInt(TestSolVolumes[l].RawValue()))+TestSols[k].CName+strconv.Itoa(j+1)
 	
 	outputfilename := filepath.Join(antha.Dirpath(),"DOE2"+ "_" + outputsandwich+ ".xlsx")
-	Errors = append(Errors,doe.AddWelllocations(filepath.Join(antha.Dirpath(), LHDOEFile),0,perconditionuntowelllocationmap,"DOE_run",outputfilename,[]string{"Volume","Solution","Replicate"}, []interface{}{TestSolVolumes[l].ToString(),TestSols[k].CName,string(j)}))
+	
+	
+	Errors = append(Errors,doe.AddWelllocations(DXORJMP,filepath.Join(antha.Dirpath(), LHDOEFile),0,perconditionuntowelllocationmap,"DOE_run",outputfilename,[]string{"Volume","Solution","Replicate"}, []interface{}{TestSolVolumes[l].ToString(),TestSols[k].CName,string(j)}))
 	
 	// other things to add to check for covariance
 	// order in which wells were pippetted
@@ -168,6 +188,8 @@ Steps {
 	}
 	}
 	}
+	
+	_ = doe.JMPXLSXFilefromRuns(runs,OutputFilename)
 	
 	// add blanks
 	
@@ -188,7 +210,8 @@ Steps {
 		fmt.Println("blankwell", well)
 		reaction := MixTo(OutPlate.Type,well, 0,bufferSample)
 		//fmt.Println("where am I?",wellpositionarray[counter])
-		//Runtowelllocationmap= append(Runtowelllocationmap,"Blank"+ strconv.Itoa(m+1) +":" + well)
+		 Runtowelllocationmap["Blank"+ strconv.Itoa(m+1)] = well
+		
 		Blankwells = append(Blankwells,well)
 	
 		reactions = append(reactions,reaction)
@@ -197,9 +220,9 @@ Steps {
 	}
 	
 	Reactions = reactions
-	Runcount = len(Reactions)
+	Runcount = counter //len(Reactions)
 	Pixelcount = len(wellpositionarray)
-	
+	Runs = runs
 	
 }
 

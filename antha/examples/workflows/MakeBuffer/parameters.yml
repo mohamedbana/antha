@@ -1,15 +1,15 @@
 {
     "Parameters": {
         "MakeBuffer": {
-            "Buffername": "Cutsmart1X",
-            "Bufferstock": "CutsmartBuffer",
-            "Bufferstockconc": "5M/l",
-            "Bufferstockvolume": "0.2ml",
+            "Buffername": "tartrazine_300uM",
+            "Bufferstock": "tartrazine",
+            "Bufferstockconc": "0.006M/l",
+            "Bufferstockvolume": "45ml",
             "Diluent": "water",
             "Diluentvolume": "0.3ml",
-            "FinalConcentration": "2mg/l",
-            "FinalVolume": "0.5ml",
-            "InPlate": "pcrplate_with_cooler",
+            "FinalConcentration": "0.0003M/l",
+            "FinalVolume": "50ml",
+           "InPlate": "pcrplate_with_cooler",
             "OutPlate": "pcrplate_with_cooler"
         }
     }

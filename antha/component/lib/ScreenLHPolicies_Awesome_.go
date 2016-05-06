@@ -21,7 +21,7 @@ import (
 
 // Data which is returned from this protocol, and data types
 
-//map[string]string
+//[]string //map[string]string
 
 //NeatSamplewells []string
 
@@ -40,6 +40,7 @@ func _ScreenLHPolicies_AwesomeSetup(_ctx context.Context, _input *ScreenLHPolici
 // for every input
 func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolicies_AwesomeInput, _output *ScreenLHPolicies_AwesomeOutput) {
 
+	// validate presence of doe design file in anthapath
 	if antha.Anthafileexists(_input.LHDOEFile) == false {
 		fmt.Println("This DOE file ", _input.LHDOEFile, " was not found in anthapath ~.antha. Please move it there, change file name and type in antha-lang/antha/microarch/driver/makelhpolicy.go and recompile antha to use this liquidhandling doe design")
 		fmt.Println("currently set to ", liquidhandling.DOEliquidhandlingFile, " type ", liquidhandling.DXORJMP)
@@ -47,21 +48,21 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 		fmt.Println("found lhpolicy doe file", _input.LHDOEFile)
 	}
 
+	// declare some global variables for use later
 	var rotate = false
 	var autorotate = true
+	var wellpositionarray = make([]string, 0)
+	var perconditionuntowelllocationmap = make([]string, 0)
+	var alphabet = wutil.MakeAlphabetArray()
+	_output.Runtowelllocationmap = make(map[string]string)
 
-	// declare some global variables for use later
-	wellpositionarray := make([]string, 0)
-	perconditionuntowelllocationmap := make([]string, 0)
-	alphabet := wutil.MakeAlphabetArray()
+	// work out plate layou based on picture or just in order
 
 	if _input.Printasimage {
 		chosencolourpalette := image.AvailablePalettes["Palette1"]
 		positiontocolourmap, _, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, rotate, autorotate)
 
-		_output.Runtowelllocationmap = make([]string, 0)
-
-		//Runtowelllocationmap = make(map[string]string)
+		//Runtowelllocationmap = make([]string,0)
 
 		for location, colour := range positiontocolourmap {
 			R, G, B, A := colour.RGBA()
@@ -90,16 +91,18 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 	//policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run",false)
 
 	//intfactors := []string{"Pre_MIX","POST_MIX"}
-	policies, names, err := liquidhandling.PolicyMakerfromDesign(_input.DXORJMP, _input.LHDOEFile, "DOE_run")
+	_, names, runs, err := liquidhandling.PolicyMakerfromDesign(_input.DXORJMP, _input.LHDOEFile, "DOE_run")
 	if err != nil {
 		panic(err)
 	}
+
+	//newruns := make([]doe.Run,len(runs))
 
 	counter := 0
 	for l := 0; l < len(_input.TestSolVolumes); l++ {
 		for k := 0; k < len(_input.TestSols); k++ {
 			for j := 0; j < _input.NumberofReplicates; j++ {
-				for i := 0; i < len(policies); i++ {
+				for i := 0; i < len(runs); i++ {
 
 					eachreaction := make([]*wtype.LHComponent, 0)
 
@@ -116,17 +119,32 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 					eachreaction = append(eachreaction, testSample)
 					reaction := execute.MixTo(_ctx, _input.OutPlate.Type, wellpositionarray[counter], 0, eachreaction...)
 					fmt.Println("where am I?", wellpositionarray[counter])
-					_output.Runtowelllocationmap = append(_output.Runtowelllocationmap, wtype.LiquidTypeName(_input.TestSols[k].Type)+":"+wellpositionarray[counter])
+
 					perconditionuntowelllocationmap = append(perconditionuntowelllocationmap, wtype.LiquidTypeName(_input.TestSols[k].Type)+":"+wellpositionarray[counter])
-					//Runtowelllocationmap[Diluent.Type]= wellpositionarray[counter]
+
+					doerun := wtype.LiquidTypeName(_input.TestSols[k].Type)
+					volume := strconv.Itoa(wutil.RoundInt(_input.TestSolVolumes[l].RawValue())) + "ul"
+					solutionname := _input.TestSols[k].CName
+
+					description := volume + "_" + solutionname + "_replicate" + strconv.Itoa(j+1)
+
+					_output.Runtowelllocationmap[doerun+"_"+description] = wellpositionarray[counter]
 					reactions = append(reactions, reaction)
 					counter = counter + 1
+
+					// add additional info for each run
+					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "Location: "+description, wellpositionarray[counter])
+					//runs[i].AddAdditionalValue("Replicate", strconv.Itoa(j+1))
+					//runs[i].AddAdditionalValue("Solution name", TestSols[k].CName)
+					//runs[i].AddAdditionalValue("Volume", strconv.Itoa(wutil.RoundInt(TestSolVolumes[l].RawValue()))+"ul)
+
 				}
 
 				outputsandwich := strconv.Itoa(wutil.RoundInt(_input.TestSolVolumes[l].RawValue())) + _input.TestSols[k].CName + strconv.Itoa(j+1)
 
 				outputfilename := filepath.Join(antha.Dirpath(), "DOE2"+"_"+outputsandwich+".xlsx")
-				_output.Errors = append(_output.Errors, doe.AddWelllocations(filepath.Join(antha.Dirpath(), _input.LHDOEFile), 0, perconditionuntowelllocationmap, "DOE_run", outputfilename, []string{"Volume", "Solution", "Replicate"}, []interface{}{_input.TestSolVolumes[l].ToString(), _input.TestSols[k].CName, string(j)}))
+
+				_output.Errors = append(_output.Errors, doe.AddWelllocations(_input.DXORJMP, filepath.Join(antha.Dirpath(), _input.LHDOEFile), 0, perconditionuntowelllocationmap, "DOE_run", outputfilename, []string{"Volume", "Solution", "Replicate"}, []interface{}{_input.TestSolVolumes[l].ToString(), _input.TestSols[k].CName, string(j)}))
 
 				// other things to add to check for covariance
 				// order in which wells were pippetted
@@ -140,6 +158,8 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 			}
 		}
 	}
+
+	_ = doe.JMPXLSXFilefromRuns(runs, _input.OutputFilename)
 
 	// add blanks
 
@@ -158,7 +178,8 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 		fmt.Println("blankwell", well)
 		reaction := execute.MixTo(_ctx, _input.OutPlate.Type, well, 0, bufferSample)
 		//fmt.Println("where am I?",wellpositionarray[counter])
-		//Runtowelllocationmap= append(Runtowelllocationmap,"Blank"+ strconv.Itoa(m+1) +":" + well)
+		_output.Runtowelllocationmap["Blank"+strconv.Itoa(m+1)] = well
+
 		_output.Blankwells = append(_output.Blankwells, well)
 
 		reactions = append(reactions, reaction)
@@ -167,8 +188,9 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 	}
 
 	_output.Reactions = reactions
-	_output.Runcount = len(_output.Reactions)
+	_output.Runcount = counter //len(Reactions)
 	_output.Pixelcount = len(wellpositionarray)
+	_output.Runs = runs
 
 }
 
@@ -237,6 +259,7 @@ type ScreenLHPolicies_AwesomeInput struct {
 	NumberofBlanks     int
 	NumberofReplicates int
 	OutPlate           *wtype.LHPlate
+	OutputFilename     string
 	Printasimage       bool
 	TestSolVolumes     []wunit.Volume
 	TestSols           []*wtype.LHComponent
@@ -249,7 +272,8 @@ type ScreenLHPolicies_AwesomeOutput struct {
 	Pixelcount           int
 	Reactions            []*wtype.LHComponent
 	Runcount             int
-	Runtowelllocationmap []string
+	Runs                 []doe.Run
+	Runtowelllocationmap map[string]string
 }
 
 type ScreenLHPolicies_AwesomeSOutput struct {
@@ -258,7 +282,8 @@ type ScreenLHPolicies_AwesomeSOutput struct {
 		Errors               []error
 		Pixelcount           int
 		Runcount             int
-		Runtowelllocationmap []string
+		Runs                 []doe.Run
+		Runtowelllocationmap map[string]string
 	}
 	Outputs struct {
 		Reactions []*wtype.LHComponent
@@ -279,6 +304,7 @@ func init() {
 				{Name: "NumberofBlanks", Desc: "", Kind: "Parameters"},
 				{Name: "NumberofReplicates", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "OutputFilename", Desc: "", Kind: "Parameters"},
 				{Name: "Printasimage", Desc: "", Kind: "Parameters"},
 				{Name: "TestSolVolumes", Desc: "", Kind: "Parameters"},
 				{Name: "TestSols", Desc: "", Kind: "Inputs"},
@@ -288,7 +314,8 @@ func init() {
 				{Name: "Pixelcount", Desc: "", Kind: "Data"},
 				{Name: "Reactions", Desc: "", Kind: "Outputs"},
 				{Name: "Runcount", Desc: "", Kind: "Data"},
-				{Name: "Runtowelllocationmap", Desc: "map[string]string\n", Kind: "Data"},
+				{Name: "Runs", Desc: "", Kind: "Data"},
+				{Name: "Runtowelllocationmap", Desc: "[]string //map[string]string\n", Kind: "Data"},
 			},
 		},
 	})

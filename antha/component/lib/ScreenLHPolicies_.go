@@ -3,6 +3,7 @@ package lib
 import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -45,7 +46,7 @@ func _ScreenLHPoliciesSteps(_ctx context.Context, _input *ScreenLHPoliciesInput,
 	//policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run",false)
 
 	//intfactors := []string{"Pre_MIX","POST_MIX"}
-	policies, names, err := liquidhandling.PolicyMakerfromDesign(_input.DXORJMP, _input.LHDOEFile, "DOE_run")
+	policies, names, runs, err := liquidhandling.PolicyMakerfromDesign(_input.DXORJMP, _input.LHDOEFile, "DOE_run")
 	if err != nil {
 		panic(err)
 	}
@@ -71,6 +72,8 @@ func _ScreenLHPoliciesSteps(_ctx context.Context, _input *ScreenLHPoliciesInput,
 		}
 	}
 	_output.Reactions = reactions
+
+	_output.Runs = runs
 
 }
 
@@ -144,11 +147,13 @@ type ScreenLHPoliciesInput struct {
 
 type ScreenLHPoliciesOutput struct {
 	Reactions []*wtype.LHComponent
+	Runs      []doe.Run
 	Status    string
 }
 
 type ScreenLHPoliciesSOutput struct {
 	Data struct {
+		Runs   []doe.Run
 		Status string
 	}
 	Outputs struct {
@@ -172,6 +177,7 @@ func init() {
 				{Name: "TestSols", Desc: "", Kind: "Inputs"},
 				{Name: "TotalVolume", Desc: "", Kind: "Parameters"},
 				{Name: "Reactions", Desc: "", Kind: "Outputs"},
+				{Name: "Runs", Desc: "", Kind: "Data"},
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
