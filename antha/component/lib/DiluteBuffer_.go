@@ -11,8 +11,6 @@ import (
 	"github.com/antha-lang/antha/inject"
 )
 
-//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
-
 // Input parameters for this protocol (data)
 
 // Physical Inputs to this protocol with types
@@ -34,7 +32,7 @@ func _DiluteBufferSetup(_ctx context.Context, _input *DiluteBufferInput) {}
 func _DiluteBufferSteps(_ctx context.Context, _input *DiluteBufferInput, _output *DiluteBufferOutput) {
 	//Bufferstockvolume := wunit.NewVolume((FinalVolume.SIValue() * FinalConcentration.SIValue()/Bufferstockconc.SIValue()),"l")
 
-	_output.FinalConcentration = buffers.Dilute(_input.Buffername, _input.Bufferstockconc, _input.BufferVolumeAdded, _input.Diluentname, _input.DiluentVolume)
+	_output.FinalConcentration = buffers.Dilute(_input.Bufferstock.CName, _input.Bufferstockconc, _input.BufferVolumeAdded, _input.Diluent.CName, _input.DiluentVolume)
 
 	_output.Buffer = execute.MixInto(_ctx, _input.OutPlate, "",
 		mixer.Sample(_input.Bufferstock, _input.BufferVolumeAdded),
@@ -44,6 +42,8 @@ func _DiluteBufferSteps(_ctx context.Context, _input *DiluteBufferInput, _output
 		"was added to ", _input.DiluentVolume.ToString(), "of", _input.Diluent.CName,
 		"to make ", _input.BufferVolumeAdded.SIValue()+_input.DiluentVolume.SIValue(), "L", "of", _input.Buffername,
 		"Buffer stock conc =", _output.FinalConcentration.ToString())
+
+	_output.OriginalDiluentVolume = _input.DiluentVolume
 
 }
 
@@ -112,22 +112,21 @@ type DiluteBufferInput struct {
 	Diluent           *wtype.LHComponent
 	DiluentVolume     wunit.Volume
 	Diluentname       string
-	InPlate           *wtype.LHPlate
 	OutPlate          *wtype.LHPlate
 }
 
 type DiluteBufferOutput struct {
-	Buffer             *wtype.LHComponent
-	DiluentVolume      wunit.Volume
-	FinalConcentration wunit.Concentration
-	Status             string
+	Buffer                *wtype.LHComponent
+	FinalConcentration    wunit.Concentration
+	OriginalDiluentVolume wunit.Volume
+	Status                string
 }
 
 type DiluteBufferSOutput struct {
 	Data struct {
-		DiluentVolume      wunit.Volume
-		FinalConcentration wunit.Concentration
-		Status             string
+		FinalConcentration    wunit.Concentration
+		OriginalDiluentVolume wunit.Volume
+		Status                string
 	}
 	Outputs struct {
 		Buffer *wtype.LHComponent
@@ -139,7 +138,7 @@ func init() {
 		Constructor: DiluteBufferNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/Liquid_handling/MakeBuffer/DiluteBuffer.an",
+			Path: "antha/component/an/Liquid_handling/MakeBuffer/Dilutebuffer.an",
 			Params: []ParamDesc{
 				{Name: "BufferVolumeAdded", Desc: "", Kind: "Parameters"},
 				{Name: "Buffername", Desc: "", Kind: "Parameters"},
@@ -148,11 +147,10 @@ func init() {
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "DiluentVolume", Desc: "", Kind: "Parameters"},
 				{Name: "Diluentname", Desc: "", Kind: "Parameters"},
-				{Name: "InPlate", Desc: "", Kind: "Inputs"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "Buffer", Desc: "", Kind: "Outputs"},
-				{Name: "DiluentVolume", Desc: "", Kind: "Data"},
 				{Name: "FinalConcentration", Desc: "", Kind: "Data"},
+				{Name: "OriginalDiluentVolume", Desc: "", Kind: "Data"},
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
