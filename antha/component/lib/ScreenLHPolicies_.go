@@ -37,7 +37,7 @@ func _ScreenLHPoliciesSteps(_ctx context.Context, _input *ScreenLHPoliciesInput,
 	//policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run",false)
 
 	//intfactors := []string{"Pre_MIX","POST_MIX"}
-	policies, names, err := liquidhandling.PolicyMakerfromDesign("LHPolicydesign.xlsx", "DOE_run")
+	policies, names, err := liquidhandling.PolicyMakerfromDesign(_input.DXORJMP, _input.LHDOEFile, "DOE_run")
 	if err != nil {
 		panic(err)
 	}
@@ -124,7 +124,9 @@ type ScreenLHPoliciesElement struct {
 }
 
 type ScreenLHPoliciesInput struct {
+	DXORJMP            string
 	Diluent            *wtype.LHComponent
+	LHDOEFile          string
 	NumberofReplicates int
 	OutPlate           *wtype.LHPlate
 	TestSolVolume      wunit.Volume
@@ -153,7 +155,9 @@ func init() {
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/FindbestLHPolicy/ScreenLHPolicies.an",
 			Params: []ParamDesc{
+				{Name: "DXORJMP", Desc: "", Kind: "Parameters"},
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
+				{Name: "LHDOEFile", Desc: "", Kind: "Parameters"},
 				{Name: "NumberofReplicates", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "TestSolVolume", Desc: "", Kind: "Parameters"},

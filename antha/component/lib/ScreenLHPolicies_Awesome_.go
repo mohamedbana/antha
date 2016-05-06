@@ -43,35 +43,33 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 	var rotate = false
 	var autorotate = true
 
-	chosencolourpalette := image.AvailablePalettes["Palette1"]
-	positiontocolourmap, _, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, rotate, autorotate)
-
-	_output.Runtowelllocationmap = make([]string, 0)
-	perconditionuntowelllocationmap := make([]string, 0)
-
-	//Runtowelllocationmap = make(map[string]string)
-
-	// work out well coordinates for any plate
+	// declare some global variables for use later
 	wellpositionarray := make([]string, 0)
+	perconditionuntowelllocationmap := make([]string, 0)
+	alphabet := wutil.MakeAlphabetArray()
 
-	for location, colour := range positiontocolourmap {
-		R, G, B, A := colour.RGBA()
+	if _input.Printasimage {
+		chosencolourpalette := image.AvailablePalettes["Palette1"]
+		positiontocolourmap, _, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, rotate, autorotate)
 
-		if uint8(R) == 242 && uint8(G) == 243 && uint8(B) == 242 && uint8(A) == 255 {
-			continue
-		} else {
-			wellpositionarray = append(wellpositionarray, location)
+		_output.Runtowelllocationmap = make([]string, 0)
+
+		//Runtowelllocationmap = make(map[string]string)
+
+		for location, colour := range positiontocolourmap {
+			R, G, B, A := colour.RGBA()
+
+			if uint8(R) == 242 && uint8(G) == 243 && uint8(B) == 242 && uint8(A) == 255 {
+				continue
+			} else {
+				wellpositionarray = append(wellpositionarray, location)
+			}
 		}
-	}
 
-	/*
-		//alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		alphabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
-			"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
-			"Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"}
-		//k := 0
-		for j := 0; j < OutPlate.WlsY; j++ {
-			for i := 0; i < OutPlate.WlsX; i++ { //countingfrom1iswhatmakesushuman := j + 1
+	} else {
+
+		for j := 0; j < _input.OutPlate.WlsY; j++ {
+			for i := 0; i < _input.OutPlate.WlsX; i++ { //countingfrom1iswhatmakesushuman := j + 1
 				//k = k + 1
 				wellposition := string(alphabet[j]) + strconv.Itoa(i+1)
 				//fmt.Println(wellposition, k)
@@ -79,13 +77,13 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 			}
 
 		}
-	*/
+	}
 	reactions := make([]*wtype.LHComponent, 0)
 
 	//policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run",false)
 
 	//intfactors := []string{"Pre_MIX","POST_MIX"}
-	policies, names, err := liquidhandling.PolicyMakerfromDesign("ScreenLHPolicyDOE2.xlsx", "DOE_run")
+	policies, names, err := liquidhandling.PolicyMakerfromDesign(_input.DXORJMP, _input.LHDOEFile, "DOE_run")
 	if err != nil {
 		panic(err)
 	}
@@ -121,7 +119,7 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 				outputsandwich := strconv.Itoa(wutil.RoundInt(_input.TestSolVolumes[l].RawValue())) + _input.TestSols[k].CName + strconv.Itoa(j+1)
 
 				outputfilename := filepath.Join(antha.Dirpath(), "DOE2"+"_"+outputsandwich+".xlsx")
-				_output.Errors = append(_output.Errors, doe.AddWelllocations(filepath.Join(antha.Dirpath(), "ScreenLHPolicyDOE2.xlsx"), 0, perconditionuntowelllocationmap, "DOE_run", outputfilename, []string{"Volume", "Solution", "Replicate"}, []interface{}{_input.TestSolVolumes[l].ToString(), _input.TestSols[k].CName, string(j)}))
+				_output.Errors = append(_output.Errors, doe.AddWelllocations(filepath.Join(antha.Dirpath(), _input.LHDOEFile), 0, perconditionuntowelllocationmap, "DOE_run", outputfilename, []string{"Volume", "Solution", "Replicate"}, []interface{}{_input.TestSolVolumes[l].ToString(), _input.TestSols[k].CName, string(j)}))
 
 				// other things to add to check for covariance
 				// order in which wells were pippetted
@@ -139,10 +137,6 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 	// add blanks
 
 	_output.Blankwells = make([]string, 0)
-
-	alphabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
-		"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
-		"Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"}
 
 	for m := 0; m < _input.NumberofBlanks; m++ {
 		//eachreaction := make([]*wtype.LHComponent, 0)
@@ -229,11 +223,14 @@ type ScreenLHPolicies_AwesomeElement struct {
 }
 
 type ScreenLHPolicies_AwesomeInput struct {
+	DXORJMP            string
 	Diluent            *wtype.LHComponent
 	Imagefilename      string
+	LHDOEFile          string
 	NumberofBlanks     int
 	NumberofReplicates int
 	OutPlate           *wtype.LHPlate
+	Printasimage       bool
 	TestSolVolumes     []wunit.Volume
 	TestSols           []*wtype.LHComponent
 	TotalVolume        wunit.Volume
@@ -268,11 +265,14 @@ func init() {
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/FindbestLHPolicy/ScreenLHPolicies_Awesome.an",
 			Params: []ParamDesc{
+				{Name: "DXORJMP", Desc: "", Kind: "Parameters"},
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
+				{Name: "LHDOEFile", Desc: "", Kind: "Parameters"},
 				{Name: "NumberofBlanks", Desc: "", Kind: "Parameters"},
 				{Name: "NumberofReplicates", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "Printasimage", Desc: "", Kind: "Parameters"},
 				{Name: "TestSolVolumes", Desc: "", Kind: "Parameters"},
 				{Name: "TestSols", Desc: "", Kind: "Inputs"},
 				{Name: "TotalVolume", Desc: "", Kind: "Parameters"},

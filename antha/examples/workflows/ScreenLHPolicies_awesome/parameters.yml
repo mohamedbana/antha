@@ -8,9 +8,12 @@
             "NumberofReplicates": 1,
             "OutPlate": "greiner384_riser",
             "TestSolVolumes": [
-			"4ul",
+			
 			"8ul"
 			],
+			"LHDOEFile":"FullFactorial.xlsx",
+			"DXORJMP":"JMP",
+			"Printasimage": false,
 			"Imagefilename": "star1.png",
             "TotalVolume": "20ul",
 			"NumberofBlanks": 5

@@ -19,8 +19,11 @@ Parameters (
 	TotalVolume Volume
 	TestSolVolumes []Volume
 	NumberofReplicates int
+	Printasimage bool
 	Imagefilename string
 	NumberofBlanks int
+	LHDOEFile string
+	DXORJMP string
 
 )
 
@@ -61,16 +64,19 @@ Steps {
 	var rotate = false
 	var autorotate = true
 	
+	
+	// declare some global variables for use later
+	wellpositionarray := make([]string, 0)
+	perconditionuntowelllocationmap := make([]string,0)
+	alphabet := wutil.MakeAlphabetArray() 
+	
+	if Printasimage {
 	chosencolourpalette := image.AvailablePalettes["Palette1"]
 	positiontocolourmap, _,_ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, rotate,autorotate) 
 	
 	Runtowelllocationmap = make([]string,0)
-	perconditionuntowelllocationmap := make([]string,0)
 	
 		//Runtowelllocationmap = make(map[string]string)
-
-	// work out well coordinates for any plate
-	wellpositionarray := make([]string, 0)
 
 
 	for location, colour := range positiontocolourmap {
@@ -83,29 +89,25 @@ Steps {
 	}
 	
 	
-	
-	/*
-	//alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	alphabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
-		"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
-		"Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"}
-	//k := 0
-	for j := 0; j < OutPlate.WlsY; j++ {
+	}else{
+		
+		
+		for j := 0; j < OutPlate.WlsY; j++ {
 		for i := 0; i < OutPlate.WlsX; i++ { //countingfrom1iswhatmakesushuman := j + 1
 			//k = k + 1
 			wellposition := string(alphabet[j]) + strconv.Itoa(i+1)
 			//fmt.Println(wellposition, k)
 			wellpositionarray = append(wellpositionarray, wellposition)
 		}
-
+		
 	}
-	*/
+	}
 	reactions := make([]*wtype.LHComponent,0)
 	
 	//policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run",false)
 	
 	//intfactors := []string{"Pre_MIX","POST_MIX"}
-	policies, names,err := liquidhandling.PolicyMakerfromDesign("ScreenLHPolicyDOE2.xlsx", "DOE_run")
+	policies, names,err := liquidhandling.PolicyMakerfromDesign(DXORJMP,LHDOEFile, "DOE_run")
 	if err != nil{
 		panic(err)
 	}
@@ -145,7 +147,7 @@ Steps {
 	outputsandwich := strconv.Itoa(wutil.RoundInt(TestSolVolumes[l].RawValue()))+TestSols[k].CName+strconv.Itoa(j+1)
 	
 	outputfilename := filepath.Join(antha.Dirpath(),"DOE2"+ "_" + outputsandwich+ ".xlsx")
-	Errors = append(Errors,doe.AddWelllocations(filepath.Join(antha.Dirpath(), "ScreenLHPolicyDOE2.xlsx"),0,perconditionuntowelllocationmap,"DOE_run",outputfilename,[]string{"Volume","Solution","Replicate"}, []interface{}{TestSolVolumes[l].ToString(),TestSols[k].CName,string(j)}))
+	Errors = append(Errors,doe.AddWelllocations(filepath.Join(antha.Dirpath(), LHDOEFile),0,perconditionuntowelllocationmap,"DOE_run",outputfilename,[]string{"Volume","Solution","Replicate"}, []interface{}{TestSolVolumes[l].ToString(),TestSols[k].CName,string(j)}))
 	
 	// other things to add to check for covariance
 	// order in which wells were pippetted
@@ -160,14 +162,9 @@ Steps {
 	}
 	}
 	
-	
 	// add blanks
 	
 	Blankwells = make([]string,0)
-	
-	alphabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
-		"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
-		"Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF"}
 	
 	
 	for m := 0; m< NumberofBlanks; m++ {

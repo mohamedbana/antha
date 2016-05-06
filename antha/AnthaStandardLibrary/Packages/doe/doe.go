@@ -608,7 +608,7 @@ func DXXLSXFilefromRuns(runs []Run, outputfilename string) (xlsxfile *xlsx.File)
 
 // jmp
 
-func RunsFromJMPDesign(xlsx string, factorcolumns []int, intfactors []string) (runs []Run, err error) {
+func RunsFromJMPDesign(xlsx string, patterncolumn int, factorcolumns []int, intfactors []string) (runs []Run, err error) {
 	file, err := spreadsheet.OpenFile(xlsx)
 	if err != nil {
 		return runs, err
@@ -640,7 +640,7 @@ func RunsFromJMPDesign(xlsx string, factorcolumns []int, intfactors []string) (r
 
 			if search.Contains(factorcolumns, j) {
 				factororresponse = "Factor"
-			} else {
+			} else if j != patterncolumn {
 				factororresponse = "Response"
 			}
 

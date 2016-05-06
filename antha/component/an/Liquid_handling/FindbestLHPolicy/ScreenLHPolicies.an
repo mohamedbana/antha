@@ -14,6 +14,8 @@ Parameters (
 	TotalVolume Volume
 	TestSolVolume  Volume
 	NumberofReplicates int
+	DXORJMP string
+	LHDOEFile string
 
 )
 
@@ -51,7 +53,7 @@ Steps {
 	//policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run",false)
 	
 	//intfactors := []string{"Pre_MIX","POST_MIX"}
-	policies, names,err := liquidhandling.PolicyMakerfromDesign("LHPolicydesign.xlsx", "DOE_run")
+	policies, names,err := liquidhandling.PolicyMakerfromDesign(DXORJMP,LHDOEFile, "DOE_run")
 	if err != nil{
 		panic(err)
 	}
