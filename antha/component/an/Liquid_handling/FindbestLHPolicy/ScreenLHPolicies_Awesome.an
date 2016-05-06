@@ -84,7 +84,7 @@ Steps {
 	
 	
 	
-	// work out plate layou based on picture or just in order
+	// work out plate layout based on picture or just in order
 	
 	if Printasimage {
 	chosencolourpalette := image.AvailablePalettes["Palette1"]
@@ -103,10 +103,10 @@ Steps {
 	
 	}else{
 			
-		for j := 0; j < OutPlate.WlsY; j++ {
-		for i := 0; i < OutPlate.WlsX; i++ { //countingfrom1iswhatmakesushuman := j + 1
+		for j := 0; j < OutPlate.WlsX; j++ {
+		for i := 0; i < OutPlate.WlsY; i++ { //countingfrom1iswhatmakesushuman := j + 1
 			//k = k + 1
-			wellposition := string(alphabet[j]) + strconv.Itoa(i+1)
+			wellposition := string(alphabet[i]) + strconv.Itoa(j+1)
 			//fmt.Println(wellposition, k)
 			wellpositionarray = append(wellpositionarray, wellposition)
 		}
@@ -131,33 +131,45 @@ Steps {
 	for j:= 0; j< NumberofReplicates;j++{
 	for i := 0; i < len(runs); i++ {
 		
-		eachreaction := make([]*wtype.LHComponent, 0)
+		//eachreaction := make([]*wtype.LHComponent, 0)
 		
 		// keep default policy for diluent
 		//Diluent.Type = names[i]
 		//fmt.Println(Diluent.Type)
 		
-		bufferSample := mixer.SampleForTotalVolume(Diluent, TotalVolume)
-		eachreaction = append(eachreaction,bufferSample)
-		testSample := mixer.Sample(TestSols[k], TestSolVolumes[l])
 		
+		// diluent first
+		bufferSample := mixer.SampleForTotalVolume(Diluent, TotalVolume)
+		//eachreaction = append(eachreaction,bufferSample)
+		
+		solution := MixTo(OutPlate.Type, wellpositionarray[counter],1,bufferSample)
+		
+		// now test sample
+		
+		// change liquid class
 		TestSols[k].Type = wtype.LiquidTypeFromString(names[i])
 		
-		eachreaction = append(eachreaction,testSample)
-		reaction := MixTo(OutPlate.Type,wellpositionarray[counter],0, eachreaction...)
+		//sample
+		testSample := mixer.Sample(TestSols[k], TestSolVolumes[l])
+		
+		//eachreaction = append(eachreaction,testSample)
+		
+		// pipette out
+		solution = MixTo(OutPlate.Type,wellpositionarray[counter],1, testSample)
 		fmt.Println("where am I?",wellpositionarray[counter])
 		
 		perconditionuntowelllocationmap = append(perconditionuntowelllocationmap,wtype.LiquidTypeName(TestSols[k].Type) +":" + wellpositionarray[counter])
 		
-		
+		// get annotation info
 		doerun := wtype.LiquidTypeName(TestSols[k].Type)
 		volume := strconv.Itoa(wutil.RoundInt(TestSolVolumes[l].RawValue()))+"ul"
 		solutionname := TestSols[k].CName
 		
 		description := volume+"_"+solutionname+"_replicate"+strconv.Itoa(j+1)
 		
+		// add run to well position lookup table 
 		Runtowelllocationmap[doerun+"_"+description]= wellpositionarray[counter]
-		reactions = append(reactions,reaction)
+		reactions = append(reactions,solution)
 	counter = counter + 1
 	
 	
@@ -169,10 +181,11 @@ Steps {
 	
 	}
 	
+	
+	// export DOE design file per set of conditions
 	outputsandwich := strconv.Itoa(wutil.RoundInt(TestSolVolumes[l].RawValue()))+TestSols[k].CName+strconv.Itoa(j+1)
 	
 	outputfilename := filepath.Join(antha.Dirpath(),"DOE2"+ "_" + outputsandwich+ ".xlsx")
-	
 	
 	Errors = append(Errors,doe.AddWelllocations(DXORJMP,filepath.Join(antha.Dirpath(), LHDOEFile),0,perconditionuntowelllocationmap,"DOE_run",outputfilename,[]string{"Volume","Solution","Replicate"}, []interface{}{TestSolVolumes[l].ToString(),TestSols[k].CName,string(j)}))
 	
@@ -189,6 +202,8 @@ Steps {
 	}
 	}
 	
+	
+	// export overall DOE design file showing all well locations for all conditions
 	_ = doe.JMPXLSXFilefromRuns(runs,OutputFilename)
 	
 	// add blanks

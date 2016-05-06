@@ -8,11 +8,11 @@
             "NumberofReplicates": 3,
             "OutPlate": "greiner384_riser",
             "TestSolVolumes": [
-			"0.5ul",
 			"1ul",
-			"2ul"
+			"2ul",
+			"4ul"
 			],
-			"LHDOEFile":"FullFactorial.xlsx",
+			"LHDOEFile":"FullFactorial_nobool.xlsx",
 			"DXORJMP":"JMP",
 			"OutputFilename":"jmpfactorialDoeoutput.xlsx",
 			"Printasimage": false,

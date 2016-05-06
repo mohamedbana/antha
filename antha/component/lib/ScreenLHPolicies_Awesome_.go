@@ -56,7 +56,7 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 	var alphabet = wutil.MakeAlphabetArray()
 	_output.Runtowelllocationmap = make(map[string]string)
 
-	// work out plate layou based on picture or just in order
+	// work out plate layout based on picture or just in order
 
 	if _input.Printasimage {
 		chosencolourpalette := image.AvailablePalettes["Palette1"]
@@ -76,10 +76,10 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 
 	} else {
 
-		for j := 0; j < _input.OutPlate.WlsY; j++ {
-			for i := 0; i < _input.OutPlate.WlsX; i++ { //countingfrom1iswhatmakesushuman := j + 1
+		for j := 0; j < _input.OutPlate.WlsX; j++ {
+			for i := 0; i < _input.OutPlate.WlsY; i++ { //countingfrom1iswhatmakesushuman := j + 1
 				//k = k + 1
-				wellposition := string(alphabet[j]) + strconv.Itoa(i+1)
+				wellposition := string(alphabet[i]) + strconv.Itoa(j+1)
 				//fmt.Println(wellposition, k)
 				wellpositionarray = append(wellpositionarray, wellposition)
 			}
@@ -104,32 +104,44 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 			for j := 0; j < _input.NumberofReplicates; j++ {
 				for i := 0; i < len(runs); i++ {
 
-					eachreaction := make([]*wtype.LHComponent, 0)
+					//eachreaction := make([]*wtype.LHComponent, 0)
 
 					// keep default policy for diluent
 					//Diluent.Type = names[i]
 					//fmt.Println(Diluent.Type)
 
+					// diluent first
 					bufferSample := mixer.SampleForTotalVolume(_input.Diluent, _input.TotalVolume)
-					eachreaction = append(eachreaction, bufferSample)
-					testSample := mixer.Sample(_input.TestSols[k], _input.TestSolVolumes[l])
+					//eachreaction = append(eachreaction,bufferSample)
 
+					solution := execute.MixTo(_ctx, _input.OutPlate.Type, wellpositionarray[counter], 1, bufferSample)
+
+					// now test sample
+
+					// change liquid class
 					_input.TestSols[k].Type = wtype.LiquidTypeFromString(names[i])
 
-					eachreaction = append(eachreaction, testSample)
-					reaction := execute.MixTo(_ctx, _input.OutPlate.Type, wellpositionarray[counter], 0, eachreaction...)
+					//sample
+					testSample := mixer.Sample(_input.TestSols[k], _input.TestSolVolumes[l])
+
+					//eachreaction = append(eachreaction,testSample)
+
+					// pipette out
+					solution = execute.MixTo(_ctx, _input.OutPlate.Type, wellpositionarray[counter], 1, testSample)
 					fmt.Println("where am I?", wellpositionarray[counter])
 
 					perconditionuntowelllocationmap = append(perconditionuntowelllocationmap, wtype.LiquidTypeName(_input.TestSols[k].Type)+":"+wellpositionarray[counter])
 
+					// get annotation info
 					doerun := wtype.LiquidTypeName(_input.TestSols[k].Type)
 					volume := strconv.Itoa(wutil.RoundInt(_input.TestSolVolumes[l].RawValue())) + "ul"
 					solutionname := _input.TestSols[k].CName
 
 					description := volume + "_" + solutionname + "_replicate" + strconv.Itoa(j+1)
 
+					// add run to well position lookup table
 					_output.Runtowelllocationmap[doerun+"_"+description] = wellpositionarray[counter]
-					reactions = append(reactions, reaction)
+					reactions = append(reactions, solution)
 					counter = counter + 1
 
 					// add additional info for each run
@@ -140,6 +152,7 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 
 				}
 
+				// export DOE design file per set of conditions
 				outputsandwich := strconv.Itoa(wutil.RoundInt(_input.TestSolVolumes[l].RawValue())) + _input.TestSols[k].CName + strconv.Itoa(j+1)
 
 				outputfilename := filepath.Join(antha.Dirpath(), "DOE2"+"_"+outputsandwich+".xlsx")
@@ -159,6 +172,7 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 		}
 	}
 
+	// export overall DOE design file showing all well locations for all conditions
 	_ = doe.JMPXLSXFilefromRuns(runs, _input.OutputFilename)
 
 	// add blanks

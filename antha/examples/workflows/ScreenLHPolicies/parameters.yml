@@ -1,6 +1,8 @@
 {
     "Parameters": {
         "ScreenLHPolicies": {
+			"DXORJMP":"JMP",
+			"LHDOEFile":"FullFactorial.xlsx",
             "Diluent": "water",
             "TestSols": [
 			"tartrazine"
