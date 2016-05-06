@@ -3,6 +3,7 @@ package parser
 import (
 	"errors"
 	"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
 	"io/ioutil"
 	"os"
@@ -75,4 +76,14 @@ func Xlsxparser(filename string, sheetIndex int, outputprefix string) (f *os.Fil
 
 	err = generateCSVFromXLSXsheet(filename, sheetIndex, printer)
 	return
+}
+
+func ParseExcel(filename string) ([]enzymes.Assemblyparameters, error) {
+	if pl, err := Xlsxparser(filename, 0, "partslist"); err != nil {
+		return nil, err
+	} else if dl, err := Xlsxparser(filename, 1, "designlist"); err != nil {
+		return nil, err
+	} else {
+		return Assemblyfromcsv(dl.Name(), pl.Name()), nil
+	}
 }
