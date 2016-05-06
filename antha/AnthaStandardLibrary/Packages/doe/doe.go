@@ -428,13 +428,16 @@ func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) 
 							return runs, err
 						}
 					}
+				} else if strings.ToUpper(cell.Value) == "TRUE" {
+					setpoint = true //cell.SetBool(true)
+				} else if strings.ToUpper(cell.Value) == "FALSE" {
+					setpoint = false //cell.SetBool(false)
+				} else if celltype == 3 {
+					setpoint = cell.Bool()
 				} else {
 					setpoint = cell.String()
 				}
 
-				if celltype == 3 {
-					setpoint = cell.Bool()
-				}
 				factordescriptors = append(factordescriptors, factrodescriptor)
 				setpoints = append(setpoints, setpoint)
 
@@ -686,12 +689,14 @@ func RunsFromJMPDesign(xlsx string, patterncolumn int, factorcolumns []int, intf
 							return runs, err
 						}
 					}
+				} else if cell.Value == "TRUE" {
+					setpoint = true //cell.SetBool(true)
+				} else if cell.Value == "FALSE" {
+					setpoint = false //cell.SetBool(false)
+				} else if celltype == 3 {
+					setpoint = cell.Bool()
 				} else {
 					setpoint = cell.String()
-				}
-
-				if celltype == 3 {
-					setpoint = cell.Bool()
 				}
 				factordescriptors = append(factordescriptors, factrodescriptor)
 				setpoints = append(setpoints, setpoint)
