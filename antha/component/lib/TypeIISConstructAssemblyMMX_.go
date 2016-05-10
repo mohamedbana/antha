@@ -38,6 +38,8 @@ func _TypeIISConstructAssemblyMMXSteps(_ctx context.Context, _input *TypeIISCons
 		samples = append(samples, partSample)
 	}
 
+	// ensure the last step is mixed
+	samples[len(samples)-1].Type = wtype.LTDNAMIX
 	_output.Reaction = execute.MixTo(_ctx, _input.OutPlate.Type, _input.OutputLocation, _input.OutputPlateNum, samples...)
 
 	// incubate the reaction mixture
