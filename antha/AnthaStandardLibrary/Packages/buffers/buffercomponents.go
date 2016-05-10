@@ -10,18 +10,18 @@ import (
 	"fmt"
 )
 
-func StockConcentration(nameofmolecule string, massofmoleculeactuallyaddedinG wunit.Mass, diluent string, volumeofdiluentinL wunit.Volume) (actualconc wunit.Concentration) {
+func StockConcentration(nameofmolecule string, massofmoleculeactuallyaddedinG wunit.Mass, diluent string, totalvolumeinL wunit.Volume) (actualconc wunit.Concentration) {
 
 	molecule := pubchem.MakeMolecule(nameofmolecule)
 
 	// in particular, the molecular weight
 	molecularweight := molecule.MolecularWeight
 
-	diluentmolecule := pubchem.MakeMolecule(diluent)
+	//diluentmolecule := pubchem.MakeMolecule(diluent)
 
-	fmt.Println(diluentmolecule)
+	fmt.Println("SI value of mass:", massofmoleculeactuallyaddedinG.SIValue())
 
-	actualconcfloat := (massofmoleculeactuallyaddedinG.SIValue() / 1000) / (molecularweight * volumeofdiluentinL.SIValue())
+	actualconcfloat := (massofmoleculeactuallyaddedinG.SIValue() * 1000) / (molecularweight * totalvolumeinL.SIValue())
 
 	actualconc = wunit.NewConcentration(actualconcfloat, "M/l")
 

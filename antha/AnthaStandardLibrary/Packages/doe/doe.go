@@ -163,7 +163,8 @@ func (run Run) GetAdditionalInfo(subheader string) (value interface{}, err error
 
 		}
 	}
-	return value, fmt.Errorf("header not found")
+	fmt.Println("Header: ", subheader)
+	return value, fmt.Errorf("header, ", subheader, " not found in ", run.AdditionalSubheaders)
 }
 
 func AddFixedFactors(runs []Run, fixedfactors []DOEPair) (runswithfixedfactors []Run) {
@@ -633,7 +634,7 @@ func DXXLSXFilefromRuns(runs []Run, outputfilename string) (xlsxfile *xlsx.File)
 
 // jmp
 
-func RunsFromJMPDesign(xlsx string, patterncolumn int, factorcolumns []int, intfactors []string) (runs []Run, err error) {
+func RunsFromJMPDesign(xlsx string, patterncolumn int, factorcolumns []int, responsecolumns []int, intfactors []string) (runs []Run, err error) {
 	file, err := spreadsheet.OpenFile(xlsx)
 	if err != nil {
 		return runs, err
@@ -665,7 +666,7 @@ func RunsFromJMPDesign(xlsx string, patterncolumn int, factorcolumns []int, intf
 
 			if search.Contains(factorcolumns, j) {
 				factororresponse = "Factor"
-			} else if j != patterncolumn {
+			} else if search.Contains(responsecolumns, j) && j != patterncolumn {
 				factororresponse = "Response"
 			}
 
@@ -727,7 +728,7 @@ func RunsFromJMPDesign(xlsx string, patterncolumn int, factorcolumns []int, intf
 					responsevalues = append(responsevalues, responsevalue)
 				}
 
-			} else {
+			} else /*if j != patterncolumn*/ {
 				descriptor = sheet.Cell(0, j).String()
 				responsedescriptor := descriptor
 

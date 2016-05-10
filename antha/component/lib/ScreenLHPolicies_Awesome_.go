@@ -55,7 +55,9 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 	var perconditionuntowelllocationmap = make([]string, 0)
 	var alphabet = wutil.MakeAlphabetArray()
 	_output.Runtowelllocationmap = make(map[string]string)
-
+	_output.Blankwells = make([]string, 0)
+	counter := 0
+	var platenum = 1
 	// work out plate layout based on picture or just in order
 
 	if _input.Printasimage {
@@ -98,11 +100,16 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 
 	//newruns := make([]doe.Run,len(runs))
 
-	counter := 0
 	for l := 0; l < len(_input.TestSolVolumes); l++ {
 		for k := 0; k < len(_input.TestSols); k++ {
 			for j := 0; j < _input.NumberofReplicates; j++ {
 				for i := 0; i < len(runs); i++ {
+
+					if counter == ((_input.OutPlate.WlsX * _input.OutPlate.WlsY) + _input.NumberofBlanks) {
+						fmt.Println("plate full, counter = ", counter)
+						platenum++
+						counter = 0
+					}
 
 					//eachreaction := make([]*wtype.LHComponent, 0)
 
@@ -114,7 +121,7 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 					bufferSample := mixer.SampleForTotalVolume(_input.Diluent, _input.TotalVolume)
 					//eachreaction = append(eachreaction,bufferSample)
 
-					solution := execute.MixTo(_ctx, _input.OutPlate.Type, wellpositionarray[counter], 1, bufferSample)
+					solution := execute.MixTo(_ctx, _input.OutPlate.Type, wellpositionarray[counter], platenum, bufferSample)
 
 					// now test sample
 
@@ -127,17 +134,19 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 					//eachreaction = append(eachreaction,testSample)
 
 					// pipette out
-					solution = execute.MixTo(_ctx, _input.OutPlate.Type, wellpositionarray[counter], 1, testSample)
-					fmt.Println("where am I?", wellpositionarray[counter])
+					solution = execute.MixTo(_ctx, _input.OutPlate.Type, wellpositionarray[counter], platenum, testSample)
 
 					perconditionuntowelllocationmap = append(perconditionuntowelllocationmap, wtype.LiquidTypeName(_input.TestSols[k].Type)+":"+wellpositionarray[counter])
 
 					// get annotation info
 					doerun := wtype.LiquidTypeName(_input.TestSols[k].Type)
-					volume := strconv.Itoa(wutil.RoundInt(_input.TestSolVolumes[l].RawValue())) + "ul"
+
+					volume := _input.TestSolVolumes[l].ToString() //strconv.Itoa(wutil.RoundInt(number))+"ul"
+
 					solutionname := _input.TestSols[k].CName
 
-					description := volume + "_" + solutionname + "_replicate" + strconv.Itoa(j+1)
+					description := volume + "_" + solutionname + "_replicate" + strconv.Itoa(j+1) + "_platenum" + strconv.Itoa(platenum)
+					//setpoints := volume+"_"+solutionname+"_replicate"+strconv.Itoa(j+1)+"_platenum"+strconv.Itoa(platenum)
 
 					// add run to well position lookup table
 					_output.Runtowelllocationmap[doerun+"_"+description] = wellpositionarray[counter]
@@ -145,7 +154,13 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 					counter = counter + 1
 
 					// add additional info for each run
-					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "Location: "+description, wellpositionarray[counter])
+					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "Location_"+description, wellpositionarray[counter])
+
+					// add run order:
+					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "runorder_"+description, counter)
+
+					// add setpoint printout to double check correct match up:
+					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "doerun"+description, doerun)
 					//runs[i].AddAdditionalValue("Replicate", strconv.Itoa(j+1))
 					//runs[i].AddAdditionalValue("Solution name", TestSols[k].CName)
 					//runs[i].AddAdditionalValue("Volume", strconv.Itoa(wutil.RoundInt(TestSolVolumes[l].RawValue()))+"ul)
@@ -175,34 +190,35 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 	// export overall DOE design file showing all well locations for all conditions
 	_ = doe.JMPXLSXFilefromRuns(runs, _input.OutputFilename)
 
-	// add blanks
+	// add blanks after
 
-	_output.Blankwells = make([]string, 0)
+	for n := 0; n < platenum; n++ {
+		for m := 0; m < _input.NumberofBlanks; m++ {
+			//eachreaction := make([]*wtype.LHComponent, 0)
 
-	for m := 0; m < _input.NumberofBlanks; m++ {
-		//eachreaction := make([]*wtype.LHComponent, 0)
+			// use defualt policy for blank
 
-		// use defualt policy for blank
+			bufferSample := mixer.Sample(_input.Diluent, _input.TotalVolume)
+			//eachreaction = append(eachreaction,bufferSample)
 
-		bufferSample := mixer.Sample(_input.Diluent, _input.TotalVolume)
-		//eachreaction = append(eachreaction,bufferSample)
+			// add blanks to last column of plate
+			well := alphabet[_input.OutPlate.WlsY-1-m] + strconv.Itoa(_input.OutPlate.WlsX)
+			fmt.Println("blankwell", well)
+			reaction := execute.MixTo(_ctx, _input.OutPlate.Type, well, n+1, bufferSample)
+			//fmt.Println("where am I?",wellpositionarray[counter])
+			_output.Runtowelllocationmap["Blank"+strconv.Itoa(m+1)+" platenum"+strconv.Itoa(n+1)] = well
 
-		// add blanks to last column of plate
-		well := alphabet[_input.OutPlate.WlsY-1-m] + strconv.Itoa(_input.OutPlate.WlsX)
-		fmt.Println("blankwell", well)
-		reaction := execute.MixTo(_ctx, _input.OutPlate.Type, well, 0, bufferSample)
-		//fmt.Println("where am I?",wellpositionarray[counter])
-		_output.Runtowelllocationmap["Blank"+strconv.Itoa(m+1)] = well
+			_output.Blankwells = append(_output.Blankwells, well)
 
-		_output.Blankwells = append(_output.Blankwells, well)
+			reactions = append(reactions, reaction)
+			counter = counter + 1
 
-		reactions = append(reactions, reaction)
-		counter = counter + 1
+		}
 
 	}
 
 	_output.Reactions = reactions
-	_output.Runcount = counter //len(Reactions)
+	_output.Runcount = len(_output.Reactions)
 	_output.Pixelcount = len(wellpositionarray)
 	_output.Runs = runs
 

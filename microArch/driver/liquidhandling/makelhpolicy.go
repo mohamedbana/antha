@@ -36,8 +36,8 @@ import (
 	"github.com/antha-lang/antha/internal/github.com/ghodss/yaml"
 )
 
-var DOEliquidhandlingFile = "FullFactorial.xlsx" // "ScreenLHPolicyDOE2.xlsx"
-var DXORJMP = "JMP"                              //"DX"
+var DOEliquidhandlingFile = "8run4cpFactorial.xlsx" //"FullFactorial.xlsx" // "ScreenLHPolicyDOE2.xlsx"
+var DXORJMP = "JMP"                                 //"DX"
 
 func MakePolicies() map[string]LHPolicy {
 	pols := make(map[string]LHPolicy)
@@ -103,8 +103,9 @@ func PolicyMakerfromDesign(DXORJMP string, dxdesignfilename string, prepend stri
 
 		patterncolumn := 0
 		factorcolumns := []int{1, 2, 3, 4, 5}
+		responsecolumns := []int{6, 7, 8, 9}
 
-		runs, err = RunsFromJMPDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), patterncolumn, factorcolumns, []string{"PRE_MIX", "POST_MIX"})
+		runs, err = RunsFromJMPDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), patterncolumn, factorcolumns, responsecolumns, []string{"PRE_MIX", "POST_MIX"})
 		if err != nil {
 			return policies, names, runs, err
 		}
