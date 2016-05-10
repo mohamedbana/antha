@@ -1981,6 +1981,28 @@ func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 			}
 			mix.Volume = v
 		}
+		// offsets
+
+		xoff, ok := pol["PRE_MIX_X"]
+
+		if ok {
+			for k := 0; k < ins.Multi; k++ {
+				mix.OffsetX = append(mix.OffsetX, xoff.(float64))
+			}
+		}
+
+		yoff, ok := pol["PRE_MIX_Y"]
+		if ok {
+			for k := 0; k < ins.Multi; k++ {
+				mix.OffsetY = append(mix.OffsetY, yoff.(float64))
+			}
+		}
+		zoff, ok := pol["PRE_MIX_Z"]
+		if ok {
+			for k := 0; k < ins.Multi; k++ {
+				mix.OffsetZ = append(mix.OffsetZ, zoff.(float64))
+			}
+		}
 
 		c := make([]int, ins.Multi)
 
@@ -1988,8 +2010,28 @@ func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 			c[i] = cycles.(int)
 		}
 
+		// set speed
+
+		mixrate, changespeed := pol["PRE_MIX_RATE"]
+
+		if changespeed {
+			setspd := NewSetPipetteSpeedInstruction()
+			setspd.Head = ins.Head
+			setspd.Channel = -1 // all channels
+			sps.Speed = mixrate.(float64)
+			ret = append(ret, sps)
+		}
+
 		mix.Cycles = c
 		ret = append(ret, mix)
+
+		if changespeed {
+			sps := NewSetPipetteSpeedInstruction()
+			sps.Head = ins.Head
+			sps.Channel = -1 // all channels
+			sps.Speed = pol["DEFAULTPIPETTESPEED"].(float64)
+			ret = append(ret, sps)
+		}
 	}
 
 	// do we need to enter slowly?
@@ -2397,8 +2439,28 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 			c[i] = cycles.(int)
 		}
 
+		// set speed
+
+		mixrate, changespeed := pol["POST_MIX_RATE"]
+
+		if changespeed {
+			setspd := NewSetPipetteSpeedInstruction()
+			setspd.Head = ins.Head
+			setspd.Channel = -1 // all channels
+			sps.Speed = mixrate.(float64)
+			ret = append(ret, sps)
+		}
+
 		mix.Cycles = c
 		ret = append(ret, mix)
+
+		if changespeed {
+			sps := NewSetPipetteSpeedInstruction()
+			sps.Head = ins.Head
+			sps.Channel = -1 // all channels
+			sps.Speed = pol["DEFAULTPIPETTESPEED"].(float64)
+			ret = append(ret, sps)
+		}
 	}
 
 	// do we need to touch off?
