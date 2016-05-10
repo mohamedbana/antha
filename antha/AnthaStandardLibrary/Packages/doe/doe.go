@@ -109,6 +109,25 @@ func AddAdditionalValue(run Run, additionalsubheader string, additionalvalue int
 	return
 }
 
+func ReplaceAdditionalValue(run Run, additionalsubheader string, additionalvalue interface{}) (newrun Run) {
+
+	newrun = run
+
+	values := make([]interface{}, len(run.AdditionalSubheaders))
+
+	for i, descriptor := range run.AdditionalSubheaders {
+		if strings.ToUpper(descriptor) == strings.ToUpper(additionalsubheader) {
+			values[i] = additionalvalue
+		} else {
+			values[i] = run.AdditionalValues[i]
+		}
+	}
+
+	newrun.AdditionalValues = values
+
+	return
+}
+
 func AddAdditionalHeaders(run Run, additionalheader string, additionalsubheader string) (newrun Run) {
 
 	newrun = run
@@ -138,9 +157,16 @@ func AddAdditionalHeaders(run Run, additionalheader string, additionalsubheader 
 }
 
 func AddAdditionalHeaderandValue(run Run, additionalheader string, additionalsubheader string, additionalvalue interface{}) (newrun Run) {
-	midrun := AddAdditionalHeaders(run, additionalheader, additionalsubheader)
-	fmt.Println("midrun: ", midrun)
-	newrun = AddAdditionalValue(midrun, additionalsubheader, additionalvalue)
+
+	// only add column if no column with header exists
+	if search.InSlice(additionalsubheader, run.AdditionalSubheaders) == false {
+
+		midrun := AddAdditionalHeaders(run, additionalheader, additionalsubheader)
+		fmt.Println("midrun: ", midrun)
+		newrun = AddAdditionalValue(midrun, additionalsubheader, additionalvalue)
+	} else {
+		newrun = ReplaceAdditionalValue(run, additionalsubheader, additionalvalue)
+	}
 	return
 }
 

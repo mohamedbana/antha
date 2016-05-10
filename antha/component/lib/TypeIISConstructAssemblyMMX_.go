@@ -12,6 +12,9 @@ import (
 
 // Input parameters for this protocol (data)
 
+//InactivationTemp			Temperature
+//InactivationTime			Time
+
 // Physical Inputs to this protocol with types
 
 // Physical outputs from this protocol with types
@@ -33,8 +36,14 @@ func _TypeIISConstructAssemblyMMXSteps(_ctx context.Context, _input *TypeIISCons
 
 	for k, part := range _input.Parts {
 		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", _input.PartNames[k], " vol ", _input.PartVols[k])
+
+		//if k == len(Parts)-1{
+		part.Type = wtype.LiquidTypeFromString(_input.LHPolicyName)
+		//}
+
 		partSample := mixer.Sample(part, _input.PartVols[k])
 		partSample.CName = _input.PartNames[k]
+
 		samples = append(samples, partSample)
 	}
 
@@ -105,8 +114,7 @@ type TypeIISConstructAssemblyMMXElement struct {
 }
 
 type TypeIISConstructAssemblyMMXInput struct {
-	InactivationTemp   wunit.Temperature
-	InactivationTime   wunit.Time
+	LHPolicyName       string
 	MasterMix          *wtype.LHComponent
 	OutPlate           *wtype.LHPlate
 	OutputLocation     string
@@ -139,13 +147,12 @@ func init() {
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/TypeIIsAssembly/TypeIISConstructAssemblyMMX/TypeIISConstructAssemblyMMX.an",
 			Params: []ParamDesc{
-				{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
-				{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
+				{Name: "LHPolicyName", Desc: "", Kind: "Parameters"},
 				{Name: "MasterMix", Desc: "", Kind: "Inputs"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "OutputLocation", Desc: "", Kind: "Parameters"},
 				{Name: "OutputPlateNum", Desc: "", Kind: "Parameters"},
-				{Name: "OutputReactionName", Desc: "", Kind: "Parameters"},
+				{Name: "OutputReactionName", Desc: "InactivationTemp\t\t\tTemperature\nInactivationTime\t\t\tTime\n", Kind: "Parameters"},
 				{Name: "PartNames", Desc: "", Kind: "Parameters"},
 				{Name: "PartVols", Desc: "", Kind: "Parameters"},
 				{Name: "Parts", Desc: "", Kind: "Inputs"},
