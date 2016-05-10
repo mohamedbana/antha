@@ -21,16 +21,4 @@ fmt_json:
 compile:
 	go install github.com/antha-lang/antha/cmd/...
 
-test_workflows: compile
-	for d in `find antha/examples -type d -o -name '*.yml'`; do \
-	  if [[ -f "$$d/workflow.json" && -f "$$d/parameters.yml" ]]; then \
-	    (cd "$$d" && antharun --workflow workflow.json --parameters parameters.yml $(ANTHA_ARGS) > /dev/null); \
-	    if [[ $$? == 0 ]]; then \
-	      echo "OK $$d"; \
-	    else \
-	      echo "FAIL $$d"; \
-	    fi; \
-	  fi; \
-	done
-
 .PHONY: all gen_comp fmt_json test test_workflows compile

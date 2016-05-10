@@ -4,11 +4,11 @@ import (
 	"fmt"
 )
 
-type goError struct {
+type Error struct {
 	BaseError interface{}
 	Stack     []byte
 }
 
-func (a *goError) Error() string {
+func (a *Error) Error() string {
 	return fmt.Sprintf("%s at:\n%s", a.BaseError, string(a.Stack))
 }
