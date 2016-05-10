@@ -2350,7 +2350,33 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 		mix.Multi = ins.Multi
 		mix.What = ins.What
 		// TODO get rid of this HARD CODE
-		mix.Blowout = []bool{false}
+		//	mix.Blowout = []bool{false}
+		// prevent issues with inconsistent array lengths
+		b := make([]bool, ins.Multi)
+		mix.Blowout = b
+
+		// offsets
+
+		xoff, ok := pol["POST_MIX_X"]
+
+		if ok {
+			for k := 0; k < ins.Multi; k++ {
+				mix.OffsetX = append(mix.OffsetX, xoff.(float64))
+			}
+		}
+
+		yoff, ok := pol["POST_MIX_Y"]
+		if ok {
+			for k := 0; k < ins.Multi; k++ {
+				mix.OffsetY = append(mix.OffsetY, yoff.(float64))
+			}
+		}
+		zoff, ok := pol["POST_MIX_Z"]
+		if ok {
+			for k := 0; k < ins.Multi; k++ {
+				mix.OffsetZ = append(mix.OffsetZ, zoff.(float64))
+			}
+		}
 
 		// this is not safe, need to verify volume is OK
 		mixvol, ok := pol["POST_MIX_VOL"]
@@ -2981,6 +3007,9 @@ type MoveMixInstruction struct {
 	Cycles    []int
 	What      []string
 	Blowout   []bool
+	OffsetX   []float64
+	OffsetY   []float64
+	OffsetZ   []float64
 	Multi     int
 	Prms      map[string]interface{}
 }
@@ -2998,6 +3027,9 @@ func NewMoveMixInstruction() *MoveMixInstruction {
 	mi.Prms = make(map[string]interface{})
 	mi.What = make([]string, 0)
 	mi.Blowout = make([]bool, 0)
+	mi.OffsetX = make([]float64, 0)
+	mi.OffsetY = make([]float64, 0)
+	mi.OffsetZ = make([]float64, 0)
 	return &mi
 }
 
@@ -3025,7 +3057,14 @@ func (ins *MoveMixInstruction) GetParameter(name string) interface{} {
 		return ins.What
 	case "BLOWOUT":
 		return ins.Blowout
+	case "OFFSETX":
+		return ins.OffsetX
+	case "OFFSETY":
+		return ins.OffsetY
+	case "OFFSETZ":
+		return ins.OffsetZ
 	}
+
 	return nil
 
 }
@@ -3045,11 +3084,9 @@ func (ins *MoveMixInstruction) Generate(policy *LHPolicyRuleSet, prms *LHPropert
 	mov.Plt = ins.PlateType
 	mov.WVolume = ins.FVolume
 	mov.Head = ins.Head
-	zoff := make([]float64, ins.Multi)
-	mov.OffsetX = append(mov.OffsetX, 0.0)
-	mov.OffsetY = append(mov.OffsetY, 0.0)
-	zoff[0] = 1.0
-	mov.OffsetZ = zoff
+	mov.OffsetX = ins.OffsetX
+	mov.OffsetY = ins.OffsetY
+	mov.OffsetZ = ins.OffsetZ
 	ref := make([]int, ins.Multi)
 	ref[0] = 0
 	mov.Reference = ref
