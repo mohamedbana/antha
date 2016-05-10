@@ -115,6 +115,7 @@ func (p *compiler) anthaInit() {
 		"Tipbox":               "wtype.LHTipbox",
 		"Tip":                  "wtype.LHTip",
 		"Well":                 "wtype.LHWell",
+		"AngularVelocity":      "wunit.AngularVelocity",
 	}
 	p.imports = map[string]string{
 		"github.com/antha-lang/antha/antha/anthalib/wunit":             "wunit.Make_units",

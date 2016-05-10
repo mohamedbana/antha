@@ -64,11 +64,12 @@ Steps {
 	// set warnings reported back to user to none initially
 	warnings := make([]string,1)
 	warnings[0] = "none"
+	var nofeatures []wtype.Feature
 	
 	/* find sequence data from keyword; looking it up by a given name in an inventory 
 	   or by biobrick ID from iGem parts registry */
 	partsinorder := make([]wtype.DNASequence,0)
-	var partDNA =wtype.DNASequence{"","",false, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, ""}
+	var partDNA =wtype.DNASequence{"","",false, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, "",nofeatures}
 	
 	Status = "all parts available"
 	for _, part := range Partsinorder {

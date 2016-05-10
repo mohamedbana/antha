@@ -1,0 +1,8 @@
+{
+    "connections": [],
+    "processes": {
+        "FindPartsThat": {
+            "component": "FindIGemPartsThat"
+        }
+    }
+}

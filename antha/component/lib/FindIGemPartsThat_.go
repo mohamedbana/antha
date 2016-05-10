@@ -6,13 +6,10 @@
 package lib
 
 import (
-	//"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"fmt"
-	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
-	//	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
-	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
@@ -23,11 +20,8 @@ import (
 
 // Input parameters for this protocol (data)
 
-//Constructname 				string
-// e.g. promoter
-// e.g. arsenic, reporter, alkane, logic gate
-
-//RestrictionsitetoAvoid		[]string
+// e.g. rbs, reporter
+// e.g. strong, arsenic, fluorescent, alkane, logic gate
 
 // Physical Inputs to this protocol with types
 
@@ -35,23 +29,21 @@ import (
 
 // Data which is returned from this protocol, and data types
 
-//Partsfound	[]wtype.DNASequence // map[string]wtype.DNASequence
-//map[string][]string
+// i.e. map[description]list of parts matching description
+// i.e. map[biobrickID]description
 
 // Input Requirement specification
-func _FindPartsthatRequirements() {
+func _FindIGemPartsThatRequirements() {
 
 }
 
 // Conditions to run on startup
-func _FindPartsthatSetup(_ctx context.Context, _input *FindPartsthatInput) {}
+func _FindIGemPartsThatSetup(_ctx context.Context, _input *FindIGemPartsThatInput) {}
 
 // The core process for this protocol, with the steps to be performed
 // for every input
-func _FindPartsthatSteps(_ctx context.Context, _input *FindPartsthatInput, _output *FindPartsthatOutput) {
-	//var msg string
-	// set warnings reported back to user to none initially
-	//	warnings := make([]string,0)
+func _FindIGemPartsThatSteps(_ctx context.Context, _input *FindIGemPartsThatInput, _output *FindIGemPartsThatOutput) {
+
 	BackupParts := make([]string, 0)
 	status := ""
 	joinedstatus := make([]string, 0)
@@ -89,6 +81,7 @@ func _FindPartsthatSteps(_ctx context.Context, _input *FindPartsthatInput, _outp
 	for desc, subparts := range _output.PartMap {
 
 		partdetails := igem.LookUp(subparts)
+
 		// now we can get detailed information of all of those records to interrogate further
 		// this can be slow if there are many parts to check (~2 seconds per block of 14 parts)
 
@@ -103,6 +96,10 @@ func _FindPartsthatSteps(_ctx context.Context, _input *FindPartsthatInput, _outp
 
 				if err == nil && rating > highestrating {
 					_output.HighestRatedMatch = subpart
+
+					seq := partdetails.Sequence(_output.HighestRatedMatch)
+
+					_output.HighestRatedMatchDNASequence = wtype.MakeLinearDNASequence(_output.HighestRatedMatch, seq)
 				}
 			}
 
@@ -113,11 +110,6 @@ func _FindPartsthatSteps(_ctx context.Context, _input *FindPartsthatInput, _outp
 		}
 		i = i + 1
 	}
-	/*
-		if len(warnings) != 0 {
-		Warnings = fmt.Errorf(strings.Join(warnings,";"))
-		}else{Warnings = nil}
-	*/
 
 	_output.FulllistBackupParts = parts
 	_output.Status = strings.Join(joinedstatus, " ; ")
@@ -128,7 +120,6 @@ func _FindPartsthatSteps(_ctx context.Context, _input *FindPartsthatInput, _outp
 	} else {
 		_output.Status = fmt.Sprintln(
 			"Warnings:", _output.Warnings.Error(),
-			"Back up parts found (Reported to work!)", _input.Parts,
 			"Back up parts found (Reported to work!)", _output.FulllistBackupParts,
 		)
 	}
@@ -137,26 +128,26 @@ func _FindPartsthatSteps(_ctx context.Context, _input *FindPartsthatInput, _outp
 
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
-func _FindPartsthatAnalysis(_ctx context.Context, _input *FindPartsthatInput, _output *FindPartsthatOutput) {
+func _FindIGemPartsThatAnalysis(_ctx context.Context, _input *FindIGemPartsThatInput, _output *FindIGemPartsThatOutput) {
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
-func _FindPartsthatValidation(_ctx context.Context, _input *FindPartsthatInput, _output *FindPartsthatOutput) {
+func _FindIGemPartsThatValidation(_ctx context.Context, _input *FindIGemPartsThatInput, _output *FindIGemPartsThatOutput) {
 }
-func _FindPartsthatRun(_ctx context.Context, input *FindPartsthatInput) *FindPartsthatOutput {
-	output := &FindPartsthatOutput{}
-	_FindPartsthatSetup(_ctx, input)
-	_FindPartsthatSteps(_ctx, input, output)
-	_FindPartsthatAnalysis(_ctx, input, output)
-	_FindPartsthatValidation(_ctx, input, output)
+func _FindIGemPartsThatRun(_ctx context.Context, input *FindIGemPartsThatInput) *FindIGemPartsThatOutput {
+	output := &FindIGemPartsThatOutput{}
+	_FindIGemPartsThatSetup(_ctx, input)
+	_FindIGemPartsThatSteps(_ctx, input, output)
+	_FindIGemPartsThatAnalysis(_ctx, input, output)
+	_FindIGemPartsThatValidation(_ctx, input, output)
 	return output
 }
 
-func FindPartsthatRunSteps(_ctx context.Context, input *FindPartsthatInput) *FindPartsthatSOutput {
-	soutput := &FindPartsthatSOutput{}
-	output := _FindPartsthatRun(_ctx, input)
+func FindIGemPartsThatRunSteps(_ctx context.Context, input *FindIGemPartsThatInput) *FindIGemPartsThatSOutput {
+	soutput := &FindIGemPartsThatSOutput{}
+	output := _FindIGemPartsThatRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
 		panic(err)
 	}
@@ -166,19 +157,19 @@ func FindPartsthatRunSteps(_ctx context.Context, input *FindPartsthatInput) *Fin
 	return soutput
 }
 
-func FindPartsthatNew() interface{} {
-	return &FindPartsthatElement{
+func FindIGemPartsThatNew() interface{} {
+	return &FindIGemPartsThatElement{
 		inject.CheckedRunner{
 			RunFunc: func(_ctx context.Context, value inject.Value) (inject.Value, error) {
-				input := &FindPartsthatInput{}
+				input := &FindIGemPartsThatInput{}
 				if err := inject.Assign(value, input); err != nil {
 					return nil, err
 				}
-				output := _FindPartsthatRun(_ctx, input)
+				output := _FindIGemPartsThatRun(_ctx, input)
 				return inject.MakeValue(output), nil
 			},
-			In:  &FindPartsthatInput{},
-			Out: &FindPartsthatOutput{},
+			In:  &FindIGemPartsThatInput{},
+			Out: &FindIGemPartsThatOutput{},
 		},
 	}
 }
@@ -188,56 +179,57 @@ var (
 	_ = wunit.Make_units
 )
 
-type FindPartsthatElement struct {
+type FindIGemPartsThatElement struct {
 	inject.CheckedRunner
 }
 
-type FindPartsthatInput struct {
+type FindIGemPartsThatInput struct {
 	OnlyreturnAvailableParts bool
 	OnlyreturnWorkingparts   bool
 	Partdescriptions         []string
-	Parts                    [][]string
 	Parttypes                []string
 }
 
-type FindPartsthatOutput struct {
-	BiobrickDescriptions map[string]string
-	FulllistBackupParts  [][]string
-	HighestRatedMatch    string
-	PartMap              map[string][]string
-	Status               string
-	Warnings             error
+type FindIGemPartsThatOutput struct {
+	BiobrickDescriptions         map[string]string
+	FulllistBackupParts          [][]string
+	HighestRatedMatch            string
+	HighestRatedMatchDNASequence wtype.DNASequence
+	PartMap                      map[string][]string
+	Status                       string
+	Warnings                     error
 }
 
-type FindPartsthatSOutput struct {
+type FindIGemPartsThatSOutput struct {
 	Data struct {
-		BiobrickDescriptions map[string]string
-		FulllistBackupParts  [][]string
-		HighestRatedMatch    string
-		PartMap              map[string][]string
-		Status               string
-		Warnings             error
+		BiobrickDescriptions         map[string]string
+		FulllistBackupParts          [][]string
+		HighestRatedMatch            string
+		HighestRatedMatchDNASequence wtype.DNASequence
+		PartMap                      map[string][]string
+		Status                       string
+		Warnings                     error
 	}
 	Outputs struct {
 	}
 }
 
 func init() {
-	addComponent(Component{Name: "FindPartsthat",
-		Constructor: FindPartsthatNew,
+	addComponent(Component{Name: "FindIGemPartsThat",
+		Constructor: FindIGemPartsThatNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/Data/DNA/FindPartsthat/Findpartsthat.an",
+			Path: "antha/component/an/Data/DNA/FindPartsThat/Findpartsthat.an",
 			Params: []ParamDesc{
 				{Name: "OnlyreturnAvailableParts", Desc: "", Kind: "Parameters"},
 				{Name: "OnlyreturnWorkingparts", Desc: "", Kind: "Parameters"},
-				{Name: "Partdescriptions", Desc: "e.g. arsenic, reporter, alkane, logic gate\n", Kind: "Parameters"},
-				{Name: "Parts", Desc: "", Kind: "Parameters"},
-				{Name: "Parttypes", Desc: "Constructname \t\t\t\tstring\n\ne.g. promoter\n", Kind: "Parameters"},
-				{Name: "BiobrickDescriptions", Desc: "", Kind: "Data"},
-				{Name: "FulllistBackupParts", Desc: "Partsfound\t[]wtype.DNASequence // map[string]wtype.DNASequence\n\nmap[string][]string\n", Kind: "Data"},
+				{Name: "Partdescriptions", Desc: "e.g. strong, arsenic, fluorescent, alkane, logic gate\n", Kind: "Parameters"},
+				{Name: "Parttypes", Desc: "e.g. rbs, reporter\n", Kind: "Parameters"},
+				{Name: "BiobrickDescriptions", Desc: "i.e. map[biobrickID]description\n", Kind: "Data"},
+				{Name: "FulllistBackupParts", Desc: "", Kind: "Data"},
 				{Name: "HighestRatedMatch", Desc: "", Kind: "Data"},
-				{Name: "PartMap", Desc: "", Kind: "Data"},
+				{Name: "HighestRatedMatchDNASequence", Desc: "", Kind: "Data"},
+				{Name: "PartMap", Desc: "i.e. map[description]list of parts matching description\n", Kind: "Data"},
 				{Name: "Status", Desc: "", Kind: "Data"},
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},

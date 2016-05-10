@@ -1,21 +1,25 @@
 {
   "Parameters": {
     "PipetteImage": {
-      "Colourcomponents": [
-	"black",
-	"white",
-	"purple",
-	"blue",
-	"green",
-	"yellow",
-	"orange",
-	"red",
-	"pink"
-	],
-	"OnlythisColour":"",
-	"NotthisColour":"white",
-	  "Imagefilename": "jenkins.jpeg",
+      "Imagefilename": "apple.jpg",
+	  "UVimage": false,
+	  "Rotate":false,
+	  "AutoRotate":true,
+	  "UseLiquidClass":"water",
 		"Palettename":"Neon",
+	      "Subsetnames": [
+		"black",
+		"white",
+		"purple",
+		"blue",
+		"green",
+		"yellow",
+		"orange",
+		"red",
+		"pink"
+		],
+		"OnlythisColour":"",
+		"Notthiscolour":"white",
       "OutPlate": "greiner384_riser",
       "VolumePerWell": "100ul"
     }

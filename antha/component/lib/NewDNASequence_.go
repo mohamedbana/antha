@@ -44,7 +44,7 @@ func _NewDNASequenceSteps(_ctx context.Context, _input *NewDNASequenceInput, _ou
 		orfs := sequences.FindallORFs(_output.DNA.Seq)
 		features := sequences.ORFs2Features(orfs)
 
-		_output.DNAwithORFs = sequences.Annotate(_output.DNA, features)
+		_output.DNAwithORFs = wtype.Annotate(_output.DNA, features)
 
 		_output.Status = fmt.Sprintln(
 			text.Print("DNA_Seq: ", _input.DNA_seq),
@@ -122,14 +122,14 @@ type NewDNASequenceInput struct {
 
 type NewDNASequenceOutput struct {
 	DNA         wtype.DNASequence
-	DNAwithORFs sequences.AnnotatedSeq
+	DNAwithORFs wtype.DNASequence
 	Status      string
 }
 
 type NewDNASequenceSOutput struct {
 	Data struct {
 		DNA         wtype.DNASequence
-		DNAwithORFs sequences.AnnotatedSeq
+		DNAwithORFs wtype.DNASequence
 		Status      string
 	}
 	Outputs struct {

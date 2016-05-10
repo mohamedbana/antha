@@ -96,15 +96,15 @@ func _PrimerDesign_sequence_your_neighboursSteps(_ctx context.Context, _input *P
 		file = filepath.Join(dirname, file)
 		sequence, _ := parser.GenbanktoAnnotatedSeq(file)
 
-		primer1, primer2 := oligos.MakeOutwardFacingPrimers(sequence.DNASequence, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, allprimerstrings, _input.PermittednucleotideOverlapBetweenPrimers)
+		primer1, primer2 := oligos.MakeOutwardFacingPrimers(sequence, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, allprimerstrings, _input.PermittednucleotideOverlapBetweenPrimers)
 
 		primer1.Nm = "primer1" + "_" + file
 
-		bindingsitesinseq1 := oligos.CheckNonSpecificBinding(sequence.DNASequence, primer1.DNASequence)
+		bindingsitesinseq1 := oligos.CheckNonSpecificBinding(sequence, primer1.DNASequence)
 
 		primer2.Nm = "primer2" + "_" + file
 
-		bindingsitesinseq2 := oligos.CheckNonSpecificBinding(sequence.DNASequence, primer2.DNASequence)
+		bindingsitesinseq2 := oligos.CheckNonSpecificBinding(sequence, primer2.DNASequence)
 
 		output = fmt.Sprintln(file, ",", "primer1: ", ",", primer1.Sequence(), ",", "melting temp: ", ",", primer1.MeltingTemp.ToString(), ",", "length: ", ",", primer1.Length, ",", "gc content: ", ",", primer1.GCContent, ",", "binds at", ",", bindingsitesinseq1, ",", "positions", ",", "primer2: ", ",", primer2.Sequence(), ",", "melting temp: ", ",", primer2.MeltingTemp.ToString(), ",", "length: ", ",", primer2.Length, ",", "gc content: ", ",", primer2.GCContent, ",", "binds at", ",", bindingsitesinseq2, ",", "positions", ",")
 		alloutputs = append(alloutputs, output)
@@ -191,7 +191,7 @@ func _PrimerDesign_sequence_your_neighboursValidation(_ctx context.Context, _inp
 			// only check other files
 			if strings.Contains(primer.Nm, file) == false {
 
-				bindingsites := oligos.CheckNonSpecificBinding(sequence.DNASequence, primer.DNASequence)
+				bindingsites := oligos.CheckNonSpecificBinding(sequence, primer.DNASequence)
 
 				// if binding found add to output file:
 

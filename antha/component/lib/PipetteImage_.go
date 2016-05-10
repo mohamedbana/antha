@@ -1,11 +1,13 @@
-// Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours
+// Generates instructions to pipette out a defined image onto a defined plate using a defined palette of coloured bacteria
 package lib
 
 import (
-	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
-	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
+	"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
+	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
@@ -15,8 +17,6 @@ import (
 )
 
 // Input parameters for this protocol (data)
-
-//AvailableColours []string
 
 // Data which is returned from this protocol, and data types
 
@@ -37,69 +37,103 @@ func _PipetteImageSetup(_ctx context.Context, _input *PipetteImageInput) {
 // for every input
 func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output *PipetteImageOutput) {
 
-	var positiontocolourmap map[string]color.Color
+	// make sub pallete if necessary
+	var chosencolourpalette color.Palette
 
-	availableColours := make([]string, 0)
-
-	for _, component := range _input.Colourcomponents {
-		availableColours = append(availableColours, component.CName)
+	if _input.Subset {
+		chosencolourpalette = image.MakeSubPallette(_input.Palettename, _input.Subsetnames)
+	} else {
+		chosencolourpalette = image.AvailablePalettes[_input.Palettename]
 	}
 
-	subpalette := image.MakeSubPallette(_input.Palettename, availableColours)
+	// resize image to fit dimensions of plate and change each pixel to match closest colour from chosen palette
+	// the output of this is a map of well positions to colours needed
+	positiontocolourmap, _, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
 
-	positiontocolourmap, _, _ = image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &subpalette, _input.Rotate, _input.AutoRotate)
+	colourtostringmap := image.AvailableComponentmaps[_input.Palettename]
+
+	// if the image will be printed using fluorescent proteins, 2 previews will be generated for the image (i) under UV light (ii) under visible light
+
+	if _input.UVimage {
+		uvmap := image.AvailableComponentmaps[_input.Palettename]
+		visiblemap := image.Visibleequivalentmaps[_input.Palettename]
+
+		if _input.Subset {
+			uvmap = image.MakeSubMapfromMap(colourtostringmap, _input.Subsetnames)
+			visiblemap = image.MakeSubMapfromMap(colourtostringmap, _input.Subsetnames)
+		}
+		image.PrintFPImagePreview(_input.Imagefilename, _input.OutPlate, _input.Rotate, visiblemap, uvmap)
+	}
 
 	// get components from factory
 	componentmap := make(map[string]*wtype.LHComponent, 0)
 
-	colourtostringmap := image.AvailableComponentmaps[_input.Palettename]
+	if _input.Subset {
+		colourtostringmap = image.MakeSubMapfromMap(colourtostringmap, _input.Subsetnames)
+	}
 
-	submap := image.MakeSubMapfromMap(colourtostringmap, availableColours)
-
-	for colourname := range submap {
+	for colourname := range colourtostringmap {
 
 		componentname := colourtostringmap[colourname]
 
 		componentmap[componentname] = factory.GetComponentByType(componentname)
 
 	}
+	fmt.Println(componentmap)
 
 	solutions := make([]*wtype.LHComponent, 0)
 
 	counter := 0
+	_output.UniqueComponents = make([]string, 0)
 
+	// loop through the position to colour map pipeting the correct coloured protein into each well
 	for locationkey, colour := range positiontocolourmap {
 
-		component := componentmap[image.Colourcomponentmap[colour]]
+		component := componentmap[colourtostringmap[colour]]
 
-		fmt.Println("component:", image.Colourcomponentmap[colour], "colour:", colour)
+		// make sure liquid class is appropriate for cell culture in case this is not set elsewhere
+		component.Type = wtype.LiquidTypeFromString(_input.UseLiquidClass) //wtype.LTCulture
 
-		//if component.TypeName() == "dna" {
-		component.Type = wtype.LTDISPENSEABOVE //"DoNotMix"
-		//}
 		fmt.Println(image.Colourcomponentmap[colour])
 
+		// if the option to only print a single colour is not selected then the pipetting actions for all colours (apart from if not this colour is not empty) will follow
 		if _input.OnlythisColour != "" {
 
 			if image.Colourcomponentmap[colour] == _input.OnlythisColour {
+
+				_output.UniqueComponents = append(_output.UniqueComponents, component.CName)
+
 				counter = counter + 1
-				fmt.Println("wells", counter)
+				fmt.Println("wells", _input.OnlythisColour, counter)
+
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
+
 				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, pixelSample)
+
 				solutions = append(solutions, solution)
 			}
 
 		} else {
-			if component.CName != _input.NotthisColour {
+			if component.CName != _input.Notthiscolour {
+
+				_output.UniqueComponents = append(_output.UniqueComponents, component.CName)
+
 				counter = counter + 1
-				fmt.Println("wells", counter)
+				fmt.Println("wells not ", _input.Notthiscolour, counter)
+
+				component.Type = wtype.LiquidTypeFromString(_input.UseLiquidClass)
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
+
 				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, pixelSample)
+
 				solutions = append(solutions, solution)
 			}
 		}
 	}
 
+	_output.UniqueComponents = search.RemoveDuplicates(_output.UniqueComponents)
+	fmt.Println("Unique Components:", _output.UniqueComponents)
+	fmt.Println("number of unique components", len(_output.UniqueComponents))
 	_output.Pixels = solutions
 
 	_output.Numberofpixels = len(_output.Pixels)
@@ -166,25 +200,30 @@ type PipetteImageElement struct {
 }
 
 type PipetteImageInput struct {
-	AutoRotate       bool
-	Colourcomponents []*wtype.LHComponent
-	Imagefilename    string
-	NotthisColour    string
-	OnlythisColour   string
-	OutPlate         *wtype.LHPlate
-	Palettename      string
-	Rotate           bool
-	VolumePerWell    wunit.Volume
+	AutoRotate     bool
+	Imagefilename  string
+	Notthiscolour  string
+	OnlythisColour string
+	OutPlate       *wtype.LHPlate
+	Palettename    string
+	Rotate         bool
+	Subset         bool
+	Subsetnames    []string
+	UVimage        bool
+	UseLiquidClass string
+	VolumePerWell  wunit.Volume
 }
 
 type PipetteImageOutput struct {
-	Numberofpixels int
-	Pixels         []*wtype.LHComponent
+	Numberofpixels   int
+	Pixels           []*wtype.LHComponent
+	UniqueComponents []string
 }
 
 type PipetteImageSOutput struct {
 	Data struct {
-		Numberofpixels int
+		Numberofpixels   int
+		UniqueComponents []string
 	}
 	Outputs struct {
 		Pixels []*wtype.LHComponent
@@ -195,20 +234,24 @@ func init() {
 	addComponent(Component{Name: "PipetteImage",
 		Constructor: PipetteImageNew,
 		Desc: ComponentDesc{
-			Desc: "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours\n",
+			Desc: "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of coloured bacteria\n",
 			Path: "antha/component/an/Liquid_handling/PipetteImage/PipetteImage.an",
 			Params: []ParamDesc{
 				{Name: "AutoRotate", Desc: "", Kind: "Parameters"},
-				{Name: "Colourcomponents", Desc: "", Kind: "Inputs"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
-				{Name: "NotthisColour", Desc: "", Kind: "Parameters"},
-				{Name: "OnlythisColour", Desc: "AvailableColours []string\n", Kind: "Parameters"},
+				{Name: "Notthiscolour", Desc: "", Kind: "Parameters"},
+				{Name: "OnlythisColour", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "Palettename", Desc: "", Kind: "Parameters"},
 				{Name: "Rotate", Desc: "", Kind: "Parameters"},
+				{Name: "Subset", Desc: "", Kind: "Parameters"},
+				{Name: "Subsetnames", Desc: "", Kind: "Parameters"},
+				{Name: "UVimage", Desc: "", Kind: "Parameters"},
+				{Name: "UseLiquidClass", Desc: "", Kind: "Parameters"},
 				{Name: "VolumePerWell", Desc: "", Kind: "Parameters"},
 				{Name: "Numberofpixels", Desc: "", Kind: "Data"},
 				{Name: "Pixels", Desc: "", Kind: "Outputs"},
+				{Name: "UniqueComponents", Desc: "", Kind: "Data"},
 			},
 		},
 	})

@@ -20,7 +20,7 @@ Parameters (
 // Data which is returned from this protocol
 Data (
 	DNA wtype.DNASequence
-	DNAwithORFs sequences.AnnotatedSeq
+	DNAwithORFs wtype.DNASequence
 	Status string
 )
 
@@ -57,7 +57,7 @@ Steps {
 	orfs := sequences.FindallORFs(DNA.Seq)
 	features := sequences.ORFs2Features(orfs)
 	
-	DNAwithORFs = sequences.Annotate(DNA,features)
+	DNAwithORFs = wtype.Annotate(DNA,features)
 	
 	Status = fmt.Sprintln(
 		text.Print("DNA_Seq: ",DNA_seq),
