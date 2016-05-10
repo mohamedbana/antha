@@ -2018,8 +2018,8 @@ func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 			setspd := NewSetPipetteSpeedInstruction()
 			setspd.Head = ins.Head
 			setspd.Channel = -1 // all channels
-			sps.Speed = mixrate.(float64)
-			ret = append(ret, sps)
+			setspd.Speed = mixrate.(float64)
+			ret = append(ret, setspd)
 		}
 
 		mix.Cycles = c
@@ -2447,8 +2447,8 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 			setspd := NewSetPipetteSpeedInstruction()
 			setspd.Head = ins.Head
 			setspd.Channel = -1 // all channels
-			sps.Speed = mixrate.(float64)
-			ret = append(ret, sps)
+			setspd.Speed = mixrate.(float64)
+			ret = append(ret, setspd)
 		}
 
 		mix.Cycles = c

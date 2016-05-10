@@ -28,6 +28,7 @@ const (
 	LTPEG
 	LTProtoplasts
 	LTCulutureReuse
+	LTDNAMIX
 )
 
 func LiquidTypeFromString(s string) LiquidType {
@@ -79,6 +80,8 @@ func LiquidTypeFromString(s string) LiquidType {
 			return LTPEG
 		case "Protoplasts":
 			return LTProtoplasts
+		case "dna_mix":
+			return LTDNAMIX
 		default:
 			return LTWater
 		}
@@ -126,6 +129,8 @@ func LiquidTypeName(lt LiquidType) string {
 		return "Protoplasts"
 	case LTPEG:
 		return "PEG"
+	case LTDNAMIX:
+		return "dna_mix"
 	default:
 		return "water"
 	}
@@ -159,7 +164,7 @@ func mergeTypes(c1, c2 *LHComponent) LiquidType {
 		return LTCulture
 	} else if c1.Type == LTProtoplasts || c2.Type == LTProtoplasts {
 		return LTProtoplasts
-	} else if c1.Type == LTDNA || c2.Type == LTDNA {
+	} else if c1.Type == LTDNA || c2.Type == LTDNA || c1.Type == LTDNAMIX || c2.Type == LTDNAMIX {
 		return LTDNA
 	} else if c1.Type == LTProtein || c2.Type == LTProtein {
 		return LTProtein
