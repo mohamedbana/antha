@@ -391,7 +391,11 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	plate = wtype.NewLHPlate("1L_DuranBottle", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 15.5)
 	plates[plate.Type] = plate
 
-	//NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64)
+	plate = MakeGreinerVBottomPlate()
+	plates[plate.Type] = plate
+
+	plate = MakeGreinerVBottomPlateWithRiser()
+	plates[plate.Type] = plate
 
 	return plates
 }
@@ -399,47 +403,34 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 func MakeGreinerVBottomPlate() *wtype.LHPlate {
 	// greiner V96
 
-	bottomtype = wtype.LHWBFLAT
-	xdim = 4.0
-	ydim = 4.0
-	zdim = 14.0
-	bottomh = 1.0
+	bottomtype := wtype.LHWBV
+	xdim := 6.2
+	ydim := 6.2
+	zdim := 11.0
+	bottomh := 1.0
 
-	wellxoffset = 4.5 // centre of well to centre of neighbouring well in x direction
-	wellyoffset = 4.5 //centre of well to centre of neighbouring well in y direction
-	xstart = -2.5     // distance from top left side of plate to first well
-	ystart = -2.5     // distance from top left side of plate to first well
-	zstart = 2        // offset of bottom of deck to bottom of well
+	wellxoffset := 9.0 // centre of well to centre of neighbouring well in x direction
+	wellyoffset := 9.0 //centre of well to centre of neighbouring well in y direction
+	xstart := 0.0      // distance from top left side of plate to first well
+	ystart := 0.0      // distance from top left side of plate to first well
+	zstart := 2.0      // offset of bottom of deck to bottom of well
 
-	square := wtype.NewShape("box", "mm", 4, 4, 14)
+	//	welltype = wtype.NewLHWell("SRWFB96", "", "", "ul", 500, 10, rwshp, 0, 8.2, 8.2, 11, 1.0, "mm")
+	rwshp := wtype.NewShape("cylinder", "mm", 6.2, 6.2, 10.0)
 	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
-	welltype = wtype.NewLHWell("384flat", "", "", "ul", 125, 10, square, bottomtype, xdim, ydim, zdim, bottomh, "mm")
+	welltype := wtype.NewLHWell("GreinerSWVBottom", "", "", "ul", 500, 1, rwshp, bottomtype, xdim, ydim, zdim, bottomh, "mm")
 
 	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
-	plate = wtype.NewLHPlate("greiner384", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
-	plates[plate.Type] = plate
+	//	plate = wtype.NewLHPlate("SRWFB96", "Unknown", 8, 12, 15, "mm", welltype, 9, 9, 0.0, 0.0, 2.0)
+	plate := wtype.NewLHPlate("GreinerSWVBottom", "Greiner", 8, 12, 15, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 
-	// greiner 384 well plate flat bottom on riser
+	return plate
+}
 
-	bottomtype = wtype.LHWBFLAT
-	xdim = 4.0
-	ydim = 4.0
-	zdim = 12.0 // modified from 14
-	bottomh = 1.0
-
-	wellxoffset = 4.5 // centre of well to centre of neighbouring well in x direction
-	wellyoffset = 4.5 //centre of well to centre of neighbouring well in y direction
-	xstart = -2.5     // distance from top left side of plate to first well
-	ystart = -2.5     // distance from top left side of plate to first well
-	zstart = 42       // offset of bottom of deck to bottom of well
-
-	square = wtype.NewShape("box", "mm", 4, 4, 14)
-	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
-	welltype = wtype.NewLHWell("384flat", "", "", "ul", 125, 10, square, bottomtype, xdim, ydim, zdim, bottomh, "mm")
-
-	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
-	plate = wtype.NewLHPlate("greiner384_riser", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
-
+func MakeGreinerVBottomPlateWithRiser() *wtype.LHPlate {
+	plate := MakeGreinerVBottomPlate()
+	plate.Type = "GreinerSWVBottom_riser"
+	plate.WellZStart = 42.0
 	return plate
 }
 

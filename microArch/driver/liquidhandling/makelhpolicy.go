@@ -314,7 +314,7 @@ func MakeDNAMixPolicy() LHPolicy {
 	dnapolicy := MakeDNAPolicy()
 	dnapolicy["POST_MIX_VOLUME"] = 50
 	dnapolicy["POST_MIX"] = 3
-	dnapolicy["POST_MIX_Z"] = 0.25
+	dnapolicy["POST_MIX_Z"] = 0.5
 	dnapolicy["POST_MIX_RATE"] = 3.0
 	return dnapolicy
 }
