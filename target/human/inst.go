@@ -59,6 +59,7 @@ func (a *Human) makeFromIncubate(c *ast.Incubate) *target.Manual {
 		Dev:     a,
 		Label:   "Incubate",
 		Details: fmt.Sprintf("Incubate %q at %s for %s", from, c.Temp.ToString(), c.Time.ToString()),
+		Time:    c.Time.Seconds(),
 	}
 }
 
