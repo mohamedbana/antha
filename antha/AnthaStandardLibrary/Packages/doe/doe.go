@@ -69,6 +69,82 @@ func AddNewResponseFieldandValue(run Run, responsedescriptor string, responseval
 	return
 }
 
+func AddNewResponseField(run Run, responsedescriptor string) (newrun Run) {
+
+	newrun = run
+
+	responsedescriptors := make([]string, len(run.Responsedescriptors))
+	responsevalues := make([]interface{}, len(run.ResponseValues)+1)
+
+	responsedescriptors = run.Responsedescriptors
+
+	for i := range run.ResponseValues {
+		responsevalues[i] = run.ResponseValues[i]
+	}
+	responsedescriptors = append(responsedescriptors, responsedescriptor)
+
+	newrun.Responsedescriptors = responsedescriptors
+	newrun.ResponseValues = responsevalues
+
+	return
+}
+
+func DeleteResponseField(run Run, responsedescriptor string) (newrun Run) {
+
+	newrun = run
+
+	responsedescriptors := make([]string, 0)
+	responsevalues := make([]interface{}, 0)
+
+	for i, descriptor := range run.Responsedescriptors {
+		if strings.ToUpper(descriptor) != strings.ToUpper(responsedescriptor) {
+			responsedescriptors = append(responsedescriptors, descriptor)
+			responsevalues = append(responsevalues, run.ResponseValues[i])
+		}
+	}
+
+	newrun.Responsedescriptors = responsedescriptors
+	newrun.ResponseValues = responsevalues
+
+	return
+}
+
+func ReplaceResponseValue(run Run, responsedescriptor string, responsevalue interface{}) (newrun Run) {
+
+	newrun = run
+
+	responsedescriptors := make([]string, 0)
+	responsevalues := make([]interface{}, 0)
+
+	for i, descriptor := range run.Responsedescriptors {
+		if strings.ToUpper(descriptor) != strings.ToUpper(responsedescriptor) {
+			responsedescriptors = append(responsedescriptors, descriptor)
+			responsevalues = append(responsevalues, run.ResponseValues[i])
+		} else if strings.ToUpper(descriptor) == strings.ToUpper(responsedescriptor) {
+			responsedescriptors = append(responsedescriptors, descriptor)
+			responsevalues = append(responsevalues, responsevalue)
+		}
+	}
+
+	newrun.Responsedescriptors = responsedescriptors
+	newrun.ResponseValues = responsevalues
+
+	return
+}
+
+func DeleteAllResponses(run Run) (newrun Run) {
+
+	newrun = run
+
+	responsedescriptors := make([]string, 0)
+	responsevalues := make([]interface{}, 0)
+
+	newrun.Responsedescriptors = responsedescriptors
+	newrun.ResponseValues = responsevalues
+
+	return
+}
+
 func AddNewFactorFieldandValue(run Run, factordescriptor string, factorvalue interface{}) (newrun Run) {
 
 	newrun = run

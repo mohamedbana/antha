@@ -34,11 +34,11 @@ import (
 // Names corresonding to input parts
 
 //fixed
-// Input parts, one per assembly
 
 // Output plate
 
 // Variable
+// Input parts, one per assembly
 
 // List of assembled parts
 
@@ -129,6 +129,11 @@ func _ScreenAssemblyConditions_specificSteps(_ctx context.Context, _input *Scree
 
 					// add run to well position lookup table
 					_output.Runtowelllocationmap[doerun+"_"+description] = wellpositionarray[counter]
+
+					// replace responses with relevant ones
+					runs[i] = doe.DeleteAllResponses(runs[i])
+
+					runs[i] = doe.AddNewResponseField(runs[i], "Number of Colonies")
 
 					// add additional info for each run
 					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "Location", wellpositionarray[counter])
@@ -256,13 +261,13 @@ func init() {
 			Params: []ParamDesc{
 				{Name: "DXORJMP", Desc: "", Kind: "Parameters"},
 				{Name: "LHDOEFile", Desc: "file containing design for liquid handling DOE\n", Kind: "Parameters"},
-				{Name: "Mastermix", Desc: "", Kind: "Inputs"},
+				{Name: "Mastermix", Desc: "fixed\n", Kind: "Inputs"},
 				{Name: "OutPlate", Desc: "Output plate\n", Kind: "Inputs"},
 				{Name: "OutputDesignFilename", Desc: "", Kind: "Parameters"},
 				{Name: "OutputReactionName", Desc: "Prefix for reaction names\n", Kind: "Parameters"},
 				{Name: "PartNamesArray", Desc: "Names corresonding to input parts\n", Kind: "Parameters"},
 				{Name: "PartVolsArray", Desc: "variable\n\nVolumes corresponding to input parts // coupled with PartsArray and should be equal in length\n", Kind: "Parameters"},
-				{Name: "PartsArray", Desc: "fixed\n\nInput parts, one per assembly\n", Kind: "Inputs"},
+				{Name: "PartsArray", Desc: "Variable\n\nInput parts, one per assembly\n", Kind: "Inputs"},
 				{Name: "ReactionTemp", Desc: "Reaction temperature\n", Kind: "Parameters"},
 				{Name: "ReactionTime", Desc: "Reaction time\n", Kind: "Parameters"},
 				{Name: "ReactionVolume", Desc: "Reaction volume\n", Kind: "Parameters"},

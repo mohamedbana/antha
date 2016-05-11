@@ -20,7 +20,6 @@ import (
 
 Parameters (
 	
-	
 	LHDOEFile string // file containing design for liquid handling DOE
 	DXORJMP string
 	Replicates int
@@ -41,11 +40,11 @@ Parameters (
 Inputs (
 	
 	//fixed
-	PartsArray 			[][]*wtype.LHComponent // Input parts, one per assembly
 	Mastermix 		*wtype.LHComponent
 	OutPlate 		*wtype.LHPlate         // Output plate
 	
 	// Variable
+	PartsArray 			[][]*wtype.LHComponent // Input parts, one per assembly
 )
 
 Outputs (
@@ -62,9 +61,7 @@ Setup {}
 
 Steps {
 	
-	
-	
-	
+
 	// validate presence of doe design file in anthapath
 	if antha.Anthafileexists(LHDOEFile) == false {
 		fmt.Println("This DOE file ", LHDOEFile, " was not found in anthapath ~.antha. Please move it there, change file name and type in antha-lang/antha/microarch/driver/makelhpolicy.go and recompile antha to use this liquidhandling doe design")
@@ -153,7 +150,10 @@ Steps {
 		// add run to well position lookup table 
 		Runtowelllocationmap[doerun+"_"+description]= wellpositionarray[counter]
 		
+	// replace responses with relevant ones
+	runs[i] = doe.DeleteAllResponses(runs[i])
 	
+	runs[i] = doe.AddNewResponseField(runs[i], "Colonies")
 	
 	// add additional info for each run
 	runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","Location", wellpositionarray[counter])
@@ -166,14 +166,10 @@ Steps {
 	
 		// add description:
 	runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","description", description)
-	//runs[i].AddAdditionalValue("Replicate", strconv.Itoa(j+1))
-	//runs[i].AddAdditionalValue("Solution name", TestSols[k].CName)
-	//runs[i].AddAdditionalValue("Volume", strconv.Itoa(wutil.RoundInt(TestSolVolumes[l].RawValue()))+"ul)
+	
 		
 		newRuns = append(newRuns,runs[i])
 		counter++
-		
-		
 		
 		}
 		}
