@@ -127,7 +127,6 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 	}
 
 	logger.Debug(fmt.Sprintf("Total time estimate: %s", d.String()))
-
 	request.TimeEstimate = d.Seconds()
 
 	return nil
