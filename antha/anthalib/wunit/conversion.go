@@ -34,3 +34,10 @@ func VolumetoMass(v Volume, d Density) (m Mass) {
 	m = NewMass(mass, "kg")
 	return m
 }
+
+func VolumeForTargetMass(targetmass Mass, startingconc Concentration) (v Volume) {
+
+	v = NewVolume(float64((targetmass.SIValue()/startingconc.SIValue())*1000000), "ul")
+
+	return v
+}
