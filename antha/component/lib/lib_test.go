@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"sync"
 	"testing"
 
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
@@ -29,6 +28,23 @@ type TInput struct {
 	ParamPath    string
 	ParamData    []byte
 	Dir          string
+}
+
+type TInputs []*TInput
+
+func (a TInputs) Len() int {
+	return len(a)
+}
+
+func (a TInputs) Less(i, j int) bool {
+	if a[i].WorkflowPath == a[j].WorkflowPath {
+		return a[i].ParamPath < a[j].ParamPath
+	}
+	return a[i].WorkflowPath < a[j].WorkflowPath
+}
+
+func (a TInputs) Swap(i, j int) {
+	a[i], a[j] = a[j], a[i]
 }
 
 func findInputs(basePath string) ([]*TInput, error) {
@@ -119,7 +135,12 @@ func runElements(t *testing.T, ctx context.Context, inputs []*TInput) {
 	tgt := target.New()
 	tgt.AddDevice(human.New(human.Opt{CanMix: true, CanIncubate: true}))
 
-	doOne := func(input *TInput) {
+	odir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, input := range inputs {
 		if len(input.Dir) != 0 {
 			if err := os.Chdir(input.Dir); err != nil {
 				t.Fatal(err)
@@ -141,40 +162,9 @@ func runElements(t *testing.T, ctx context.Context, inputs []*TInput) {
 		}
 	}
 
-	items := make(chan *TInput)
-	done := make(chan bool)
-
-	go func() {
-		defer close(items)
-		for _, item := range inputs {
-			select {
-			case items <- item:
-			case <-done:
-				return
-			}
-		}
-	}()
-
-	var wg sync.WaitGroup
-	wg.Add(NumConcurrent)
-	for i := 0; i < NumConcurrent; i += 1 {
-		go func() {
-			defer wg.Done()
-			for {
-				select {
-				case <-done:
-					return
-				case item := <-items:
-					if item == nil {
-						return
-					}
-					doOne(item)
-				}
-			}
-		}()
+	if err := os.Chdir(odir); err != nil {
+		t.Fatal(err)
 	}
-
-	wg.Wait()
 }
 
 func makeContext() (context.Context, error) {
@@ -192,7 +182,7 @@ func makeContext() (context.Context, error) {
 	return ctx, nil
 }
 
-func TestElementsWithExampleInputs(t *testing.T) {
+func getExampleInputs(t *testing.T) []*TInput {
 	flag.Parse()
 	args := flag.Args()
 	input := "../../examples"
@@ -208,14 +198,93 @@ func TestElementsWithExampleInputs(t *testing.T) {
 		t.Fatalf("no tests found under path %q", input)
 	}
 
+	sort.Sort(TInputs(inputs))
+
+	return inputs
+}
+
+// Divide l into n pieces, return indices for ith piece
+func divide(i, n, l int) (int, int) {
+	each := (l + n - 1) / n
+	if i == n-1 {
+		return i * each, l
+	} else {
+		return i * each, (i + 1) * each
+	}
+}
+
+func TestElementsWithExampleInputs0(t *testing.T) {
+	t.Parallel()
+
 	ctx, err := makeContext()
 	if err != nil {
 		t.Fatal(err)
 	}
-	runElements(t, ctx, inputs)
+
+	inputs := getExampleInputs(t)
+	first, last := divide(0, 5, len(inputs))
+
+	runElements(t, ctx, inputs[first:last])
+}
+
+func TestElementsWithExampleInputs1(t *testing.T) {
+	t.Parallel()
+
+	ctx, err := makeContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	inputs := getExampleInputs(t)
+	first, last := divide(1, 5, len(inputs))
+
+	runElements(t, ctx, inputs[first:last])
+}
+
+func TestElementsWithExampleInputs2(t *testing.T) {
+	t.Parallel()
+
+	ctx, err := makeContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	inputs := getExampleInputs(t)
+	first, last := divide(2, 5, len(inputs))
+
+	runElements(t, ctx, inputs[first:last])
+}
+
+func TestElementsWithExampleInputs3(t *testing.T) {
+	t.Parallel()
+
+	ctx, err := makeContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	inputs := getExampleInputs(t)
+	first, last := divide(3, 5, len(inputs))
+
+	runElements(t, ctx, inputs[first:last])
+}
+
+func TestElementsWithExampleInputs4(t *testing.T) {
+	t.Parallel()
+
+	ctx, err := makeContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	inputs := getExampleInputs(t)
+	first, last := divide(4, 5, len(inputs))
+
+	runElements(t, ctx, inputs[first:last])
 }
 
 func TestElementsWithDefaultInputs(t *testing.T) {
+	t.Parallel()
 	type Process struct {
 		Component string `json:"component"`
 	}
