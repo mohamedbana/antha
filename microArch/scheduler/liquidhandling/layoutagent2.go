@@ -274,6 +274,7 @@ func choose_plates(request *LHRequest, pc []PlateChoice, order []string) []Plate
 			}
 
 			pc[ass].Assigned = append(pc[ass].Assigned, v.ID)
+			pc[ass].Wells = append(pc[ass].Wells, "")
 		}
 	}
 
@@ -315,6 +316,9 @@ func modpc(choice PlateChoice, nwell int) []PlateChoice {
 			// new ID
 			ID = wtype.GetUUID()
 		}
+		fmt.Println("S: ", s, " E: ", e)
+		fmt.Println("L: ", len(choice.Assigned), " ", choice.Assigned)
+		fmt.Println("W: ", len(choice.Wells), " ", choice.Wells)
 		r = append(r, PlateChoice{choice.Platetype, choice.Assigned[s:e], ID, choice.Wells[s:e]})
 	}
 	return r
@@ -428,7 +432,9 @@ func make_layouts(request *LHRequest, pc []PlateChoice) {
 
 			var assignment string
 
+			fmt.Println("OK ONE OF THESE HAS TO BE THERE")
 			if well == "" {
+				fmt.Println("WTAF????")
 				wc := plat.NextEmptyWell(it)
 
 				if wc.IsZero() {
@@ -444,6 +450,7 @@ func make_layouts(request *LHRequest, pc []PlateChoice) {
 				assignment = c.ID + ":" + wc.FormatA1()
 				c.Wells[i] = wc.FormatA1()
 			} else {
+				fmt.Println("WELL HERE: ", well)
 				assignment = c.ID + ":" + well
 			}
 

@@ -38,6 +38,7 @@ func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProper
 		//	request.InstructionSet.Add(ConvertInstruction(request.LHInstructions[insID], robot))
 		transfers = append(transfers, ConvertInstruction(request.LHInstructions[insID], robot))
 		cmp := fmt.Sprintf("%s_%s", request.LHInstructions[insID].ComponentsMoving(), request.LHInstructions[insID].Generation())
+
 		ar, ok := agg[cmp]
 		if !ok {
 			ar = make([]int, 0, 1)

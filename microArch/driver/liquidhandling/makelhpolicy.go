@@ -62,6 +62,7 @@ func MakePolicies() map[string]LHPolicy {
 	pols["DispenseAboveLiquid"] = MakeDispenseAboveLiquidPolicy()
 	pols["PEG"] = MakePEGPolicy()
 	pols["Protoplasts"] = MakeProtoplastPolicy()
+	pols["dna_mix"] = MakeDNAMixPolicy()
 	//      pols["lysate"] = MakeLysatePolicy()
 
 	/*policies, names := PolicyMaker(Allpairs, "DOE_run", false)
@@ -297,8 +298,6 @@ func MakeSolventPolicy() LHPolicy {
 
 func MakeDNAPolicy() LHPolicy {
 	dnapolicy := make(LHPolicy, 10)
-	dnapolicy["POST_MIX_VOLUME"] = 50
-	dnapolicy["POST_MIX"] = 3
 	dnapolicy["ASPSPEED"] = 2.0
 	dnapolicy["DSPSPEED"] = 2.0
 	dnapolicy["CAN_MULTI"] = false
@@ -308,6 +307,15 @@ func MakeDNAPolicy() LHPolicy {
 	dnapolicy["DSPZOFFSET"] = 0.5
 	dnapolicy["TIP_REUSE_LIMIT"] = 0
 	dnapolicy["NO_AIR_DISPENSE"] = true
+	return dnapolicy
+}
+
+func MakeDNAMixPolicy() LHPolicy {
+	dnapolicy := MakeDNAPolicy()
+	dnapolicy["POST_MIX_VOLUME"] = 50
+	dnapolicy["POST_MIX"] = 3
+	dnapolicy["POST_MIX_Z"] = 0.5
+	dnapolicy["POST_MIX_RATE"] = 3.0
 	return dnapolicy
 }
 
@@ -405,8 +413,9 @@ func MakeNeedToMixPolicy() LHPolicy {
 
 func MakeDefaultPolicy() LHPolicy {
 	defaultpolicy := make(LHPolicy, 10)
-	defaultpolicy["ASP_SPEED"] = 3.0
-	defaultpolicy["DSP_SPEED"] = 3.0
+	// don't set this here -- use defaultpipette speed or there will be inconsistencies
+	// defaultpolicy["ASP_SPEED"] = 3.0
+	// defaultpolicy["DSP_SPEED"] = 3.0
 	defaultpolicy["TOUCHOFF"] = false
 	defaultpolicy["TOUCHOFFSET"] = 0.5
 	defaultpolicy["ASPREFERENCE"] = 0
@@ -424,7 +433,7 @@ func MakeDefaultPolicy() LHPolicy {
 	defaultpolicy["PTZREFERENCE"] = 1
 	defaultpolicy["PTZOFFSET"] = -0.5
 	defaultpolicy["NO_AIR_DISPENSE"] = false
-	defaultpolicy["DEFAULTPIPETTESPEED"] = 1.0
+	defaultpolicy["DEFAULTPIPETTESPEED"] = 3.0
 	defaultpolicy["MANUALPTZ"] = false
 	defaultpolicy["JUSTBLOWOUT"] = false
 	defaultpolicy["DONT_BE_DIRTY"] = true
