@@ -30,6 +30,7 @@ Parameters (
 	ReactionTime 		Time        // Reaction time
 	OutputReactionName	string      // Prefix for reaction names
 	ReactionVolume 	Volume     // Reaction volume
+	MasterMixVolume Volume
 	
 	// variable
 	PartVolsArray 		[][]Volume // Volumes corresponding to input parts // coupled with PartsArray and should be equal in length
@@ -42,7 +43,7 @@ Inputs (
 	//fixed
 	Mastermix 		*wtype.LHComponent
 	OutPlate 		*wtype.LHPlate         // Output plate
-	
+	Water 			*wtype.LHComponent
 	// Variable
 	PartsArray 			[][]*wtype.LHComponent // Input parts, one per assembly
 )
@@ -118,6 +119,7 @@ Steps {
 		result := RunSteps(TypeIISConstructAssemblyMMX,
                 Parameters{
                 	ReactionVolume: ReactionVolume,
+					MasterMixVolume: MasterMixVolume,
                         PartVols: PartVolsArray[k],
                         PartNames: PartNamesArray[j],
                         ReactionTemp: ReactionTemp,
@@ -129,6 +131,7 @@ Steps {
                 }, Inputs{
                         Parts: PartsArray[j],
                         MasterMix:Mastermix,
+						 Water: Water,
                         OutPlate: OutPlate,
                 })
 		Reactions = append(Reactions, result.Outputs.Reaction)

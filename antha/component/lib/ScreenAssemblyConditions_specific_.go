@@ -98,6 +98,7 @@ func _ScreenAssemblyConditions_specificSteps(_ctx context.Context, _input *Scree
 					fmt.Println("WellPositionarray", wellpositionarray, "OutPlate.WlsX", _input.OutPlate.WlsX)
 
 					result := TypeIISConstructAssemblyMMXRunSteps(_ctx, &TypeIISConstructAssemblyMMXInput{ReactionVolume: _input.ReactionVolume,
+						MasterMixVolume:    _input.MasterMixVolume,
 						PartVols:           _input.PartVolsArray[k],
 						PartNames:          _input.PartNamesArray[j],
 						ReactionTemp:       _input.ReactionTemp,
@@ -109,6 +110,7 @@ func _ScreenAssemblyConditions_specificSteps(_ctx context.Context, _input *Scree
 
 						Parts:     _input.PartsArray[j],
 						MasterMix: _input.Mastermix,
+						Water:     _input.Water,
 						OutPlate:  _input.OutPlate},
 					)
 					_output.Reactions = append(_output.Reactions, result.Outputs.Reaction)
@@ -133,7 +135,7 @@ func _ScreenAssemblyConditions_specificSteps(_ctx context.Context, _input *Scree
 					// replace responses with relevant ones
 					runs[i] = doe.DeleteAllResponses(runs[i])
 
-					runs[i] = doe.AddNewResponseField(runs[i], "Number of Colonies")
+					runs[i] = doe.AddNewResponseField(runs[i], "Colonies")
 
 					// add additional info for each run
 					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "Location", wellpositionarray[counter])
@@ -146,9 +148,6 @@ func _ScreenAssemblyConditions_specificSteps(_ctx context.Context, _input *Scree
 
 					// add description:
 					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "description", description)
-					//runs[i].AddAdditionalValue("Replicate", strconv.Itoa(j+1))
-					//runs[i].AddAdditionalValue("Solution name", TestSols[k].CName)
-					//runs[i].AddAdditionalValue("Volume", strconv.Itoa(wutil.RoundInt(TestSolVolumes[l].RawValue()))+"ul)
 
 					newRuns = append(newRuns, runs[i])
 					counter++
@@ -221,6 +220,7 @@ type ScreenAssemblyConditions_specificElement struct {
 type ScreenAssemblyConditions_specificInput struct {
 	DXORJMP              string
 	LHDOEFile            string
+	MasterMixVolume      wunit.Volume
 	Mastermix            *wtype.LHComponent
 	OutPlate             *wtype.LHPlate
 	OutputDesignFilename string
@@ -232,6 +232,7 @@ type ScreenAssemblyConditions_specificInput struct {
 	ReactionTime         wunit.Time
 	ReactionVolume       wunit.Volume
 	Replicates           int
+	Water                *wtype.LHComponent
 }
 
 type ScreenAssemblyConditions_specificOutput struct {
@@ -261,6 +262,7 @@ func init() {
 			Params: []ParamDesc{
 				{Name: "DXORJMP", Desc: "", Kind: "Parameters"},
 				{Name: "LHDOEFile", Desc: "file containing design for liquid handling DOE\n", Kind: "Parameters"},
+				{Name: "MasterMixVolume", Desc: "", Kind: "Parameters"},
 				{Name: "Mastermix", Desc: "fixed\n", Kind: "Inputs"},
 				{Name: "OutPlate", Desc: "Output plate\n", Kind: "Inputs"},
 				{Name: "OutputDesignFilename", Desc: "", Kind: "Parameters"},
@@ -272,6 +274,7 @@ func init() {
 				{Name: "ReactionTime", Desc: "Reaction time\n", Kind: "Parameters"},
 				{Name: "ReactionVolume", Desc: "Reaction volume\n", Kind: "Parameters"},
 				{Name: "Replicates", Desc: "", Kind: "Parameters"},
+				{Name: "Water", Desc: "", Kind: "Inputs"},
 				{Name: "NumberofReactions", Desc: "", Kind: "Data"},
 				{Name: "Reactions", Desc: "List of assembled parts\n", Kind: "Outputs"},
 				{Name: "Runs", Desc: "", Kind: "Data"},
