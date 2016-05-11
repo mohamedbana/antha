@@ -94,7 +94,7 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	// shallow round well flat bottom 96 on riser
 	rwshp = wtype.NewShape("cylinder", "mm", 8.2, 8.2, 11)
 	welltype = wtype.NewLHWell("SRWFB96", "", "", "ul", 500, 10, rwshp, 0, 8.2, 8.2, 11, 1.0, "mm")
-	plate = wtype.NewLHPlate("SRWFB96_riser", "Unknown", 8, 12, 15, "mm", welltype, 9, 9, 0.0, 0.0, 41.0)
+	plate = wtype.NewLHPlate("SRWFB96_riser", "Unknown", 8, 12, 15, "mm", welltype, 9, 9, 0.0, 0.0, 40.0)
 	plates[plate.Type] = plate
 
 	// deep well strip trough 12
@@ -126,7 +126,7 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 250, 5, cone, 0, 5.5, 5.5, 20.4, 1.4, "mm")
 	//plate = wtype.NewLHPlate("pcrplate", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 6.5)
 	//plates[plate.Type] = plate
-	plate = wtype.NewLHPlate("pcrplate_with_cooler", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 15.5)
+	plate = wtype.NewLHPlate("pcrplate_with_cooler", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 14.5)
 	plates[plate.Type] = plate
 
 	// pcr plate skirted (on riser)
@@ -197,7 +197,7 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	wellyoffset = 4.5 //centre of well to centre of neighbouring well in y direction
 	xstart = -2.5     // distance from top left side of plate to first well
 	ystart = -2.5     // distance from top left side of plate to first well
-	zstart = 42       // offset of bottom of deck to bottom of well
+	zstart = 40       // offset of bottom of deck to bottom of well
 
 	square = wtype.NewShape("box", "mm", 4, 4, 14)
 	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
