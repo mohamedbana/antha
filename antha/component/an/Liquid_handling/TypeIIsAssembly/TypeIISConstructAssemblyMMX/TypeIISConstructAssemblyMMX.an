@@ -9,12 +9,13 @@ import (
 // Input parameters for this protocol (data)
 Parameters (
 	ReactionVolume				Volume
+	MasterMixVolume				Volume
 	PartVols				[]Volume
 	PartNames				[]string
 	ReactionTemp				Temperature
 	ReactionTime				Time
-	//InactivationTemp			Temperature
-	//InactivationTime			Time
+	InactivationTemp			Temperature
+	InactivationTime			Time
 	OutputReactionName			string
 	OutputLocation 				string
 	OutputPlateNum				int
@@ -25,6 +26,7 @@ Parameters (
 Inputs (
 	Parts			[]*wtype.LHComponent
 	MasterMix		*wtype.LHComponent
+	Water 			*wtype.LHComponent
 	OutPlate		*wtype.LHPlate
 )
 
@@ -46,20 +48,20 @@ Setup {}
 // for every input
 Steps {
 	samples := make([]*wtype.LHComponent, 0)
-	mmxSample:=mixer.SampleForTotalVolume(MasterMix,ReactionVolume)
+	
+	waterSample:=mixer.SampleForTotalVolume(Water,ReactionVolume)
+	samples = append(samples, waterSample)
+	
+	mmxSample:=mixer.Sample(MasterMix,MasterMixVolume)
 	samples = append(samples, mmxSample)
 
 	for k, part := range Parts {
 		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", PartNames[k], " vol ", PartVols[k])
 		
-		//if k == len(Parts)-1{
-			part.Type = wtype.LiquidTypeFromString(LHPolicyName)
-		//}
+		part.Type = wtype.LiquidTypeFromString(LHPolicyName)
 		
 		partSample := mixer.Sample(part, PartVols[k])
 		partSample.CName = PartNames[k]
-		
-		
 		samples = append(samples, partSample)
 	}
 
