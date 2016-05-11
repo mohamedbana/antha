@@ -36,6 +36,9 @@ import (
 	"github.com/antha-lang/antha/internal/github.com/ghodss/yaml"
 )
 
+var DOEliquidhandlingFile = "8run4cpFactorial.xlsx" //"FullFactorial.xlsx" // "ScreenLHPolicyDOE2.xlsx"
+var DXORJMP = "JMP"                                 //"DX"
+
 func MakePolicies() map[string]LHPolicy {
 	pols := make(map[string]LHPolicy)
 
@@ -70,9 +73,10 @@ func MakePolicies() map[string]LHPolicy {
 		pols[names[i]] = policy
 	}
 	*/
-	if antha.Anthafileexists("ScreenLHPolicyDOE2.xlsx") {
-		fmt.Println("found lhpolicy doe file")
-		policies, names, err := PolicyMakerfromDesign("ScreenLHPolicyDOE2.xlsx", "DOE_run")
+
+	if antha.Anthafileexists(DOEliquidhandlingFile) {
+		fmt.Println("found lhpolicy doe file", DOEliquidhandlingFile)
+		policies, names, _, err := PolicyMakerfromDesign(DXORJMP, DOEliquidhandlingFile, "DOE_run")
 
 		for i, policy := range policies {
 			pols[names[i]] = policy
@@ -81,19 +85,36 @@ func MakePolicies() map[string]LHPolicy {
 			panic(err)
 		}
 	} else {
-		fmt.Println("no lhpolicy doe file found")
+		fmt.Println("no lhpolicy doe file found named: ", DOEliquidhandlingFile)
 	}
 	return pols
 
 }
 
-func PolicyMakerfromDesign(dxdesignfilename string, prepend string) (policies []LHPolicy, names []string, err error) {
-	runs, err := RunsFromDXDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), []string{"Pre_MIX", "POST_MIX"})
-	if err != nil {
-		return policies, names, err
+func PolicyMakerfromDesign(DXORJMP string, dxdesignfilename string, prepend string) (policies []LHPolicy, names []string, runs []Run, err error) {
+
+	if DXORJMP == "DX" {
+
+		runs, err = RunsFromDXDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), []string{"Pre_MIX", "POST_MIX"})
+		if err != nil {
+			return policies, names, runs, err
+		}
+
+	} else if DXORJMP == "JMP" {
+
+		patterncolumn := 0
+		factorcolumns := []int{1, 2, 3, 4, 5}
+		responsecolumns := []int{6, 7, 8, 9}
+
+		runs, err = RunsFromJMPDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), patterncolumn, factorcolumns, responsecolumns, []string{"PRE_MIX", "POST_MIX"})
+		if err != nil {
+			return policies, names, runs, err
+		}
+	} else {
+		return policies, names, runs, fmt.Errorf("only JMP or DX allowed as valid inputs for DXORJMP variable")
 	}
 	policies, names = PolicyMakerfromRuns(runs, prepend, false)
-	return
+	return policies, names, runs, err
 }
 
 func PolicyMaker(factors []DOEPair, nameprepend string, concatfactorlevelsinname bool) (policies []LHPolicy, names []string) {

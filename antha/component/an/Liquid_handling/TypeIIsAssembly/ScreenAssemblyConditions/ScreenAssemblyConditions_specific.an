@@ -1,0 +1,195 @@
+// Assemble multiple assemblies using TypeIIs construct assembly
+protocol ScreenAssemblyConditions_specific
+
+import (
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"fmt"
+	
+	
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
+	
+	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
+
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
+
+	antha "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
+	"strings"
+	"strconv"
+	
+)
+
+Parameters (
+	
+	LHDOEFile string // file containing design for liquid handling DOE
+	DXORJMP string
+	Replicates int
+	OutputDesignFilename string
+	// fixed factors
+	
+	ReactionTemp 		Temperature // Reaction temperature
+	ReactionTime 		Time        // Reaction time
+	OutputReactionName	string      // Prefix for reaction names
+	ReactionVolume 	Volume     // Reaction volume
+	MasterMixVolume Volume
+	
+	// variable
+	PartVolsArray 		[][]Volume // Volumes corresponding to input parts // coupled with PartsArray and should be equal in length
+	PartNamesArray		[][]string // Names corresonding to input parts
+	
+)
+
+Inputs (
+	
+	//fixed
+	Mastermix 		*wtype.LHComponent
+	OutPlate 		*wtype.LHPlate         // Output plate
+	Water 			*wtype.LHComponent
+	// Variable
+	PartsArray 			[][]*wtype.LHComponent // Input parts, one per assembly
+)
+
+Outputs (
+	Reactions []*wtype.LHComponent      // List of assembled parts
+)
+
+Data (
+	Runtowelllocationmap map[string]string
+	Runs []doe.Run
+	NumberofReactions int
+)
+
+Setup {}
+
+Steps {
+	
+
+	// validate presence of doe design file in anthapath
+	if antha.Anthafileexists(LHDOEFile) == false {
+		fmt.Println("This DOE file ", LHDOEFile, " was not found in anthapath ~.antha. Please move it there, change file name and type in antha-lang/antha/microarch/driver/makelhpolicy.go and recompile antha to use this liquidhandling doe design")
+		fmt.Println("currently set to ", liquidhandling.DOEliquidhandlingFile, " type ", liquidhandling.DXORJMP)
+		}else{
+		fmt.Println("found lhpolicy doe file", LHDOEFile)
+	}
+	
+	// declare some global variables for use later
+	var wellpositionarray = make([]string, 0)
+	var alphabet = wutil.MakeAlphabetArray() 
+	Runtowelllocationmap = make(map[string]string)
+	counter := 0
+	var platenum = 1
+	
+	
+	
+	// range through well coordinates
+	for j := 0; j < OutPlate.WlsX; j++ {
+		for i := 0; i < OutPlate.WlsY; i++ { //countingfrom1iswhatmakesushuman := j + 1
+			//k = k + 1
+			wellposition := string(alphabet[i]) + strconv.Itoa(j+1)
+			//fmt.Println(wellposition, k)
+			wellpositionarray = append(wellpositionarray, wellposition)
+		}
+	
+	}
+	
+	_, names, runs, err := liquidhandling.PolicyMakerfromDesign(DXORJMP,LHDOEFile, "DOE_run")
+	if err != nil{
+		panic(err)
+	}
+	
+	var newRuns = make([]doe.Run,0)
+	
+	
+	for l := 0; l < Replicates;l++{	
+	
+	for k := range PartVolsArray {
+		
+		for j := range PartNamesArray{
+		
+		for i := 0; i < len(runs);i++ {
+		
+		if counter==((OutPlate.WlsX*OutPlate.WlsY)){
+			fmt.Println("plate full, counter = ", counter)
+			platenum++
+			counter = 0
+		}
+		
+		fmt.Println("counter:",counter)
+		fmt.Println("WellPositionarray",wellpositionarray,"OutPlate.WlsX",OutPlate.WlsX)
+		
+		result := RunSteps(TypeIISConstructAssemblyMMX,
+                Parameters{
+                	ReactionVolume: ReactionVolume,
+					MasterMixVolume: MasterMixVolume,
+                        PartVols: PartVolsArray[k],
+                        PartNames: PartNamesArray[j],
+                        ReactionTemp: ReactionTemp,
+                        ReactionTime: ReactionTime,
+                        OutputReactionName: fmt.Sprintf("%s%d", OutputReactionName, counter),
+						OutputLocation: wellpositionarray[counter],
+						OutputPlateNum:platenum,
+						LHPolicyName: names[i],
+                }, Inputs{
+                        Parts: PartsArray[j],
+                        MasterMix:Mastermix,
+						 Water: Water,
+                        OutPlate: OutPlate,
+                })
+		Reactions = append(Reactions, result.Outputs.Reaction)
+		
+		// get annotation info
+		doerun := names[i]
+		
+		partvols := make([]string,0)
+		
+		for _, volume := range PartVolsArray[k] {
+		partvols = append(partvols,volume.ToString())
+		} //strconv.Itoa(wutil.RoundInt(number))+"ul"
+		
+		solutionnames := PartNamesArray[j]
+		
+		description := strings.Join(partvols,":")+"_"+strings.Join(solutionnames,":")+"_replicate"+strconv.Itoa(l+1)+"_platenum"+strconv.Itoa(platenum)
+		//setpoints := volume+"_"+solutionname+"_replicate"+strconv.Itoa(j+1)+"_platenum"+strconv.Itoa(platenum)
+		
+		// add run to well position lookup table 
+		Runtowelllocationmap[doerun+"_"+description]= wellpositionarray[counter]
+		
+	// replace responses with relevant ones
+	runs[i] = doe.DeleteAllResponses(runs[i])
+	
+	runs[i] = doe.AddNewResponseField(runs[i], "Colonies")
+	
+	// add additional info for each run
+	runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","Location", wellpositionarray[counter])
+	
+	// add run order:
+	runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","runorder", counter)
+	
+	// add setpoint printout to double check correct match up:
+	runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","doerun", doerun)
+	
+		// add description:
+	runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","description", description)
+	
+		
+		newRuns = append(newRuns,runs[i])
+		counter++
+		
+		}
+		}
+        }
+		
+		
+		// export overall DOE design file showing all well locations for all conditions
+	_ = doe.JMPXLSXFilefromRuns(newRuns,OutputDesignFilename)
+		
+		Runs = newRuns
+		NumberofReactions = len(Runs) //counter //len(Reactions)
+}
+
+}
+
+
+
+Analysis { }
+
+Validation { }

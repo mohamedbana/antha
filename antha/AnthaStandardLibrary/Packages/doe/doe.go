@@ -69,7 +69,85 @@ func AddNewResponseFieldandValue(run Run, responsedescriptor string, responseval
 	return
 }
 
+func AddNewResponseField(run Run, responsedescriptor string) (newrun Run) {
+
+	newrun = run
+
+	responsedescriptors := make([]string, len(run.Responsedescriptors))
+	responsevalues := make([]interface{}, len(run.ResponseValues)+1)
+
+	responsedescriptors = run.Responsedescriptors
+
+	for i := range run.ResponseValues {
+		responsevalues[i] = run.ResponseValues[i]
+	}
+	responsedescriptors = append(responsedescriptors, responsedescriptor)
+
+	newrun.Responsedescriptors = responsedescriptors
+	newrun.ResponseValues = responsevalues
+
+	return
+}
+
+func DeleteResponseField(run Run, responsedescriptor string) (newrun Run) {
+
+	newrun = run
+
+	responsedescriptors := make([]string, 0)
+	responsevalues := make([]interface{}, 0)
+
+	for i, descriptor := range run.Responsedescriptors {
+		if strings.ToUpper(descriptor) != strings.ToUpper(responsedescriptor) {
+			responsedescriptors = append(responsedescriptors, descriptor)
+			responsevalues = append(responsevalues, run.ResponseValues[i])
+		}
+	}
+
+	newrun.Responsedescriptors = responsedescriptors
+	newrun.ResponseValues = responsevalues
+
+	return
+}
+
+func ReplaceResponseValue(run Run, responsedescriptor string, responsevalue interface{}) (newrun Run) {
+
+	newrun = run
+
+	responsedescriptors := make([]string, 0)
+	responsevalues := make([]interface{}, 0)
+
+	for i, descriptor := range run.Responsedescriptors {
+		if strings.ToUpper(descriptor) != strings.ToUpper(responsedescriptor) {
+			responsedescriptors = append(responsedescriptors, descriptor)
+			responsevalues = append(responsevalues, run.ResponseValues[i])
+		} else if strings.ToUpper(descriptor) == strings.ToUpper(responsedescriptor) {
+			responsedescriptors = append(responsedescriptors, descriptor)
+			responsevalues = append(responsevalues, responsevalue)
+		}
+	}
+
+	newrun.Responsedescriptors = responsedescriptors
+	newrun.ResponseValues = responsevalues
+
+	return
+}
+
+func DeleteAllResponses(run Run) (newrun Run) {
+
+	newrun = run
+
+	responsedescriptors := make([]string, 0)
+	responsevalues := make([]interface{}, 0)
+
+	newrun.Responsedescriptors = responsedescriptors
+	newrun.ResponseValues = responsevalues
+
+	return
+}
+
 func AddNewFactorFieldandValue(run Run, factordescriptor string, factorvalue interface{}) (newrun Run) {
+
+	newrun = run
 
 	factordescriptors := make([]string, len(run.Factordescriptors))
 	factorvalues := make([]interface{}, len(run.Setpoints))
@@ -86,19 +164,51 @@ func AddNewFactorFieldandValue(run Run, factordescriptor string, factorvalue int
 	return
 }
 
-func (run Run) AddAdditionalValue(additionalsubheader string, additionalvalue interface{}) {
+func AddAdditionalValue(run Run, additionalsubheader string, additionalvalue interface{}) (newrun Run) {
 
-	for i, descriptor := range run.AdditionalSubheaders {
+	newrun = run
+
+	values := make([]interface{}, 0)
+
+	for _, value := range run.AdditionalValues {
+		values = append(values, value)
+	}
+
+	for _, descriptor := range run.AdditionalSubheaders {
 		if strings.ToUpper(descriptor) == strings.ToUpper(additionalsubheader) {
-			run.AdditionalValues[i] = additionalvalue
+			values = append(values, additionalvalue)
 		}
 	}
 
+	newrun.AdditionalValues = values
+
+	return
 }
 
-func (run Run) AddAdditionalHeaders(additionalheader string, additionalsubheader string) {
+func ReplaceAdditionalValue(run Run, additionalsubheader string, additionalvalue interface{}) (newrun Run) {
 
-	headers := make([]string, len(run.AdditionalHeaders))
+	newrun = run
+
+	values := make([]interface{}, len(run.AdditionalSubheaders))
+
+	for i, descriptor := range run.AdditionalSubheaders {
+		if strings.ToUpper(descriptor) == strings.ToUpper(additionalsubheader) {
+			values[i] = additionalvalue
+		} else {
+			values[i] = run.AdditionalValues[i]
+		}
+	}
+
+	newrun.AdditionalValues = values
+
+	return
+}
+
+func AddAdditionalHeaders(run Run, additionalheader string, additionalsubheader string) (newrun Run) {
+
+	newrun = run
+
+	headers := make([]string, 0)
 
 	for _, header := range run.AdditionalHeaders {
 		headers = append(headers, header)
@@ -106,7 +216,7 @@ func (run Run) AddAdditionalHeaders(additionalheader string, additionalsubheader
 
 	headers = append(headers, additionalheader)
 
-	subheaders := make([]string, len(run.AdditionalSubheaders))
+	subheaders := make([]string, 0)
 
 	for _, subheader := range run.AdditionalSubheaders {
 		subheaders = append(subheaders, subheader)
@@ -114,12 +224,26 @@ func (run Run) AddAdditionalHeaders(additionalheader string, additionalsubheader
 
 	subheaders = append(subheaders, additionalsubheader)
 
+	newrun.AdditionalHeaders = headers
+	newrun.AdditionalSubheaders = subheaders
+
+	fmt.Println("newrun: ", newrun)
+	return
+
 }
 
-func (run Run) AddAdditionalHeaderandValue(additionalheader string, additionalsubheader string, additionalvalue interface{}) {
-	run.AddAdditionalHeaders(additionalheader, additionalsubheader)
-	run.AddAdditionalValue(additionalsubheader, additionalvalue)
+func AddAdditionalHeaderandValue(run Run, additionalheader string, additionalsubheader string, additionalvalue interface{}) (newrun Run) {
 
+	// only add column if no column with header exists
+	if search.InSlice(additionalsubheader, run.AdditionalSubheaders) == false {
+
+		midrun := AddAdditionalHeaders(run, additionalheader, additionalsubheader)
+		fmt.Println("midrun: ", midrun)
+		newrun = AddAdditionalValue(midrun, additionalsubheader, additionalvalue)
+	} else {
+		newrun = ReplaceAdditionalValue(run, additionalsubheader, additionalvalue)
+	}
+	return
 }
 
 func (run Run) CheckAdditionalInfo(subheader string, value interface{}) bool {
@@ -141,7 +265,8 @@ func (run Run) GetAdditionalInfo(subheader string) (value interface{}, err error
 
 		}
 	}
-	return value, fmt.Errorf("header not found")
+	fmt.Println("Header: ", subheader)
+	return value, fmt.Errorf("header, ", subheader, " not found in ", run.AdditionalSubheaders)
 }
 
 func AddFixedFactors(runs []Run, fixedfactors []DOEPair) (runswithfixedfactors []Run) {
@@ -292,7 +417,7 @@ func ParseRunWellPair(pair string, nameappendage string) (runnumber int, well st
 	return
 }
 
-func AddWelllocations(xlsxfile string, oldsheet int, runnumbertowellcombos []string, nameappendage string, pathtosave string, extracolumnheaders []string, extracolumnvalues []interface{}) error {
+func AddWelllocations(DXORJMP string, xlsxfile string, oldsheet int, runnumbertowellcombos []string, nameappendage string, pathtosave string, extracolumnheaders []string, extracolumnvalues []interface{}) error {
 
 	var xlsxcell *xlsx.Cell
 
@@ -406,13 +531,16 @@ func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) 
 							return runs, err
 						}
 					}
+				} else if strings.ToUpper(cell.Value) == "TRUE" {
+					setpoint = true //cell.SetBool(true)
+				} else if strings.ToUpper(cell.Value) == "FALSE" {
+					setpoint = false //cell.SetBool(false)
+				} else if celltype == 3 {
+					setpoint = cell.Bool()
 				} else {
 					setpoint = cell.String()
 				}
 
-				if celltype == 3 {
-					setpoint = cell.Bool()
-				}
 				factordescriptors = append(factordescriptors, factrodescriptor)
 				setpoints = append(setpoints, setpoint)
 
@@ -608,7 +736,7 @@ func DXXLSXFilefromRuns(runs []Run, outputfilename string) (xlsxfile *xlsx.File)
 
 // jmp
 
-func RunsFromJMPDesign(xlsx string, factorcolumns []int, intfactors []string) (runs []Run, err error) {
+func RunsFromJMPDesign(xlsx string, patterncolumn int, factorcolumns []int, responsecolumns []int, intfactors []string) (runs []Run, err error) {
 	file, err := spreadsheet.OpenFile(xlsx)
 	if err != nil {
 		return runs, err
@@ -640,7 +768,7 @@ func RunsFromJMPDesign(xlsx string, factorcolumns []int, intfactors []string) (r
 
 			if search.Contains(factorcolumns, j) {
 				factororresponse = "Factor"
-			} else {
+			} else if search.Contains(responsecolumns, j) && j != patterncolumn {
 				factororresponse = "Response"
 			}
 
@@ -664,12 +792,14 @@ func RunsFromJMPDesign(xlsx string, factorcolumns []int, intfactors []string) (r
 							return runs, err
 						}
 					}
+				} else if cell.Value == "TRUE" {
+					setpoint = true //cell.SetBool(true)
+				} else if cell.Value == "FALSE" {
+					setpoint = false //cell.SetBool(false)
+				} else if celltype == 3 {
+					setpoint = cell.Bool()
 				} else {
 					setpoint = cell.String()
-				}
-
-				if celltype == 3 {
-					setpoint = cell.Bool()
 				}
 				factordescriptors = append(factordescriptors, factrodescriptor)
 				setpoints = append(setpoints, setpoint)
@@ -700,7 +830,7 @@ func RunsFromJMPDesign(xlsx string, factorcolumns []int, intfactors []string) (r
 					responsevalues = append(responsevalues, responsevalue)
 				}
 
-			} else {
+			} else /*if j != patterncolumn*/ {
 				descriptor = sheet.Cell(0, j).String()
 				responsedescriptor := descriptor
 

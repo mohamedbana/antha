@@ -28,11 +28,18 @@ func _TypeIISConstructAssemblyMMXSetup(_ctx context.Context, _input *TypeIISCons
 // for every input
 func _TypeIISConstructAssemblyMMXSteps(_ctx context.Context, _input *TypeIISConstructAssemblyMMXInput, _output *TypeIISConstructAssemblyMMXOutput) {
 	samples := make([]*wtype.LHComponent, 0)
-	mmxSample := mixer.SampleForTotalVolume(_input.MasterMix, _input.ReactionVolume)
+
+	waterSample := mixer.SampleForTotalVolume(_input.Water, _input.ReactionVolume)
+	samples = append(samples, waterSample)
+
+	mmxSample := mixer.Sample(_input.MasterMix, _input.MasterMixVolume)
 	samples = append(samples, mmxSample)
 
 	for k, part := range _input.Parts {
 		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", _input.PartNames[k], " vol ", _input.PartVols[k])
+
+		part.Type = wtype.LiquidTypeFromString(_input.LHPolicyName)
+
 		partSample := mixer.Sample(part, _input.PartVols[k])
 		partSample.CName = _input.PartNames[k]
 		samples = append(samples, partSample)
@@ -109,7 +116,9 @@ type TypeIISConstructAssemblyMMXElement struct {
 type TypeIISConstructAssemblyMMXInput struct {
 	InactivationTemp   wunit.Temperature
 	InactivationTime   wunit.Time
+	LHPolicyName       string
 	MasterMix          *wtype.LHComponent
+	MasterMixVolume    wunit.Volume
 	OutPlate           *wtype.LHPlate
 	OutputLocation     string
 	OutputPlateNum     int
@@ -120,6 +129,7 @@ type TypeIISConstructAssemblyMMXInput struct {
 	ReactionTemp       wunit.Temperature
 	ReactionTime       wunit.Time
 	ReactionVolume     wunit.Volume
+	Water              *wtype.LHComponent
 }
 
 type TypeIISConstructAssemblyMMXOutput struct {
@@ -143,7 +153,9 @@ func init() {
 			Params: []ParamDesc{
 				{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
 				{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
+				{Name: "LHPolicyName", Desc: "", Kind: "Parameters"},
 				{Name: "MasterMix", Desc: "", Kind: "Inputs"},
+				{Name: "MasterMixVolume", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "OutputLocation", Desc: "", Kind: "Parameters"},
 				{Name: "OutputPlateNum", Desc: "", Kind: "Parameters"},
@@ -154,6 +166,7 @@ func init() {
 				{Name: "ReactionTemp", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionTime", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionVolume", Desc: "", Kind: "Parameters"},
+				{Name: "Water", Desc: "", Kind: "Inputs"},
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
 			},
 		},

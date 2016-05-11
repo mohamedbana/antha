@@ -11,7 +11,8 @@ import (
 
 // Input parameters for this protocol (data)
 
-// if buffer is being added
+//TotalVolumeperreaction Volume // if buffer is being added
+//VolumetoLeaveforDNAperreaction Volume
 
 //NumberofMastermixes int // add as many as possible option e.g. if == -1
 
@@ -19,7 +20,7 @@ import (
 
 // Physical Inputs to this protocol with types
 
-// optional if nil this is ignored
+//TopUpBuffer *wtype.LHComponent // optional if nil this is ignored
 
 // Physical outputs from this protocol with types
 
@@ -37,41 +38,36 @@ func _Mastermix_oneSteps(_ctx context.Context, _input *Mastermix_oneInput, _outp
 	var mastermix *wtype.LHComponent
 
 	// work out volume to top up to in each case (per reaction) in l:
-	topupVolumeperreacttion := _input.TotalVolumeperreaction.SIValue() - _input.VolumetoLeaveforDNAperreaction.SIValue()
+	//topupVolumeperreacttion := TotalVolumeperreaction.SIValue() - VolumetoLeaveforDNAperreaction.SIValue()
 
 	// multiply by number of reactions per mastermix
-	topupVolume := wunit.NewVolume(float64(_input.Reactionspermastermix)*topupVolumeperreacttion, "l")
+	//topupVolume := wunit.NewVolume(float64(Reactionspermastermix)*topupVolumeperreacttion,"l")
 
 	if len(_input.Components) != len(_input.ComponentVolumesperReaction) {
 		panic("len(Components) != len(OtherComponentVolumes)")
 	}
 
-	if _input.AliquotbyRow {
-		panic("MixTo based method coming soon!")
-	} else {
+	eachmastermix := make([]*wtype.LHComponent, 0)
 
-		eachmastermix := make([]*wtype.LHComponent, 0)
+	//if TopUpBuffer != nil {
+	//bufferSample := mixer.SampleForTotalVolume(TopUpBuffer, topupVolume)
+	//eachmastermix = append(eachmastermix,bufferSample)
+	//	}
 
-		if _input.TopUpBuffer != nil {
-			bufferSample := mixer.SampleForTotalVolume(_input.TopUpBuffer, topupVolume)
-			eachmastermix = append(eachmastermix, bufferSample)
+	for k, component := range _input.Components {
+		if k == len(_input.Components) {
+			component.Type = wtype.LTNeedToMix //"NeedToMix"
 		}
 
-		for k, component := range _input.Components {
-			if k == len(_input.Components) {
-				component.Type = wtype.LTNeedToMix //"NeedToMix"
-			}
+		// multiply volume of each component by number of reactions per mastermix
+		adjustedvol := wunit.NewVolume(float64(_input.Reactionspermastermix)*_input.ComponentVolumesperReaction[k].SIValue()*1000000, "ul")
 
-			// multiply volume of each component by number of reactions per mastermix
-			adjustedvol := wunit.NewVolume(float64(_input.Reactionspermastermix)*_input.ComponentVolumesperReaction[k].SIValue(), "l")
-
-			componentSample := mixer.Sample(component, adjustedvol)
-			eachmastermix = append(eachmastermix, componentSample)
-		}
-
-		mastermix = execute.MixInto(_ctx, _input.OutPlate, "", eachmastermix...)
+		componentSample := mixer.Sample(component, adjustedvol)
+		eachmastermix = append(eachmastermix, componentSample)
 
 	}
+	mastermix = execute.MixInto(_ctx, _input.OutPlate, "", eachmastermix...)
+
 	_output.Mastermix = mastermix
 
 }
@@ -134,15 +130,10 @@ type Mastermix_oneElement struct {
 }
 
 type Mastermix_oneInput struct {
-	AliquotbyRow                   bool
-	ComponentVolumesperReaction    []wunit.Volume
-	Components                     []*wtype.LHComponent
-	Inplate                        *wtype.LHPlate
-	OutPlate                       *wtype.LHPlate
-	Reactionspermastermix          int
-	TopUpBuffer                    *wtype.LHComponent
-	TotalVolumeperreaction         wunit.Volume
-	VolumetoLeaveforDNAperreaction wunit.Volume
+	ComponentVolumesperReaction []wunit.Volume
+	Components                  []*wtype.LHComponent
+	OutPlate                    *wtype.LHPlate
+	Reactionspermastermix       int
 }
 
 type Mastermix_oneOutput struct {
@@ -166,15 +157,10 @@ func init() {
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/MakeMastermix/Mastermix_one.an",
 			Params: []ParamDesc{
-				{Name: "AliquotbyRow", Desc: "NumberofMastermixes int // add as many as possible option e.g. if == -1\n", Kind: "Parameters"},
 				{Name: "ComponentVolumesperReaction", Desc: "", Kind: "Parameters"},
-				{Name: "Components", Desc: "", Kind: "Inputs"},
-				{Name: "Inplate", Desc: "", Kind: "Inputs"},
+				{Name: "Components", Desc: "TopUpBuffer *wtype.LHComponent // optional if nil this is ignored\n", Kind: "Inputs"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-				{Name: "Reactionspermastermix", Desc: "", Kind: "Parameters"},
-				{Name: "TopUpBuffer", Desc: "optional if nil this is ignored\n", Kind: "Inputs"},
-				{Name: "TotalVolumeperreaction", Desc: "if buffer is being added\n", Kind: "Parameters"},
-				{Name: "VolumetoLeaveforDNAperreaction", Desc: "", Kind: "Parameters"},
+				{Name: "Reactionspermastermix", Desc: "TotalVolumeperreaction Volume // if buffer is being added\nVolumetoLeaveforDNAperreaction Volume\n", Kind: "Parameters"},
 				{Name: "Mastermix", Desc: "", Kind: "Outputs"},
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},

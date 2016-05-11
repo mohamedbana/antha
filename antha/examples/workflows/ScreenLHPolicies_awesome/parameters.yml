@@ -5,15 +5,20 @@
             "TestSols": [
 			"tartrazine"
 			],
-            "NumberofReplicates": 1,
+            "NumberofReplicates": 2,
             "OutPlate": "greiner384_riser",
             "TestSolVolumes": [
-			"4ul",
-			"8ul"
+			"1ul",
+			"2ul",
+			"3ul"
 			],
+			"LHDOEFile":"8run4cpFactorial.xlsx",
+			"DXORJMP":"JMP",
+			"OutputFilename":"jmpfactorialDoeoutput_test.xlsx",
+			"Printasimage": true,
 			"Imagefilename": "star1.png",
             "TotalVolume": "20ul",
-			"NumberofBlanks": 5
+			"NumberofBlanks": 0
         }
     }
 }
