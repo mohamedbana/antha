@@ -21,4 +21,15 @@ fmt_json:
 compile:
 	go install github.com/antha-lang/antha/cmd/...
 
+test_workflows: compile
+	for d in `find antha/examples -mindepth 2 -maxdepth 2 -type d`; do \
+	  abs=`cd $$d; pwd` ;\
+	  (go test github.com/antha-lang/antha/antha/component/lib -args $$abs > /dev/null) ;\
+	  if [[ $$? == 0 ]]; then \
+	    echo "PASS $$d"; \
+	  else \
+	    echo "FAIL $$d"; \
+	  fi; \
+	done
+
 .PHONY: all gen_comp fmt_json test test_workflows compile
