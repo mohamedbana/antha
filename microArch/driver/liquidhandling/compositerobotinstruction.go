@@ -1985,23 +1985,26 @@ func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 
 		xoff, ok := pol["PRE_MIX_X"]
 
-		if ok {
-			for k := 0; k < ins.Multi; k++ {
-				mix.OffsetX = append(mix.OffsetX, xoff.(float64))
-			}
+		if !ok {
+			xoff = 0.0
+		}
+		for k := 0; k < ins.Multi; k++ {
+			mix.OffsetX = append(mix.OffsetX, xoff.(float64))
 		}
 
 		yoff, ok := pol["PRE_MIX_Y"]
-		if ok {
-			for k := 0; k < ins.Multi; k++ {
-				mix.OffsetY = append(mix.OffsetY, yoff.(float64))
-			}
+		if !ok {
+			yoff = 0.0
+		}
+		for k := 0; k < ins.Multi; k++ {
+			mix.OffsetY = append(mix.OffsetY, yoff.(float64))
 		}
 		zoff, ok := pol["PRE_MIX_Z"]
-		if ok {
-			for k := 0; k < ins.Multi; k++ {
-				mix.OffsetZ = append(mix.OffsetZ, zoff.(float64))
-			}
+		if !ok {
+			zoff = 0.0
+		}
+		for k := 0; k < ins.Multi; k++ {
+			mix.OffsetZ = append(mix.OffsetZ, zoff.(float64))
 		}
 
 		c := make([]int, ins.Multi)
@@ -2401,23 +2404,26 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 
 		xoff, ok := pol["POST_MIX_X"]
 
-		if ok {
-			for k := 0; k < ins.Multi; k++ {
-				mix.OffsetX = append(mix.OffsetX, xoff.(float64))
-			}
+		if !ok {
+			xoff = 0.0
+		}
+		for k := 0; k < ins.Multi; k++ {
+			mix.OffsetX = append(mix.OffsetX, xoff.(float64))
 		}
 
 		yoff, ok := pol["POST_MIX_Y"]
-		if ok {
-			for k := 0; k < ins.Multi; k++ {
-				mix.OffsetY = append(mix.OffsetY, yoff.(float64))
-			}
+		if !ok {
+			yoff = 0.0
+		}
+		for k := 0; k < ins.Multi; k++ {
+			mix.OffsetY = append(mix.OffsetY, yoff.(float64))
 		}
 		zoff, ok := pol["POST_MIX_Z"]
-		if ok {
-			for k := 0; k < ins.Multi; k++ {
-				mix.OffsetZ = append(mix.OffsetZ, zoff.(float64))
-			}
+		if !ok {
+			zoff = 0.0
+		}
+		for k := 0; k < ins.Multi; k++ {
+			mix.OffsetZ = append(mix.OffsetZ, zoff.(float64))
 		}
 
 		// this is not safe, need to verify volume is OK
