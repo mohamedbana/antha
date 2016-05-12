@@ -1,4 +1,4 @@
-protocol TypeIISConstructAssemblyMMX
+protocol TypeIISConstructAssemblyMMX_forscreen
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"

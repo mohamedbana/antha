@@ -9,7 +9,6 @@ import (
 // Input parameters for this protocol (data)
 Parameters (
 	ReactionVolume				Volume
-	MasterMixVolume				Volume
 	PartVols				[]Volume
 	PartNames				[]string
 	ReactionTemp				Temperature
@@ -51,7 +50,7 @@ Steps {
 	//waterSample:=mixer.SampleForTotalVolume(Water,ReactionVolume)
 //	samples = append(samples, waterSample)
 	
-	mmxSample:=mixer.Sample(MasterMix,MasterMixVolume)
+	mmxSample:=mixer.Sample(MasterMix,ReactionVolume)
 	samples = append(samples, mmxSample)
 
 	for k, part := range Parts {

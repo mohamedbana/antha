@@ -107,7 +107,7 @@ func _ScreenAssemblyConditions_concSteps(_ctx context.Context, _input *ScreenAss
 					fmt.Println("counter:", counter)
 					fmt.Println("WellPositionarray", wellpositionarray, "OutPlate.WlsX", _input.OutPlate.WlsX)
 
-					result := TypeIISConstructAssemblyMMXRunSteps(_ctx, &TypeIISConstructAssemblyMMXInput{ReactionVolume: _input.ReactionVolume,
+					result := TypeIISConstructAssemblyMMX_forscreenRunSteps(_ctx, &TypeIISConstructAssemblyMMX_forscreenInput{ReactionVolume: _input.ReactionVolume,
 						PartVols:           PartVolsArray,
 						PartNames:          _input.PartNamesArray[j],
 						MasterMixVolume:    _input.MastermixVolume,

@@ -32,7 +32,7 @@ func _TypeIISConstructAssemblyMMXSteps(_ctx context.Context, _input *TypeIISCons
 	//waterSample:=mixer.SampleForTotalVolume(Water,ReactionVolume)
 	//	samples = append(samples, waterSample)
 
-	mmxSample := mixer.Sample(_input.MasterMix, _input.MasterMixVolume)
+	mmxSample := mixer.Sample(_input.MasterMix, _input.ReactionVolume)
 	samples = append(samples, mmxSample)
 
 	for k, part := range _input.Parts {
@@ -118,7 +118,6 @@ type TypeIISConstructAssemblyMMXInput struct {
 	InactivationTime   wunit.Time
 	LHPolicyName       string
 	MasterMix          *wtype.LHComponent
-	MasterMixVolume    wunit.Volume
 	OutPlate           *wtype.LHPlate
 	OutputLocation     string
 	OutputPlateNum     int
@@ -154,7 +153,6 @@ func init() {
 				{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
 				{Name: "LHPolicyName", Desc: "", Kind: "Parameters"},
 				{Name: "MasterMix", Desc: "", Kind: "Inputs"},
-				{Name: "MasterMixVolume", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "OutputLocation", Desc: "", Kind: "Parameters"},
 				{Name: "OutputPlateNum", Desc: "", Kind: "Parameters"},
