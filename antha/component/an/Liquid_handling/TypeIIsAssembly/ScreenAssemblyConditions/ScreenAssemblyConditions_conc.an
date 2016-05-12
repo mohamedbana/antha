@@ -126,7 +126,7 @@ Steps {
 		fmt.Println("counter:",counter)
 		fmt.Println("WellPositionarray",wellpositionarray,"OutPlate.WlsX",OutPlate.WlsX)
 		
-		result := RunSteps(TypeIISConstructAssemblyMMX,
+		result := RunSteps(TypeIISConstructAssemblyMMX_forscreen,
                 Parameters{
                 	ReactionVolume: ReactionVolume,
                         PartVols: PartVolsArray,
