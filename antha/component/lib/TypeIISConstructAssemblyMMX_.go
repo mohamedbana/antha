@@ -29,8 +29,8 @@ func _TypeIISConstructAssemblyMMXSetup(_ctx context.Context, _input *TypeIISCons
 func _TypeIISConstructAssemblyMMXSteps(_ctx context.Context, _input *TypeIISConstructAssemblyMMXInput, _output *TypeIISConstructAssemblyMMXOutput) {
 	samples := make([]*wtype.LHComponent, 0)
 
-	waterSample := mixer.SampleForTotalVolume(_input.Water, _input.ReactionVolume)
-	samples = append(samples, waterSample)
+	//waterSample:=mixer.SampleForTotalVolume(Water,ReactionVolume)
+	//	samples = append(samples, waterSample)
 
 	mmxSample := mixer.Sample(_input.MasterMix, _input.MasterMixVolume)
 	samples = append(samples, mmxSample)
@@ -129,7 +129,6 @@ type TypeIISConstructAssemblyMMXInput struct {
 	ReactionTemp       wunit.Temperature
 	ReactionTime       wunit.Time
 	ReactionVolume     wunit.Volume
-	Water              *wtype.LHComponent
 }
 
 type TypeIISConstructAssemblyMMXOutput struct {
@@ -166,7 +165,6 @@ func init() {
 				{Name: "ReactionTemp", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionTime", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionVolume", Desc: "", Kind: "Parameters"},
-				{Name: "Water", Desc: "", Kind: "Inputs"},
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
 			},
 		},

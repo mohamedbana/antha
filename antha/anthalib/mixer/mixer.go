@@ -137,6 +137,7 @@ func SampleMass(s *wtype.LHComponent, m wunit.Mass, d wunit.Density) *wtype.LHCo
 // edited to take into account the volume of the other solution components
 func SampleForTotalVolume(l *wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
+
 	ret.ID = l.ID
 	l.AddDaughter(ret.ID)
 	if l.HasAnyParent() {
