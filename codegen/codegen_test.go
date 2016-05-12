@@ -24,6 +24,10 @@ func (a *incubateInst) SetDependsOn(xs []target.Inst) {
 	a.Depends = xs
 }
 
+func (a *incubateInst) GetTimeEstimate() float64 {
+	return 0.0
+}
+
 type incubator struct{}
 
 func (a *incubator) CanCompile(req ast.Request) bool {
