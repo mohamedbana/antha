@@ -1064,8 +1064,6 @@ func (ins *SingleChannelTransferInstruction) Generate(policy *LHPolicyRuleSet, p
 	blowinstruction.Multi = 1
 	blowinstruction.Prms = ins.Prms
 	ret = append(ret, blowinstruction)
-	logger.Debug(InsToString(suckinstruction))
-	logger.Debug(InsToString(blowinstruction))
 
 	/*
 		// commented out pending putting it as part of blow
@@ -1957,7 +1955,7 @@ func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 
 	cycles, premix := pol["PRE_MIX"]
 
-	if premix {
+	if premix && cycles > 0 {
 		// add the premix step
 		mix := NewMoveMixInstruction()
 		mix.Head = ins.Head
@@ -2015,7 +2013,7 @@ func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 
 		// set speed
 
-		mixrate, changespeed := pol["PRE_MIX_RATE"]
+		mixrate, changepipspeed := pol["PRE_MIX_RATE"]
 
 		if changespeed {
 			setspd := NewSetPipetteSpeedInstruction()
@@ -2028,7 +2026,7 @@ func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 		mix.Cycles = c
 		ret = append(ret, mix)
 
-		if changespeed {
+		if changepipspeed {
 			sps := NewSetPipetteSpeedInstruction()
 			sps.Head = ins.Head
 			sps.Channel = -1 // all channels
@@ -2385,7 +2383,7 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 	// do we mix?
 	cycles, postmix := pol["POST_MIX"]
 
-	if postmix {
+	if postmix && cycles > 0 {
 		// add the postmix step
 		mix := NewMoveMixInstruction()
 		mix.Head = ins.Head
