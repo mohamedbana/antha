@@ -114,14 +114,14 @@ type DNA struct {
 
 // DNAsequence is a type of Biosequence
 type DNASequence struct {
-	Nm             string
-	Seq            string
-	Plasmid        bool
-	Singlestranded bool
-	Overhang5prime Overhang
-	Overhang3prime Overhang
-	Methylation    string // add histones etc?
-	Features       []Feature
+	Nm             string    `json:"jm"`
+	Seq            string    `json:"seq"`
+	Plasmid        bool      `json:"plasmid"`
+	Singlestranded bool      `json:"single_stranded"`
+	Overhang5prime Overhang  `json:"overhang_5_prime"`
+	Overhang3prime Overhang  `json:"overhang_3_prime"`
+	Methylation    string    `json:"methylation"` // add histones etc?
+	Features       []Feature `json:"features"`
 }
 
 func MakeDNASequence(name string, seqstring string, properties []string) (seq DNASequence, err error) {
@@ -260,11 +260,11 @@ const (
 
 type Overhang struct {
 	//Strand          int // i.e. 1 or 2 (top or bottom
-	End             int // i.e. 5 or 3 or 0
-	Type            int //as contants above
-	Length          int
-	Sequence        string
-	Phosphorylation bool
+	End             int    `json:"end"`  // i.e. 5 or 3 or 0
+	Type            int    `json:"type"` //as contants above
+	Length          int    `json:"length"`
+	Sequence        string `json:"sequence"`
+	Phosphorylation bool   `json:"phosphorylation"`
 }
 
 func (dna *DNASequence) Sequence() string {
