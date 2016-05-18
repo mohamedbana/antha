@@ -1,0 +1,11 @@
+{
+    "Parameters": {
+        "DNA_movement1": {
+            "OutPlatetype":"pcrplate_skirted_riser",
+			"DNA":"dna_part",
+			"DNAVol":"2ul",
+			"Partname":"thepart",
+			"OutWell":"A1"
+        }
+    }
+}
