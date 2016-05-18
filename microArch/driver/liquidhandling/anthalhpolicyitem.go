@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"reflect"
+	"sort"
 
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/logger"
@@ -67,7 +68,7 @@ func ReadPolicyItemsFromFile(fn string) AnthaLHPolicyItemSet {
 		if err == io.EOF {
 			break
 		}
-		if len(rec) != 3 {
+		if len(rec) < 3 {
 			// we only take lines which are well formatted
 			continue
 		}
@@ -82,4 +83,23 @@ func ReadPolicyItemsFromFile(fn string) AnthaLHPolicyItemSet {
 		}
 	}
 	return ret
+}
+
+func (alhpis AnthaLHPolicyItemSet) TypeList() string {
+	ks := make([]string, 0, len(alhpis))
+
+	for k, _ := range alhpis {
+		ks = append(ks, k)
+	}
+
+	sort.Strings(ks)
+
+	s := ""
+
+	for _, k := range ks {
+		alhpi := alhpis[k]
+		s += fmt.Sprintf("%s,%s,%s\n", k, alhpi.TypeName(), alhpi.Desc)
+	}
+
+	return s
 }
