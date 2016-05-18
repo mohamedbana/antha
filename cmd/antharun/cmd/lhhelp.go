@@ -38,7 +38,10 @@ var lhhelpCmd = &cobra.Command{
 
 func lhhelp(cmd *cobra.Command, args []string) error {
 	viper.BindPFlags(cmd.Flags())
+	fmt.Println("Liquid handling policy commands available:")
+	fmt.Println()
 	fmt.Print(liquidhandling.GetPolicyConsequents().TypeList())
+	fmt.Println()
 	return nil
 }
 
