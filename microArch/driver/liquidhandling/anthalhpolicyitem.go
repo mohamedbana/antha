@@ -1,6 +1,19 @@
 package liquidhandling
 
-import "reflect"
+import (
+	"encoding/csv"
+	"fmt"
+	"io"
+	"os"
+	"reflect"
+
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/microArch/logger"
+)
+
+func GetPolicyConsequents() AnthaLHPolicyItemSet {
+	return ReadPolicyItemsFromFile("lhpolicyconsequents.csv")
+}
 
 // defines possible liquid handling policy consequences
 type AnthaLHPolicyItem struct {
@@ -9,9 +22,13 @@ type AnthaLHPolicyItem struct {
 	Desc string
 }
 
+func (alhpi AnthaLHPolicyItem) TypeName() string {
+	return alhpi.Type.Name()
+}
+
 var typemap map[string]reflect.Type
 
-func maketypemap() typemap {
+func maketypemap() map[string]reflect.Type {
 	// prototypical types for map
 	var f float64
 	var i int
@@ -19,7 +36,7 @@ func maketypemap() typemap {
 	var v wunit.Volume
 	var b bool
 
-	ret := make(typemap, 4)
+	ret := make(map[string]reflect.Type, 4)
 	ret["float64"] = reflect.TypeOf(f)
 	ret["int"] = reflect.TypeOf(i)
 	ret["string"] = reflect.TypeOf(s)
@@ -34,8 +51,13 @@ type AnthaLHPolicyItemSet map[string]AnthaLHPolicyItem
 func ReadPolicyItemsFromFile(fn string) AnthaLHPolicyItemSet {
 	typemap = maketypemap()
 
-	csvIn := os.Open(fn)
-	csvr := csv.NewReader()
+	csvIn, err := os.Open(fn)
+
+	if err != nil {
+		logger.Fatal(fmt.Sprintf("Cannot find policy consequents file %s", fn))
+	}
+
+	csvr := csv.NewReader(csvIn)
 	csvr.FieldsPerRecord = -1 // this is absurd
 
 	ret := make(AnthaLHPolicyItemSet, 30)
