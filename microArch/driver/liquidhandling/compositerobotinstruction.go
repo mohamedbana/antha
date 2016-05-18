@@ -3139,7 +3139,8 @@ func (ins *ResetInstruction) Generate(policy *LHPolicyRuleSet, prms *LHPropertie
 	ret = append(ret, blow)
 
 	// when needed we will add this pistons-to-zero instruction
-	if pol["MANUALPTZ"].(bool) {
+	manptz := SafeGetBool(pol, "MANUALPTZ")
+	if manptz {
 		ret = append(ret, mov2)
 		ret = append(ret, ptz)
 	}

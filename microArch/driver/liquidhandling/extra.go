@@ -1,13 +1,17 @@
 package liquidhandling
 
-import "github.com/antha-lang/antha/antha/anthalib/wunit"
+import (
+	"reflect"
+
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
+)
 
 func SafeGetF64(m map[string]interface{}, key string) float64 {
 	ret := 0.0
 
 	v, ok := m[key]
 
-	// TODO -- implement type safety
+	ok = ok && reflect.TypeOf(v) == reflect.TypeOf(ret)
 	if ok {
 		ret = v.(float64)
 	}
@@ -20,7 +24,7 @@ func SafeGetBool(m map[string]interface{}, key string) bool {
 
 	v, ok := m[key]
 
-	// TODO -- implement type safety
+	ok = ok && reflect.TypeOf(v) == reflect.TypeOf(ret)
 	if ok {
 		ret = v.(bool)
 	}
@@ -34,7 +38,7 @@ func SafeGetString(m map[string]interface{}, key string) string {
 
 	v, ok := m[key]
 
-	// TODO -- implement type safety
+	ok = ok && reflect.TypeOf(v) == reflect.TypeOf(ret)
 	if ok {
 		ret = v.(string)
 	}
@@ -48,7 +52,7 @@ func SafeGetInt(m map[string]interface{}, key string) int {
 
 	v, ok := m[key]
 
-	// TODO -- implement type safety
+	ok = ok && reflect.TypeOf(v) == reflect.TypeOf(ret)
 	if ok {
 		ret = v.(int)
 	}
@@ -61,7 +65,7 @@ func SafeGetVolume(m map[string]interface{}, key string) wunit.Volume {
 
 	v, ok := m[key]
 
-	//TODO -- implement type safety
+	ok = ok && reflect.TypeOf(v) == reflect.TypeOf(ret)
 	if ok {
 		ret = v.(wunit.Volume)
 	}
