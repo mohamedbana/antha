@@ -25,7 +25,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/antha-lang/antha/cmd/antharun/comp"
 	"github.com/antha-lang/antha/internal/github.com/spf13/cobra"
 	"github.com/antha-lang/antha/internal/github.com/spf13/viper"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
@@ -45,6 +44,6 @@ func lhhelp(cmd *cobra.Command, args []string) error {
 
 func init() {
 	c := listCmd
-	flags := c.Flags()
+	//flags := c.Flags()
 	RootCmd.AddCommand(c)
 }
