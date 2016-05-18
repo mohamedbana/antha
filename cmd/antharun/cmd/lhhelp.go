@@ -43,7 +43,7 @@ func lhhelp(cmd *cobra.Command, args []string) error {
 }
 
 func init() {
-	c := listCmd
+	c := lhhelpCmd
 	//flags := c.Flags()
 	RootCmd.AddCommand(c)
 }

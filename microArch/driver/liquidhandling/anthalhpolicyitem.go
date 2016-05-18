@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/user"
 	"reflect"
 	"sort"
 
@@ -13,7 +14,17 @@ import (
 )
 
 func GetPolicyConsequents() AnthaLHPolicyItemSet {
-	return ReadPolicyItemsFromFile("lhpolicyconsequents.csv")
+	return ReadPolicyItemsFromDefaultFile()
+}
+
+func ReadPolicyItemsFromDefaultFile() AnthaLHPolicyItemSet {
+	u, e := user.Current()
+	if e != nil {
+		logger.Fatal("NO CURRENT USER SET")
+	}
+	gp := u.HomeDir + "/go/"
+	fp := "src/github.com/antha-lang/antha/microArch/driver/liquidhandling/lhpolicyconsequents.csv"
+	return ReadPolicyItemsFromFile(gp + fp)
 }
 
 // defines possible liquid handling policy consequences
