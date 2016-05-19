@@ -15,4 +15,5 @@ func TestALHPI(t *testing.T) {
 	} else if alhpi.TypeName() != "float64" {
 		t.Error(fmt.Sprintf("Type of PRE_MIX_Z not as expected: want float64 got %s"), alhpi.TypeName())
 	}
+
 }
