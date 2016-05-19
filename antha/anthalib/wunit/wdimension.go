@@ -109,6 +109,10 @@ func (v Volume) Dup() Volume {
 	return ret
 }
 
+func ZeroVolume() Volume {
+	return NewVolume(0.0, "ul")
+}
+
 // temperature
 type Temperature struct {
 	*ConcreteMeasurement
