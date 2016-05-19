@@ -1,9 +1,0 @@
-{
-    "connections": [],
-    "processes": {
-        "DNA_movement1": {
-            "component": "DNA_movement"
-        }
-		
-    }
-}
