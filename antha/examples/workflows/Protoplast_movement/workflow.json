@@ -3,7 +3,21 @@
     "processes": {
         "Protoplast_movement1": {
             "component": "Protoplast_movement"
+        },
+		"Protoplast_movement2": {
+            "component": "Protoplast_movement"
+        },
+		"Protoplast_movement3": {
+            "component": "Protoplast_movement"
+        },
+		"Protoplast_movement4": {
+            "component": "Protoplast_movement"
+        },
+		"Protoplast_movement5": {
+            "component": "Protoplast_movement"
+        },
+		"Protoplast_movement6": {
+            "component": "Protoplast_movement"
         }
-		
     }
 }
