@@ -25,7 +25,6 @@ package logger
 import (
 	"fmt"
 	"runtime"
-	"sync"
 	"time"
 
 	"strings"
@@ -33,47 +32,36 @@ import (
 
 //Logging Functions
 func Track(message string, extra ...interface{}) {
-	_middlewares_mutex.Lock()
-	defer _middlewares_mutex.Unlock()
 	for _, h := range getMiddlewareList() {
 		h.Log(TRACK, time.Now().Unix(), getSource(), message, extra...)
 	}
 }
+
 func Info(message string, extra ...interface{}) {
-	_middlewares_mutex.Lock()
-	defer _middlewares_mutex.Unlock()
 	for _, h := range getMiddlewareList() {
 		h.Log(INFO, time.Now().Unix(), getSource(), message, extra...)
 	}
 }
 
 func Debug(message string, extra ...interface{}) {
-	_middlewares_mutex.Lock()
-	defer _middlewares_mutex.Unlock()
 	for _, h := range getMiddlewareList() {
 		h.Log(DEBUG, time.Now().Unix(), getSource(), message, extra...)
 	}
 }
 
 func Warning(message string, extra ...interface{}) {
-	_middlewares_mutex.Lock()
-	defer _middlewares_mutex.Unlock()
 	for _, h := range getMiddlewareList() {
 		h.Log(WARNING, time.Now().Unix(), getSource(), message, extra...)
 	}
 }
 
 func Error(message string, extra ...interface{}) {
-	_middlewares_mutex.Lock()
-	defer _middlewares_mutex.Unlock()
 	for _, h := range getMiddlewareList() {
 		h.Log(ERROR, time.Now().Unix(), getSource(), message, extra...)
 	}
 }
 
 func Fatal(message string, extra ...interface{}) {
-	_middlewares_mutex.Lock()
-	defer _middlewares_mutex.Unlock()
 	buf := make([]byte, 8192)
 	runtime.Stack(buf, true)
 	stack := make(map[string]string)
@@ -91,52 +79,31 @@ func Fatal(message string, extra ...interface{}) {
 
 //telemetry and sensors functions
 func Measure(message string, extra ...interface{}) {
-	_middlewares_mutex.Lock()
-	defer _middlewares_mutex.Unlock()
 	for _, h := range getMiddlewareList() {
 		h.Measure(time.Now().Unix(), getSource(), message, extra...)
 	}
 }
 
 func Sensor(message string, extra ...interface{}) {
-	_middlewares_mutex.Lock()
-	defer _middlewares_mutex.Unlock()
 	for _, h := range getMiddlewareList() {
 		h.Sensor(time.Now().Unix(), getSource(), message, extra...)
 	}
 }
 
 func Data(data interface{}, extra ...interface{}) {
-	_middlewares_mutex.Lock()
-	defer _middlewares_mutex.Unlock()
 	for _, h := range getMiddlewareList() {
 		h.Data(time.Now().Unix(), data, append(extra, getSource()))
 	}
 }
 
 var (
-	middlewares        []LoggerMiddleware
-	_defaultmw         *DefaultMiddleware //only used if none other available
-	_middlewares_mutex sync.Mutex
+	middlewares []LoggerMiddleware
+	_defaultmw  *DefaultMiddleware //only used if none other available
 )
 
+// Register all middleware before making any logger calls
 func RegisterMiddleware(m LoggerMiddleware) {
-	_middlewares_mutex.Lock()
-	defer _middlewares_mutex.Unlock()
 	middlewares = append(middlewares, m)
-}
-
-func UnregisterMiddleware(u LoggerMiddleware) {
-	_middlewares_mutex.Lock()
-	defer _middlewares_mutex.Unlock()
-
-	var newM []LoggerMiddleware
-	for _, m := range middlewares {
-		if m != u {
-			newM = append(newM, m)
-		}
-	}
-	middlewares = newM
 }
 
 func getMiddlewareList() []LoggerMiddleware {
@@ -148,12 +115,6 @@ func getMiddlewareList() []LoggerMiddleware {
 		return []LoggerMiddleware{_defaultmw}
 	}
 	return middlewares
-}
-
-func cleanMiddleware() {
-	_middlewares_mutex.Lock()
-	defer _middlewares_mutex.Unlock()
-	middlewares = make([]LoggerMiddleware, 0)
 }
 
 //LoggerMiddleware a means to react to specific log events
