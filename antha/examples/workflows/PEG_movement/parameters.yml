@@ -1,0 +1,10 @@
+{
+    "Parameters": {
+        "PEG_movement1": {
+            "OutPlatetype":"pcrplate_skirted_riser",
+			"PEG":"PEG",
+			"PEGVol":"190ul",
+			"OutWell":"A1"
+        }
+    }
+}

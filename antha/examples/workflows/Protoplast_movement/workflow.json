@@ -1,0 +1,9 @@
+{
+    "connections": [],
+    "processes": {
+        "Protoplast_movement1": {
+            "component": "Protoplast_movement"
+        }
+		
+    }
+}

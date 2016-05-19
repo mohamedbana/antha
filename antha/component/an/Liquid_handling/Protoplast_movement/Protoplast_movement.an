@@ -1,0 +1,69 @@
+protocol Protoplast_movement
+
+import (
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/mixer"
+)
+
+
+// Input parameters for this protocol (data)
+Parameters (
+	CellVol wunit.Volume
+	DNAVol wunit.Volume
+	PEGVol wunit.Volume 
+	OutPlatetype string
+	OutWell string
+	Partname string
+)
+
+// Data which is returned from this protocol, and data types
+Data (
+	
+)
+
+
+// Physical Inputs to this protocol with types
+Inputs (
+	Cells *wtype.LHComponent
+	DNA *wtype.LHComponent
+	PEG *wtype.LHComponent
+)
+
+// Physical outputs from this protocol with types
+Outputs (
+	TransformedCells *wtype.LHComponent
+)
+
+Requirements {
+	
+	
+	
+}
+
+// Conditions to run on startup
+Setup {
+	
+}
+
+// The core process for this protocol, with the steps to be performed
+// for every input
+Steps {
+	cellsample:=mixer.Sample(Cells,CellVol)
+	cellsinwell:=MixTo(OutPlatetype, OutWell,1, cellsample)
+	DNASample:=mixer.Sample(DNA, DNAVol)
+	cellsplusdna:=Mix(cellsinwell, DNASample)
+	PEGSample:=mixer.Sample(PEG, PEGVol)
+	TransformedCells=Mix(cellsplusdna,PEGSample)
+	
+}
+// Run after controls and a steps block are completed to
+// post process any data and provide downstream results
+Analysis {
+}
+
+// A block of tests to perform to validate that the sample was processed 
+//correctly. Optionally, destructive tests can be performed to validate 
+//results on a dipstick basis
+Validation {
+	 
+}
