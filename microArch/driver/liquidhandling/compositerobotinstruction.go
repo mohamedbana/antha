@@ -1961,6 +1961,8 @@ func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 
 	final_asp_ref := SafeGetInt(pol, "ASPREFERENCE")
 
+	pspeed := SafeGetF64(pol, "DEFAULTPIPETTESPEED")
+
 	// do we need to enter slowly?
 	entryspeed, gentlynow := pol["ASPENTRYSPEED"]
 	if gentlynow {
@@ -2067,10 +2069,13 @@ func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 
 		// set speed
 
-		_, changepipspeed := pol["PRE_MIX_RATE"]
+		//_, changepipspeed := pol["PRE_MIX_RATE"]
+
+		mixrate := SafeGetF64(pol, "PRE_MIX_RATE")
+
+		changepipspeed := (mixrate == pspeed) && (mixrate > 0.0)
 
 		if changepipspeed {
-			mixrate := SafeGetF64(pol, "PRE_MIX_RATE")
 			setspd := NewSetPipetteSpeedInstruction()
 			setspd.Head = ins.Head
 			setspd.Channel = -1 // all channels
@@ -2082,11 +2087,10 @@ func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 		ret = append(ret, mix)
 
 		if changepipspeed {
-			defspeed := SafeGetF64(pol, "DEFAULTPIPETTESPEED")
 			sps := NewSetPipetteSpeedInstruction()
 			sps.Head = ins.Head
 			sps.Channel = -1 // all channels
-			sps.Speed = defspeed
+			sps.Speed = pspeed
 			ret = append(ret, sps)
 		}
 	}
@@ -2123,13 +2127,15 @@ func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 
 	// Set the pipette speed if needed
 
-	_, setpspeed := pol["ASPSPEED"]
+	apspeed := SafeGetF64(pol, "ASPSPEED")
 
-	if setpspeed {
+	changepspeed := (apspeed == pspeed) && (apspeed > 0.0)
+
+	if changepspeed {
 		sps := NewSetPipetteSpeedInstruction()
 		sps.Head = ins.Head
-		sps.Channel = -1                        // all channels
-		sps.Speed = SafeGetF64(pol, "ASPSPEED") //pspeed.(float64)
+		sps.Channel = -1 // all channels
+		sps.Speed = apspeed
 		ret = append(ret, sps)
 	}
 
@@ -2160,11 +2166,11 @@ func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 
 	// do we reset the pipette speed?
 
-	if setpspeed {
+	if changepspeed {
 		sps := NewSetPipetteSpeedInstruction()
 		sps.Head = ins.Head
 		sps.Channel = -1 // all channels
-		sps.Speed = pol["DEFAULTPIPETTESPEED"].(float64)
+		sps.Speed = pspeed
 		ret = append(ret, sps)
 	}
 
@@ -2292,9 +2298,7 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 	ofx := SafeGetF64(pol, "DSPXOFFSET")
 	ofy := SafeGetF64(pol, "DSPYOFFSET")
 	ofz := SafeGetF64(pol, "DSPZOFFSET")
-
 	ref := SafeGetInt(pol, "DSPREFERENCE")
-
 	entryspeed := SafeGetF64(pol, "DSPENTRYSPEED")
 	defaultspeed := SafeGetF64(pol, "DEFAULTZSPEED")
 
@@ -2365,14 +2369,13 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 
 	ret = append(ret, mov)
 
-	// next, are we setting the pipette speed
-
+	// change pipette speed?
 	pspeed := SafeGetF64(pol, "DEFAULTPIPETTESPEED")
 	dpspeed := SafeGetF64(pol, "DSPSPEED")
 
 	var setpspeed bool
 
-	if pspeed != dpspeed {
+	if pspeed != dpspeed && dpspeed != 0.0 {
 		setpspeed = true
 	}
 
@@ -2380,7 +2383,7 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 		sps := NewSetPipetteSpeedInstruction()
 		sps.Head = ins.Head
 		sps.Channel = -1 // all channels
-		sps.Speed = pspeed
+		sps.Speed = dpspeed
 		ret = append(ret, sps)
 	}
 
@@ -2444,7 +2447,7 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 		sps := NewSetPipetteSpeedInstruction()
 		sps.Head = ins.Head
 		sps.Channel = -1 // all channels
-		sps.Speed = dpspeed
+		sps.Speed = pspeed
 		ret = append(ret, sps)
 	}
 
@@ -2461,6 +2464,7 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 	// do we mix?
 	_, postmix := pol["POST_MIX"]
 	cycles := SafeGetInt(pol, "POST_MIX")
+	fmt.Println("POST MIX : ", postmix, " CYCLES: ", cycles)
 
 	if postmix && cycles > 0 {
 		// add the postmix step
@@ -2520,7 +2524,7 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 		//mixrate, changespeed := pol["POST_MIX_RATE"]
 		var changespeed bool
 		mixrate := SafeGetF64(pol, "POST_MIX_RATE")
-		if mixrate != dpspeed {
+		if mixrate != pspeed && mixrate != 0.0 {
 			changespeed = true
 		}
 
@@ -2539,7 +2543,7 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 			sps := NewSetPipetteSpeedInstruction()
 			sps.Head = ins.Head
 			sps.Channel = -1 // all channels
-			sps.Speed = dpspeed
+			sps.Speed = pspeed
 			ret = append(ret, sps)
 		}
 

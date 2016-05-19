@@ -184,6 +184,7 @@ func MakePEGPolicy() LHPolicy {
 	policy["ASP_WAIT"] = 2.0
 	policy["DSP_WAIT"] = 2.0
 	policy["POST_MIX"] = 3
+	policy["POST_MIX_Z"] = 3.5
 	policy["BLOWOUTVOLUME"] = 0.0
 	policy["BLOWOUTVOLUMEUNIT"] = "ul"
 	policy["TOUCHOFF"] = true
@@ -481,6 +482,17 @@ func MakeLVExtraPolicy() LHPolicy {
 	return lvep
 }
 
+func MakeLVOffsetPolicy() LHPolicy {
+	lvop := make(LHPolicy, 2)
+	lvop["ASPZOFFSET"] = 0.0
+	lvop["DSPZOFFSET"] = 0.0
+	lvop["POST_MIX_Z"] = 0.0
+	lvop["PRE_MIX_Z"] = 0.0
+	lvop["DSPREFERENCE"] = 0
+	lvop["ASPREFERENCE"] = 0
+	return lvop
+}
+
 func GetLHPolicyForTest() *LHPolicyRuleSet {
 	// make some policies
 
@@ -512,6 +524,19 @@ func GetLHPolicyForTest() *LHPolicyRuleSet {
 	rule = NewLHPolicyRule("ExtraVolumeForLV")
 	rule.AddNumericConditionOn("VOLUME", 0.0, 20.0)
 	pol = MakeLVExtraPolicy()
+	lhpr.AddRule(rule, pol)
+
+	// hack to fix plate type problems
+	rule = NewLHPolicyRule("LVOffsetFix")
+	rule.AddNumericConditionOn("VOLUME", 0.0, 20.0)
+	rule.AddCategoryConditionOn("FROMPLATETYPE", "pcrplate_skirted_riser")
+	pol = MakeLVOffsetPolicy()
+	lhpr.AddRule(rule, pol)
+
+	rule = NewLHPolicyRule("LVOffsetFix2")
+	rule.AddNumericConditionOn("VOLUME", 0.0, 20.0)
+	rule.AddCategoryConditionOn("TOPLATETYPE", "pcrplate_skirted_riser")
+	pol = MakeLVOffsetPolicy()
 	lhpr.AddRule(rule, pol)
 
 	return lhpr
