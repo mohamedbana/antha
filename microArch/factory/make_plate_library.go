@@ -142,6 +142,12 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	plate = wtype.NewLHPlate("pcrplate_skirted_riser", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 37.5)
 	plates[plate.Type] = plate
 
+	// pcr plate skirted (on riser) increased Z offset
+	cone = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
+	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 200, 5, cone, wtype.LHWBU, 5.5, 5.5, 20.4, 1.4, "mm")
+	plate = wtype.NewLHPlate("pcrplate_skirted_riser_zoffset", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 40)
+	plates[plate.Type] = plate
+
 	// pcr plate skirted
 	cone = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
 	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 200, 5, cone, wtype.LHWBU, 5.5, 5.5, 20.4, 1.4, "mm")
