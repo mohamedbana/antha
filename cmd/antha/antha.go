@@ -26,16 +26,17 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"github.com/antha-lang/antha/antha/ast"
-	"github.com/antha-lang/antha/antha/compile"
-	"github.com/antha-lang/antha/antha/parser"
-	"github.com/antha-lang/antha/antha/scanner"
-	"github.com/antha-lang/antha/antha/token"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/antha-lang/antha/antha/ast"
+	"github.com/antha-lang/antha/antha/compile"
+	"github.com/antha-lang/antha/antha/parser"
+	"github.com/antha-lang/antha/antha/scanner"
+	"github.com/antha-lang/antha/antha/token"
 )
 
 // execution variables
@@ -116,18 +117,11 @@ func removeFiles(dir, suffix string) error {
 }
 
 type output struct {
-	OutDir     string
-	outName    string
-	importPath string
+	OutDir  string
+	outName string
 }
 
 func (a *output) Init() error {
-	r, err := getImportPath(a.OutDir)
-	if err != nil {
-		return err
-	}
-	a.importPath = r
-
 	p, err := filepath.Abs(a.OutDir)
 	if err != nil {
 		return err
@@ -284,29 +278,6 @@ func processFile(opt processFileOptions) error {
 	}
 
 	return err
-}
-
-// Return the go import path for a directory or if directory is empty, the
-// import path for the current working directory
-func getImportPath(dir string) (string, error) {
-	goPath := os.Getenv("GOPATH")
-	if len(goPath) == 0 {
-		return "", fmt.Errorf("GOPATH is not configured")
-	}
-	var err error
-	if len(dir) == 0 {
-		dir, err = os.Getwd()
-	} else {
-		dir, err = filepath.Abs(dir)
-	}
-	if err != nil {
-		return "", err
-	}
-	goSrcPath := filepath.Join(goPath, "src") + string(filepath.Separator)
-	if !strings.HasPrefix(dir, goSrcPath) {
-		return "", fmt.Errorf("GOPATH not a prefix of %s", dir)
-	}
-	return filepath.ToSlash(dir[len(goSrcPath):]), nil
 }
 
 // parse parses src, which was read from filename,
