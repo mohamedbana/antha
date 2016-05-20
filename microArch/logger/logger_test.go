@@ -51,23 +51,6 @@ func TestRegisterMiddleware(t *testing.T) {
 	}
 }
 
-func TestRegisterMiddlewareLock(t *testing.T) {
-	midCount := len(middlewares)
-	count := 20
-	wg := sync.WaitGroup{}
-	wg.Add(count)
-	for i := 0; i < count; i++ {
-		go func() {
-			RegisterMiddleware(testMiddleware{})
-			wg.Done()
-		}()
-	}
-	wg.Wait()
-	if l := len(middlewares); l != count+midCount {
-		t.Error("middlewares size err. Expecting ", count+midCount, " got ", l)
-	}
-}
-
 func TestMiddlewareCalls(t *testing.T) {
 	cleanMiddleware()
 	//reset counter values

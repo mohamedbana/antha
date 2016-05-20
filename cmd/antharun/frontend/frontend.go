@@ -70,7 +70,6 @@ func New(opt Opt) (*Frontend, error) {
 
 	ret := &Frontend{}
 	ret.shutdowns = append(ret.shutdowns, func() error {
-		logger.UnregisterMiddleware(mw)
 		return nil
 	})
 
