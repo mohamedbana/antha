@@ -182,10 +182,10 @@ func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequen
 
 // struct containing all information required to use AssemblySimulator function
 type Assemblyparameters struct {
-	Constructname string
-	Enzymename    string
-	Vector        wtype.DNASequence
-	Partsinorder  []wtype.DNASequence
+	Constructname string              `json:"construct_name"`
+	Enzymename    string              `json:"enzyme_name"`
+	Vector        wtype.DNASequence   `json:"vector"`
+	Partsinorder  []wtype.DNASequence `json:"parts_in_order"`
 }
 
 /*type AA_DNA_Assemblyparameters struct {
