@@ -23,6 +23,7 @@
 package liquidhandling
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -79,25 +80,34 @@ func Init(properties *liquidhandling.LHProperties) *Liquidhandler {
 
 // high-level function which requests planning and execution for an incoming set of
 // solutions
-func (this *Liquidhandler) MakeSolutions(request *LHRequest) *LHRequest {
+func (this *Liquidhandler) MakeSolutions(request *LHRequest) error {
 	// the minimal request which is possible defines what solutions are to be made
 	if len(request.LHInstructions) == 0 {
-		return request
+		return errors.New("Nil plan requested: no Mix Instructions present")
 	}
 
-	f := func() {
-		this.Plan(request)
-		this.Execute(request)
+	//f := func() {
+	err := this.Plan(request)
 
-		// output some info on the final setup
-
-		OutputSetup(this.Properties)
+	if err != nil {
+		return err
 	}
+	err = this.Execute(request)
+
+	if err != nil {
+		return err
+	}
+
+	// output some info on the final setup
+
+	OutputSetup(this.Properties)
+
+	//}
 
 	// this is protective, should not be needed
-	this.Once.Do(f)
+	//err := this.Once.Do(f)
 
-	return request
+	return err
 }
 
 // run the request via the driver
@@ -250,7 +260,7 @@ func (this *Liquidhandler) do_setup(rq *LHRequest) {
 // paused, which should be tricky but possible.
 //
 
-func (this *Liquidhandler) Plan(request *LHRequest) {
+func (this *Liquidhandler) Plan(request *LHRequest) error {
 	// convert requests to volumes and determine required stock concentrations
 	instructions, stockconcs := solution_setup(request, this.Properties)
 	request.LHInstructions = instructions

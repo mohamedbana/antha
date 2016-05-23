@@ -232,7 +232,11 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 		r.LHRequest.Add_instruction(mix)
 	}
 
-	r.Liquidhandler.MakeSolutions(r.LHRequest)
+	err := r.Liquidhandler.MakeSolutions(r.LHRequest)
+
+	if err != nil {
+		return nil, err
+	}
 
 	tarball, err := a.saveFile("input")
 	if err != nil {
