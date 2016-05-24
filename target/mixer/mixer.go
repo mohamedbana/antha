@@ -69,7 +69,13 @@ func (a *Mixer) makeLhreq() (*lhreq, error) {
 	}
 
 	req := planner.NewLHRequest()
-	req.Policies = driver.GetLHPolicyForTest()
+	pols, err := driver.GetLHPolicyForTest()
+
+	if err != nil {
+		return nil, err
+	}
+	req.Policies = pols
+
 	plan := planner.Init(&a.properties)
 
 	if p := a.opt.MaxPlates; p != nil {
@@ -137,7 +143,7 @@ func (a *Mixer) makeLhreq() (*lhreq, error) {
 		}
 	}
 
-	err := req.ConfigureYourself()
+	err = req.ConfigureYourself()
 	if err != nil {
 		return nil, err
 	}
