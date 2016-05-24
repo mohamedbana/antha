@@ -26,7 +26,7 @@ func ErrorDesc(code int) string {
 }
 
 func LHError(code int, detail string) error {
-	s := fmt.Sprintf("%d (%s): %s -- %s", code, ErrorName(code), ErrorDesc(code), detail)
+	s := fmt.Sprintf("%d (%s) : %s : %s", code, ErrorName(code), ErrorDesc(code), detail)
 
 	return errors.New(s)
 }
