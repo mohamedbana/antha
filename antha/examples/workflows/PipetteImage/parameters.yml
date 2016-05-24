@@ -1,12 +1,14 @@
 {
   "Parameters": {
     "PipetteImage": {
-      "Imagefilename": "apple.jpg",
+      "Imagefilename": "windows.png",
 	  "UVimage": false,
 	  "Rotate":false,
-	  "AutoRotate":true,
+	  "AutoRotate":false,
+	  "CheckResizeAlgorithms":true,
 	  "UseLiquidClass":"water",
-		"Palettename":"Neon",
+		"Palettename":"Palette1",
+		"Subset":false,
 	      "Subsetnames": [
 		"black",
 		"white",
@@ -19,7 +21,7 @@
 		"pink"
 		],
 		"OnlythisColour":"",
-		"Notthiscolour":"white",
+		"Notthiscolour":"black",
       "OutPlate": "greiner384_riser",
       "VolumePerWell": "100ul"
     }
