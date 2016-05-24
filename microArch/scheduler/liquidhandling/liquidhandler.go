@@ -294,6 +294,8 @@ func (this *Liquidhandler) Plan(request *LHRequest) error {
 	// fix the deck setup
 
 	request = this.Tip_box_setup(request)
+
+	return nil
 }
 
 // sort out inputs
