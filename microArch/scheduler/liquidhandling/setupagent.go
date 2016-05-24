@@ -25,6 +25,7 @@ package liquidhandling
 import (
 	"fmt"
 
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/logger"
 )
@@ -33,7 +34,7 @@ import (
 // positioning in the face of constraints
 
 // default setup agent
-func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *LHRequest {
+func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) (*LHRequest, error) {
 	// this is quite tricky and requires extensive interaction with the liquid handling
 	// parameters
 
@@ -94,7 +95,9 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 	for _, p := range output_plates {
 		position := get_first_available_preference(output_preferences, setup)
 		if position == "" {
-			RaiseError("No positions left for output")
+			//RaiseError("No positions left for output")
+			err := wtype.LHError(wtype.LH_ERR_NO_DECK_SPACE, "No positions left for output")
+			return request, err
 		}
 		setup[position] = p
 		plate_lookup[p.ID] = position
@@ -105,7 +108,9 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 	for _, p := range input_plates {
 		position := get_first_available_preference(input_preferences, setup)
 		if position == "" {
-			RaiseError("No positions left for input")
+			//RaiseError("No positions left for input")
+			err := wtype.LHError(wtype.LH_ERR_NO_DECK_SPACE, "No positions left for input")
+			return request, err
 		}
 		//fmt.Println("PLAATE: ", position)
 		setup[position] = p
@@ -116,7 +121,7 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 
 	//request.Setup = setup
 	request.Plate_lookup = plate_lookup
-	return request
+	return request, nil
 }
 
 func get_first_available_preference(prefs []string, setup map[string]interface{}) string {

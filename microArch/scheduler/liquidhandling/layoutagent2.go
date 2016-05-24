@@ -33,30 +33,38 @@ import (
 	"strings"
 )
 
-func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) *LHRequest {
+func ImprovedLayoutAgent(request *LHRequest, params *liquidhandling.LHProperties) (*LHRequest, error) {
 	// do this multiply based on the order in the chain
 
 	ch := request.InstructionChain
 	pc := make([]PlateChoice, 0, 3)
 	mp := make(map[int]string)
+	var err error
 	for {
 		if ch == nil {
 			break
 		}
-		request, pc, mp = LayoutStage(request, params, ch, pc, mp)
+		request, pc, mp, err = LayoutStage(request, params, ch, pc, mp)
+		if err != nil {
+			break
+		}
 		ch = ch.Child
 	}
 
-	return request
+	return request, err
 }
-func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain *IChain, plate_choices []PlateChoice, mapchoices map[int]string) (*LHRequest, []PlateChoice, map[int]string) {
+func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain *IChain, plate_choices []PlateChoice, mapchoices map[int]string) (*LHRequest, []PlateChoice, map[int]string, error) {
 	// we have three kinds of solution
 	// 1- ones going to a specific plate
 	// 2- ones going to a specific plate type
 	// 3- ones going to a plate of our choosing
 
 	// find existing assignments
-	plate_choices, mapchoices = get_and_complete_assignments(request, chain.ValueIDs(), plate_choices, mapchoices)
+	plate_choices, mapchoices, err := get_and_complete_assignments(request, chain.ValueIDs(), plate_choices, mapchoices)
+
+	if err != nil {
+		return request, plate_choices, mapchoices, err
+	}
 	// now we know what remains unassigned, we assign it
 
 	plate_choices = choose_plates(request, plate_choices, chain.ValueIDs())
@@ -144,7 +152,7 @@ func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain 
 		}
 	}
 
-	return request, plate_choices, mapchoices
+	return request, plate_choices, mapchoices, nil
 }
 
 type PlateChoice struct {
@@ -154,7 +162,7 @@ type PlateChoice struct {
 	Wells     []string
 }
 
-func get_and_complete_assignments(request *LHRequest, order []string, s []PlateChoice, m map[int]string) ([]PlateChoice, map[int]string) {
+func get_and_complete_assignments(request *LHRequest, order []string, s []PlateChoice, m map[int]string) ([]PlateChoice, map[int]string, error) {
 	//s := make([]PlateChoice, 0, 3)
 	//m := make(map[int]string)
 
@@ -200,7 +208,9 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 			addr, ok := st.GetLocationOf(v.Components[0].ID)
 
 			if !ok {
-				logger.Fatal("MIX IN PLACE WITH NO LOCATION SET")
+				//logger.Fatal("MIX IN PLACE WITH NO LOCATION SET")
+				err := wtype.LHError(wtype.LH_ERR_DIRE, "MIX IN PLACE WITH NO LOCATION SET")
+				return s, m, err
 			}
 
 			v.Components[0].Loc = addr
@@ -241,7 +251,7 @@ func get_and_complete_assignments(request *LHRequest, order []string, s []PlateC
 		}
 	}
 
-	return s, m
+	return s, m, nil
 }
 
 func defined(s string, pc []PlateChoice) int {
@@ -398,7 +408,7 @@ func make_plates(request *LHRequest, order []string) map[string]string {
 	return remap
 }
 
-func make_layouts(request *LHRequest, pc []PlateChoice) {
+func make_layouts(request *LHRequest, pc []PlateChoice) error {
 	// we need to fill in the platechoice structure then
 	// transfer the info across to the solutions
 
@@ -432,14 +442,13 @@ func make_layouts(request *LHRequest, pc []PlateChoice) {
 
 			var assignment string
 
-			fmt.Println("OK ONE OF THESE HAS TO BE THERE")
 			if well == "" {
-				fmt.Println("WTAF????")
 				wc := plat.NextEmptyWell(it)
 
 				if wc.IsZero() {
 					// something very bad has happened
-					logger.Fatal("DIRE WARNING: The unthinkable has happened... output plate has too many assignments!")
+					//	logger.Fatal("DIRE WARNING: The unthinkable has happened... output plate has too many assignments!")
+					return wtype.LHError(wtype.LH_ERR_DIRE, "DIRE WARNING: The unthinkable has happened... output plate has too many assignments!")
 				}
 
 				//plat.Cols[wc.X][wc.Y].Currvol += 100.0
@@ -450,7 +459,6 @@ func make_layouts(request *LHRequest, pc []PlateChoice) {
 				assignment = c.ID + ":" + wc.FormatA1()
 				c.Wells[i] = wc.FormatA1()
 			} else {
-				fmt.Println("WELL HERE: ", well)
 				assignment = c.ID + ":" + well
 			}
 
@@ -459,4 +467,5 @@ func make_layouts(request *LHRequest, pc []PlateChoice) {
 	}
 
 	request.Output_assignments = opa
+	return nil
 }

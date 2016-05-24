@@ -348,19 +348,17 @@ func (lhp *LHProperties) TipsLeftOfType(tiptype string) int {
 	return n
 }
 
-func (lhp *LHProperties) AddTipBox(tipbox *wtype.LHTipbox) bool {
+func (lhp *LHProperties) AddTipBox(tipbox *wtype.LHTipbox) error {
 	for _, pref := range lhp.Tip_preferences {
 		if lhp.PosLookup[pref] != "" {
-			//fmt.Println(pref, " ", lhp.PlateLookup[lhp.PosLookup[pref]])
 			continue
 		}
 
 		lhp.AddTipBoxTo(pref, tipbox)
-		return true
+		return nil
 	}
 
-	logger.Debug("NO TIP SPACES LEFT")
-	return false
+	return wtype.LHError(wtype.LH_ERR_NO_DECK_SPACE, "Trying to add tip box")
 }
 func (lhp *LHProperties) AddTipBoxTo(pos string, tipbox *wtype.LHTipbox) bool {
 	/*
@@ -430,25 +428,17 @@ func (lhp *LHProperties) TipSpacesLeft() int {
 	return r
 }
 
-func (lhp *LHProperties) AddTipWaste(tipwaste *wtype.LHTipwaste) bool {
+func (lhp *LHProperties) AddTipWaste(tipwaste *wtype.LHTipwaste) error {
 	for _, pref := range lhp.Tipwaste_preferences {
 		if lhp.PosLookup[pref] != "" {
-
-			//fmt.Println(pref, " ", lhp.PlateLookup[lhp.PosLookup[pref]])
-
 			continue
 		}
 
 		lhp.AddTipWasteTo(pref, tipwaste)
-		return true
+		return nil
 	}
-	/*
-		logger.Fatal("NO TIPWASTE SPACES LEFT")
-		panic("NO TIPWASTE SPACES LEFT")
-	*/
 
-	logger.Debug("NO TIPWASTE SPACES LEFT")
-	return false
+	return wtype.LHError(wtype.LH_ERR_NO_DECK_SPACE, "Trying to add tip waste")
 }
 
 func (lhp *LHProperties) AddTipWasteTo(pos string, tipwaste *wtype.LHTipwaste) bool {
@@ -553,7 +543,7 @@ func (lhp *LHProperties) AddWashTo(pos string, wash *wtype.LHPlate) bool {
 
 // of necessity, this must be destructive of state so we have to work on a copy
 // NB this is not properly specified yet
-func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []string) {
+func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []string, error) {
 	r1 := make([]string, len(cmps))
 	r2 := make([]string, len(cmps))
 
@@ -615,16 +605,18 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []s
 			}
 
 			if !foundIt {
-				logger.Fatal("NO SOURCE FOR ", v.CName, " at volume ", v.Volume().ToString())
+				//logger.Fatal("NOSOURCE FOR ", v.CName, " at volume ", v.Volume().ToString())
+				err := wtype.LHError(wtype.LH_ERR_DIRE, fmt.Sprint("NO SOURCE FOR ", v.CName, " at volume ", v.Volume().ToString()))
+				return r1, r2, err
 			}
 
 		}
 	}
 
-	return r1, r2
+	return r1, r2, nil
 }
 
-func (lhp *LHProperties) GetCleanTips(tiptype string, channel *wtype.LHChannelParameter, mirror bool, multi int) (wells, positions, boxtypes []string) {
+func (lhp *LHProperties) GetCleanTips(tiptype string, channel *wtype.LHChannelParameter, mirror bool, multi int) (wells, positions, boxtypes []string, err error) {
 	positions = make([]string, multi)
 	boxtypes = make([]string, multi)
 
@@ -673,13 +665,15 @@ func (lhp *LHProperties) GetCleanTips(tiptype string, channel *wtype.LHChannelPa
 		bx := factory.GetTipboxByType(tiptype)
 
 		if bx == nil {
-			return nil, nil, nil
+			err = wtype.LHError(wtype.LH_ERR_NO_TIPS, fmt.Sprint("No tipbox of type ", tiptype, " is known"))
+			return nil, nil, nil, err
 		}
 
 		r := lhp.AddTipBox(bx)
 
-		if !r {
-			return nil, nil, nil
+		if r != nil {
+			err = r
+			return nil, nil, nil, err
 		}
 
 		return lhp.GetCleanTips(tiptype, channel, mirror, multi)

@@ -29,14 +29,20 @@ import (
 )
 
 // robot here should be a copy... this routine will be destructive of state
-func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProperties) *LHRequest {
+func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProperties) (*LHRequest, error) {
 	// 1 -- generate high level instructions
 	// also work out which ones can be aggregated
 	agg := make(map[string][]int)
 	transfers := make([]liquidhandling.RobotInstruction, 0, len(request.LHInstructions))
 	for ix, insID := range request.Output_order {
 		//	request.InstructionSet.Add(ConvertInstruction(request.LHInstructions[insID], robot))
-		transfers = append(transfers, ConvertInstruction(request.LHInstructions[insID], robot))
+		transIns, err := ConvertInstruction(request.LHInstructions[insID], robot)
+
+		if err != nil {
+			return request, err
+		}
+
+		transfers = append(transfers, transIns)
 		cmp := fmt.Sprintf("%s_%s", request.LHInstructions[insID].ComponentsMoving(), request.LHInstructions[insID].Generation())
 
 		ar, ok := agg[cmp]
@@ -64,14 +70,17 @@ func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProper
 
 	// 4 -- make the low-level instructions
 
-	inx := request.InstructionSet.Generate(request.Policies, robot)
+	inx, err := request.InstructionSet.Generate(request.Policies, robot)
+
+	if err != nil {
+		return nil, err
+	}
+
 	instrx := make([]liquidhandling.TerminalRobotInstruction, len(inx))
 	for i := 0; i < len(inx); i++ {
-		//		fmt.Println(liquidhandling.InsToString(inx[i]))
 		instrx[i] = inx[i].(liquidhandling.TerminalRobotInstruction)
 	}
 	request.Instructions = instrx
-	//	fmt.Println(request.InstructionSet.ToString(1))
 
-	return request
+	return request, nil
 }

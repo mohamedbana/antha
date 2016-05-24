@@ -23,13 +23,12 @@
 package liquidhandling
 
 import (
-	"errors"
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/microArch/driver"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
@@ -61,11 +60,10 @@ import (
 
 type Liquidhandler struct {
 	Properties       *liquidhandling.LHProperties
-	SetupAgent       func(*LHRequest, *liquidhandling.LHProperties) *LHRequest
-	LayoutAgent      func(*LHRequest, *liquidhandling.LHProperties) *LHRequest
-	ExecutionPlanner func(*LHRequest, *liquidhandling.LHProperties) *LHRequest
+	SetupAgent       func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
+	LayoutAgent      func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
+	ExecutionPlanner func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
 	PolicyManager    *LHPolicyManager
-	Once             sync.Once
 }
 
 // initialize the liquid handling structure
@@ -83,7 +81,7 @@ func Init(properties *liquidhandling.LHProperties) *Liquidhandler {
 func (this *Liquidhandler) MakeSolutions(request *LHRequest) error {
 	// the minimal request which is possible defines what solutions are to be made
 	if len(request.LHInstructions) == 0 {
-		return errors.New("Nil plan requested: no Mix Instructions present")
+		return wtype.LHError(wtype.LH_ERR_OTHER, "Nil plan requested: no Mix Instructions present")
 	}
 
 	//f := func() {
@@ -107,19 +105,23 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) error {
 	// this is protective, should not be needed
 	//err := this.Once.Do(f)
 
-	return err
+	return nil
 }
 
 // run the request via the driver
 func (this *Liquidhandler) Execute(request *LHRequest) error {
 	// set up the robot
 
-	this.do_setup(request)
+	err := this.do_setup(request)
+
+	if err != nil {
+		return err
+	}
 
 	instructions := (*request).Instructions
 
 	if instructions == nil {
-		RaiseError("Cannot execute request: no instructions")
+		return wtype.LHError(wtype.LH_ERR_OTHER, "Cannot execute request: no instructions")
 	}
 
 	// some timing info for the log (only) for now
@@ -142,7 +144,7 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 	return nil
 }
 
-func (this *Liquidhandler) revise_volumes(rq *LHRequest) {
+func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 	// just count up the volumes... add a fudge for additional volume perhaps
 
 	// XXX -- HARD CODE 8 here
@@ -195,7 +197,8 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) {
 		plate, ok := this.Properties.Plates[this.Properties.PlateIDLookup[plateID]]
 
 		if !ok {
-			logger.Fatal(fmt.Sprint("NO SUCH PLATE: ", plateID))
+			err := wtype.LHError(wtype.LH_ERR_DIRE, fmt.Sprint("NO SUCH PLATE: ", plateID))
+			return err
 		}
 
 		for crd, vol := range wellmap {
@@ -212,25 +215,43 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) {
 
 	// all done
 
+	return nil
 }
 
-func (this *Liquidhandler) do_setup(rq *LHRequest) {
+func (this *Liquidhandler) do_setup(rq *LHRequest) error {
 	// revise the volumes etc
 
-	this.revise_volumes(rq)
+	err := this.revise_volumes(rq)
 
-	this.Properties.Driver.RemoveAllPlates()
+	if err != nil {
+		return err
+	}
+
+	stat := this.Properties.Driver.RemoveAllPlates()
+
+	if stat.Errorcode == driver.ERR {
+		return wtype.LHError(wtype.LH_ERR_DRIV, stat.Msg)
+	}
+
 	for position, plateid := range this.Properties.PosLookup {
 		if plateid == "" {
 			continue
 		}
 		plate := this.Properties.PlateLookup[plateid]
 		name := plate.(wtype.Named).GetName()
-		this.Properties.Driver.AddPlateTo(position, plate, name)
+		stat = this.Properties.Driver.AddPlateTo(position, plate, name)
+
+		if stat.Errorcode == driver.ERR {
+			return wtype.LHError(wtype.LH_ERR_DRIV, stat.Msg)
+		}
 	}
 
-	// XXX -- this needs to check this won't be an error
-	this.Properties.Driver.(liquidhandling.ExtendedLiquidhandlingDriver).UpdateMetaData(this.Properties)
+	stat = this.Properties.Driver.(liquidhandling.ExtendedLiquidhandlingDriver).UpdateMetaData(this.Properties)
+	if stat.Errorcode == driver.ERR {
+		return wtype.LHError(wtype.LH_ERR_DRIV, stat.Msg)
+	}
+
+	return nil
 }
 
 // This runs the following steps in order:
@@ -262,44 +283,67 @@ func (this *Liquidhandler) do_setup(rq *LHRequest) {
 
 func (this *Liquidhandler) Plan(request *LHRequest) error {
 	// convert requests to volumes and determine required stock concentrations
-	instructions, stockconcs := solution_setup(request, this.Properties)
+	instructions, stockconcs, err := solution_setup(request, this.Properties)
+
+	if err != nil {
+		return err
+	}
+
 	request.LHInstructions = instructions
 	request.Stockconcs = stockconcs
 
 	// figure out the output order
 
-	set_output_order(request)
+	err = set_output_order(request)
 
+	if err != nil {
+		return err
+	}
 	// looks at components, determines what inputs are required
-	request = this.GetInputs(request)
+	request, err = this.GetInputs(request)
 
+	if err != nil {
+		return err
+	}
 	// define the input plates
 	// should be merged with the above
 
-	request = input_plate_setup(request)
+	request, err = input_plate_setup(request)
 
+	if err != nil {
+		return err
+	}
 	// set up the mapping of the outputs
-	request = this.Layout(request)
+	request, err = this.Layout(request)
 
-	// define the output plates
-	// DEPRECATED, marked for deletion
-	//request = output_plate_setup(request)
+	if err != nil {
+		return err
+	}
 
 	// next we need to determine the liquid handler setup
-	request = this.Setup(request)
+	request, err = this.Setup(request)
+	if err != nil {
+		return err
+	}
 
 	// now make instructions
-	request = this.ExecutionPlan(request)
+	request, err = this.ExecutionPlan(request)
 
+	if err != nil {
+		return err
+	}
 	// fix the deck setup
 
-	request = this.Tip_box_setup(request)
+	request, err = this.Tip_box_setup(request)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
 // sort out inputs
-func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
+func (this *Liquidhandler) GetInputs(request *LHRequest) (*LHRequest, error) {
 	instructions := (*request).LHInstructions
 	inputs := make(map[string][]*wtype.LHComponent, 3)
 	order := make(map[string]map[string]int, 3)
@@ -368,7 +412,11 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 
 	// define component ordering
 
-	component_order := DefineOrderOrFail(order)
+	component_order, err := DefineOrderOrFail(order)
+
+	if err != nil {
+		return request, err
+	}
 
 	(*request).Input_order = component_order
 
@@ -400,8 +448,8 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 		if volb.GreaterThanFloat(0.0001) {
 			vmap3[k] = volb
 		}
-		volc := vmap[k]
-		fmt.Println("COMPONENT ", k, " HAVE : ", vola.ToString(), " WANT: ", volc.ToString(), " DIFF: ", volb.ToString())
+		//volc := vmap[k]
+		//		fmt.Println("COMPONENT ", k, " HAVE : ", vola.ToString(), " WANT: ", volc.ToString(), " DIFF: ", volb.ToString())
 
 	}
 
@@ -438,10 +486,10 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 		this.Properties.AddTipWaste(waste)
 	}
 
-	return request
+	return request, nil
 }
 
-func DefineOrderOrFail(mapin map[string]map[string]int) []string {
+func DefineOrderOrFail(mapin map[string]map[string]int) ([]string, error) {
 	cmps := make([]string, 0, 1)
 
 	for name, _ := range mapin {
@@ -507,7 +555,7 @@ func DefineOrderOrFail(mapin map[string]map[string]int) []string {
 		}
 	}
 
-	return ret
+	return ret, nil
 }
 
 // define which labware to use
@@ -537,14 +585,14 @@ func (this *Liquidhandler) GetPlates(plates map[string]*wtype.LHPlate, major_lay
 }
 
 // generate setup for the robot
-func (this *Liquidhandler) Setup(request *LHRequest) *LHRequest {
+func (this *Liquidhandler) Setup(request *LHRequest) (*LHRequest, error) {
 	// assign the plates to positions
 	// this needs to be parameterizable
 	return this.SetupAgent(request, this.Properties)
 }
 
 // generate the output layout
-func (this *Liquidhandler) Layout(request *LHRequest) *LHRequest {
+func (this *Liquidhandler) Layout(request *LHRequest) (*LHRequest, error) {
 	// assign the results to destinations
 	// again needs to be parameterized
 
@@ -552,14 +600,14 @@ func (this *Liquidhandler) Layout(request *LHRequest) *LHRequest {
 }
 
 // make the instructions for executing this request
-func (this *Liquidhandler) ExecutionPlan(request *LHRequest) *LHRequest {
+func (this *Liquidhandler) ExecutionPlan(request *LHRequest) (*LHRequest, error) {
 	rbtcpy := this.Properties.Dup()
 
-	rq := this.ExecutionPlanner(request, rbtcpy)
+	rq, err := this.ExecutionPlanner(request, rbtcpy)
 
 	// ensure any relevant state changes are noted
 
-	return rq
+	return rq, err
 }
 
 func OutputSetup(robot *liquidhandling.LHProperties) {
