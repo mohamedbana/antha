@@ -206,11 +206,11 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	zdim = 12.0 // modified from 14
 	bottomh = 1.0
 
-	wellxoffset = 4.5 // centre of well to centre of neighbouring well in x direction
-	wellyoffset = 4.5 //centre of well to centre of neighbouring well in y direction
-	xstart = -2.5     // distance from top left side of plate to first well
-	ystart = -2.5     // distance from top left side of plate to first well
-	zstart = 40       // offset of bottom of deck to bottom of well
+	wellxoffset = 4.5              // centre of well to centre of neighbouring well in x direction
+	wellyoffset = 4.5              //centre of well to centre of neighbouring well in y direction
+	xstart = -2.5                  // distance from top left side of plate to first well
+	ystart = -2.5                  // distance from top left side of plate to first well
+	zstart = riserheightinmm + 1.0 // offset of bottom of deck to bottom of well
 
 	square = wtype.NewShape("box", "mm", 4, 4, 14)
 	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
