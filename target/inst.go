@@ -15,6 +15,7 @@ type Inst interface {
 	DependsOn() []Inst
 	SetDependsOn([]Inst)
 	GetTimeEstimate() float64
+	Error() error
 }
 
 type Files struct {
@@ -80,6 +81,7 @@ type Mix struct {
 	Request    *lh.LHRequest
 	Properties liquidhandling.LHProperties
 	Files      Files
+	Err        error
 }
 
 func (a *Mix) Data() Files {
@@ -92,6 +94,11 @@ func (a *Mix) Device() Device {
 
 func (a *Mix) DependsOn() []Inst {
 	return a.Depends
+}
+
+// TODO -- this needs to return the real result
+func (a *Mix) Error() error {
+	return a.Err
 }
 
 func (a *Mix) SetDependsOn(x []Inst) {
@@ -124,6 +131,10 @@ func (a *Manual) Device() Device {
 	return a.Dev
 }
 
+func (a *Manual) Error() error {
+	return nil
+}
+
 func (a *Manual) SetDependsOn(x []Inst) {
 	a.Depends = x
 }
@@ -143,6 +154,10 @@ func (a *Wait) Device() Device {
 
 func (a *Wait) DependsOn() []Inst {
 	return a.Depends
+}
+
+func (a *Wait) Error() error {
+	return nil
 }
 
 func (a *Wait) SetDependsOn(x []Inst) {
