@@ -74,15 +74,3 @@ func TestDeckSpace2(t *testing.T) {
 	}
 
 }
-
-func TestNoTips(t *testing.T) {
-
-}
-
-func TestNotImplemented(t *testing.T) {
-
-}
-
-func TestDriv(t *testing.T) {
-
-}
