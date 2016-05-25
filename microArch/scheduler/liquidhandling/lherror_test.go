@@ -55,6 +55,26 @@ func TestDeckSpace1(t *testing.T) {
 	}
 }
 
+func TestDeckSpace2(t *testing.T) {
+	lh := GetLiquidHandlerForTest()
+
+	for i := 0; i < len(lh.Properties.Input_preferences); i++ {
+		plate := factory.GetPlateByType("pcrplate_skirted")
+		err := lh.Properties.AddPlate(lh.Properties.Input_preferences[i], plate)
+		if err != nil {
+			t.Fatal(fmt.Sprintf("position %s is full, should be empty", lh.Properties.Input_preferences[i]))
+		}
+	}
+
+	plate := factory.GetPlateByType("pcrplate_skirted")
+	err := lh.Properties.AddPlate(lh.Properties.Input_preferences[0], plate)
+
+	if err.Error() != "1 (LH_ERR_NO_DECK_SPACE) : insufficient deck space to fit all required items; this may be due to constraints : Trying to add plate to full position position_4" {
+		t.Fatal(fmt.Sprint("1 (LH_ERR_NO_DECK_SPACE) : insufficient deck space to fit all required items; this may be due to constraints : Trying to add plate to full position position_4\n", " got: ", err.Error()))
+	}
+
+}
+
 func TestNoTips(t *testing.T) {
 
 }

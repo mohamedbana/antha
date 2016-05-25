@@ -434,36 +434,33 @@ func (lhp *LHProperties) AddTipWaste(tipwaste *wtype.LHTipwaste) error {
 			continue
 		}
 
-		lhp.AddTipWasteTo(pref, tipwaste)
-		return nil
+		err := lhp.AddTipWasteTo(pref, tipwaste)
+		return err
 	}
 
 	return wtype.LHError(wtype.LH_ERR_NO_DECK_SPACE, "Trying to add tip waste")
 }
 
-func (lhp *LHProperties) AddTipWasteTo(pos string, tipwaste *wtype.LHTipwaste) bool {
+func (lhp *LHProperties) AddTipWasteTo(pos string, tipwaste *wtype.LHTipwaste) error {
 	if lhp.PosLookup[pos] != "" {
-		logger.Debug("CAN'T ADD TIPWASTE TO FULL POSITION")
-		//panic("CAN'T ADD TIPWASTE TO FULL POSITION")
-		return false
+		return wtype.LHError(wtype.LH_ERR_NO_DECK_SPACE, fmt.Sprintf("Trying to add tip waste to full position %s", pos))
 	}
 	lhp.Tipwastes[pos] = tipwaste
 	lhp.PlateLookup[tipwaste.ID] = tipwaste
 	lhp.PosLookup[pos] = tipwaste.ID
 	lhp.PlateIDLookup[tipwaste.ID] = pos
-	return true
+	return nil
 }
 
-func (lhp *LHProperties) AddPlate(pos string, plate *wtype.LHPlate) bool {
+func (lhp *LHProperties) AddPlate(pos string, plate *wtype.LHPlate) error {
 	if lhp.PosLookup[pos] != "" {
-		logger.Debug("CAN'T ADD PLATE TO FULL POSITION")
-		return false
+		return wtype.LHError(wtype.LH_ERR_NO_DECK_SPACE, fmt.Sprintf("Trying to add plate to full position %s", pos))
 	}
 	lhp.Plates[pos] = plate
 	lhp.PlateLookup[plate.ID] = plate
 	lhp.PosLookup[pos] = plate.ID
 	lhp.PlateIDLookup[plate.ID] = pos
-	return true
+	return nil
 }
 
 // reverse the above
