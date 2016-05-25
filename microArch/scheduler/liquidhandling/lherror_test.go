@@ -37,7 +37,7 @@ func TestDeckSpace1(t *testing.T) {
 	lh := GetLiquidHandlerForTest()
 
 	for i := 0; i < lh.Properties.Nposns; i++ {
-
+		tb := factory.GetTipBoxByType()
 	}
 }
 

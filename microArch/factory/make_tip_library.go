@@ -82,6 +82,10 @@ func makeTipLibrary() map[string]*wtype.LHTipbox {
 	return tips
 }
 
+func GetTipBoxByTip(tip *wtype.LHTip) *wtype.LHTipbox {
+	return GetTipByType(tip.Type)
+}
+
 func GetTipboxByType(typ string) *wtype.LHTipbox {
 	return GetTipByType(typ)
 }

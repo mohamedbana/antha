@@ -1,5 +1,8 @@
 package liquidhandling
 
+// this version of the liquid handler factory is JUST for testing
+// so has no public calls to return liquid handlers
+
 import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -97,21 +100,4 @@ func makeGilson() *liquidhandling.LHProperties {
 	lhp.HeadsLoaded = append(lhp.HeadsLoaded, lvhead)
 
 	return lhp
-}
-
-func GetLiquidhandlerByType(typ string) *liquidhandling.LHProperties {
-	liquidhandlers := makeLiquidhandlerLibrary()
-	t := liquidhandlers[typ]
-	return t.Dup()
-}
-
-func LiquidhandlerList() []string {
-	liquidhandlers := makeLiquidhandlerLibrary()
-	kz := make([]string, len(liquidhandlers))
-	x := 0
-	for name, _ := range liquidhandlers {
-		kz[x] = name
-		x += 1
-	}
-	return kz
 }
