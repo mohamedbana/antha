@@ -25,9 +25,9 @@ package factory
 import (
 	"fmt"
 
+	"github.com/Synthace/antha/microArch/logger"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"github.com/antha-lang/antha/microArch/logger"
 )
 
 func makeComponentLibrary() map[string]*wtype.LHComponent {

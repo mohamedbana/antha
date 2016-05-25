@@ -16,6 +16,12 @@ func GetLHRequestForTest() *LHRequest {
 	return req
 }
 
+func GetComponentForTest(name string, vol wunit.Volume) *wtype.LHComponent {
+	c := factory.GetComponentByType(name)
+	c.SetVolume(vol)
+	return c
+}
+
 func TestNoInstructions(t *testing.T) {
 	req := GetLHRequestForTest()
 	lh := GetLiquidHandlerForTest()
@@ -28,6 +34,11 @@ func TestNoInstructions(t *testing.T) {
 
 func TestDeckSpace1(t *testing.T) {
 
+	lh := GetLiquidHandlerForTest()
+
+	for i := 0; i < lh.Properties.Nposns; i++ {
+
+	}
 }
 
 func TestNoTips(t *testing.T) {
