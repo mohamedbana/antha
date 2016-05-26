@@ -120,6 +120,11 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 			RaiseError("No positions left for output")
 		}
 		allowed, isConstrained := p.IsConstrainedOn(params.Model)
+
+		if isConstrained {
+			(fmt.Println("PLATE ", pid, " NAME: ", p.PlateName, " type ", p.Type, " IS CONSTRAINED"))
+		}
+
 		if isConstrained && !isInStrArr(position, allowed) {
 			continue
 		}

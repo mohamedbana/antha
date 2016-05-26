@@ -348,7 +348,8 @@ func (p *LHPlate) IsConstrainedOn(platform string) ([]string, bool) {
 
 	if ok {
 		pos = par.([]string)
+		return pos, true
 	}
 
-	return pos, true
+	return pos, false
 }

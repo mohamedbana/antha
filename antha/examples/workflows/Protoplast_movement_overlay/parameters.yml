@@ -10,9 +10,9 @@
 			"Partname":"thepart",
 			"CellVol":"10ul",
 			"DNAVol":"2ul",
-			"PEGVol":"190ul",
+			"PEGVol":"180ul",
 			"Plateoutvolume":"50ul",
-			"TransformedCellsVol":"190ul",
+			"TransformedCellsVol":"180ul",
 			"OutWell":"A1",
 			"OutWell2":"A1"
         }
