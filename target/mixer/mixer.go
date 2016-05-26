@@ -247,7 +247,7 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 		if wtype.LHErrorIsInternal(err) {
 			return nil, err
 		} else {
-			return CmpErr{Err: err}, nil
+			return &target.CmpError{Err: err, Dev: a}, nil
 		}
 	}
 
