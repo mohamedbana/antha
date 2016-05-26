@@ -119,6 +119,7 @@ func NewLHRequest() *LHRequest {
 	lhr.Input_setup_weights = make(map[string]float64)
 	lhr.Output_plates = make(map[string]*wtype.LHPlate)
 	lhr.Output_plate_layout = make([]string, 0, 1)
+	lhr.Input_plate_layout = make([]string, 0, 1)
 	lhr.Plate_lookup = make(map[string]string)
 	lhr.Stockconcs = make(map[string]float64)
 	lhr.Input_order = make([]string, 0)
