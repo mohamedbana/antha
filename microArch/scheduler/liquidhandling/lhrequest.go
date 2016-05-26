@@ -45,10 +45,10 @@ type LHRequest struct {
 	Input_plates             map[string]*wtype.LHPlate
 	Output_plates            map[string]*wtype.LHPlate
 	Input_platetypes         []*wtype.LHPlate
-	Input_plate_layout       []string
+	Input_plate_order        []string
 	Input_setup_weights      map[string]float64
 	Output_platetypes        []*wtype.LHPlate
-	Output_plate_layout      []string
+	Output_plate_order       []string
 	Plate_lookup             map[string]string
 	Stockconcs               map[string]float64
 	Policies                 *liquidhandling.LHPolicyRuleSet
@@ -118,8 +118,8 @@ func NewLHRequest() *LHRequest {
 	lhr.Input_platetypes = make([]*wtype.LHPlate, 0, 2)
 	lhr.Input_setup_weights = make(map[string]float64)
 	lhr.Output_plates = make(map[string]*wtype.LHPlate)
-	lhr.Output_plate_layout = make([]string, 0, 1)
-	lhr.Input_plate_layout = make([]string, 0, 1)
+	lhr.Output_plate_order = make([]string, 0, 1)
+	lhr.Input_plate_order = make([]string, 0, 1)
 	lhr.Plate_lookup = make(map[string]string)
 	lhr.Stockconcs = make(map[string]float64)
 	lhr.Input_order = make([]string, 0)
