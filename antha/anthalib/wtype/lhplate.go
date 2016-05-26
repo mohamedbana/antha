@@ -338,13 +338,13 @@ func (p *LHPlate) IsTemporary() bool {
 
 //// VERY VERY VERY BAD XXX XXX XXX
 func (p *LHPlate) SetConstrained(platform string, positions []string) {
-	p.WellType.Extra[platform] = positions
+	p.Welltype.Extra[platform] = positions
 }
 
 func (p *LHPlate) IsConstrainedOn(platform string) ([]string, bool) {
 	var pos []string
 
-	par, ok := p.WellType.Extra[platform]
+	par, ok := p.Welltype.Extra[platform]
 
 	if ok {
 		pos = par.([]string)
