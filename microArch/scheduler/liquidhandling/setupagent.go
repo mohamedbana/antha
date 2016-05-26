@@ -119,6 +119,11 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 		if position == "" {
 			RaiseError("No positions left for output")
 		}
+		allowed, isConstrained := p.IsConstrainedOn(params.Model)
+		if isConstrained && !isInStrArr(position, allowed) {
+			continue
+		}
+
 		setup[position] = p
 		plate_lookup[p.ID] = position
 		params.AddPlate(position, p)
@@ -130,6 +135,10 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 		position := get_first_available_preference(input_preferences, setup)
 		if position == "" {
 			RaiseError("No positions left for input")
+		}
+		allowed, isConstrained := p.IsConstrainedOn(params.Model)
+		if isConstrained && !isInStrArr(position, allowed) {
+			continue
 		}
 		//fmt.Println("PLAATE: ", position)
 		setup[position] = p
@@ -152,4 +161,14 @@ func get_first_available_preference(prefs []string, setup map[string]interface{}
 
 	}
 	return ""
+}
+
+func isInStrArr(q string, ar []string) bool {
+	for _, s := range ar {
+		if q == s {
+			return true
+		}
+	}
+
+	return false
 }
