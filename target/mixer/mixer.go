@@ -241,12 +241,14 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 	err = r.Liquidhandler.MakeSolutions(r.LHRequest)
 
 	if err != nil {
-		return &target.Mix{
-			Dev:        a,
-			Request:    r.LHRequest,
-			Properties: a.properties,
-			Err:        err,
-		}, nil
+		// depending on what went wrong we might error out or return
+		// an error instruction
+
+		if wtype.LHErrorIsInternal(err) {
+			return nil, err
+		} else {
+			return CmpErr{Err: err}, nil
+		}
 	}
 
 	tarball, err := a.saveFile("input")

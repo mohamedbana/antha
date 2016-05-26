@@ -3,6 +3,9 @@ package wtype
 import (
 	"errors"
 	"fmt"
+	"strings"
+
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
 )
 
 // consts for liquid handling planner errors
@@ -35,4 +38,18 @@ func LHError(code int, detail string) error {
 	s := fmt.Sprintf("%d (%s) : %s : %s", code, ErrorName(code), ErrorDesc(code), detail)
 
 	return errors.New(s)
+}
+
+func LHErrorCodeFromErr(err error) int {
+	tx := strings.Split(err.Error(), " ")
+
+	i := wutil.ParseInt(tx[0])
+
+	return i
+}
+
+func LHErrorIsInternal(err error) bool {
+	c := LHErrorCodeFromErr(err)
+
+	return c == LH_ERR_DIRE
 }
