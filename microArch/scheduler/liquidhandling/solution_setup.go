@@ -23,8 +23,8 @@
 package liquidhandling
 
 import (
-	"errors"
 	"fmt"
+
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
@@ -35,7 +35,7 @@ import (
 // fulfil the requirements for making
 // instructions to specifications
 
-func solution_setup(request *LHRequest, prms *liquidhandling.LHProperties) (map[string]*wtype.LHInstruction, map[string]float64) {
+func solution_setup(request *LHRequest, prms *liquidhandling.LHProperties) (map[string]*wtype.LHInstruction, map[string]float64, error) {
 	instructions := request.LHInstructions
 
 	// index of components used to make up to a total volume, along with the required total
@@ -77,7 +77,7 @@ func solution_setup(request *LHRequest, prms *liquidhandling.LHProperties) (map[
 					totalvol = tv
 				} else {
 					// error
-					wutil.Error(errors.New(fmt.Sprintf("Inconsistent total volumes %-6.4f and %-6.4f at component %s", totalvol, tv, component.Name)))
+					wtype.LHError(wtype.LH_ERR_CONC, fmt.Sprintf("Inconsistent total volumes %-6.4f and %-6.4f at component %s", totalvol, tv, component.Name))
 				}
 			} else {
 				cmpvol += component.Vol
@@ -207,7 +207,7 @@ func solution_setup(request *LHRequest, prms *liquidhandling.LHProperties) (map[
 					totalvol = tv
 				} else {
 					// error
-					wutil.Error(errors.New(fmt.Sprintf("Inconsistent total volumes %-6.4f and %-6.4f at component %s", totalvol, tv, component.Name)))
+					wtype.LHError(wtype.LH_ERR_CONC, fmt.Sprintf("Inconsistent total volumes %-6.4f and %-6.4f at component %s", totalvol, tv, component.Name))
 				}
 			} else {
 				// need to add in the volume taken up by any volume components
@@ -252,5 +252,5 @@ func solution_setup(request *LHRequest, prms *liquidhandling.LHProperties) (map[
 		newInstructions[instruction.ID] = instruction
 	}
 
-	return newInstructions, stockconcs
+	return newInstructions, stockconcs, nil
 }

@@ -73,7 +73,7 @@ func (is InputSorter) Less(i, j int) bool {
 // INPUT: 	"input_platetype", "inputs"
 //OUTPUT: 	"input_plates"      -- these each have components in wells
 //		"input_assignments" -- map with arrays of assignment strings, i.e. {tea: [plate1:A:1, plate1:A:2...] }etc.
-func input_plate_setup(request *LHRequest) *LHRequest {
+func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 	// I think this might need moving too
 	logger.Debug("in input plate setup")
 	input_platetypes := (*request).Input_platetypes
@@ -223,5 +223,5 @@ func input_plate_setup(request *LHRequest) *LHRequest {
 	(*request).Input_plates = input_plates
 	(*request).Input_assignments = input_assignments
 	//return input_plates, input_assignments
-	return request
+	return request, nil
 }

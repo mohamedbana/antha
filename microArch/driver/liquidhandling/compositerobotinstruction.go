@@ -23,7 +23,6 @@
 package liquidhandling
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"sort"
@@ -193,7 +192,7 @@ func (ins *TransferInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func TransferVolumes(Vol, Min, Max wunit.Volume) []wunit.Volume {
+func TransferVolumes(Vol, Min, Max wunit.Volume) ([]wunit.Volume, error) {
 	ret := make([]wunit.Volume, 0)
 
 	vol := Vol.ConvertTo(Min.Unit())
@@ -201,13 +200,18 @@ func TransferVolumes(Vol, Min, Max wunit.Volume) []wunit.Volume {
 	max := Max.RawValue()
 
 	if vol < min {
-		logger.Fatal(fmt.Sprintf("Error: %f below min vol %f", vol, min))
-		panic(errors.New(fmt.Sprintf("Error: %f below min vol %f", vol, min)))
+		/*
+			logger.Fatal(fmt.Sprintf("Error: %f below min vol %f", vol, min))
+			panic(errors.New(fmt.Sprintf("Error: %f below min vol %f", vol, min)))
+		*/
+
+		err := wtype.LHError(wtype.LH_ERR_VOL, fmt.Sprintf("Liquid Handler cannot service volume requested: %f - minimum volume is %f", vol, min))
+		return ret, err
 	}
 
 	if vol <= max {
 		ret = append(ret, Vol)
-		return ret
+		return ret, nil
 	}
 
 	// vol is > max, need to know by how much
@@ -225,7 +229,7 @@ func TransferVolumes(Vol, Min, Max wunit.Volume) []wunit.Volume {
 		ret = append(ret, wunit.NewVolume(vol/n, Vol.Unit().PrefixedSymbol()))
 	}
 
-	return ret
+	return ret, nil
 }
 
 func (vs VolumeSet) MaxMultiTransferVolume() wunit.Volume {
@@ -485,7 +489,7 @@ func (vs VolumeSet) GetACopy() []wunit.Volume {
 	return r
 }
 
-func (ins *TransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
+func (ins *TransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
 	pol := policy.GetPolicyFor(ins)
 
 	ret := make([]RobotInstruction, 0)
@@ -499,8 +503,6 @@ func (ins *TransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProper
 		// this is a bit problematic: we need to define head choice here partly on the
 		// basis of its multi, partly based on volume range
 		parallelsets := ins.GetParallelSetsFor(prms.HeadsLoaded[0].Params)
-
-		fmt.Println("PARALLEL SETS FOUND: ", parallelsets)
 
 		mci := NewMultiChannelBlockInstruction()
 		mci.Multi = prms.HeadsLoaded[0].Params.Multi // TODO Remove Hard code here
@@ -616,7 +618,7 @@ func (ins *TransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProper
 		ret = append(ret, sci)
 	}
 
-	return ret
+	return ret, nil
 }
 
 type SingleChannelBlockInstruction struct {
@@ -701,12 +703,18 @@ func (ins *SingleChannelBlockInstruction) GetParameter(name string) interface{} 
 	return nil
 }
 
-func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
+func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
 	pol := policy.GetPolicyFor(ins)
 	ret := make([]RobotInstruction, 0)
 	// get tips
 	channel, tiptype := ChooseChannel(ins.Volume[0], prms)
-	ret = append(ret, GetTips(tiptype, prms, channel, 1, false))
+	tipget, err := GetTips(tiptype, prms, channel, 1, false)
+
+	if err != nil {
+		return ret, err
+	}
+
+	ret = append(ret, tipget)
 	n_tip_uses := 0
 
 	var last_thing *wtype.LHComponent
@@ -717,7 +725,11 @@ func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms
 
 	for t := 0; t < len(ins.Volume); t++ {
 		newchannel, newtiptype := ChooseChannel(ins.Volume[t], prms)
-		tvs := TransferVolumes(ins.Volume[t], channel.Minvol, channel.Maxvol)
+		tvs, err := TransferVolumes(ins.Volume[t], channel.Minvol, channel.Maxvol)
+
+		if err != nil {
+			return ret, err
+		}
 		for _, vol := range tvs {
 			// determine whether to change tips
 			change_tips := false
@@ -741,8 +753,20 @@ func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms
 			if change_tips {
 				// maybe wrap this as a ChangeTips function call
 				// these need parameters
-				ret = append(ret, DropTips(tiptype, prms, channel, 1))
-				ret = append(ret, GetTips(newtiptype, prms, newchannel, 1, false))
+
+				tipdrp, err := DropTips(tiptype, prms, channel, 1)
+				if err != nil {
+					return ret, err
+				}
+				ret = append(ret, tipdrp)
+
+				tipget, err := GetTips(newtiptype, prms, newchannel, 1, false)
+
+				if err != nil {
+					return ret, err
+				}
+
+				ret = append(ret, tipget)
 				tiptype = newtiptype
 				channel = newchannel
 				n_tip_uses = 0
@@ -784,9 +808,14 @@ func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms
 		}
 
 	}
-	ret = append(ret, DropTips(tiptype, prms, channel, 1))
+	tipdrp, err := DropTips(tiptype, prms, channel, 1)
 
-	return ret
+	if err != nil {
+		return ret, err
+	}
+	ret = append(ret, tipdrp)
+
+	return ret, nil
 }
 
 type MultiChannelBlockInstruction struct {
@@ -873,13 +902,17 @@ func (ins *MultiChannelBlockInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *MultiChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
+func (ins *MultiChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
 	pol := policy.GetPolicyFor(ins)
 	ret := make([]RobotInstruction, 0)
 	// get some tips
 
 	channel, tiptype := ChooseChannel(ins.Volume[0][0], prms)
-	ret = append(ret, GetTips(tiptype, prms, channel, ins.Multi, false))
+	tipget, err := GetTips(tiptype, prms, channel, ins.Multi, false)
+	if err != nil {
+		return ret, err
+	}
+	ret = append(ret, tipget)
 	n_tip_uses := 0
 
 	for t := 0; t < len(ins.Volume); t++ {
@@ -901,7 +934,11 @@ func (ins *MultiChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms 
 		// split the transfer up
 		// NB we assume all volumes are equal here;
 		// oof we need to do some work here -- this needs to be in sync with singlechannel block
-		tvs := TransferVolumes(ins.Volume[t][0], newchannel.Minvol, newchannel.Maxvol)
+		tvs, err := TransferVolumes(ins.Volume[t][0], newchannel.Minvol, newchannel.Maxvol)
+
+		if err != nil {
+			return ret, err
+		}
 
 		for _, vol := range tvs {
 			// determine whether to change tips
@@ -927,8 +964,19 @@ func (ins *MultiChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms 
 			if change_tips {
 				// maybe wrap this as a ChangeTips function call
 				// these need parameters
-				ret = append(ret, DropTips(tiptype, prms, channel, ins.Multi))
-				ret = append(ret, GetTips(newtiptype, prms, newchannel, ins.Multi, false))
+				tipdrp, err := DropTips(tiptype, prms, channel, ins.Multi)
+
+				if err != nil {
+					return ret, err
+				}
+				ret = append(ret, tipdrp)
+
+				tipget, err := GetTips(newtiptype, prms, newchannel, ins.Multi, false)
+				if err != nil {
+					return ret, err
+				}
+
+				ret = append(ret, tipget)
 				tiptype = newtiptype
 				channel = newchannel
 				n_tip_uses = 0
@@ -970,9 +1018,15 @@ func (ins *MultiChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms 
 	}
 
 	// remove tips
-	ret = append(ret, DropTips(tiptype, prms, channel, ins.Multi))
+	tipdrp, err := DropTips(tiptype, prms, channel, ins.Multi)
 
-	return ret
+	if err != nil {
+		return ret, err
+	}
+
+	ret = append(ret, tipdrp)
+
+	return ret, nil
 }
 
 type SingleChannelTransferInstruction struct {
@@ -1049,7 +1103,7 @@ func (ins *SingleChannelTransferInstruction) GetParameter(name string) interface
 	return nil
 }
 
-func (ins *SingleChannelTransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
+func (ins *SingleChannelTransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
 	ret := make([]RobotInstruction, 0)
 	// make the instructions
 
@@ -1076,7 +1130,7 @@ func (ins *SingleChannelTransferInstruction) Generate(policy *LHPolicyRuleSet, p
 		ret = append(ret, resetinstruction)
 	*/
 
-	return ret
+	return ret, nil
 }
 
 type MultiChannelTransferInstruction struct {
@@ -1163,7 +1217,7 @@ func (ins *MultiChannelTransferInstruction) GetParameter(name string) interface{
 	return nil
 }
 
-func (ins *MultiChannelTransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
+func (ins *MultiChannelTransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
 	ret := make([]RobotInstruction, 0)
 
 	// make the instructions
@@ -1186,7 +1240,7 @@ func (ins *MultiChannelTransferInstruction) Generate(policy *LHPolicyRuleSet, pr
 	ret = append(ret, blowinstruction)
 	ret = append(ret, resetinstruction)
 
-	return ret
+	return ret, nil
 }
 
 type StateChangeInstruction struct {
@@ -1218,8 +1272,8 @@ func (ins *StateChangeInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *StateChangeInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *StateChangeInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 type ChangeAdaptorInstruction struct {
@@ -1263,7 +1317,7 @@ func (ins *ChangeAdaptorInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *ChangeAdaptorInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
+func (ins *ChangeAdaptorInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
 	ret := make([]RobotInstruction, 4)
 	/*
 		ret[0]=NewMoveInstruction(ins.DropPosition,...)
@@ -1272,7 +1326,7 @@ func (ins *ChangeAdaptorInstruction) Generate(policy *LHPolicyRuleSet, prms *LHP
 		ret[3]=NewLoadAdaptorInstruction(ins.GetPosition,...)
 	*/
 
-	return ret
+	return ret, nil
 }
 
 type LoadTipsMoveInstruction struct {
@@ -1314,7 +1368,7 @@ func (ins *LoadTipsMoveInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *LoadTipsMoveInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
+func (ins *LoadTipsMoveInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
 	ret := make([]RobotInstruction, 2)
 
 	// move
@@ -1342,7 +1396,7 @@ func (ins *LoadTipsMoveInstruction) Generate(policy *LHPolicyRuleSet, prms *LHPr
 	lod.Well = ins.Well
 	ret[1] = lod
 
-	return ret
+	return ret, nil
 }
 
 type UnloadTipsMoveInstruction struct {
@@ -1384,7 +1438,7 @@ func (ins *UnloadTipsMoveInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *UnloadTipsMoveInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
+func (ins *UnloadTipsMoveInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
 	ret := make([]RobotInstruction, 2)
 
 	// move
@@ -1412,7 +1466,7 @@ func (ins *UnloadTipsMoveInstruction) Generate(policy *LHPolicyRuleSet, prms *LH
 	uld.Well = ins.WellTo
 	ret[1] = uld
 
-	return ret
+	return ret, nil
 }
 
 type AspirateInstruction struct {
@@ -1461,8 +1515,8 @@ func (ins *AspirateInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *AspirateInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *AspirateInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *AspirateInstruction) OutputTo(driver LiquidhandlingDriver) {
@@ -1518,8 +1572,8 @@ func (ins *DispenseInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *DispenseInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *DispenseInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *DispenseInstruction) OutputTo(driver LiquidhandlingDriver) {
@@ -1572,8 +1626,8 @@ func (ins *BlowoutInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *BlowoutInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *BlowoutInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *BlowoutInstruction) OutputTo(driver LiquidhandlingDriver) {
@@ -1615,8 +1669,8 @@ func (ins *PTZInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *PTZInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *PTZInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *PTZInstruction) OutputTo(driver LiquidhandlingDriver) {
@@ -1679,8 +1733,8 @@ func (ins *MoveInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *MoveInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *MoveInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *MoveInstruction) OutputTo(driver LiquidhandlingDriver) {
@@ -1754,8 +1808,8 @@ func (ins *MoveRawInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *MoveRawInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *MoveRawInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *MoveRawInstruction) OutputTo(driver LiquidhandlingDriver) {
@@ -1812,8 +1866,8 @@ func (ins *LoadTipsInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *LoadTipsInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *LoadTipsInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *LoadTipsInstruction) OutputTo(driver LiquidhandlingDriver) {
@@ -1867,8 +1921,8 @@ func (ins *UnloadTipsInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *UnloadTipsInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *UnloadTipsInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *UnloadTipsInstruction) OutputTo(driver LiquidhandlingDriver) {
@@ -1945,7 +1999,7 @@ func (ins *SuckInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
+func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
 	ret := make([]RobotInstruction, 0, 1)
 
 	// this is where the policies come into effect
@@ -2160,7 +2214,7 @@ func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 		ret = append(ret, waitins)
 	}
 
-	return ret
+	return ret, nil
 }
 
 type BlowInstruction struct {
@@ -2240,7 +2294,7 @@ func (scti *BlowInstruction) Params() MultiTransferParams {
 	return tp
 }
 
-func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
+func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
 	ret := make([]RobotInstruction, 0)
 	// apply policies here
 
@@ -2509,7 +2563,7 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 		ret = append(ret, resetinstruction)
 	}
 
-	return ret
+	return ret, nil
 }
 
 type SetPipetteSpeedInstruction struct {
@@ -2542,8 +2596,8 @@ func (ins *SetPipetteSpeedInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *SetPipetteSpeedInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *SetPipetteSpeedInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *SetPipetteSpeedInstruction) OutputTo(driver LiquidhandlingDriver) {
@@ -2577,8 +2631,8 @@ func (ins *SetDriveSpeedInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *SetDriveSpeedInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *SetDriveSpeedInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *SetDriveSpeedInstruction) OutputTo(driver LiquidhandlingDriver) {
@@ -2602,8 +2656,8 @@ func (ins *InitializeInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *InitializeInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *InitializeInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *InitializeInstruction) OutputTo(driver LiquidhandlingDriver) {
@@ -2627,8 +2681,8 @@ func (ins *FinalizeInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *FinalizeInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *FinalizeInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *FinalizeInstruction) OutputTo(driver LiquidhandlingDriver) {
@@ -2659,8 +2713,8 @@ func (ins *WaitInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *WaitInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *WaitInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *WaitInstruction) OutputTo(driver LiquidhandlingDriver) {
@@ -2701,8 +2755,8 @@ func (ins *LightsOnInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *LightsOnInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *LightsOnInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *LightsOnInstruction) OutputTo(driver LiquidhandlingDriver) {
@@ -2744,8 +2798,8 @@ func (ins *LightsOffInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *LightsOffInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *LightsOffInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *LightsOffInstruction) OutputTo(driver LiquidhandlingDriver) {
@@ -2787,8 +2841,8 @@ func (ins *OpenInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *OpenInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *OpenInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *OpenInstruction) OutputTo(driver LiquidhandlingDriver) {
@@ -2830,8 +2884,8 @@ func (ins *CloseInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *CloseInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *CloseInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *CloseInstruction) OutputTo(driver LiquidhandlingDriver) {
@@ -2873,8 +2927,8 @@ func (ins *LoadAdaptorInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *LoadAdaptorInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *LoadAdaptorInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *LoadAdaptorInstruction) OutputTo(driver LiquidhandlingDriver) {
@@ -2916,8 +2970,8 @@ func (ins *UnloadAdaptorInstruction) GetParameter(name string) interface{} {
 	return nil
 }
 
-func (ins *UnloadAdaptorInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *UnloadAdaptorInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *UnloadAdaptorInstruction) OutputTo(driver LiquidhandlingDriver) {
@@ -3009,7 +3063,7 @@ func (ins *ResetInstruction) AddMultiTransferParams(mtp MultiTransferParams) {
 	ins.Prms = mtp.Channel
 }
 
-func (ins *ResetInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
+func (ins *ResetInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
 	pol := policy.GetPolicyFor(ins)
 	ret := make([]RobotInstruction, 0)
 
@@ -3061,7 +3115,7 @@ func (ins *ResetInstruction) Generate(policy *LHPolicyRuleSet, prms *LHPropertie
 		ret = append(ret, mov2)
 		ret = append(ret, ptz)
 	}
-	return ret
+	return ret, nil
 }
 
 type MoveMixInstruction struct {
@@ -3141,7 +3195,7 @@ func (ins *MoveMixInstruction) InstructionType() int {
 	return MMX
 }
 
-func (ins *MoveMixInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
+func (ins *MoveMixInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
 	ret := make([]RobotInstruction, 2)
 
 	// move
@@ -3172,7 +3226,7 @@ func (ins *MoveMixInstruction) Generate(policy *LHPolicyRuleSet, prms *LHPropert
 	mix.Blowout = ins.Blowout
 	ret[1] = mix
 
-	return ret
+	return ret, nil
 }
 
 type MixInstruction struct {
@@ -3202,8 +3256,8 @@ func (mi *MixInstruction) InstructionType() int {
 	return mi.Type
 }
 
-func (ins *MixInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction {
-	return nil
+func (ins *MixInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
 }
 
 func (ins *MixInstruction) GetParameter(name string) interface{} {
@@ -3237,13 +3291,17 @@ func (mi *MixInstruction) OutputTo(driver LiquidhandlingDriver) {
 
 // TODO -- implement MESSAGE
 
-func GetTips(tiptype string, params *LHProperties, channel *wtype.LHChannelParameter, multi int, mirror bool) RobotInstruction {
+func GetTips(tiptype string, params *LHProperties, channel *wtype.LHChannelParameter, multi int, mirror bool) (RobotInstruction, error) {
 
-	tipwells, tipboxpositions, tipboxtypes := params.GetCleanTips(tiptype, channel, mirror, multi)
+	tipwells, tipboxpositions, tipboxtypes, terr := params.GetCleanTips(tiptype, channel, mirror, multi)
 
-	if tipwells == nil {
-		logger.Fatal("No tips left")
-		panic("NO TIPS LEFT BOYO")
+	if tipwells == nil || terr != nil {
+		/*
+			logger.Fatal("No tips left")
+			panic("NO TIPS LEFT BOYO")
+		*/
+		err := wtype.LHError(wtype.LH_ERR_NO_TIPS, fmt.Sprint("PICKUP: type: ", tiptype, " n: ", multi, " mirror: ", mirror))
+		return NewLoadTipsMoveInstruction(), err
 	}
 
 	ins := NewLoadTipsMoveInstruction()
@@ -3253,17 +3311,18 @@ func GetTips(tiptype string, params *LHProperties, channel *wtype.LHChannelParam
 	ins.FPlateType = tipboxtypes
 	ins.Multi = multi
 
-	logger.Debug(InsToString(ins))
-
-	return ins
+	return ins, nil
 }
 
-func DropTips(tiptype string, params *LHProperties, channel *wtype.LHChannelParameter, multi int) RobotInstruction {
+func DropTips(tiptype string, params *LHProperties, channel *wtype.LHChannelParameter, multi int) (RobotInstruction, error) {
 	tipwells, tipwastepositions, tipwastetypes := params.DropDirtyTips(channel, multi)
 
 	if tipwells == nil {
-		logger.Fatal("Could not dispose tip. No usable tipwell found")
-		panic("NO ROOM AT THE INN FOR THESE LITTLE TIPS")
+		//logger.Fatal("Could not dispose tip. No usable tipwell found")
+		//panic("NO ROOM AT THE INN FOR THESE LITTLE TIPS")
+		ins := NewUnloadTipsMoveInstruction()
+		err := wtype.LHError(wtype.LH_ERR_NO_TIPS, fmt.Sprint("DROP: type: ", tiptype, " n: ", multi))
+		return ins, err
 	}
 
 	ins := NewUnloadTipsMoveInstruction()
@@ -3273,5 +3332,5 @@ func DropTips(tiptype string, params *LHProperties, channel *wtype.LHChannelPara
 	ins.TPlateType = tipwastetypes
 	ins.Multi = multi
 	logger.Debug(InsToString(ins))
-	return ins
+	return ins, nil
 }
