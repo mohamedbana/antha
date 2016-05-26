@@ -24,6 +24,7 @@ package liquidhandling
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/logger"
@@ -55,10 +56,35 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 
 	// input plates
 	input_plates := request.Input_plates
+	input_plate_order := request.Input_plate_order
+
+	if len(input_plate_order) < len(input_plates) {
+		input_plate_order = make([]string, len(input_plates))
+		x := 0
+		for k, _ := range input_plates {
+			input_plate_order[x] = k
+			x += 1
+		}
+
+		sort.Strings(input_plate_order)
+		request.Input_plate_order = input_plate_order
+	}
 
 	// output plates
 	output_plates := request.Output_plates
+	output_plate_order := request.Output_plate_order
 
+	if len(output_plate_order) < len(output_plates) {
+		output_plate_order = make([]string, len(output_plates))
+		x := 0
+		for k, _ := range output_plates {
+			output_plate_order[x] = k
+			x += 1
+		}
+
+		sort.Strings(output_plate_order)
+		request.Output_plate_order = output_plate_order
+	}
 	// tips
 	tips := request.Tips
 
@@ -85,27 +111,34 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 
 	}
 
-	// this logic may not transfer well but I expect that outputs are more constrained
-	// than inputs for the simple reason that most output takes place to single wells
-	// while input (sometimes) takes place from reservoirs
+	// place outputs
 
-	// outputs
-
-	for _, p := range output_plates {
+	for _, pid := range output_plate_order {
+		p := output_plates[pid]
 		position := get_first_available_preference(output_preferences, setup)
 		if position == "" {
 			RaiseError("No positions left for output")
 		}
+		allowed, isConstrained := p.IsConstrainedOn(params.Model)
+		if isConstrained && !isInStrArr(position, allowed) {
+			continue
+		}
+
 		setup[position] = p
 		plate_lookup[p.ID] = position
 		params.AddPlate(position, p)
 		logger.Info(fmt.Sprintf("Output plate of type %s in position %s", p.Type, position))
 	}
 
-	for _, p := range input_plates {
+	for _, pid := range input_plate_order {
+		p := input_plates[pid]
 		position := get_first_available_preference(input_preferences, setup)
 		if position == "" {
 			RaiseError("No positions left for input")
+		}
+		allowed, isConstrained := p.IsConstrainedOn(params.Model)
+		if isConstrained && !isInStrArr(position, allowed) {
+			continue
 		}
 		//fmt.Println("PLAATE: ", position)
 		setup[position] = p
@@ -128,4 +161,14 @@ func get_first_available_preference(prefs []string, setup map[string]interface{}
 
 	}
 	return ""
+}
+
+func isInStrArr(q string, ar []string) bool {
+	for _, s := range ar {
+		if q == s {
+			return true
+		}
+	}
+
+	return false
 }

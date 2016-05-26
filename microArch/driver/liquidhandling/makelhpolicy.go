@@ -524,11 +524,12 @@ func GetLHPolicyForTest() *LHPolicyRuleSet {
 
 	// a further refinement: for low volumes we need to add extra volume
 	// for aspirate and dispense
-
-	rule = NewLHPolicyRule("ExtraVolumeForLV")
-	rule.AddNumericConditionOn("VOLUME", 0.0, 20.0)
-	pol = MakeLVExtraPolicy()
-	lhpr.AddRule(rule, pol)
+	/*
+		rule = NewLHPolicyRule("ExtraVolumeForLV")
+		rule.AddNumericConditionOn("VOLUME", 0.0, 20.0)
+		pol = MakeLVExtraPolicy()
+		lhpr.AddRule(rule, pol)
+	*/
 
 	// hack to fix plate type problems
 	rule = NewLHPolicyRule("LVOffsetFix")
