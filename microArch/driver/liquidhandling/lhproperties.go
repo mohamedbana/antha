@@ -349,8 +349,6 @@ func (lhp *LHProperties) TipsLeftOfType(tiptype string) int {
 }
 
 func (lhp *LHProperties) AddTipBox(tipbox *wtype.LHTipbox) error {
-	/// TODO --- get rid of this!
-	return wtype.LHError(wtype.LH_ERR_NO_DECK_SPACE, "Trying to add tip box")
 	for _, pref := range lhp.Tip_preferences {
 		if lhp.PosLookup[pref] != "" {
 			continue
