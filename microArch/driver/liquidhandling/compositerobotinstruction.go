@@ -2095,35 +2095,34 @@ func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 		}
 	}
 
-	discrepancy := false
+	/*
+		discrepancy := false
 
-	if premix {
-		// check whether there is a discrepancy between the mix reference
-		// etc. and the asp reference... if not we don't need to move
+		if premix {
+			// check whether there is a discrepancy between the mix reference
+			// etc. and the asp reference... if not we don't need to move
 
-		discrepancy = discrepancy || (mixofx != ofx)
-		discrepancy = discrepancy || (mixofy != ofy)
-		discrepancy = discrepancy || (mixofz != ofz)
-	}
-
-	if !premix || discrepancy {
-		// only move if we need to
-		mov := NewMoveInstruction()
-		mov.Head = ins.Head
-
-		mov.Pos = ins.PltFrom
-		mov.Plt = ins.FPlateType
-		mov.Well = ins.WellFrom
-		mov.WVolume = ins.FVolume
-
-		for i := 0; i < ins.Multi; i++ {
-			mov.Reference = append(mov.Reference, final_asp_ref)
-			mov.OffsetX = append(mov.OffsetX, ofx)
-			mov.OffsetY = append(mov.OffsetY, ofy)
-			mov.OffsetZ = append(mov.OffsetZ, ofz)
+			discrepancy = discrepancy || (mixofx != ofx)
+			discrepancy = discrepancy || (mixofy != ofy)
+			discrepancy = discrepancy || (mixofz != ofz)
 		}
-		ret = append(ret, mov)
+	*/
+	//nb moves are mandatory
+	mov := NewMoveInstruction()
+	mov.Head = ins.Head
+
+	mov.Pos = ins.PltFrom
+	mov.Plt = ins.FPlateType
+	mov.Well = ins.WellFrom
+	mov.WVolume = ins.FVolume
+
+	for i := 0; i < ins.Multi; i++ {
+		mov.Reference = append(mov.Reference, final_asp_ref)
+		mov.OffsetX = append(mov.OffsetX, ofx)
+		mov.OffsetY = append(mov.OffsetY, ofy)
+		mov.OffsetZ = append(mov.OffsetZ, ofz)
 	}
+	ret = append(ret, mov)
 
 	// Set the pipette speed if needed
 
