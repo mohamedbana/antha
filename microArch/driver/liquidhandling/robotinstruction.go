@@ -30,7 +30,7 @@ import (
 type RobotInstruction interface {
 	InstructionType() int
 	GetParameter(name string) interface{}
-	Generate(policy *LHPolicyRuleSet, prms *LHProperties) []RobotInstruction
+	Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error)
 }
 
 type TerminalRobotInstruction interface {

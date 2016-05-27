@@ -481,7 +481,7 @@ func MakeLVExtraPolicy() LHPolicy {
 	return lvep
 }
 
-func GetLHPolicyForTest() *LHPolicyRuleSet {
+func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
 	// make some policies
 
 	policies := MakePolicies()
@@ -492,7 +492,11 @@ func GetLHPolicyForTest() *LHPolicyRuleSet {
 
 	for name, policy := range policies {
 		rule := NewLHPolicyRule(name)
-		rule.AddCategoryConditionOn("LIQUIDCLASS", name)
+		err := rule.AddCategoryConditionOn("LIQUIDCLASS", name)
+
+		if err != nil {
+			return nil, err
+		}
 		lhpr.AddRule(rule, policy)
 	}
 
@@ -501,8 +505,16 @@ func GetLHPolicyForTest() *LHPolicyRuleSet {
 	// are being properly kept in sync
 
 	rule := NewLHPolicyRule("BlowOutToEmptyWells")
-	rule.AddNumericConditionOn("WELLTOVOLUME", 0.0, 1.0)
-	rule.AddCategoryConditionOn("LIQUIDCLASS", "water")
+	err := rule.AddNumericConditionOn("WELLTOVOLUME", 0.0, 1.0)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = rule.AddCategoryConditionOn("LIQUIDCLASS", "water")
+	if err != nil {
+		return nil, err
+	}
 	pol := MakeJBPolicy()
 	lhpr.AddRule(rule, pol)
 
@@ -510,11 +522,15 @@ func GetLHPolicyForTest() *LHPolicyRuleSet {
 	// for aspirate and dispense
 
 	rule = NewLHPolicyRule("ExtraVolumeForLV")
-	rule.AddNumericConditionOn("VOLUME", 0.0, 20.0)
+	err = rule.AddNumericConditionOn("VOLUME", 0.0, 20.0)
+	if err != nil {
+		return nil, err
+	}
+
 	pol = MakeLVExtraPolicy()
 	lhpr.AddRule(rule, pol)
 
-	return lhpr
+	return lhpr, nil
 }
 
 func LoadLHPoliciesFromFile() (*LHPolicyRuleSet, error) {

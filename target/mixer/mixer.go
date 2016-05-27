@@ -69,7 +69,13 @@ func (a *Mixer) makeLhreq() (*lhreq, error) {
 	}
 
 	req := planner.NewLHRequest()
-	req.Policies = driver.GetLHPolicyForTest()
+	pols, err := driver.GetLHPolicyForTest()
+
+	if err != nil {
+		return nil, err
+	}
+	req.Policies = pols
+
 	plan := planner.Init(&a.properties)
 
 	if p := a.opt.MaxPlates; p != nil {
@@ -137,7 +143,7 @@ func (a *Mixer) makeLhreq() (*lhreq, error) {
 		}
 	}
 
-	err := req.ConfigureYourself()
+	err = req.ConfigureYourself()
 	if err != nil {
 		return nil, err
 	}
@@ -232,7 +238,18 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 		r.LHRequest.Add_instruction(mix)
 	}
 
-	r.Liquidhandler.MakeSolutions(r.LHRequest)
+	err = r.Liquidhandler.MakeSolutions(r.LHRequest)
+
+	if err != nil {
+		// depending on what went wrong we might error out or return
+		// an error instruction
+
+		if wtype.LHErrorIsInternal(err) {
+			return nil, err
+		} else {
+			return &target.CmpError{Err: err, Dev: a}, nil
+		}
+	}
 
 	tarball, err := a.saveFile("input")
 	if err != nil {

@@ -35,7 +35,7 @@ import (
 //  TASK: 	Determine number of tip boxes of each type
 // INPUT: 	instructions
 //OUTPUT: 	arrays of tip boxes
-func (lh *Liquidhandler) Tip_box_setup(request *LHRequest) *LHRequest {
+func (lh *Liquidhandler) Tip_box_setup(request *LHRequest) (*LHRequest, error) {
 	tip_boxes := make([]*wtype.LHTipbox, 0)
 
 	// the instructions have been generated at this point so we just need to go through and count the tips used
@@ -131,5 +131,5 @@ func (lh *Liquidhandler) Tip_box_setup(request *LHRequest) *LHRequest {
 		lh.Properties.AddTipBoxTo(tiplocs2[i], tb)
 	}
 
-	return request
+	return request, nil
 }
