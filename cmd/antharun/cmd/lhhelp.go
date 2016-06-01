@@ -1,4 +1,4 @@
-// /anthalib/liquidhandling/funcs.go: Part of the Antha language
+// lhhelp.go: Part of the Antha language
 // Copyright (C) 2015 The Antha authors. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
@@ -20,26 +20,36 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
-package liquidhandling
+package cmd
 
 import (
-	"github.com/antha-lang/antha/microArch/logger"
+	"fmt"
+
+	"github.com/antha-lang/antha/internal/github.com/spf13/cobra"
+	"github.com/antha-lang/antha/internal/github.com/spf13/viper"
+	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 )
 
-func RaiseError(err string) {
-	logger.Fatal(err)
-	panic(err)
+var lhhelpCmd = &cobra.Command{
+	Use:   "lhhelp",
+	Short: "List available liquid handling policy commands",
+	RunE:  lhhelp,
 }
 
-// looks up where a plate is mounted on a liquid handler as expressed in a request
-/* deprecated
-func PlateLookup(rq LHRequest, id string) string {
-	lookupmap := rq.Plate_lookup
-
-	if len(lookupmap) == 0 {
-		RaiseError("Cannot find plate lookup")
-	}
-
-	return lookupmap[id]
+func lhhelp(cmd *cobra.Command, args []string) error {
+	viper.BindPFlags(cmd.Flags())
+	fmt.Println()
+	fmt.Println("Liquid handling policy commands available:")
+	fmt.Println()
+	fmt.Println("name,         type,   description")
+	fmt.Println()
+	fmt.Print(liquidhandling.GetPolicyConsequents().TypeList())
+	fmt.Println()
+	return nil
 }
-*/
+
+func init() {
+	c := lhhelpCmd
+	//flags := c.Flags()
+	RootCmd.AddCommand(c)
+}

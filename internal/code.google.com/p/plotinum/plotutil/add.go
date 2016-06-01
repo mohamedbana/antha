@@ -159,6 +159,34 @@ func AddScatters(plt *plot.Plot, vs ...interface{}) error {
 	return nil
 }
 
+func AddScattersXYer(plt *plot.Plot, vs []plotter.XYer) error {
+	var ps []plot.Plotter
+	names := make(map[*plotter.Scatter]string)
+	name := ""
+	var i int
+	for _, v := range vs {
+
+		s, err := plotter.NewScatter(v)
+		if err != nil {
+			return err
+		}
+		s.Color = Color(i)
+		s.Shape = Shape(i)
+		i++
+		ps = append(ps, s)
+		if name != "" {
+			names[s] = name
+			name = ""
+		}
+
+	}
+	plt.Add(ps...)
+	for p, n := range names {
+		plt.Legend.Add(n, p)
+	}
+	return nil
+}
+
 // AddLines adds Line plotters to a plot.
 // The variadic arguments must be either strings
 // or plotter.XYers.  Each plotter.XYer is added to

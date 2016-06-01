@@ -177,8 +177,55 @@ func PolicyMakerfromRuns(runs []Run, nameprepend string, concatfactorlevelsinnam
 //        return proteinpolicy
 //}
 
+func GetPolicyByName(policyname string) (lhpolicy LHPolicy, policypresent bool) {
+	policymap := MakePolicies()
+
+	lhpolicy, policypresent = policymap[policyname]
+	return
+}
+
+/*
+Available policy field names and policy types to use:
+
+Here is a list of everything currently implemented in the liquid handling policy framework
+
+ASPENTRYSPEED,                    ,float64,      ,allows slow moves into liquids
+ASPSPEED,                                ,float64,     ,aspirate pipetting rate
+ASPZOFFSET,                           ,float64,      ,mm above well bottom when aspirating
+ASP_WAIT,                                   ,float64,     ,wait time in seconds post aspirate
+BLOWOUTOFFSET,                    ,float64,     ,mm above BLOWOUTREFERENCE
+BLOWOUTREFERENCE,          ,int,             ,where to be when blowing out: 0 well bottom, 1 well top
+BLOWOUTVOLUME,                ,float64,      ,how much to blow out
+CAN_MULTI,                              ,bool,         ,is multichannel operation allowed?
+DSPENTRYSPEED,                    ,float64,     ,allows slow moves into liquids
+DSPREFERENCE,                      ,int,            ,where to be when dispensing: 0 well bottom, 1 well top
+DSPSPEED,                              ,float64,       ,dispense pipetting rate
+DSPZOFFSET,                         ,float64,          ,mm above DSPREFERENCE
+DSP_WAIT,                               ,float64,        ,wait time in seconds post dispense
+EXTRA_ASP_VOLUME,            ,wunit.Volume,       ,additional volume to take up when aspirating
+EXTRA_DISP_VOLUME,           ,wunit.Volume,       ,additional volume to dispense
+JUSTBLOWOUT,                      ,bool,            ,shortcut to get single transfer
+POST_MIX,                               ,int,               ,number of mix cycles to do after dispense
+POST_MIX_RATE,                    ,float64,          ,pipetting rate when post mixing
+POST_MIX_VOL,                      ,float64,          ,volume to post mix (ul)
+POST_MIX_X,                          ,float64,           ,x offset from centre of well (mm) when post-mixing
+POST_MIX_Y,                          ,float64,           ,y offset from centre of well (mm) when post-mixing
+POST_MIX_Z,                          ,float64,           ,z offset from centre of well (mm) when post-mixing
+PRE_MIX,                                ,int,               ,number of mix cycles to do before aspirating
+PRE_MIX_RATE,                     ,float64,           ,pipetting rate when pre mixing
+PRE_MIX_VOL,                       ,float64,           ,volume to pre mix (ul)
+PRE_MIX_X,                              ,float64,          ,x offset from centre of well (mm) when pre-mixing
+PRE_MIX_Y,                              ,float64,           ,y offset from centre of well (mm) when pre-mixing
+PRE_MIX_Z,                              ,float64,           ,z offset from centre of well (mm) when pre-mixing
+TIP_REUSE_LIMIT,                    ,int,                ,number of times tips can be reused for asp/dsp cycles
+TOUCHOFF,                              ,bool,             ,whether to move to TOUCHOFFSET after dispense
+TOUCHOFFSET,                         ,float64,          ,mm above wb to touch off at
+
+
+*/
+
 func MakePEGPolicy() LHPolicy {
-	policy := make(LHPolicy, 6)
+	policy := make(LHPolicy, 9)
 	policy["ASP_SPEED"] = 1.5
 	policy["DSP_SPEED"] = 1.5
 	policy["ASP_WAIT"] = 2.0
@@ -190,11 +237,12 @@ func MakePEGPolicy() LHPolicy {
 	policy["BLOWOUTVOLUME"] = 0.0
 	policy["BLOWOUTVOLUMEUNIT"] = "ul"
 	policy["TOUCHOFF"] = true
+	policy["CAN_MULTI"] = false
 	return policy
 }
 
 func MakeProtoplastPolicy() LHPolicy {
-	policy := make(LHPolicy, 6)
+	policy := make(LHPolicy, 7)
 	policy["ASP_SPEED"] = 0.15
 	policy["DSP_SPEED"] = 0.15
 	policy["ASPZOFFSET"] = 1.5
@@ -203,12 +251,13 @@ func MakeProtoplastPolicy() LHPolicy {
 	//policy["BLOWOUTVOLUMEUNIT"] = "ul"
 	//policy["TOUCHOFF"] = true
 	policy["TIP_REUSE_LIMIT"] = 5
+	policy["CAN_MULTI"] = false
 	return policy
 }
 
 func MakePaintPolicy() LHPolicy {
 
-	policy := make(LHPolicy, 12)
+	policy := make(LHPolicy, 13)
 	policy["DSPREFERENCE"] = 0
 	policy["DSPZOFFSET"] = 0.5
 	policy["ASP_SPEED"] = 1.5
@@ -220,6 +269,7 @@ func MakePaintPolicy() LHPolicy {
 	policy["BLOWOUTVOLUME"] = 0.0
 	policy["BLOWOUTVOLUMEUNIT"] = "ul"
 	policy["TOUCHOFF"] = true
+	policy["CAN_MULTI"] = false
 
 	return policy
 }
@@ -235,6 +285,24 @@ func MakeDispenseAboveLiquidPolicy() LHPolicy {
 	policy["BLOWOUTVOLUME"] = 0.0
 	policy["BLOWOUTVOLUMEUNIT"] = "ul"
 	policy["TOUCHOFF"] = false
+	policy["CAN_MULTI"] = false
+
+	return policy
+}
+
+func MakeColonyPolicy() LHPolicy {
+
+	policy := make(LHPolicy, 10)
+	policy["DSPREFERENCE"] = 0
+	policy["DSPZOFFSET"] = 0.0
+	policy["ASP_SPEED"] = 3.0
+	policy["DSP_SPEED"] = 3.0
+	policy["ASP_WAIT"] = 1.0
+	policy["POST_MIX"] = 3
+	policy["BLOWOUTVOLUME"] = 0.0
+	policy["BLOWOUTVOLUMEUNIT"] = "ul"
+	policy["TOUCHOFF"] = true
+	policy["CAN_MULTI"] = false
 
 	return policy
 }
@@ -242,7 +310,8 @@ func MakeDispenseAboveLiquidPolicy() LHPolicy {
 func MakeWaterPolicy() LHPolicy {
 	waterpolicy := make(LHPolicy, 6)
 	waterpolicy["DSPREFERENCE"] = 0
-	waterpolicy["CAN_MULTI"] = true
+	//waterpolicy["CAN_MULTI"] = true
+	waterpolicy["CAN_MULTI"] = false
 	waterpolicy["CAN_MSA"] = true
 	waterpolicy["CAN_SDD"] = true
 	waterpolicy["DSPZOFFSET"] = 0.5
@@ -276,12 +345,36 @@ func MakeCulturePolicy() LHPolicy {
 	return culturepolicy
 }
 
+func MakePlateOutPolicy() LHPolicy {
+	culturepolicy := make(LHPolicy, 17)
+	culturepolicy["PRE_MIX"] = 2
+	culturepolicy["PRE_MIX_VOLUME"] = 50
+	culturepolicy["PRE_MIX_Z"] = 2.0
+	culturepolicy["PRE_MIX_RATE"] = 4.0
+	culturepolicy["ASPSPEED"] = 4.0
+	culturepolicy["ASPZOFFSET"] = 2.0
+	culturepolicy["DSPSPEED"] = 4.0
+	culturepolicy["CAN_MULTI"] = false
+	culturepolicy["CAN_MSA"] = false
+	culturepolicy["CAN_SDD"] = false
+	culturepolicy["DSPREFERENCE"] = 0
+	culturepolicy["DSPZOFFSET"] = 0.5
+	culturepolicy["TIP_REUSE_LIMIT"] = 0
+	culturepolicy["NO_AIR_DISPENSE"] = true
+	culturepolicy["BLOWOUTVOLUME"] = 0.0
+	culturepolicy["BLOWOUTVOLUMEUNIT"] = "ul"
+	culturepolicy["TOUCHOFF"] = false
+
+	return culturepolicy
+}
+
 func MakeCultureReusePolicy() LHPolicy {
 	culturepolicy := make(LHPolicy, 10)
 	culturepolicy["PRE_MIX"] = 2
 	culturepolicy["ASPSPEED"] = 2.0
 	culturepolicy["DSPSPEED"] = 2.0
-	culturepolicy["CAN_MULTI"] = true
+	//culturepolicy["CAN_MULTI"] = true
+	culturepolicy["CAN_MULTI"] = false
 	culturepolicy["CAN_MSA"] = true
 	culturepolicy["CAN_SDD"] = true
 	culturepolicy["DSPREFERENCE"] = 0
@@ -295,12 +388,13 @@ func MakeCultureReusePolicy() LHPolicy {
 }
 
 func MakeGlycerolPolicy() LHPolicy {
-	glycerolpolicy := make(LHPolicy, 5)
+	glycerolpolicy := make(LHPolicy, 6)
 	glycerolpolicy["ASP_SPEED"] = 1.5
 	glycerolpolicy["DSP_SPEED"] = 1.5
 	glycerolpolicy["ASP_WAIT"] = 1.0
 	glycerolpolicy["DSP_WAIT"] = 1.0
 	glycerolpolicy["TIP_REUSE_LIMIT"] = 0
+	glycerolpolicy["CAN_MULTI"] = false
 	return glycerolpolicy
 }
 
@@ -314,11 +408,12 @@ func MakeViscousPolicy() LHPolicy {
 	return glycerolpolicy
 }
 func MakeSolventPolicy() LHPolicy {
-	solventpolicy := make(LHPolicy, 4)
+	solventpolicy := make(LHPolicy, 5)
 	solventpolicy["PRE_MIX"] = 3
 	solventpolicy["DSPREFERENCE"] = 0
 	solventpolicy["DSPZOFFSET"] = 0.5
 	solventpolicy["NO_AIR_DISPENSE"] = true
+	solventpolicy["CAN_MULTI"] = false
 	return solventpolicy
 }
 
@@ -438,7 +533,7 @@ func MakeNeedToMixPolicy() LHPolicy {
 }
 
 func MakeDefaultPolicy() LHPolicy {
-	defaultpolicy := make(LHPolicy, 10)
+	defaultpolicy := make(LHPolicy, 21)
 	// don't set this here -- use defaultpipette speed or there will be inconsistencies
 	// defaultpolicy["ASP_SPEED"] = 3.0
 	// defaultpolicy["DSP_SPEED"] = 3.0
@@ -497,7 +592,8 @@ func MakeLVOffsetPolicy() LHPolicy {
 	return lvop
 }
 
-func GetLHPolicyForTest() *LHPolicyRuleSet {
+func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
+
 	// make some policies
 
 	policies := MakePolicies()
@@ -508,7 +604,11 @@ func GetLHPolicyForTest() *LHPolicyRuleSet {
 
 	for name, policy := range policies {
 		rule := NewLHPolicyRule(name)
-		rule.AddCategoryConditionOn("LIQUIDCLASS", name)
+		err := rule.AddCategoryConditionOn("LIQUIDCLASS", name)
+
+		if err != nil {
+			return nil, err
+		}
 		lhpr.AddRule(rule, policy)
 	}
 
@@ -517,8 +617,16 @@ func GetLHPolicyForTest() *LHPolicyRuleSet {
 	// are being properly kept in sync
 
 	rule := NewLHPolicyRule("BlowOutToEmptyWells")
-	rule.AddNumericConditionOn("WELLTOVOLUME", 0.0, 1.0)
-	rule.AddCategoryConditionOn("LIQUIDCLASS", "water")
+	err := rule.AddNumericConditionOn("WELLTOVOLUME", 0.0, 1.0)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = rule.AddCategoryConditionOn("LIQUIDCLASS", "water")
+	if err != nil {
+		return nil, err
+	}
 	pol := MakeJBPolicy()
 	lhpr.AddRule(rule, pol)
 
@@ -542,9 +650,10 @@ func GetLHPolicyForTest() *LHPolicyRuleSet {
 	rule.AddNumericConditionOn("VOLUME", 0.0, 20.0)
 	rule.AddCategoryConditionOn("TOPLATETYPE", "pcrplate_skirted_riser")
 	pol = MakeLVOffsetPolicy()
+
 	lhpr.AddRule(rule, pol)
 
-	return lhpr
+	return lhpr, nil
 }
 
 func LoadLHPoliciesFromFile() (*LHPolicyRuleSet, error) {

@@ -43,16 +43,20 @@ func (ri *RobotInstructionSet) Add(ins RobotInstruction) {
 	ri.instructions = append(ri.instructions, ris)
 }
 
-func (ri *RobotInstructionSet) Generate(lhpr *LHPolicyRuleSet, lhpm *LHProperties) []RobotInstruction {
+func (ri *RobotInstructionSet) Generate(lhpr *LHPolicyRuleSet, lhpm *LHProperties) ([]RobotInstruction, error) {
 	ret := make([]RobotInstruction, 0, 1)
 
 	if ri.parent != nil {
-		arr := ri.parent.Generate(lhpr, lhpm)
+		arr, err := ri.parent.Generate(lhpr, lhpm)
+
+		if err != nil {
+			return ret, err
+		}
 
 		// if the parent doesn't generate anything then it is our return - bottom out here
 		if arr == nil || len(arr) == 0 {
 			ret = append(ret, ri.parent)
-			return ret
+			return ret, nil
 		} else {
 			for _, ins := range arr {
 				ri.Add(ins)
@@ -61,7 +65,11 @@ func (ri *RobotInstructionSet) Generate(lhpr *LHPolicyRuleSet, lhpm *LHPropertie
 	}
 
 	for _, ins := range ri.instructions {
-		arr := ins.Generate(lhpr, lhpm)
+		arr, err := ins.Generate(lhpr, lhpm)
+
+		if err != nil {
+			return arr, err
+		}
 		ret = append(ret, arr...)
 	}
 
@@ -76,7 +84,7 @@ func (ri *RobotInstructionSet) Generate(lhpr *LHPolicyRuleSet, lhpm *LHPropertie
 		ret = newret
 	}
 
-	return ret
+	return ret, nil
 }
 
 func (ri *RobotInstructionSet) ToString(level int) string {

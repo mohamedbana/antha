@@ -55,7 +55,7 @@ type LHRequest struct {
 	Input_order              []string
 	Output_order             []string
 	Order_instructions_added []string
-	OutputIteratorFactory    func(*wtype.LHPlate) wtype.PlateIterator
+	OutputIteratorFactory    func(*wtype.LHPlate) wtype.PlateIterator `json:"-"`
 	InstructionChain         *IChain
 	Input_vols_supplied      map[string]wunit.Volume
 	Input_vols_required      map[string]wunit.Volume

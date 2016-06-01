@@ -69,7 +69,13 @@ func (a *Mixer) makeLhreq() (*lhreq, error) {
 	}
 
 	req := planner.NewLHRequest()
-	req.Policies = driver.GetLHPolicyForTest()
+	pols, err := driver.GetLHPolicyForTest()
+
+	if err != nil {
+		return nil, err
+	}
+	req.Policies = pols
+
 	plan := planner.Init(&a.properties)
 
 	if p := a.opt.MaxPlates; p != nil {
@@ -137,7 +143,7 @@ func (a *Mixer) makeLhreq() (*lhreq, error) {
 		}
 	}
 
-	err := req.ConfigureYourself()
+	err = req.ConfigureYourself()
 	if err != nil {
 		return nil, err
 	}
@@ -224,17 +230,31 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 	r.LHRequest.BlockID = getId(mixes)
 
 	for _, mix := range mixes {
-		if len(mix.Platetype) != 0 && !hasPlate(r.LHRequest.Output_platetypes, mix.Platetype, mix.PlateID) {
+		if len(mix.Platetype) != 0 && !hasPlate(r.LHRequest.Output_platetypes, mix.Platetype, mix.PlateID()) {
 			p := factory.GetPlateByType(mix.Platetype)
-			p.ID = mix.PlateID
+			p.ID = mix.PlateID()
 			r.LHRequest.Output_platetypes = append(r.LHRequest.Output_platetypes, p)
 		}
 		r.LHRequest.Add_instruction(mix)
 	}
 
-	r.Liquidhandler.MakeSolutions(r.LHRequest)
+	err = r.Liquidhandler.MakeSolutions(r.LHRequest)
 
-	tarball, err := a.saveFile("input")
+	if err != nil {
+		// depending on what went wrong we might error out or return
+		// an error instruction
+
+		if wtype.LHErrorIsInternal(err) {
+			return nil, err
+		} else {
+			return &target.CmpError{Err: err, Dev: a}, nil
+		}
+	}
+
+	// TODO: Desired filename not exposed in current driver interface, so pick
+	// a name. So far, at least Gilson software cares what the filename is, so
+	// use .sqlite for compatibility
+	tarball, err := a.saveFile("input.sqlite")
 	if err != nil {
 		return nil, err
 	}

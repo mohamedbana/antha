@@ -28,8 +28,8 @@ import (
 	"io/ioutil"
 	"sort"
 
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/microArch/logger"
 )
 
 const (
@@ -85,18 +85,29 @@ func NewLHPolicyRule(name string) LHPolicyRule {
 	return lhpr
 }
 
-func (lhpr *LHPolicyRule) AddNumericConditionOn(variable string, low, up float64) {
+func (lhpr *LHPolicyRule) AddNumericConditionOn(variable string, low, up float64) error {
 	lhvc := NewLHVariableCondition(variable)
-	lhvc.SetNumeric(low, up)
+	err := lhvc.SetNumeric(low, up)
+
+	if err != nil {
+		return err
+	}
 	lhpr.Conditions = append(lhpr.Conditions, lhvc)
 	lhpr.Priority += 1
+	return nil
 }
 
-func (lhpr *LHPolicyRule) AddCategoryConditionOn(variable, category string) {
+func (lhpr *LHPolicyRule) AddCategoryConditionOn(variable, category string) error {
 	lhvc := NewLHVariableCondition(variable)
-	lhvc.SetCategoric(category)
+	err := lhvc.SetCategoric(category)
+
+	if err != nil {
+		return err
+	}
+
 	lhpr.Conditions = append(lhpr.Conditions, lhvc)
 	lhpr.Priority += 1
+	return err
 }
 
 func (lhpr LHPolicyRule) Check(ins RobotInstruction) bool {
@@ -215,20 +226,28 @@ func NewLHVariableCondition(testvariable string) LHVariableCondition {
 	return lhvc
 }
 
-func (lhvc *LHVariableCondition) SetNumeric(low, up float64) {
+func (lhvc *LHVariableCondition) SetNumeric(low, up float64) error {
 	if low > up {
-		logger.Fatal("Nonsensical numeric condition requested")
-		panic("Nonsensical numeric condition requested")
+		/*
+			logger.Fatal("Nonsensical numeric condition requested")
+			panic("Nonsensical numeric condition requested")
+		*/
+		return wtype.LHError(wtype.LH_ERR_POLICY, fmt.Sprintf("Numeric condition requested with lower limit (%f) greater than upper limit (%f), which is not allowed", low, up))
 	}
 	lhvc.Condition = LHNumericCondition{up, low}
+	return nil
 }
 
-func (lhvc *LHVariableCondition) SetCategoric(category string) {
+func (lhvc *LHVariableCondition) SetCategoric(category string) error {
 	if category == "" {
-		logger.Fatal("No empty categoric conditions can be made")
-		panic("No empty categoric conditions can be made")
+		/*
+			logger.Fatal("No empty categoric conditions can be made")
+			panic("No empty categoric conditions can be made")
+		*/
+		return wtype.LHError(wtype.LH_ERR_POLICY, fmt.Sprintf("Categoric condition %s has an empty category, which is not allowed", category))
 	}
 	lhvc.Condition = LHCategoryCondition{category}
+	return nil
 }
 
 func (lhvc LHVariableCondition) IsEqualTo(other LHVariableCondition) bool {

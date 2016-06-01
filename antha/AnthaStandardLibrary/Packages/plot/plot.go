@@ -43,7 +43,7 @@ func Plot(Xvalues []float64, Yvaluearray [][]float64) (plt *plot.Plot) {
 				xys[j].Y = yfloats[j]
 
 			}
-			fmt.Println(xys)
+			//fmt.Println(xys)
 			pts = append(pts, xys) //
 		}
 
@@ -59,24 +59,28 @@ func Plot(Xvalues []float64, Yvaluearray [][]float64) (plt *plot.Plot) {
 	// error bars give the 95% confidence intervals.  For the
 	// second, each point is the median x and y value with the
 	// error bars showing the minimum and maximum values.
+	/*
+	   	fmt.Println("pts", pts)
+	   	mean95, err := plotutil.NewErrorPoints(plotutil.MeanAndConf95, pts...)
+	   	if err != nil {
+	   		panic(err)
+	   	}
+	   	//medMinMax, err := plotutil.NewErrorPoints(plotutil.MedianAndMinMax, pts...)
+	   //	if err != nil {
+	   //		panic(err)
+	   //	}
+	   	plotutil.AddLinePoints(plt,
+	   		"mean and 95% confidence", mean95,
+	   	) //	"median and minimum and maximum", medMinMax)
+	   	//plotutil.AddErrorBars(plt, mean95, medMinMax)
 
-	fmt.Println("pts", pts)
-	mean95, err := plotutil.NewErrorPoints(plotutil.MeanAndConf95, pts...)
-	if err != nil {
-		panic(err)
-	}
-	/*medMinMax, err := plotutil.NewErrorPoints(plotutil.MedianAndMinMax, pts...)
-	if err != nil {
-		panic(err)
-	}*/
-	plotutil.AddLinePoints(plt,
-		"mean and 95% confidence", mean95,
-	) //	"median and minimum and maximum", medMinMax)
-	//plotutil.AddErrorBars(plt, mean95, medMinMax)
+	   	// Add the points that are summarized by the error points.
 
-	// Add the points that are summarized by the error points.
+
+	*/
+
 	fmt.Println(len(pts))
-	plotutil.AddScatters(plt, pts[0], pts[1], pts[2], pts[3], pts[4])
+	plotutil.AddScattersXYer(plt, pts)
 	return
 }
 
