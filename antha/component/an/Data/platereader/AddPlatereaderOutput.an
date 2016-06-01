@@ -8,7 +8,7 @@ import (
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/platereader"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Platereader"
 	//"path/filepath"
 	//antha "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"fmt"
