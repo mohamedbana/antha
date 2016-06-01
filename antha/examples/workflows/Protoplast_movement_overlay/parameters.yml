@@ -14,7 +14,8 @@
 			"Plateoutvolume":"50ul",
 			"TransformedCellsVol":"190ul",
 			"OutWell":"A1",
-			"OutWell2":"A1"
+			"OutWell2":"A1",
+      "OutWell3":"A1"
         }
     }
 }

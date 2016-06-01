@@ -18,6 +18,7 @@ Parameters (
 	AgarPlate string
 	OutWell string
 	OutWell2 string
+	OutWell3 string
 	Partname string
 )
 
@@ -59,10 +60,10 @@ Steps {
 	cellsinwell:=MixTo(OutPlatetype, OutWell,1, cellsample)
 	
 	DNASample:=mixer.Sample(DNA, DNAVol)
-	cellsplusdna:=Mix(cellsinwell, DNASample)
+	cellsplusdna:=MixTo(OutPlatetype, OutWell,1,cellsinwell, DNASample)
 	
 	PEGSample:=mixer.Sample(PEG, PEGVol)
-	TransformedCells=Mix(cellsplusdna,PEGSample)
+	TransformedCells=MixTo(OutPlatetype, OutWell, 1, cellsplusdna,PEGSample)
 	
 	CellsAgar:=mixer.Sample(TransformedCells,TransformedCellsVol)
 	CellsAgarinWell:=MixTo(OutPlatetype2, OutWell2, 1, CellsAgar)
@@ -70,7 +71,7 @@ Steps {
 	CellsAgarinWellFinal=CellsAgarinWell
 	
 	plateout := mixer.Sample(CellsAgarinWellFinal, Plateoutvolume)
-	platedculture := MixTo(AgarPlate, "", 1, plateout)
+	platedculture := MixTo(AgarPlate, OutWell3, 1, plateout)
 	
 	Platedculture = platedculture
 	

@@ -33,10 +33,10 @@ func _Protoplast_movement_overlaySteps(_ctx context.Context, _input *Protoplast_
 	cellsinwell := execute.MixTo(_ctx, _input.OutPlatetype, _input.OutWell, 1, cellsample)
 
 	DNASample := mixer.Sample(_input.DNA, _input.DNAVol)
-	cellsplusdna := execute.Mix(_ctx, cellsinwell, DNASample)
+	cellsplusdna := execute.MixTo(_ctx, _input.OutPlatetype, _input.OutWell, 1, cellsinwell, DNASample)
 
 	PEGSample := mixer.Sample(_input.PEG, _input.PEGVol)
-	_output.TransformedCells = execute.Mix(_ctx, cellsplusdna, PEGSample)
+	_output.TransformedCells = execute.MixTo(_ctx, _input.OutPlatetype, _input.OutWell, 1, cellsplusdna, PEGSample)
 
 	CellsAgar := mixer.Sample(_output.TransformedCells, _input.TransformedCellsVol)
 	CellsAgarinWell := execute.MixTo(_ctx, _input.OutPlatetype2, _input.OutWell2, 1, CellsAgar)
@@ -44,7 +44,7 @@ func _Protoplast_movement_overlaySteps(_ctx context.Context, _input *Protoplast_
 	_output.CellsAgarinWellFinal = CellsAgarinWell
 
 	plateout := mixer.Sample(_output.CellsAgarinWellFinal, _input.Plateoutvolume)
-	platedculture := execute.MixTo(_ctx, _input.AgarPlate, "", 1, plateout)
+	platedculture := execute.MixTo(_ctx, _input.AgarPlate, _input.OutWell3, 1, plateout)
 
 	_output.Platedculture = platedculture
 
@@ -118,6 +118,7 @@ type Protoplast_movement_overlayInput struct {
 	OutPlatetype2       string
 	OutWell             string
 	OutWell2            string
+	OutWell3            string
 	PEG                 *wtype.LHComponent
 	PEGVol              wunit.Volume
 	Partname            string
@@ -157,6 +158,7 @@ func init() {
 				{Name: "OutPlatetype2", Desc: "", Kind: "Parameters"},
 				{Name: "OutWell", Desc: "", Kind: "Parameters"},
 				{Name: "OutWell2", Desc: "", Kind: "Parameters"},
+				{Name: "OutWell3", Desc: "", Kind: "Parameters"},
 				{Name: "PEG", Desc: "", Kind: "Inputs"},
 				{Name: "PEGVol", Desc: "", Kind: "Parameters"},
 				{Name: "Partname", Desc: "", Kind: "Parameters"},
