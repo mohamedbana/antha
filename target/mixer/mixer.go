@@ -251,7 +251,10 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 		}
 	}
 
-	tarball, err := a.saveFile("input")
+	// TODO: Desired filename not exposed in current driver interface, so pick
+	// a name. So far, at least Gilson software cares what the filename is, so
+	// use .sqlite for compatibility
+	tarball, err := a.saveFile("input.sqlite")
 	if err != nil {
 		return nil, err
 	}
