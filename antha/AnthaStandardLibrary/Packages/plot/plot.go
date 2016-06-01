@@ -43,7 +43,7 @@ func Plot(Xvalues []float64, Yvaluearray [][]float64) (plt *plot.Plot) {
 				xys[j].Y = yfloats[j]
 
 			}
-			fmt.Println(xys)
+			//fmt.Println(xys)
 			pts = append(pts, xys) //
 		}
 
