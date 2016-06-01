@@ -28,16 +28,25 @@ func _TypeIISConstructAssemblyMMXSetup(_ctx context.Context, _input *TypeIISCons
 // for every input
 func _TypeIISConstructAssemblyMMXSteps(_ctx context.Context, _input *TypeIISConstructAssemblyMMXInput, _output *TypeIISConstructAssemblyMMXOutput) {
 	samples := make([]*wtype.LHComponent, 0)
-	mmxSample := mixer.SampleForTotalVolume(_input.MasterMix, _input.ReactionVolume)
+
+	//waterSample:=mixer.SampleForTotalVolume(Water,ReactionVolume)
+	//	samples = append(samples, waterSample)
+
+	mmxSample := mixer.Sample(_input.MasterMix, _input.ReactionVolume)
 	samples = append(samples, mmxSample)
 
 	for k, part := range _input.Parts {
 		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", _input.PartNames[k], " vol ", _input.PartVols[k])
+
+		part.Type = wtype.LiquidTypeFromString(_input.LHPolicyName)
+
 		partSample := mixer.Sample(part, _input.PartVols[k])
 		partSample.CName = _input.PartNames[k]
 		samples = append(samples, partSample)
 	}
 
+	// ensure the last step is mixed
+	samples[len(samples)-1].Type = wtype.LTDNAMIX
 	_output.Reaction = execute.MixTo(_ctx, _input.OutPlate.Type, _input.OutputLocation, _input.OutputPlateNum, samples...)
 
 	// incubate the reaction mixture
@@ -107,6 +116,7 @@ type TypeIISConstructAssemblyMMXElement struct {
 type TypeIISConstructAssemblyMMXInput struct {
 	InactivationTemp   wunit.Temperature
 	InactivationTime   wunit.Time
+	LHPolicyName       string
 	MasterMix          *wtype.LHComponent
 	OutPlate           *wtype.LHPlate
 	OutputLocation     string
@@ -141,6 +151,7 @@ func init() {
 			Params: []ParamDesc{
 				{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
 				{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
+				{Name: "LHPolicyName", Desc: "", Kind: "Parameters"},
 				{Name: "MasterMix", Desc: "", Kind: "Inputs"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "OutputLocation", Desc: "", Kind: "Parameters"},

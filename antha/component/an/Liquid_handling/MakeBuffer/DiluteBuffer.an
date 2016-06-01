@@ -1,21 +1,18 @@
-protocol MakeBuffer
+protocol DiluteBuffer
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"fmt"
-	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
-	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/buffers"
 )
 
 // Input parameters for this protocol (data)
 Parameters (
 	Buffername string
-	Bufferstockvolume Volume
+	BufferVolumeAdded Volume
 	Bufferstockconc Concentration
-	FinalConcentration Concentration
-	FinalVolume Volume
-	Diluentvolume Volume
+	DiluentVolume Volume
 	Diluentname string
 )
 
@@ -24,18 +21,19 @@ Inputs (
 	Bufferstock		*wtype.LHComponent
 	Diluent			*wtype.LHComponent
 	OutPlate 		*wtype.LHPlate
-	InPlate 		*wtype.LHPlate
 )
 
 
 // Physical outputs from this protocol with types
 Outputs (
-	Buffer *wtype.LHComponent
+	Buffer 			*wtype.LHComponent
 )
 
 // Data which is returned from this protocol, and data types
 Data (
 	Status string
+	FinalConcentration Concentration
+	OriginalDiluentVolume Volume
 )
 // Input Requirement specification
 Requirements {
@@ -51,15 +49,19 @@ Setup {}
 Steps {
 	//Bufferstockvolume := wunit.NewVolume((FinalVolume.SIValue() * FinalConcentration.SIValue()/Bufferstockconc.SIValue()),"l")
 		
-	Buffer = MixInto(OutPlate,"",
-	mixer.Sample(Bufferstock,Bufferstockvolume),
-	mixer.Sample(Diluent,Diluentvolume))
-
-	Status = fmt.Sprintln( "Buffer stock volume = ", Bufferstockvolume.ToString(), "of", Bufferstock.CName,
-	"was added to ", Diluentvolume.ToString(), "of", Diluent.CName,
-	"to make ", FinalVolume.ToString(), "of", Buffername,
-	"Buffer stock conc =",Bufferstockconc.ToString())
+	FinalConcentration = buffers.Dilute(Bufferstock.CName, Bufferstockconc, BufferVolumeAdded, Diluent.CName, DiluentVolume)
 		
+	Buffer = MixInto(OutPlate,"",
+	mixer.Sample(Bufferstock,BufferVolumeAdded),
+	mixer.Sample(Diluent,DiluentVolume))
+
+	Status = fmt.Sprintln( "Buffer stock volume = ", BufferVolumeAdded.ToString(), "of", Bufferstock.CName,
+	"was added to ", DiluentVolume.ToString(), "of", Diluent.CName,
+	"to make ", BufferVolumeAdded.SIValue() + DiluentVolume.SIValue(), "L", "of", Buffername,
+	"Buffer stock conc =",FinalConcentration.ToString())
+		
+	OriginalDiluentVolume = DiluentVolume
+
 }
 
 // Run after controls and a steps block are completed to

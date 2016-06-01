@@ -36,6 +36,9 @@ import (
 	"github.com/antha-lang/antha/internal/github.com/ghodss/yaml"
 )
 
+var DOEliquidhandlingFile = "8run4cpFactorial.xlsx" //"FullFactorial.xlsx" // "ScreenLHPolicyDOE2.xlsx"
+var DXORJMP = "JMP"                                 //"DX"
+
 func MakePolicies() map[string]LHPolicy {
 	pols := make(map[string]LHPolicy)
 
@@ -62,6 +65,7 @@ func MakePolicies() map[string]LHPolicy {
 	pols["DispenseAboveLiquid"] = MakeDispenseAboveLiquidPolicy()
 	pols["PEG"] = MakePEGPolicy()
 	pols["Protoplasts"] = MakeProtoplastPolicy()
+	pols["dna_mix"] = MakeDNAMixPolicy()
 	//      pols["lysate"] = MakeLysatePolicy()
 
 	/*policies, names := PolicyMaker(Allpairs, "DOE_run", false)
@@ -69,9 +73,10 @@ func MakePolicies() map[string]LHPolicy {
 		pols[names[i]] = policy
 	}
 	*/
-	if antha.Anthafileexists("ScreenLHPolicyDOE2.xlsx") {
-		fmt.Println("found lhpolicy doe file")
-		policies, names, err := PolicyMakerfromDesign("ScreenLHPolicyDOE2.xlsx", "DOE_run")
+
+	if antha.Anthafileexists(DOEliquidhandlingFile) {
+		fmt.Println("found lhpolicy doe file", DOEliquidhandlingFile)
+		policies, names, _, err := PolicyMakerfromDesign(DXORJMP, DOEliquidhandlingFile, "DOE_run")
 
 		for i, policy := range policies {
 			pols[names[i]] = policy
@@ -80,19 +85,36 @@ func MakePolicies() map[string]LHPolicy {
 			panic(err)
 		}
 	} else {
-		fmt.Println("no lhpolicy doe file found")
+		fmt.Println("no lhpolicy doe file found named: ", DOEliquidhandlingFile)
 	}
 	return pols
 
 }
 
-func PolicyMakerfromDesign(dxdesignfilename string, prepend string) (policies []LHPolicy, names []string, err error) {
-	runs, err := RunsFromDXDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), []string{"Pre_MIX", "POST_MIX"})
-	if err != nil {
-		return policies, names, err
+func PolicyMakerfromDesign(DXORJMP string, dxdesignfilename string, prepend string) (policies []LHPolicy, names []string, runs []Run, err error) {
+
+	if DXORJMP == "DX" {
+
+		runs, err = RunsFromDXDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), []string{"Pre_MIX", "POST_MIX"})
+		if err != nil {
+			return policies, names, runs, err
+		}
+
+	} else if DXORJMP == "JMP" {
+
+		patterncolumn := 0
+		factorcolumns := []int{1, 2, 3, 4, 5}
+		responsecolumns := []int{6, 7, 8, 9}
+
+		runs, err = RunsFromJMPDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), patterncolumn, factorcolumns, responsecolumns, []string{"PRE_MIX", "POST_MIX"})
+		if err != nil {
+			return policies, names, runs, err
+		}
+	} else {
+		return policies, names, runs, fmt.Errorf("only JMP or DX allowed as valid inputs for DXORJMP variable")
 	}
 	policies, names = PolicyMakerfromRuns(runs, prepend, false)
-	return
+	return policies, names, runs, err
 }
 
 func PolicyMaker(factors []DOEPair, nameprepend string, concatfactorlevelsinname bool) (policies []LHPolicy, names []string) {
@@ -297,8 +319,6 @@ func MakeSolventPolicy() LHPolicy {
 
 func MakeDNAPolicy() LHPolicy {
 	dnapolicy := make(LHPolicy, 10)
-	dnapolicy["POST_MIX_VOLUME"] = 50
-	dnapolicy["POST_MIX"] = 3
 	dnapolicy["ASPSPEED"] = 2.0
 	dnapolicy["DSPSPEED"] = 2.0
 	dnapolicy["CAN_MULTI"] = false
@@ -308,6 +328,15 @@ func MakeDNAPolicy() LHPolicy {
 	dnapolicy["DSPZOFFSET"] = 0.5
 	dnapolicy["TIP_REUSE_LIMIT"] = 0
 	dnapolicy["NO_AIR_DISPENSE"] = true
+	return dnapolicy
+}
+
+func MakeDNAMixPolicy() LHPolicy {
+	dnapolicy := MakeDNAPolicy()
+	dnapolicy["POST_MIX_VOLUME"] = 50
+	dnapolicy["POST_MIX"] = 3
+	dnapolicy["POST_MIX_Z"] = 0.5
+	dnapolicy["POST_MIX_RATE"] = 3.0
 	return dnapolicy
 }
 
@@ -405,8 +434,9 @@ func MakeNeedToMixPolicy() LHPolicy {
 
 func MakeDefaultPolicy() LHPolicy {
 	defaultpolicy := make(LHPolicy, 10)
-	defaultpolicy["ASP_SPEED"] = 3.0
-	defaultpolicy["DSP_SPEED"] = 3.0
+	// don't set this here -- use defaultpipette speed or there will be inconsistencies
+	// defaultpolicy["ASP_SPEED"] = 3.0
+	// defaultpolicy["DSP_SPEED"] = 3.0
 	defaultpolicy["TOUCHOFF"] = false
 	defaultpolicy["TOUCHOFFSET"] = 0.5
 	defaultpolicy["ASPREFERENCE"] = 0
@@ -424,7 +454,7 @@ func MakeDefaultPolicy() LHPolicy {
 	defaultpolicy["PTZREFERENCE"] = 1
 	defaultpolicy["PTZOFFSET"] = -0.5
 	defaultpolicy["NO_AIR_DISPENSE"] = false
-	defaultpolicy["DEFAULTPIPETTESPEED"] = 1.0
+	defaultpolicy["DEFAULTPIPETTESPEED"] = 3.0
 	defaultpolicy["MANUALPTZ"] = false
 	defaultpolicy["JUSTBLOWOUT"] = false
 	defaultpolicy["DONT_BE_DIRTY"] = true
@@ -451,7 +481,7 @@ func MakeLVExtraPolicy() LHPolicy {
 	return lvep
 }
 
-func GetLHPolicyForTest() *LHPolicyRuleSet {
+func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
 	// make some policies
 
 	policies := MakePolicies()
@@ -462,7 +492,11 @@ func GetLHPolicyForTest() *LHPolicyRuleSet {
 
 	for name, policy := range policies {
 		rule := NewLHPolicyRule(name)
-		rule.AddCategoryConditionOn("LIQUIDCLASS", name)
+		err := rule.AddCategoryConditionOn("LIQUIDCLASS", name)
+
+		if err != nil {
+			return nil, err
+		}
 		lhpr.AddRule(rule, policy)
 	}
 
@@ -471,8 +505,16 @@ func GetLHPolicyForTest() *LHPolicyRuleSet {
 	// are being properly kept in sync
 
 	rule := NewLHPolicyRule("BlowOutToEmptyWells")
-	rule.AddNumericConditionOn("WELLTOVOLUME", 0.0, 1.0)
-	rule.AddCategoryConditionOn("LIQUIDCLASS", "water")
+	err := rule.AddNumericConditionOn("WELLTOVOLUME", 0.0, 1.0)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = rule.AddCategoryConditionOn("LIQUIDCLASS", "water")
+	if err != nil {
+		return nil, err
+	}
 	pol := MakeJBPolicy()
 	lhpr.AddRule(rule, pol)
 
@@ -480,11 +522,15 @@ func GetLHPolicyForTest() *LHPolicyRuleSet {
 	// for aspirate and dispense
 
 	rule = NewLHPolicyRule("ExtraVolumeForLV")
-	rule.AddNumericConditionOn("VOLUME", 0.0, 20.0)
+	err = rule.AddNumericConditionOn("VOLUME", 0.0, 20.0)
+	if err != nil {
+		return nil, err
+	}
+
 	pol = MakeLVExtraPolicy()
 	lhpr.AddRule(rule, pol)
 
-	return lhpr
+	return lhpr, nil
 }
 
 func LoadLHPoliciesFromFile() (*LHPolicyRuleSet, error) {

@@ -1,6 +1,8 @@
 {
     "Parameters": {
         "ScreenLHPolicies": {
+			"DXORJMP":"JMP",
+			"LHDOEFile":"8run4cpFactorial.xlsx",
             "Diluent": "water",
             "TestSols": [
 			"tartrazine"

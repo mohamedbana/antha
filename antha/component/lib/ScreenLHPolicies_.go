@@ -2,6 +2,8 @@ package lib
 
 import (
 	"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -32,12 +34,19 @@ func _ScreenLHPoliciesSetup(_ctx context.Context, _input *ScreenLHPoliciesInput)
 // for every input
 func _ScreenLHPoliciesSteps(_ctx context.Context, _input *ScreenLHPoliciesInput, _output *ScreenLHPoliciesOutput) {
 
+	if anthapath.Anthafileexists(_input.LHDOEFile) == false {
+		fmt.Println("This DOE file ", _input.LHDOEFile, " was not found in anthapath ~.antha. Please move it there, change file name and type in antha-lang/antha/microarch/driver/makelhpolicy.go and recompile antha to use this liquidhandling doe design")
+		fmt.Println("currently set to ", liquidhandling.DOEliquidhandlingFile, " type ", liquidhandling.DXORJMP)
+	} else {
+		fmt.Println("found lhpolicy doe file", _input.LHDOEFile)
+	}
+
 	reactions := make([]*wtype.LHComponent, 0)
 
 	//policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run",false)
 
 	//intfactors := []string{"Pre_MIX","POST_MIX"}
-	policies, names, err := liquidhandling.PolicyMakerfromDesign("LHPolicydesign.xlsx", "DOE_run")
+	policies, names, runs, err := liquidhandling.PolicyMakerfromDesign(_input.DXORJMP, _input.LHDOEFile, "DOE_run")
 	if err != nil {
 		panic(err)
 	}
@@ -63,6 +72,8 @@ func _ScreenLHPoliciesSteps(_ctx context.Context, _input *ScreenLHPoliciesInput,
 		}
 	}
 	_output.Reactions = reactions
+
+	_output.Runs = runs
 
 }
 
@@ -124,7 +135,9 @@ type ScreenLHPoliciesElement struct {
 }
 
 type ScreenLHPoliciesInput struct {
+	DXORJMP            string
 	Diluent            *wtype.LHComponent
+	LHDOEFile          string
 	NumberofReplicates int
 	OutPlate           *wtype.LHPlate
 	TestSolVolume      wunit.Volume
@@ -134,11 +147,13 @@ type ScreenLHPoliciesInput struct {
 
 type ScreenLHPoliciesOutput struct {
 	Reactions []*wtype.LHComponent
+	Runs      []doe.Run
 	Status    string
 }
 
 type ScreenLHPoliciesSOutput struct {
 	Data struct {
+		Runs   []doe.Run
 		Status string
 	}
 	Outputs struct {
@@ -153,13 +168,16 @@ func init() {
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/FindbestLHPolicy/ScreenLHPolicies.an",
 			Params: []ParamDesc{
+				{Name: "DXORJMP", Desc: "", Kind: "Parameters"},
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
+				{Name: "LHDOEFile", Desc: "", Kind: "Parameters"},
 				{Name: "NumberofReplicates", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "TestSolVolume", Desc: "", Kind: "Parameters"},
 				{Name: "TestSols", Desc: "", Kind: "Inputs"},
 				{Name: "TotalVolume", Desc: "", Kind: "Parameters"},
 				{Name: "Reactions", Desc: "", Kind: "Outputs"},
+				{Name: "Runs", Desc: "", Kind: "Data"},
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},

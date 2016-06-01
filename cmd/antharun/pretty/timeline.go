@@ -19,6 +19,8 @@ func summarize(inst target.Inst) (string, error) {
 		return fmt.Sprintf("Manual: %s", inst.Details), nil
 	case *target.Wait:
 		return "", nil
+	case target.ErrInst:
+		return "", fmt.Errorf("Planning error: %s", inst.(target.ErrInst).Error())
 	default:
 		return "", fmt.Errorf("unknown inst %T", inst)
 	}

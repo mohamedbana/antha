@@ -134,11 +134,15 @@ type Time struct {
 // make a time unit
 func NewTime(v float64, unit string) Time {
 	if unit != "s" {
-		panic("Can't make temperatures which aren't in seconds")
+		panic("Can't make times which aren't in seconds")
 	}
 
 	t := Time{NewMeasurement(v, "", unit)}
 	return t
+}
+
+func (t Time) Seconds() float64 {
+	return t.SIValue()
 }
 
 // mass

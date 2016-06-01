@@ -26,7 +26,6 @@ package wtype
 import (
 	"fmt"
 	"strings"
-
 	//. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 )
 
@@ -42,13 +41,13 @@ const (
 )
 */
 type Feature struct {
-	Name          string
-	Class         string //int // defined by constants above
-	Reverse       bool
-	StartPosition int
-	EndPosition   int
-	DNASeq        string
-	Protseq       string
+	Name          string `json:"name"`
+	Class         string `json:"class	"` //int // defined by constants above
+	Reverse       bool   `json:"reverse"`
+	StartPosition int    `json:"start_position"`
+	EndPosition   int    `json:"end_position"`
+	DNASeq        string `json:"dna_seq"`
+	Protseq       string `json:"prot_seq"`
 	//Status        string
 }
 

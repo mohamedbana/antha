@@ -1,15 +1,12 @@
-name: antha
-peanutversion: 0.0.1
+apiversion: v2
+kind: package
+name: github.com/antha-lang/antha
 version: 0.0.2
-dependson:
+build:
+  morelines:
+  - RUN apt-get update && apt-get install -y libglpk-dev libsqlite3-dev libopencv-dev
 modules:
-    golang:
-        package: github.com/antha-lang/antha
-        buildpackages:
-            - ~internal
-            - ~bvendor
-    docker:
-        packages:
-            - libglpk-dev
-            - libsqlite3-dev
-            - libopencv-dev
+  golang:
+    testpackages:
+    - ~internal
+    - ~bvendor

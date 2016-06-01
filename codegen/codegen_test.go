@@ -20,8 +20,16 @@ func (a *incubateInst) DependsOn() []target.Inst {
 	return a.Depends
 }
 
+func (a *incubateInst) Error() error {
+	return nil
+}
+
 func (a *incubateInst) SetDependsOn(xs []target.Inst) {
 	a.Depends = xs
+}
+
+func (a *incubateInst) GetTimeEstimate() float64 {
+	return 0.0
 }
 
 type incubator struct{}

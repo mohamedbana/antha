@@ -30,7 +30,6 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	driver "github.com/antha-lang/antha/microArch/driver/liquidhandling"
-	"github.com/antha-lang/antha/microArch/logger"
 )
 
 const (
@@ -131,7 +130,7 @@ func (bg ByGeneration) Less(i, j int) bool {
 	return bg[i].Generation() < bg[j].Generation()
 }
 
-func set_output_order(rq *LHRequest) {
+func set_output_order(rq *LHRequest) error {
 	// sort into equivalence classes by generation
 	// nb that this basically means the ichain stuff is a bit pointless
 	// however for now it will be maintained to test whether
@@ -155,6 +154,8 @@ func set_output_order(rq *LHRequest) {
 	it.Print()
 
 	rq.InstructionChain = it
+
+	return nil
 }
 
 type ByOrdinal [][]int
@@ -203,7 +204,7 @@ func merge_transfers(insIn []driver.RobotInstruction, aggregates [][]int) []driv
 	return ret
 }
 
-func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) (insOut *driver.TransferInstruction) {
+func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) (insOut *driver.TransferInstruction, err error) {
 	cmps := insIn.Components
 
 	lenToMake := len(insIn.Components)
@@ -218,7 +219,11 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) 
 
 	// six parameters applying to the source
 
-	fromPlateID, fromWells := robot.GetComponents(cmps)
+	fromPlateID, fromWells, err := robot.GetComponents(cmps)
+
+	if err != nil {
+		return nil, err
+	}
 
 	pf := make([]string, lenToMake)
 	wf := make([]string, lenToMake)
@@ -252,7 +257,8 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) 
 		wlt, ok := tlhp.WellAtString(insIn.Welladdress)
 
 		if !ok {
-			logger.Fatal(fmt.Sprint("Well ", insIn.Welladdress, " not found on dest plate ", insIn.PlateID))
+			err = wtype.LHError(wtype.LH_ERR_DIRE, fmt.Sprint("Well ", insIn.Welladdress, " not found on dest plate ", insIn.PlateID))
+			return nil, err
 		}
 
 		v2 := wunit.NewVolume(v.Vol, v.Vunit)
@@ -268,7 +274,9 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) 
 		wlf, ok := flhp.WellAtString(fromWells[ix])
 
 		if !ok {
-			logger.Fatal(fmt.Sprint("Well ", fromWells[ix], " not found on source plate ", fromPlateID[ix]))
+			//logger.Fatal(fmt.Sprint("Well ", fromWells[ix], " not found on source plate ", fromPlateID[ix]))
+			err = wtype.LHError(wtype.LH_ERR_DIRE, fmt.Sprint("Well ", fromWells[ix], " not found on source plate ", fromPlateID[ix]))
+			return nil, err
 		}
 
 		vf[ix] = wlf.CurrVolume()
@@ -286,5 +294,5 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) 
 	}
 
 	ti := driver.TransferInstruction{Type: driver.TFR, What: wh, Volume: va, PltTo: pt, WellTo: wt, TPlateWX: ptwx, TPlateWY: ptwy, PltFrom: pf, WellFrom: wf, FPlateWX: pfwx, FPlateWY: pfwy, FVolume: vf, TVolume: vt, FPlateType: ptf, TPlateType: ptt}
-	return &ti
+	return &ti, nil
 }

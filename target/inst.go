@@ -14,6 +14,7 @@ type Inst interface {
 	Device() Device
 	DependsOn() []Inst
 	SetDependsOn([]Inst)
+	GetTimeEstimate() float64
 }
 
 type Files struct {
@@ -24,6 +25,11 @@ type Files struct {
 type RunInst interface {
 	Inst
 	Data() Files // Blob of data that is runnable
+}
+
+type ErrInst interface {
+	Inst
+	Error() error // error returned during compilation
 }
 
 type Graph struct {
@@ -46,10 +52,36 @@ func (a *Graph) Out(n graph.Node, i int) graph.Node {
 	return n.(Inst).DependsOn()[i]
 }
 
+type CmpError struct {
+	Dev     Device
+	Depends []Inst
+	Err     error
+}
+
+func (a *CmpError) Device() Device {
+	return a.Dev
+}
+
+func (a *CmpError) DependsOn() []Inst {
+	return a.Depends
+}
+
+func (a *CmpError) SetDependsOn(x []Inst) {
+	a.Depends = x
+}
+func (a *CmpError) GetTimeEstimate() float64 {
+	return 0.0
+}
+
+func (a *CmpError) Error() error {
+	return a.Err
+}
+
 type Incubate struct {
 	Dev     Device
 	Depends []Inst
 	Files   Files
+	Time    float64
 }
 
 func (a *Incubate) Data() Files {
@@ -66,6 +98,10 @@ func (a *Incubate) DependsOn() []Inst {
 
 func (a *Incubate) SetDependsOn(x []Inst) {
 	a.Depends = x
+}
+
+func (a *Incubate) GetTimeEstimate() float64 {
+	return a.Time
 }
 
 type Mix struct {
@@ -92,11 +128,22 @@ func (a *Mix) SetDependsOn(x []Inst) {
 	a.Depends = x
 }
 
+func (a *Mix) GetTimeEstimate() float64 {
+	est := 0.0
+
+	if a.Request != nil {
+		est = a.Request.TimeEstimate
+	}
+
+	return est
+}
+
 type Manual struct {
 	Dev     Device
 	Label   string
 	Details string
 	Depends []Inst
+	Time    float64
 }
 
 func (a *Manual) DependsOn() []Inst {
@@ -109,6 +156,10 @@ func (a *Manual) Device() Device {
 
 func (a *Manual) SetDependsOn(x []Inst) {
 	a.Depends = x
+}
+
+func (a *Manual) GetTimeEstimate() float64 {
+	return a.Time
 }
 
 // Virtual instruction to hang dependencies on
@@ -126,4 +177,8 @@ func (a *Wait) DependsOn() []Inst {
 
 func (a *Wait) SetDependsOn(x []Inst) {
 	a.Depends = x
+}
+
+func (a *Wait) GetTimeEstimate() float64 {
+	return 0.0
 }

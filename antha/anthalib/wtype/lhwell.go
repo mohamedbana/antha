@@ -30,6 +30,12 @@ import (
 	"github.com/antha-lang/antha/microArch/logger"
 )
 
+const (
+	LHWBFLAT = iota
+	LHWBU
+	LHWBV
+)
+
 // structure representing a well on a microplate - description of a destination
 type LHWell struct {
 	ID        string
