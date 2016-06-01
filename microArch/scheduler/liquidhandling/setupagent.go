@@ -26,7 +26,9 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
+	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
 )
 
@@ -115,18 +117,14 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 
 	for _, pid := range output_plate_order {
 		p := output_plates[pid]
-		position := get_first_available_preference(output_preferences, setup)
-		if position == "" {
-			RaiseError("No positions left for output")
-		}
 		allowed, isConstrained := p.IsConstrainedOn(params.Model)
-
-		if isConstrained {
-			(fmt.Println("PLATE ", pid, " NAME: ", p.PlateName, " type ", p.Type, " IS CONSTRAINED"))
+		if !isConstrained {
+			allowed = make([]string, 0, 1)
 		}
+		position := get_first_available_preference(output_preferences, setup, allowed)
 
-		if isConstrained && !isInStrArr(position, allowed) {
-			continue
+		if position == "" {
+			RaiseError(fmt.Sprint("No position left for output ", p.Name(), " Type: ", p.Type, " Constrained: ", isConstrained, " allowed positions: ", allowed))
 		}
 
 		setup[position] = p
@@ -137,13 +135,13 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 
 	for _, pid := range input_plate_order {
 		p := input_plates[pid]
-		position := get_first_available_preference(input_preferences, setup)
-		if position == "" {
-			RaiseError("No positions left for input")
-		}
 		allowed, isConstrained := p.IsConstrainedOn(params.Model)
-		if isConstrained && !isInStrArr(position, allowed) {
-			continue
+		if !isConstrained {
+			allowed = make([]string, 0, 1)
+		}
+		position := get_first_available_preference(input_preferences, setup, allowed)
+		if position == "" {
+			RaiseError(fmt.Sprint("No position left for input ", p.Name(), " Type: ", p.Type, " Constrained: ", isConstrained, " allowed positions: ", allowed))
 		}
 		//fmt.Println("PLAATE: ", position)
 		setup[position] = p
@@ -152,13 +150,32 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) *L
 		logger.Info(fmt.Sprintf("Input plate of type %s in position %s", p.Type, position))
 	}
 
+	// add the waste
+	s := params.TipWastesMounted()
+
+	if s == 0 {
+		var waste *wtype.LHTipwaste
+		// this should be added to the automagic config setup... however it will require adding to the
+		// representation of the liquid handler
+		//TODO handle general case differently
+		if params.Model == "Pipetmax" {
+			waste = factory.GetTipwasteByType("Gilsontipwaste")
+		} else if params.Model == "GeneTheatre" {
+			waste = factory.GetTipwasteByType("CyBiotipwaste")
+		}
+
+		params.AddTipWaste(waste)
+	}
 	//request.Setup = setup
 	request.Plate_lookup = plate_lookup
 	return request
 }
 
-func get_first_available_preference(prefs []string, setup map[string]interface{}) string {
+func get_first_available_preference(prefs []string, setup map[string]interface{}, allowed []string) string {
 	for _, pref := range prefs {
+		if len(allowed) != 0 && !isInStrArr(pref, allowed) {
+			continue
+		}
 		_, ok := setup[pref]
 		if !ok {
 			return pref

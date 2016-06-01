@@ -1,6 +1,8 @@
 package wtype
 
-import "strings"
+import (
+	"strings"
+)
 
 //  instruction to a liquid handler
 type LHInstruction struct {
@@ -13,7 +15,7 @@ type LHInstruction struct {
 	ContainerType    string
 	Welladdress      string
 	Plateaddress     string
-	PlateID          string
+	plateID          string
 	Platetype        string
 	Vol              float64
 	Type             string
@@ -48,6 +50,14 @@ func (ins *LHInstruction) Generation() int {
 }
 func (ins *LHInstruction) SetGeneration(i int) {
 	ins.gen = i
+}
+
+func (ins *LHInstruction) PlateID() string {
+	return ins.plateID
+}
+
+func (ins *LHInstruction) SetPlateID(pid string) {
+	ins.plateID = pid
 }
 
 func (ins *LHInstruction) IsMixInPlace() bool {

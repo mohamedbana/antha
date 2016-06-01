@@ -24,6 +24,7 @@ package wtype
 
 import (
 	"github.com/antha-lang/antha/internal/github.com/twinj/uuid"
+	//"github.com/dustinkirkland/golang-petname"
 )
 
 // this package wraps the uuid library appropriately
@@ -31,6 +32,14 @@ import (
 func GetUUID() string {
 	return uuid.NewV4().String()
 }
+
+/*
+// for debugging this can be useful
+func GetUUID() string {
+	return petname.Generate(2, "_")
+}
+*/
+
 func NewUUID() string {
 	return GetUUID()
 }

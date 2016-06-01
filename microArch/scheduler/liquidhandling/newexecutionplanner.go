@@ -37,8 +37,7 @@ func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProper
 	for ix, insID := range request.Output_order {
 		//	request.InstructionSet.Add(ConvertInstruction(request.LHInstructions[insID], robot))
 		transfers = append(transfers, ConvertInstruction(request.LHInstructions[insID], robot))
-		cmp := fmt.Sprintf("%s_%s", request.LHInstructions[insID].ComponentsMoving(), request.LHInstructions[insID].Generation())
-
+		cmp := fmt.Sprintf("%s_%d", request.LHInstructions[insID].ComponentsMoving(), request.LHInstructions[insID].Generation())
 		ar, ok := agg[cmp]
 		if !ok {
 			ar = make([]int, 0, 1)
@@ -67,7 +66,7 @@ func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProper
 	inx := request.InstructionSet.Generate(request.Policies, robot)
 	instrx := make([]liquidhandling.TerminalRobotInstruction, len(inx))
 	for i := 0; i < len(inx); i++ {
-		//		fmt.Println(liquidhandling.InsToString(inx[i]))
+		//fmt.Println(liquidhandling.InsToString(inx[i]))
 		instrx[i] = inx[i].(liquidhandling.TerminalRobotInstruction)
 	}
 	request.Instructions = instrx

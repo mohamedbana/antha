@@ -251,6 +251,20 @@ func (this *Liquidhandler) do_setup(rq *LHRequest) {
 //
 
 func (this *Liquidhandler) Plan(request *LHRequest) {
+	// give us some idea what's going on
+
+	ix := 0
+	for insID, _ := range request.LHInstructions {
+		fmt.Printf("INS::%d : ", ix)
+
+		for _, c := range request.LHInstructions[insID].Components {
+			fmt.Printf(" %s %s -- ", c.CName, c.Volume().ToString())
+		}
+
+		fmt.Println()
+		ix += 1
+	}
+
 	// convert requests to volumes and determine required stock concentrations
 	instructions, stockconcs := solution_setup(request, this.Properties)
 	request.LHInstructions = instructions
@@ -406,25 +420,6 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) *LHRequest {
 	}
 
 	(*request).Input_solutions = requestinputs
-
-	// finally we have to add a waste if there isn't one already
-	/// ??? This should not be here
-	// work out if we need to empty soon
-
-	s := this.Properties.TipWastesMounted()
-
-	if s == 0 {
-		var waste *wtype.LHTipwaste
-		// this should be added to the automagic config setup... however it will require adding to the
-		// representation of the liquid handler
-		if this.Properties.Model == "Pipetmax" {
-			waste = factory.GetTipwasteByType("Gilsontipwaste")
-		} else { //if this.Properties.Model == "GeneTheatre" { //TODO handle general case differently
-			waste = factory.GetTipwasteByType("CyBiotipwaste")
-		}
-
-		this.Properties.AddTipWaste(waste)
-	}
 
 	return request
 }
