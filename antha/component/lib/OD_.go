@@ -5,7 +5,7 @@ package lib
 
 import (
 	//"liquid handler"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Platereader"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/platereader"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
