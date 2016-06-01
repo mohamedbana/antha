@@ -590,8 +590,6 @@ func MakeLVOffsetPolicy() LHPolicy {
 
 func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
 
-	var err error
-
 	// make some policies
 
 	policies := MakePolicies()
@@ -615,7 +613,7 @@ func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
 	// are being properly kept in sync
 
 	rule := NewLHPolicyRule("BlowOutToEmptyWells")
-	err = rule.AddNumericConditionOn("WELLTOVOLUME", 0.0, 1.0)
+	err := rule.AddNumericConditionOn("WELLTOVOLUME", 0.0, 1.0)
 
 	if err != nil {
 		return nil, err
