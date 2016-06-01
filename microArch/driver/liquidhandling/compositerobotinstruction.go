@@ -315,12 +315,12 @@ func (ins *TransferInstruction) GetParallelSetsFor(channel *wtype.LHChannelParam
 		pmf, _ := strconv.Atoi(tx[5])
 		pmt, _ := strconv.Atoi(tx[6])
 
-		fmt.Println("transfer ", k, " len : ", len(a))
+		//		fmt.Println("transfer ", k, " len : ", len(a))
 		if len(a) >= channel.Multi {
 			// could be
 			mss := GetMultiSet(a, channel.Multi, pmf, pmt)
 
-			fmt.Println("Multiset length: ", len(mss))
+			//fmt.Println("Multiset length: ", len(mss))
 
 			if len(mss) != 0 {
 				for _, ms := range mss {
@@ -377,7 +377,7 @@ func GetNextSet(a []string, channelmulti int, fromplatemulti int, toplatemulti i
 	ret := getset(r, channelmulti)
 	censa := censoredcopy(a, ret)
 
-	fmt.Println("RET: ", ret, " CENSA: ", censa)
+	//fmt.Println("RET: ", ret, " CENSA: ", censa)
 
 	return ret, censa
 }
@@ -503,6 +503,8 @@ func (ins *TransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProper
 		// this is a bit problematic: we need to define head choice here partly on the
 		// basis of its multi, partly based on volume range
 		parallelsets := ins.GetParallelSetsFor(prms.HeadsLoaded[0].Params)
+
+		//fmt.Println("PARALLEL SETS FOUND: ", parallelsets)
 
 		mci := NewMultiChannelBlockInstruction()
 		mci.Multi = prms.HeadsLoaded[0].Params.Multi // TODO Remove Hard code here
@@ -2518,7 +2520,6 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 	// do we mix?
 	_, postmix := pol["POST_MIX"]
 	cycles := SafeGetInt(pol, "POST_MIX")
-	fmt.Println("POST MIX : ", postmix, " CYCLES: ", cycles)
 
 	if postmix && cycles > 0 {
 		// add the postmix step

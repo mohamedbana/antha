@@ -24,9 +24,11 @@ package liquidhandling
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
+	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
 )
 
@@ -56,10 +58,35 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) (*
 
 	// input plates
 	input_plates := request.Input_plates
+	input_plate_order := request.Input_plate_order
+
+	if len(input_plate_order) < len(input_plates) {
+		input_plate_order = make([]string, len(input_plates))
+		x := 0
+		for k, _ := range input_plates {
+			input_plate_order[x] = k
+			x += 1
+		}
+
+		sort.Strings(input_plate_order)
+		request.Input_plate_order = input_plate_order
+	}
 
 	// output plates
 	output_plates := request.Output_plates
+	output_plate_order := request.Output_plate_order
 
+	if len(output_plate_order) < len(output_plates) {
+		output_plate_order = make([]string, len(output_plates))
+		x := 0
+		for k, _ := range output_plates {
+			output_plate_order[x] = k
+			x += 1
+		}
+
+		sort.Strings(output_plate_order)
+		request.Output_plate_order = output_plate_order
+	}
 	// tips
 	tips := request.Tips
 
@@ -86,30 +113,38 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) (*
 
 	}
 
-	// this logic may not transfer well but I expect that outputs are more constrained
-	// than inputs for the simple reason that most output takes place to single wells
-	// while input (sometimes) takes place from reservoirs
+	// place outputs
 
-	// outputs
+	for _, pid := range output_plate_order {
+		p := output_plates[pid]
+		allowed, isConstrained := p.IsConstrainedOn(params.Model)
+		if !isConstrained {
+			allowed = make([]string, 0, 1)
+		}
+		position := get_first_available_preference(output_preferences, setup, allowed)
 
-	for _, p := range output_plates {
-		position := get_first_available_preference(output_preferences, setup)
 		if position == "" {
 			//RaiseError("No positions left for output")
-			err := wtype.LHError(wtype.LH_ERR_NO_DECK_SPACE, "No positions left for output")
+			err := wtype.LHError(wtype.LH_ERR_NO_DECK_SPACE, fmt.Sprint("No position left for output ", p.Name(), " Type: ", p.Type, " Constrained: ", isConstrained, " allowed positions: ", allowed))
 			return request, err
 		}
+
 		setup[position] = p
 		plate_lookup[p.ID] = position
 		params.AddPlate(position, p)
 		logger.Info(fmt.Sprintf("Output plate of type %s in position %s", p.Type, position))
 	}
 
-	for _, p := range input_plates {
-		position := get_first_available_preference(input_preferences, setup)
+	for _, pid := range input_plate_order {
+		p := input_plates[pid]
+		allowed, isConstrained := p.IsConstrainedOn(params.Model)
+		if !isConstrained {
+			allowed = make([]string, 0, 1)
+		}
+		position := get_first_available_preference(input_preferences, setup, allowed)
 		if position == "" {
 			//RaiseError("No positions left for input")
-			err := wtype.LHError(wtype.LH_ERR_NO_DECK_SPACE, "No positions left for input")
+			err := wtype.LHError(wtype.LH_ERR_NO_DECK_SPACE, fmt.Sprint("No position left for input ", p.Name(), " Type: ", p.Type, " Constrained: ", isConstrained, " allowed positions: ", allowed))
 			return request, err
 		}
 		//fmt.Println("PLAATE: ", position)
@@ -119,13 +154,32 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) (*
 		logger.Info(fmt.Sprintf("Input plate of type %s in position %s", p.Type, position))
 	}
 
+	// add the waste
+	s := params.TipWastesMounted()
+
+	if s == 0 {
+		var waste *wtype.LHTipwaste
+		// this should be added to the automagic config setup... however it will require adding to the
+		// representation of the liquid handler
+		//TODO handle general case differently
+		if params.Model == "Pipetmax" {
+			waste = factory.GetTipwasteByType("Gilsontipwaste")
+		} else if params.Model == "GeneTheatre" {
+			waste = factory.GetTipwasteByType("CyBiotipwaste")
+		}
+
+		params.AddTipWaste(waste)
+	}
 	//request.Setup = setup
 	request.Plate_lookup = plate_lookup
 	return request, nil
 }
 
-func get_first_available_preference(prefs []string, setup map[string]interface{}) string {
+func get_first_available_preference(prefs []string, setup map[string]interface{}, allowed []string) string {
 	for _, pref := range prefs {
+		if len(allowed) != 0 && !isInStrArr(pref, allowed) {
+			continue
+		}
 		_, ok := setup[pref]
 		if !ok {
 			return pref
@@ -133,4 +187,14 @@ func get_first_available_preference(prefs []string, setup map[string]interface{}
 
 	}
 	return ""
+}
+
+func isInStrArr(q string, ar []string) bool {
+	for _, s := range ar {
+		if q == s {
+			return true
+		}
+	}
+
+	return false
 }

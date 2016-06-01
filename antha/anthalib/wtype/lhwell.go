@@ -182,7 +182,7 @@ func (w *LHWell) Remove(v wunit.Volume) *LHComponent {
 	// if the volume is too high we complain
 
 	if v.GreaterThan(w.CurrentVolume()) {
-		logger.Debug("You ask too much: ", w.Crds, v.ToString())
+		logger.Debug("You ask too much: ", w.Crds, " ", v.ToString(), " I only have: ", w.CurrentVolume().ToString(), " PLATEID: ", w.Plateid)
 		return nil
 	}
 

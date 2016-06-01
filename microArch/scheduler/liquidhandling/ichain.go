@@ -50,7 +50,12 @@ func (it *IChain) GetChild() *IChain {
 func (it *IChain) Print() {
 	fmt.Println("****")
 	fmt.Println("\tPARENT NIL: ", it.Parent == nil)
-	fmt.Println("\tINPUTS: ", len(it.Values))
+	fmt.Print("\tINPUTS: ", len(it.Values), ":")
+	for i := 0; i < len(it.Values[0].Components); i++ {
+		fmt.Print(" ", it.Values[0].Components[i].CName)
+	}
+
+	fmt.Println()
 	if it.Child != nil {
 		it.Child.Print()
 	}

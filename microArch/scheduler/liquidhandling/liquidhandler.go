@@ -467,25 +467,6 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) (*LHRequest, error) {
 
 	(*request).Input_solutions = requestinputs
 
-	// finally we have to add a waste if there isn't one already
-	/// ??? This should not be here
-	// work out if we need to empty soon
-
-	s := this.Properties.TipWastesMounted()
-
-	if s == 0 {
-		var waste *wtype.LHTipwaste
-		// this should be added to the automagic config setup... however it will require adding to the
-		// representation of the liquid handler
-		if this.Properties.Model == "Pipetmax" {
-			waste = factory.GetTipwasteByType("Gilsontipwaste")
-		} else { //if this.Properties.Model == "GeneTheatre" { //TODO handle general case differently
-			waste = factory.GetTipwasteByType("CyBiotipwaste")
-		}
-
-		this.Properties.AddTipWaste(waste)
-	}
-
 	return request, nil
 }
 
