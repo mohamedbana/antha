@@ -2,7 +2,7 @@
     "Parameters": {
         "Protoplast_movement_overlay1": {
             "OutPlatetype":"pcrplate_skirted_riser",
-			"OutPlatetype2":"Nuncon12wellAgar_incubator",
+			"OutPlatetype2":"Nuncon12well_incubator",
 			"AgarPlate":"falcon6wellAgar",
             "Cells":"protoplasts",
 			"DNA":"dna_part",
