@@ -60,10 +60,10 @@ Steps {
 	cellsinwell:=MixTo(OutPlatetype, OutWell,1, cellsample)
 	
 	DNASample:=mixer.Sample(DNA, DNAVol)
-	cellsplusdna:=MixTo(OutPlatetype, OutWell,1,cellsinwell, DNASample)
+	cellsplusdna:=Mix(cellsinwell, DNASample)
 	
 	PEGSample:=mixer.Sample(PEG, PEGVol)
-	TransformedCells=MixTo(OutPlatetype, OutWell, 1, cellsplusdna,PEGSample)
+	TransformedCells=Mix(cellsplusdna, PEGSample)
 	
 	CellsAgar:=mixer.Sample(TransformedCells,TransformedCellsVol)
 	CellsAgarinWell:=MixTo(OutPlatetype2, OutWell2, 1, CellsAgar)

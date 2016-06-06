@@ -33,10 +33,10 @@ func _Protoplast_movement_overlaySteps(_ctx context.Context, _input *Protoplast_
 	cellsinwell := execute.MixTo(_ctx, _input.OutPlatetype, _input.OutWell, 1, cellsample)
 
 	DNASample := mixer.Sample(_input.DNA, _input.DNAVol)
-	cellsplusdna := execute.MixTo(_ctx, _input.OutPlatetype, _input.OutWell, 1, cellsinwell, DNASample)
+	cellsplusdna := execute.Mix(_ctx, cellsinwell, DNASample)
 
 	PEGSample := mixer.Sample(_input.PEG, _input.PEGVol)
-	_output.TransformedCells = execute.MixTo(_ctx, _input.OutPlatetype, _input.OutWell, 1, cellsplusdna, PEGSample)
+	_output.TransformedCells = execute.Mix(_ctx, cellsplusdna, PEGSample)
 
 	CellsAgar := mixer.Sample(_output.TransformedCells, _input.TransformedCellsVol)
 	CellsAgarinWell := execute.MixTo(_ctx, _input.OutPlatetype2, _input.OutWell2, 1, CellsAgar)

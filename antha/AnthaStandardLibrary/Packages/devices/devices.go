@@ -69,7 +69,7 @@ var (
 			"weightinkg":         1.5,
 			"Width":              0.142, // in m
 			"Depth":              0.099,
-			"Height":             0.055,
+			"Height":             0.0525,
 		},
 		"InhecoStaticOnDeck": map[string]float64{
 			"Height": 0.0575, // height in m
