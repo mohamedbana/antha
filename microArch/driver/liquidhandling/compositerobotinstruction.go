@@ -3419,6 +3419,5 @@ func DropTips(tiptype string, params *LHProperties, channel *wtype.LHChannelPara
 	ins.PltTo = tipwastepositions
 	ins.TPlateType = tipwastetypes
 	ins.Multi = multi
-	logger.Debug(InsToString(ins))
 	return ins, nil
 }
