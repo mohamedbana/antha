@@ -84,10 +84,10 @@ func LiquidTypeFromString(s string) LiquidType {
 	case "colony":
 		return LTCOLONY
 	default:
-		return LTNIL // LTWater
+		return LTWater
 	}
 
-	return LTNIL //LTWater
+	return LTWater
 }
 
 func LiquidTypeName(lt LiquidType) string {

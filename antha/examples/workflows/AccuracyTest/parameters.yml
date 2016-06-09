@@ -5,39 +5,21 @@
             "TestSols": [
 			"tartrazine"
 			],
-            "NumberofReplicates": 3,
+            "NumberofReplicates": 1,
             "OutPlate": "greiner384_riser",
             "TestSolVolumes": [
-			"0ul",
 			"0.5ul",
 			"1ul",
-			"2ul",
-			"3ul",
-			"4ul",
-			"5ul",
-			"6ul",
-			"7ul",
-			"8ul",
-			"9ul",
-			"10ul",
-			"11ul",
-			"12ul",
-			"13ul",
-			"14ul",
-			"15ul",
-			"16ul",
-			"17ul",
-			"18ul",
-			"19ul"
+			"2ul"
 			],
-			"UseLiquidPolicyForTestSolutions": false,
-			"LHPolicy":"dna_mix",
+			"UseLiquidPolicyForTestSolutions": true,
+			"LHPolicy":"NeedToMix",
 			"DXORJMP":"JMP",
-			"OutputFilename":"Accuracytestoeoutput_test.xlsx",
+			"OutputFilename":"AccuracytestoeoutputSmall_test.xlsx",
 			"Printasimage": true,
 			"Imagefilename": "star.png",
             "TotalVolume": "20ul",
-			"NumberofBlanks": 0
+			"NumberofBlanks": 1
         }
     }
 }

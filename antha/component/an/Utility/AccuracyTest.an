@@ -20,14 +20,10 @@ Parameters (
 	NumberofReplicates int
 	Printasimage bool
 	Imagefilename string
-<<<<<<< HEAD:antha/component/an/Utility/AccuracyTest.an
+
 	NumberofBlanks int
 	UseLiquidPolicyForTestSolutions bool
 	LHPolicy string
-=======
-	NumberofBlanks int	
-	LHDOEFile string
->>>>>>> master:antha/component/an/Liquid_handling/FindbestLHPolicy/ScreenLHPolicies_Awesome.an
 	DXORJMP string
 	OutputFilename string
 	PipetteOnebyOne bool

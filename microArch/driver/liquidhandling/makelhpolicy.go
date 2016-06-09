@@ -636,11 +636,15 @@ func MakeLoadlowPolicy() LHPolicy {
 }
 
 func MakeNeedToMixPolicy() LHPolicy {
-	dnapolicy := make(LHPolicy, 10)
+	dnapolicy := make(LHPolicy, 15)
 	dnapolicy["POST_MIX"] = 4
 	dnapolicy["POST_MIX_VOLUME"] = 10
-	dnapolicy["ASPSPEED"] = 4.0
-	dnapolicy["DSPSPEED"] = 4.0
+	dnapolicy["POST_MIX_RATE"] = 3.0
+	dnapolicy["PRE_MIX"] = 4
+	dnapolicy["PRE_MIX_VOLUME"] = 10
+	dnapolicy["PRE_MIX_RATE"] = 3.0
+	dnapolicy["ASPSPEED"] = 3.0
+	dnapolicy["DSPSPEED"] = 3.0
 	dnapolicy["CAN_MULTI"] = false
 	dnapolicy["CAN_MSA"] = false
 	dnapolicy["CAN_SDD"] = false
@@ -653,7 +657,7 @@ func MakeNeedToMixPolicy() LHPolicy {
 }
 
 func MakeDefaultPolicy() LHPolicy {
-	defaultpolicy := make(LHPolicy, 21)
+	defaultpolicy := make(LHPolicy, 27)
 	// don't set this here -- use defaultpipette speed or there will be inconsistencies
 	// defaultpolicy["ASP_SPEED"] = 3.0
 	// defaultpolicy["DSP_SPEED"] = 3.0
@@ -669,7 +673,7 @@ func MakeDefaultPolicy() LHPolicy {
 	defaultpolicy["TIP_REUSE_LIMIT"] = 100
 	defaultpolicy["BLOWOUTREFERENCE"] = 1
 	defaultpolicy["BLOWOUTOFFSET"] = -0.5
-	defaultpolicy["BLOWOUTVOLUME"] = 200.0
+	defaultpolicy["BLOWOUTVOLUME"] = 0.0
 	defaultpolicy["BLOWOUTVOLUMEUNIT"] = "ul"
 	defaultpolicy["PTZREFERENCE"] = 1
 	defaultpolicy["PTZOFFSET"] = -0.5
@@ -678,6 +682,16 @@ func MakeDefaultPolicy() LHPolicy {
 	defaultpolicy["MANUALPTZ"] = false
 	defaultpolicy["JUSTBLOWOUT"] = false
 	defaultpolicy["DONT_BE_DIRTY"] = true
+	// added to diagnose bubble cause
+	defaultpolicy["ASPZOFFSET"] = 0.5
+	defaultpolicy["DSPZOFFSET"] = 0.5
+	defaultpolicy["POST_MIX_Z"] = 0.5
+	defaultpolicy["PRE_MIX_Z"] = 0.5
+	//defaultpolicy["ASP_WAIT"] = 1.0
+	//defaultpolicy["DSP_WAIT"] = 1.0
+	defaultpolicy["PRE_MIX_VOLUME"] = 10
+	defaultpolicy["POST_MIX_VOLUME"] = 10
+
 	return defaultpolicy
 }
 
@@ -736,6 +750,7 @@ func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
 	// nb for this to really work I think we still need to make sure well volumes
 	// are being properly kept in sync
 
+	/* hide this for now as a suspect for causing bubbles
 	rule := NewLHPolicyRule("BlowOutToEmptyWells")
 	err := rule.AddNumericConditionOn("WELLTOVOLUME", 0.0, 1.0)
 
@@ -749,9 +764,11 @@ func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
 	}
 	pol := MakeJBPolicy()
 	lhpr.AddRule(rule, pol)
+	*/
 
 	// a further refinement: for low volumes we need to add extra volume
 	// for aspirate and dispense
+
 	/*
 		rule = NewLHPolicyRule("ExtraVolumeForLV")
 		rule.AddNumericConditionOn("VOLUME", 0.0, 20.0)
@@ -760,10 +777,10 @@ func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
 	*/
 
 	// hack to fix plate type problems
-	rule = NewLHPolicyRule("HVOffsetFix")
+	rule := NewLHPolicyRule("HVOffsetFix")
 	rule.AddNumericConditionOn("VOLUME", 20.5, 300.0) // what about higher?
 	//rule.AddCategoryConditionOn("FROMPLATETYPE", "pcrplate_skirted_riser")
-	pol = MakeHVOffsetPolicy()
+	pol := MakeHVOffsetPolicy()
 	lhpr.AddRule(rule, pol)
 
 	/*rule = NewLHPolicyRule("LVOffsetFix2")
