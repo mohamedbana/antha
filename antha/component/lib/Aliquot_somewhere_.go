@@ -1,3 +1,4 @@
+// example protocol showing the highest level antha mix command which does not specify a plate type, therefore leaving it up to the scheduler to decide
 package lib
 
 import (
@@ -31,20 +32,32 @@ func _Aliquot_somewhereSetup(_ctx context.Context, _input *Aliquot_somewhereInpu
 // for every input
 func _Aliquot_somewhereSteps(_ctx context.Context, _input *Aliquot_somewhereInput, _output *Aliquot_somewhereOutput) {
 
+	// First check that we can make enough aliquots of this volume
 	number := _input.SolutionVolume.SIValue() / _input.VolumePerAliquot.SIValue()
 	possiblenumberofAliquots, _ := wutil.RoundDown(number)
 	if possiblenumberofAliquots < _input.NumberofAliquots {
 		panic("Not enough solution for this many aliquots")
 	}
 
+	// make an slice of components which we'll fill with aliquots;
+	// same as we would for an array of samples but this time we won't mix together
 	aliquots := make([]*wtype.LHComponent, 0)
 
+	// this is golang syntax for a for loop
+	// variable i is initialised at 0 and will increase with each loop whilst i < NumberofAliquots is still true
 	for i := 0; i < _input.NumberofAliquots; i++ {
+
+		// this is golang syntax for if statements
+		// here we're checking if the liquid type is "dna" and if so we're changing the type
+		// to ensure risk of cross contamination is completely avoided the dna liquid type does not allow multipipetting
+		// in this case where we're just aliquoting the same dna into multiple destinations we can override this by changing the liquid type
 		if _input.Solution.TypeName() == "dna" {
 			_input.Solution.Type = wtype.LTDoNotMix
 		}
 		aliquotSample := mixer.Sample(_input.Solution, _input.VolumePerAliquot)
 		aliquot := execute.Mix(_ctx, aliquotSample)
+
+		// this time we append the slice of components after mixing
 		aliquots = append(aliquots, aliquot)
 	}
 	_output.Aliquots = aliquots
@@ -131,8 +144,8 @@ func init() {
 	addComponent(Component{Name: "Aliquot_somewhere",
 		Constructor: Aliquot_somewhereNew,
 		Desc: ComponentDesc{
-			Desc: "",
-			Path: "antha/component/an/Liquid_handling/Aliquot/Aliquot_somewhereorother.an",
+			Desc: "example protocol showing the highest level antha mix command which does not specify a plate type, therefore leaving it up to the scheduler to decide\n",
+			Path: "antha/component/an/AnthaAcademy/Lesson2_mix/Aliquot_somewhereorother.an",
 			Params: []ParamDesc{
 				{Name: "NumberofAliquots", Desc: "", Kind: "Parameters"},
 				{Name: "Solution", Desc: "", Kind: "Inputs"},

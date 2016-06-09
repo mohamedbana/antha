@@ -11,17 +11,16 @@ import (
 )
 
 Parameters (
-	Parts []string
-	Vector string
-	ConstructName string
-	RE string
-	EndsAlreadyAdded bool
-	SynthesisProvider string
-	ExporttoFastaFile bool
+	Parts []string // dna sequences as strings "ACTTGCGTC","GGTCCA"
+	Vector string // dna sequence as string
+	ConstructName string // name you want to give your construct
+	RE string // typeIIs restriction enzyme name
+	EndsAlreadyAdded bool // have the typeIIs assembly ends been added already? true/false
+	SynthesisProvider string // name of synthesis provider e.g. GenScript
+	ExporttoFastaFile bool // Whether or not you want to export the sequences generated to a fasta file
 )
 Data (
-	// input seq
-	Sequence string
+
 	// output parts with correct overhangs
 	PartsWithOverhangs []wtype.DNASequence
 	SimulationStatus string
@@ -44,13 +43,13 @@ Setup {
 Steps {
 	PartDNA := make([]wtype.DNASequence, 0)
 	
-	// Retrieve part seqs from entrez
+	// make DNASequence type from sequence
 	for i, part := range Parts {
 		DNA := wtype.MakeLinearDNASequence("part" + strconv.Itoa(i),part)
 		PartDNA = append(PartDNA,DNA)
 	}
 	
-	// look up vector sequence
+	// make vector sequence
 	VectorSeq := wtype.MakePlasmidDNASequence("Vector",Vector)
 
 	// Look up the restriction enzyme

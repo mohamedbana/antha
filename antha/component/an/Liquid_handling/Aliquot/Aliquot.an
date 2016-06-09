@@ -23,6 +23,7 @@ Data (
 
 // Physical Inputs to this protocol with types
 Inputs (
+	OutPlate *wtype.LHPlate
 	Solution *wtype.LHComponent
 	
 )
