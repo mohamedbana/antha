@@ -2,7 +2,6 @@ package lib
 
 import (
 	"fmt"
-	antha "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
@@ -13,7 +12,6 @@ import (
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
-	"path/filepath"
 	"strconv"
 )
 
@@ -29,35 +27,27 @@ import (
 
 // Physical outputs from this protocol with types
 
-func _ScreenLHPolicies_AwesomeRequirements() {
+func _AccuracyTestRequirements() {
 }
 
 // Conditions to run on startup
-func _ScreenLHPolicies_AwesomeSetup(_ctx context.Context, _input *ScreenLHPolicies_AwesomeInput) {
+func _AccuracyTestSetup(_ctx context.Context, _input *AccuracyTestInput) {
 }
 
 // The core process for this protocol, with the steps to be performed
 // for every input
-func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolicies_AwesomeInput, _output *ScreenLHPolicies_AwesomeOutput) {
-
-	// validate presence of doe design file in anthapath
-	if antha.Anthafileexists(_input.LHDOEFile) == false {
-		fmt.Println("This DOE file ", _input.LHDOEFile, " was not found in anthapath ~.antha. Please move it there, change file name and type in antha-lang/antha/microarch/driver/makelhpolicy.go and recompile antha to use this liquidhandling doe design")
-		fmt.Println("currently set to ", liquidhandling.DOEliquidhandlingFile, " type ", liquidhandling.DXORJMP)
-	} else {
-		fmt.Println("found lhpolicy doe file", _input.LHDOEFile)
-	}
+func _AccuracyTestSteps(_ctx context.Context, _input *AccuracyTestInput, _output *AccuracyTestOutput) {
 
 	// declare some global variables for use later
 	var rotate = false
 	var autorotate = true
 	var wellpositionarray = make([]string, 0)
-	var perconditionuntowelllocationmap = make([]string, 0)
 	var alphabet = wutil.MakeAlphabetArray()
 	_output.Runtowelllocationmap = make(map[string]string)
 	_output.Blankwells = make([]string, 0)
 	counter := 0
 	var platenum = 1
+	var runs = make([]doe.Run, 1)
 	// work out plate layout based on picture or just in order
 
 	if _input.Printasimage {
@@ -78,27 +68,18 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 
 	} else {
 
-		for j := 0; j < _input.OutPlate.WlsX; j++ {
-			for i := 0; i < _input.OutPlate.WlsY; i++ { //countingfrom1iswhatmakesushuman := j + 1
-				//k = k + 1
-				wellposition := string(alphabet[i]) + strconv.Itoa(j+1)
-				//fmt.Println(wellposition, k)
-				wellpositionarray = append(wellpositionarray, wellposition)
-			}
+		wellpositionarray = _input.OutPlate.AllWellPositions()
 
-		}
 	}
 	reactions := make([]*wtype.LHComponent, 0)
 
-	//policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run",false)
+	// use first policy as reference to ensure consistent range through map values
+	referencepolicy, _ := liquidhandling.GetPolicyByName(_input.LHPolicy)
 
-	//intfactors := []string{"Pre_MIX","POST_MIX"}
-	_, names, runs, err := liquidhandling.PolicyMakerfromDesign(_input.DXORJMP, _input.LHDOEFile, "DOE_run")
-	if err != nil {
-		panic(err)
+	referencekeys := make([]string, 0)
+	for key := range referencepolicy {
+		referencekeys = append(referencekeys, key)
 	}
-
-	//newruns := make([]doe.Run,len(runs))
 
 	for l := 0; l < len(_input.TestSolVolumes); l++ {
 		for k := 0; k < len(_input.TestSols); k++ {
@@ -111,32 +92,50 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 						counter = 0
 					}
 
-					//eachreaction := make([]*wtype.LHComponent, 0)
+					var eachreaction []*wtype.LHComponent
+					var solution *wtype.LHComponent
 
+					if _input.PipetteOnebyOne {
+						eachreaction = make([]*wtype.LHComponent, 0)
+					}
 					// keep default policy for diluent
-					//Diluent.Type = names[i]
-					//fmt.Println(Diluent.Type)
 
 					// diluent first
+
+					// change lhpolicy if desired
+					if _input.UseLHPolicyDoeforDiluent {
+						_input.Diluent.Type = wtype.LiquidTypeFromString(_input.LHPolicy)
+					}
+
 					bufferSample := mixer.SampleForTotalVolume(_input.Diluent, _input.TotalVolume)
-					//eachreaction = append(eachreaction,bufferSample)
 
-					solution := execute.MixTo(_ctx, _input.OutPlate.Type, wellpositionarray[counter], platenum, bufferSample)
+					if _input.PipetteOnebyOne {
+						eachreaction = append(eachreaction, bufferSample)
+					} else {
 
+						solution = execute.MixTo(_ctx, _input.OutPlate.Type, wellpositionarray[counter], platenum, bufferSample)
+					}
 					// now test sample
 
 					// change liquid class
-					_input.TestSols[k].Type = wtype.LiquidTypeFromString(names[i])
+					if _input.UseLiquidPolicyForTestSolutions && _input.LHPolicy != "" {
+						_input.TestSols[k].Type = wtype.LiquidTypeFromString(_input.LHPolicy)
+					}
 
-					//sample
-					testSample := mixer.Sample(_input.TestSols[k], _input.TestSolVolumes[l])
+					if _input.TestSolVolumes[l].RawValue() > 0.0 {
+						//sample
+						testSample := mixer.Sample(_input.TestSols[k], _input.TestSolVolumes[l])
 
-					//eachreaction = append(eachreaction,testSample)
+						if _input.PipetteOnebyOne {
+							eachreaction = append(eachreaction, testSample)
+							solution = execute.MixTo(_ctx, _input.OutPlate.Type, wellpositionarray[counter], platenum, eachreaction...)
+						} else {
+							// pipette out
+							//solution = MixTo(OutPlate.Type,wellpositionarray[counter],platenum, testSample)
+							solution = execute.Mix(_ctx, solution, testSample)
+						}
 
-					// pipette out
-					solution = execute.MixTo(_ctx, _input.OutPlate.Type, wellpositionarray[counter], platenum, testSample)
-
-					perconditionuntowelllocationmap = append(perconditionuntowelllocationmap, wtype.LiquidTypeName(_input.TestSols[k].Type)+":"+wellpositionarray[counter])
+					}
 
 					// get annotation info
 					doerun := wtype.LiquidTypeName(_input.TestSols[k].Type)
@@ -150,51 +149,62 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 
 					// add run to well position lookup table
 					_output.Runtowelllocationmap[doerun+"_"+description] = wellpositionarray[counter]
-					reactions = append(reactions, solution)
-					counter = counter + 1
 
 					// add additional info for each run
+					fmt.Println("len(runs)", len(runs), "counter", counter, "len(wellpositionarray)", len(wellpositionarray))
 					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "Location_"+description, wellpositionarray[counter])
 
 					// add run order:
 					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "runorder_"+description, counter)
 
 					// add setpoint printout to double check correct match up:
-					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "doerun"+description, doerun)
-					//runs[i].AddAdditionalValue("Replicate", strconv.Itoa(j+1))
-					//runs[i].AddAdditionalValue("Solution name", TestSols[k].CName)
-					//runs[i].AddAdditionalValue("Volume", strconv.Itoa(wutil.RoundInt(TestSolVolumes[l].RawValue()))+"ul)
+					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "LHPolicy_"+description, doerun)
+
+					// add plate info:
+					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "Plate Type", _input.OutPlate.Type)
+
+					// add plate ZStart:
+					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "Plate WellZStart", _input.OutPlate.WellZStart)
+
+					// add plate Height:
+					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "Plate Height", _input.OutPlate.Height)
+
+					// other plate offsets:
+					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "Plate WellXOffset", _input.OutPlate.WellXOffset)
+
+					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "Plate WellYOffset", _input.OutPlate.WellYOffset)
+
+					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "Plate WellXStart", _input.OutPlate.WellXStart)
+
+					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "Plate WellYStart", _input.OutPlate.WellYStart)
+
+					// add LHPolicy setpoint printout to double check correct match up:
+					runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "LHPolicy", doerun)
+
+					// print out LHPolicy info
+					policy, _ := liquidhandling.GetPolicyByName(doerun)
+
+					for _, key := range referencekeys {
+						runs[i] = doe.AddAdditionalHeaderandValue(runs[i], "Additional", "LHPolicy"+"_"+key, policy[key])
+					}
+
+					reactions = append(reactions, solution)
+
+					counter = counter + 1
 
 				}
 
-				// export DOE design file per set of conditions
-				outputsandwich := strconv.Itoa(wutil.RoundInt(_input.TestSolVolumes[l].RawValue())) + _input.TestSols[k].CName + strconv.Itoa(j+1)
-
-				outputfilename := filepath.Join(antha.Dirpath(), "DOE2"+"_"+outputsandwich+".xlsx")
-
-				_output.Errors = append(_output.Errors, doe.AddWelllocations(_input.DXORJMP, filepath.Join(antha.Dirpath(), _input.LHDOEFile), 0, perconditionuntowelllocationmap, "DOE_run", outputfilename, []string{"Volume", "Solution", "Replicate"}, []interface{}{_input.TestSolVolumes[l].ToString(), _input.TestSols[k].CName, string(j)}))
-
-				// other things to add to check for covariance
-				// order in which wells were pippetted
-				// plate ID
-				// row
-				// column
-				// ambient temp
-
-				// empty
-				perconditionuntowelllocationmap = make([]string, 0)
 			}
 		}
 	}
 
 	// export overall DOE design file showing all well locations for all conditions
-	_ = doe.JMPXLSXFilefromRuns(runs, _input.OutputFilename)
+	_ = doe.XLSXFileFromRuns(runs, _input.OutputFilename, _input.DXORJMP)
 
 	// add blanks after
 
 	for n := 0; n < platenum; n++ {
 		for m := 0; m < _input.NumberofBlanks; m++ {
-			//eachreaction := make([]*wtype.LHComponent, 0)
 
 			// use defualt policy for blank
 
@@ -203,9 +213,9 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 
 			// add blanks to last column of plate
 			well := alphabet[_input.OutPlate.WlsY-1-m] + strconv.Itoa(_input.OutPlate.WlsX)
-			fmt.Println("blankwell", well)
+
 			reaction := execute.MixTo(_ctx, _input.OutPlate.Type, well, n+1, bufferSample)
-			//fmt.Println("where am I?",wellpositionarray[counter])
+
 			_output.Runtowelllocationmap["Blank"+strconv.Itoa(m+1)+" platenum"+strconv.Itoa(n+1)] = well
 
 			_output.Blankwells = append(_output.Blankwells, well)
@@ -221,31 +231,31 @@ func _ScreenLHPolicies_AwesomeSteps(_ctx context.Context, _input *ScreenLHPolici
 	_output.Runcount = len(_output.Reactions)
 	_output.Pixelcount = len(wellpositionarray)
 	_output.Runs = runs
-
+	_output.Wellpositionarray = wellpositionarray
 }
 
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
-func _ScreenLHPolicies_AwesomeAnalysis(_ctx context.Context, _input *ScreenLHPolicies_AwesomeInput, _output *ScreenLHPolicies_AwesomeOutput) {
+func _AccuracyTestAnalysis(_ctx context.Context, _input *AccuracyTestInput, _output *AccuracyTestOutput) {
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
-func _ScreenLHPolicies_AwesomeValidation(_ctx context.Context, _input *ScreenLHPolicies_AwesomeInput, _output *ScreenLHPolicies_AwesomeOutput) {
+func _AccuracyTestValidation(_ctx context.Context, _input *AccuracyTestInput, _output *AccuracyTestOutput) {
 }
-func _ScreenLHPolicies_AwesomeRun(_ctx context.Context, input *ScreenLHPolicies_AwesomeInput) *ScreenLHPolicies_AwesomeOutput {
-	output := &ScreenLHPolicies_AwesomeOutput{}
-	_ScreenLHPolicies_AwesomeSetup(_ctx, input)
-	_ScreenLHPolicies_AwesomeSteps(_ctx, input, output)
-	_ScreenLHPolicies_AwesomeAnalysis(_ctx, input, output)
-	_ScreenLHPolicies_AwesomeValidation(_ctx, input, output)
+func _AccuracyTestRun(_ctx context.Context, input *AccuracyTestInput) *AccuracyTestOutput {
+	output := &AccuracyTestOutput{}
+	_AccuracyTestSetup(_ctx, input)
+	_AccuracyTestSteps(_ctx, input, output)
+	_AccuracyTestAnalysis(_ctx, input, output)
+	_AccuracyTestValidation(_ctx, input, output)
 	return output
 }
 
-func ScreenLHPolicies_AwesomeRunSteps(_ctx context.Context, input *ScreenLHPolicies_AwesomeInput) *ScreenLHPolicies_AwesomeSOutput {
-	soutput := &ScreenLHPolicies_AwesomeSOutput{}
-	output := _ScreenLHPolicies_AwesomeRun(_ctx, input)
+func AccuracyTestRunSteps(_ctx context.Context, input *AccuracyTestInput) *AccuracyTestSOutput {
+	soutput := &AccuracyTestSOutput{}
+	output := _AccuracyTestRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
 		panic(err)
 	}
@@ -255,19 +265,19 @@ func ScreenLHPolicies_AwesomeRunSteps(_ctx context.Context, input *ScreenLHPolic
 	return soutput
 }
 
-func ScreenLHPolicies_AwesomeNew() interface{} {
-	return &ScreenLHPolicies_AwesomeElement{
+func AccuracyTestNew() interface{} {
+	return &AccuracyTestElement{
 		inject.CheckedRunner{
 			RunFunc: func(_ctx context.Context, value inject.Value) (inject.Value, error) {
-				input := &ScreenLHPolicies_AwesomeInput{}
+				input := &AccuracyTestInput{}
 				if err := inject.Assign(value, input); err != nil {
 					return nil, err
 				}
-				output := _ScreenLHPolicies_AwesomeRun(_ctx, input)
+				output := _AccuracyTestRun(_ctx, input)
 				return inject.MakeValue(output), nil
 			},
-			In:  &ScreenLHPolicies_AwesomeInput{},
-			Out: &ScreenLHPolicies_AwesomeOutput{},
+			In:  &AccuracyTestInput{},
+			Out: &AccuracyTestOutput{},
 		},
 	}
 }
@@ -277,26 +287,29 @@ var (
 	_ = wunit.Make_units
 )
 
-type ScreenLHPolicies_AwesomeElement struct {
+type AccuracyTestElement struct {
 	inject.CheckedRunner
 }
 
-type ScreenLHPolicies_AwesomeInput struct {
-	DXORJMP            string
-	Diluent            *wtype.LHComponent
-	Imagefilename      string
-	LHDOEFile          string
-	NumberofBlanks     int
-	NumberofReplicates int
-	OutPlate           *wtype.LHPlate
-	OutputFilename     string
-	Printasimage       bool
-	TestSolVolumes     []wunit.Volume
-	TestSols           []*wtype.LHComponent
-	TotalVolume        wunit.Volume
+type AccuracyTestInput struct {
+	DXORJMP                         string
+	Diluent                         *wtype.LHComponent
+	Imagefilename                   string
+	LHPolicy                        string
+	NumberofBlanks                  int
+	NumberofReplicates              int
+	OutPlate                        *wtype.LHPlate
+	OutputFilename                  string
+	PipetteOnebyOne                 bool
+	Printasimage                    bool
+	TestSolVolumes                  []wunit.Volume
+	TestSols                        []*wtype.LHComponent
+	TotalVolume                     wunit.Volume
+	UseLHPolicyDoeforDiluent        bool
+	UseLiquidPolicyForTestSolutions bool
 }
 
-type ScreenLHPolicies_AwesomeOutput struct {
+type AccuracyTestOutput struct {
 	Blankwells           []string
 	Errors               []error
 	Pixelcount           int
@@ -304,9 +317,10 @@ type ScreenLHPolicies_AwesomeOutput struct {
 	Runcount             int
 	Runs                 []doe.Run
 	Runtowelllocationmap map[string]string
+	Wellpositionarray    []string
 }
 
-type ScreenLHPolicies_AwesomeSOutput struct {
+type AccuracyTestSOutput struct {
 	Data struct {
 		Blankwells           []string
 		Errors               []error
@@ -314,6 +328,7 @@ type ScreenLHPolicies_AwesomeSOutput struct {
 		Runcount             int
 		Runs                 []doe.Run
 		Runtowelllocationmap map[string]string
+		Wellpositionarray    []string
 	}
 	Outputs struct {
 		Reactions []*wtype.LHComponent
@@ -321,24 +336,27 @@ type ScreenLHPolicies_AwesomeSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "ScreenLHPolicies_Awesome",
-		Constructor: ScreenLHPolicies_AwesomeNew,
+	addComponent(Component{Name: "AccuracyTest",
+		Constructor: AccuracyTestNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/Liquid_handling/FindbestLHPolicy/ScreenLHPolicies_Awesome.an",
+			Path: "antha/component/an/Utility/AccuracyTest.an",
 			Params: []ParamDesc{
 				{Name: "DXORJMP", Desc: "", Kind: "Parameters"},
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
-				{Name: "LHDOEFile", Desc: "", Kind: "Parameters"},
+				{Name: "LHPolicy", Desc: "", Kind: "Parameters"},
 				{Name: "NumberofBlanks", Desc: "", Kind: "Parameters"},
 				{Name: "NumberofReplicates", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "OutputFilename", Desc: "", Kind: "Parameters"},
+				{Name: "PipetteOnebyOne", Desc: "", Kind: "Parameters"},
 				{Name: "Printasimage", Desc: "", Kind: "Parameters"},
 				{Name: "TestSolVolumes", Desc: "", Kind: "Parameters"},
 				{Name: "TestSols", Desc: "", Kind: "Inputs"},
 				{Name: "TotalVolume", Desc: "", Kind: "Parameters"},
+				{Name: "UseLHPolicyDoeforDiluent", Desc: "", Kind: "Parameters"},
+				{Name: "UseLiquidPolicyForTestSolutions", Desc: "", Kind: "Parameters"},
 				{Name: "Blankwells", Desc: "", Kind: "Data"},
 				{Name: "Errors", Desc: "", Kind: "Data"},
 				{Name: "Pixelcount", Desc: "", Kind: "Data"},
@@ -346,6 +364,7 @@ func init() {
 				{Name: "Runcount", Desc: "", Kind: "Data"},
 				{Name: "Runs", Desc: "", Kind: "Data"},
 				{Name: "Runtowelllocationmap", Desc: "[]string //map[string]string\n", Kind: "Data"},
+				{Name: "Wellpositionarray", Desc: "", Kind: "Data"},
 			},
 		},
 	})

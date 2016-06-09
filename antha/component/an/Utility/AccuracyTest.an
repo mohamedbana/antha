@@ -1,4 +1,4 @@
-protocol ScreenLHPolicies_Awesome
+protocol AccuracyTest
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -7,10 +7,9 @@ import (
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
-	"path/filepath"
-	antha "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"fmt"
 	"strconv"
+
 )
 
 
@@ -22,9 +21,12 @@ Parameters (
 	Printasimage bool
 	Imagefilename string
 	NumberofBlanks int
-	LHDOEFile string
+	UseLiquidPolicyForTestSolutions bool
+	LHPolicy string
 	DXORJMP string
 	OutputFilename string
+	PipetteOnebyOne bool
+	UseLHPolicyDoeforDiluent bool
 
 )
 
@@ -36,6 +38,7 @@ Data (
 	Errors []error
 	Blankwells []string
 	Runs []doe.Run
+	Wellpositionarray []string
 	//NeatSamplewells []string 
 )
 
@@ -62,29 +65,17 @@ Setup {
 // The core process for this protocol, with the steps to be performed
 // for every input
 Steps {
-	
-	
-	
-	// validate presence of doe design file in anthapath
-	if antha.Anthafileexists(LHDOEFile) == false {
-		fmt.Println("This DOE file ", LHDOEFile, " was not found in anthapath ~.antha. Please move it there, change file name and type in antha-lang/antha/microarch/driver/makelhpolicy.go and recompile antha to use this liquidhandling doe design")
-		fmt.Println("currently set to ", liquidhandling.DOEliquidhandlingFile, " type ", liquidhandling.DXORJMP)
-		}else{
-		fmt.Println("found lhpolicy doe file", LHDOEFile)
-	}
-	
-	
-	
+		
 	// declare some global variables for use later
 	var rotate = false
 	var autorotate = true
 	var wellpositionarray = make([]string, 0)
-	var perconditionuntowelllocationmap = make([]string,0)
 	var alphabet = wutil.MakeAlphabetArray() 
 	Runtowelllocationmap = make(map[string]string)
 	Blankwells = make([]string,0)
 	counter := 0
 	var platenum = 1
+	var runs = make([]doe.Run,1)
 	// work out plate layout based on picture or just in order
 	
 	if Printasimage {
@@ -104,29 +95,19 @@ Steps {
 	
 	}else{
 			
-		for j := 0; j < OutPlate.WlsX; j++ {
-		for i := 0; i < OutPlate.WlsY; i++ { //countingfrom1iswhatmakesushuman := j + 1
-			//k = k + 1
-			wellposition := string(alphabet[i]) + strconv.Itoa(j+1)
-			//fmt.Println(wellposition, k)
-			wellpositionarray = append(wellpositionarray, wellposition)
-		}
-		
-	}
+	wellpositionarray = OutPlate.AllWellPositions()
+	
 	}
 	reactions := make([]*wtype.LHComponent,0)
 	
-	//policies, names := liquidhandling.PolicyMaker(liquidhandling.Allpairs, "DOE_run",false)
+	// use first policy as reference to ensure consistent range through map values
+	referencepolicy, _ := liquidhandling.GetPolicyByName(LHPolicy)
 	
-	//intfactors := []string{"Pre_MIX","POST_MIX"}
-	_, names, runs, err := liquidhandling.PolicyMakerfromDesign(DXORJMP,LHDOEFile, "DOE_run")
-	if err != nil{
-		panic(err)
+	referencekeys := make([]string,0)
+	for key,_:= range referencepolicy {
+		referencekeys = append(referencekeys,key)
 	}
-	
-	//newruns := make([]doe.Run,len(runs))
-	
-	
+		
 	for l := 0; l < len(TestSolVolumes); l++ {
 	for k := 0; k< len(TestSols);k++{
 	for j:= 0; j< NumberofReplicates;j++{
@@ -139,36 +120,57 @@ Steps {
 			counter = 0
 		}
 		
-		//eachreaction := make([]*wtype.LHComponent, 0)
+		var eachreaction []*wtype.LHComponent
+		var solution *wtype.LHComponent
 		
+		if PipetteOnebyOne {
+		eachreaction = make([]*wtype.LHComponent, 0)
+		}
 		// keep default policy for diluent
-		//Diluent.Type = names[i]
-		//fmt.Println(Diluent.Type)
-		
 		
 		// diluent first
+		
+		// change lhpolicy if desired
+		if UseLHPolicyDoeforDiluent {
+				Diluent.Type = wtype.LiquidTypeFromString(LHPolicy)
+			}
+		
+		
 		bufferSample := mixer.SampleForTotalVolume(Diluent, TotalVolume)
-		//eachreaction = append(eachreaction,bufferSample)
 		
-		solution := MixTo(OutPlate.Type, wellpositionarray[counter],platenum,bufferSample)
-		
+		if PipetteOnebyOne {
+		eachreaction = append(eachreaction,bufferSample)
+		}else {
+			
+			
+		solution = MixTo(OutPlate.Type, wellpositionarray[counter],platenum,bufferSample)
+		}
 		// now test sample
 		
-		// change liquid class
-		TestSols[k].Type = wtype.LiquidTypeFromString(names[i])
 		
+		// change liquid class
+		if UseLiquidPolicyForTestSolutions && LHPolicy != ""{
+		TestSols[k].Type = wtype.LiquidTypeFromString(LHPolicy)
+		}
+		
+		if TestSolVolumes[l].RawValue() > 0.0 {
 		//sample
 		testSample := mixer.Sample(TestSols[k], TestSolVolumes[l])
 		
-		//eachreaction = append(eachreaction,testSample)
-		
+		if PipetteOnebyOne {
+		eachreaction = append(eachreaction,testSample)
+		solution = MixTo(OutPlate.Type,wellpositionarray[counter],platenum,eachreaction...)
+		} else {
 		// pipette out
-		solution = MixTo(OutPlate.Type,wellpositionarray[counter],platenum, testSample)
+		//solution = MixTo(OutPlate.Type,wellpositionarray[counter],platenum, testSample)
+		solution = Mix(solution,testSample)
+		}
 		
-		perconditionuntowelllocationmap = append(perconditionuntowelllocationmap,wtype.LiquidTypeName(TestSols[k].Type) +":" + wellpositionarray[counter])
+		
+		}
 		
 		// get annotation info
-		doerun := wtype.LiquidTypeName(TestSols[k].Type)
+		doerun :=  wtype.LiquidTypeName(TestSols[k].Type)
 		
 		volume := TestSolVolumes[l].ToString() //strconv.Itoa(wutil.RoundInt(number))+"ul"
 		
@@ -178,67 +180,74 @@ Steps {
 		//setpoints := volume+"_"+solutionname+"_replicate"+strconv.Itoa(j+1)+"_platenum"+strconv.Itoa(platenum)
 		
 		// add run to well position lookup table 
-		Runtowelllocationmap[doerun+"_"+description]= wellpositionarray[counter]
-		reactions = append(reactions,solution)
-	counter = counter + 1
-	
+		Runtowelllocationmap[doerun+"_"+description]= wellpositionarray[counter]	
 	
 	// add additional info for each run
+	fmt.Println("len(runs)", len(runs), "counter", counter, "len(wellpositionarray)", len(wellpositionarray))
 	runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","Location_"+ description, wellpositionarray[counter])
 	
 	// add run order:
 	runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","runorder_"+ description, counter)
 	
 	// add setpoint printout to double check correct match up:
-	runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","doerun"+ description, doerun)
-	//runs[i].AddAdditionalValue("Replicate", strconv.Itoa(j+1))
-	//runs[i].AddAdditionalValue("Solution name", TestSols[k].CName)
-	//runs[i].AddAdditionalValue("Volume", strconv.Itoa(wutil.RoundInt(TestSolVolumes[l].RawValue()))+"ul)
+	runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","LHPolicy_"+ description, doerun)
+
+	// add plate info:
+	runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","Plate Type", OutPlate.Type)
 	
+	// add plate ZStart:
+	runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","Plate WellZStart", OutPlate.WellZStart)
+	
+	// add plate Height:
+	runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","Plate Height", OutPlate.Height)
+	
+	// other plate offsets:
+	runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","Plate WellXOffset", OutPlate.WellXOffset)
+	
+	runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","Plate WellYOffset", OutPlate.WellYOffset)
+	
+	runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","Plate WellXStart", OutPlate.WellXStart)
+	
+	runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","Plate WellYStart", OutPlate.WellYStart)
+	
+	// add LHPolicy setpoint printout to double check correct match up:
+	runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","LHPolicy", doerun)
+	
+	// print out LHPolicy info
+	policy, _ := liquidhandling.GetPolicyByName(doerun)
+	
+	for _,key := range referencekeys {
+		runs[i] = doe.AddAdditionalHeaderandValue(runs[i],"Additional","LHPolicy"+"_"+key, policy[key])
 	}
 	
+	reactions = append(reactions,solution)
 	
-	// export DOE design file per set of conditions
-	outputsandwich := strconv.Itoa(wutil.RoundInt(TestSolVolumes[l].RawValue()))+TestSols[k].CName+strconv.Itoa(j+1)
+	counter = counter + 1
 	
-	outputfilename := filepath.Join(antha.Dirpath(),"DOE2"+ "_" + outputsandwich+ ".xlsx")
-	
-	Errors = append(Errors,doe.AddWelllocations(DXORJMP,filepath.Join(antha.Dirpath(), LHDOEFile),0,perconditionuntowelllocationmap,"DOE_run",outputfilename,[]string{"Volume","Solution","Replicate"}, []interface{}{TestSolVolumes[l].ToString(),TestSols[k].CName,string(j)}))
-	
-	// other things to add to check for covariance
-	// order in which wells were pippetted
-	// plate ID
-	// row 
-	// column
-	// ambient temp 
-	
-	// empty
-	perconditionuntowelllocationmap = make([]string,0)
+	}
+
 	}
 	}
 	}
-	
 	
 	// export overall DOE design file showing all well locations for all conditions
-	_ = doe.JMPXLSXFilefromRuns(runs,OutputFilename)
+	_ = doe.XLSXFileFromRuns(runs,OutputFilename,DXORJMP)
 	
 	// add blanks after
 	
 	for n := 0; n <platenum; n++ {
 	for m := 0; m< NumberofBlanks; m++ {
-	//eachreaction := make([]*wtype.LHComponent, 0)
-		
+	
 		// use defualt policy for blank
 		
 		bufferSample := mixer.Sample(Diluent, TotalVolume)
 		//eachreaction = append(eachreaction,bufferSample)
 		
-		
 		// add blanks to last column of plate
 		well := alphabet[OutPlate.WlsY-1-m]+strconv.Itoa(OutPlate.WlsX)
-		fmt.Println("blankwell", well)
+	
 		reaction := MixTo(OutPlate.Type,well, n+1,bufferSample)
-		//fmt.Println("where am I?",wellpositionarray[counter])
+
 		Runtowelllocationmap["Blank"+ strconv.Itoa(m+1)+" platenum"+strconv.Itoa(n+1)] = well
 		
 		Blankwells = append(Blankwells,well)
@@ -254,7 +263,7 @@ Steps {
 	Runcount = len(Reactions)
 	Pixelcount = len(wellpositionarray)
 	Runs = runs
-	
+	Wellpositionarray = wellpositionarray
 }
 
 // Run after controls and a steps block are completed to
