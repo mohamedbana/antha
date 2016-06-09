@@ -55,8 +55,8 @@ func _AliquotToSteps(_ctx context.Context, _input *AliquotToInput, _output *Aliq
 
 	if _input.ByRow {
 		// add well positions to the array based upon the number of wells per column (OutPlate.WlsX) and row (OutPlate.WlsY) of the plate type in question
-		for j := 0; j < _input.OutPlate.WlsX; j++ {
-			for i := 0; i < _input.OutPlate.WlsY; i++ {
+		for j := 0; j < _input.OutPlate.WlsY; j++ {
+			for i := 0; i < _input.OutPlate.WlsX; i++ {
 
 				// antha, like golang upon which it is built, is a strongly type language so an int must be converted to a string using the strconv package
 				// as shown here, strings can be concatenated using +
