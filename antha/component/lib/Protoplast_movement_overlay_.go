@@ -41,9 +41,9 @@ func _Protoplast_movement_overlaySteps(_ctx context.Context, _input *Protoplast_
 	CellsAgar := mixer.Sample(_output.TransformedCells, _input.TransformedCellsVol)
 	CellsAgarinWell := execute.MixTo(_ctx, _input.OutPlatetype2, _input.OutWell2, 1, CellsAgar)
 
-	_output.CellsAgarinWellFinal = CellsAgarinWell
+	//CellsAgarinWellFinal=CellsAgarinWell
 
-	plateout := mixer.Sample(_output.CellsAgarinWellFinal, _input.Plateoutvolume)
+	plateout := mixer.Sample(CellsAgarinWell, _input.Plateoutvolume)
 	platedculture := execute.MixTo(_ctx, _input.AgarPlate, _input.OutWell3, 1, plateout)
 
 	_output.Platedculture = platedculture

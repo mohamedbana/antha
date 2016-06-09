@@ -50,7 +50,7 @@ Steps {
 	//waterSample:=mixer.SampleForTotalVolume(Water,ReactionVolume)
 //	samples = append(samples, waterSample)
 	
-	mmxSample:=mixer.Sample(MasterMix,ReactionVolume)
+	mmxSample:=mixer.SampleForTotalVolume(MasterMix,ReactionVolume)
 	samples = append(samples, mmxSample)
 
 	for k, part := range Parts {

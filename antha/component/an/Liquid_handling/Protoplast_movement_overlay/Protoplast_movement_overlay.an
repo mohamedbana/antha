@@ -68,9 +68,9 @@ Steps {
 	CellsAgar:=mixer.Sample(TransformedCells,TransformedCellsVol)
 	CellsAgarinWell:=MixTo(OutPlatetype2, OutWell2, 1, CellsAgar)
 	
-	CellsAgarinWellFinal=CellsAgarinWell
+	//CellsAgarinWellFinal=CellsAgarinWell
 	
-	plateout := mixer.Sample(CellsAgarinWellFinal, Plateoutvolume)
+	plateout := mixer.Sample(CellsAgarinWell, Plateoutvolume)
 	platedculture := MixTo(AgarPlate, OutWell3, 1, plateout)
 	
 	Platedculture = platedculture
