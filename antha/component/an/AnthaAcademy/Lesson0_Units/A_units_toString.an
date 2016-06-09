@@ -1,4 +1,5 @@
-protocol Units_Sum
+// demo protocol of how to convert units to string
+protocol Units_ToString
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -6,14 +7,20 @@ import (
 // Input parameters for this protocol
 Parameters (
 	MyVolume Volume
-    MyOtherVolume Volume
-	
-
+	MyTemperature Temperature
+	MyConc Concentration
+	MyMoles wunit.Moles
+	MyTime Time
+	MyMass Mass
 )
 
 // Data which is returned from this protocol
 Data (
-	SumOfVolumes Volume
+	VolumeasString string
+	TempasString string
+	ConcasString string
+	MolesasString string
+	MassasString string
 )
 
 // Physical inputs to this protocol
@@ -36,21 +43,15 @@ Setup {
 
 // Core process of the protocol: steps to be performed for each input
 Steps {
-
-var sumofSIValues float64
-var siUnit string
-
-sumofSIValues = MyVolume.SIValue()+MyOtherVolume.SIValue()
-
-siUnit = MyVolume.Unit().BaseSISymbol()
-
-// or a less safe but simpler way would be 
-// siUnit = "l"
-
-SumOfVolumes = wunit.NewVolume(sumofSIValues,siUnit) 
-
+	VolumeasString = MyVolume.ToString()
+	TempasString = MyTemperature.ToString()
+	ConcasString = MyConc.ToString()
+	MolesasString = MyMoles.ToString()
+	MassasString = MyMass.ToString()
+	
+	
+	// Exercise: Add an equivalent process for a FlowRate
 }
-
 
 // Actions to perform after steps block to analyze data
 Analysis {

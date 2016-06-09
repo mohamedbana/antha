@@ -1,20 +1,19 @@
-// demo of how to create units from raw values and unit strings
-protocol Units_New
+protocol Units_Sum
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 )
 // Input parameters for this protocol
 Parameters (
-	MyValue float64
-	MyUnit string
+	MyVolume Volume
+    MyOtherVolume Volume
+	
 
 )
 
 // Data which is returned from this protocol
 Data (
-	MyVolume Volume
-
+	SumOfVolumes Volume
 )
 
 // Physical inputs to this protocol
@@ -37,10 +36,25 @@ Setup {
 
 // Core process of the protocol: steps to be performed for each input
 Steps {
-	MyVolume = wunit.NewVolume(MyValue,MyUnit)
-	
-	// adjust the protocol to make a concentration instead
+
+var sumofSIValues float64
+var siUnit string
+
+sumofSIValues = MyVolume.SIValue()+MyOtherVolume.SIValue()
+
+siUnit = MyVolume.Unit().BaseSISymbol()
+
+// or a less safe but simpler way would be 
+// siUnit = "l"
+
+SumOfVolumes = wunit.NewVolume(sumofSIValues,siUnit) 
+
+// Exercise: this is quite a convoluted way of doing this so instead we could create a function to perform this task
+// try doing this below
+
+
 }
+
 
 // Actions to perform after steps block to analyze data
 Analysis {

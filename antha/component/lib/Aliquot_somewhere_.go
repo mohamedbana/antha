@@ -145,7 +145,7 @@ func init() {
 		Constructor: Aliquot_somewhereNew,
 		Desc: ComponentDesc{
 			Desc: "example protocol showing the highest level antha mix command which does not specify a plate type, therefore leaving it up to the scheduler to decide\n",
-			Path: "antha/component/an/AnthaAcademy/Lesson2_mix/Aliquot_somewhereorother.an",
+			Path: "antha/component/an/AnthaAcademy/Lesson2_mix/A_Aliquot_somewhereorother.an",
 			Params: []ParamDesc{
 				{Name: "NumberofAliquots", Desc: "", Kind: "Parameters"},
 				{Name: "Solution", Desc: "", Kind: "Inputs"},

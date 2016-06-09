@@ -111,7 +111,7 @@ func init() {
 		Constructor: Units_ConcentrationNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/units_Conc.an",
+			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/D_units_Conc.an",
 			Params: []ParamDesc{
 				{Name: "MolecularWeight", Desc: "", Kind: "Parameters"},
 				{Name: "MyConc", Desc: "", Kind: "Parameters"},
