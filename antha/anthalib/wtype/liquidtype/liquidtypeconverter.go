@@ -61,6 +61,8 @@ func LiquidTypeFromPolicyDOE(s string) (match bool, number int) {
 	return
 }
 
+// not robust! must get rid of this soon
+// max 900 policies allowed per file at present
 func StringFromLiquidTypeNumber(lt int) (match bool, str string) {
 
 	if lt > 99 {
@@ -69,7 +71,7 @@ func StringFromLiquidTypeNumber(lt int) (match bool, str string) {
 		var smallestgreaterthanzero int = 1000000000 // set to an absurdly high number to initialise
 
 		for _, polfile := range AvailablePolicyfiles {
-			if lt > polfile.StarterNumber() && int(lt)-polfile.StarterNumber() < smallestgreaterthanzero && lt > 0 {
+			if lt >= polfile.StarterNumber() && int(lt)-polfile.StarterNumber() < smallestgreaterthanzero && lt > 0 && int(lt)-polfile.StarterNumber() < 900 {
 				smallestgreaterthanzero = int(lt) - polfile.StarterNumber()
 				liquidstring = polfile.Prepend() + strconv.Itoa(int(lt)-polfile.StarterNumber())
 
