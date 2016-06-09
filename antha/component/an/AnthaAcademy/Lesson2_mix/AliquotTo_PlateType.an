@@ -1,4 +1,5 @@
-protocol Aliquot_somewhere
+// example protocol showing The MixTo command which allows a specifc plate type to be specified. i.e. platetype pcrplate_skirted
+protocol Aliquot_PlateType
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -12,6 +13,7 @@ Parameters (
 	SolutionVolume Volume
 	VolumePerAliquot  Volume
 	NumberofAliquots int
+	OutPlatetype string
 )
 
 // Data which is returned from this protocol, and data types
@@ -58,7 +60,14 @@ Steps {
 		Solution.Type = wtype.LTDoNotMix
 		}
 		aliquotSample := mixer.Sample(Solution, VolumePerAliquot)
-		aliquot := Mix(aliquotSample)
+		// the MixTo command is used instead of Mix to specify the plate type (e.g. "greiner384" or "pcrplate_skirted")
+		// the plate types can be found in antha-lang/antha/microArch/factory/make_plate_library.go
+		// the four input fields to the MixTo command represent 
+		// 1. the platetype as a string: commonly the input to the antha element will actually be an LHPlate rather than a string so the type field can be accessed with OutPlate.Type 
+		// 2. well location as a  string e.g. "A1" (in this case leaving it blank "" will leave the well location up to the scheduler),
+		// 3. the plate number,starting from 1 (not zero)
+		// 4. the sample or array of samples to be mixed; in the case of an array you'd normally feed this in as samples...
+		aliquot := MixTo(OutPlatetype, "", 1,aliquotSample)
 		aliquots = append(aliquots,aliquot)
 	}
 	Aliquots = aliquots

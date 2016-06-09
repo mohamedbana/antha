@@ -14,7 +14,13 @@ import (
 	"strconv"
 )
 
-// input seq
+// dna sequences as strings "ACTTGCGTC","GGTCCA"
+// dna sequence as string
+// name you want to give your construct
+// typeIIs restriction enzyme name
+// have the typeIIs assembly ends been added already? true/false
+// name of synthesis provider e.g. GenScript
+// Whether or not you want to export the sequences generated to a fasta file
 
 // output parts with correct overhangs
 
@@ -27,13 +33,13 @@ func _GeneDesign_seqSetup(_ctx context.Context, _input *GeneDesign_seqInput) {
 func _GeneDesign_seqSteps(_ctx context.Context, _input *GeneDesign_seqInput, _output *GeneDesign_seqOutput) {
 	PartDNA := make([]wtype.DNASequence, 0)
 
-	// Retrieve part seqs from entrez
+	// make DNASequence type from sequence
 	for i, part := range _input.Parts {
 		DNA := wtype.MakeLinearDNASequence("part"+strconv.Itoa(i), part)
 		PartDNA = append(PartDNA, DNA)
 	}
 
-	// look up vector sequence
+	// make vector sequence
 	VectorSeq := wtype.MakePlasmidDNASequence("Vector", _input.Vector)
 
 	// Look up the restriction enzyme
@@ -125,7 +131,6 @@ type GeneDesign_seqInput struct {
 
 type GeneDesign_seqOutput struct {
 	PartsWithOverhangs []wtype.DNASequence
-	Sequence           string
 	SimulationStatus   string
 	Validated          bool
 	ValidationStatus   string
@@ -134,7 +139,6 @@ type GeneDesign_seqOutput struct {
 type GeneDesign_seqSOutput struct {
 	Data struct {
 		PartsWithOverhangs []wtype.DNASequence
-		Sequence           string
 		SimulationStatus   string
 		Validated          bool
 		ValidationStatus   string
@@ -150,15 +154,14 @@ func init() {
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/GeneDesign/GeneDesign_seq.an",
 			Params: []ParamDesc{
-				{Name: "ConstructName", Desc: "", Kind: "Parameters"},
-				{Name: "EndsAlreadyAdded", Desc: "", Kind: "Parameters"},
-				{Name: "ExporttoFastaFile", Desc: "", Kind: "Parameters"},
-				{Name: "Parts", Desc: "", Kind: "Parameters"},
-				{Name: "RE", Desc: "", Kind: "Parameters"},
-				{Name: "SynthesisProvider", Desc: "", Kind: "Parameters"},
-				{Name: "Vector", Desc: "", Kind: "Parameters"},
+				{Name: "ConstructName", Desc: "name you want to give your construct\n", Kind: "Parameters"},
+				{Name: "EndsAlreadyAdded", Desc: "have the typeIIs assembly ends been added already? true/false\n", Kind: "Parameters"},
+				{Name: "ExporttoFastaFile", Desc: "Whether or not you want to export the sequences generated to a fasta file\n", Kind: "Parameters"},
+				{Name: "Parts", Desc: "dna sequences as strings \"ACTTGCGTC\",\"GGTCCA\"\n", Kind: "Parameters"},
+				{Name: "RE", Desc: "typeIIs restriction enzyme name\n", Kind: "Parameters"},
+				{Name: "SynthesisProvider", Desc: "name of synthesis provider e.g. GenScript\n", Kind: "Parameters"},
+				{Name: "Vector", Desc: "dna sequence as string\n", Kind: "Parameters"},
 				{Name: "PartsWithOverhangs", Desc: "output parts with correct overhangs\n", Kind: "Data"},
-				{Name: "Sequence", Desc: "input seq\n", Kind: "Data"},
 				{Name: "SimulationStatus", Desc: "", Kind: "Data"},
 				{Name: "Validated", Desc: "", Kind: "Data"},
 				{Name: "ValidationStatus", Desc: "", Kind: "Data"},

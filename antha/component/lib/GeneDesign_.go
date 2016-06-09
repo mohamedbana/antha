@@ -14,7 +14,9 @@ import (
 	"github.com/antha-lang/antha/inject"
 )
 
-// input seq
+// by ncbi Accession numer
+// by ncbi Accession numer
+// restriction enzyme name
 
 // output parts with correct overhangs
 
@@ -44,8 +46,8 @@ func _GeneDesignSteps(_ctx context.Context, _input *GeneDesignInput, _output *Ge
 
 	// validation
 	assembly := enzymes.Assemblyparameters{"NewConstruct", _input.RE, VectorSeq, _output.PartsWithOverhangs}
-	Status, _, _, _, _ := enzymes.Assemblysimulator(assembly)
-	fmt.Println(Status)
+	_output.Status, _, _, _, _ = enzymes.Assemblysimulator(assembly)
+	fmt.Println(_output.Status)
 
 	// check if sequence meets requirements for synthesis
 	sequences.ValidateSynthesis(_output.PartsWithOverhangs, _input.Vector, "GenScript")
@@ -117,13 +119,13 @@ type GeneDesignInput struct {
 
 type GeneDesignOutput struct {
 	PartsWithOverhangs []wtype.DNASequence
-	Sequence           string
+	Status             string
 }
 
 type GeneDesignSOutput struct {
 	Data struct {
 		PartsWithOverhangs []wtype.DNASequence
-		Sequence           string
+		Status             string
 	}
 	Outputs struct {
 	}
@@ -136,11 +138,11 @@ func init() {
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/GeneDesign/GeneDesign.an",
 			Params: []ParamDesc{
-				{Name: "Parts", Desc: "", Kind: "Parameters"},
-				{Name: "RE", Desc: "", Kind: "Parameters"},
-				{Name: "Vector", Desc: "", Kind: "Parameters"},
+				{Name: "Parts", Desc: "by ncbi Accession numer\n", Kind: "Parameters"},
+				{Name: "RE", Desc: "restriction enzyme name\n", Kind: "Parameters"},
+				{Name: "Vector", Desc: "by ncbi Accession numer\n", Kind: "Parameters"},
 				{Name: "PartsWithOverhangs", Desc: "output parts with correct overhangs\n", Kind: "Data"},
-				{Name: "Sequence", Desc: "input seq\n", Kind: "Data"},
+				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
 	})

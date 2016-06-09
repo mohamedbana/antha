@@ -1,0 +1,10 @@
+{
+    "Parameters": {
+        "AliquotParams": {
+            "NumberofAliquots": 8,
+            "Solution": "water",
+            "SolutionVolume": "4000ul",
+            "VolumePerAliquot": "25ul"
+        }
+    }
+}

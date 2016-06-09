@@ -1,3 +1,4 @@
+// example protocol showing The MixInto command which allows a specifc plate to be specified. i.e. plate with ID blahblahblah
 package lib
 
 import (
@@ -15,6 +16,8 @@ import (
 // Data which is returned from this protocol, and data types
 
 // Physical Inputs to this protocol with types
+
+// this time we're specifying the plate
 
 // Physical outputs from this protocol with types
 
@@ -44,7 +47,14 @@ func _Aliquot_SpecificPlateSteps(_ctx context.Context, _input *Aliquot_SpecificP
 			_input.Solution.Type = wtype.LTDoNotMix
 		}
 		aliquotSample := mixer.Sample(_input.Solution, _input.VolumePerAliquot)
-		aliquot := execute.MixTo(_ctx, _input.OutPlate, "", 1, aliquotSample)
+
+		// the MixInto command is used instead of Mix to specify the plate
+		// MixInto allows you to specify the exact plate to MixInto (i.e. rather than just a plate type. e.g. barcode 123214234)
+		// the three input fields to the MixInto command represent
+		// 1. the plate,
+		// 2. well location as a  string e.g. "A1" (in this case leaving it blank "" will leave the well location up to the scheduler),
+		// 3. the sample or array of samples to be mixed
+		aliquot := execute.MixInto(_ctx, _input.OutPlate, "", aliquotSample)
 		aliquots = append(aliquots, aliquot)
 	}
 	_output.Aliquots = aliquots
@@ -110,7 +120,7 @@ type Aliquot_SpecificPlateElement struct {
 
 type Aliquot_SpecificPlateInput struct {
 	NumberofAliquots int
-	OutPlate         string
+	OutPlate         *wtype.LHPlate
 	Solution         *wtype.LHComponent
 	SolutionVolume   wunit.Volume
 	VolumePerAliquot wunit.Volume
@@ -132,11 +142,11 @@ func init() {
 	addComponent(Component{Name: "Aliquot_SpecificPlate",
 		Constructor: Aliquot_SpecificPlateNew,
 		Desc: ComponentDesc{
-			Desc: "",
-			Path: "antha/component/an/Liquid_handling/Aliquot/AliquotTo_PlateType.an",
+			Desc: "example protocol showing The MixInto command which allows a specifc plate to be specified. i.e. plate with ID blahblahblah\n",
+			Path: "antha/component/an/AnthaAcademy/Lesson2_mix/AliquotIntoSpecificPlate.an",
 			Params: []ParamDesc{
 				{Name: "NumberofAliquots", Desc: "", Kind: "Parameters"},
-				{Name: "OutPlate", Desc: "", Kind: "Parameters"},
+				{Name: "OutPlate", Desc: "this time we're specifying the plate\n", Kind: "Inputs"},
 				{Name: "Solution", Desc: "", Kind: "Inputs"},
 				{Name: "SolutionVolume", Desc: "", Kind: "Parameters"},
 				{Name: "VolumePerAliquot", Desc: "", Kind: "Parameters"},

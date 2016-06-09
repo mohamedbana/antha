@@ -11,13 +11,13 @@ import (
 )
 
 Parameters (
-	Parts []string
-	Vector string
-	RE string
+	Parts []string // by ncbi Accession numer
+	Vector string // by ncbi Accession numer
+	RE string // restriction enzyme name
 )
 Data (
-	// input seq
-	Sequence string
+
+	Status string
 	// output parts with correct overhangs
 	PartsWithOverhangs []wtype.DNASequence
 )
@@ -54,7 +54,7 @@ Steps {
 	
 	// validation
 	assembly := enzymes.Assemblyparameters{"NewConstruct", RE, VectorSeq, PartsWithOverhangs}
-	Status, _, _, _, _ := enzymes.Assemblysimulator(assembly)
+	Status, _, _, _, _ = enzymes.Assemblysimulator(assembly)
 	fmt.Println(Status)
 	
 	// check if sequence meets requirements for synthesis
