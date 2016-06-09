@@ -121,6 +121,9 @@ Steps {
 		counter = counter +1 // this is the same as using the more concise counter++
 	}
 	Aliquots = aliquots
+	
+	
+	// Exercise: refactor to use wtype.WellCoords instead of creating the well ids manually using alphabet and strconv
 }
 
 }

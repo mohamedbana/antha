@@ -117,7 +117,7 @@ func init() {
 		Constructor: SampleAllNew,
 		Desc: ComponentDesc{
 			Desc: "example protocol demonstrating the use of the SampleAll function\n",
-			Path: "antha/component/an/AnthaAcademy/Lesson1_Sample/SampleAll.an",
+			Path: "antha/component/an/AnthaAcademy/Lesson1_Sample/B_SampleAll.an",
 			Params: []ParamDesc{
 				{Name: "Sampleall", Desc: "", Kind: "Parameters"},
 				{Name: "Solution", Desc: "", Kind: "Inputs"},

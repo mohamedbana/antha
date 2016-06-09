@@ -39,6 +39,9 @@ func _Units_SumSteps(_ctx context.Context, _input *Units_SumInput, _output *Unit
 
 	_output.SumOfVolumes = wunit.NewVolume(sumofSIValues, siUnit)
 
+	// Exercise: this is quite a convoluted way of doing this so instead we could create a function to perform this task
+	// try doing this below
+
 }
 
 // Actions to perform after steps block to analyze data
@@ -118,7 +121,7 @@ func init() {
 		Constructor: Units_SumNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/units_Sum.an",
+			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/E_units_Sum.an",
 			Params: []ParamDesc{
 				{Name: "MyOtherVolume", Desc: "", Kind: "Parameters"},
 				{Name: "MyVolume", Desc: "", Kind: "Parameters"},

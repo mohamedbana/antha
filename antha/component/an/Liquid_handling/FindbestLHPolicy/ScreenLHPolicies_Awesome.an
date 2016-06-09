@@ -21,7 +21,7 @@ Parameters (
 	NumberofReplicates int
 	Printasimage bool
 	Imagefilename string
-	NumberofBlanks int
+	NumberofBlanks int	
 	LHDOEFile string
 	DXORJMP string
 	OutputFilename string

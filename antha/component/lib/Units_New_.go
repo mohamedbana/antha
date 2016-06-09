@@ -29,7 +29,7 @@ func _Units_NewSetup(_ctx context.Context, _input *Units_NewInput) {
 func _Units_NewSteps(_ctx context.Context, _input *Units_NewInput, _output *Units_NewOutput) {
 	_output.MyVolume = wunit.NewVolume(_input.MyValue, _input.MyUnit)
 
-	// adjust the protocol to make a concentration instead
+	// Exercise: adjust the protocol to make a concentration instead
 }
 
 // Actions to perform after steps block to analyze data
@@ -109,7 +109,7 @@ func init() {
 		Constructor: Units_NewNew,
 		Desc: ComponentDesc{
 			Desc: "demo of how to create units from raw values and unit strings\n",
-			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/units_new.an",
+			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/B_units_new.an",
 			Params: []ParamDesc{
 				{Name: "MyUnit", Desc: "", Kind: "Parameters"},
 				{Name: "MyValue", Desc: "", Kind: "Parameters"},

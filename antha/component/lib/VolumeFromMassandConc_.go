@@ -107,7 +107,7 @@ func init() {
 		Constructor: VolumeFromMassandConcNew,
 		Desc: ComponentDesc{
 			Desc: "example of how to convert a concentration and mass to a volume\n",
-			Path: "antha/component/an/AnthaAcademy/Lesson5_Units2/VolumefromMassandConc.an",
+			Path: "antha/component/an/AnthaAcademy/Lesson5_Units2/C_VolumefromMassandConc.an",
 			Params: []ParamDesc{
 				{Name: "DNAConc", Desc: "", Kind: "Parameters"},
 				{Name: "DNAMassperReaction", Desc: "", Kind: "Parameters"},
