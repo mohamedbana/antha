@@ -1,6 +1,6 @@
 {
     "processes": {
-        "AccuracyTest": { "component": "AccuracyTest" }
+        "AccuracyTest": { "component": "AccuracyTest_2" }
        
     },
     "connections": [

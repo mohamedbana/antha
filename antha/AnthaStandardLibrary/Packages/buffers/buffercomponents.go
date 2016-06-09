@@ -7,7 +7,6 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Pubchem"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	//"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"fmt"
 )
 
 func StockConcentration(nameofmolecule string, massofmoleculeactuallyaddedinG wunit.Mass, diluent string, totalvolumeinL wunit.Volume) (actualconc wunit.Concentration) {
@@ -19,7 +18,7 @@ func StockConcentration(nameofmolecule string, massofmoleculeactuallyaddedinG wu
 
 	//diluentmolecule := pubchem.MakeMolecule(diluent)
 
-	fmt.Println("SI value of mass:", massofmoleculeactuallyaddedinG.SIValue())
+	//fmt.Println("SI value of mass:", massofmoleculeactuallyaddedinG.SIValue())
 
 	actualconcfloat := (massofmoleculeactuallyaddedinG.SIValue() * 1000) / (molecularweight * totalvolumeinL.SIValue())
 
@@ -41,7 +40,22 @@ func Dilute(moleculename string, stockconc wunit.Concentration, stockvolume wuni
 	dilutedconcMperL := stockMperL.SIValue() * stockSI / (stockSI + diluentSI)
 
 	dilutedconc = wunit.NewConcentration(dilutedconcMperL, "M/l")
-	fmt.Println(diluentname)
+	//fmt.Println(diluentname)
+	return
+}
+
+func DiluteBasedonMolecularWeight(molecularweight float64, stockconc wunit.Concentration, stockvolume wunit.Volume, diluentname string, diluentvoladded wunit.Volume) (dilutedconc wunit.Concentration) {
+
+	stockMperL := stockconc.MolPerL(molecularweight)
+
+	diluentSI := diluentvoladded.SIValue()
+
+	stockSI := stockvolume.SIValue()
+
+	dilutedconcMperL := stockMperL.SIValue() * stockSI / (stockSI + diluentSI)
+
+	dilutedconc = wunit.NewConcentration(dilutedconcMperL, "M/l")
+	// fmt.Println(diluentname)
 	return
 }
 
