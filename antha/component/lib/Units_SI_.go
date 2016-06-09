@@ -117,7 +117,7 @@ func init() {
 		Constructor: Units_SINew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/units_SI.an",
+			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/C_units_SI.an",
 			Params: []ParamDesc{
 				{Name: "MyMass", Desc: "", Kind: "Parameters"},
 				{Name: "RawMass", Desc: "", Kind: "Data"},
