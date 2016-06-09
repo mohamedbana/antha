@@ -32,6 +32,8 @@ func _Units_ToStringSteps(_ctx context.Context, _input *Units_ToStringInput, _ou
 	_output.ConcasString = _input.MyConc.ToString()
 	_output.MolesasString = _input.MyMoles.ToString()
 	_output.MassasString = _input.MyMass.ToString()
+
+	// Exercise: Add an equivalent process for a FlowRate
 }
 
 // Actions to perform after steps block to analyze data
@@ -123,7 +125,7 @@ func init() {
 		Constructor: Units_ToStringNew,
 		Desc: ComponentDesc{
 			Desc: "demo protocol of how to convert units to string\n",
-			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/units_toString.an",
+			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/A_units_toString.an",
 			Params: []ParamDesc{
 				{Name: "MyConc", Desc: "", Kind: "Parameters"},
 				{Name: "MyMass", Desc: "", Kind: "Parameters"},

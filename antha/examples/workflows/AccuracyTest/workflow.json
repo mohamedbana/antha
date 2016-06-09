@@ -1,6 +1,6 @@
 {
     "processes": {
-        "ScreenLHPolicies_Awesome": { "component": "ScreenLHPolicies_Awesome" }
+        "AccuracyTest": { "component": "AccuracyTest" }
        
     },
     "connections": [

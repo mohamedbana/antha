@@ -143,7 +143,7 @@ func init() {
 		Constructor: Aliquot_SpecificPlateNew,
 		Desc: ComponentDesc{
 			Desc: "example protocol showing The MixInto command which allows a specifc plate to be specified. i.e. plate with ID blahblahblah\n",
-			Path: "antha/component/an/AnthaAcademy/Lesson2_mix/AliquotIntoSpecificPlate.an",
+			Path: "antha/component/an/AnthaAcademy/Lesson2_mix/B_AliquotIntoSpecificPlate.an",
 			Params: []ParamDesc{
 				{Name: "NumberofAliquots", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "this time we're specifying the plate\n", Kind: "Inputs"},

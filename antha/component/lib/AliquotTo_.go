@@ -105,6 +105,8 @@ func _AliquotToSteps(_ctx context.Context, _input *AliquotToInput, _output *Aliq
 			counter = counter + 1 // this is the same as using the more concise counter++
 		}
 		_output.Aliquots = aliquots
+
+		// Exercise: refactor to use wtype.WellCoords instead of creating the well ids manually using alphabet and strconv
 	}
 
 }
@@ -193,7 +195,7 @@ func init() {
 		Constructor: AliquotToNew,
 		Desc: ComponentDesc{
 			Desc: "The lowest level example protocol showing The MixTo command being used to specify the specific wells to be aliquoted to;\nBy doing this we are able to specify whether the aliqouts are pipetted by row or by column.\nIn this case the user is still not specifying the well location (i.e. A1) in the parameters, although that would be possible to specify.\nWe don't generally encourage this since Antha is designed to be prodiminantly a high level language which avoids the user specifying well locations but this possibility is there if necessary.\n",
-			Path: "antha/component/an/AnthaAcademy/Lesson2_mix/AliquotTo_wellpositions.an",
+			Path: "antha/component/an/AnthaAcademy/Lesson2_mix/E_AliquotTo_wellpositions.an",
 			Params: []ParamDesc{
 				{Name: "ByRow", Desc: "", Kind: "Parameters"},
 				{Name: "NumberofAliquots", Desc: "", Kind: "Parameters"},
