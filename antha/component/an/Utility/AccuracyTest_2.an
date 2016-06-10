@@ -139,7 +139,7 @@ Steps {
 			}
 		
 		
-		bufferSample := mixer.SampleForTotalVolume(Diluent, TotalVolume)
+		bufferSample := mixer.Sample(Diluent, wunit.NewVolume(TotalVolume.RawValue()-TestSolVolumes[l].RawValue(),TotalVolume.Unit().PrefixedSymbol())) //SampleForTotalVolume(Diluent, TotalVolume)
 		
 		if PipetteOnebyOne {
 		eachreaction = append(eachreaction,bufferSample)

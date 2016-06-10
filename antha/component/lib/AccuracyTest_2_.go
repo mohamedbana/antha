@@ -111,7 +111,7 @@ func _AccuracyTest_2Steps(_ctx context.Context, _input *AccuracyTest_2Input, _ou
 						_input.Diluent.Type = wtype.LiquidTypeFromString(_input.LHPolicy)
 					}
 
-					bufferSample := mixer.SampleForTotalVolume(_input.Diluent, _input.TotalVolume)
+					bufferSample := mixer.Sample(_input.Diluent, wunit.NewVolume(_input.TotalVolume.RawValue()-_input.TestSolVolumes[l].RawValue(), _input.TotalVolume.Unit().PrefixedSymbol())) //SampleForTotalVolume(Diluent, TotalVolume)
 
 					if _input.PipetteOnebyOne {
 						eachreaction = append(eachreaction, bufferSample)

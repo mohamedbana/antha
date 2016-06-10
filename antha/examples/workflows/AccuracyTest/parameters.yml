@@ -5,12 +5,11 @@
             "TestSols": [
 			"tartrazine"
 			],
-            "NumberofReplicates": 5,
+            "NumberofReplicates": 3,
             "OutPlate": "greiner384_riser",
             "TestSolVolumes": [
-			"0.5ul",
-			"1ul",
-			"2ul"
+			"25ul",
+			"50ul"
 			],
 			"UseLiquidPolicyForTestSolutions": true,
 			"LHPolicy":"NeedToMix",
@@ -18,7 +17,7 @@
 			"OutputFilename":"Accuracytest2output_test.xlsx",
 			"Printasimage": true,
 			"Imagefilename": "star.png",
-            "TotalVolume": "20ul",
+            "TotalVolume": "100ul",
 			"NumberofBlanks": 1
         }
     }
