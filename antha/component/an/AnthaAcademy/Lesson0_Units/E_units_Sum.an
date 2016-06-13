@@ -65,11 +65,11 @@ SumOfVolumes = wunit.NewVolume(sumofSIValues,siUnit)
 // Approach 2: 
 // using anthalib funcs and methods
 
-/*
+
 SumOfVolumes = (wunit.CopyVolume(MyVolume))
 
 SumOfVolumes.Add(MyOtherVolume)
-*/
+
 
 
 
@@ -86,8 +86,8 @@ Validation {
 
 }
 
-/*
 
+/*
 // this is how to write a function in go and use it in an antha protocol
 func AddVolume(myvolume wunit.ConcreteMeasurement, myothervolume wunit.ConcreteMeasurement )(newvolume wunit.ConcreteMeasurement) {
 

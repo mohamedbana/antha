@@ -10,7 +10,8 @@
             "MyConc": "100ng/ul",
 			"MyMoles": "0.001M",
 			"MyTime":"60s",
-			"MyMass":"100ng"
+			"MyMass":"100ng",
+			"MyFlowrate":"2ml/min"
         },
         "sum": {
             "MyVolume": "15ml",

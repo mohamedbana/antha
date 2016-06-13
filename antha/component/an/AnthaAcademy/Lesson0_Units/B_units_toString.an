@@ -12,6 +12,7 @@ Parameters (
 	MyMoles wunit.Moles
 	MyTime Time
 	MyMass Mass
+	MyFlowrate FlowRate
 )
 
 // Data which is returned from this protocol
@@ -21,6 +22,7 @@ Data (
 	ConcasString string
 	MolesasString string
 	MassasString string
+	FlowrateString string
 )
 
 // Physical inputs to this protocol
@@ -48,7 +50,7 @@ Steps {
 	ConcasString = MyConc.ToString()
 	MolesasString = MyMoles.ToString()
 	MassasString = MyMass.ToString()
-	
+	FlowrateString = MyFlowrate.ToString()
 	
 	// Exercise: Add an equivalent process for a FlowRate
 }
