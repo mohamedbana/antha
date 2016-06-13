@@ -125,7 +125,7 @@ func init() {
 		Constructor: Units_ToStringNew,
 		Desc: ComponentDesc{
 			Desc: "demo protocol of how to convert units to string\n",
-			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/A_units_toString.an",
+			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/B_units_toString.an",
 			Params: []ParamDesc{
 				{Name: "MyConc", Desc: "", Kind: "Parameters"},
 				{Name: "MyMass", Desc: "", Kind: "Parameters"},
