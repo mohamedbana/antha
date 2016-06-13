@@ -637,14 +637,14 @@ func MakeLoadlowPolicy() LHPolicy {
 
 func MakeNeedToMixPolicy() LHPolicy {
 	dnapolicy := make(LHPolicy, 15)
-	dnapolicy["POST_MIX"] = 4
+	dnapolicy["POST_MIX"] = 2
 	dnapolicy["POST_MIX_VOLUME"] = 10
-	dnapolicy["POST_MIX_RATE"] = 3.0
-	dnapolicy["PRE_MIX"] = 4
+	dnapolicy["POST_MIX_RATE"] = 3.9
+	//dnapolicy["PRE_MIX"] = 4
 	dnapolicy["PRE_MIX_VOLUME"] = 10
 	dnapolicy["PRE_MIX_RATE"] = 3.0
-	dnapolicy["ASPSPEED"] = 3.0
-	dnapolicy["DSPSPEED"] = 3.0
+	dnapolicy["ASPSPEED"] = 3.9
+	dnapolicy["DSPSPEED"] = 3.9
 	dnapolicy["CAN_MULTI"] = false
 	dnapolicy["CAN_MSA"] = false
 	dnapolicy["CAN_SDD"] = false
