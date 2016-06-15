@@ -56,6 +56,7 @@ func parseInputPlateData(inData io.Reader) (*wtype.LHPlate, error) {
 		if err == io.EOF {
 			break
 		}
+		lineNo += 1
 
 		if err != nil {
 			logger.Info(fmt.Sprint("parseInputPlate ERRROR here: ", err))
@@ -146,8 +147,6 @@ func parseInputPlateData(inData io.Reader) (*wtype.LHPlate, error) {
 		cmp.Type = ctype
 
 		p.WellAt(well).Add(cmp)
-
-		lineNo += 1
 	}
 
 	// all done!
