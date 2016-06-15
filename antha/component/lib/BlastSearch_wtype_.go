@@ -11,7 +11,7 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
-	biogo "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
+	biogo "github.com/biogo/ncbi/blast"
 )
 
 // Input parameters for this protocol

@@ -8,5 +8,5 @@ build:
 modules:
   golang:
     testpackages:
-    - ~internal
+    - ~vendor
     - ~bvendor

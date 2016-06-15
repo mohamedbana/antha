@@ -12,7 +12,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
-	//"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
+	//"github.com/tealeg/xlsx"
 )
 
 // simple reverse complement check to test testing methodology initially

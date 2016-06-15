@@ -10,8 +10,8 @@ import (
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
-	"github.com/antha-lang/antha/internal/github.com/montanaflynn/stats"
-	"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
+	"github.com/montanaflynn/stats"
+	"github.com/tealeg/xlsx"
 )
 
 /*

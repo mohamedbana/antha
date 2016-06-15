@@ -30,7 +30,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/antha-lang/antha/internal/github.com/jroimartin/gocui"
+	"github.com/jroimartin/gocui"
 	"github.com/antha-lang/antha/microArch/logger"
 )
 
