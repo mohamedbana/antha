@@ -1,0 +1,25 @@
+{
+    "Parameters": {
+        "AccuracyTest": {
+            "Diluent": "water",
+            "TestSols": [
+			"tartrazine"
+			],
+            "NumberofReplicates": 3,
+            "OutPlate": "greiner384_riser",
+            "TestSolVolumes": [
+			"25ul",
+			"50ul"
+			],
+			"UseLiquidPolicyForTestSolutions": true,
+			"LHPolicy":"NeedToMix",
+			"DXORJMP":"JMP",
+			"OutputFilename":"Accuracytest2output_test.xlsx",
+			"Printasimage": true,
+			"Imagefilename": "star.png",
+            "TotalVolume": "100ul",
+			"NumberofBlanks": 1
+        }
+    }
+}
+

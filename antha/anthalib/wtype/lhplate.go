@@ -24,9 +24,13 @@
 package wtype
 
 import (
+	"encoding/csv"
 	"fmt"
+	"os"
+	"strconv"
 
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/microArch/logger"
 )
 
@@ -157,6 +161,24 @@ func (lhp *LHPlate) Wells() [][]*LHWell {
 }
 func (lhp *LHPlate) WellMap() map[string]*LHWell {
 	return lhp.Wellcoords
+}
+
+func (lhp *LHPlate) AllWellPositions() (wellpositionarray []string) {
+
+	wellpositionarray = make([]string, 0)
+
+	alphabet := wutil.MakeAlphabetArray()
+	// range through well coordinates
+	for j := 0; j < lhp.WlsX; j++ {
+		for i := 0; i < lhp.WlsY; i++ { //countingfrom1iswhatmakesushuman := j + 1
+
+			wellposition := string(alphabet[i]) + strconv.Itoa(j+1)
+
+			wellpositionarray = append(wellpositionarray, wellposition)
+		}
+
+	}
+	return
 }
 
 // @implement named
@@ -336,7 +358,51 @@ func (p *LHPlate) IsTemporary() bool {
 	return true
 }
 
-//// VERY VERY VERY BAD XXX XXX XXX
+func ExportPlateCSV(outputpilename string, plate *LHPlate, platename string, wells []string, liquids []*LHComponent, Volumes []wunit.Volume) error {
+
+	csvfile, err := os.Create(outputpilename)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return err
+	}
+	defer csvfile.Close()
+
+	records := make([][]string, 0)
+
+	//record := make([]string, 0)
+
+	headerrecord := []string{plate.Type, platename, "", "", ""}
+
+	records = append(records, headerrecord)
+
+	for i, well := range wells {
+
+		volfloat := Volumes[i].RawValue()
+
+		volstr := strconv.FormatFloat(volfloat, 'G', -1, 64)
+
+		fmt.Println("len(wells)", len(wells))
+		fmt.Println("len(liquids)", len(liquids))
+		fmt.Println("len(Volumes)", len(Volumes))
+
+		record := []string{well, liquids[i].CName, liquids[i].TypeName(), volstr, Volumes[i].Unit().PrefixedSymbol()}
+		records = append(records, record)
+	}
+
+	csvwriter := csv.NewWriter(csvfile)
+
+	for _, record := range records {
+
+		err = csvwriter.Write(record)
+
+		if err != nil {
+			return err
+		}
+	}
+	csvwriter.Flush()
+
+	return err
+}
 func (p *LHPlate) SetConstrained(platform string, positions []string) {
 	p.Welltype.Extra[platform] = positions
 }
@@ -352,4 +418,5 @@ func (p *LHPlate) IsConstrainedOn(platform string) ([]string, bool) {
 	}
 
 	return pos, false
+
 }

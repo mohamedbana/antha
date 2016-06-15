@@ -166,3 +166,8 @@ func parseInputPlateFile(filename string) (*wtype.LHPlate, error) {
 	defer f.Close()
 	return parseInputPlateData(f)
 }
+
+func ParseInputPlateFile(filename string) (*wtype.LHPlate, error) {
+	p, err := parseInputPlateFile(filename)
+	return p, err
+}

@@ -50,6 +50,16 @@ func (run Run) AddResponseValue(responsedescriptor string, responsevalue interfa
 
 }
 
+func (run Run) GetResponseValue(responsedescriptor string) (responsevalue interface{}) {
+
+	for i, descriptor := range run.Responsedescriptors {
+		if strings.ToUpper(descriptor) == strings.ToUpper(responsedescriptor) {
+			responsevalue = run.ResponseValues[i]
+		}
+	}
+	return
+}
+
 func AddNewResponseFieldandValue(run Run, responsedescriptor string, responsevalue interface{}) (newrun Run) {
 
 	newrun = run
@@ -523,7 +533,13 @@ func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) 
 
 				_, err := cell.Float()
 
-				if err == nil || celltype == 1 {
+				if strings.ToUpper(cell.Value) == "TRUE" {
+					setpoint = true //cell.SetBool(true)
+				} else if strings.ToUpper(cell.Value) == "FALSE" {
+					setpoint = false //cell.SetBool(false)
+				} else if celltype == 3 {
+					setpoint = cell.Bool()
+				} else if err == nil || celltype == 1 {
 					setpoint, _ = cell.Float()
 					if search.InSlice(descriptor, intfactors) {
 						setpoint, err = cell.Int()
@@ -531,12 +547,6 @@ func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) 
 							return runs, err
 						}
 					}
-				} else if strings.ToUpper(cell.Value) == "TRUE" {
-					setpoint = true //cell.SetBool(true)
-				} else if strings.ToUpper(cell.Value) == "FALSE" {
-					setpoint = false //cell.SetBool(false)
-				} else if celltype == 3 {
-					setpoint = cell.Bool()
 				} else {
 					setpoint = cell.String()
 				}
@@ -736,7 +746,7 @@ func DXXLSXFilefromRuns(runs []Run, outputfilename string) (xlsxfile *xlsx.File)
 
 // jmp
 
-func RunsFromJMPDesign(xlsx string, patterncolumn int, factorcolumns []int, responsecolumns []int, intfactors []string) (runs []Run, err error) {
+func RunsFromJMPDesign(xlsx string, factorcolumns []int, responsecolumns []int, intfactors []string) (runs []Run, err error) {
 	file, err := spreadsheet.OpenFile(xlsx)
 	if err != nil {
 		return runs, err
@@ -768,7 +778,7 @@ func RunsFromJMPDesign(xlsx string, patterncolumn int, factorcolumns []int, resp
 
 			if search.Contains(factorcolumns, j) {
 				factororresponse = "Factor"
-			} else if search.Contains(responsecolumns, j) && j != patterncolumn {
+			} else if search.Contains(responsecolumns, j) {
 				factororresponse = "Response"
 			}
 
@@ -784,7 +794,13 @@ func RunsFromJMPDesign(xlsx string, patterncolumn int, factorcolumns []int, resp
 
 				_, err := cell.Float()
 
-				if err == nil || celltype == 1 {
+				if strings.ToUpper(cell.Value) == "TRUE" {
+					setpoint = true //cell.SetBool(true)
+				} else if strings.ToUpper(cell.Value) == "FALSE" {
+					setpoint = false //cell.SetBool(false)
+				} else if celltype == 3 {
+					setpoint = cell.Bool()
+				} else if err == nil || celltype == 1 {
 					setpoint, _ = cell.Float()
 					if search.InSlice(descriptor, intfactors) {
 						setpoint, err = cell.Int()
@@ -792,12 +808,6 @@ func RunsFromJMPDesign(xlsx string, patterncolumn int, factorcolumns []int, resp
 							return runs, err
 						}
 					}
-				} else if cell.Value == "TRUE" {
-					setpoint = true //cell.SetBool(true)
-				} else if cell.Value == "FALSE" {
-					setpoint = false //cell.SetBool(false)
-				} else if celltype == 3 {
-					setpoint = cell.Bool()
 				} else {
 					setpoint = cell.String()
 				}
@@ -946,6 +956,16 @@ func JMPXLSXFilefromRuns(runs []Run, outputfilename string) (xlsxfile *xlsx.File
 	err = xlsxfile.Save(outputfilename)
 	if err != nil {
 		fmt.Printf(err.Error())
+	}
+	return
+}
+
+func XLSXFileFromRuns(runs []Run, outputfilename string, dxorjmp string) (xlsxfile *xlsx.File) {
+	if dxorjmp == "DX" {
+		xlsxfile = DXXLSXFilefromRuns(runs, outputfilename)
+	}
+	if dxorjmp == "JMP" {
+		xlsxfile = JMPXLSXFilefromRuns(runs, outputfilename)
 	}
 	return
 }
