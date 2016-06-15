@@ -1,15 +1,20 @@
 // example protocol showing the highest level antha mix command which does not specify a plate type, therefore leaving it up to the scheduler to decide
 package lib
 
-import (
+import
+
+// we can import code libraries and use functions and types from these libraries
+(
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wtype" // the LHComponent type is imported from this library
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 )
+
+// the Sample function is imported from mixer
 
 // Input parameters for this protocol (data)
 
@@ -39,7 +44,7 @@ func _Aliquot_somewhereSteps(_ctx context.Context, _input *Aliquot_somewhereInpu
 		panic("Not enough solution for this many aliquots")
 	}
 
-	// make an slice of components which we'll fill with aliquots;
+	// make a slice of components which we'll fill with aliquots;
 	// same as we would for an array of samples but this time we won't mix together
 	aliquots := make([]*wtype.LHComponent, 0)
 

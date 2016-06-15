@@ -12,8 +12,8 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
-	"github.com/disintegration/imaging"
 	"github.com/antha-lang/antha/microArch/factory"
+	"github.com/disintegration/imaging"
 	"image/color"
 )
 
