@@ -72,6 +72,12 @@ func parseInputPlateData(inData io.Reader) (*wtype.LHPlate, error) {
 			continue
 		}
 
+		if len(rec[0]) == 0 {
+			logger.Info(fmt.Sprint("parseInputPlate WARN (line ", lineNo, "): skipped - no well coords"))
+			continue
+
+		}
+
 		well := wtype.MakeWellCoords(rec[0])
 
 		if well.IsZero() {
