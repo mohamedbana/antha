@@ -1,3 +1,5 @@
+ASL=antha/AnthaStandardLibrary/Packages
+
 all: gen_comp
 
 gen_comp:
@@ -33,4 +35,24 @@ test_workflows: compile
 	  fi; \
 	done
 
-.PHONY: all gen_comp fmt_json test test_workflows compile
+assets: $(ASL)/asset/asset.go
+
+$(ASL)/asset/asset.go: $(GOPATH)/bin/go-bindata-assetfs $(ASL)/asset_files/rebase/type2.txt
+	$(GOPATH)/bin/go-bindata-assetfs -pkg=asset $(ASL)/asset_files && mv bindata_assetfs.go $@
+	gofmt -s -w $@
+
+$(ASL)/asset_files/rebase/type2.txt: ALWAYS
+	mkdir -p `dirname $@`
+	curl -o $@ ftp://ftp.neb.com/pub/rebase/type2.txt
+
+$(GOPATH)/bin/2goarray:
+	go get -u github.com/cratonica/2goarray
+
+$(GOPATH)/bin/go-bindata:
+	go get -u github.com/jteeuwen/go-bindata/...
+
+$(GOPATH)/bin/go-bindata-assetfs: $(GOPATH)/bin/go-bindata
+	go get -u -f github.com/elazarl/go-bindata-assetfs/...
+	touch $@
+
+.PHONY: all gen_comp fmt_json test test_workflows compile assets ALWAYS
