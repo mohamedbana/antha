@@ -173,6 +173,7 @@ func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 					curr_plate.PlateName = platename
 					curplaten += 1
 					curr_plate.DeclareTemporary()
+					curr_plate.DeclareAutoallocated()
 				}
 
 				// find somewhere to put it

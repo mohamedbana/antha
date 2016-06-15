@@ -358,6 +358,22 @@ func (p *LHPlate) IsTemporary() bool {
 	return true
 }
 
+func (p *LHPlate) DeclareAutoallocated() {
+	for _, w := range p.Wellcoords {
+		w.DeclareAutoallocated()
+	}
+}
+
+func (p *LHPlate) IsAutoallocated() bool {
+	for _, w := range p.Wellcoords {
+		if !w.IsAutoallocated() {
+			return false
+		}
+	}
+
+	return true
+}
+
 func ExportPlateCSV(outputpilename string, plate *LHPlate, platename string, wells []string, liquids []*LHComponent, Volumes []wunit.Volume) error {
 
 	csvfile, err := os.Create(outputpilename)

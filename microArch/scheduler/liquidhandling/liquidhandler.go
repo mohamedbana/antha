@@ -203,9 +203,11 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 
 		for crd, vol := range wellmap {
 			well := plate.Wellcoords[crd]
-			vol.Add(well.ResidualVolume())
-			well.WContents.SetVolume(vol)
-			well.DeclareNotTemporary()
+			if well.IsAutoallocated() {
+				vol.Add(well.ResidualVolume())
+				well.WContents.SetVolume(vol)
+				well.DeclareNotTemporary()
+			}
 		}
 	}
 
