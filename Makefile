@@ -40,6 +40,7 @@ assets: $(ASL)/asset/asset.go
 $(ASL)/asset/asset.go: $(GOPATH)/bin/go-bindata-assetfs $(ASL)/asset_files/rebase/type2.txt
 	$(GOPATH)/bin/go-bindata-assetfs -pkg=asset $(ASL)/asset_files && mv bindata_assetfs.go $@
 	gofmt -s -w $@
+	perl -p -i -e 's|github.com/elazarl/go-bindata-assetfs|github.com/antha-lang/antha/internal/github.com/elazarl/go-bindata-assetfs|' $@
 
 $(ASL)/asset_files/rebase/type2.txt: ALWAYS
 	mkdir -p `dirname $@`

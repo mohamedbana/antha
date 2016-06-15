@@ -9,7 +9,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"fmt"
-	"github.com/elazarl/go-bindata-assetfs"
+	"github.com/antha-lang/antha/internal/github.com/elazarl/go-bindata-assetfs"
 	"io"
 	"io/ioutil"
 	"os"
@@ -84,7 +84,7 @@ func anthaAnthastandardlibraryPackagesAsset_filesType2Txt() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "antha/AnthaStandardLibrary/Packages/asset_files/type2.txt", size: 186939, mode: os.FileMode(420), modTime: time.Unix(1465989180, 0)}
+	info := bindataFileInfo{name: "antha/AnthaStandardLibrary/Packages/asset_files/type2.txt", size: 186939, mode: os.FileMode(420), modTime: time.Unix(1465989245, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
