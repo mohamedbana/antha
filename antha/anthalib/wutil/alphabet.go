@@ -20,6 +20,7 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
+// Utility package
 package wutil
 
 var Alphabet = []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",

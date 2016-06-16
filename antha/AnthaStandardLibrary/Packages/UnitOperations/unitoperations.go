@@ -1,11 +1,12 @@
-// Package for working with bioprocessing unitoperations (e.g. Chromatography)
+// Package for working with bioprocessing unitoperations
 package UnitOperations
 
 import (
+	"time"
+
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"time"
 )
 
 type Pellet struct {
