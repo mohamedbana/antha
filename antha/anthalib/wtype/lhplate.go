@@ -141,15 +141,15 @@ func (lhp *LHPlate) GetComponent(cmp *LHComponent, exact bool) ([]WellCoords, bo
 			volGot.Add(v)
 			ret = append(ret, wc)
 
-			if volGot.GreaterThan(cmp.Volume()) {
+			if volGot.GreaterThan(cmp.Volume()) || volGot.EqualTo(cmp.Volume()) {
 				break
 			}
 		}
 	}
 
-	fmt.Println("FOUND: ", cmp.CName, " WANT ", cmp.Volume().ToString(), " GOT ", volGot.ToString(), "  ", ret)
+	//fmt.Println("FOUND: ", cmp.CName, " WANT ", cmp.Volume().ToString(), " GOT ", volGot.ToString(), "  ", ret)
 
-	if !volGot.GreaterThan(cmp.Volume()) {
+	if !volGot.GreaterThan(cmp.Volume()) || volGot.EqualTo(cmp.Volume()) {
 		return ret, false
 	}
 

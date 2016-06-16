@@ -540,11 +540,9 @@ func (lhp *LHProperties) AddWashTo(pos string, wash *wtype.LHPlate) bool {
 
 // of necessity, this must be destructive of state so we have to work on a copy
 // NB this is not properly specified yet
-func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []string, error) {
+func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent, carryvol wunit.Volume) ([]string, []string, error) {
 	r1 := make([]string, len(cmps))
 	r2 := make([]string, len(cmps))
-
-	fudgevol := wunit.NewVolume(0.5, "ul")
 
 	for i, v := range cmps {
 		foundIt := false
@@ -566,7 +564,7 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []s
 			r2[i] = tx[1]
 
 			vol := v.Volume().Dup()
-			vol.Add(fudgevol)
+			vol.Add(carryvol)
 			lhp.RemoveComponent(tx[0], tx[1], vol)
 
 			foundIt = true
@@ -592,7 +590,7 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []s
 						r2[i] = wcarr[0].FormatA1()
 
 						vol := v.Volume().Dup()
-						vol.Add(fudgevol)
+						vol.Add(carryvol)
 
 						lhp.RemoveComponent(r1[i], r2[i], vol)
 

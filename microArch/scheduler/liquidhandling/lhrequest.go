@@ -61,6 +61,7 @@ type LHRequest struct {
 	Input_vols_required      map[string]wunit.Volume
 	Input_vols_wanting       map[string]wunit.Volume
 	TimeEstimate             float64
+	CarryVolume              wunit.Volume
 }
 
 func (req *LHRequest) ConfigureYourself() error {
@@ -132,6 +133,7 @@ func NewLHRequest() *LHRequest {
 	lhr.Input_vols_required = make(map[string]wunit.Volume)
 	lhr.Input_vols_supplied = make(map[string]wunit.Volume)
 	lhr.Input_vols_wanting = make(map[string]wunit.Volume)
+	lhr.CarryVolume = wunit.NewVolume(0.5, "ul")
 	return &lhr
 }
 

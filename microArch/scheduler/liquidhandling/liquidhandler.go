@@ -187,6 +187,7 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 
 				vols := ins.GetParameter("VOLUME").([]wunit.Volume)
 				v.Add(vols[i])
+				v.Add(rq.CarryVolume)
 			}
 		}
 	}
