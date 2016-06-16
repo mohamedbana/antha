@@ -20,7 +20,7 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
-// Example syntax
+// Package for working with enzymes; in particular restriction enzymes
 package enzymes
 
 import (

@@ -20,7 +20,7 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
-// Formulae for the estimation of thaw times based upon thermodynamics and empirical equations
+// Package for performing engineering calculations; at present this consists of evaporation rate estimation, thawtime estimation and fluid dynamics
 package eng
 
 import (
