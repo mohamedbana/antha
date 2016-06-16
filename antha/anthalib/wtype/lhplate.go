@@ -128,6 +128,11 @@ func (lhp *LHPlate) GetComponent(cmp *LHComponent, exact bool) ([]WellCoords, bo
 		w := lhp.Wellcoords[wc.FormatA1()]
 		//	logger.Debug(fmt.Sprint("WANT$$$: ", cmp.CName, " :: ", wc.FormatA1(), " ", w.Contents().CName))
 
+		/*
+			if !w.Empty() {
+				logger.Debug(fmt.Sprint("WANT: ", cmp.CName, " :: ", wc.FormatA1(), " ", w.Contents().CName, " ", w.CurrVolume().ToString()))
+			}
+		*/
 		if w.Contents().CName == cmp.CName {
 			if exact && w.Contents().ID != cmp.ID {
 				continue
@@ -147,7 +152,7 @@ func (lhp *LHPlate) GetComponent(cmp *LHComponent, exact bool) ([]WellCoords, bo
 		}
 	}
 
-	//fmt.Println("FOUND: ", cmp.CName, " WANT ", cmp.Volume().ToString(), " GOT ", volGot.ToString(), "  ", ret)
+	//	fmt.Println("FOUND: ", cmp.CName, " WANT ", cmp.Volume().ToString(), " GOT ", volGot.ToString(), "  ", ret)
 
 	if !volGot.GreaterThan(cmp.Volume()) || volGot.EqualTo(cmp.Volume()) {
 		return ret, false

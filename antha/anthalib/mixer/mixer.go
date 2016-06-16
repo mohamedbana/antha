@@ -23,7 +23,6 @@
 package mixer
 
 import (
-	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 )
@@ -137,7 +136,6 @@ func SampleMass(s *wtype.LHComponent, m wunit.Mass, d wunit.Density) *wtype.LHCo
 // a particular total volume
 // edited to take into account the volume of the other solution components
 func SampleForTotalVolume(l *wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
-	fmt.Println("WELL THIS WORKS")
 	ret := wtype.NewLHComponent()
 
 	ret.ID = l.ID

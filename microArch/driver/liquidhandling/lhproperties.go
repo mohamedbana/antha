@@ -565,6 +565,8 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent, carryvol wunit
 
 			vol := v.Volume().Dup()
 			vol.Add(carryvol)
+			/// XXX -- adding carry volumes is all very well but
+			// assumes we have made more of this component than we really need!
 			lhp.RemoveComponent(tx[0], tx[1], vol)
 
 			foundIt = true
@@ -600,7 +602,6 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent, carryvol wunit
 			}
 
 			if !foundIt {
-				//logger.Fatal("NOSOURCE FOR ", v.CName, " at volume ", v.Volume().ToString())
 				err := wtype.LHError(wtype.LH_ERR_DIRE, fmt.Sprint("NO SOURCE FOR ", v.CName, " at volume ", v.Volume().ToString()))
 				return r1, r2, err
 			}
