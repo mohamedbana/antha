@@ -55,11 +55,9 @@ func _Units_SumSteps(_ctx context.Context, _input *Units_SumInput, _output *Unit
 	// Approach 2:
 	// using anthalib funcs and methods
 
-	/*
-	   SumOfVolumes = (wunit.CopyVolume(MyVolume))
+	_output.SumOfVolumes = (wunit.CopyVolume(_input.MyVolume))
 
-	   SumOfVolumes.Add(MyOtherVolume)
-	*/
+	_output.SumOfVolumes.Add(_input.MyOtherVolume)
 
 }
 
@@ -151,7 +149,6 @@ func init() {
 }
 
 /*
-
 // this is how to write a function in go and use it in an antha protocol
 func AddVolume(myvolume wunit.ConcreteMeasurement, myothervolume wunit.ConcreteMeasurement )(newvolume wunit.ConcreteMeasurement) {
 

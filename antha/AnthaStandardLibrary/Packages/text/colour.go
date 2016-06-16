@@ -3,7 +3,7 @@ package text
 
 import (
 	"fmt"
-	"github.com/antha-lang/antha/internal/github.com/mgutz/ansi"
+	"github.com/mgutz/ansi"
 )
 
 // Prints a description highlighted in red followed by the value in unformatted text

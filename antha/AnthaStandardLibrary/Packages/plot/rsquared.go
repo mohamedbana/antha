@@ -24,7 +24,7 @@
 package plot
 
 import (
-	"github.com/antha-lang/antha/internal/github.com/sajari/regression"
+	"github.com/sajari/regression"
 )
 
 func Rsquared(xname string, xvalues []float64, yname string, yvalues []float64) (rsquared float64) {

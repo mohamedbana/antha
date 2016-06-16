@@ -31,7 +31,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
+	"github.com/tealeg/xlsx"
 )
 
 type DOEPair struct {

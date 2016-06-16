@@ -30,7 +30,7 @@ import (
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
+	"github.com/tealeg/xlsx"
 )
 
 func OpenFile(filename string) (file *xlsx.File, err error) {

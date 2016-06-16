@@ -3,7 +3,7 @@ package lib
 import (
 	"fmt"
 	//"math/rand"
-	//"github.com/antha-lang/antha/internal/github.com/montanaflynn/stats"
+	//"github.com/montanaflynn/stats"
 	graph "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/plot"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"

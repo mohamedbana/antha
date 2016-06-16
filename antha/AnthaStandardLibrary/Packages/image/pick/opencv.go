@@ -16,11 +16,11 @@ import (
 	"strings"
 
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"github.com/antha-lang/antha/internal/code.google.com/p/draw2d/draw2d"
+	"code.google.com/p/draw2d/draw2d"
 	//"code.google.com/p/draw2d/draw2d"
-	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
-	//"github.com/antha-lang/antha/internal/github.com/hybridgroup/go-opencv/opencv"
-	"github.com/antha-lang/antha/internal/github.com/lazywei/go-opencv/opencv"
+	"github.com/disintegration/imaging"
+	//"github.com/hybridgroup/go-opencv/opencv"
+	"github.com/lazywei/go-opencv/opencv"
 	//"../opencv" // can be used in forks, comment in real application
 )
 

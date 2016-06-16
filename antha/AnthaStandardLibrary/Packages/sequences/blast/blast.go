@@ -27,10 +27,10 @@ import (
 	"fmt"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
-	. "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
+	. "github.com/biogo/ncbi/blast"
 	//"github.com/biogo/ncbi/blast_test"
 	//"log"
-	"github.com/antha-lang/antha/internal/github.com/mgutz/ansi"
+	"github.com/mgutz/ansi"
 	//"reflect"
 	"strconv"
 	"strings"
