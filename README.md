@@ -8,7 +8,7 @@ Antha v0.0.2
 
 ### OSX
 
-First step is to install or upgrade to go 1.5. Follow the instructions at the
+First step is to install or upgrade to go 1.6. Follow the instructions at the
 [Golang](http://golang.org/doc/install) site. 
 
 After you install go, if you don't have [Homebrew](http://brew.sh/), please
@@ -29,7 +29,7 @@ xcode-select --install
 
 # Install some external dependencies
 brew update
-brew install homebrew/science/glpk sqlite3
+brew install homebrew/science/glpk sqlite3 opencv
 
 # Install antha
 go get github.com/antha-lang/antha/cmd/...
@@ -48,8 +48,8 @@ replacing the go binary with one that corresponds to your platform and
 replacing ``apt-get`` with your package manager.
 ```sh
 # Install go
-curl -O https://storage.googleapis.com/golang/go1.5.3.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.5.3.linux-amd64.tar.gz
+curl -O https://storage.googleapis.com/golang/go1.6.2.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.6.2.linux-amd64.tar.gz
 
 # Setup environment variables
 cat<<EOF>>$HOME/.bash_profile
@@ -61,7 +61,7 @@ EOF
 . $HOME/.bash_profile
 
 # Install antha external dependencies
-sudo apt-get install -y libglpk-dev libsqlite3-dev git
+sudo apt-get install -y libglpk-dev libopencv-dev libsqlite3-dev git
 
 # Now, we are ready to get antha
 go get github.com/antha-lang/antha/cmd/...

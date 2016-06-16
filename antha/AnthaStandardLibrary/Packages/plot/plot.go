@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
-	"github.com/antha-lang/antha/internal/code.google.com/p/plotinum/plot"
-	"github.com/antha-lang/antha/internal/code.google.com/p/plotinum/plotter"
-	"github.com/antha-lang/antha/internal/code.google.com/p/plotinum/plotutil"
-	"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
+	"code.google.com/p/plotinum/plot"
+	"code.google.com/p/plotinum/plotter"
+	"code.google.com/p/plotinum/plotutil"
+	"github.com/tealeg/xlsx"
 )
 
 var (

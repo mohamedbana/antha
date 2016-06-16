@@ -15,8 +15,8 @@ import (
 	"time"
 
 	"github.com/antha-lang/antha/cmd/antharun/writer"
-	"github.com/antha-lang/antha/internal/github.com/mattn/go-colorable"
-	"github.com/antha-lang/antha/internal/github.com/mgutz/ansi"
+	"github.com/mattn/go-colorable"
+	"github.com/mgutz/ansi"
 )
 
 var (
