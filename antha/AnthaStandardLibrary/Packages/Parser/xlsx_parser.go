@@ -29,7 +29,7 @@ import (
 	"strings"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
-	"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
+	"github.com/tealeg/xlsx"
 )
 
 var delimiter = ","
