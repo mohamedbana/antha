@@ -161,14 +161,20 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) (*
 		var waste *wtype.LHTipwaste
 		// this should be added to the automagic config setup... however it will require adding to the
 		// representation of the liquid handler
-		//TODO handle general case differently
 		if params.Model == "Pipetmax" {
 			waste = factory.GetTipwasteByType("Gilsontipwaste")
-		} else if params.Model == "GeneTheatre" {
+		} else if params.Model == "GeneTheatre" || params.Model == "Felix" {
 			waste = factory.GetTipwasteByType("CyBiotipwaste")
+		} else if params.Model == "Human" {
+			waste = factory.GetTipwasteByType("Manualtipwaste")
 		}
 
-		params.AddTipWaste(waste)
+		if waste != nil {
+			params.AddTipWaste(waste)
+		} else {
+			err := wtype.LHError(wtype.LH_ERR_OTHER, fmt.Sprint("No tip waste defined for model ", params.Model))
+			return nil, err
+		}
 	}
 	//request.Setup = setup
 	request.Plate_lookup = plate_lookup
