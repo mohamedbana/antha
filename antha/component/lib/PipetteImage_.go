@@ -96,7 +96,7 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 		component := componentmap[colourtostringmap[colour]]
 
 		// make sure liquid class is appropriate for cell culture in case this is not set elsewhere
-		component.Type = wtype.LiquidTypeFromString(_input.UseLiquidClass) //wtype.LTCulture
+		component.Type, _ = wtype.LiquidTypeFromString(_input.UseLiquidClass) //wtype.LTCulture
 
 		fmt.Println(image.Colourcomponentmap[colour])
 
@@ -125,7 +125,7 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 				counter = counter + 1
 				fmt.Println("wells not ", _input.Notthiscolour, counter)
 
-				component.Type = wtype.LiquidTypeFromString(_input.UseLiquidClass)
+				component.Type, _ = wtype.LiquidTypeFromString(_input.UseLiquidClass)
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
 
 				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, pixelSample)

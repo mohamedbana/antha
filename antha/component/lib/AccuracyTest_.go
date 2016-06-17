@@ -48,6 +48,8 @@ func _AccuracyTestSteps(_ctx context.Context, _input *AccuracyTestInput, _output
 	counter := 0
 	var platenum = 1
 	var runs = make([]doe.Run, 1)
+	var err error
+	_output.Errors = make([]error, 0)
 	// work out plate layout based on picture or just in order
 
 	if _input.Printasimage {
@@ -104,7 +106,10 @@ func _AccuracyTestSteps(_ctx context.Context, _input *AccuracyTestInput, _output
 
 					// change lhpolicy if desired
 					if _input.UseLHPolicyDoeforDiluent {
-						_input.Diluent.Type = wtype.LiquidTypeFromString(_input.LHPolicy)
+						_input.Diluent.Type, err = wtype.LiquidTypeFromString(_input.LHPolicy)
+						if err != nil {
+							_output.Errors = append(_output.Errors, err)
+						}
 					}
 
 					bufferSample := mixer.SampleForTotalVolume(_input.Diluent, _input.TotalVolume)
@@ -119,7 +124,10 @@ func _AccuracyTestSteps(_ctx context.Context, _input *AccuracyTestInput, _output
 
 					// change liquid class
 					if _input.UseLiquidPolicyForTestSolutions && _input.LHPolicy != "" {
-						_input.TestSols[k].Type = wtype.LiquidTypeFromString(_input.LHPolicy)
+						_input.TestSols[k].Type, err = wtype.LiquidTypeFromString(_input.LHPolicy)
+						if err != nil {
+							_output.Errors = append(_output.Errors, err)
+						}
 					}
 
 					if _input.TestSolVolumes[l].RawValue() > 0.0 {

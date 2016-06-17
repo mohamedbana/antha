@@ -78,6 +78,8 @@ Steps {
 	var platenum = 1
 	var runs = make([]doe.Run,1)
 	var newruns = make([]doe.Run,0)
+	var err error
+	Errors = make([]error,0)
 	// work out plate layout based on picture or just in order
 	
 	if Printasimage {
@@ -103,7 +105,10 @@ Steps {
 	reactions := make([]*wtype.LHComponent,0)
 	
 	// use first policy as reference to ensure consistent range through map values
-	referencepolicy, _ := liquidhandling.GetPolicyByName(LHPolicy)
+	referencepolicy,found := liquidhandling.GetPolicyByName(LHPolicy)
+	if  !found {
+		Errors = append(Errors,fmt.Errorf("policy ",LHPolicy," not found"))
+	}
 	
 	referencekeys := make([]string,0)
 	for key,_:= range referencepolicy {
@@ -135,7 +140,10 @@ Steps {
 		
 		// change lhpolicy if desired
 		if UseLHPolicyDoeforDiluent {
-				Diluent.Type = wtype.LiquidTypeFromString(LHPolicy)
+				Diluent.Type, err = wtype.LiquidTypeFromString(LHPolicy)
+				if err != nil {
+					Errors = append(Errors,err)
+				}
 			}
 		
 		
@@ -153,7 +161,10 @@ Steps {
 		
 		// change liquid class
 		if UseLiquidPolicyForTestSolutions && LHPolicy != ""{
-		TestSols[k].Type = wtype.LiquidTypeFromString(LHPolicy)
+		TestSols[k].Type,err = wtype.LiquidTypeFromString(LHPolicy)
+			if err != nil {
+					Errors = append(Errors,err)
+				}
 		}
 		
 		if TestSolVolumes[l].RawValue() > 0.0 {
@@ -174,6 +185,7 @@ Steps {
 		
 		// get annotation info
 		doerun :=  wtype.LiquidTypeName(TestSols[k].Type)
+		
 		
 		volume := TestSolVolumes[l].ToString() //strconv.Itoa(wutil.RoundInt(number))+"ul"
 		
@@ -230,7 +242,10 @@ Steps {
 	run = doe.AddAdditionalHeaderandValue(run,"Additional","LHPolicy", doerun)
 	
 	// print out LHPolicy info
-	policy, _ := liquidhandling.GetPolicyByName(doerun)
+	policy, found := liquidhandling.GetPolicyByName(doerun)
+	if  !found {
+		Errors = append(Errors,fmt.Errorf("policy ",doerun," not found"))
+	}
 	
 	for _,key := range referencekeys {
 		run = doe.AddAdditionalHeaderandValue(run,"Additional","LHPolicy"+"_"+key, policy[key])

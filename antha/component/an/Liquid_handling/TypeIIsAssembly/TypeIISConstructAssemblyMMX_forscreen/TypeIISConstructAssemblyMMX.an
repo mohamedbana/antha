@@ -37,7 +37,9 @@ Outputs (
 )
 
 // Data which is returned from this protocol, and data types
-Data ()
+Data (
+	Errors []error
+)
 
 Requirements {}
 
@@ -47,6 +49,10 @@ Setup {}
 // The core process for this protocol, with the steps to be performed
 // for every input
 Steps {
+	
+	Errors = make([]error,0)
+	var err error
+	
 	samples := make([]*wtype.LHComponent, 0)
 	
 	waterSample:=mixer.SampleForTotalVolume(Water,ReactionVolume)
@@ -58,7 +64,11 @@ Steps {
 	for k, part := range Parts {
 		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", PartNames[k], " vol ", PartVols[k])
 		
-		part.Type = wtype.LiquidTypeFromString(LHPolicyName)
+		part.Type, err = wtype.LiquidTypeFromString(LHPolicyName)
+		
+		if err != nil {
+			Errors = append(Errors,err)
+		}
 		
 		partSample := mixer.Sample(part, PartVols[k])
 		partSample.CName = PartNames[k]

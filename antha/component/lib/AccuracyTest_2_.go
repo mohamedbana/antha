@@ -50,6 +50,8 @@ func _AccuracyTest_2Steps(_ctx context.Context, _input *AccuracyTest_2Input, _ou
 	var platenum = 1
 	var runs = make([]doe.Run, 1)
 	var newruns = make([]doe.Run, 0)
+	var err error
+	_output.Errors = make([]error, 0)
 	// work out plate layout based on picture or just in order
 
 	if _input.Printasimage {
@@ -76,7 +78,10 @@ func _AccuracyTest_2Steps(_ctx context.Context, _input *AccuracyTest_2Input, _ou
 	reactions := make([]*wtype.LHComponent, 0)
 
 	// use first policy as reference to ensure consistent range through map values
-	referencepolicy, _ := liquidhandling.GetPolicyByName(_input.LHPolicy)
+	referencepolicy, found := liquidhandling.GetPolicyByName(_input.LHPolicy)
+	if !found {
+		_output.Errors = append(_output.Errors, fmt.Errorf("policy ", _input.LHPolicy, " not found"))
+	}
 
 	referencekeys := make([]string, 0)
 	for key := range referencepolicy {
@@ -108,7 +113,10 @@ func _AccuracyTest_2Steps(_ctx context.Context, _input *AccuracyTest_2Input, _ou
 
 					// change lhpolicy if desired
 					if _input.UseLHPolicyDoeforDiluent {
-						_input.Diluent.Type = wtype.LiquidTypeFromString(_input.LHPolicy)
+						_input.Diluent.Type, err = wtype.LiquidTypeFromString(_input.LHPolicy)
+						if err != nil {
+							_output.Errors = append(_output.Errors, err)
+						}
 					}
 
 					bufferSample := mixer.Sample(_input.Diluent, wunit.NewVolume(_input.TotalVolume.RawValue()-_input.TestSolVolumes[l].RawValue(), _input.TotalVolume.Unit().PrefixedSymbol())) //SampleForTotalVolume(Diluent, TotalVolume)
@@ -123,7 +131,10 @@ func _AccuracyTest_2Steps(_ctx context.Context, _input *AccuracyTest_2Input, _ou
 
 					// change liquid class
 					if _input.UseLiquidPolicyForTestSolutions && _input.LHPolicy != "" {
-						_input.TestSols[k].Type = wtype.LiquidTypeFromString(_input.LHPolicy)
+						_input.TestSols[k].Type, err = wtype.LiquidTypeFromString(_input.LHPolicy)
+						if err != nil {
+							_output.Errors = append(_output.Errors, err)
+						}
 					}
 
 					if _input.TestSolVolumes[l].RawValue() > 0.0 {
@@ -198,7 +209,10 @@ func _AccuracyTest_2Steps(_ctx context.Context, _input *AccuracyTest_2Input, _ou
 					run = doe.AddAdditionalHeaderandValue(run, "Additional", "LHPolicy", doerun)
 
 					// print out LHPolicy info
-					policy, _ := liquidhandling.GetPolicyByName(doerun)
+					policy, found := liquidhandling.GetPolicyByName(doerun)
+					if !found {
+						_output.Errors = append(_output.Errors, fmt.Errorf("policy ", doerun, " not found"))
+					}
 
 					for _, key := range referencekeys {
 						run = doe.AddAdditionalHeaderandValue(run, "Additional", "LHPolicy"+"_"+key, policy[key])

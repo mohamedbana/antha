@@ -126,7 +126,7 @@ Steps {
 		fmt.Println("skipping well:", skipped,locationkey)
 		}else{
 			whitevol := VolumeForFullcolour
-			Diluent.Type = wtype.LiquidTypeFromString(NonMixingClass)
+			Diluent.Type,_ = wtype.LiquidTypeFromString(NonMixingClass)
 			
 			waterSample := mixer.Sample(Diluent,whitevol)
 			solution = MixTo(OutPlate.Type, locationkey,1, waterSample)
@@ -173,9 +173,9 @@ Steps {
 		if DontMix {
 		Black.Type = wtype.LTDISPENSEABOVE
 		}else if gray.Y >= fullblackuint8 {
-		Black.Type = wtype.LiquidTypeFromString(NonMixingClass)
+		Black.Type,_ = wtype.LiquidTypeFromString(NonMixingClass)
 		}else{
-			Black.Type = wtype.LiquidTypeFromString(MixingLiquidClass)
+			Black.Type,_ = wtype.LiquidTypeFromString(MixingLiquidClass)
 		}
 		
 		//fmt.Println("blackvol2",blackvol.ToString())
