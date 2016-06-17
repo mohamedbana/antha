@@ -641,12 +641,12 @@ func MakeNeedToMixPolicy() LHPolicy {
 	dnapolicy := make(LHPolicy, 15)
 	dnapolicy["POST_MIX"] = 3
 	dnapolicy["POST_MIX_VOLUME"] = 10
-	dnapolicy["POST_MIX_RATE"] = 3.9
+	dnapolicy["POST_MIX_RATE"] = 3.74
 	dnapolicy["PRE_MIX"] = 3
 	dnapolicy["PRE_MIX_VOLUME"] = 10
-	dnapolicy["PRE_MIX_RATE"] = 3.9
-	dnapolicy["ASPSPEED"] = 3.9
-	dnapolicy["DSPSPEED"] = 3.9
+	dnapolicy["PRE_MIX_RATE"] = 3.74
+	dnapolicy["ASPSPEED"] = 3.74
+	dnapolicy["DSPSPEED"] = 3.74
 	dnapolicy["CAN_MULTI"] = false
 	dnapolicy["CAN_MSA"] = false
 	dnapolicy["CAN_SDD"] = false
@@ -661,12 +661,12 @@ func PreMixPolicy() LHPolicy {
 	dnapolicy := make(LHPolicy, 12)
 	//dnapolicy["POST_MIX"] = 3
 	//dnapolicy["POST_MIX_VOLUME"] = 10
-	//dnapolicy["POST_MIX_RATE"] = 3.9
+	//dnapolicy["POST_MIX_RATE"] = 3.74
 	dnapolicy["PRE_MIX"] = 3
 	dnapolicy["PRE_MIX_VOLUME"] = 10
-	dnapolicy["PRE_MIX_RATE"] = 3.9
-	dnapolicy["ASPSPEED"] = 3.9
-	dnapolicy["DSPSPEED"] = 3.9
+	dnapolicy["PRE_MIX_RATE"] = 3.74
+	dnapolicy["ASPSPEED"] = 3.74
+	dnapolicy["DSPSPEED"] = 3.74
 	dnapolicy["CAN_MULTI"] = false
 	dnapolicy["CAN_MSA"] = false
 	dnapolicy["CAN_SDD"] = false
@@ -682,12 +682,12 @@ func PostMixPolicy() LHPolicy {
 	dnapolicy := make(LHPolicy, 12)
 	dnapolicy["POST_MIX"] = 3
 	dnapolicy["POST_MIX_VOLUME"] = 10
-	dnapolicy["POST_MIX_RATE"] = 3.9
+	dnapolicy["POST_MIX_RATE"] = 3.74
 	//dnapolicy["PRE_MIX"] = 3
 	//dnapolicy["PRE_MIX_VOLUME"] = 10
-	//dnapolicy["PRE_MIX_RATE"] = 3.9
-	dnapolicy["ASPSPEED"] = 3.9
-	dnapolicy["DSPSPEED"] = 3.9
+	//dnapolicy["PRE_MIX_RATE"] = 3.74
+	dnapolicy["ASPSPEED"] = 3.74
+	dnapolicy["DSPSPEED"] = 3.74
 	dnapolicy["CAN_MULTI"] = false
 	dnapolicy["CAN_MSA"] = false
 	dnapolicy["CAN_SDD"] = false
@@ -769,6 +769,15 @@ func MakeHVOffsetPolicy() LHPolicy {
 	return lvop
 }
 
+func MakeHVFlowRatePolicy() LHPolicy {
+	policy := make(LHPolicy, 4)
+	policy["POST_MIX_RATE"] = 37
+	policy["PRE_MIX_RATE"] = 37
+	policy["ASPSPEED"] = 37
+	policy["DSPSPEED"] = 37
+	return policy
+}
+
 func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
 
 	// make some policies
@@ -821,9 +830,16 @@ func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
 
 	// hack to fix plate type problems
 	rule := NewLHPolicyRule("HVOffsetFix")
-	rule.AddNumericConditionOn("VOLUME", 9.9, 300.0) // what about higher? // set specifically for openPlant configuration
+	rule.AddNumericConditionOn("VOLUME", 20.1, 300.0) // what about higher? // set specifically for openPlant configuration
 	//rule.AddCategoryConditionOn("FROMPLATETYPE", "pcrplate_skirted_riser")
 	pol := MakeHVOffsetPolicy()
+	lhpr.AddRule(rule, pol)
+
+	// hack to fix plate type problems
+	rule = NewLHPolicyRule("HVFlowRate")
+	rule.AddNumericConditionOn("VOLUME", 20.1, 300.0) // what about higher? // set specifically for openPlant configuration
+	//rule.AddCategoryConditionOn("FROMPLATETYPE", "pcrplate_skirted_riser")
+	pol = MakeHVFlowRatePolicy()
 	lhpr.AddRule(rule, pol)
 
 	/*rule = NewLHPolicyRule("LVOffsetFix2")

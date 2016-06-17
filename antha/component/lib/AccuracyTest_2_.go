@@ -79,7 +79,8 @@ func _AccuracyTest_2Steps(_ctx context.Context, _input *AccuracyTest_2Input, _ou
 
 	// use first policy as reference to ensure consistent range through map values
 	referencepolicy, found := liquidhandling.GetPolicyByName(_input.LHPolicy)
-	if !found {
+	if found == false {
+		panic("policy " + _input.LHPolicy + " not found")
 		_output.Errors = append(_output.Errors, fmt.Errorf("policy ", _input.LHPolicy, " not found"))
 	}
 
@@ -211,6 +212,7 @@ func _AccuracyTest_2Steps(_ctx context.Context, _input *AccuracyTest_2Input, _ou
 					// print out LHPolicy info
 					policy, found := liquidhandling.GetPolicyByName(doerun)
 					if !found {
+						panic("policy " + doerun + " not found")
 						_output.Errors = append(_output.Errors, fmt.Errorf("policy ", doerun, " not found"))
 					}
 
