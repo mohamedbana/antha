@@ -20,16 +20,18 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
+// Package for working with enzymes; in particular restriction enzymes
 package enzymes
 
 import (
+	"sort"
+	"strconv"
+	"strings"
+
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"sort"
-	"strconv"
-	"strings"
 )
 
 //should expand to be more general, i.e. 3prime overhangs

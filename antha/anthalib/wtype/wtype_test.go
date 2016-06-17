@@ -208,7 +208,7 @@ type testpair struct {
 	ltint    int
 }
 
-var lts []testpair = []testpair{testpair{ltstring: "170516CCFDesign_noTouchoff_noBlowout2", ltint: 102}, testpair{ltstring: "190516OnePolicy0", ltint: 3000}, testpair{ltstring: "dna_mix", ltint: LTDNAMIX}}
+var lts []testpair = []testpair{testpair{ltstring: "170516CCFDesign_noTouchoff_noBlowout2", ltint: 102}, testpair{ltstring: "190516OnePolicy0", ltint: 3000}, testpair{ltstring: "dna_mix", ltint: LTDNAMIX}, testpair{ltstring: "PreMix", ltint: LTPreMix}, testpair{ltstring: "InvalidEntry", ltint: LTWater}}
 
 func TestLiquidTypeFromString(t *testing.T) {
 
