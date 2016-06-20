@@ -760,10 +760,10 @@ func MakeLVExtraPolicy() LHPolicy {
 
 func MakeHVOffsetPolicy() LHPolicy {
 	lvop := make(LHPolicy, 6)
-	lvop["ASPZOFFSET"] = 2.5
-	lvop["DSPZOFFSET"] = 2.5
-	lvop["POST_MIX_Z"] = 2.5
-	lvop["PRE_MIX_Z"] = 2.5
+	lvop["ASPZOFFSET"] = 2.25
+	lvop["DSPZOFFSET"] = 2.25
+	lvop["POST_MIX_Z"] = 2.25
+	lvop["PRE_MIX_Z"] = 2.25
 	lvop["DSPREFERENCE"] = 0
 	lvop["ASPREFERENCE"] = 0
 	return lvop
