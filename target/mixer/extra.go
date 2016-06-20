@@ -108,7 +108,7 @@ func parseInputPlateData(inData io.Reader) (*wtype.LHPlate, error) {
 
 		// component type
 
-		ctype := wtype.LiquidTypeFromString(rec[2])
+		ctype, _ := wtype.LiquidTypeFromString(rec[2])
 
 		if ctype == wtype.LTWater && !strings.Contains(rec[2], "water") {
 			// just warn, this is tolerable but possibly not desired

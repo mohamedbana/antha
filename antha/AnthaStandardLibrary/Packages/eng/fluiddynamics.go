@@ -20,7 +20,7 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
-// Package containing formulae for the estimation of mixing properties
+// Package for performing engineering calculations; at present this consists of evaporation rate estimation, thawtime estimation and fluid dynamics
 package eng
 
 import (

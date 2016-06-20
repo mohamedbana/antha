@@ -97,7 +97,7 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 				fmt.Println("skipping well:", skipped, locationkey)
 			} else {
 				whitevol := _input.VolumeForFullcolour
-				_input.Diluent.Type = wtype.LiquidTypeFromString(_input.NonMixingClass)
+				_input.Diluent.Type, _ = wtype.LiquidTypeFromString(_input.NonMixingClass)
 
 				waterSample := mixer.Sample(_input.Diluent, whitevol)
 				solution = execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, waterSample)
@@ -144,9 +144,9 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 			if _input.DontMix {
 				_input.Black.Type = wtype.LTDISPENSEABOVE
 			} else if gray.Y >= fullblackuint8 {
-				_input.Black.Type = wtype.LiquidTypeFromString(_input.NonMixingClass)
+				_input.Black.Type, _ = wtype.LiquidTypeFromString(_input.NonMixingClass)
 			} else {
-				_input.Black.Type = wtype.LiquidTypeFromString(_input.MixingLiquidClass)
+				_input.Black.Type, _ = wtype.LiquidTypeFromString(_input.MixingLiquidClass)
 			}
 
 			//fmt.Println("blackvol2",blackvol.ToString())

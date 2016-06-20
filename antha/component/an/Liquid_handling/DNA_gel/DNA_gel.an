@@ -128,7 +128,7 @@ Steps {
 	DNAgelloadmix.CName = Samplenames[0]//[i] //originalname + strconv.Itoa(i)
 	
 	// replacing following line with temporary hard code whilst developing protocol:
-	DNAgelloadmix.Type = wtype.LiquidTypeFromString(Mixingpolicy)	
+	DNAgelloadmix.Type,_ = wtype.LiquidTypeFromString(Mixingpolicy)	
 	//DNAgelloadmix.Type = "loadwater"
 	
 	loadedsample := MixInto(

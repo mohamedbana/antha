@@ -122,7 +122,7 @@ Steps {
 		component := componentmap[colourtostringmap[colour]]
 
 		// make sure liquid class is appropriate for cell culture in case this is not set elsewhere
-		component.Type = wtype.LiquidTypeFromString(UseLiquidClass)//wtype.LTCulture
+		component.Type,_ = wtype.LiquidTypeFromString(UseLiquidClass)//wtype.LTCulture
 		
 		fmt.Println(image.Colourcomponentmap[colour])
 		
@@ -151,7 +151,7 @@ Steps {
 			counter = counter + 1
 			fmt.Println("wells not ",Notthiscolour,counter)
 	
-		component.Type = wtype.LiquidTypeFromString(UseLiquidClass)
+		component.Type,_ = wtype.LiquidTypeFromString(UseLiquidClass)
 		pixelSample := mixer.Sample(component, VolumePerWell)
 	
 		solution := MixTo(OutPlate.Type, locationkey, 1, pixelSample)

@@ -1,6 +1,7 @@
 package wtype
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype/liquidtype"
@@ -22,6 +23,8 @@ const (
 	LTDoNotMix
 	LTloadwater
 	LTNeedToMix
+	LTPreMix
+	LTPostMix
 	LTVISCOUS
 	LTPAINT
 	LTDISPENSEABOVE
@@ -33,61 +36,65 @@ const (
 	LTCOLONY
 )
 
-func LiquidTypeFromString(s string) LiquidType {
+func LiquidTypeFromString(s string) (LiquidType, error) {
 
 	match, number := liquidtype.LiquidTypeFromPolicyDOE(s)
 
 	if match {
-		return LiquidType(number)
+		return LiquidType(number), nil
 	}
 
 	switch s {
 	case "water":
 	case "":
-		return LTWater
+		return LTWater, nil
 	case "glycerol":
-		return LTGlycerol
+		return LTGlycerol, nil
 	case "ethanol":
-		return LTEthanol
+		return LTEthanol, nil
 	case "detergent":
-		return LTDetergent
+		return LTDetergent, nil
 	case "culture":
-		return LTCulture
+		return LTCulture, nil
 	case "culturereuse":
-		return LTCulutureReuse
+		return LTCulutureReuse, nil
 	case "protein":
-		return LTProtein
+		return LTProtein, nil
 	case "dna":
-		return LTDNA
+		return LTDNA, nil
 	case "load":
-		return LTload
+		return LTload, nil
 	case "DoNotMix":
-		return LTDoNotMix
+		return LTDoNotMix, nil
 	case "loadwater":
-		return LTloadwater
+		return LTloadwater, nil
 	case "NeedToMix":
-		return LTNeedToMix
+		return LTNeedToMix, nil
+	case "PreMix":
+		return LTPreMix, nil
+	case "PostMix":
+		return LTPostMix, nil
 	case "viscous":
-		return LTVISCOUS
+		return LTVISCOUS, nil
 	case "Paint":
-		return LTPAINT
+		return LTPAINT, nil
 	case "DispenseAboveLiquid":
-		return LTDISPENSEABOVE
+		return LTDISPENSEABOVE, nil
 	case "PEG":
-		return LTPEG
+		return LTPEG, nil
 	case "Protoplasts":
-		return LTProtoplasts
+		return LTProtoplasts, nil
 	case "dna_mix":
-		return LTDNAMIX
+		return LTDNAMIX, nil
 	case "plateout":
-		return LTPLATEOUT
+		return LTPLATEOUT, nil
 	case "colony":
-		return LTCOLONY
+		return LTCOLONY, nil
 	default:
-		return LTWater
+		return LTWater, nil
 	}
 
-	return LTWater
+	return LTWater, fmt.Errorf("no liquid policy found so using default water policy")
 }
 
 func LiquidTypeName(lt LiquidType) string {
@@ -122,6 +129,10 @@ func LiquidTypeName(lt LiquidType) string {
 		return "loadwater"
 	case LTNeedToMix:
 		return "NeedToMix"
+	case LTPreMix:
+		return "PreMix"
+	case LTPostMix:
+		return "PostMix"
 	case LTPAINT:
 		return "Paint"
 	case LTDISPENSEABOVE:
