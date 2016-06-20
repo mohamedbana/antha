@@ -3,8 +3,8 @@ package cmd
 import (
 	"testing"
 
-	"github.com/antha-lang/antha/internal/github.com/spf13/pflag"
-	"github.com/antha-lang/antha/internal/github.com/spf13/viper"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 func TestGetStringSliceWorkaroundNeeded(t *testing.T) {

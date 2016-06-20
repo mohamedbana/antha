@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"image/color"
 	"strconv"
-	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
+	"github.com/disintegration/imaging"
 
 )
 

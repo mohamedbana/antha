@@ -1,12 +1,10 @@
 package wtype
 
 import (
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"regexp"
 	"strconv"
 	"strings"
-
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
-	"github.com/antha-lang/antha/antha/anthalib/wutil"
 )
 
 // convenience structure for handling well coordinates
@@ -61,32 +59,33 @@ func MakeWellCoords(wc string) WellCoords {
 	return r
 }
 
-/*
 // make well coordinates in the "A1" convention
 func MakeWellCoordsA1(a1 string) WellCoords {
-	// only handles 96 well plates
-	if !MatchString("[A-Z][0-9]{1,2}", a1) {
+	if !MatchString("[A-Z]{1,}[0-9]{1,2}", a1) {
 		return WellCoords{-1, -1}
 	}
-	return WellCoords{wutil.ParseInt(a1[1:len(a1)]) - 1, AlphaToNum(string(a1[0])) - 1}
-}
-*/
-// make well coordinates in the "A1" convention
-func MakeWellCoordsA1(a1 string) WellCoords {
+	re, _ := regexp.Compile("[A-Z]{1,}")
+	ix := re.FindIndex([]byte(a1))
+	endC := ix[1]
 
-	row, col, _ := spreadsheet.A1formattorowcolumn(a1)
-
-	return WellCoords{X: col, Y: row}
+	X := wutil.ParseInt(a1[endC:len(a1)]) - 1
+	Y := AlphaToNum(string(a1[0:endC])) - 1
+	return WellCoords{X, Y}
 }
 
 // make well coordinates in the "1A" convention
 func MakeWellCoords1A(a1 string) WellCoords {
-	// only handles 96 well plates
 
-	if !MatchString("[0-9]{1,2}[A-Z]", a1) {
+	if !MatchString("[0-9]{1,2}[A-Z]{1,}", a1) {
 		return WellCoords{-1, -1}
 	}
-	return WellCoords{AlphaToNum(string(a1[0])) - 1, wutil.ParseInt(a1[1:len(a1)]) - 1}
+	re, _ := regexp.Compile("[A-Z]{1,}")
+	ix := re.FindIndex([]byte(a1))
+	startC := ix[0]
+
+	Y := AlphaToNum(string(a1[startC:len(a1)])) - 1
+	X := wutil.ParseInt(a1[0:startC]) - 1
+	return WellCoords{X, Y}
 }
 
 // make well coordinates in a manner compatble with "X1,Y1" etc.

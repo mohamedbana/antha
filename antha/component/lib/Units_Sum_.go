@@ -27,6 +27,8 @@ func _Units_SumSetup(_ctx context.Context, _input *Units_SumInput) {
 // Core process of the protocol: steps to be performed for each input
 func _Units_SumSteps(_ctx context.Context, _input *Units_SumInput, _output *Units_SumOutput) {
 
+	///*
+
 	var sumofSIValues float64
 	var siUnit string
 
@@ -39,8 +41,23 @@ func _Units_SumSteps(_ctx context.Context, _input *Units_SumInput, _output *Unit
 
 	_output.SumOfVolumes = wunit.NewVolume(sumofSIValues, siUnit)
 
+	//*/
+
 	// Exercise: this is quite a convoluted way of doing this so instead we could create a function to perform this task
 	// try doing this below
+
+	// Approach 1:
+	//writing something like the AddVolume func written below the validation section
+
+	//e.g.
+	//SumOfVolumes = AddVolume(MyVolume,MyOtherVolume)
+
+	// Approach 2:
+	// using anthalib funcs and methods
+
+	_output.SumOfVolumes = (wunit.CopyVolume(_input.MyVolume))
+
+	_output.SumOfVolumes.Add(_input.MyOtherVolume)
 
 }
 
@@ -130,3 +147,22 @@ func init() {
 		},
 	})
 }
+
+/*
+// this is how to write a function in go and use it in an antha protocol
+func AddVolume(myvolume wunit.ConcreteMeasurement, myothervolume wunit.ConcreteMeasurement )(newvolume wunit.ConcreteMeasurement) {
+
+var sumofSIValues float64
+var siUnit string
+
+sumofSIValues = myvolume.SIValue() + myothervolume.SIValue()
+
+siUnit = myvolume.Unit().BaseSISymbol()
+
+// or a less safe but simpler way would be
+// siUnit = "l"
+
+newvolume = wunit.NewVolume(sumofSIValues,siUnit)
+	return
+}
+*/

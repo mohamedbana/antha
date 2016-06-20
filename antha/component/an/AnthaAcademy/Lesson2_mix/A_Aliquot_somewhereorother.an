@@ -1,10 +1,12 @@
 // example protocol showing the highest level antha mix command which does not specify a plate type, therefore leaving it up to the scheduler to decide
 protocol Aliquot_somewhere
 
+
+// we can import code libraries and use functions and types from these libraries
 import (
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wtype" // the LHComponent type is imported from this library
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"github.com/antha-lang/antha/antha/anthalib/mixer"
+	"github.com/antha-lang/antha/antha/anthalib/mixer" // the Sample function is imported from mixer
 )
 
 
@@ -53,7 +55,7 @@ Steps {
 	}
 	
 	
-	// make an slice of components which we'll fill with aliquots; 
+	// make a slice of components which we'll fill with aliquots; 
 	// same as we would for an array of samples but this time we won't mix together
 	aliquots := make([]*wtype.LHComponent,0)
 	

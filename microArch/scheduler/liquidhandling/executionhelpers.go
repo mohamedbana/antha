@@ -204,7 +204,7 @@ func merge_transfers(insIn []driver.RobotInstruction, aggregates [][]int) []driv
 	return ret
 }
 
-func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) (insOut *driver.TransferInstruction, err error) {
+func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties, carryvol wunit.Volume) (insOut *driver.TransferInstruction, err error) {
 	cmps := insIn.Components
 
 	lenToMake := len(insIn.Components)
@@ -219,7 +219,7 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) 
 
 	// six parameters applying to the source
 
-	fromPlateID, fromWells, err := robot.GetComponents(cmps)
+	fromPlateID, fromWells, err := robot.GetComponents(cmps, carryvol)
 
 	if err != nil {
 		return nil, err

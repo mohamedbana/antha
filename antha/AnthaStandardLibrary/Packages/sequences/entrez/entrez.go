@@ -36,7 +36,7 @@ import (
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	biogo "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/entrez"
+	biogo "github.com/biogo/ncbi/entrez"
 )
 
 var (

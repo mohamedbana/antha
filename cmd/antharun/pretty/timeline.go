@@ -52,11 +52,14 @@ func Timeline(out io.Writer, result *execute.Result) error {
 	lines = append(lines, fmt.Sprint("== Workflow Outputs:\n"))
 
 	for k, v := range result.Workflow.Outputs {
+		var s string
 		bs, err := json.Marshal(v)
-		if err != nil {
-			return err
+		if err == nil {
+			s = string(bs)
+		} else {
+			s = fmt.Sprintf("<cannot unmarshal: %s>", err)
 		}
-		lines = append(lines, fmt.Sprintf("    - %s: %s\n", k, string(bs)))
+		lines = append(lines, fmt.Sprintf("    - %s: %s\n", k, s))
 	}
 
 	_, err := fmt.Fprint(out, strings.Join(lines, ""))
