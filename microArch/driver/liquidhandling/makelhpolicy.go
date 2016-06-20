@@ -116,7 +116,7 @@ func MakePolicies() map[string]LHPolicy {
 
 	// TODO: Remove this hack
 	for _, DOEliquidhandlingFile := range AvailablePolicyfiles {
-		if _, err := os.Stat(filepath.Join(anthapath.Path(), DOEliquidhandlingFile.Filename)); err != nil {
+		if _, err := os.Stat(filepath.Join(anthapath.Path(), DOEliquidhandlingFile.Filename)); err == nil {
 			//if antha.Anthafileexists(DOEliquidhandlingFile) {
 			fmt.Println("found lhpolicy doe file", DOEliquidhandlingFile)
 
