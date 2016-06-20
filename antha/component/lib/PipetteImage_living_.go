@@ -53,6 +53,7 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 
 	// make sub pallete if necessary
 	var chosencolourpalette color.Palette
+	var err error
 
 	if _input.Subset {
 		chosencolourpalette = image.MakeSubPallette(_input.Palettename, _input.Subsetnames)
@@ -108,7 +109,11 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 		component := componentmap[colourtostringmap[colour]]
 
 		// make sure liquid class is appropriate for cell culture in case this is not set elsewhere
-		component.Type = wtype.LiquidTypeFromString(_input.UseLiquidClass) //wtype.LTCulture
+		component.Type, err = wtype.LiquidTypeFromString(_input.UseLiquidClass) //wtype.LTCulture
+
+		if err != nil {
+			panic(err.Error())
+		}
 
 		fmt.Println(image.Colourcomponentmap[colour])
 
@@ -152,7 +157,12 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 				inducerSample := mixer.Sample(Inducer, InducerVolume)
 				components = append(components,inducerSample)*/
 
-				component.Type = wtype.LiquidTypeFromString(_input.UseLiquidClass) //wtype.LTCulture
+				component.Type, err = wtype.LiquidTypeFromString(_input.UseLiquidClass) //wtype.LTCulture
+
+				if err != nil {
+					panic(err.Error())
+				}
+
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
 				//components = append(components,pixelSample)
 				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, pixelSample)

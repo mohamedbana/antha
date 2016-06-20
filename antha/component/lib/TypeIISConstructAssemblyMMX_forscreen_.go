@@ -27,6 +27,10 @@ func _TypeIISConstructAssemblyMMX_forscreenSetup(_ctx context.Context, _input *T
 // The core process for this protocol, with the steps to be performed
 // for every input
 func _TypeIISConstructAssemblyMMX_forscreenSteps(_ctx context.Context, _input *TypeIISConstructAssemblyMMX_forscreenInput, _output *TypeIISConstructAssemblyMMX_forscreenOutput) {
+
+	_output.Errors = make([]error, 0)
+	var err error
+
 	samples := make([]*wtype.LHComponent, 0)
 
 	waterSample := mixer.SampleForTotalVolume(_input.Water, _input.ReactionVolume)
@@ -38,7 +42,11 @@ func _TypeIISConstructAssemblyMMX_forscreenSteps(_ctx context.Context, _input *T
 	for k, part := range _input.Parts {
 		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", _input.PartNames[k], " vol ", _input.PartVols[k])
 
-		part.Type = wtype.LiquidTypeFromString(_input.LHPolicyName)
+		part.Type, err = wtype.LiquidTypeFromString(_input.LHPolicyName)
+
+		if err != nil {
+			_output.Errors = append(_output.Errors, err)
+		}
 
 		partSample := mixer.Sample(part, _input.PartVols[k])
 		partSample.CName = _input.PartNames[k]
@@ -133,11 +141,13 @@ type TypeIISConstructAssemblyMMX_forscreenInput struct {
 }
 
 type TypeIISConstructAssemblyMMX_forscreenOutput struct {
+	Errors   []error
 	Reaction *wtype.LHComponent
 }
 
 type TypeIISConstructAssemblyMMX_forscreenSOutput struct {
 	Data struct {
+		Errors []error
 	}
 	Outputs struct {
 		Reaction *wtype.LHComponent
@@ -167,6 +177,7 @@ func init() {
 				{Name: "ReactionTime", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionVolume", Desc: "", Kind: "Parameters"},
 				{Name: "Water", Desc: "", Kind: "Inputs"},
+				{Name: "Errors", Desc: "", Kind: "Data"},
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
 			},
 		},

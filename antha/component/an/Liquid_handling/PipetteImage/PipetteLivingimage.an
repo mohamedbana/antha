@@ -71,6 +71,7 @@ Steps {
 	
 	// make sub pallete if necessary
 	var chosencolourpalette color.Palette
+	var err error
 	
 	if Subset {
 		chosencolourpalette = image.MakeSubPallette(Palettename, Subsetnames)
@@ -127,7 +128,11 @@ Steps {
 		component := componentmap[colourtostringmap[colour]]
 
 		// make sure liquid class is appropriate for cell culture in case this is not set elsewhere
-		component.Type = wtype.LiquidTypeFromString(UseLiquidClass)//wtype.LTCulture
+		component.Type, err = wtype.LiquidTypeFromString(UseLiquidClass)//wtype.LTCulture
+		
+		if err != nil {
+			panic(err.Error())
+		}
 		
 		fmt.Println(image.Colourcomponentmap[colour])
 		
@@ -171,7 +176,12 @@ Steps {
 		inducerSample := mixer.Sample(Inducer, InducerVolume)
 		components = append(components,inducerSample)*/
 		
-		component.Type = wtype.LiquidTypeFromString(UseLiquidClass)//wtype.LTCulture
+		component.Type,err = wtype.LiquidTypeFromString(UseLiquidClass)//wtype.LTCulture
+		
+		if err != nil {
+			panic(err.Error())
+		}
+		
 		pixelSample := mixer.Sample(component, VolumePerWell)
 		//components = append(components,pixelSample)
 		solution := MixTo(OutPlate.Type, locationkey, 1, pixelSample)
