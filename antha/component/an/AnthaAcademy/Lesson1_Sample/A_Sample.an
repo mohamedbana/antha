@@ -28,7 +28,7 @@ Data (
 // Physical Inputs to this protocol with types
 Inputs (
 	// the LHComponent is the principal liquidhandling type in antha
-	// the * signifies that this is a pointer to the actual component rather than the component itself
+	// the * signifies that this is a pointer to the component rather than the component itself
 	// most key antha functions such as Sample and Mix use *LHComponent rather than LHComponent
 	// since the type is imported from the wtype package we need to use  *wtype.LHComponent rather than simply *LHComponent
 	Solution *wtype.LHComponent
@@ -52,14 +52,11 @@ Setup {
 // for every input
 Steps {
 	
-	// The Sample function is imported from the mixer library
-	// It's used to take a sample of a specified volume of a component prior to mixing
+	// the Sample function is imported from the mixer library
 	// in the mixer library the function signature can be found, here it is:
 	// func Sample(l *wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 	// The function signature  shows that the function requires a *LHComponent and a Volume and returns an *LHComponent	
 	Sample = mixer.Sample(Solution,SampleVolume)
-	 
-	// Now move on to part B_SampleAll.an to see the next type of Sample function
 	
 }
 // Run after controls and a steps block are completed to

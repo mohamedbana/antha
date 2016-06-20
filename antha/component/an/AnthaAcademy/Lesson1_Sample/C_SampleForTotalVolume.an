@@ -60,7 +60,7 @@ Steps {
 	// The Sample functions will not generate liquid handling instructions on their own
 	// We need to tell Antha what to do with samples
 	// For this we need to use one of the Mix functions
-	// therefoe finally we use Mix to combine samples into a new component
+	// therefore finally we use Mix to combine samples into a new component
 	DilutedSample = Mix(allsamples...)
 	
 	// Now we have an antha element which will generate liquid handling instructions

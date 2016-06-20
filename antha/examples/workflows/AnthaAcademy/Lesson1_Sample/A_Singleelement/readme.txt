@@ -14,7 +14,7 @@ If you need to change the source code however, you'll need to recompile
 
 anthabuild:
 
-If you’ve added this alias this will build all .an files in components into their corresponding .go files ready for execution. 
+If you’ve added this alias this will build(recompile) all .an files in components into their corresponding .go files ready for execution. 
 Whenever you change the source code of an antha element you must run anthabuild for the changes to take effect.
 
 if you haven't set up the anthabuild alias you can do so here:
