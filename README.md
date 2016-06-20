@@ -62,7 +62,7 @@ xcode-select --install
 
 # Install some external dependencies
 brew update
-brew install homebrew/science/glpk sqlite3 opencv
+brew install pkg-config homebrew/science/glpk sqlite3 opencv
 
 # Install antha
 go get github.com/antha-lang/antha/cmd/...
