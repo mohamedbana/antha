@@ -435,7 +435,7 @@ func MakeWaterPolicy() LHPolicy {
 	waterpolicy["CAN_MULTI"] = false
 	waterpolicy["CAN_MSA"] = true
 	waterpolicy["CAN_SDD"] = true
-	waterpolicy["DSPZOFFSET"] = 0.5 // changed from 0.5 to prevent bubbles !
+	waterpolicy["DSPZOFFSET"] = 1.0
 	waterpolicy["BLOWOUTVOLUME"] = 0.0
 	return waterpolicy
 }
@@ -760,10 +760,10 @@ func MakeLVExtraPolicy() LHPolicy {
 
 func MakeHVOffsetPolicy() LHPolicy {
 	lvop := make(LHPolicy, 6)
-	lvop["ASPZOFFSET"] = 2.25
-	lvop["DSPZOFFSET"] = 2.25
-	lvop["POST_MIX_Z"] = 2.25
-	lvop["PRE_MIX_Z"] = 2.25
+	lvop["ASPZOFFSET"] = 1.00
+	lvop["DSPZOFFSET"] = 1.00
+	lvop["POST_MIX_Z"] = 1.00
+	lvop["PRE_MIX_Z"] = 1.00
 	lvop["DSPREFERENCE"] = 0
 	lvop["ASPREFERENCE"] = 0
 	return lvop
