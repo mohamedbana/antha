@@ -34,7 +34,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	parser "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	biogo "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/entrez"
+	biogo "github.com/biogo/ncbi/entrez"
 )
 
 var (

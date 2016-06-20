@@ -41,10 +41,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/antha-lang/antha/internal/golang.org/x/net/trace"
+	"golang.org/x/net/trace"
 )
 
-// EnableTracing controls whether to trace RPCs using the github.com/antha-lang/antha/internal/golang.org/x/net/trace package.
+// EnableTracing controls whether to trace RPCs using the golang.org/x/net/trace package.
 // This should only be set before any RPCs are sent or received by this program.
 var EnableTracing = true
 

@@ -7,7 +7,7 @@ gen_comp:
 	gofmt -w -s antha/component/lib
 
 test:
-	go test -v `go list ./... | grep -v internal | grep -v bvendor`
+	go test -v `go list ./... | grep -v vendor | grep -v bvendor`
 
 gen_pb:
 	go generate github.com/antha-lang/antha/driver

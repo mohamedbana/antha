@@ -34,7 +34,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/internal/github.com/ghodss/yaml"
+	"github.com/ghodss/yaml"
 )
 
 type PolicyFile struct {

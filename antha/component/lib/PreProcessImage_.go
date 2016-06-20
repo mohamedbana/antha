@@ -7,7 +7,7 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
-	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
+	"github.com/disintegration/imaging"
 )
 
 // Input parameters for this protocol (data)

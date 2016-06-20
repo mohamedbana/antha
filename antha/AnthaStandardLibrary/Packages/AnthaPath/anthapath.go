@@ -1,4 +1,4 @@
-// antha/AnthaStandardLibrary/Packages/igem/igem.go: Part of the Antha language
+// Part of the Antha language
 // Copyright (C) 2015 The Antha authors. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or

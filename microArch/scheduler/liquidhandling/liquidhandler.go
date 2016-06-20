@@ -185,8 +185,9 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 				}
 				//v.Add(ins.Volume[i])
 
-				vols := ins.GetParameter("VOLUME").([]wunit.Volume)
-				v.Add(vols[i])
+				insvols := ins.GetParameter("VOLUME").([]wunit.Volume)
+				v.Add(insvols[i])
+				v.Add(rq.CarryVolume)
 			}
 		}
 	}
@@ -203,9 +204,11 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 
 		for crd, vol := range wellmap {
 			well := plate.Wellcoords[crd]
-			vol.Add(well.ResidualVolume())
-			well.WContents.SetVolume(vol)
-			well.DeclareNotTemporary()
+			if well.IsAutoallocated() {
+				vol.Add(well.ResidualVolume())
+				well.WContents.SetVolume(vol)
+				well.DeclareNotTemporary()
+			}
 		}
 	}
 

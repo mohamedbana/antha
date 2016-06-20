@@ -56,6 +56,7 @@ func parseInputPlateData(inData io.Reader) (*wtype.LHPlate, error) {
 		if err == io.EOF {
 			break
 		}
+		lineNo += 1
 
 		if err != nil {
 			logger.Info(fmt.Sprint("parseInputPlate ERRROR here: ", err))
@@ -70,6 +71,12 @@ func parseInputPlateData(inData io.Reader) (*wtype.LHPlate, error) {
 		if len(rec) < 3 {
 			logger.Info(fmt.Sprint("parseInputPlate ERROR (line ", lineNo, "): minimum length is 3 fields (well, component name, component type in string form)"))
 			continue
+		}
+
+		if len(rec[0]) == 0 {
+			logger.Info(fmt.Sprint("parseInputPlate WARN (line ", lineNo, "): skipped - no well coords"))
+			continue
+
 		}
 
 		well := wtype.MakeWellCoords(rec[0])
@@ -140,8 +147,6 @@ func parseInputPlateData(inData io.Reader) (*wtype.LHPlate, error) {
 		cmp.Type = ctype
 
 		p.WellAt(well).Add(cmp)
-
-		lineNo += 1
 	}
 
 	// all done!

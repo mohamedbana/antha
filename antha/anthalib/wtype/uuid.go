@@ -23,7 +23,7 @@
 package wtype
 
 import (
-	"github.com/antha-lang/antha/internal/github.com/twinj/uuid"
+	"github.com/twinj/uuid"
 	//"github.com/dustinkirkland/golang-petname"
 )
 

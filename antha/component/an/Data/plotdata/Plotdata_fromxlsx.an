@@ -4,7 +4,7 @@ protocol Plotdata_spreadsheet
 import (
 	"fmt"
 	//"math/rand"
-	//"github.com/antha-lang/antha/internal/github.com/montanaflynn/stats"
+	//"github.com/montanaflynn/stats"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
 	graph "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/plot"
 )

@@ -16,7 +16,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
+	"github.com/disintegration/imaging"
 )
 
 // Colour palette to use // this would relate to a map of components of these available colours in factor

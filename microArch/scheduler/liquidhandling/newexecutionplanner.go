@@ -36,7 +36,7 @@ func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProper
 	transfers := make([]liquidhandling.RobotInstruction, 0, len(request.LHInstructions))
 	for ix, insID := range request.Output_order {
 		//	request.InstructionSet.Add(ConvertInstruction(request.LHInstructions[insID], robot))
-		transIns, err := ConvertInstruction(request.LHInstructions[insID], robot)
+		transIns, err := ConvertInstruction(request.LHInstructions[insID], robot, request.CarryVolume)
 
 		if err != nil {
 			return request, err
