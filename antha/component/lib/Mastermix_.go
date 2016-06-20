@@ -32,8 +32,6 @@ func _MastermixSetup(_ctx context.Context, _input *MastermixInput) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func _MastermixSteps(_ctx context.Context, _input *MastermixInput, _output *MastermixOutput) {
-
-	panic("AD")
 	if len(_input.OtherComponents) != len(_input.OtherComponentVolumes) {
 		execute.Errorf(_ctx, "%d != %d", len(_input.OtherComponents), len(_input.OtherComponentVolumes))
 	}
