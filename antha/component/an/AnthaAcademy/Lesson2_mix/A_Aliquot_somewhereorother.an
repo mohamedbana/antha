@@ -76,7 +76,10 @@ Steps {
 		// this time we append the slice of components after mixing
 		aliquots = append(aliquots,aliquot)
 	}
-	Aliquots = aliquots
+	
+	// Now we assign our temporary variable aliqouts to export as a variable as specified in Outputs
+	// In Antha the first letter of a variablename must be uppercase to allow the variable to be exported
+	Aliquots = aliquots 
 }
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results

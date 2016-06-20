@@ -28,7 +28,7 @@ Data (
 // Physical Inputs to this protocol with types
 Inputs (
 	// the LHComponent is the principal liquidhandling type in antha
-	// the * signifies that this is a pointer to the actual component rather than the variable itself
+	// the * signifies that this is a pointer to the component rather than the component itself
 	// most key antha functions such as Sample and Mix use *LHComponent rather than LHComponent
 	// since the type is imported from the wtype package we need to use  *wtype.LHComponent rather than simply *LHComponent
 	Solution *wtype.LHComponent
