@@ -1,12 +1,14 @@
 {
   "Parameters": {
     "PipetteImage": {
-      "Imagefilename": "apple.jpg",
+      "Imagefilename": "jenkins.jpeg",
 	  "UVimage": false,
 	  "Rotate":false,
-	  "AutoRotate":true,
+	  "AutoRotate":false,
+	  "CheckResizeAlgorithms":true,
 	  "UseLiquidClass":"water",
-		"Palettename":"Neon",
+		"Palettename":"Palette1",
+		"Subset":false,
 	      "Subsetnames": [
 		"black",
 		"white",
@@ -20,8 +22,8 @@
 		],
 		"OnlythisColour":"",
 		"Notthiscolour":"white",
-      "OutPlate": "greiner384_riser",
-      "VolumePerWell": "100ul"
+      "OutPlate": "nunc1536_riser",
+      "VolumePerWell": "0.5ul"
     }
   }
 }

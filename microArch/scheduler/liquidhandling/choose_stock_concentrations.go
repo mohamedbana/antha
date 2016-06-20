@@ -26,7 +26,7 @@ import (
 	"fmt"
 
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"github.com/antha-lang/antha/internal/github.com/Synthace/go-glpk/glpk"
+	"github.com/Synthace/go-glpk/glpk"
 )
 
 func choose_stock_concentrations(minrequired map[string]float64, maxrequired map[string]float64, Smax map[string]float64, vmin float64, T map[string]float64) map[string]float64 {

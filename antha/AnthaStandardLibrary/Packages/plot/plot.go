@@ -1,13 +1,36 @@
+// Part of the Antha language
+// Copyright (C) 2015 The Antha authors. All rights reserved.
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+//
+// For more information relating to the software or licensing issues please
+// contact license@antha-lang.org or write to the Antha team c/o
+// Synthace Ltd. The London Bioscience Innovation Centre
+// 2 Royal College St, London NW1 0NH UK
+
+// Package for plotting data
 package plot
 
 import (
 	"fmt"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
-	"github.com/antha-lang/antha/internal/code.google.com/p/plotinum/plot"
-	"github.com/antha-lang/antha/internal/code.google.com/p/plotinum/plotter"
-	"github.com/antha-lang/antha/internal/code.google.com/p/plotinum/plotutil"
-	"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
+	"code.google.com/p/plotinum/plot"
+	"code.google.com/p/plotinum/plotter"
+	"code.google.com/p/plotinum/plotutil"
+	"github.com/tealeg/xlsx"
 )
 
 var (
@@ -43,7 +66,7 @@ func Plot(Xvalues []float64, Yvaluearray [][]float64) (plt *plot.Plot) {
 				xys[j].Y = yfloats[j]
 
 			}
-			fmt.Println(xys)
+			//fmt.Println(xys)
 			pts = append(pts, xys) //
 		}
 
@@ -59,24 +82,28 @@ func Plot(Xvalues []float64, Yvaluearray [][]float64) (plt *plot.Plot) {
 	// error bars give the 95% confidence intervals.  For the
 	// second, each point is the median x and y value with the
 	// error bars showing the minimum and maximum values.
+	/*
+	   	fmt.Println("pts", pts)
+	   	mean95, err := plotutil.NewErrorPoints(plotutil.MeanAndConf95, pts...)
+	   	if err != nil {
+	   		panic(err)
+	   	}
+	   	//medMinMax, err := plotutil.NewErrorPoints(plotutil.MedianAndMinMax, pts...)
+	   //	if err != nil {
+	   //		panic(err)
+	   //	}
+	   	plotutil.AddLinePoints(plt,
+	   		"mean and 95% confidence", mean95,
+	   	) //	"median and minimum and maximum", medMinMax)
+	   	//plotutil.AddErrorBars(plt, mean95, medMinMax)
 
-	fmt.Println("pts", pts)
-	mean95, err := plotutil.NewErrorPoints(plotutil.MeanAndConf95, pts...)
-	if err != nil {
-		panic(err)
-	}
-	/*medMinMax, err := plotutil.NewErrorPoints(plotutil.MedianAndMinMax, pts...)
-	if err != nil {
-		panic(err)
-	}*/
-	plotutil.AddLinePoints(plt,
-		"mean and 95% confidence", mean95,
-	) //	"median and minimum and maximum", medMinMax)
-	//plotutil.AddErrorBars(plt, mean95, medMinMax)
+	   	// Add the points that are summarized by the error points.
 
-	// Add the points that are summarized by the error points.
+
+	*/
+
 	fmt.Println(len(pts))
-	plotutil.AddScatters(plt, pts[0], pts[1], pts[2], pts[3], pts[4])
+	plotutil.AddScattersXYer(plt, pts)
 	return
 }
 

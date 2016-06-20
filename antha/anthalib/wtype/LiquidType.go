@@ -1,9 +1,9 @@
 package wtype
 
 import (
-	"strconv"
 	"strings"
 
+	"github.com/antha-lang/antha/antha/anthalib/wtype/liquidtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 )
 
@@ -29,71 +29,72 @@ const (
 	LTProtoplasts
 	LTCulutureReuse
 	LTDNAMIX
+	LTPLATEOUT
+	LTCOLONY
 )
 
 func LiquidTypeFromString(s string) LiquidType {
-	if strings.Contains(s, "DOE_run") {
-		fields := strings.SplitAfter(s, "DOE_run")
 
-		runnumber, err := strconv.Atoi(fields[1])
-		if err != nil {
-			panic("for Liguid type " + s + err.Error())
-		}
-		liquid := LiquidType(100 + runnumber)
+	match, number := liquidtype.LiquidTypeFromPolicyDOE(s)
 
-		return liquid
-	} else {
-
-		switch s {
-		case "water":
-		case "":
-			return LTWater
-		case "glycerol":
-			return LTGlycerol
-		case "ethanol":
-			return LTEthanol
-		case "detergent":
-			return LTDetergent
-		case "culture":
-			return LTCulture
-		case "culturereuse":
-			return LTCulutureReuse
-		case "protein":
-			return LTProtein
-		case "dna":
-			return LTDNA
-		case "load":
-			return LTload
-		case "DoNotMix":
-			return LTDoNotMix
-		case "loadwater":
-			return LTloadwater
-		case "NeedToMix":
-			return LTNeedToMix
-		case "viscous":
-			return LTVISCOUS
-		case "Paint":
-			return LTPAINT
-		case "DispenseAboveLiquid":
-			return LTDISPENSEABOVE
-		case "PEG":
-			return LTPEG
-		case "Protoplasts":
-			return LTProtoplasts
-		case "dna_mix":
-			return LTDNAMIX
-		default:
-			return LTWater
-		}
-
+	if match {
+		return LiquidType(number)
 	}
+
+	switch s {
+	case "water":
+	case "":
+		return LTWater
+	case "glycerol":
+		return LTGlycerol
+	case "ethanol":
+		return LTEthanol
+	case "detergent":
+		return LTDetergent
+	case "culture":
+		return LTCulture
+	case "culturereuse":
+		return LTCulutureReuse
+	case "protein":
+		return LTProtein
+	case "dna":
+		return LTDNA
+	case "load":
+		return LTload
+	case "DoNotMix":
+		return LTDoNotMix
+	case "loadwater":
+		return LTloadwater
+	case "NeedToMix":
+		return LTNeedToMix
+	case "viscous":
+		return LTVISCOUS
+	case "Paint":
+		return LTPAINT
+	case "DispenseAboveLiquid":
+		return LTDISPENSEABOVE
+	case "PEG":
+		return LTPEG
+	case "Protoplasts":
+		return LTProtoplasts
+	case "dna_mix":
+		return LTDNAMIX
+	case "plateout":
+		return LTPLATEOUT
+	case "colony":
+		return LTCOLONY
+	default:
+		return LTWater
+	}
+
 	return LTWater
 }
 
 func LiquidTypeName(lt LiquidType) string {
 
-	if lt > 99 {
-		return "DOE_run" + strconv.Itoa(int(lt)-100)
+	match, str := liquidtype.StringFromLiquidTypeNumber(int(lt))
+	if match {
+		return str
 	}
 
 	switch lt {
@@ -131,8 +132,12 @@ func LiquidTypeName(lt LiquidType) string {
 		return "PEG"
 	case LTDNAMIX:
 		return "dna_mix"
+	case LTPLATEOUT:
+		return "plateout"
+	case LTCOLONY:
+		return "colony"
 	default:
-		return "water"
+		return "nil"
 	}
 }
 

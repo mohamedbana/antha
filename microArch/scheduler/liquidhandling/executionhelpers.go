@@ -204,7 +204,7 @@ func merge_transfers(insIn []driver.RobotInstruction, aggregates [][]int) []driv
 	return ret
 }
 
-func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) (insOut *driver.TransferInstruction, err error) {
+func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties, carryvol wunit.Volume) (insOut *driver.TransferInstruction, err error) {
 	cmps := insIn.Components
 
 	lenToMake := len(insIn.Components)
@@ -219,7 +219,7 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) 
 
 	// six parameters applying to the source
 
-	fromPlateID, fromWells, err := robot.GetComponents(cmps)
+	fromPlateID, fromWells, err := robot.GetComponents(cmps, carryvol)
 
 	if err != nil {
 		return nil, err
@@ -251,8 +251,30 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) 
 		// get dem big ole plates out
 		// TODO -- pass them in instead of all this nonsense
 
-		flhp := robot.PlateLookup[fromPlateID[ix]].(*wtype.LHPlate)
-		tlhp := robot.PlateLookup[insIn.PlateID].(*wtype.LHPlate)
+		var flhp, tlhp *wtype.LHPlate
+
+		flhif := robot.PlateLookup[fromPlateID[ix]]
+
+		if flhif != nil {
+			flhp = flhif.(*wtype.LHPlate)
+		} else {
+			//logger.Fatal("NO SRC PLATE FOUND : ", ix, " ", fromPlateID[ix])
+			s := fmt.Sprint("NO SRC PLATE FOUND : ", ix, " ", fromPlateID[ix])
+			err := wtype.LHError(wtype.LH_ERR_DIRE, s)
+
+			return nil, err
+		}
+
+		tlhif := robot.PlateLookup[insIn.PlateID()]
+
+		if tlhif != nil {
+			tlhp = tlhif.(*wtype.LHPlate)
+		} else {
+			s := fmt.Sprint("NO DST PLATE FOUND : ", ix, " ", insIn.PlateID())
+			err := wtype.LHError(wtype.LH_ERR_DIRE, s)
+
+			return nil, err
+		}
 
 		wlt, ok := tlhp.WellAtString(insIn.Welladdress)
 
@@ -265,7 +287,7 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) 
 		vt[ix] = wlt.CurrVolume()
 		wh[ix] = v.TypeName()
 		va[ix] = v2
-		pt[ix] = robot.PlateIDLookup[insIn.PlateID]
+		pt[ix] = robot.PlateIDLookup[insIn.PlateID()]
 		wt[ix] = insIn.Welladdress
 		ptwx[ix] = tlhp.WellsX()
 		ptwy[ix] = tlhp.WellsY()

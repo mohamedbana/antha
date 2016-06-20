@@ -27,13 +27,16 @@ func _RestrictionDigestion_concSetup(_ctx context.Context, _input *RestrictionDi
 // The core process for this protocol, with the steps to be performed
 // for every input
 func _RestrictionDigestion_concSteps(_ctx context.Context, _input *RestrictionDigestion_concInput, _output *RestrictionDigestion_concOutput) {
+
+	statii := make([]string, 0)
+
 	samples := make([]*wtype.LHComponent, 0)
 	waterSample := mixer.SampleForTotalVolume(_input.Water, _input.ReactionVolume)
 	samples = append(samples, waterSample)
 
 	// workout volume of buffer to add in SI units
 	BufferVol := wunit.NewVolume(float64(_input.ReactionVolume.SIValue()/float64(_input.BufferConcX)), "l")
-	fmt.Println("HELLLLLOOOOOO:", _input.ReactionVolume.SIValue(), _input.BufferConcX, float64(_input.ReactionVolume.SIValue()/float64(_input.BufferConcX)), BufferVol.SIValue())
+	statii = append(statii, fmt.Sprintln("buffer volume conversion:", _input.ReactionVolume.SIValue(), _input.BufferConcX, float64(_input.ReactionVolume.SIValue()/float64(_input.BufferConcX)), " Buffervol = ", BufferVol.SIValue()))
 	bufferSample := mixer.Sample(_input.Buffer, BufferVol)
 	samples = append(samples, bufferSample)
 
@@ -45,9 +48,9 @@ func _RestrictionDigestion_concSteps(_ctx context.Context, _input *RestrictionDi
 	_input.DNASolution.CName = _input.DNAName
 
 	// work out necessary volume to add
-	DNAVol := wunit.NewVolume(float64((_input.DNAMassperReaction.SIValue() / _input.DNAConc.SIValue())), "l")
-	fmt.Println("HELLLLLOOOOOO Again:", _input.DNAMassperReaction.SIValue(), _input.DNAConc.SIValue(), float64((_input.DNAMassperReaction.SIValue() / _input.DNAConc.SIValue())), DNAVol.SIValue())
-	text.Print("DNAVOL", DNAVol.ToString())
+	DNAVol := wunit.VolumeForTargetMass(_input.DNAMassperReaction, _input.DNAConc) //NewVolume(float64((DNAMassperReaction.SIValue()/DNAConc.SIValue())),"l")
+	statii = append(statii, fmt.Sprintln("DNA MAss to Volume conversion:", _input.DNAMassperReaction.SIValue(), _input.DNAConc.SIValue(), float64((_input.DNAMassperReaction.SIValue()/_input.DNAConc.SIValue())), "DNAVol =", DNAVol.SIValue()))
+	statii = append(statii, fmt.Sprintln("DNAVOL", DNAVol.ToString()))
 	dnaSample := mixer.Sample(_input.DNASolution, DNAVol)
 	samples = append(samples, dnaSample)
 
@@ -64,8 +67,8 @@ func _RestrictionDigestion_concSteps(_ctx context.Context, _input *RestrictionDi
 
 		var enzvoltoadd wunit.Volume
 
-		if enzvoltoaddinul < 1 {
-			enzvoltoadd = wunit.NewVolume(float64(1), "ul")
+		if float64(enzvoltoaddinul) < 0.5 {
+			enzvoltoadd = wunit.NewVolume(float64(0.5), "ul")
 		} else {
 			enzvoltoadd = wunit.NewVolume(float64(enzvoltoaddinul), "ul")
 		}
@@ -165,10 +168,12 @@ type RestrictionDigestion_concInput struct {
 
 type RestrictionDigestion_concOutput struct {
 	Reaction *wtype.LHComponent
+	Status   string
 }
 
 type RestrictionDigestion_concSOutput struct {
 	Data struct {
+		Status string
 	}
 	Outputs struct {
 		Reaction *wtype.LHComponent
@@ -204,6 +209,7 @@ func init() {
 				{Name: "StockReConcinUperml", Desc: "", Kind: "Parameters"},
 				{Name: "Water", Desc: "", Kind: "Inputs"},
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
+				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
 	})

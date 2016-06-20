@@ -42,7 +42,7 @@ import (
 	"time"
 
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
-	"github.com/antha-lang/antha/internal/golang.org/x/net/trace"
+	"golang.org/x/net/trace"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/credentials"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/grpclog"
 	"github.com/antha-lang/antha/bvendor/google.golang.org/grpc/transport"

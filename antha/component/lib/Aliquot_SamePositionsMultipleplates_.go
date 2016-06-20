@@ -1,3 +1,4 @@
+// example protocol showing how the MixTo command can be used to specify different plates of the same type  i.e. plate 1 ,2, 3 of type greiner384
 package lib
 
 import (
@@ -10,6 +11,9 @@ import (
 )
 
 // Input parameters for this protocol (data)
+
+// positions on each plate to add aliquots
+// number of plates to fill aliquots into
 
 // Data which is returned from this protocol, and data types
 
@@ -32,14 +36,29 @@ func _Aliquot_SamePositionsMultipleplatesSteps(_ctx context.Context, _input *Ali
 
 	aliquots := make([]*wtype.LHComponent, 0)
 
-	for i := 1; i < _input.NumberofPlates+1; i++ {
+	// this time round we're going to change the platenumber with each loop until we reach NumberofPlates specified in parameters
+	// note that we're starting counting from 1 instead of zero since a platenumber of 0 is an invalid entry into MixTo
+	// to ensure we reach the correct number or plates to aliquot to we also therefore need to change the evaluation condition to platenumber < (NumberofPlates +1) rather than platenumber < NumberofPlates
+	// alternatively we could have changed the evaluation condition to platenumber <= NumberofPlates
+	for platenumber := 1; platenumber < (_input.NumberofPlates + 1); platenumber++ {
 
+		// for each plate we will aliquot to every position specified in the parameters
+		// this introduces an alternative syntax for looping through an array using the range keyword
+		// a position in the slice Positions can alternatively be accessed with the range command by
+		// (i) using the index of which position is required, e.g. Positions[0],Positions[1],Positions[i]
+		// using the range syntax this would look like this:
+		// for i := range Positions {
+		// aliquot := MixTo(OutPlate,Positions[i],platenumber,aliqiotSample)
+		// }
+		// in that case i starts at 0 and increases by 1 with each loop finishing at len(Positions)
+		//(ii) the method as shown below where we use a temporary variable name position for each value of the slice and ignore the index by using the underscore _,
 		for _, position := range _input.Positions {
 			if _input.Solution.TypeName() == "dna" {
 				_input.Solution.Type = wtype.LTDoNotMix
 			}
 			aliquotSample := mixer.Sample(_input.Solution, _input.VolumePerAliquot)
-			aliquot := execute.MixTo(_ctx, _input.OutPlate, position, i, aliquotSample)
+			// position and platenumber are termporary variables filled in and updated per loop
+			aliquot := execute.MixTo(_ctx, _input.OutPlate, position, platenumber, aliquotSample)
 			aliquots = append(aliquots, aliquot)
 		}
 	}
@@ -129,12 +148,12 @@ func init() {
 	addComponent(Component{Name: "Aliquot_SamePositionsMultipleplates",
 		Constructor: Aliquot_SamePositionsMultipleplatesNew,
 		Desc: ComponentDesc{
-			Desc: "",
-			Path: "antha/component/an/Liquid_handling/Aliquot/AliquotTo_samepositionmultipleplates.an",
+			Desc: "example protocol showing how the MixTo command can be used to specify different plates of the same type  i.e. plate 1 ,2, 3 of type greiner384\n",
+			Path: "antha/component/an/AnthaAcademy/Lesson2_mix/D_AliquotTo_samepositionmultipleplates.an",
 			Params: []ParamDesc{
-				{Name: "NumberofPlates", Desc: "", Kind: "Parameters"},
+				{Name: "NumberofPlates", Desc: "number of plates to fill aliquots into\n", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Parameters"},
-				{Name: "Positions", Desc: "", Kind: "Parameters"},
+				{Name: "Positions", Desc: "positions on each plate to add aliquots\n", Kind: "Parameters"},
 				{Name: "Solution", Desc: "", Kind: "Inputs"},
 				{Name: "SolutionVolume", Desc: "", Kind: "Parameters"},
 				{Name: "VolumePerAliquot", Desc: "", Kind: "Parameters"},

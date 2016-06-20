@@ -54,7 +54,7 @@ var (
 			"Height":             0.0575,
 		},
 		"InhecoStaticOnDeck": map[string]float64{
-			"Height": 0.0575, //shaking amplitude diameter in m
+			"Height": 0.0575, // height in m
 
 		},
 	}

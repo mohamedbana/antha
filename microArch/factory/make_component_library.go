@@ -36,7 +36,6 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	cmap := make(map[string]*wtype.LHComponent)
 
 	A := wtype.NewLHComponent()
-	//	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "water"
 	A.Type = wtype.LTWater
 	A.Smax = 9999
@@ -62,7 +61,6 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "ethanol"
 	A.Type = wtype.LTWater
 	A.Smax = 9999
@@ -93,6 +91,13 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "neb5compcells"
 	A.Type = wtype.LTCulture
+	A.Smax = 1.0
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	//A.GenericMatter = matter[wtype.LTWater]
+	A.CName = "mediaonculture"
+	A.Type = wtype.LTNeedToMix
 	A.Smax = 1.0
 	cmap[A.CName] = A
 
@@ -139,7 +144,6 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
-	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "tartrazine"
 	A.Type = wtype.LTWater
 	A.Smax = 9999
@@ -163,6 +167,13 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "Magenta"
 	A.Type = wtype.LTPAINT
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	//A.GenericMatter = matter[wtype.LTWater]
+	A.CName = "transparent"
+	A.Type = wtype.LTWater
 	A.Smax = 9999
 	cmap[A.CName] = A
 

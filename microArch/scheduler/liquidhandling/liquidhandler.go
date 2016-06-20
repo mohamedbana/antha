@@ -130,7 +130,7 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 	var d time.Duration
 
 	for _, ins := range instructions {
-		//		logger.Debug(fmt.Sprintln(liquidhandling.InsToString(ins)))
+		//logger.Debug(fmt.Sprintln(liquidhandling.InsToString(ins)))
 		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(this.Properties.Driver)
 
 		if timer != nil {
@@ -185,8 +185,9 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 				}
 				//v.Add(ins.Volume[i])
 
-				vols := ins.GetParameter("VOLUME").([]wunit.Volume)
-				v.Add(vols[i])
+				insvols := ins.GetParameter("VOLUME").([]wunit.Volume)
+				v.Add(insvols[i])
+				v.Add(rq.CarryVolume)
 			}
 		}
 	}
@@ -203,9 +204,11 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 
 		for crd, vol := range wellmap {
 			well := plate.Wellcoords[crd]
-			vol.Add(well.ResidualVolume())
-			well.WContents.SetVolume(vol)
-			well.DeclareNotTemporary()
+			if well.IsAutoallocated() {
+				vol.Add(well.ResidualVolume())
+				well.WContents.SetVolume(vol)
+				well.DeclareNotTemporary()
+			}
 		}
 	}
 
@@ -466,25 +469,6 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) (*LHRequest, error) {
 	}
 
 	(*request).Input_solutions = requestinputs
-
-	// finally we have to add a waste if there isn't one already
-	/// ??? This should not be here
-	// work out if we need to empty soon
-
-	s := this.Properties.TipWastesMounted()
-
-	if s == 0 {
-		var waste *wtype.LHTipwaste
-		// this should be added to the automagic config setup... however it will require adding to the
-		// representation of the liquid handler
-		if this.Properties.Model == "Pipetmax" {
-			waste = factory.GetTipwasteByType("Gilsontipwaste")
-		} else { //if this.Properties.Model == "GeneTheatre" { //TODO handle general case differently
-			waste = factory.GetTipwasteByType("CyBiotipwaste")
-		}
-
-		this.Properties.AddTipWaste(waste)
-	}
 
 	return request, nil
 }

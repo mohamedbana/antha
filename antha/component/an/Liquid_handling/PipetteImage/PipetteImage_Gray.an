@@ -7,7 +7,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"fmt"
-	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
+	"github.com/disintegration/imaging"
 	)
 
 
@@ -27,6 +27,7 @@ Parameters (
 	PosterizeImage bool
 	PosterizeLevels int
 	DontMix bool
+	CheckResizeAlgorithms bool
 )
 
 // Data which is returned from this protocol, and data types
@@ -77,8 +78,10 @@ Steps {
 	
 	chosencolourpalette := image.AvailablePalettes["Gray"]
 	
-	
+	if CheckResizeAlgorithms {
 	image.CheckAllResizealgorithms(Imagefilename,OutPlate,Rotate,imaging.AllResampleFilters)
+	}
+	
 	
 	positiontocolourmap, _, newimagename := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate,AutoRotate) 
 	

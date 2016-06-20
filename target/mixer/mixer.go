@@ -230,9 +230,9 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 	r.LHRequest.BlockID = getId(mixes)
 
 	for _, mix := range mixes {
-		if len(mix.Platetype) != 0 && !hasPlate(r.LHRequest.Output_platetypes, mix.Platetype, mix.PlateID) {
+		if len(mix.Platetype) != 0 && !hasPlate(r.LHRequest.Output_platetypes, mix.Platetype, mix.PlateID()) {
 			p := factory.GetPlateByType(mix.Platetype)
-			p.ID = mix.PlateID
+			p.ID = mix.PlateID()
 			r.LHRequest.Output_platetypes = append(r.LHRequest.Output_platetypes, p)
 		}
 		r.LHRequest.Add_instruction(mix)
@@ -251,7 +251,10 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 		}
 	}
 
-	tarball, err := a.saveFile("input")
+	// TODO: Desired filename not exposed in current driver interface, so pick
+	// a name. So far, at least Gilson software cares what the filename is, so
+	// use .sqlite for compatibility
+	tarball, err := a.saveFile("input.sqlite")
 	if err != nil {
 		return nil, err
 	}

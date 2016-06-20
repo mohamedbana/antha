@@ -6,6 +6,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
+	"github.com/disintegration/imaging"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/microArch/factory"
 	"fmt"
@@ -26,6 +27,7 @@ Parameters (
 	Subset bool
 	UseLiquidClass string
 	Subsetnames []string
+	CheckResizeAlgorithms bool
 
 )
 
@@ -69,6 +71,10 @@ Steps {
 		chosencolourpalette = image.AvailablePalettes[Palettename]
 	}
 	
+	
+	if CheckResizeAlgorithms {
+		image.CheckAllResizealgorithms(Imagefilename,OutPlate,Rotate,imaging.AllResampleFilters)
+	}
 	// resize image to fit dimensions of plate and change each pixel to match closest colour from chosen palette
 	// the output of this is a map of well positions to colours needed
 	positiontocolourmap, _,_ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette,Rotate,AutoRotate) 
@@ -138,7 +144,7 @@ Steps {
 			}
 			
 		}else{
-			if component.CName !=Notthiscolour{
+			if component.CName !=Notthiscolour && component.CName != "transparent"{
 				
 			UniqueComponents = append(UniqueComponents,component.CName)
 			

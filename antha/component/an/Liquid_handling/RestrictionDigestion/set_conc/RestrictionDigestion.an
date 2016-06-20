@@ -24,7 +24,7 @@ Parameters (
 	ReactionTime 				Time
 	InactivationTemp 			Temperature
 	InactivationTime 			Time
-	Platenumber int
+	Platenumber 				int
 )
 
 // Physical Inputs to this protocol with types
@@ -47,6 +47,7 @@ Outputs (
 
 // Data which is returned from this protocol, and data types
 Data (
+	Status string
 )
 
 Requirements {}
@@ -57,13 +58,17 @@ Setup {}
 // The core process for this protocol, with the steps to be performed
 // for every input
 Steps {
+	
+	statii := make([]string,0)
+	
+	
 	samples := make([]*wtype.LHComponent, 0)
 	waterSample := mixer.SampleForTotalVolume(Water, ReactionVolume)
 	samples = append(samples, waterSample)
 
 	// workout volume of buffer to add in SI units
 	BufferVol := wunit.NewVolume(float64(ReactionVolume.SIValue()/float64(BufferConcX)),"l")	
-	fmt.Println("HELLLLLOOOOOO:",ReactionVolume.SIValue(),BufferConcX, float64(ReactionVolume.SIValue()/float64(BufferConcX)),BufferVol.SIValue())
+	statii = append(statii,fmt.Sprintln("buffer volume conversion:",ReactionVolume.SIValue(),BufferConcX, float64(ReactionVolume.SIValue()/float64(BufferConcX)), " Buffervol = ", BufferVol.SIValue()))
 	bufferSample := mixer.Sample(Buffer, BufferVol)
 	samples = append(samples, bufferSample)
 
@@ -74,9 +79,9 @@ Steps {
 	DNASolution.CName = DNAName
 	
 	// work out necessary volume to add
-	DNAVol := wunit.NewVolume(float64((DNAMassperReaction.SIValue()/DNAConc.SIValue())),"l")
-	fmt.Println("HELLLLLOOOOOO Again:", DNAMassperReaction.SIValue(),DNAConc.SIValue(),float64((DNAMassperReaction.SIValue()/DNAConc.SIValue())),DNAVol.SIValue())
-	text.Print("DNAVOL",DNAVol.ToString())
+	DNAVol := wunit.VolumeForTargetMass(DNAMassperReaction,DNAConc) //NewVolume(float64((DNAMassperReaction.SIValue()/DNAConc.SIValue())),"l")
+	statii = append(statii,fmt.Sprintln("DNA MAss to Volume conversion:", DNAMassperReaction.SIValue(),DNAConc.SIValue(),float64((DNAMassperReaction.SIValue()/DNAConc.SIValue())), "DNAVol =",DNAVol.SIValue()))
+	statii = append(statii,fmt.Sprintln("DNAVOL",DNAVol.ToString()))
 	dnaSample := mixer.Sample(DNASolution, DNAVol)
 	samples = append(samples, dnaSample)
 
@@ -93,8 +98,8 @@ Steps {
 		
 		var enzvoltoadd Volume
 		
-		if enzvoltoaddinul < 1 {
-			enzvoltoadd = wunit.NewVolume(float64(1),"ul")
+		if float64(enzvoltoaddinul) < 0.5 {
+			enzvoltoadd = wunit.NewVolume(float64(0.5),"ul")
 			}else {
 				enzvoltoadd = wunit.NewVolume(float64(enzvoltoaddinul),"ul")
 				}

@@ -29,7 +29,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	//"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"github.com/antha-lang/antha/internal/github.com/jlaffaye/ftp"
+	"github.com/jlaffaye/ftp"
 	"io"
 	//"io/ioutil"
 	"log"

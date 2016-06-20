@@ -68,7 +68,6 @@ func solution_setup(request *LHRequest, prms *liquidhandling.LHProperties) (map[
 			// what sort of component is it?
 			conc := component.Conc
 			tvol := component.Tvol
-
 			if conc != 0.0 {
 				arrCncs = append(arrCncs, component)
 			} else if tvol != 0.0 {

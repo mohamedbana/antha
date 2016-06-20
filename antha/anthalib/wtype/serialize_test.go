@@ -28,7 +28,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/antha-lang/antha/internal/github.com/kylelemons/godebug/pretty"
+	"github.com/kylelemons/godebug/pretty"
 )
 
 func TestDeserializeLHSolution(t *testing.T) {

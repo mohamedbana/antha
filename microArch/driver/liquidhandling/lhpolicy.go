@@ -258,7 +258,6 @@ func (lhvc LHVariableCondition) IsEqualTo(other LHVariableCondition) bool {
 }
 
 func (lhvc LHVariableCondition) Check(ins RobotInstruction) bool {
-	////logger.Debug(fmt.Sprintln("TESTING VARIABLE: ", lhvc.TestVariable))
 	v := ins.GetParameter(lhvc.TestVariable)
 	return lhvc.Condition.Match(v)
 }
@@ -444,11 +443,11 @@ func (lhnc LHNumericCondition) Match(v interface{}) bool {
 		}
 		return true
 
-	case []*wunit.Volume:
+	case []wunit.Volume:
 		//true iff all values are within range
 		// these are simple rules but could need refinement
-		for _, f := range v.([]*wunit.Volume) {
-			if f == nil {
+		for _, f := range v.([]wunit.Volume) {
+			if f.IsZero() {
 				return true
 			}
 			if !lhnc.Match(f.RawValue()) {

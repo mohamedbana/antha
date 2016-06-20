@@ -111,6 +111,7 @@ type AliquotElement struct {
 
 type AliquotInput struct {
 	NumberofAliquots int
+	OutPlate         *wtype.LHPlate
 	OutPlatetype     string
 	Solution         *wtype.LHComponent
 	SolutionVolume   wunit.Volume
@@ -137,6 +138,7 @@ func init() {
 			Path: "antha/component/an/Liquid_handling/Aliquot/Aliquot.an",
 			Params: []ParamDesc{
 				{Name: "NumberofAliquots", Desc: "", Kind: "Parameters"},
+				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "OutPlatetype", Desc: "", Kind: "Parameters"},
 				{Name: "Solution", Desc: "", Kind: "Inputs"},
 				{Name: "SolutionVolume", Desc: "", Kind: "Parameters"},

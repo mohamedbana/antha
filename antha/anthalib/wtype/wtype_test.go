@@ -78,6 +78,50 @@ func TestWellCoords(*testing.T) {
 }
 */
 
+func TestWellCoords(t *testing.T) {
+	wc := MakeWellCoordsA1("A1")
+
+	if wc.X != 0 || wc.Y != 0 {
+		t.Fatal(fmt.Sprint("Well Coords A1 expected {0,0} got ", wc))
+	}
+
+	if wc.FormatA1() != "A1" {
+		t.Fatal(fmt.Sprint("Well coords A1 expected formatA1 to return A1, instead got ", wc.FormatA1()))
+	}
+
+	if wc.Format1A() != "1A" {
+		t.Fatal(fmt.Sprint("Well coords A1 expected format1A to return 1A, instead got ", wc.FormatA1()))
+	}
+
+	wc = MakeWellCoords1A("1A")
+	if wc.X != 0 || wc.Y != 0 {
+		t.Fatal(fmt.Sprint("Well Coords 1A expected {0,0} got ", wc))
+	}
+
+	wc = MakeWellCoordsA1("AA1")
+
+	if wc.X != 0 || wc.Y != 26 {
+		t.Fatal(fmt.Sprint("Well Coords AA1 expected {0,26} got ", wc))
+	}
+
+	wc = MakeWellCoords1A("1AA")
+	if wc.X != 0 || wc.Y != 26 {
+		t.Fatal(fmt.Sprint("Well Coords 1AA expected {0,26} got ", wc))
+	}
+
+	wc = MakeWellCoordsA1("AAA1")
+
+	if wc.X != 0 || wc.Y != 702 {
+		t.Fatal(fmt.Sprint("Well Coords AAA1 expected {0,702} got ", wc))
+	}
+
+	wc = MakeWellCoords1A("1AAA")
+	if wc.X != 0 || wc.Y != 702 {
+		t.Fatal(fmt.Sprint("Well Coords AAA1 expected {0,702} got ", wc))
+	}
+
+}
+
 func TestLHComponentSampleStuff(t *testing.T) {
 	var c LHComponent
 
@@ -164,7 +208,7 @@ type testpair struct {
 	ltint    int
 }
 
-var lts []testpair = []testpair{testpair{ltstring: "DOE_run2", ltint: 102}, testpair{ltstring: "DOE_run0", ltint: 100}}
+var lts []testpair = []testpair{testpair{ltstring: "170516CCFDesign_noTouchoff_noBlowout2", ltint: 102}, testpair{ltstring: "190516OnePolicy0", ltint: 3000}, testpair{ltstring: "dna_mix", ltint: LTDNAMIX}}
 
 func TestLiquidTypeFromString(t *testing.T) {
 

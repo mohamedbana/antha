@@ -21,7 +21,6 @@
 // 2 Royal College St, London NW1 0NH UK
 
 // Package for interacting with the iGem registry
-
 package igem
 
 import (

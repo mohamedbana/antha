@@ -11,7 +11,7 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
-	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
+	"github.com/disintegration/imaging"
 )
 
 // Input parameters for this protocol (data)
@@ -52,7 +52,9 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 
 	chosencolourpalette := image.AvailablePalettes["Gray"]
 
-	image.CheckAllResizealgorithms(_input.Imagefilename, _input.OutPlate, _input.Rotate, imaging.AllResampleFilters)
+	if _input.CheckResizeAlgorithms {
+		image.CheckAllResizealgorithms(_input.Imagefilename, _input.OutPlate, _input.Rotate, imaging.AllResampleFilters)
+	}
 
 	positiontocolourmap, _, newimagename := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
 
@@ -235,6 +237,7 @@ type PipetteImage_GrayElement struct {
 type PipetteImage_GrayInput struct {
 	AutoRotate                      bool
 	Black                           *wtype.LHComponent
+	CheckResizeAlgorithms           bool
 	Diluent                         *wtype.LHComponent
 	DontMix                         bool
 	Imagefilename                   string
@@ -283,6 +286,7 @@ func init() {
 			Params: []ParamDesc{
 				{Name: "AutoRotate", Desc: "", Kind: "Parameters"},
 				{Name: "Black", Desc: "", Kind: "Inputs"},
+				{Name: "CheckResizeAlgorithms", Desc: "", Kind: "Parameters"},
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "DontMix", Desc: "", Kind: "Parameters"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},

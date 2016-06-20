@@ -13,6 +13,7 @@ import (
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/microArch/factory"
+	"github.com/disintegration/imaging"
 	"image/color"
 )
 
@@ -46,6 +47,9 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 		chosencolourpalette = image.AvailablePalettes[_input.Palettename]
 	}
 
+	if _input.CheckResizeAlgorithms {
+		image.CheckAllResizealgorithms(_input.Imagefilename, _input.OutPlate, _input.Rotate, imaging.AllResampleFilters)
+	}
 	// resize image to fit dimensions of plate and change each pixel to match closest colour from chosen palette
 	// the output of this is a map of well positions to colours needed
 	positiontocolourmap, _, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
@@ -114,7 +118,7 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 			}
 
 		} else {
-			if component.CName != _input.Notthiscolour {
+			if component.CName != _input.Notthiscolour && component.CName != "transparent" {
 
 				_output.UniqueComponents = append(_output.UniqueComponents, component.CName)
 
@@ -200,18 +204,19 @@ type PipetteImageElement struct {
 }
 
 type PipetteImageInput struct {
-	AutoRotate     bool
-	Imagefilename  string
-	Notthiscolour  string
-	OnlythisColour string
-	OutPlate       *wtype.LHPlate
-	Palettename    string
-	Rotate         bool
-	Subset         bool
-	Subsetnames    []string
-	UVimage        bool
-	UseLiquidClass string
-	VolumePerWell  wunit.Volume
+	AutoRotate            bool
+	CheckResizeAlgorithms bool
+	Imagefilename         string
+	Notthiscolour         string
+	OnlythisColour        string
+	OutPlate              *wtype.LHPlate
+	Palettename           string
+	Rotate                bool
+	Subset                bool
+	Subsetnames           []string
+	UVimage               bool
+	UseLiquidClass        string
+	VolumePerWell         wunit.Volume
 }
 
 type PipetteImageOutput struct {
@@ -238,6 +243,7 @@ func init() {
 			Path: "antha/component/an/Liquid_handling/PipetteImage/PipetteImage.an",
 			Params: []ParamDesc{
 				{Name: "AutoRotate", Desc: "", Kind: "Parameters"},
+				{Name: "CheckResizeAlgorithms", Desc: "", Kind: "Parameters"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
 				{Name: "Notthiscolour", Desc: "", Kind: "Parameters"},
 				{Name: "OnlythisColour", Desc: "", Kind: "Parameters"},

@@ -182,7 +182,7 @@ func (w *LHWell) Remove(v wunit.Volume) *LHComponent {
 	// if the volume is too high we complain
 
 	if v.GreaterThan(w.CurrentVolume()) {
-		logger.Debug("You ask too much: ", w.Crds, v.ToString())
+		logger.Debug("You ask too much: ", w.Crds, " ", v.ToString(), " I only have: ", w.CurrentVolume().ToString(), " PLATEID: ", w.Plateid)
 		return nil
 	}
 
@@ -409,6 +409,48 @@ func (well *LHWell) IsTemporary() bool {
 		return true
 	} else {
 		logger.Debug("Warning: Attempt to access nil well in DeclareTemporary()")
+	}
+	return false
+}
+
+func (well *LHWell) DeclareAutoallocated() {
+	if well != nil {
+
+		if well.Extra == nil {
+			well.Extra = make(map[string]interface{})
+		}
+
+		well.Extra["autoallocated"] = true
+	} else {
+		logger.Debug("Warning: Attempt to access nil well in DeclareAutoallocated()")
+	}
+}
+
+func (well *LHWell) DeclareNotAutoallocated() {
+	if well != nil {
+		if well.Extra == nil {
+			well.Extra = make(map[string]interface{})
+		}
+		well.Extra["autoallocated"] = false
+	} else {
+		logger.Debug("Warning: Attempt to access nil well in DeclareNotAutoallocated()")
+	}
+}
+
+func (well *LHWell) IsAutoallocated() bool {
+	if well != nil {
+		if well.Extra == nil {
+			return false
+		}
+
+		t, ok := well.Extra["autoallocated"]
+
+		if !ok || !t.(bool) {
+			return false
+		}
+		return true
+	} else {
+		logger.Debug("Warning: Attempt to access nil well in IsAutoallocated()")
 	}
 	return false
 }

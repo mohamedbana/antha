@@ -31,7 +31,7 @@ import (
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/blast"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	. "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
+	. "github.com/biogo/ncbi/blast"
 )
 
 // the following are all physical things; we need a way to separate
