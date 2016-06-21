@@ -16,14 +16,14 @@ pre-build operating system images on your own machine.
   2. Follow the docker instructions to start the docker server on your machine
   3. Run the antha docker image
   ```sh
-docker run -it anthalang/antha
+docker run -it antha/antha
   ```
   4. Inside the antha docker image, you can follow the instructions below
      for making and running antha elements
 
 By default, when you run the antha image again, you will get a new machine
 instance and any changes you made in previously will not be available. If you want
-to persist changes you make to antha elements you can mount directories on your
+to persist changes you make to antha elements, you can mount directories on your
 host machine inside docker instances.
 
 For example,
@@ -34,7 +34,7 @@ git clone https://github.com/antha-lang/antha
   2. Run the antha docker image and mount your host directory to a directory
      inside the docker instance.
   ```sh
-docker run -it -v `pwd`/antha:/go/src/github.com/antha-lang/antha 
+docker run -it -v `pwd`/antha:/go/src/github.com/antha-lang/antha antha/antha
   ```
 Now, any changes you make to antha on your host machine will be available
 within the docker instance.
