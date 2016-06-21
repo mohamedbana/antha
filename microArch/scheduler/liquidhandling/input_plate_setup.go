@@ -193,14 +193,14 @@ func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 				location := curr_plate.ID + ":" + curr_well.Crds
 				ass = append(ass, location)
 
-				// make a duplicate of this component to stick in the well
-				// wait wait wait is this right?
 				newcomponent := component.Dup()
+				// sort out parent issue
+				// first we don't allow these to have the same ID
+				newcomponent.ID = wtype.GetUUID()
+				// second we add a parent
+				newcomponent.AddParent(component.ID)
 				newcomponent.Vol = curr_well.MaxVol
 				volume.Subtract(curr_well.WorkingVolume())
-
-				fmt.Println("ADDING component ", component.CName, " to ", location)
-
 				curr_well.Add(newcomponent)
 				input_plates[curr_plate.ID] = curr_plate
 			}
