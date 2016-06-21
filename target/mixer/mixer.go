@@ -146,7 +146,7 @@ func (a *Mixer) makeLhreq() (*lhreq, error) {
 		}
 	}
 
-	err = req.ConfigureYourself()
+	err := req.ConfigureYourself()
 	if err != nil {
 		return nil, err
 	}
