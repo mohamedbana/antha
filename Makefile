@@ -1,3 +1,4 @@
+SHELL=/bin/bash
 ASL=antha/AnthaStandardLibrary/Packages
 
 all: gen_comp
