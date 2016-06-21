@@ -199,8 +199,6 @@ func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 				newcomponent.Vol = curr_well.MaxVol
 				volume.Subtract(curr_well.WorkingVolume())
 
-				fmt.Println("ADDING component ", component.CName, " to ", location)
-
 				curr_well.Add(newcomponent)
 				input_plates[curr_plate.ID] = curr_plate
 			}
