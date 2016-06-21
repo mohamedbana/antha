@@ -75,6 +75,7 @@ func TestPlateReuse(t *testing.T) {
 		ins.AddComponent(ws)
 		ins.AddComponent(mmxs)
 		ins.AddComponent(ps)
+		ins.AddProduct(GetComponentForTest("water", wunit.NewVolume(17.0, "ul")))
 		rq.Add_instruction(ins)
 	}
 
