@@ -1,0 +1,7 @@
+{
+    "processes": {
+        "AssemblyMMX": {
+            "component": "TypeIISConstructAssemblyMMX_forscreen"
+        }
+    }
+}
