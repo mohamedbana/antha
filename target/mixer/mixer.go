@@ -69,12 +69,15 @@ func (a *Mixer) makeLhreq() (*lhreq, error) {
 	}
 
 	req := planner.NewLHRequest()
-	pols, err := driver.GetLHPolicyForTest()
+	/*
+		-- moved to NewLHRequest, which is a better place for it
+		pols, err := driver.GetLHPolicyForTest()
 
-	if err != nil {
-		return nil, err
-	}
-	req.Policies = pols
+		if err != nil {
+			return nil, err
+		}
+		req.Policies = pols
+	*/
 
 	plan := planner.Init(&a.properties)
 

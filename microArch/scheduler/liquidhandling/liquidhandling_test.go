@@ -82,10 +82,45 @@ func TestPlateReuse(t *testing.T) {
 	rq.Input_platetypes = append(rq.Input_platetypes, GetPlateForTest())
 	rq.Output_platetypes = append(rq.Output_platetypes, GetPlateForTest())
 
+	fmt.Println("PLAN 1")
+	rq.ConfigureYourself()
 	err := lh.Plan(rq)
 
 	// this should test whether reuse is functioning
 
+	fmt.Println("PLAN 2")
+	instrx := rq.LHInstructions
+	// reset the request
+	rq = GetLHRequestForTest()
+
+	for _, ins := range instrx {
+		rq.Add_instruction(ins)
+	}
+
+	for _, plateid := range lh.Properties.PosLookup {
+		if plateid == "" {
+			continue
+		}
+		thing := lh.Properties.PlateLookup[plateid]
+
+		plate, ok := thing.(*wtype.LHPlate)
+		if !ok {
+			continue
+		}
+
+		// this should kill it
+
+		for _, v := range plate.HWells {
+			if !v.Empty() {
+				v.Remove(wunit.NewVolume(5.0, "ul"))
+			}
+		}
+
+		rq.Input_plates[plateid] = plate
+	}
+	rq.ConfigureYourself()
+
+	lh = GetLiquidHandlerForTest()
 	err = lh.Plan(rq)
 
 	if err != nil {

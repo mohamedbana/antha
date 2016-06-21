@@ -126,7 +126,6 @@ func (lhp *LHPlate) GetComponent(cmp *LHComponent, exact bool) ([]WellCoords, bo
 
 	for wc := it.Curr(); it.Valid(); wc = it.Next() {
 		w := lhp.Wellcoords[wc.FormatA1()]
-		//	logger.Debug(fmt.Sprint("WANT$$$: ", cmp.CName, " :: ", wc.FormatA1(), " ", w.Contents().CName))
 
 		/*
 			if !w.Empty() {
@@ -402,9 +401,11 @@ func ExportPlateCSV(outputpilename string, plate *LHPlate, platename string, wel
 
 		volstr := strconv.FormatFloat(volfloat, 'G', -1, 64)
 
-		fmt.Println("len(wells)", len(wells))
-		fmt.Println("len(liquids)", len(liquids))
-		fmt.Println("len(Volumes)", len(Volumes))
+		/*
+			fmt.Println("len(wells)", len(wells))
+			fmt.Println("len(liquids)", len(liquids))
+			fmt.Println("len(Volumes)", len(Volumes))
+		*/
 
 		record := []string{well, liquids[i].CName, liquids[i].TypeName(), volstr, Volumes[i].Unit().PrefixedSymbol()}
 		records = append(records, record)
