@@ -23,6 +23,10 @@
 package liquidhandling
 
 import (
+	"fmt"
+	"github.com/antha-lang/antha/antha/anthalib/mixer"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"math/rand"
 	"testing"
 )
@@ -52,4 +56,39 @@ func TestStockConcs(*testing.T) {
 	/*for k, v := range cncs {
 		logger.Debug(fmt.Sprintln(k, " ", minrequired[k], " ", maxrequired[k], " ", T[k], " ", v))
 	}*/
+}
+
+func TestPlateReuse(t *testing.T) {
+	lh := GetLiquidHandlerForTest()
+	rq := GetLHRequestForTest()
+
+	water := GetComponentForTest("water", wunit.NewVolume(100.0, "ul"))
+	mmx := GetComponentForTest("mastermix_sapI", wunit.NewVolume(100.0, "ul"))
+	part := GetComponentForTest("dna", wunit.NewVolume(50.0, "ul"))
+
+	for k := 0; k < 9; k++ {
+		ins := wtype.NewLHInstruction()
+		ws := mixer.Sample(water, wunit.NewVolume(8.0, "ul"))
+		mmxs := mixer.Sample(mmx, wunit.NewVolume(8.0, "ul"))
+		ps := mixer.Sample(part, wunit.NewVolume(1.0, "ul"))
+
+		ins.AddComponent(ws)
+		ins.AddComponent(mmxs)
+		ins.AddComponent(ps)
+		rq.Add_instruction(ins)
+	}
+
+	rq.Input_platetypes = append(rq.Input_platetypes, GetPlateForTest())
+	rq.Output_platetypes = append(rq.Output_platetypes, GetPlateForTest())
+
+	err := lh.Plan(rq)
+
+	// this should test whether reuse is functioning
+
+	err = lh.Plan(rq)
+
+	if err != nil {
+		t.Fatal(fmt.Sprint("Got error resimulating: ", err))
+	}
+
 }
