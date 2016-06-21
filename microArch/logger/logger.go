@@ -24,6 +24,8 @@ package logger
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"runtime"
 	"time"
 
@@ -98,7 +100,7 @@ func Data(data interface{}, extra ...interface{}) {
 
 var (
 	middlewares []LoggerMiddleware
-	_defaultmw  *DefaultMiddleware //only used if none other available
+	_defaultmw  LoggerMiddleware //only used if none other available
 )
 
 // Register all middleware before making any logger calls
@@ -110,7 +112,7 @@ func getMiddlewareList() []LoggerMiddleware {
 	//return the list or list with default inside if empty
 	if len(middlewares) == 0 {
 		if _defaultmw == nil {
-			_defaultmw = &DefaultMiddleware{}
+			_defaultmw = &LogMiddleware{log.New(os.Stdout, "", log.LstdFlags)}
 		}
 		return []LoggerMiddleware{_defaultmw}
 	}
