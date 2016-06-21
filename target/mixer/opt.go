@@ -23,11 +23,15 @@ type Opt struct {
 	InputPlateType       []string
 	OutputPlateType      []string
 	TipType              []string
+	PlanningVersion      *int
+
 	// Three methods of populating Opt.InputPlates
 	InputPlateFiles []string         // From filenames
 	InputPlateData  [][]byte         // From contents of files
 	InputPlates     []*wtype.LHPlate // Directly
-	PlanningVersion *int
+
+	// Driver specific position names (e.g., position_1 or A2) will be revised when multi-device is available
+	DriverSpecificTipPreferences []string
 }
 
 // Merge two configs together and return the result. Values in the argument
@@ -62,6 +66,9 @@ func (a Opt) Merge(x *Opt) Opt {
 	}
 	if len(x.InputPlates) != 0 {
 		a.InputPlates = x.InputPlates
+	}
+	if len(x.DriverSpecificTipPreferences) != 0 {
+		a.DriverSpecificTipPreferences = x.DriverSpecificTipPreferences
 	}
 	if x.PlanningVersion != nil {
 		a.PlanningVersion = x.PlanningVersion
