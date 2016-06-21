@@ -96,7 +96,7 @@ type FluorescenceMeasurementSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "FluorescenceMeasurement",
+	if err := addComponent(Component{Name: "FluorescenceMeasurement",
 		Constructor: FluorescenceMeasurementNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -110,5 +110,7 @@ func init() {
 				{Name: "FluorescenceMeasurement", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

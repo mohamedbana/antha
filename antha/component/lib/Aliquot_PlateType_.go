@@ -137,7 +137,7 @@ type Aliquot_PlateTypeSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Aliquot_PlateType",
+	if err := addComponent(Component{Name: "Aliquot_PlateType",
 		Constructor: Aliquot_PlateTypeNew,
 		Desc: ComponentDesc{
 			Desc: "example protocol showing The MixTo command which allows a specifc plate type to be specified. i.e. platetype pcrplate_skirted\n",
@@ -151,5 +151,7 @@ func init() {
 				{Name: "Aliquots", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

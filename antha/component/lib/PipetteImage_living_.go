@@ -272,7 +272,7 @@ type PipetteImage_livingSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PipetteImage_living",
+	if err := addComponent(Component{Name: "PipetteImage_living",
 		Constructor: PipetteImage_livingNew,
 		Desc: ComponentDesc{
 			Desc: "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of coloured bacteria\n",
@@ -295,5 +295,7 @@ func init() {
 				{Name: "UniqueComponents", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

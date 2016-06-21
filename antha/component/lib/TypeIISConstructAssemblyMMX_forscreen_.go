@@ -155,7 +155,7 @@ type TypeIISConstructAssemblyMMX_forscreenSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "TypeIISConstructAssemblyMMX_forscreen",
+	if err := addComponent(Component{Name: "TypeIISConstructAssemblyMMX_forscreen",
 		Constructor: TypeIISConstructAssemblyMMX_forscreenNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -181,5 +181,7 @@ func init() {
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

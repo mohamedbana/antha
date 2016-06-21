@@ -147,7 +147,7 @@ type SetupReactionsSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "SetupReactions",
+	if err := addComponent(Component{Name: "SetupReactions",
 		Constructor: SetupReactionsNew,
 		Desc: ComponentDesc{
 			Desc: "this protocol will set up a specified number of reactions one component at a time, i.e. in the following format:\nadd component 1 into reaction 1 location,\nadd component 1 into reaction 2 location,\nadd component 1 into reaction n location,\nadd component 2 into reaction 1 location,\nadd component 2 into reaction 2 location,\nadd component 2 into reaction n location,\nadd component x into reaction 1 location,\nadd component x into reaction 2 location,\nadd component x into reaction n location,\n",
@@ -165,5 +165,7 @@ func init() {
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

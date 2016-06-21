@@ -135,7 +135,7 @@ type PrimerDesign_coverfullsequenceSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PrimerDesign_coverfullsequence",
+	if err := addComponent(Component{Name: "PrimerDesign_coverfullsequence",
 		Constructor: PrimerDesign_coverfullsequenceNew,
 		Desc: ComponentDesc{
 			Desc: "This element will design primers to cover the full length of a sequence at the interval specified by the user (e.g. every 800 bp).\nDesign criteria such as maximum gc content, acceptable ranges of melting temperatures and primer length may be specified by the user.\n",
@@ -155,5 +155,7 @@ func init() {
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

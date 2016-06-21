@@ -133,7 +133,7 @@ type PartiallySequentialMixTestProtocolSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PartiallySequentialMixTestProtocol",
+	if err := addComponent(Component{Name: "PartiallySequentialMixTestProtocol",
 		Constructor: PartiallySequentialMixTestProtocolNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -155,5 +155,7 @@ func init() {
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

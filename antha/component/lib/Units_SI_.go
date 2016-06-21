@@ -113,7 +113,7 @@ type Units_SISOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Units_SI",
+	if err := addComponent(Component{Name: "Units_SI",
 		Constructor: Units_SINew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -126,5 +126,7 @@ func init() {
 				{Name: "SIMassUnit", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

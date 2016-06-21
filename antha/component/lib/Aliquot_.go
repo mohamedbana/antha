@@ -131,7 +131,7 @@ type AliquotSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Aliquot",
+	if err := addComponent(Component{Name: "Aliquot",
 		Constructor: AliquotNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -146,5 +146,7 @@ func init() {
 				{Name: "Aliquots", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

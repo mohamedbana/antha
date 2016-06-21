@@ -144,7 +144,7 @@ type NewDNASequence_fromLookupSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "NewDNASequence_fromLookup",
+	if err := addComponent(Component{Name: "NewDNASequence_fromLookup",
 		Constructor: NewDNASequence_fromLookupNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -159,5 +159,7 @@ func init() {
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

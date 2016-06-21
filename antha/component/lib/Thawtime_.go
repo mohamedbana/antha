@@ -156,7 +156,7 @@ type ThawtimeSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Thawtime",
+	if err := addComponent(Component{Name: "Thawtime",
 		Constructor: ThawtimeNew,
 		Desc: ComponentDesc{
 			Desc: "status = compiles and calculates; need to fill in correct parameters and check units\ncurrently using dummy values only so won't be accurate yet!\n",
@@ -174,5 +174,7 @@ func init() {
 				{Name: "Thawtimeused", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

@@ -137,7 +137,7 @@ type NewDNASequenceSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "NewDNASequence",
+	if err := addComponent(Component{Name: "NewDNASequence",
 		Constructor: NewDNASequenceNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -153,5 +153,7 @@ func init() {
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

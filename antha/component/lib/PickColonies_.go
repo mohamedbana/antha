@@ -141,7 +141,7 @@ type PickColoniesSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PickColonies",
+	if err := addComponent(Component{Name: "PickColonies",
 		Constructor: PickColoniesNew,
 		Desc: ComponentDesc{
 			Desc: "row\n",
@@ -155,5 +155,7 @@ func init() {
 				{Name: "ColoniesinRecoveryMedia", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

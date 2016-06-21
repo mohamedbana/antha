@@ -140,7 +140,7 @@ type SampleForTotalVolumeSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "SampleForTotalVolume",
+	if err := addComponent(Component{Name: "SampleForTotalVolume",
 		Constructor: SampleForTotalVolumeNew,
 		Desc: ComponentDesc{
 			Desc: "example protocol demonstrating the use of the SampleForTotalVolume function\n",
@@ -153,5 +153,7 @@ func init() {
 				{Name: "DilutedSample", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

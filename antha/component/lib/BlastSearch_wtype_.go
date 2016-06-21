@@ -155,7 +155,7 @@ type BlastSearch_wtypeSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "BlastSearch_wtype",
+	if err := addComponent(Component{Name: "BlastSearch_wtype",
 		Constructor: BlastSearch_wtypeNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -166,5 +166,7 @@ func init() {
 				{Name: "Hits", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

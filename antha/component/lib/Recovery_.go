@@ -119,7 +119,7 @@ type RecoverySOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Recovery",
+	if err := addComponent(Component{Name: "Recovery",
 		Constructor: RecoveryNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -134,5 +134,7 @@ func init() {
 				{Name: "RecoveredCells", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

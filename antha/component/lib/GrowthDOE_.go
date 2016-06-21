@@ -96,7 +96,7 @@ type GrowthDOESOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "GrowthDOE",
+	if err := addComponent(Component{Name: "GrowthDOE",
 		Constructor: GrowthDOENew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -109,5 +109,7 @@ func init() {
 				{Name: "Culture", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

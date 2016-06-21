@@ -143,7 +143,7 @@ type InoculateSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Inoculate",
+	if err := addComponent(Component{Name: "Inoculate",
 		Constructor: InoculateNew,
 		Desc: ComponentDesc{
 			Desc: "Example inoculation protocol.\nInoculates seed culture into fresh media (and logs conditions?)\nTODO: in progress from edited bradford protocol\n",
@@ -162,5 +162,7 @@ func init() {
 				{Name: "OD_at_inoculation", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

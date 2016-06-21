@@ -171,7 +171,7 @@ type TypeIISConstructAssembly_altSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "TypeIISConstructAssembly_alt",
+	if err := addComponent(Component{Name: "TypeIISConstructAssembly_alt",
 		Constructor: TypeIISConstructAssembly_altNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -203,5 +203,7 @@ func init() {
 				{Name: "S", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }
