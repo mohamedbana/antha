@@ -150,9 +150,6 @@ func set_output_order(rq *LHRequest) error {
 
 	rq.Output_order = it.Flatten()
 
-	// wha
-	it.Print()
-
 	rq.InstructionChain = it
 
 	return nil
