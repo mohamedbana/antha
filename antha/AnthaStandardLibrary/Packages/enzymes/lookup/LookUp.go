@@ -25,7 +25,6 @@ package lookup
 
 import (
 	"bytes"
-	"fmt"
 	"strings"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/REBASE"
@@ -54,7 +53,6 @@ func EnzymeLookup(name string) (enzyme wtype.RestrictionEnzyme) {
 		class := "not specified"*/
 
 		if strings.ToUpper(record.Name) == strings.ToUpper(name) {
-			fmt.Println(record)
 			//RecognitionSeqs = append(RecognitionSeqs, record)
 			enzyme = record
 		}
