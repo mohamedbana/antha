@@ -31,7 +31,7 @@ import (
 	"strconv"
 	"strings"
 
-	antha "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/ghodss/yaml"
@@ -116,8 +116,9 @@ func MakePolicies() map[string]LHPolicy {
 	}
 	*/
 
+	// TODO: Remove this hack
 	for _, DOEliquidhandlingFile := range AvailablePolicyfiles {
-		if antha.Anthafileexists(DOEliquidhandlingFile.Filename) {
+		if _, err := os.Stat(filepath.Join(anthapath.Path(), DOEliquidhandlingFile.Filename)); err == nil {
 			//if antha.Anthafileexists(DOEliquidhandlingFile) {
 			fmt.Println("found lhpolicy doe file", DOEliquidhandlingFile)
 
@@ -134,7 +135,6 @@ func MakePolicies() map[string]LHPolicy {
 		} else {
 			fmt.Println("no lhpolicy doe file found named: ", DOEliquidhandlingFile)
 		}
-
 	}
 	return pols
 
@@ -178,7 +178,7 @@ func PolicyMakerfromDesign(basepolicy string, DXORJMP string, dxdesignfilename s
 	}
 	if DXORJMP == "DX" {
 
-		runs, err = RunsFromDXDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), intfactors)
+		runs, err = RunsFromDXDesign(filepath.Join(anthapath.Path(), dxdesignfilename), intfactors)
 		if err != nil {
 			return policies, names, runs, err
 		}
@@ -188,7 +188,7 @@ func PolicyMakerfromDesign(basepolicy string, DXORJMP string, dxdesignfilename s
 		factorcolumns := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}
 		responsecolumns := []int{14, 15, 16, 17}
 
-		runs, err = RunsFromJMPDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), factorcolumns, responsecolumns, intfactors)
+		runs, err = RunsFromJMPDesign(filepath.Join(anthapath.Path(), dxdesignfilename), factorcolumns, responsecolumns, intfactors)
 		if err != nil {
 			return policies, names, runs, err
 		}

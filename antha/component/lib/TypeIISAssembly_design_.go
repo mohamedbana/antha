@@ -18,7 +18,6 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
-	"strconv"
 	"strings"
 )
 
@@ -152,12 +151,12 @@ func _TypeIISAssembly_designSteps(_ctx context.Context, _input *TypeIISAssembly_
 	// Export sequences to order into a fasta file
 
 	partswithOverhangs := make([]*wtype.DNASequence, 0)
-	for i, part := range _output.PartswithOverhangs {
-		_ = export.ExportFastaDir(_input.Constructname, strconv.Itoa(i+1), &part)
+	for _, part := range _output.PartswithOverhangs {
+		export.ExportFasta(_input.Constructname, &part)
 		partswithOverhangs = append(partswithOverhangs, &part)
 
 	}
-	_ = export.Makefastaserial(_input.Constructname, partswithOverhangs)
+	export.Makefastaserial(_input.Constructname, partswithOverhangs)
 
 	//partstoorder := ansi.Color(fmt.Sprintln("PartswithOverhangs", PartswithOverhangs),"red")
 	partstoorder := fmt.Sprintln("PartswithOverhangs", _output.PartswithOverhangs)
