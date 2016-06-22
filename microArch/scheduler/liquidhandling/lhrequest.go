@@ -79,7 +79,11 @@ func (req *LHRequest) ConfigureYourself() error {
 			if w.Empty() {
 				continue
 			}
-			c := w.Contents()
+			c := w.Contents().Dup()
+			// issue here -- not accounting for working volume of well
+			vvvvvv := c.Volume()
+			vvvvvv.Subtract(w.ResidualVolume())
+			c.SetVolume(vvvvvv)
 			ar := inputs[c.CName]
 			ar = append(ar, c)
 			inputs[c.CName] = ar
@@ -134,6 +138,10 @@ func NewLHRequest() *LHRequest {
 	lhr.Input_vols_supplied = make(map[string]wunit.Volume)
 	lhr.Input_vols_wanting = make(map[string]wunit.Volume)
 	lhr.CarryVolume = wunit.NewVolume(0.5, "ul")
+	lhr.Input_setup_weights["MAX_N_PLATES"] = 2
+	lhr.Input_setup_weights["MAX_N_WELLS"] = 96
+	lhr.Input_setup_weights["RESIDUAL_VOLUME_WEIGHT"] = 1.0
+	lhr.Policies, _ = liquidhandling.GetLHPolicyForTest()
 	return &lhr
 }
 
