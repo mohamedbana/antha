@@ -34,6 +34,7 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 
 	offset := 0.25
 	riserheightinmm := 40.0 - offset
+	shallowriserheightinmm := 20.0 - offset
 	incubatorheightinmm := devices.Shaker["3000 T-elm"]["Height"] * 1000
 
 	inhecoincubatorinmm := devices.Shaker["InhecoStaticOnDeck"]["Height"] * 1000
@@ -217,6 +218,28 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 
 	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
 	plate = wtype.NewLHPlate("greiner384_riser", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+	plates[plate.Type] = plate
+
+	// greiner 384 well plate flat bottom on shallow riser
+
+	bottomtype = wtype.LHWBFLAT
+	xdim = 4.0
+	ydim = 4.0
+	zdim = 12.0 // modified from 14
+	bottomh = 1.0
+
+	wellxoffset = 4.5                     // centre of well to centre of neighbouring well in x direction
+	wellyoffset = 4.5                     //centre of well to centre of neighbouring well in y direction
+	xstart = -2.5                         // distance from top left side of plate to first well
+	ystart = -2.5                         // distance from top left side of plate to first well
+	zstart = shallowriserheightinmm + 0.5 // offset of bottom of deck to bottom of well
+
+	square = wtype.NewShape("box", "mm", 4, 4, 14)
+	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
+	welltype = wtype.NewLHWell("384flat", "", "", "ul", 125, 10, square, bottomtype, xdim, ydim, zdim, bottomh, "mm")
+
+	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
+	plate = wtype.NewLHPlate("greiner384_shallowriser", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
 
 	// NUNC 1536 well plate flat bottom on riser
