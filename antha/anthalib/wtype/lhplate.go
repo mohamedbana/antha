@@ -288,12 +288,15 @@ func (lhp *LHPlate) Dup() *LHPlate {
 
 	ret.PlateName = lhp.PlateName
 
+	ret.HWells = make(map[string]*LHWell, len(ret.HWells))
+
 	for i, row := range lhp.Rows {
 		for j, well := range row {
 			d := well.Dup()
 			ret.Rows[i][j] = d
 			ret.Cols[j][i] = d
 			ret.Wellcoords[d.Crds] = d
+			ret.HWells[d.ID] = d
 		}
 	}
 
@@ -314,7 +317,7 @@ func (p *LHPlate) UnProtectAllWells() {
 
 func New_Plate(platetype *LHPlate) *LHPlate {
 	new_plate := NewLHPlate(platetype.Type, platetype.Mnfr, platetype.WlsY, platetype.WlsX, platetype.Height, platetype.Hunit, platetype.Welltype, platetype.WellXOffset, platetype.WellYOffset, platetype.WellXStart, platetype.WellYStart, platetype.WellZStart)
-	Initialize_Wells(new_plate)
+	//	Initialize_Wells(new_plate)
 	return new_plate
 }
 
