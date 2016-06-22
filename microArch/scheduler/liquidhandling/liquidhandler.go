@@ -426,6 +426,8 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) (*LHRequest, error) {
 
 	(*request).Input_order = component_order
 
+	// work out how much we have and how much we need
+
 	var requestinputs map[string][]*wtype.LHComponent
 	requestinputs = request.Input_solutions
 
@@ -433,12 +435,9 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) (*LHRequest, error) {
 		requestinputs = make(map[string][]*wtype.LHComponent, 5)
 	}
 
-	// work out how much we have and how much we need
-
 	vmap2 := make(map[string]wunit.Volume, len(vmap))
 	vmap3 := make(map[string]wunit.Volume, len(vmap))
 
-	//	for k, ar := range requestinputs {
 	for _, k := range allinputs {
 		// vola: how much comes in
 		ar := requestinputs[k]
@@ -451,6 +450,7 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) (*LHRequest, error) {
 		volb := vmap[k].Dup()
 		volb.Subtract(vola)
 		vmap2[k] = vola
+
 		if volb.GreaterThanFloat(0.0001) {
 			vmap3[k] = volb
 		}

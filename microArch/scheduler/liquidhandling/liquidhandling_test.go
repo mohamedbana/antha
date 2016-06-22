@@ -58,10 +58,60 @@ func TestStockConcs(*testing.T) {
 	}*/
 }
 
-func TestPlateReuse(t *testing.T) {
+/*
+func TestInputAssignments(t *testing.T) {
 	lh := GetLiquidHandlerForTest()
 	rq := GetLHRequestForTest()
+	configure_request_simple(rq)
 
+	fmt.Println("INPUT ASSIGNMENTS")
+	for k, v := range rq.Input_assignments {
+		fmt.Println(k, " ", v)
+	}
+
+	fmt.Println("INPUT SOLUTIONS")
+
+	for k, v := range rq.Input_solutions {
+		fmt.Println("\t", k, ":")
+		for _, v2 := range v {
+			fmt.Println("\t\t", v2.CName, " ", v2.Volume().ToString())
+		}
+	}
+
+	fmt.Println("INPUT PLATES")
+
+	for _, v := range rq.Input_plates {
+		fmt.Println("\tPLATE: ", v.Name, " ", v.Type)
+	}
+
+	fmt.Println("INPUT ASSIGNMENTS")
+
+	for k, v := range rq.Input_assignments {
+		fmt.Println("\t", k, " ", v)
+	}
+
+	fmt.Println("INPUT VOLS SUPPLIED")
+
+	for k, v := range rq.Input_vols_supplied {
+		fmt.Println(k, " ", v.ToString())
+	}
+
+	fmt.Println("INPUT VOLS REQUIRED")
+
+	for k, v := range rq.Input_vols_required {
+		fmt.Println(k, " ", v.ToString())
+	}
+
+	fmt.Println("INPUT VOLS WANTING")
+	for k, v := range rq.Input_vols_wanting {
+		fmt.Println(k, " ", v.ToString())
+	}
+
+
+}
+*/
+
+func configure_request_simple(rq *LHRequest) {
 	water := GetComponentForTest("water", wunit.NewVolume(100.0, "ul"))
 	mmx := GetComponentForTest("mastermix_sapI", wunit.NewVolume(100.0, "ul"))
 	part := GetComponentForTest("dna", wunit.NewVolume(50.0, "ul"))
@@ -78,24 +128,26 @@ func TestPlateReuse(t *testing.T) {
 		ins.AddProduct(GetComponentForTest("water", wunit.NewVolume(17.0, "ul")))
 		rq.Add_instruction(ins)
 	}
+}
 
+func TestPlateReuse(t *testing.T) {
+	lh := GetLiquidHandlerForTest()
+	rq := GetLHRequestForTest()
+	configure_request_simple(rq)
 	rq.Input_platetypes = append(rq.Input_platetypes, GetPlateForTest())
 	rq.Output_platetypes = append(rq.Output_platetypes, GetPlateForTest())
 
-	fmt.Println("PLAN 1")
 	rq.ConfigureYourself()
+
 	err := lh.Plan(rq)
 
-	// this should test whether reuse is functioning
+	if err != nil {
+		t.Fatal(fmt.Sprint("Got an error planning with no inputs: ", err))
+	}
 
-	fmt.Println("PLAN 2")
-	instrx := rq.LHInstructions
 	// reset the request
 	rq = GetLHRequestForTest()
-
-	for _, ins := range instrx {
-		rq.Add_instruction(ins)
-	}
+	configure_request_simple(rq)
 
 	for _, plateid := range lh.Properties.PosLookup {
 		if plateid == "" {
@@ -107,17 +159,11 @@ func TestPlateReuse(t *testing.T) {
 		if !ok {
 			continue
 		}
-
-		// this should kill it
-
-		for _, v := range plate.HWells {
-			if !v.Empty() {
-				v.Remove(wunit.NewVolume(5.0, "ul"))
-			}
-		}
-
 		rq.Input_plates[plateid] = plate
 	}
+	rq.Input_platetypes = append(rq.Input_platetypes, GetPlateForTest())
+	rq.Output_platetypes = append(rq.Output_platetypes, GetPlateForTest())
+
 	rq.ConfigureYourself()
 
 	lh = GetLiquidHandlerForTest()
@@ -125,6 +171,53 @@ func TestPlateReuse(t *testing.T) {
 
 	if err != nil {
 		t.Fatal(fmt.Sprint("Got error resimulating: ", err))
+	}
+
+	// if we added nothing, input assignments should be empty
+
+	if len(rq.Input_assignments) != 0 {
+		t.Fatal(fmt.Sprint("Resimulation failed: needed to add ", len(rq.Input_assignments), " components"))
+	}
+
+	// now try a deliberate fail
+
+	// reset the request again
+	rq = GetLHRequestForTest()
+	configure_request_simple(rq)
+
+	for _, plateid := range lh.Properties.PosLookup {
+		if plateid == "" {
+			continue
+		}
+		thing := lh.Properties.PlateLookup[plateid]
+
+		plate, ok := thing.(*wtype.LHPlate)
+		if !ok {
+			continue
+		}
+		for _, v := range plate.Wellcoords {
+			if !v.Empty() {
+				v.Remove(wunit.NewVolume(5.0, "ul"))
+			}
+		}
+
+		rq.Input_plates[plateid] = plate
+	}
+	rq.Input_platetypes = append(rq.Input_platetypes, GetPlateForTest())
+	rq.Output_platetypes = append(rq.Output_platetypes, GetPlateForTest())
+
+	rq.ConfigureYourself()
+
+	lh = GetLiquidHandlerForTest()
+	err = lh.Plan(rq)
+
+	if err != nil {
+		t.Fatal(fmt.Sprint("Got error resimulating: ", err))
+	}
+
+	// this time we should have added some components again
+	if len(rq.Input_assignments) != 3 {
+		t.Fatal(fmt.Sprintf("Error resimulating, should have added 3 components, instead added ", len(rq.Input_assignments)))
 	}
 
 }

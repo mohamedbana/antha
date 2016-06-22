@@ -132,6 +132,7 @@ func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 
 	if len(input_volumes) != 0 {
 		well_count_assignments = choose_plate_assignments(input_volumes, input_platetypes, weights_constraints)
+
 	}
 
 	input_assignments := make(map[string][]string, len(well_count_assignments))
@@ -223,6 +224,7 @@ func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 
 	(*request).Input_plates = input_plates
 	(*request).Input_assignments = input_assignments
+
 	//return input_plates, input_assignments
 	return request, nil
 }

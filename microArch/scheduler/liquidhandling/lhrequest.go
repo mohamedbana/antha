@@ -79,7 +79,11 @@ func (req *LHRequest) ConfigureYourself() error {
 			if w.Empty() {
 				continue
 			}
-			c := w.Contents()
+			c := w.Contents().Dup()
+			// issue here -- not accounting for working volume of well
+			vvvvvv := c.Volume()
+			vvvvvv.Subtract(w.ResidualVolume())
+			c.SetVolume(vvvvvv)
 			ar := inputs[c.CName]
 			ar = append(ar, c)
 			inputs[c.CName] = ar
