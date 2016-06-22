@@ -172,16 +172,12 @@ func (lhp *LHPlate) AllWellPositions() (wellpositionarray []string) {
 
 	wellpositionarray = make([]string, 0)
 
-	alphabet := wutil.MakeAlphabetArray()
 	// range through well coordinates
 	for j := 0; j < lhp.WlsX; j++ {
-		for i := 0; i < lhp.WlsY; i++ { //countingfrom1iswhatmakesushuman := j + 1
-
-			wellposition := string(alphabet[i]) + strconv.Itoa(j+1)
-
+		for i := 0; i < lhp.WlsY; i++ {
+			wellposition := wutil.NumToAlpha(i+1) + strconv.Itoa(j+1)
 			wellpositionarray = append(wellpositionarray, wellposition)
 		}
-
 	}
 	return
 }

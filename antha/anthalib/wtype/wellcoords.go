@@ -1,10 +1,11 @@
 package wtype
 
 import (
-	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
 )
 
 // convenience structure for handling well coordinates
@@ -69,7 +70,7 @@ func MakeWellCoordsA1(a1 string) WellCoords {
 	endC := ix[1]
 
 	X := wutil.ParseInt(a1[endC:len(a1)]) - 1
-	Y := AlphaToNum(string(a1[0:endC])) - 1
+	Y := wutil.AlphaToNum(string(a1[0:endC])) - 1
 	return WellCoords{X, Y}
 }
 
@@ -83,7 +84,7 @@ func MakeWellCoords1A(a1 string) WellCoords {
 	ix := re.FindIndex([]byte(a1))
 	startC := ix[0]
 
-	Y := AlphaToNum(string(a1[startC:len(a1)])) - 1
+	Y := wutil.AlphaToNum(string(a1[startC:len(a1)])) - 1
 	X := wutil.ParseInt(a1[0:startC]) - 1
 	return WellCoords{X, Y}
 }
@@ -116,18 +117,21 @@ func (wc WellCoords) FormatXY() string {
 	}
 	return "X" + strconv.Itoa(wc.X+1) + "Y" + strconv.Itoa(wc.Y+1)
 }
+
 func (wc WellCoords) Format1A() string {
 	if wc.X < 0 || wc.Y < 0 {
 		return ""
 	}
-	return strconv.Itoa(wc.X+1) + NumToAlpha(wc.Y+1)
+	return strconv.Itoa(wc.X+1) + wutil.NumToAlpha(wc.Y+1)
 }
+
 func (wc WellCoords) FormatA1() string {
 	if wc.X < 0 || wc.Y < 0 {
 		return ""
 	}
-	return NumToAlpha(wc.Y+1) + strconv.Itoa(wc.X+1)
+	return wutil.NumToAlpha(wc.Y+1) + strconv.Itoa(wc.X+1)
 }
+
 func (wc WellCoords) WellNumber() int {
 	if wc.X < 0 || wc.Y < 0 {
 		return -1
@@ -141,11 +145,12 @@ func (wc WellCoords) ColNumString() string {
 	}
 	return strconv.Itoa(wc.X + 1)
 }
+
 func (wc WellCoords) RowLettString() string {
 	if wc.X < 0 || wc.Y < 0 {
 		return ""
 	}
-	return NumToAlpha(wc.Y + 1)
+	return wutil.NumToAlpha(wc.Y + 1)
 }
 
 // comparison operators
