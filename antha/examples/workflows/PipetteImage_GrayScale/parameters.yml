@@ -16,7 +16,7 @@
 		"PosterizeImage": true,
 		"PosterizeLevels": 2,
 		"Black": "Black",
-      "OutPlate": "greiner384",
+      "OutPlate": "greiner384_riser",
       "VolumeForFullcolour": "25ul"
     }
   }
