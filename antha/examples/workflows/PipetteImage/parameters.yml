@@ -1,29 +1,22 @@
 {
   "Parameters": {
     "PipetteImage": {
-      "Imagefilename": "jenkins.jpeg",
+      "Imagefilename": "turing.jpg",
 	  "UVimage": false,
 	  "Rotate":false,
-	  "AutoRotate":false,
+	  "AutoRotate":true,
 	  "CheckResizeAlgorithms":true,
 	  "UseLiquidClass":"water",
 		"Palettename":"Palette1",
-		"Subset":false,
+		"Subset":true,
 	      "Subsetnames": [
 		"black",
-		"white",
-		"purple",
-		"blue",
-		"green",
-		"yellow",
-		"orange",
-		"red",
-		"pink"
+		"white"
 		],
 		"OnlythisColour":"",
-		"Notthiscolour":"white",
-      "OutPlate": "greiner384_riser",
-      "VolumePerWell": "25ul"
+		"Notthiscolour":"",
+      "OutPlate": "Agarplateforpicking384_riser",
+      "VolumePerWell": "2ul"
     }
   }
 }
