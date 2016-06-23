@@ -26,8 +26,8 @@ func TestNoRotationNeeded(t *testing.T) {
 }
 func TestSomeRotationNeeded(t *testing.T) {
 	enzyme, _ := lookup.TypeIIsLookup("SAPI")
-	seq := "xxxxxGCTCTTC"
-	rseq := "GCTCTTCxxxxx"
+	seq := "xxxxxGCTCTTCn"
+	rseq := "GCTCTTCnxxxxx"
 
 	s := wtype.DNASequence{Nm: "nevermind", Seq: seq}
 
