@@ -26,12 +26,12 @@ import (
 	"fmt"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
-	"math/rand"
-	"strings"
-
+	"encoding/json"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/blast"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	. "github.com/biogo/ncbi/blast"
+	"math/rand"
+	"strings"
 )
 
 // the following are all physical things; we need a way to separate
@@ -122,6 +122,15 @@ type DNASequence struct {
 	Overhang3prime Overhang  `json:"overhang_3_prime"`
 	Methylation    string    `json:"methylation"` // add histones etc?
 	Features       []Feature `json:"features"`
+}
+
+func (seq DNASequence) Dup() DNASequence {
+	var ret DNASequence
+
+	d, _ := json.Marshal(seq)
+	json.Unmarshal(d, &ret)
+
+	return ret
 }
 
 func MakeDNASequence(name string, seqstring string, properties []string) (seq DNASequence, err error) {

@@ -150,6 +150,13 @@ func (lhr *LHRequest) Add_instruction(ins *wtype.LHInstruction) {
 	lhr.Order_instructions_added = append(lhr.Order_instructions_added, ins.ID)
 }
 
+func (lhr *LHRequest) NewComponentsAdded() bool {
+	// run this after Plan to determine if anything
+	// new was added to the inputs
+
+	return len(lhr.Input_assignments) == 0
+}
+
 type LHPolicyManager struct {
 	SystemPolicies *liquidhandling.LHPolicyRuleSet
 	UserPolicies   *liquidhandling.LHPolicyRuleSet
