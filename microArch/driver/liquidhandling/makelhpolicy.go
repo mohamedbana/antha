@@ -120,7 +120,7 @@ func MakePolicies() map[string]LHPolicy {
 	for _, DOEliquidhandlingFile := range AvailablePolicyfiles {
 		if _, err := os.Stat(filepath.Join(anthapath.Path(), DOEliquidhandlingFile.Filename)); err == nil {
 			//if antha.Anthafileexists(DOEliquidhandlingFile) {
-			fmt.Println("found lhpolicy doe file", DOEliquidhandlingFile)
+			//fmt.Println("found lhpolicy doe file", DOEliquidhandlingFile)
 
 			filenameparts := strings.Split(DOEliquidhandlingFile.Filename, ".")
 
@@ -133,7 +133,7 @@ func MakePolicies() map[string]LHPolicy {
 				panic(err)
 			}
 		} else {
-			fmt.Println("no lhpolicy doe file found named: ", DOEliquidhandlingFile)
+			//	fmt.Println("no lhpolicy doe file found named: ", DOEliquidhandlingFile)
 		}
 	}
 	return pols
@@ -224,7 +224,7 @@ func PolicyMakerfromRuns(basepolicy string, runs []Run, nameprepend string, conc
 		policy[key] = value
 	}
 	*/
-	fmt.Println("basepolicy:", basepolicy)
+	//fmt.Println("basepolicy:", basepolicy)
 	for _, run := range runs {
 		for j, desc := range run.Factordescriptors {
 
@@ -715,7 +715,7 @@ func MakeDefaultPolicy() LHPolicy {
 	defaultpolicy["CAN_SDD"] = true
 	defaultpolicy["TIP_REUSE_LIMIT"] = 100
 	defaultpolicy["BLOWOUTREFERENCE"] = 1
-	defaultpolicy["BLOWOUTOFFSET"] = -0.5
+	defaultpolicy["BLOWOUTOFFSET"] = -5.0
 	defaultpolicy["BLOWOUTVOLUME"] = 0.0
 	defaultpolicy["BLOWOUTVOLUMEUNIT"] = "ul"
 	defaultpolicy["PTZREFERENCE"] = 1
