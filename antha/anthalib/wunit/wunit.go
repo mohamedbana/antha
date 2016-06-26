@@ -73,9 +73,13 @@ type Measurement interface {
 	// wrapper for above
 	ConvertToString(s string) float64
 	// add to this measurement
-	Add(m Measurement)
+	Add(m Measurement) Measurement
 	// subtract from this measurement
-	Subtract(m Measurement)
+	Subtract(m Measurement) Measurement
+	// multiply measurement by a factor
+	MultiplyBy(factor float64) (multiplied Measurement)
+	// divide measurement by a factor
+	DivideBy(factor float64) (divided Measurement)
 	// comparison operators
 	LessThan(m Measurement) bool
 	GreaterThan(m Measurement) bool
@@ -163,26 +167,58 @@ func (cm *ConcreteMeasurement) String() string {
 
 // add to this
 
-func (cm *ConcreteMeasurement) Add(m Measurement) {
+func (cm *ConcreteMeasurement) Add(m Measurement) Measurement {
 	if cm == nil {
-		return
+		return nil
 	}
 	// ideally should check these have the same Dimension
 	// need to improve this
 
 	cm.SetValue(m.ConvertTo(cm.Unit()) + cm.RawValue())
+
+	return cm
 }
 
 // subtract
 
-func (cm *ConcreteMeasurement) Subtract(m Measurement) {
+func (cm *ConcreteMeasurement) Subtract(m Measurement) Measurement {
+	if cm == nil {
+		return nil
+	}
+	// ideally should check these have the same Dimension
+	// need to improve this
+
+	cm.SetValue(cm.RawValue() - m.ConvertTo(cm.Unit()))
+
+	return cm
+}
+
+// multiply
+func (cm *ConcreteMeasurement) MultiplyBy(factor float64) (multiplied Measurement) {
 	if cm == nil {
 		return
 	}
 	// ideally should check these have the same Dimension
 	// need to improve this
 
-	cm.SetValue(cm.RawValue() - m.ConvertTo(cm.Unit()))
+	cm.SetValue(cm.RawValue() * float64(factor))
+
+	multiplied = cm
+	return
+}
+
+func (cm *ConcreteMeasurement) DivideBy(factor float64) (divided Measurement) {
+
+	if cm == nil {
+		return
+	}
+	// ideally should check these have the same Dimension
+	// need to improve this
+
+	cm.SetValue(cm.RawValue() / float64(factor))
+
+	divided = cm
+	return
 }
 
 // define a zero
