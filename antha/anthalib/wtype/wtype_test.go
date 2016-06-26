@@ -206,19 +206,24 @@ func TestLHComponentSampleStuff(t *testing.T) {
 type testpair struct {
 	ltstring string
 	ltint    int
+	err      error
 }
 
-var lts []testpair = []testpair{testpair{ltstring: "170516CCFDesign_noTouchoff_noBlowout2", ltint: 102}, testpair{ltstring: "190516OnePolicy0", ltint: 3000}, testpair{ltstring: "dna_mix", ltint: LTDNAMIX}}
+var lts []testpair = []testpair{testpair{ltstring: "170516CCFDesign_noTouchoff_noBlowout2", ltint: 102}, testpair{ltstring: "190516OnePolicy0", ltint: 3000}, testpair{ltstring: "dna_mix", ltint: LTDNAMIX}, testpair{ltstring: "PreMix", ltint: LTPreMix} /*testpair{ltstring: "InvalidEntry", ltint: LTWater, err: fmt.Errorf("!")}*/}
 
 func TestLiquidTypeFromString(t *testing.T) {
 
 	for _, lt := range lts {
 
-		ltnum := LiquidTypeFromString(lt.ltstring)
+		ltnum, err := LiquidTypeFromString(lt.ltstring)
 		if int(ltnum) != lt.ltint {
 			t.Error("running LiquidTypeFromString on ", lt.ltstring, "expected", lt.ltint, "got", ltnum)
 		}
-
+		if err != nil {
+			if err != lt.err {
+				t.Error("running LiquidTypeFromString on ", lt.ltstring, "expected err:", lt.err.Error(), "got", err.Error())
+			}
+		}
 	}
 }
 

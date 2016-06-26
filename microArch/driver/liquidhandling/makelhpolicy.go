@@ -31,7 +31,7 @@ import (
 	"strconv"
 	"strings"
 
-	antha "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/ghodss/yaml"
@@ -91,6 +91,8 @@ func MakePolicies() map[string]LHPolicy {
 	pols["dna"] = MakeDNAPolicy()
 	pols["DoNotMix"] = MakeDefaultPolicy()
 	pols["NeedToMix"] = MakeNeedToMixPolicy()
+	pols["PreMix"] = PreMixPolicy()
+	pols["PostMix"] = PostMixPolicy()
 	pols["viscous"] = MakeViscousPolicy()
 	pols["Paint"] = MakePaintPolicy()
 
@@ -114,10 +116,11 @@ func MakePolicies() map[string]LHPolicy {
 	}
 	*/
 
+	// TODO: Remove this hack
 	for _, DOEliquidhandlingFile := range AvailablePolicyfiles {
-		if antha.Anthafileexists(DOEliquidhandlingFile.Filename) {
+		if _, err := os.Stat(filepath.Join(anthapath.Path(), DOEliquidhandlingFile.Filename)); err == nil {
 			//if antha.Anthafileexists(DOEliquidhandlingFile) {
-			fmt.Println("found lhpolicy doe file", DOEliquidhandlingFile)
+			//fmt.Println("found lhpolicy doe file", DOEliquidhandlingFile)
 
 			filenameparts := strings.Split(DOEliquidhandlingFile.Filename, ".")
 
@@ -130,9 +133,8 @@ func MakePolicies() map[string]LHPolicy {
 				panic(err)
 			}
 		} else {
-			fmt.Println("no lhpolicy doe file found named: ", DOEliquidhandlingFile)
+			//	fmt.Println("no lhpolicy doe file found named: ", DOEliquidhandlingFile)
 		}
-
 	}
 	return pols
 
@@ -176,7 +178,7 @@ func PolicyMakerfromDesign(basepolicy string, DXORJMP string, dxdesignfilename s
 	}
 	if DXORJMP == "DX" {
 
-		runs, err = RunsFromDXDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), intfactors)
+		runs, err = RunsFromDXDesign(filepath.Join(anthapath.Path(), dxdesignfilename), intfactors)
 		if err != nil {
 			return policies, names, runs, err
 		}
@@ -186,7 +188,7 @@ func PolicyMakerfromDesign(basepolicy string, DXORJMP string, dxdesignfilename s
 		factorcolumns := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}
 		responsecolumns := []int{14, 15, 16, 17}
 
-		runs, err = RunsFromJMPDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), factorcolumns, responsecolumns, intfactors)
+		runs, err = RunsFromJMPDesign(filepath.Join(anthapath.Path(), dxdesignfilename), factorcolumns, responsecolumns, intfactors)
 		if err != nil {
 			return policies, names, runs, err
 		}
@@ -222,7 +224,7 @@ func PolicyMakerfromRuns(basepolicy string, runs []Run, nameprepend string, conc
 		policy[key] = value
 	}
 	*/
-	fmt.Println("basepolicy:", basepolicy)
+	//fmt.Println("basepolicy:", basepolicy)
 	for _, run := range runs {
 		for j, desc := range run.Factordescriptors {
 
@@ -433,7 +435,7 @@ func MakeWaterPolicy() LHPolicy {
 	waterpolicy["CAN_MULTI"] = false
 	waterpolicy["CAN_MSA"] = true
 	waterpolicy["CAN_SDD"] = true
-	waterpolicy["DSPZOFFSET"] = 0.5 // changed from 0.5 to prevent bubbles !
+	waterpolicy["DSPZOFFSET"] = 1.0
 	waterpolicy["BLOWOUTVOLUME"] = 0.0
 	return waterpolicy
 }
@@ -637,14 +639,55 @@ func MakeLoadlowPolicy() LHPolicy {
 
 func MakeNeedToMixPolicy() LHPolicy {
 	dnapolicy := make(LHPolicy, 15)
-	dnapolicy["POST_MIX"] = 2
+	dnapolicy["POST_MIX"] = 3
 	dnapolicy["POST_MIX_VOLUME"] = 10
-	dnapolicy["POST_MIX_RATE"] = 3.9
-	//dnapolicy["PRE_MIX"] = 4
+	dnapolicy["POST_MIX_RATE"] = 3.74
+	dnapolicy["PRE_MIX"] = 3
 	dnapolicy["PRE_MIX_VOLUME"] = 10
-	dnapolicy["PRE_MIX_RATE"] = 3.0
-	dnapolicy["ASPSPEED"] = 3.9
-	dnapolicy["DSPSPEED"] = 3.9
+	dnapolicy["PRE_MIX_RATE"] = 3.74
+	dnapolicy["ASPSPEED"] = 3.74
+	dnapolicy["DSPSPEED"] = 3.74
+	dnapolicy["CAN_MULTI"] = false
+	dnapolicy["CAN_MSA"] = false
+	dnapolicy["CAN_SDD"] = false
+	dnapolicy["DSPREFERENCE"] = 0
+	dnapolicy["DSPZOFFSET"] = 0.5
+	dnapolicy["TIP_REUSE_LIMIT"] = 0
+	dnapolicy["NO_AIR_DISPENSE"] = true
+	return dnapolicy
+}
+
+func PreMixPolicy() LHPolicy {
+	dnapolicy := make(LHPolicy, 12)
+	//dnapolicy["POST_MIX"] = 3
+	//dnapolicy["POST_MIX_VOLUME"] = 10
+	//dnapolicy["POST_MIX_RATE"] = 3.74
+	dnapolicy["PRE_MIX"] = 3
+	dnapolicy["PRE_MIX_VOLUME"] = 10
+	dnapolicy["PRE_MIX_RATE"] = 3.74
+	dnapolicy["ASPSPEED"] = 3.74
+	dnapolicy["DSPSPEED"] = 3.74
+	dnapolicy["CAN_MULTI"] = false
+	dnapolicy["CAN_MSA"] = false
+	dnapolicy["CAN_SDD"] = false
+	dnapolicy["DSPREFERENCE"] = 0
+	dnapolicy["DSPZOFFSET"] = 0.5
+	dnapolicy["TIP_REUSE_LIMIT"] = 0
+	dnapolicy["NO_AIR_DISPENSE"] = true
+	return dnapolicy
+
+}
+
+func PostMixPolicy() LHPolicy {
+	dnapolicy := make(LHPolicy, 12)
+	dnapolicy["POST_MIX"] = 3
+	dnapolicy["POST_MIX_VOLUME"] = 10
+	dnapolicy["POST_MIX_RATE"] = 3.74
+	//dnapolicy["PRE_MIX"] = 3
+	//dnapolicy["PRE_MIX_VOLUME"] = 10
+	//dnapolicy["PRE_MIX_RATE"] = 3.74
+	dnapolicy["ASPSPEED"] = 3.74
+	dnapolicy["DSPSPEED"] = 3.74
 	dnapolicy["CAN_MULTI"] = false
 	dnapolicy["CAN_MSA"] = false
 	dnapolicy["CAN_SDD"] = false
@@ -672,7 +715,7 @@ func MakeDefaultPolicy() LHPolicy {
 	defaultpolicy["CAN_SDD"] = true
 	defaultpolicy["TIP_REUSE_LIMIT"] = 100
 	defaultpolicy["BLOWOUTREFERENCE"] = 1
-	defaultpolicy["BLOWOUTOFFSET"] = -0.5
+	defaultpolicy["BLOWOUTOFFSET"] = -5.0
 	defaultpolicy["BLOWOUTVOLUME"] = 0.0
 	defaultpolicy["BLOWOUTVOLUMEUNIT"] = "ul"
 	defaultpolicy["PTZREFERENCE"] = 1
@@ -717,13 +760,22 @@ func MakeLVExtraPolicy() LHPolicy {
 
 func MakeHVOffsetPolicy() LHPolicy {
 	lvop := make(LHPolicy, 6)
-	lvop["ASPZOFFSET"] = 2.5
-	lvop["DSPZOFFSET"] = 2.5
-	lvop["POST_MIX_Z"] = 2.5
-	lvop["PRE_MIX_Z"] = 2.5
+	lvop["ASPZOFFSET"] = 1.00
+	lvop["DSPZOFFSET"] = 1.00
+	lvop["POST_MIX_Z"] = 1.00
+	lvop["PRE_MIX_Z"] = 1.00
 	lvop["DSPREFERENCE"] = 0
 	lvop["ASPREFERENCE"] = 0
 	return lvop
+}
+
+func MakeHVFlowRatePolicy() LHPolicy {
+	policy := make(LHPolicy, 4)
+	policy["POST_MIX_RATE"] = 37
+	policy["PRE_MIX_RATE"] = 37
+	policy["ASPSPEED"] = 37
+	policy["DSPSPEED"] = 37
+	return policy
 }
 
 func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
@@ -778,9 +830,16 @@ func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
 
 	// hack to fix plate type problems
 	rule := NewLHPolicyRule("HVOffsetFix")
-	rule.AddNumericConditionOn("VOLUME", 9.9, 300.0) // what about higher? // set specifically for openPlant configuration
+	rule.AddNumericConditionOn("VOLUME", 20.1, 300.0) // what about higher? // set specifically for openPlant configuration
 	//rule.AddCategoryConditionOn("FROMPLATETYPE", "pcrplate_skirted_riser")
 	pol := MakeHVOffsetPolicy()
+	lhpr.AddRule(rule, pol)
+
+	// hack to fix plate type problems
+	rule = NewLHPolicyRule("HVFlowRate")
+	rule.AddNumericConditionOn("VOLUME", 20.1, 300.0) // what about higher? // set specifically for openPlant configuration
+	//rule.AddCategoryConditionOn("FROMPLATETYPE", "pcrplate_skirted_riser")
+	pol = MakeHVFlowRatePolicy()
 	lhpr.AddRule(rule, pol)
 
 	/*rule = NewLHPolicyRule("LVOffsetFix2")

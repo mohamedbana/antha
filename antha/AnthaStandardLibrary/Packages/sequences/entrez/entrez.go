@@ -27,14 +27,12 @@ import (
 	"fmt"
 	"io"
 	"os"
-	//"path/filepath"
+	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	parser "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
-	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
-	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	biogo "github.com/biogo/ncbi/entrez"
 )
@@ -64,7 +62,9 @@ func RetrieveRecords(query string, database string, Max int, ReturnType string, 
 	if out == "" {
 		of = os.Stdout
 	} else {
-		out = fmt.Sprintf("%s%c%s", anthapath.Dirpath(), os.PathSeparator, out)
+		if err := os.Mkdir(filepath.Dir(out), 0777); err != nil {
+			return err
+		}
 		of, err = os.Create(out)
 		if err != nil {
 			return err
@@ -130,7 +130,7 @@ func RetrieveSequence(id string, database string) (wtype.DNASequence, error) {
 	if err := RetrieveRecords(id, database, 1, "gb", "temp.gb"); err != nil {
 		return wtype.DNASequence{}, err
 	}
-	file := fmt.Sprintf("%s%c%s", anthapath.Dirpath(), os.PathSeparator, "temp.gb")
+	file := filepath.Join(anthapath.Path(), "temp.gb")
 	seq, err := parser.GenbanktoFeaturelessDNASequence(file)
 	if err != nil {
 		return wtype.DNASequence{}, err
@@ -143,7 +143,6 @@ func RetrieveSequence(id string, database string) (wtype.DNASequence, error) {
 // This will retrieve vector using fasta or db
 func RetrieveVector(id string) (wtype.DNASequence, error) {
 	//first check if vector sequence is in fasta file
-	anthapath.CreatedotAnthafolder()
 	if seq, err := parser.RetrieveSeqFromFASTA(id, "vectors.txt"); err != nil {
 		// if not in refactor, check db
 		return RetrieveSequence(id, "nucleotide")

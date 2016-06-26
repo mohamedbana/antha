@@ -132,6 +132,7 @@ func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 
 	if len(input_volumes) != 0 {
 		well_count_assignments = choose_plate_assignments(input_volumes, input_platetypes, weights_constraints)
+
 	}
 
 	input_assignments := make(map[string][]string, len(well_count_assignments))
@@ -193,14 +194,14 @@ func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 				location := curr_plate.ID + ":" + curr_well.Crds
 				ass = append(ass, location)
 
-				// make a duplicate of this component to stick in the well
-				// wait wait wait is this right?
 				newcomponent := component.Dup()
+				// sort out parent issue
+				// first we don't allow these to have the same ID
+				newcomponent.ID = wtype.GetUUID()
+				// second we add a parent
+				newcomponent.AddParent(component.ID)
 				newcomponent.Vol = curr_well.MaxVol
 				volume.Subtract(curr_well.WorkingVolume())
-
-				fmt.Println("ADDING component ", component.CName, " to ", location)
-
 				curr_well.Add(newcomponent)
 				input_plates[curr_plate.ID] = curr_plate
 			}
@@ -223,6 +224,7 @@ func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 
 	(*request).Input_plates = input_plates
 	(*request).Input_assignments = input_assignments
+
 	//return input_plates, input_assignments
 	return request, nil
 }

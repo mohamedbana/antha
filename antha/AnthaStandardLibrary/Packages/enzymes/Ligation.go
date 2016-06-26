@@ -20,6 +20,7 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
+// Package for working with enzymes; in particular restriction enzymes
 package enzymes
 
 import (
@@ -90,6 +91,31 @@ func Jointwopartsfromsequence(vector wtype.DNASequence, part1 wtype.DNASequence,
 	return assembledfragments, plasmidproducts
 }
 
+func rotate_vector(vector wtype.DNASequence, enzyme wtype.TypeIIs) (wtype.DNASequence, error) {
+	ret := vector.Dup()
+
+	// the purpose of this is to ensure the RE sites go ---> xxxx <---
+
+	// we just ensure the first one is first in the sequence... if there's more than one
+	// it's not our problem
+
+	ix := strings.Index(ret.Seq, enzyme.RecognitionSequence)
+
+	if ix == -1 {
+		err := fmt.Errorf("No restriction sites found in vector - cannot rotate")
+		return ret, err
+	}
+
+	newseq := ""
+
+	newseq += ret.Seq[ix:]
+	newseq += ret.Seq[:ix]
+
+	ret.Seq = newseq
+
+	return ret, nil
+}
+
 // key function for returning an error message, arrays of partially assembled fragments and fully assembled fragments from performing typeIIS assembly on a vector and array of parts
 func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequence, enzyme wtype.TypeIIs) (assembledfragments []Digestedfragment, plasmidproducts []wtype.DNASequence, err error) {
 
@@ -97,7 +123,20 @@ func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequen
 		err = fmt.Errorf("No Vector sequence found")
 		return assembledfragments, plasmidproducts, err
 	}
-	doublestrandedvector := MakedoublestrandedDNA(vector)
+	// there are two cases: either the vector comes in same way parts do
+	// i.e. SAPI--->xxxx<---IPAS
+	// OR it comes in the other way round
+	// i.e. xxxx<---IPASyyyySAPI--->zzzz
+	// we have either to rotate the vector or tolerate this
+	// probably best to rotate first
+
+	rotatedvector, err := rotate_vector(vector, enzyme)
+
+	if err != nil {
+		return assembledfragments, plasmidproducts, err
+	}
+
+	doublestrandedvector := MakedoublestrandedDNA(rotatedvector)
 	digestedvector := DigestionPairs(doublestrandedvector, enzyme)
 
 	if len(partsinorder) == 0 {
@@ -111,6 +150,7 @@ func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequen
 	}
 	doublestrandedpart := MakedoublestrandedDNA(partsinorder[0])
 	digestedpart := DigestionPairs(doublestrandedpart, enzyme)
+
 	var newerr error
 	assembledfragments, plasmidproducts, newerr = jointwoparts(digestedvector, digestedpart)
 	if newerr != nil {
@@ -130,6 +170,7 @@ func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequen
 		doublestrandedpart = MakedoublestrandedDNA(partsinorder[i])
 		digestedpart := DigestionPairs(doublestrandedpart, enzyme)
 		//for _, newfragments := range assembledfragments {
+
 		assembledfragments, plasmidproducts, newerr = jointwoparts(assembledfragments, digestedpart)
 		//err = newerr
 

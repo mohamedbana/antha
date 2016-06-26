@@ -85,6 +85,10 @@ type LHChannelParameter struct {
 	Head        int
 }
 
+func (lhcp LHChannelParameter) String() string {
+	return fmt.Sprintf("%s Minvol %s Maxvol %s Minspd %s Maxspd %s Multi %d Independent %t Ori %d Head %d", lhcp.Name, lhcp.Minvol.ToString(), lhcp.Maxvol.ToString(), lhcp.Minspd.ToString(), lhcp.Maxspd.ToString(), lhcp.Multi, lhcp.Independent, lhcp.Orientation, lhcp.Head)
+}
+
 // given the dimension of the plate, what is the constraint
 // on multichannel access?
 func (lhcp LHChannelParameter) GetConstraint(n int) LHMultiChannelConstraint {

@@ -29,13 +29,14 @@ func makeTipwastes() map[string]*wtype.LHTipwaste {
 
 	ret["Gilsontipwaste"] = makeGilsonTipWaste()
 	ret["CyBiotipwaste"] = makeCyBioTipwaste()
+	ret["Manualtipwaste"] = makeManualTipwaste()
 	return ret
 }
 
 func makeGilsonTipWaste() *wtype.LHTipwaste {
 	shp := wtype.NewShape("box", "mm", 123.0, 80.0, 92.0)
 	w := wtype.NewLHWell("Gilsontipwaste", "", "A1", "ul", 800000.0, 800000.0, shp, 0, 123.0, 80.0, 92.0, 0.0, "mm")
-	lht := wtype.NewLHTipwaste(500, "gilsontipwaste", "gilson", 92.0, w, 49.5, 31.5, 0.0)
+	lht := wtype.NewLHTipwaste(600, "gilsontipwaste", "gilson", 92.0, w, 49.5, 31.5, 0.0)
 	return lht
 }
 
@@ -44,6 +45,14 @@ func makeCyBioTipwaste() *wtype.LHTipwaste {
 	shp := wtype.NewShape("box", "mm", 90.5, 171.0, 90.0)
 	w := wtype.NewLHWell("CyBiotipwaste", "", "A1", "ul", 800000.0, 800000.0, shp, 0, 90.5, 171.0, 90.0, 0.0, "mm")
 	lht := wtype.NewLHTipwaste(700, "CyBiotipwaste", "cybio", 90.5, w, 85.5, 45.0, 0.0)
+	return lht
+}
+
+// TODO figure out tip capacity
+func makeManualTipwaste() *wtype.LHTipwaste {
+	shp := wtype.NewShape("box", "mm", 90.5, 171.0, 90.0)
+	w := wtype.NewLHWell("manualtipwaste", "", "A1", "ul", 800000.0, 800000.0, shp, 0, 90.5, 171.0, 90.0, 0.0, "mm")
+	lht := wtype.NewLHTipwaste(1000000, "TipWasteBag", "ACMEBagsInc", 90.5, w, 85.5, 45.0, 0.0)
 	return lht
 }
 

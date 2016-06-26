@@ -9,9 +9,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
 	"fmt"
 	"strconv"
-
 )
-
 
 // Input parameters for this protocol (data)
 Parameters (
@@ -77,6 +75,8 @@ Steps {
 	counter := 0
 	var platenum = 1
 	var runs = make([]doe.Run,1)
+	var err error
+	Errors = make([]error,0)
 	// work out plate layout based on picture or just in order
 	
 	if Printasimage {
@@ -133,7 +133,10 @@ Steps {
 		
 		// change lhpolicy if desired
 		if UseLHPolicyDoeforDiluent {
-				Diluent.Type = wtype.LiquidTypeFromString(LHPolicy)
+				Diluent.Type, err = wtype.LiquidTypeFromString(LHPolicy)
+				if err != nil {
+				Errors = append(Errors,err)
+				}
 			}
 		
 		
@@ -151,7 +154,10 @@ Steps {
 		
 		// change liquid class
 		if UseLiquidPolicyForTestSolutions && LHPolicy != ""{
-		TestSols[k].Type = wtype.LiquidTypeFromString(LHPolicy)
+		TestSols[k].Type, err = wtype.LiquidTypeFromString(LHPolicy)
+		if err != nil {
+			Errors = append(Errors,err)
+		}
 		}
 		
 		if TestSolVolumes[l].RawValue() > 0.0 {
