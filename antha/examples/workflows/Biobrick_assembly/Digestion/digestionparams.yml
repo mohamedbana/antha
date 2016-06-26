@@ -101,26 +101,6 @@
 				10000
             ],
             "Water": "water"
-        },
-		"Ligation": {
-		            "Atp": "ATP",
-		            "AtpVol": "1ul",
-		            "Buffer": "CutsmartBuffer",
-		            "BufferVol": "2ul",
-		            "InactivationTemp": "80C",
-		            "InactivationTime": "1200s",
-		            "LigVol": "1ul",
-		            "Ligase": "T4Ligase",
-		            "OutPlate": "pcrplate_with_cooler",
-		            "PartVols": [
-		                "3ul",
-		                "3ul"
-		            ],
-		            "ReactionTemp": "16C",
-		            "ReactionTime": "600s",
-		            "ReactionVolume": "20ul",
-		            "VectorVol": "3ul",
-		            "Water": "water"
-         }
+        }
     }
 }
