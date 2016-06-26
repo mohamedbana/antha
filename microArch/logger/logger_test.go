@@ -130,23 +130,21 @@ func TestMiddlewareCallsSync(t *testing.T) {
 	}
 }
 
-func TestDefaultLogger(t *testing.T) {
+func TestLogLogger(t *testing.T) {
 	cleanMiddleware() //MUST!
-	x := make([]byte, 0)
-	buffer := bytes.NewBuffer(x)
-	log.SetOutput(buffer)
+	var buf bytes.Buffer
+	RegisterMiddleware(&LogMiddleware{log.New(&buf, "", log.LstdFlags)})
+
 	Info("test")
-	if len(buffer.Bytes()) == 0 {
+	if buf.Len() == 0 {
 		t.Errorf("default logger output empty. Expecting ", len("test"))
 	}
 	cleanMiddleware() //MUST!
+	before := logCounter
 	RegisterMiddleware(testMiddleware{})
-	x = make([]byte, 0)
-	buffer = bytes.NewBuffer(x)
-	log.SetOutput(buffer) //even now, since we have something registered, we should not be going in
 	Info("test")
-	if len(buffer.Bytes()) != 0 {
-		t.Errorf("unexpected output in log")
+	if logCounter != before+1 {
+		t.Errorf("expected %d calls found %d", before+1, logCounter)
 	}
 }
 

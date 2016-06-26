@@ -4,6 +4,19 @@
 
 Antha v0.0.2
 
+Contents:
+- Installation Instructions
+  - Docker
+  - OSX (Native)
+  - Linux (Native)
+  - Windows (Native)
+- Checking Your Installation
+- Making and Running Antha Components
+- Adding Custom Equipment Drivers
+  - List of Supported Interfaces
+  - Connecting the Driver to Antha
+- Demo
+
 ## Installation Instructions
 
 ### Docker
@@ -142,6 +155,36 @@ make
 go get github.com/antha-lang/antha/cmd/...
 antharun --workflow myworkflowdefinition.json --parameters myparameters.yml
 ```
+
+## Adding Custom Equipment Drivers
+
+In order to write a custom driver for a piece of equipment and use it with Antha, you would need:
+
+1. Find out what device interfaces does Antha currently support (see the list below)
+2. Implementing the driver against that gRPC interface
+3. Connect the driver to Antha.
+
+### List of Supported Interfaces
+
+This list could be interpreted as a list of device functions that this version of Antha can automate.
+
+- **LIQUID HANDLING**
+
+  - Interface: https://github.com/antha-lang/manualLiquidHandler#implementation
+  - Dummy Driver (example code): https://github.com/antha-lang/manualLiquidHandler
+
+### Connecting the Driver to Antha
+
+Connecting the driver is as simple as running antharun with a flag --driver [driver_tcp_port]. It could look like this:
+
+```
+antharun --workflow wf.json --parameters params.json --driver localhost:50051
+```
+
+More instructions can be found here:
+
+- https://github.com/antha-lang/antha/blob/master/antha/examples/workflows/AnthaAcademy/Lesson1_Sample/B_parallelruns/readme_drivers.txt
+- https://github.com/antha-lang/manualLiquidHandler#antharun-as-client
 
 ## Demo 
 

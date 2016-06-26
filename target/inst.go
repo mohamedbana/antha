@@ -27,11 +27,6 @@ type RunInst interface {
 	Data() Files // Blob of data that is runnable
 }
 
-type ErrInst interface {
-	Inst
-	Error() error // error returned during compilation
-}
-
 type Graph struct {
 	Insts []Inst
 }
@@ -55,7 +50,7 @@ func (a *Graph) Out(n graph.Node, i int) graph.Node {
 type CmpError struct {
 	Dev     Device
 	Depends []Inst
-	Err     error
+	Error   error
 }
 
 func (a *CmpError) Device() Device {
@@ -69,12 +64,9 @@ func (a *CmpError) DependsOn() []Inst {
 func (a *CmpError) SetDependsOn(x []Inst) {
 	a.Depends = x
 }
+
 func (a *CmpError) GetTimeEstimate() float64 {
 	return 0.0
-}
-
-func (a *CmpError) Error() error {
-	return a.Err
 }
 
 type Incubate struct {

@@ -137,6 +137,12 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) (*
 
 	for _, pid := range input_plate_order {
 		p := input_plates[pid]
+
+		if p == nil {
+			err := wtype.LHError(wtype.LH_ERR_DIRE, fmt.Sprint("Plate with id ", pid, " in input_plate_order does not exist in input_plates"))
+			return request, err
+		}
+
 		allowed, isConstrained := p.IsConstrainedOn(params.Model)
 		if !isConstrained {
 			allowed = make([]string, 0, 1)
