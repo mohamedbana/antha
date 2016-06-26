@@ -222,13 +222,6 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 }
 
 func (this *Liquidhandler) do_setup(rq *LHRequest) error {
-	// revise the volumes etc
-
-	err := this.revise_volumes(rq)
-
-	if err != nil {
-		return err
-	}
 
 	stat := this.Properties.Driver.RemoveAllPlates()
 
@@ -342,6 +335,13 @@ func (this *Liquidhandler) Plan(request *LHRequest) error {
 		return err
 	}
 
+	// revise the volumes
+	err = this.revise_volumes(request)
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -383,6 +383,9 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) (*LHRequest, error) {
 
 			v2a := wunit.NewVolume(component.Vol, component.Vunit)
 
+			// we have to add the carry volume here
+			// this is roughly per transfer so should be OK
+			v2a.Add(request.CarryVolume)
 			vol.Add(v2a)
 
 			vmap[component.CName] = vol
@@ -423,6 +426,8 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) (*LHRequest, error) {
 
 	(*request).Input_order = component_order
 
+	// work out how much we have and how much we need
+
 	var requestinputs map[string][]*wtype.LHComponent
 	requestinputs = request.Input_solutions
 
@@ -430,12 +435,9 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) (*LHRequest, error) {
 		requestinputs = make(map[string][]*wtype.LHComponent, 5)
 	}
 
-	// work out how much we have and how much we need
-
 	vmap2 := make(map[string]wunit.Volume, len(vmap))
 	vmap3 := make(map[string]wunit.Volume, len(vmap))
 
-	//	for k, ar := range requestinputs {
 	for _, k := range allinputs {
 		// vola: how much comes in
 		ar := requestinputs[k]
@@ -448,12 +450,12 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) (*LHRequest, error) {
 		volb := vmap[k].Dup()
 		volb.Subtract(vola)
 		vmap2[k] = vola
+
 		if volb.GreaterThanFloat(0.0001) {
 			vmap3[k] = volb
 		}
-		//volc := vmap[k]
-		//		fmt.Println("COMPONENT ", k, " HAVE : ", vola.ToString(), " WANT: ", volc.ToString(), " DIFF: ", volb.ToString())
-
+		volc := vmap[k]
+		logger.Debug(fmt.Sprint("COMPONENT ", k, " HAVE : ", vola.ToString(), " WANT: ", volc.ToString(), " DIFF: ", volb.ToString()))
 	}
 
 	(*request).Input_vols_required = vmap

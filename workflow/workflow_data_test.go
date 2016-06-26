@@ -1,3 +1,6 @@
+package workflow
+
+var condCopyEqualsJson = `
 {
     "processes": {
         "Equals": { "component": "Equals" },
@@ -27,3 +30,4 @@
         }
     ]
 }
+`

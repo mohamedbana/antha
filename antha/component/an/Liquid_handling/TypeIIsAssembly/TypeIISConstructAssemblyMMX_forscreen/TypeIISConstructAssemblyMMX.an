@@ -3,6 +3,7 @@ protocol TypeIISConstructAssemblyMMX_forscreen
 import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"fmt"
 )
 
@@ -11,15 +12,18 @@ Parameters (
 	ReactionVolume				Volume
 	MasterMixVolume				Volume
 	PartVols				[]Volume
-	PartNames				[]string
 	ReactionTemp				Temperature
 	ReactionTime				Time
 	InactivationTemp			Temperature
 	InactivationTime			Time
 	OutputReactionName			string
 	OutputLocation 				string
+        OutputConstructName                     string
 	OutputPlateNum				int
 	LHPolicyName				string
+        EnzymeName                              string
+        PartSeqs                                []wtype.DNASequence
+
 )
 
 // Physical Inputs to this protocol with types
@@ -27,18 +31,20 @@ Inputs (
 	Parts			[]*wtype.LHComponent
 	MasterMix		*wtype.LHComponent
 	OutPlate		*wtype.LHPlate
-	Water *wtype.LHComponent
+	Water                   *wtype.LHComponent
 )
 
 
 // Physical outputs from this protocol with types
 Outputs (
-	Reaction *wtype.LHComponent
+	Reaction      *wtype.LHComponent
 )
 
 // Data which is returned from this protocol, and data types
 Data (
-	Errors []error
+	Errors        []string
+        ConstructName string
+        Sequence      wtype.DNASequence
 )
 
 Requirements {}
@@ -49,12 +55,29 @@ Setup {}
 // The core process for this protocol, with the steps to be performed
 // for every input
 Steps {
-	
-	Errors = make([]error,0)
 	var err error
-	
+
 	samples := make([]*wtype.LHComponent, 0)
+        ConstructName = OutputConstructName
 	
+        last := len(PartSeqs) - 1
+	output, count, _, seq, err := enzymes.Assemblysimulator(enzymes.Assemblyparameters{
+            Constructname: ConstructName,
+            Enzymename: EnzymeName,
+            Vector: PartSeqs[last],
+            Partsinorder: PartSeqs[:last],
+        })
+        if err != nil {
+          Errors = append(Errors, fmt.Sprintf("%s: %s", output, err))
+          return
+        }
+        if count != 1 {
+          Errors = append(Errors, fmt.Sprintf("no successful assembly"))
+          return
+        }
+
+        Sequence = seq
+
 	waterSample:=mixer.SampleForTotalVolume(Water,ReactionVolume)
 	samples = append(samples, waterSample)
 	
@@ -62,16 +85,17 @@ Steps {
 	samples = append(samples, mmxSample)
 
 	for k, part := range Parts {
-		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", PartNames[k], " vol ", PartVols[k])
+		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", PartSeqs[k].Nm, " vol ", PartVols[k])
 		
 		part.Type, err = wtype.LiquidTypeFromString(LHPolicyName)
 		
 		if err != nil {
-			Errors = append(Errors,err)
+			Errors = append(Errors, fmt.Sprintf("cannot find liquid type: %s", err))
+                        return
 		}
 		
 		partSample := mixer.Sample(part, PartVols[k])
-		partSample.CName = PartNames[k]
+		partSample.CName = PartSeqs[k].Nm
 		samples = append(samples, partSample)
 	}
 

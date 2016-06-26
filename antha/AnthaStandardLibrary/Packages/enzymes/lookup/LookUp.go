@@ -53,7 +53,6 @@ func EnzymeLookup(name string) (enzyme wtype.RestrictionEnzyme) {
 		class := "not specified"*/
 
 		if strings.ToUpper(record.Name) == strings.ToUpper(name) {
-			//RecognitionSeqs = append(RecognitionSeqs, record)
 			enzyme = record
 		}
 
