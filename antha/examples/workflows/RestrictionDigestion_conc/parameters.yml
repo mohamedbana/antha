@@ -18,7 +18,6 @@
             "EnzymeNames": [
                 "Nco1"
             ],
-            "InPlate": "pcrplate_with_cooler",
             "InactivationTemp": "65C",
             "InactivationTime": "900s",
             "OutPlate": "pcrplate_with_cooler",
