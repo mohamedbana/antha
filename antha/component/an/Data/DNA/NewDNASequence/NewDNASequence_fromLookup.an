@@ -52,7 +52,7 @@ Steps {
 		
 			if DNAID {
 			
-			DNA, err = entrez.RetrieveSequence(ID, "nucleotide")
+			DNA, err = entrez.RetrieveSequence(ID, "nucleotide",ID+".gb")
 			
 			}
 		} else if BiobrickID {

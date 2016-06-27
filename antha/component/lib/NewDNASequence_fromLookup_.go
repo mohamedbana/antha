@@ -40,7 +40,7 @@ func _NewDNASequence_fromLookupSteps(_ctx context.Context, _input *NewDNASequenc
 
 		if _input.DNAID {
 
-			_output.DNA, err = entrez.RetrieveSequence(_input.ID, "nucleotide")
+			_output.DNA, err = entrez.RetrieveSequence(_input.ID, "nucleotide", _input.ID+".gb")
 
 		}
 	} else if _input.BiobrickID {

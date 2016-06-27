@@ -182,6 +182,7 @@ Steps {
 			panic(err.Error())
 		}
 		
+		
 		pixelSample := mixer.Sample(component, VolumePerWell)
 		//components = append(components,pixelSample)
 		solution := MixTo(OutPlate.Type, locationkey, 1, pixelSample)

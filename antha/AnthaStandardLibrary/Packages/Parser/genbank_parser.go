@@ -194,7 +194,7 @@ func HandleGenbank(lines []string) (annotatedseq wtype.DNASequence, err error) {
 		annotatedseq, err = wtype.MakeAnnotatedSeq(name, seq, circular, features)
 		// // fmt.Println("annotated", annotatedseq)
 	} else {
-		err = fmt.Errorf("no LOCUS found on first line")
+		err = fmt.Errorf("no LOCUS found on first line "+"Found:", lines[0][0:5])
 	}
 	return
 }

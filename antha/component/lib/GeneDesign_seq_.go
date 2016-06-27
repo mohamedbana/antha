@@ -7,6 +7,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/entrez"
+	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
@@ -63,6 +64,8 @@ func _GeneDesign_seqSteps(_ctx context.Context, _input *GeneDesign_seqInput, _ou
 	if _input.ExporttoFastaFile {
 		export.Makefastaserial2(_input.ConstructName, _output.PartsWithOverhangs)
 	}
+
+	fmt.Println("Parts Source: ", _output.PartsWithOverhangs)
 }
 
 func _GeneDesign_seqAnalysis(_ctx context.Context, _input *GeneDesign_seqInput, _output *GeneDesign_seqOutput) {
