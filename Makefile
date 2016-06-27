@@ -24,7 +24,7 @@ compile:
 test_workflows: compile
 	for d in `find antha/examples -mindepth 2 -maxdepth 2 -type d`; do \
 	  abs=`cd $$d; pwd` ;\
-	  (go test github.com/antha-lang/antha/antha/component/lib -args $$abs > /dev/null) ;\
+	  (go test github.com/antha-lang/antha/antha/component/lib -args $$abs) ;\
 	  if [[ $$? == 0 ]]; then \
 	    echo "PASS $$d"; \
 	  else \
