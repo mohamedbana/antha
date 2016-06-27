@@ -1,7 +1,7 @@
 {
   "Parameters": {
     "PipetteImage": {
-      "Imagefilename": "apple.jpg",
+      "Imagefilename": "jenkins.jpeg",
 	  "UVimage": false,
 	  "Rotate":false,
 	  "AutoRotate":false,
@@ -22,8 +22,8 @@
 		],
 		"OnlythisColour":"",
 		"Notthiscolour":"white",
-      "OutPlate": "greiner384_riser",
-      "VolumePerWell": "25ul"
+      "OutPlate": "nunc1536_riser",
+      "VolumePerWell": "0.5ul"
     }
   }
 }
