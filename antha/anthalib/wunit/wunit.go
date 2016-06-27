@@ -157,6 +157,10 @@ func (cm *ConcreteMeasurement) ConvertToString(s string) float64 {
 	return cm.ConvertTo(ppu)
 }
 
+func (cm *ConcreteMeasurement) String() string {
+	return cm.ToString()
+}
+
 // add to this
 
 func (cm *ConcreteMeasurement) Add(m Measurement) {

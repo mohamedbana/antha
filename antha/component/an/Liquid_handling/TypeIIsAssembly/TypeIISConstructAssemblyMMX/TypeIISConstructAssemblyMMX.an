@@ -56,7 +56,7 @@ Steps {
 	for k, part := range Parts {
 		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", PartNames[k], " vol ", PartVols[k])
 		
-		part.Type = wtype.LiquidTypeFromString(LHPolicyName)
+		part.Type,_ = wtype.LiquidTypeFromString(LHPolicyName)
 		
 		partSample := mixer.Sample(part, PartVols[k])
 		partSample.CName = PartNames[k]

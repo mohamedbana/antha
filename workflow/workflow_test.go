@@ -2,11 +2,10 @@ package workflow
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/inject"
-	"io/ioutil"
-	"path/filepath"
-	"testing"
 )
 
 const (
@@ -61,11 +60,7 @@ func createContext() (context.Context, error) {
 }
 
 func TestRunFromFile(t *testing.T) {
-	bs, err := ioutil.ReadFile(filepath.Join(dataDir, "cond-copy-equals.json"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	w, err := New(Opt{FromBytes: bs})
+	w, err := New(Opt{FromBytes: []byte(condCopyEqualsJson)})
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -547,6 +547,9 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent, carryvol wunit
 	for i, v := range cmps {
 		foundIt := false
 
+		vdup := v.Dup()
+		vdup.Vol += carryvol.ConvertTo(wunit.ParsePrefixedUnit(vdup.Vunit))
+
 		if v.HasAnyParent() {
 			//fmt.Println("Trying to get component ", v.CName, v.ParentID)
 			// this means it was already made with a previous call
@@ -567,6 +570,7 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent, carryvol wunit
 			vol.Add(carryvol)
 			/// XXX -- adding carry volumes is all very well but
 			// assumes we have made more of this component than we really need!
+			// -- this may just need to be removed pending a better fix
 			lhp.RemoveComponent(tx[0], tx[1], vol)
 
 			foundIt = true
@@ -581,7 +585,7 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent, carryvol wunit
 				if ok {
 					// whaddya got?
 					// nb this won't work if we need to split a volume across several plates
-					wcarr, ok := p.GetComponent(v, false)
+					wcarr, ok := p.GetComponent(vdup, false)
 
 					if ok {
 						foundIt = true

@@ -119,7 +119,7 @@ func _DNA_gelSteps(_ctx context.Context, _input *DNA_gelInput, _output *DNA_gelO
 		DNAgelloadmix.CName = _input.Samplenames[0] //[i] //originalname + strconv.Itoa(i)
 
 		// replacing following line with temporary hard code whilst developing protocol:
-		DNAgelloadmix.Type = wtype.LiquidTypeFromString(_input.Mixingpolicy)
+		DNAgelloadmix.Type, _ = wtype.LiquidTypeFromString(_input.Mixingpolicy)
 		//DNAgelloadmix.Type = "loadwater"
 
 		loadedsample := execute.MixInto(_ctx, _input.DNAgel,

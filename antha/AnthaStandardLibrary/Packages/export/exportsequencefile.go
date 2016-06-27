@@ -24,153 +24,136 @@
 package export
 
 import (
+	"bytes"
 	"fmt"
-	"log"
+	"io"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
-	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
 )
 
 // function to export a standard report of sequence properties to a txt file
-func Exporttofile(dir string, seq wtype.BioSequence) string {
-	anthapath.CreatedotAnthafolder()
-
-	filename := fmt.Sprintf("%s%c%s_%s.txt", anthapath.Dirpath(), os.PathSeparator, dir, seq.Name())
-
-	//f, _ := os.Create(filepath.Join(anthapath.Dirpath(), "iGem_registry.txt"))
-
-	f, e := os.Create(filename)
-	if e != nil {
-		log.Fatal(e)
+func Exporttofile(dir string, seq wtype.BioSequence) (string, error) {
+	filename := filepath.Join(anthapath.Path(), fmt.Sprintf("%s_%s.txt", dir, seq.Name()))
+	if err := os.MkdirAll(filepath.Dir(filename), 0777); err != nil {
+		return "", err
 	}
+
+	f, err := os.Create(filename)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+
+	var buf bytes.Buffer
 
 	// GC content
-	GC := GCcontent(seq.Sequence())
+	GC := sequences.GCcontent(seq.Sequence())
 
 	// Find all orfs:
-	orfs := DoublestrandedORFS(seq.Sequence())
+	orfs := sequences.DoublestrandedORFS(seq.Sequence())
 
-	fmt.Fprintln(f, ">", dir[2:]+"_"+seq.Name())
-	fmt.Fprintln(f, seq.Sequence())
+	fmt.Fprintln(&buf, ">", dir[2:]+"_"+seq.Name())
+	fmt.Fprintln(&buf, seq.Sequence())
 
-	fmt.Fprintln(f, "Sequence length:", len(seq.Sequence()))
-	fmt.Fprintln(f, "Molecular weight:", wutil.RoundInt(MassDNA(seq.Sequence(), false, true)), "g/mol")
-	fmt.Fprintln(f, "GC Content:", wutil.RoundInt((GC * 100)), "%")
+	fmt.Fprintln(&buf, "Sequence length:", len(seq.Sequence()))
+	fmt.Fprintln(&buf, "Molecular weight:", wutil.RoundInt(sequences.MassDNA(seq.Sequence(), false, true)), "g/mol")
+	fmt.Fprintln(&buf, "GC Content:", wutil.RoundInt((GC * 100)), "%")
 
-	fmt.Fprintln(f, (len(orfs.TopstrandORFS) + len(orfs.BottomstrandORFS)), "Potential Open reading frames found:")
-	//fmt.Fprintln(f, "Top strand")
+	fmt.Fprintln(&buf, (len(orfs.TopstrandORFS) + len(orfs.BottomstrandORFS)), "Potential Open reading frames found:")
 	for _, strandorf := range orfs.TopstrandORFS {
-		fmt.Fprintln(f, "Topstrand")
-		fmt.Fprintln(f, "Position:", strandorf.StartPosition, "..", strandorf.EndPosition)
+		fmt.Fprintln(&buf, "Topstrand")
+		fmt.Fprintln(&buf, "Position:", strandorf.StartPosition, "..", strandorf.EndPosition)
 
-		fmt.Fprintln(f, " DNA Sequence:", strandorf.DNASeq)
+		fmt.Fprintln(&buf, " DNA Sequence:", strandorf.DNASeq)
 
-		fmt.Fprintln(f, "Translated Amino Acid Sequence:", strandorf.ProtSeq)
-		fmt.Fprintln(f, "Length of Amino acid sequence:", len(strandorf.ProtSeq)-1)
-		fmt.Fprintln(f, "molecular weight:", Molecularweight(strandorf), "kDA")
+		fmt.Fprintln(&buf, "Translated Amino Acid Sequence:", strandorf.ProtSeq)
+		fmt.Fprintln(&buf, "Length of Amino acid sequence:", len(strandorf.ProtSeq)-1)
+		fmt.Fprintln(&buf, "molecular weight:", sequences.Molecularweight(strandorf), "kDA")
 	}
-	//fmt.Fprintln(f, "Bottom strand")
 	for _, strandorf := range orfs.BottomstrandORFS {
-		fmt.Fprintln(f, "Bottom strand")
-		fmt.Fprintln(f, "Position:", strandorf.StartPosition, "..", strandorf.EndPosition)
+		fmt.Fprintln(&buf, "Bottom strand")
+		fmt.Fprintln(&buf, "Position:", strandorf.StartPosition, "..", strandorf.EndPosition)
 
-		fmt.Fprintln(f, " DNA Sequence:", strandorf.DNASeq)
+		fmt.Fprintln(&buf, " DNA Sequence:", strandorf.DNASeq)
 
-		fmt.Fprintln(f, "Translated Amino Acid Sequence:", strandorf.ProtSeq)
-		fmt.Fprintln(f, "Length of Amino acid sequence:", len(strandorf.ProtSeq)-1)
-		fmt.Fprintln(f, "molecular weight:", Molecularweight(strandorf), "kDA")
+		fmt.Fprintln(&buf, "Translated Amino Acid Sequence:", strandorf.ProtSeq)
+		fmt.Fprintln(&buf, "Length of Amino acid sequence:", len(strandorf.ProtSeq)-1)
+		fmt.Fprintln(&buf, "molecular weight:", sequences.Molecularweight(strandorf), "kDA")
 	}
-	f.Close()
 
-	return filename
+	_, err = io.Copy(f, &buf)
+
+	return filename, err
 }
 
 // function to export a sequence to a txt file
-func ExportFasta(dir string, seq wtype.BioSequence) string {
-	anthapath.CreatedotAnthafolder()
-
-	filename := fmt.Sprintf("%s%c%s_%s.fasta", anthapath.Dirpath(), os.PathSeparator, dir, seq.Name())
-	f, e := os.Create(filename)
-	if e != nil {
-		log.Fatal(e)
+func ExportFasta(dir string, seq wtype.BioSequence) (string, error) {
+	filename := filepath.Join(anthapath.Path(), fmt.Sprintf("%s_%s.fasta", dir, seq.Name()))
+	if err := os.MkdirAll(filepath.Dir(filename), 0777); err != nil {
+		return "", err
 	}
 
-	fmt.Fprintf(f, ">%s\n%s\n", seq.Name(), seq.Sequence())
-
-	f.Close()
-
-	return filename
-}
-
-// function to export a sequence to a txt file
-func ExportFastaDir(dir string, file string, seq wtype.BioSequence) string {
-	filename := fmt.Sprintf("%s%c%s_%s.fasta", anthapath.Dirpath(), os.PathSeparator, dir, seq.Name())
-	f, e := os.Create(filename)
-	if e != nil {
-		log.Fatal(e)
+	f, err := os.Create(filename)
+	if err != nil {
+		return "", err
 	}
+	defer f.Close()
 
-	fmt.Fprintf(f, ">%s\n%s\n", seq.Name(), seq.Sequence())
+	_, err = fmt.Fprintf(f, ">%s\n%s\n", seq.Name(), seq.Sequence())
 
-	f.Close()
-
-	return filename
-}
-
-func ExportReport(dir string, seq wtype.BioSequence) string {
-	anthapath.CreatedotAnthafolder()
-
-	filename := fmt.Sprintf("%s%c%s_%s.txt", anthapath.Dirpath(), os.PathSeparator, dir, seq.Name())
-	f, e := os.Create(filename)
-	if e != nil {
-		log.Fatal(e)
-	}
-
-	fmt.Fprintf(f, ">%s\n%s\n", seq.Name(), seq.Sequence())
-
-	f.Close()
-
-	return filename
+	return filename, err
 }
 
 // function to export multiple sequences in fasta format into a single txt file
 // Modify this for the more general case
-func Makefastaserial(dir string, seqs []*wtype.DNASequence) string {
-	anthapath.CreatedotAnthafolder()
-	filename := fmt.Sprintf("%s%c%s.fasta", anthapath.Dirpath(), os.PathSeparator, dir)
-	f, e := os.Create(filename)
-	if e != nil {
-		log.Fatal(e)
+func Makefastaserial(dir string, seqs []*wtype.DNASequence) (string, error) {
+	filename := filepath.Join(anthapath.Path(), fmt.Sprintf("%s.fasta", dir))
+	if err := os.MkdirAll(filepath.Dir(filename), 0777); err != nil {
+		return "", err
 	}
+
+	f, err := os.Create(filename)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
 
 	for _, seq := range seqs {
-		fmt.Fprintf(f, ">%s\n%s\n", seq.Name(), seq.Sequence())
+		if _, err := fmt.Fprintf(f, ">%s\n%s\n", seq.Name(), seq.Sequence()); err != nil {
+			return "", err
+		}
 	}
 
-	f.Close()
-	return filename
+	return filename, nil
 }
 
-func Makefastaserial2(dir string, seqs []wtype.DNASequence) string {
-	anthapath.CreatedotAnthafolder()
-	filename := fmt.Sprintf("%s%c%s.fasta", anthapath.Dirpath(), os.PathSeparator, dir)
-	f, e := os.Create(filename)
-	if e != nil {
-		log.Fatal(e)
+func Makefastaserial2(dir string, seqs []wtype.DNASequence) (string, error) {
+	filename := filepath.Join(anthapath.Path(), fmt.Sprintf("%s.fasta", dir))
+	if err := os.MkdirAll(filepath.Dir(filename), 0777); err != nil {
+		return "", err
 	}
+
+	f, err := os.Create(filename)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
 
 	for _, seq := range seqs {
-		fmt.Fprintf(f, ">%s\n%s\n", seq.Name(), seq.Sequence())
+		if _, err := fmt.Fprintf(f, ">%s\n%s\n", seq.Name(), seq.Sequence()); err != nil {
+			return "", err
+		}
 	}
 
-	f.Close()
-	return filename
+	return filename, nil
 }
 
 func ExportFastaandSummaryforEachSeq(assemblyparameters enzymes.Assemblyparameters) (err error) {
@@ -191,18 +174,20 @@ func ExportFastaandSummaryforEachSeq(assemblyparameters enzymes.Assemblyparamete
 	}
 
 	for _, assemblyproduct := range plasmidproductsfromXprimaryseq {
+		filename := filepath.Join(anthapath.Path(), assemblyparameters.Constructname)
+		if _, err := Exporttofile(filename, &assemblyproduct); err != nil {
+			return err
+		}
 
-		fileprefix := anthapath.Dirpath() + "/"
-		tojoin := make([]string, 0)
-		tojoin = append(tojoin, fileprefix, assemblyparameters.Constructname)
-		filename := strings.Join(tojoin, "")
-		Exporttofile(filename, &assemblyproduct)
-		ExportFasta(filename, &assemblyproduct)
+		if _, err := ExportFasta(filename, &assemblyproduct); err != nil {
+			return err
+		}
 	}
-	return err
+
+	return nil
 }
 
-func ExportFastaSerialfromMultipleAssemblies(dirname string, multipleassemblyparameters []enzymes.Assemblyparameters) (filename string, err error) {
+func ExportFastaSerialfromMultipleAssemblies(dirname string, multipleassemblyparameters []enzymes.Assemblyparameters) (string, error) {
 
 	seqs := make([]wtype.DNASequence, 0)
 
@@ -214,13 +199,12 @@ func ExportFastaSerialfromMultipleAssemblies(dirname string, multipleassemblypar
 		//enzyme := TypeIIsEnzymeproperties[enzymename]
 		enzyme, err := lookup.TypeIIsLookup(enzymename)
 		if err != nil {
-			return filename, err
+			return "", err
 		}
 		//assemble (note that sapIenz is found in package enzymes)
 		_, plasmidproductsfromXprimaryseq, err := enzymes.JoinXnumberofparts(assemblyparameters.Vector, assemblyparameters.Partsinorder, enzyme)
-
 		if err != nil {
-			return filename, err
+			return "", err
 		}
 
 		for _, assemblyproduct := range plasmidproductsfromXprimaryseq {
@@ -237,35 +221,21 @@ func ExportFastaSerialfromMultipleAssemblies(dirname string, multipleassemblypar
 
 	}
 
-	filename = Makefastaserial2(dirname, seqs)
-
-	return filename, err
+	return Makefastaserial2(dirname, seqs)
 }
 
-func ExporttoTextFile(filename string, data []string) (err error) {
-
-	//filename := fmt.Sprintf("%s%c%s_%s.csv", anthapath.Dirpath(), os.PathSeparator, dir, name)
-
-	//f, _ := os.Create(filepath.Join(anthapath.Dirpath(), "iGem_registry.txt"))
-
-	f, e := os.Create(filename)
-	if e != nil {
-		log.Fatal(e)
+func ExporttoTextFile(filename string, data []string) error {
+	f, err := os.Create(filename)
+	if err != nil {
+		return err
 	}
+	defer f.Close()
 
 	for _, str := range data {
-
-		fmt.Fprintln(f, str)
-
-		/*	_, err = f.WriteString(str)
-
-			if err != nil {
-				fmt.Println(err.Error())
-				return
-			}
-		*/
+		if _, err := fmt.Fprintln(f, str); err != nil {
+			return err
+		}
 	}
-	f.Close()
 
-	return
+	return nil
 }

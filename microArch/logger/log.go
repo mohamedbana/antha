@@ -1,4 +1,4 @@
-// microArch/logger/default.go: Part of the Antha language
+// microArch/logger/log.go: Part of the Antha language
 // Copyright (C) 2015 The Antha authors. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
@@ -22,31 +22,29 @@
 
 package logger
 
-import (
-	"log"
-)
+import "log"
 
-//defaultMiddleware uses builtin log package
-type DefaultMiddleware struct {
+// Middleware using log package
+type LogMiddleware struct {
+	log *log.Logger
 }
 
-func NewDefaultMiddleware() *DefaultMiddleware {
-	ret := new(DefaultMiddleware)
-	return ret
+func NewLogMiddleware() *LogMiddleware {
+	return new(LogMiddleware)
 }
 
-func (m *DefaultMiddleware) Log(level LogLevel, ts int64, source string, message string, extra ...interface{}) {
-	log.Println(level, ts, source, message, extra)
+func (m *LogMiddleware) Log(level LogLevel, ts int64, source string, message string, extra ...interface{}) {
+	m.log.Println(level, ts, source, message, extra)
 }
 
-func (m *DefaultMiddleware) Measure(ts int64, source string, message string, extra ...interface{}) {
-	log.Println(ts, source, message, extra)
+func (m *LogMiddleware) Measure(ts int64, source string, message string, extra ...interface{}) {
+	m.log.Println(ts, source, message, extra)
 }
 
-func (m *DefaultMiddleware) Sensor(ts int64, source string, message string, extra ...interface{}) {
-	log.Println(ts, source, message, extra)
+func (m *LogMiddleware) Sensor(ts int64, source string, message string, extra ...interface{}) {
+	m.log.Println(ts, source, message, extra)
 }
 
-func (m *DefaultMiddleware) Data(ts int64, data interface{}, extra ...interface{}) {
-	log.Printf("%d | %+v | %+v\n", ts, data, extra)
+func (m *LogMiddleware) Data(ts int64, data interface{}, extra ...interface{}) {
+	m.log.Printf("%d | %+v | %+v\n", ts, data, extra)
 }

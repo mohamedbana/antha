@@ -65,6 +65,9 @@ func _Aliquot_somewhereSteps(_ctx context.Context, _input *Aliquot_somewhereInpu
 		// this time we append the slice of components after mixing
 		aliquots = append(aliquots, aliquot)
 	}
+
+	// Now we assign our temporary variable aliqouts to export as a variable as specified in Outputs
+	// In Antha the first letter of a variablename must be uppercase to allow the variable to be exported
 	_output.Aliquots = aliquots
 }
 
