@@ -206,11 +206,15 @@ func getExampleInputs(t *testing.T) []*TInput {
 // Divide l into n pieces, return indices for ith piece
 func divide(i, n, l int) (int, int) {
 	each := (l + n - 1) / n
-	if i == n-1 {
-		return i * each, l
-	} else {
-		return i * each, (i + 1) * each
+	first := i * each
+	last := (i + 1) * each
+	if first > l {
+		first = l
 	}
+	if last > l {
+		last = l
+	}
+	return first, last
 }
 
 func TestElementsWithExampleInputs0(t *testing.T) {
