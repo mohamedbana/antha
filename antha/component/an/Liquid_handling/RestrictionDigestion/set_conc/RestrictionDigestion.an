@@ -18,7 +18,7 @@ Parameters (
 	BSAvol						Volume
 	
 	StockReConcinUperml 		[]int
-	DesiredConcinUperml	 	[]int
+	DesiredConcinUperml	 		[]int
 	
 	ReactionTemp 				Temperature
 	ReactionTime 				Time
@@ -36,7 +36,6 @@ Inputs (
 	Water  				*wtype.LHComponent
 
 	OutPlate 			*wtype.LHPlate
-
 )
 
 
