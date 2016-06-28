@@ -20,7 +20,6 @@ func _AbsorbanceMeasurementSteps(_ctx context.Context, _input *AbsorbanceMeasure
 
 	// dilute sample
 	diluentSample := mixer.Sample(_input.Diluent, _input.DilutionVolume)
-	execute.Mix(_ctx, _input.SampleForReading, diluentSample)
 
 	dilutedSample := execute.Mix(_ctx, _input.SampleForReading, diluentSample)
 

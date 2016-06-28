@@ -1,9 +1,10 @@
 {
     "Parameters": {
-        "InitialGrowth1": {
+        "Growth1": {
             "Growthtemp": "25C",
             "Growthtime": "3600s",
-            "ShakingSpeed": "800/min"
+            "ShakingSpeed": "800/min",
+	"StrainInMedium":"culture"
         },
         "MediaPrep1": {
             "YeastExtractConc": "30g/l",
@@ -16,20 +17,10 @@
             "Glycerol": "Glycerol",
             "BaseMedium": "LB"
         },
-        "InoculateInitialGrowth1": {
-            "InoculumVolume": "20ul",
-            "Inoculum": "culture",
-            "Medium": "TB"
-        },
-        "InoculateOvernightGrowth1": {
+        "InoculateGrowth1": {
             "InoculumVolume": "20ul"
         },
-        "OverNightGrowth1": {
-            "Growthtemp": "25C",
-            "Growthtime": "86400s",
-            "ShakingSpeed": "800/min"
-        },
-        "Split1": {
+	"Split1": {
             "Stream1Vol": "50ul",
             "Stream2Vol": "50ul",
             "Stream1PlateType": "greinerfb96",
@@ -48,11 +39,5 @@
         }
     },
     "Config": {
-        "InputPlateType": [
-            "pcrplate_skirted_riser"
-        ],
-        "OutputPlateType": [
-            "pcrplate_skirted_riser"
-        ]
     }
 }

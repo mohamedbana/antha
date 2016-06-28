@@ -20,6 +20,7 @@ func _InoculateDOESteps(_ctx context.Context, _input *InoculateDOEInput, _output
 	inocsample := mixer.Sample(_input.Inoculum, _input.InoculumVolume)
 	fmt.Println("Inoculum ", _input.Inoculum.CName, "Inoculum Volume ", _input.InoculumVolume.ToString(), "Medium", _input.Medium.CName)
 	_output.Seed = execute.Mix(_ctx, _input.Medium, inocsample)
+	fmt.Println("Seed:", _output.Seed.CName)
 }
 
 func _InoculateDOEAnalysis(_ctx context.Context, _input *InoculateDOEInput, _output *InoculateDOEOutput) {

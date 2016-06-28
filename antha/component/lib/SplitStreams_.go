@@ -20,14 +20,18 @@ func _SplitStreamsSetup(_ctx context.Context, _input *SplitStreamsInput) {
 
 func _SplitStreamsSteps(_ctx context.Context, _input *SplitStreamsInput, _output *SplitStreamsOutput) {
 	s1 := mixer.Sample(_input.InputStream, _input.Stream1Vol)
+	s1.CName = s1.CName + "_Stream1"
 	_output.Stream1 = execute.MixTo(_ctx, _input.Stream1PlateType, "", 1, s1)
+
 	// ensure we end up with samples on different plates if types are the same
-	pt2 := 1
-	if _input.Stream1PlateType == _input.Stream2PlateType {
-		pt2 = 2
-	}
+	//pt2:=1
+	//if Stream1PlateType==Stream2PlateType{
+	pt2 := 2
+	//}
 	s2 := mixer.Sample(_input.InputStream, _input.Stream2Vol)
+	s2.CName = s2.CName + "_Stream2"
 	_output.Stream2 = execute.MixTo(_ctx, _input.Stream2PlateType, "", pt2, s2)
+	_output.Stream2.CName = _output.Stream2.CName + "_Stream2"
 }
 
 func _SplitStreamsAnalysis(_ctx context.Context, _input *SplitStreamsInput, _output *SplitStreamsOutput) {

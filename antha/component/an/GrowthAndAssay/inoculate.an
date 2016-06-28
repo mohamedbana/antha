@@ -32,6 +32,7 @@ Steps {
 	inocsample:=mixer.Sample(Inoculum, InoculumVolume)
 	fmt.Println("Inoculum ", Inoculum.CName, "Inoculum Volume ", InoculumVolume.ToString(), "Medium", Medium.CName)
 	Seed=Mix(Medium, inocsample)
+	fmt.Println("Seed:",Seed.CName)
 }
 
 Analysis {
