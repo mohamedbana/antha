@@ -113,7 +113,7 @@ func init() {
 		Constructor: SplitStreamsNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/DoE/splitstreams.an",
+			Path: "antha/component/an/GrowthAndAssay/splitstreams.an",
 			Params: []ParamDesc{
 				{Name: "InputStream", Desc: "", Kind: "Inputs"},
 				{Name: "Stream1PlateType", Desc: "", Kind: "Parameters"},

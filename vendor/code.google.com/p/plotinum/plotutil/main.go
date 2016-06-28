@@ -3,9 +3,9 @@
 package main
 
 import (
-	"code.google.com/p/plotinum/plot"
-	"code.google.com/p/plotinum/plotter"
-	"code.google.com/p/plotinum/plotutil"
+	"github.com/gonum/plot/plot"
+	"github.com/gonum/plot/plotter"
+	"github.com/gonum/plot/plotutil"
 	"math/rand"
 )
 

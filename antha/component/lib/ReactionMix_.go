@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -8,8 +9,6 @@ import (
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 )
-
-//"fmt"
 
 // Input parameters for this protocol (data)
 
@@ -25,6 +24,9 @@ func _ReactionMixRequirements() {}
 func _ReactionMixSetup(_ctx context.Context, _input *ReactionMixInput) {}
 
 func _ReactionMixSteps(_ctx context.Context, _input *ReactionMixInput, _output *ReactionMixOutput) {
+
+	fmt.Println("Components:", _input.Components)
+
 	samples := make([]*wtype.LHComponent, 0)
 
 	VectorS := mixer.Sample(_input.Vector, _input.VectorV)

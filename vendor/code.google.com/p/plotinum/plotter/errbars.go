@@ -7,8 +7,8 @@ package plotter
 import (
 	"math"
 
-	"code.google.com/p/plotinum/plot"
-	"code.google.com/p/plotinum/vg"
+	"github.com/gonum/plot/plot"
+	"github.com/gonum/plot/vg"
 )
 
 // DefaultCapWidth is the default width of error bar caps.

@@ -1,7 +1,7 @@
 package plotter
 
 import (
-	"code.google.com/p/plotinum/vg"
+	"github.com/gonum/plot/vg"
 	"testing"
 )
 

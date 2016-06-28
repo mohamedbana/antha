@@ -4,7 +4,7 @@ import (
 	"math"
 	"sort"
 
-	"code.google.com/p/plotinum/plotter"
+	"github.com/gonum/plot/plotter"
 )
 
 // ErrorPoints holds a set of x, y pairs along

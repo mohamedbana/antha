@@ -14,7 +14,7 @@ import (
 	"io"
 	"math"
 
-	"code.google.com/p/plotinum/vg"
+	"github.com/gonum/plot/vg"
 	svgo "github.com/ajstarks/svgo"
 )
 

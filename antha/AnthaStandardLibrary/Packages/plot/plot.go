@@ -27,9 +27,10 @@ import (
 	"fmt"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
-	"code.google.com/p/plotinum/plot"
-	"code.google.com/p/plotinum/plotter"
-	"code.google.com/p/plotinum/plotutil"
+	"github.com/gonum/plot"
+	"github.com/gonum/plot/plotter"
+	"github.com/gonum/plot/plotutil"
+	"github.com/gonum/plot/vg"
 	"github.com/tealeg/xlsx"
 )
 
@@ -38,7 +39,9 @@ var (
 )
 
 func Export(plt *plot.Plot, filename string) {
-	plt.Save(4, 4, filename)
+	length, _ := vg.ParseLength("10cm")
+
+	plt.Save(length, length, filename)
 }
 
 func Plot(Xvalues []float64, Yvaluearray [][]float64) (plt *plot.Plot) {
@@ -103,7 +106,14 @@ func Plot(Xvalues []float64, Yvaluearray [][]float64) (plt *plot.Plot) {
 	*/
 
 	fmt.Println(len(pts))
-	plotutil.AddScattersXYer(plt, pts)
+
+	ptsinterface := make([]interface{}, 0)
+
+	for _, pt := range pts {
+		ptsinterface = append(ptsinterface, pt)
+	}
+
+	plotutil.AddScatters(plt, ptsinterface...) //AddScattersXYer(plt, pts)
 	return
 }
 
@@ -239,24 +249,33 @@ func Plotfromspreadsheet(sheet *xlsx.Sheet, Xdatarange []string, Ydatarangearray
 	// second, each point is the median x and y value with the
 	// error bars showing the minimum and maximum values.
 
-	fmt.Println("pts", pts)
-	mean95, err := plotutil.NewErrorPoints(plotutil.MeanAndConf95, pts...)
-	if err != nil {
-		panic(err)
-	}
+	//	fmt.Println("pts", pts)
+	//	mean95, err := plotutil.NewErrorPoints(plotutil.MeanAndConf95, pts...)
+	//	if err != nil {
+	//		panic(err)
+	//	}
 	/*medMinMax, err := plotutil.NewErrorPoints(plotutil.MedianAndMinMax, pts...)
 	if err != nil {
 		panic(err)
 	}*/
-	plotutil.AddLinePoints(plt,
-		"mean and 95% confidence", mean95,
-	) //	"median and minimum and maximum", medMinMax)
+	//	plotutil.AddLinePoints(plt,
+	//		"mean and 95% confidence", mean95,
+	//	) //	"median and minimum and maximum", medMinMax)
 	//plotutil.AddErrorBars(plt, mean95, medMinMax)
 
 	// Add the points that are summarized by the error points.
 	fmt.Println(len(pts))
-	plotutil.AddScatters(plt, pts[0], pts[1], pts[2], pts[3], pts[4])
 
-	plt.Save(4, 4, Exportedfilename)
+	ptsinterface := make([]interface{}, 0)
+
+	for _, pt := range pts {
+		ptsinterface = append(ptsinterface, pt)
+	}
+
+	plotutil.AddScatters(plt, ptsinterface...) //pts[0], pts[1], pts[2], pts[3], pts[4])
+
+	length, _ := vg.ParseLength("10cm")
+
+	plt.Save(length, length, Exportedfilename)
 
 }

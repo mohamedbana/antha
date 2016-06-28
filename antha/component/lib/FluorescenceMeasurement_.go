@@ -100,7 +100,7 @@ func init() {
 		Constructor: FluorescenceMeasurementNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/DoE/fluorescenceassay.an",
+			Path: "antha/component/an/GrowthAndAssay/fluorescenceassay.an",
 			Params: []ParamDesc{
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "DilutionVolume", Desc: "", Kind: "Parameters"},
