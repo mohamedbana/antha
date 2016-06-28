@@ -163,6 +163,27 @@
 			"revisionTime": "2015-12-24T06:54:52+02:00"
 		},
 		{
+			"checksumSHA1": "L3MAOjb/7cFQa5M9XpiCTXQxcvE=",
+			"path": "github.com/gonum/plot/vg",
+			"revision": "986a404a76fa599aed8ce476ec816c82fd9c9c4e",
+			"revisionTime": "2016-06-17T15:34:52-04:00"
+		},
+		{	
+			"path": "github.com/gonum/plot/plotter",
+			"revision": "986a404a76fa599aed8ce476ec816c82fd9c9c4e",
+			"revisionTime": "2016-06-17T15:34:52-04:00"
+		},
+		{	
+			"path": "github.com/gonum/plot/plotutil",
+			"revision": "986a404a76fa599aed8ce476ec816c82fd9c9c4e",
+			"revisionTime": "2016-06-17T15:34:52-04:00"
+		},
+		{	
+			"path": "github.com/gonum/plot",
+			"revision": "986a404a76fa599aed8ce476ec816c82fd9c9c4e",
+			"revisionTime": "2016-06-17T15:34:52-04:00"
+		},
+		{
 			"path": "github.com/hashicorp/hcl",
 			"revision": "197e8d3cf42199cfd53cd775deb37f3637234635",
 			"revisionTime": "2015-12-18T11:53:00-06:00"
