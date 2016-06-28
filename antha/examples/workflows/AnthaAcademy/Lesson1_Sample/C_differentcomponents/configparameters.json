@@ -17,5 +17,14 @@
            "SolutionVolume": "15ul",
 		   "TotalVolume": "150ul"
         }
+    },
+	"Config": {
+        "InputPlateType": [
+            "pcrplate_skirted_riser"
+        ],
+        "OutputPlateType": [
+            "greiner384_riser"
+        ]
     }
+	
 }

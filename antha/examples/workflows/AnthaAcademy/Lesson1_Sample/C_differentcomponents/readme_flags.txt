@@ -28,3 +28,19 @@ antharun --inputPlates
 This allows user defined input plates to be defined. If this is not chosen antha will decide upon the layout.
 More than one inputplate can be defined: this waould be done like so:
 antharun --inputPlates assemblyreagents.csv --inputPlates assemblyparts.csv
+
+_____________
+
+Config
+
+4. An alternative to specifying plates as a flag is adding a Config section to the parameters file.
+An input or output plate type can be specified by adding a config section to the parameters file as shown in configparameters.json
+
+ "Config": {
+        "InputPlateType": [
+            "pcrplate_skirted_riser"
+        ],
+        "OutputPlateType": [
+            "greiner384_riser"
+        ]
+    }
