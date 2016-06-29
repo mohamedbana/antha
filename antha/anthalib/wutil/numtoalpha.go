@@ -1,5 +1,5 @@
-// anthalib/wutil/round_test.go: Part of the Antha language
-// Copyright (C) 2016 the Antha authors. All rights reserved.
+// wutil/numtoalpha.go: Part of the Antha language
+// Copyright (C) 2014 the Antha authors. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -22,21 +22,63 @@
 
 package wutil
 
-import "fmt"
+import (
+	"math"
+	"strings"
+)
 
-func ExampleRound() {
-	fmt.Println(RoundInt(-3.3))
-	fmt.Println(RoundInt(3.3))
-	fmt.Println(RoundInt(-3.9))
-	fmt.Println(RoundInt(3.9))
-	fmt.Println(RoundInt(-3.5))
-	fmt.Println(RoundInt(3.5))
+func NumToAlphaCountFromZero(n int) string {
+	return NumToAlpha(n + 1)
+}
 
-	// Output:
-	// -3
-	// 3
-	// -4
-	// 4
-	// -4
-	// 4
+// COUNTING FROM 1!
+func NumToAlpha(n int) string {
+	symbols := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	s := ""
+
+	if n < 1 {
+		return s
+	}
+
+	v := 26
+
+	for {
+		n -= 1
+		r := (n % v)
+		s += strings.Split(symbols, "")[r]
+		n /= v
+		if n <= 0 {
+			break
+		}
+	}
+
+	t := ""
+
+	for i := len(s) - 1; i >= 0; i-- {
+		t += string(s[i])
+	}
+
+	return t
+}
+
+func AlphaToNum(s string) int {
+	symbols := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+	v := 0
+
+	for i, b := range s {
+		c := string(b)
+		x := int(math.Pow(float64(len(symbols)), float64(len(s)-(i+1)))) * (strings.Index(symbols, c) + 1)
+		v += x
+	}
+
+	return v
+}
+
+func DecodeCoords(s string) (int, int) {
+	var x, y int
+	tox := strings.Split(s, ":")
+	x = AlphaToNum(tox[0]) - 1
+	y = ParseInt(tox[1]) - 1
+	return x, y
 }

@@ -1,4 +1,4 @@
-// anthalib/wutil/intset_test.go: Part of the Antha language
+// anthalib//wutil/intarray.go: Part of the Antha language
 // Copyright (C) 2015 The Antha authors. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
@@ -19,25 +19,23 @@
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
+
 package wutil
 
-import "testing"
+import "sort"
 
-func TestIntSet(t *testing.T) {
-	s := NewIntSet(10)
-
-	for i := 0; i < 100; i++ {
-		s.Add(i % 10)
+func Max(ints []int) (int, bool) {
+	if len(ints) == 0 {
+		return 0, false
 	}
+	sort.Ints(ints)
+	return ints[len(ints)-1], false
+}
 
-	// s now should contain only 0..9
-	// in that order
-
-	ss := s.AsSlice()
-
-	for i := 0; i < 10; i++ {
-		if ss[i] != i {
-			t.Errorf("expected %d found %d", ss[i], i)
-		}
+func Min(ints []int) (int, bool) {
+	if len(ints) == 0 {
+		return 0, false
 	}
+	sort.Ints(ints)
+	return ints[0], false
 }

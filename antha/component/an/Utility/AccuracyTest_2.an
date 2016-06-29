@@ -70,6 +70,7 @@ Steps {
 	var rotate = false
 	var autorotate = true
 	var wellpositionarray = make([]string, 0)
+	var alphabet = wutil.MakeAlphabetArray() 
 	Runtowelllocationmap = make(map[string]string)
 	Blankwells = make([]string,0)
 	counter := 0
@@ -278,7 +279,7 @@ Steps {
 		//eachreaction = append(eachreaction,bufferSample)
 		
 		// add blanks to last column of plate
-		well := wutil.NumToAlpha(OutPlate.WlsY-m)+strconv.Itoa(OutPlate.WlsX)
+		well := alphabet[OutPlate.WlsY-1-m]+strconv.Itoa(OutPlate.WlsX)
 	
 		reaction := MixTo(OutPlate.Type,well, n+1,bufferSample)
 

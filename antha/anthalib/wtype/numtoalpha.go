@@ -1,5 +1,5 @@
-// anthalib/wutil/ints.go: Part of the Antha language
-// Copyright (C) 2016 The Antha authors. All rights reserved.
+// anthalib//wtype/numtoalpha.go: Part of the Antha language
+// Copyright (C) 2015 The Antha authors. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,30 +19,53 @@
 // contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
-package wutil
 
-func Max(ints []int) (int, bool) {
-	if len(ints) == 0 {
-		return 0, false
+package wtype
+
+import (
+	"math"
+	"strings"
+)
+
+func NumToAlpha(n int) string {
+	symbols := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	s := ""
+
+	if n < 1 {
+		return s
 	}
-	m := ints[0]
-	for _, i := range ints {
-		if m < i {
-			m = i
+
+	v := 26
+
+	for {
+		n -= 1
+		r := (n % v)
+		s += strings.Split(symbols, "")[r]
+		n /= v
+		if n <= 0 {
+			break
 		}
 	}
-	return m, false
+
+	t := ""
+
+	for i := len(s) - 1; i >= 0; i-- {
+		t += string(s[i])
+	}
+
+	return t
 }
 
-func Min(ints []int) (int, bool) {
-	if len(ints) == 0 {
-		return 0, false
+func AlphaToNum(s string) int {
+	symbols := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+	v := 0
+
+	for i, b := range s {
+		c := string(b)
+		x := int(math.Pow(float64(len(symbols)), float64(len(s)-(i+1)))) * (strings.Index(symbols, c) + 1)
+		v += x
 	}
-	m := ints[0]
-	for _, i := range ints {
-		if m > i {
-			m = i
-		}
-	}
-	return m, false
+
+	return v
 }
