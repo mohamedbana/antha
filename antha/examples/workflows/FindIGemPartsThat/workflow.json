@@ -1,7 +1,16 @@
 {
     "connections": [],
     "processes": {
-        "FindPartsThat": {
+        "RBS": {
+            "component": "FindIGemPartsThat"
+        },
+		"CyanReporter": {
+            "component": "FindIGemPartsThat"
+        },
+		"YellowReporter": {
+            "component": "FindIGemPartsThat"
+        },
+		"GreenReporter": {
             "component": "FindIGemPartsThat"
         }
     }

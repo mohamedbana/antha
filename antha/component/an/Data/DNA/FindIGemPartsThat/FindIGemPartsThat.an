@@ -18,6 +18,7 @@ import (
 Parameters (
 	Parttypes			[]string // e.g. rbs, reporter
 	Partdescriptions	[]string  // e.g. strong, arsenic, fluorescent, alkane, logic gate
+	ExactTypeOnly bool
 	OnlyreturnAvailableParts bool
 	OnlyreturnWorkingparts bool
 )
@@ -35,11 +36,12 @@ Outputs (
 // Data which is returned from this protocol, and data types
 Data (
 	Warnings error
-	Status string
-	FulllistBackupParts [][]string 
+	FulllistBackupParts []string 
+	WorkingBackupParts []string
 	PartMap map[string][]string // i.e. map[description]list of parts matching description
 	BiobrickDescriptions map[string]string // i.e. map[biobrickID]description
 	HighestRatedMatch string
+	HighestRatedMatchScore int
 	HighestRatedMatchDNASequence wtype.DNASequence
 )
 // Input Requirement specification
@@ -54,13 +56,15 @@ Setup {}
 // for every input
 Steps {
 
+	//Parttypes := []string{Parttype}
 
 	BackupParts := make([]string,0)
-	status := ""
-	joinedstatus := make([]string,0)
+	WorkingBackupParts = make([]string,0)
+
 	// Look up parts from registry according to properties (this will take a couple of minutes the first time)
 	
 	parts := make([][]string,0)
+	OriginalPartMap := make(map[string][]string)
 	PartMap = make(map[string][]string)
 	BiobrickDescriptions = make(map[string]string)
 	subparts := make([]string,0)
@@ -75,11 +79,10 @@ Steps {
 	// first we'll parse the igem registry based on the short description contained in the fasta header for each part sequence
 	for _, desc := range Parttypes {
 	
-	subparts = igem.FilterRegistry(desc,[]string{desc, partstatus})
-	status = text.Print(desc + " :",subparts)
-	joinedstatus = append(joinedstatus, status)
+	subparts = igem.FilterRegistry(desc,[]string{partstatus},ExactTypeOnly)
 	parts = append(parts,subparts)
-	PartMap[desc]=subparts
+	OriginalPartMap[desc+"_"+partstatus]=subparts
+	PartMap[desc+"_"+partstatus]=subparts
 	}
 	 
 	
@@ -89,23 +92,24 @@ Steps {
 		}
 	
 	
-	var i int
 	
-	for desc,subparts := range PartMap {
+	
+	for desc,subparts := range OriginalPartMap {
 	
 	partdetails := igem.LookUp(subparts)
 	
 	
+	
 	// now we can get detailed information of all of those records to interrogate further
 	// this can be slow if there are many parts to check (~2 seconds per block of 14 parts)
-	
+	for i := range Partdescriptions {
 	
 	for _, subpart := range subparts {
 		
 		if strings.Contains(strings.ToUpper(partdetails.Description(subpart)),strings.ToUpper(Partdescriptions[i])) &&
 			strings.Contains(partdetails.Results(subpart), othercriteria) {
 			BackupParts = append(BackupParts, subpart)
-			BiobrickDescriptions[subpart]= partdetails.Description(subpart)
+			
 			
 			rating, err := strconv.Atoi(partdetails.Rating(subpart))
 			
@@ -115,32 +119,53 @@ Steps {
 			seq := partdetails.Sequence(HighestRatedMatch)
 			
 			HighestRatedMatchDNASequence = wtype.MakeLinearDNASequence(HighestRatedMatch,seq)
+			highestrating = rating
 			}
+		}
+		if strings.Contains(strings.ToUpper(partdetails.Description(subpart)),strings.ToUpper(Partdescriptions[i])) &&
+			strings.Contains(partdetails.Results(subpart), "WORKS"){
+			WorkingBackupParts = append(WorkingBackupParts,subpart)
 		}
 		
 		
-		delete(PartMap,desc)
-		PartMap[desc]=BackupParts
+		//delete(PartMap,desc)
 		
-		FulllistBackupParts = append(FulllistBackupParts,BackupParts)
+		PartMap[desc+"_"+Partdescriptions[i]]=BackupParts
+		PartMap[desc+"_"+Partdescriptions[i]+"+WORKS"]=WorkingBackupParts
+		
+		
+		FulllistBackupParts = BackupParts //append(FulllistBackupParts,BackupParts)
 	}
 	i = i + 1
+	
+	}
+	for _, subpart := range BackupParts {
+	BiobrickDescriptions[subpart]= partdetails.Description(subpart)
+	}
 	}
 	
+	HighestRatedMatchScore = highestrating
 
-	FulllistBackupParts = parts
-	Status = strings.Join(joinedstatus," ; ")
+	for key, value := range PartMap {
+		fmt.Println(text.Print(key,value))
+	}
+
+
+
+
+	//FulllistBackupParts = parts
 	
+	//Status = strings.Join(joinedstatus," ; ")
 	
 	// Print status
-	if Status != "all parts available"{
+	/*if Status != "all parts available"{
 		Status = fmt.Sprintln(Status)
 	} else {Status = fmt.Sprintln(
 		"Warnings:", Warnings.Error(),
-		"Back up parts found (Reported to work!)", FulllistBackupParts,
+		"Back up parts found (Reported to work!)", BackupParts,
 		)
 		}
-	
+	*/
 }
 
 // Run after controls and a steps block are completed to
