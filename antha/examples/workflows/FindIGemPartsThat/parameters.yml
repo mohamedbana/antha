@@ -7,9 +7,9 @@
             "Partdescriptions": [
                "STRONG"
             ],
-            "Parttypes":[
+            "Parttype":
                 "RBS"
-            ]
+            
         },
 		"CyanReporter": {
             "OnlyreturnAvailableParts": true,
@@ -18,9 +18,9 @@
             "Partdescriptions": [
                "CYAN"
             ],
-            "Parttypes":[
+            "Parttype":
                 "REPORTER"
-            ]
+            
         },
 		"YellowReporter": {
             "OnlyreturnAvailableParts": true,
@@ -29,9 +29,9 @@
             "Partdescriptions": [
                "YELLOW"
             ],
-            "Parttypes":[
+            "Parttype":
                 "REPORTER"
-            ]
+            
         },
 		"GreenReporter": {
             "OnlyreturnAvailableParts": true,
@@ -40,9 +40,9 @@
             "Partdescriptions": [
                "GREEN"
             ],
-            "Parttypes":[
+            "Parttype":
                 "REPORTER"
-            ]
+            
         }
     }
 }

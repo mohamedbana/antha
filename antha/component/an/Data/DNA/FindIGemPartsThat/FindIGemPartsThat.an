@@ -16,7 +16,7 @@ import (
 
 // Input parameters for this protocol (data)
 Parameters (
-	Parttypes			[]string // e.g. rbs, reporter
+	Parttype			string // e.g. rbs, reporter
 	Partdescriptions	[]string  // e.g. strong, arsenic, fluorescent, alkane, logic gate
 	ExactTypeOnly bool
 	OnlyreturnAvailableParts bool
@@ -56,13 +56,13 @@ Setup {}
 // for every input
 Steps {
 
-	//Parttypes := []string{Parttype}
+	Parttypes := []string{Parttype}
 
 	BackupParts := make([]string,0)
 	WorkingBackupParts = make([]string,0)
 
-	// Look up parts from registry according to properties (this will take a couple of minutes the first time)
 	
+	// initialise some variables for use later
 	parts := make([][]string,0)
 	OriginalPartMap := make(map[string][]string)
 	PartMap = make(map[string][]string)
@@ -77,12 +77,12 @@ Steps {
 	} 
 	
 	// first we'll parse the igem registry based on the short description contained in the fasta header for each part sequence
-	for _, desc := range Parttypes {
+	for _, parttype := range Parttypes {
 	
-	subparts = igem.FilterRegistry(desc,[]string{partstatus},ExactTypeOnly)
+	subparts = igem.FilterRegistry(parttype,[]string{partstatus},ExactTypeOnly)
 	parts = append(parts,subparts)
-	OriginalPartMap[desc+"_"+partstatus]=subparts
-	PartMap[desc+"_"+partstatus]=subparts
+	OriginalPartMap[parttype+"_"+partstatus]=subparts
+	PartMap[parttype+"_"+partstatus]=subparts
 	}
 	 
 	
@@ -92,25 +92,23 @@ Steps {
 		}
 	
 	
-	
-	
 	for desc,subparts := range OriginalPartMap {
 	
 	partdetails := igem.LookUp(subparts)
-	
-	
+
 	
 	// now we can get detailed information of all of those records to interrogate further
-	// this can be slow if there are many parts to check (~2 seconds per block of 14 parts)
+	// this can be slow if there are many parts to check 
 	for i := range Partdescriptions {
 	
 	for _, subpart := range subparts {
 		
+		// check if key words are in description and that status == "WORKS if only working parts are desired
 		if strings.Contains(strings.ToUpper(partdetails.Description(subpart)),strings.ToUpper(Partdescriptions[i])) &&
 			strings.Contains(partdetails.Results(subpart), othercriteria) {
 			BackupParts = append(BackupParts, subpart)
 			
-			
+			// ensure the highest rated part is returned
 			rating, err := strconv.Atoi(partdetails.Rating(subpart))
 			
 			if err == nil && rating >highestrating{
@@ -127,14 +125,12 @@ Steps {
 			WorkingBackupParts = append(WorkingBackupParts,subpart)
 		}
 		
-		
-		//delete(PartMap,desc)
-		
+		// add to look up table to report back to user
 		PartMap[desc+"_"+Partdescriptions[i]]=BackupParts
 		PartMap[desc+"_"+Partdescriptions[i]+"+WORKS"]=WorkingBackupParts
 		
 		
-		FulllistBackupParts = BackupParts //append(FulllistBackupParts,BackupParts)
+		FulllistBackupParts = BackupParts 
 	}
 	i = i + 1
 	
@@ -146,26 +142,12 @@ Steps {
 	
 	HighestRatedMatchScore = highestrating
 
+
+	// print in pretty format on terminal 
 	for key, value := range PartMap {
 		fmt.Println(text.Print(key,value))
 	}
 
-
-
-
-	//FulllistBackupParts = parts
-	
-	//Status = strings.Join(joinedstatus," ; ")
-	
-	// Print status
-	/*if Status != "all parts available"{
-		Status = fmt.Sprintln(Status)
-	} else {Status = fmt.Sprintln(
-		"Warnings:", Warnings.Error(),
-		"Back up parts found (Reported to work!)", BackupParts,
-		)
-		}
-	*/
 }
 
 // Run after controls and a steps block are completed to

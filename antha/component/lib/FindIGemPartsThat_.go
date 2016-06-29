@@ -44,13 +44,12 @@ func _FindIGemPartsThatSetup(_ctx context.Context, _input *FindIGemPartsThatInpu
 // for every input
 func _FindIGemPartsThatSteps(_ctx context.Context, _input *FindIGemPartsThatInput, _output *FindIGemPartsThatOutput) {
 
-	//Parttypes := []string{Parttype}
+	Parttypes := []string{_input.Parttype}
 
 	BackupParts := make([]string, 0)
 	_output.WorkingBackupParts = make([]string, 0)
 
-	// Look up parts from registry according to properties (this will take a couple of minutes the first time)
-
+	// initialise some variables for use later
 	parts := make([][]string, 0)
 	OriginalPartMap := make(map[string][]string)
 	_output.PartMap = make(map[string][]string)
@@ -65,12 +64,12 @@ func _FindIGemPartsThatSteps(_ctx context.Context, _input *FindIGemPartsThatInpu
 	}
 
 	// first we'll parse the igem registry based on the short description contained in the fasta header for each part sequence
-	for _, desc := range _input.Parttypes {
+	for _, parttype := range Parttypes {
 
-		subparts = igem.FilterRegistry(desc, []string{partstatus}, _input.ExactTypeOnly)
+		subparts = igem.FilterRegistry(parttype, []string{partstatus}, _input.ExactTypeOnly)
 		parts = append(parts, subparts)
-		OriginalPartMap[desc+"_"+partstatus] = subparts
-		_output.PartMap[desc+"_"+partstatus] = subparts
+		OriginalPartMap[parttype+"_"+partstatus] = subparts
+		_output.PartMap[parttype+"_"+partstatus] = subparts
 	}
 
 	othercriteria := ""
@@ -83,15 +82,17 @@ func _FindIGemPartsThatSteps(_ctx context.Context, _input *FindIGemPartsThatInpu
 		partdetails := igem.LookUp(subparts)
 
 		// now we can get detailed information of all of those records to interrogate further
-		// this can be slow if there are many parts to check (~2 seconds per block of 14 parts)
+		// this can be slow if there are many parts to check
 		for i := range _input.Partdescriptions {
 
 			for _, subpart := range subparts {
 
+				// check if key words are in description and that status == "WORKS if only working parts are desired
 				if strings.Contains(strings.ToUpper(partdetails.Description(subpart)), strings.ToUpper(_input.Partdescriptions[i])) &&
 					strings.Contains(partdetails.Results(subpart), othercriteria) {
 					BackupParts = append(BackupParts, subpart)
 
+					// ensure the highest rated part is returned
 					rating, err := strconv.Atoi(partdetails.Rating(subpart))
 
 					if err == nil && rating > highestrating {
@@ -108,12 +109,11 @@ func _FindIGemPartsThatSteps(_ctx context.Context, _input *FindIGemPartsThatInpu
 					_output.WorkingBackupParts = append(_output.WorkingBackupParts, subpart)
 				}
 
-				//delete(PartMap,desc)
-
+				// add to look up table to report back to user
 				_output.PartMap[desc+"_"+_input.Partdescriptions[i]] = BackupParts
 				_output.PartMap[desc+"_"+_input.Partdescriptions[i]+"+WORKS"] = _output.WorkingBackupParts
 
-				_output.FulllistBackupParts = BackupParts //append(FulllistBackupParts,BackupParts)
+				_output.FulllistBackupParts = BackupParts
 			}
 			i = i + 1
 
@@ -125,23 +125,11 @@ func _FindIGemPartsThatSteps(_ctx context.Context, _input *FindIGemPartsThatInpu
 
 	_output.HighestRatedMatchScore = highestrating
 
+	// print in pretty format on terminal
 	for key, value := range _output.PartMap {
 		fmt.Println(text.Print(key, value))
 	}
 
-	//FulllistBackupParts = parts
-
-	//Status = strings.Join(joinedstatus," ; ")
-
-	// Print status
-	/*if Status != "all parts available"{
-		Status = fmt.Sprintln(Status)
-	} else {Status = fmt.Sprintln(
-		"Warnings:", Warnings.Error(),
-		"Back up parts found (Reported to work!)", BackupParts,
-		)
-		}
-	*/
 }
 
 // Run after controls and a steps block are completed to
@@ -206,7 +194,7 @@ type FindIGemPartsThatInput struct {
 	OnlyreturnAvailableParts bool
 	OnlyreturnWorkingparts   bool
 	Partdescriptions         []string
-	Parttypes                []string
+	Parttype                 string
 }
 
 type FindIGemPartsThatOutput struct {
@@ -246,7 +234,7 @@ func init() {
 				{Name: "OnlyreturnAvailableParts", Desc: "", Kind: "Parameters"},
 				{Name: "OnlyreturnWorkingparts", Desc: "", Kind: "Parameters"},
 				{Name: "Partdescriptions", Desc: "e.g. strong, arsenic, fluorescent, alkane, logic gate\n", Kind: "Parameters"},
-				{Name: "Parttypes", Desc: "e.g. rbs, reporter\n", Kind: "Parameters"},
+				{Name: "Parttype", Desc: "e.g. rbs, reporter\n", Kind: "Parameters"},
 				{Name: "BiobrickDescriptions", Desc: "i.e. map[biobrickID]description\n", Kind: "Data"},
 				{Name: "FulllistBackupParts", Desc: "", Kind: "Data"},
 				{Name: "HighestRatedMatch", Desc: "", Kind: "Data"},
