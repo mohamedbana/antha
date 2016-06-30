@@ -12,6 +12,7 @@ import (
 	"strings"
 	"strconv"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 )
 
 // Input parameters for this protocol (data)
@@ -19,6 +20,7 @@ Parameters (
 	Parttype			string // e.g. rbs, reporter
 	Partdescriptions	[]string  // e.g. strong, arsenic, fluorescent, alkane, logic gate
 	ExactTypeOnly bool
+	MatchAllDescriptions bool
 	OnlyreturnAvailableParts bool
 	OnlyreturnWorkingparts bool
 )
@@ -99,15 +101,35 @@ Steps {
 	
 	// now we can get detailed information of all of those records to interrogate further
 	// this can be slow if there are many parts to check 
+	// Parts will be added if they contain either description not both
 	for i := range Partdescriptions {
 	
 	for _, subpart := range subparts {
 		
 		// check if key words are in description and that status == "WORKS if only working parts are desired
-		if strings.Contains(strings.ToUpper(partdetails.Description(subpart)),strings.ToUpper(Partdescriptions[i])) &&
+		 if MatchAllDescriptions == false && strings.Contains(strings.ToUpper(partdetails.Description(subpart)),strings.ToUpper(Partdescriptions[i])) &&
 			strings.Contains(partdetails.Results(subpart), othercriteria) {
+				
+			if !search.InSlice(subpart,BackupParts){
 			BackupParts = append(BackupParts, subpart)
+			}
+			// ensure the highest rated part is returned
+			rating, err := strconv.Atoi(partdetails.Rating(subpart))
 			
+			if err == nil && rating >highestrating{
+			HighestRatedMatch = subpart
+			
+			seq := partdetails.Sequence(HighestRatedMatch)
+			
+			HighestRatedMatchDNASequence = wtype.MakeLinearDNASequence(HighestRatedMatch,seq)
+			highestrating = rating
+			}
+		}else if MatchAllDescriptions && search.Containsallthings((partdetails.Description(subpart)),Partdescriptions) &&
+			strings.Contains(partdetails.Results(subpart), othercriteria) {
+				
+			if !search.InSlice(subpart,BackupParts){
+			BackupParts = append(BackupParts, subpart)
+			}
 			// ensure the highest rated part is returned
 			rating, err := strconv.Atoi(partdetails.Rating(subpart))
 			
@@ -120,20 +142,40 @@ Steps {
 			highestrating = rating
 			}
 		}
-		if strings.Contains(strings.ToUpper(partdetails.Description(subpart)),strings.ToUpper(Partdescriptions[i])) &&
+		if MatchAllDescriptions == false && strings.Contains(strings.ToUpper(partdetails.Description(subpart)),strings.ToUpper(Partdescriptions[i])) &&
 			strings.Contains(partdetails.Results(subpart), "WORKS"){
+				if !search.InSlice(subpart,WorkingBackupParts){
 			WorkingBackupParts = append(WorkingBackupParts,subpart)
-		}
-		
+			}
+		} else if MatchAllDescriptions && search.Containsallthings((partdetails.Description(subpart)),Partdescriptions) &&
+			strings.Contains(partdetails.Results(subpart), "WORKS") {
+				if !search.InSlice(subpart,WorkingBackupParts){
+			WorkingBackupParts = append(WorkingBackupParts,subpart)
+			}
+		}		
 		// add to look up table to report back to user
+		if MatchAllDescriptions {
+			var partdesc string
+			
+			for _, descriptor := range Partdescriptions {
+				partdesc = partdesc + "_"+descriptor
+			}
+		PartMap[desc+"_"+partdesc]=BackupParts
+		PartMap[desc+"_"+partdesc+"+WORKS"]=WorkingBackupParts
+			
+		}else if MatchAllDescriptions == false {
+		
 		PartMap[desc+"_"+Partdescriptions[i]]=BackupParts
 		PartMap[desc+"_"+Partdescriptions[i]+"+WORKS"]=WorkingBackupParts
-		
+		}
 		
 		FulllistBackupParts = BackupParts 
 	}
 	i = i + 1
-	
+	if MatchAllDescriptions {
+		// don't need to loop through each description if we're matching all
+		break
+	}
 	}
 	for _, subpart := range BackupParts {
 	BiobrickDescriptions[subpart]= partdetails.Description(subpart)

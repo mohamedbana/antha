@@ -3,20 +3,24 @@
         "RBS": {
             "OnlyreturnAvailableParts": true,
             "OnlyreturnWorkingparts": true,
-			"ExactTypeOnly":false,
+			"ExactTypeOnly":true,
+			"MatchAllDescriptions":true,
             "Partdescriptions": [
+				"RBS",
                "STRONG"
             ],
             "Parttype":
-                "RBS"
+                "GENERIC"
             
         },
 		"CyanReporter": {
             "OnlyreturnAvailableParts": true,
             "OnlyreturnWorkingparts": false,
 			"ExactTypeOnly":true,
+			"MatchAllDescriptions":true,
             "Partdescriptions": [
-               "CYAN"
+               "cyan",
+			   "fluorescent"
             ],
             "Parttype":
                 "REPORTER"
@@ -26,6 +30,7 @@
             "OnlyreturnAvailableParts": true,
             "OnlyreturnWorkingparts": false,
 			"ExactTypeOnly":true,
+			"MatchAllDescriptions":true,
             "Partdescriptions": [
                "YELLOW"
             ],
@@ -37,6 +42,7 @@
             "OnlyreturnAvailableParts": true,
             "OnlyreturnWorkingparts": false,
 			"ExactTypeOnly":true,
+			"MatchAllDescriptions":true,
             "Partdescriptions": [
                "GREEN"
             ],
