@@ -8,6 +8,59 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
 )
 
+// convenience comparison operator
+
+func CompareStringWellCoordsCol(sw1, sw2 string) int {
+	w1 := MakeWellCoords(sw1)
+	w2 := MakeWellCoords(sw2)
+	return CompareWellCoordsCol(w1, w2)
+}
+
+func CompareWellCoordsCol(w1, w2 WellCoords) int {
+	dx := w1.X - w2.X
+	dy := w1.Y - w2.Y
+
+	if dx < 0 {
+		return -1
+	} else if dx > 0 {
+		return 1
+	} else {
+		if dy < 0 {
+			return -1
+		} else if dy > 0 {
+			return 1
+		} else {
+			return 0
+		}
+	}
+	return 0
+}
+func CompareStringWellCoordsRow(sw1, sw2 string) int {
+	w1 := MakeWellCoords(sw1)
+	w2 := MakeWellCoords(sw2)
+	return CompareWellCoordsRow(w1, w2)
+}
+
+func CompareWellCoordsRow(w1, w2 WellCoords) int {
+	dx := w1.X - w2.X
+	dy := w1.Y - w2.Y
+
+	if dy < 0 {
+		return -1
+	} else if dy > 0 {
+		return 1
+	} else {
+		if dx < 0 {
+			return -1
+		} else if dx > 0 {
+			return 1
+		} else {
+			return 0
+		}
+	}
+	return 0
+}
+
 // convenience structure for handling well coordinates
 type WellCoords struct {
 	X int
