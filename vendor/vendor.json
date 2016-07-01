@@ -163,6 +163,30 @@
 			"revisionTime": "2015-12-24T06:54:52+02:00"
 		},
 		{
+			"path": "github.com/golang/freetype",
+			"revision": "38b4c392adc5eed94207994c4848fff99f4ac234",
+			"revisionTime": "2016-06-26T16:51:47+10:00"
+			
+		},
+		{
+			"path": "github.com/golang/freetype/truetype",
+			"revision": "38b4c392adc5eed94207994c4848fff99f4ac234",
+			"revisionTime": "2016-06-26T16:51:47+10:00"
+			
+		},
+		{
+			"path": "github.com/gonum/floats",
+			"revision": "a147620b4ae568fdb3487ad6dc6d3613714b5e7d",
+			"revisionTime": "2015-09-30T11:41:40+09:00"
+			
+		},
+		{
+			"path": "github.com/gonum/internal",
+			"revision": "266f56a1bd90ca9ec520f5e918a683fc00eea8b5",
+			"revisionTime": "2015-08-31T15:28:52+09:30"
+			
+		},
+		{
 			"checksumSHA1": "L3MAOjb/7cFQa5M9XpiCTXQxcvE=",
 			"path": "github.com/gonum/plot/vg",
 			"revision": "986a404a76fa599aed8ce476ec816c82fd9c9c4e",
@@ -259,6 +283,11 @@
 			"revisionTime": "2016-01-27T00:08:56+08:00"
 		},
 		{
+			"path": "github.com/llgcode/draw2d",
+			"revision": "3f01cfe277a813f87884f0ff9430d9998d058576",
+			"revisionTime": "2016-06-27T21:46:37+02:00"
+		},
+		{
 			"path": "github.com/magiconair/properties",
 			"revision": "c81f9d71af8f8cba1466501d30326b99a4e56c19",
 			"revisionTime": "2015-12-21T22:31:49+01:00"
@@ -332,6 +361,11 @@
 			"path": "golang.org/x/image/bmp",
 			"revision": "baddd3465a05d84a6d8d3507547a91cb188c81ea",
 			"revisionTime": "2015-09-11T13:43:18+10:00"
+		},
+		{
+			"path": "golang.org/x/image/math",
+			"revision": "I2506067ba6ac12c275b65c3a52cb38579d4b9dca",
+			"revisionTime": "2016-05-26T15:28:50+10:00"
 		},
 		{
 			"path": "golang.org/x/image/tiff",

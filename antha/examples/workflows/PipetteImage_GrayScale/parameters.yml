@@ -1,7 +1,7 @@
 {
   "Parameters": {
     "PipetteImage": {
-		"Imagefilename":"vader.jpeg",
+		"Imagefilename":"8-Bit-Pixel-Handlebar-Moustache.png",
 		"Rotate": false,
 		"AutoRotate": true,
 		"Diluent":"water",
@@ -16,7 +16,7 @@
 		"PosterizeImage": true,
 		"PosterizeLevels": 2,
 		"Black": "Black",
-      "OutPlate": "greiner384_riser",
+      "OutPlate": "greiner384",
       "VolumeForFullcolour": "25ul"
     }
   }

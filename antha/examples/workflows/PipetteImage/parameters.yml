@@ -1,7 +1,7 @@
 {
   "Parameters": {
     "PipetteImage": {
-      "Imagefilename": "apple.jpg",
+      "Imagefilename": "jenkins.jpeg",
 	  "UVimage": false,
 	  "Rotate":false,
 	  "AutoRotate":false,
