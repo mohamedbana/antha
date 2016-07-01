@@ -36,25 +36,7 @@ func _BlastSearch_wtypeSteps(_ctx context.Context, _input *BlastSearch_wtypeInpu
 
 	var err error
 	var hits []biogo.Hit
-	/*
-		if Querytype == "PROTEIN" {
-		hits, err = blast.MegaBlastP(Query)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
 
-		Hits = fmt.Sprintln(blast.HitSummary(hits))
-
-
-		} else if Querytype == "DNA" {
-		hits, err = blast.MegaBlastN(Query)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-
-		Hits = fmt.Sprintln(blast.HitSummary(hits))
-		}
-	*/
 	_output.AnthaSeq = _input.DNA
 
 	// look for orfs

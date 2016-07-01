@@ -8,6 +8,7 @@ package lib
 import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -44,12 +45,14 @@ func _FindIGemPartsThatSetup(_ctx context.Context, _input *FindIGemPartsThatInpu
 // for every input
 func _FindIGemPartsThatSteps(_ctx context.Context, _input *FindIGemPartsThatInput, _output *FindIGemPartsThatOutput) {
 
-	BackupParts := make([]string, 0)
-	status := ""
-	joinedstatus := make([]string, 0)
-	// Look up parts from registry according to properties (this will take a couple of minutes the first time)
+	Parttypes := []string{_input.Parttype}
 
+	BackupParts := make([]string, 0)
+	_output.WorkingBackupParts = make([]string, 0)
+
+	// initialise some variables for use later
 	parts := make([][]string, 0)
+	OriginalPartMap := make(map[string][]string)
 	_output.PartMap = make(map[string][]string)
 	_output.BiobrickDescriptions = make(map[string]string)
 	subparts := make([]string, 0)
@@ -62,13 +65,12 @@ func _FindIGemPartsThatSteps(_ctx context.Context, _input *FindIGemPartsThatInpu
 	}
 
 	// first we'll parse the igem registry based on the short description contained in the fasta header for each part sequence
-	for _, desc := range _input.Parttypes {
+	for _, parttype := range Parttypes {
 
-		subparts = igem.FilterRegistry(desc, []string{desc, partstatus})
-		status = text.Print(desc+" :", subparts)
-		joinedstatus = append(joinedstatus, status)
+		subparts = igem.FilterRegistry(parttype, []string{partstatus}, _input.ExactTypeOnly)
 		parts = append(parts, subparts)
-		_output.PartMap[desc] = subparts
+		OriginalPartMap[parttype+"_"+partstatus] = subparts
+		_output.PartMap[parttype+"_"+partstatus] = subparts
 	}
 
 	othercriteria := ""
@@ -76,52 +78,98 @@ func _FindIGemPartsThatSteps(_ctx context.Context, _input *FindIGemPartsThatInpu
 		othercriteria = "WORKS"
 	}
 
-	var i int
-
-	for desc, subparts := range _output.PartMap {
+	for desc, subparts := range OriginalPartMap {
 
 		partdetails := igem.LookUp(subparts)
 
 		// now we can get detailed information of all of those records to interrogate further
-		// this can be slow if there are many parts to check (~2 seconds per block of 14 parts)
+		// this can be slow if there are many parts to check
+		// Parts will be added if they contain either description not both
+		for i := range _input.Partdescriptions {
 
-		for _, subpart := range subparts {
+			for _, subpart := range subparts {
 
-			if strings.Contains(strings.ToUpper(partdetails.Description(subpart)), strings.ToUpper(_input.Partdescriptions[i])) &&
-				strings.Contains(partdetails.Results(subpart), othercriteria) {
-				BackupParts = append(BackupParts, subpart)
-				_output.BiobrickDescriptions[subpart] = partdetails.Description(subpart)
+				// check if key words are in description and that status == "WORKS if only working parts are desired
+				if _input.MatchAllDescriptions == false && strings.Contains(strings.ToUpper(partdetails.Description(subpart)), strings.ToUpper(_input.Partdescriptions[i])) &&
+					strings.Contains(partdetails.Results(subpart), othercriteria) {
 
-				rating, err := strconv.Atoi(partdetails.Rating(subpart))
+					if !search.InSlice(subpart, BackupParts) {
+						BackupParts = append(BackupParts, subpart)
+					}
+					// ensure the highest rated part is returned
+					rating, err := strconv.Atoi(partdetails.Rating(subpart))
 
-				if err == nil && rating > highestrating {
-					_output.HighestRatedMatch = subpart
+					if err == nil && rating > highestrating {
+						_output.HighestRatedMatch = subpart
 
-					seq := partdetails.Sequence(_output.HighestRatedMatch)
+						seq := partdetails.Sequence(_output.HighestRatedMatch)
 
-					_output.HighestRatedMatchDNASequence = wtype.MakeLinearDNASequence(_output.HighestRatedMatch, seq)
+						_output.HighestRatedMatchDNASequence = wtype.MakeLinearDNASequence(_output.HighestRatedMatch, seq)
+						highestrating = rating
+					}
+				} else if _input.MatchAllDescriptions && search.Containsallthings((partdetails.Description(subpart)), _input.Partdescriptions) &&
+					strings.Contains(partdetails.Results(subpart), othercriteria) {
+
+					if !search.InSlice(subpart, BackupParts) {
+						BackupParts = append(BackupParts, subpart)
+					}
+					// ensure the highest rated part is returned
+					rating, err := strconv.Atoi(partdetails.Rating(subpart))
+
+					if err == nil && rating > highestrating {
+						_output.HighestRatedMatch = subpart
+
+						seq := partdetails.Sequence(_output.HighestRatedMatch)
+
+						_output.HighestRatedMatchDNASequence = wtype.MakeLinearDNASequence(_output.HighestRatedMatch, seq)
+						highestrating = rating
+					}
 				}
+				if _input.MatchAllDescriptions == false && strings.Contains(strings.ToUpper(partdetails.Description(subpart)), strings.ToUpper(_input.Partdescriptions[i])) &&
+					strings.Contains(partdetails.Results(subpart), "WORKS") {
+					if !search.InSlice(subpart, _output.WorkingBackupParts) {
+						_output.WorkingBackupParts = append(_output.WorkingBackupParts, subpart)
+					}
+				} else if _input.MatchAllDescriptions && search.Containsallthings((partdetails.Description(subpart)), _input.Partdescriptions) &&
+					strings.Contains(partdetails.Results(subpart), "WORKS") {
+					if !search.InSlice(subpart, _output.WorkingBackupParts) {
+						_output.WorkingBackupParts = append(_output.WorkingBackupParts, subpart)
+					}
+				}
+				// add to look up table to report back to user
+				if _input.MatchAllDescriptions {
+					var partdesc string
+
+					for _, descriptor := range _input.Partdescriptions {
+						partdesc = partdesc + "_" + descriptor
+					}
+					_output.PartMap[desc+"_"+partdesc] = BackupParts
+					_output.PartMap[desc+"_"+partdesc+"+WORKS"] = _output.WorkingBackupParts
+
+				} else if _input.MatchAllDescriptions == false {
+
+					_output.PartMap[desc+"_"+_input.Partdescriptions[i]] = BackupParts
+					_output.PartMap[desc+"_"+_input.Partdescriptions[i]+"+WORKS"] = _output.WorkingBackupParts
+				}
+
+				_output.FulllistBackupParts = BackupParts
 			}
-
-			delete(_output.PartMap, desc)
-			_output.PartMap[desc] = BackupParts
-
-			_output.FulllistBackupParts = append(_output.FulllistBackupParts, BackupParts)
+			i = i + 1
+			if _input.MatchAllDescriptions {
+				// don't need to loop through each description if we're matching all
+				break
+			}
 		}
-		i = i + 1
+		for _, subpart := range BackupParts {
+			_output.BiobrickDescriptions[subpart] = partdetails.Description(subpart)
+		}
 	}
 
-	_output.FulllistBackupParts = parts
-	_output.Status = strings.Join(joinedstatus, " ; ")
+	_output.HighestRatedMatchScore = highestrating
 
-	// Print status
-	if _output.Status != "all parts available" {
-		_output.Status = fmt.Sprintln(_output.Status)
-	} else {
-		_output.Status = fmt.Sprintln(
-			"Warnings:", _output.Warnings.Error(),
-			"Back up parts found (Reported to work!)", _output.FulllistBackupParts,
-		)
+	// print in pretty format on terminal
+	for key, value := range _output.PartMap {
+		fmt.Println(text.Print(key, value))
 	}
 
 }
@@ -184,31 +232,35 @@ type FindIGemPartsThatElement struct {
 }
 
 type FindIGemPartsThatInput struct {
+	ExactTypeOnly            bool
+	MatchAllDescriptions     bool
 	OnlyreturnAvailableParts bool
 	OnlyreturnWorkingparts   bool
 	Partdescriptions         []string
-	Parttypes                []string
+	Parttype                 string
 }
 
 type FindIGemPartsThatOutput struct {
 	BiobrickDescriptions         map[string]string
-	FulllistBackupParts          [][]string
+	FulllistBackupParts          []string
 	HighestRatedMatch            string
 	HighestRatedMatchDNASequence wtype.DNASequence
+	HighestRatedMatchScore       int
 	PartMap                      map[string][]string
-	Status                       string
 	Warnings                     error
+	WorkingBackupParts           []string
 }
 
 type FindIGemPartsThatSOutput struct {
 	Data struct {
 		BiobrickDescriptions         map[string]string
-		FulllistBackupParts          [][]string
+		FulllistBackupParts          []string
 		HighestRatedMatch            string
 		HighestRatedMatchDNASequence wtype.DNASequence
+		HighestRatedMatchScore       int
 		PartMap                      map[string][]string
-		Status                       string
 		Warnings                     error
+		WorkingBackupParts           []string
 	}
 	Outputs struct {
 	}
@@ -221,17 +273,20 @@ func init() {
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/FindIGemPartsThat/FindIGemPartsThat.an",
 			Params: []ParamDesc{
+				{Name: "ExactTypeOnly", Desc: "", Kind: "Parameters"},
+				{Name: "MatchAllDescriptions", Desc: "", Kind: "Parameters"},
 				{Name: "OnlyreturnAvailableParts", Desc: "", Kind: "Parameters"},
 				{Name: "OnlyreturnWorkingparts", Desc: "", Kind: "Parameters"},
 				{Name: "Partdescriptions", Desc: "e.g. strong, arsenic, fluorescent, alkane, logic gate\n", Kind: "Parameters"},
-				{Name: "Parttypes", Desc: "e.g. rbs, reporter\n", Kind: "Parameters"},
+				{Name: "Parttype", Desc: "e.g. rbs, reporter\n", Kind: "Parameters"},
 				{Name: "BiobrickDescriptions", Desc: "i.e. map[biobrickID]description\n", Kind: "Data"},
 				{Name: "FulllistBackupParts", Desc: "", Kind: "Data"},
 				{Name: "HighestRatedMatch", Desc: "", Kind: "Data"},
 				{Name: "HighestRatedMatchDNASequence", Desc: "", Kind: "Data"},
+				{Name: "HighestRatedMatchScore", Desc: "", Kind: "Data"},
 				{Name: "PartMap", Desc: "i.e. map[description]list of parts matching description\n", Kind: "Data"},
-				{Name: "Status", Desc: "", Kind: "Data"},
 				{Name: "Warnings", Desc: "", Kind: "Data"},
+				{Name: "WorkingBackupParts", Desc: "", Kind: "Data"},
 			},
 		},
 	})

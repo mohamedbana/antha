@@ -93,6 +93,57 @@ const (
 	registryFile = "iGem_registry.txt"
 )
 
+// Part Name classifications
+/*
+BBa_B... = Generic basic parts such as Terminators, DNA, and Ribosome Binding Site
+BBa_C... = Protein coding parts
+BBa_E... = Reporter parts
+BBa_F... = Signalling parts
+BBa_G... = Primer parts
+BBa_I... = IAP 2003, 2004 project parts
+BBa_J... = iGEM project parts
+BBa_M... = Tag parts
+BBa_P... = Protein Generator parts
+BBa_Q... = Inverter parts
+BBa_R... = Regulatory parts
+BBa_S... = Intermediate parts
+BBa_V... = Cell strain parts
+*/
+
+const (
+	GENERIC          = "BBa_B"
+	PROTEINCODING    = "BBa_C"
+	REPORTER         = "BBa_E"
+	SIGNALLING       = "BBa_F"
+	PRIMER           = "BBa_G"
+	IAPPROJECT       = "BBa_I"
+	IGEMPROJECT      = "BBa_J"
+	TAG              = "BBa_M"
+	PROTEINGENERATOR = "BBa_P"
+	INVERTER         = "BBa_Q"
+	REGULATORY       = "BBa_R"
+	INTERMEDIATE     = "BBa_S"
+	CELLSTRAIN       = "BBa_V"
+)
+
+var (
+	IgemTypeCodes = map[string]string{
+		"GENERIC":          "BBa_B",
+		"PROTEINCODING":    "BBa_C",
+		"REPORTER":         "BBa_E",
+		"SIGNALLING":       "BBa_F",
+		"PRIMER":           "BBa_G",
+		"IAPPROJECT":       "BBa_I",
+		"IGEMPROJECT":      "BBa_J",
+		"TAG":              "BBa_M",
+		"PROTEINGENERATOR": "BBa_P",
+		"INVERTER":         "BBa_Q",
+		"REGULATORY":       "BBa_R",
+		"INTERMEDIATE":     "BBa_S",
+		"CELLSTRAIN":       "BBa_V",
+	}
+)
+
 func MakeFastaURL(partname string) (Urlstring string) {
 	// see comment above for structure
 	//<domain> = substance | compound | assay | <other inputs>
@@ -312,7 +363,7 @@ func CountPartsinRegistryContaining(keystrings []string) (numberofparts int) {
 	return numberofparts
 }
 
-func FilterRegistry(partype string, keystrings []string) (listofpartIDs []string) {
+func FilterRegistry(partype string, keystrings []string, exacttypecodeonly bool) (listofpartIDs []string) {
 	allparts, err := makeRegistryfile()
 	if err != nil {
 		return
@@ -333,9 +384,16 @@ func FilterRegistry(partype string, keystrings []string) (listofpartIDs []string
 		seqtype := "DNA"
 		class := "not specified"*/
 
-		if search.Containsallthings(record.Desc, keystrings) && strings.Contains(strings.ToUpper(record.Part_type), strings.ToUpper(partype)) && record.Seq_data != "" {
-			fmt.Println(record.Part_name)
+		if !exacttypecodeonly && search.Containsallthings(record.Desc, keystrings) && strings.Contains(strings.ToUpper(record.Part_type), strings.ToUpper(partype)) && record.Seq_data != "" {
 			listofpartIDs = append(listofpartIDs, record.Part_name)
+		}
+
+		bba_code, ok := IgemTypeCodes[strings.ToUpper(partype)]
+		i := 0
+		if ok && search.Containsallthings(record.Desc, keystrings) && record.Seq_data != "" && strings.Contains(record.Part_name, bba_code) {
+
+			listofpartIDs = append(listofpartIDs, record.Part_name)
+			i++
 		}
 		/*	if strings.Contains(record.Desc, "Amino acid") || strings.Contains(record.Id, "aa") {
 				seqtype = "AA"
@@ -489,13 +547,13 @@ func LookUp(parts []string) (parsedxml Rsbpml) {
 	if len(parts) > 14 {
 
 		partslice := parts[0:14]
-		fmt.Println("len(partslice) =", len(partslice))
+		//fmt.Println("len(partslice) =", len(partslice))
 
 		parsedxml = Partpropertiesmini(partslice)
 
 		//var parts []Part
 		newparsedxml := make([]Part, 0)
-		fmt.Println("len(parsedxml.Partlist[0].Parts) =", len(parsedxml.Partlist[0].Parts))
+		//	fmt.Println("len(parsedxml.Partlist[0].Parts) =", len(parsedxml.Partlist[0].Parts))
 		for _, part := range parsedxml.Partlist[0].Parts {
 			newparsedxml = append(newparsedxml, part)
 		}
@@ -512,10 +570,10 @@ func LookUp(parts []string) (parsedxml Rsbpml) {
 		for i := 10; i < len(parts); i = i + 14 {
 			partslice = parts[i : i+14]
 			parsedxml = Partpropertiesmini(partslice)
-			fmt.Println("len(parsedxml.Partlist[0].Parts) =", len(parsedxml.Partlist[0].Parts))
+			//	fmt.Println("len(parsedxml.Partlist[0].Parts) =", len(parsedxml.Partlist[0].Parts))
 			for _, part := range parsedxml.Partlist[0].Parts {
 				newparsedxml = append(newparsedxml, part)
-				fmt.Println("len(newparsedxml)", len(newparsedxml))
+				//			fmt.Println("len(newparsedxml)", len(newparsedxml))
 			}
 			var parsedxml Rsbpml
 			partsleft = partsleft - len(partslice)
@@ -527,9 +585,9 @@ func LookUp(parts []string) (parsedxml Rsbpml) {
 
 				for _, part := range parsedxml.Partlist[0].Parts {
 					newparsedxml = append(newparsedxml, part)
-					fmt.Println("len(newparsedxml)", len(newparsedxml))
+					//				fmt.Println("len(newparsedxml)", len(newparsedxml))
 					parsedxml.Partlist[0].Parts = newparsedxml
-					fmt.Println("newparsedxml", newparsedxml)
+					//				fmt.Println("newparsedxml", newparsedxml)
 
 				}
 				{

@@ -65,6 +65,7 @@ func _PrimerDesign_coverRegionSteps(_ctx context.Context, _input *PrimerDesign_c
 
 	}
 	_output.AllPrimers = allprimers
+
 }
 
 // Actions to perform after steps block to analyze data

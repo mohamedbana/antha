@@ -1,14 +1,54 @@
 {
     "Parameters": {
-        "FindPartsThat": {
+        "RBS": {
             "OnlyreturnAvailableParts": true,
             "OnlyreturnWorkingparts": true,
+			"ExactTypeOnly":true,
+			"MatchAllDescriptions":true,
             "Partdescriptions": [
-                "strong"
+				"RBS",
+               "STRONG"
             ],
-            "Parttypes": [
-                "RBS"
-            ]
+            "Parttype":
+                "GENERIC"
+            
+        },
+		"CyanReporter": {
+            "OnlyreturnAvailableParts": true,
+            "OnlyreturnWorkingparts": false,
+			"ExactTypeOnly":true,
+			"MatchAllDescriptions":true,
+            "Partdescriptions": [
+               "cyan",
+			   "fluorescent"
+            ],
+            "Parttype":
+                "REPORTER"
+            
+        },
+		"YellowReporter": {
+            "OnlyreturnAvailableParts": true,
+            "OnlyreturnWorkingparts": false,
+			"ExactTypeOnly":true,
+			"MatchAllDescriptions":true,
+            "Partdescriptions": [
+               "YELLOW"
+            ],
+            "Parttype":
+                "REPORTER"
+            
+        },
+		"GreenReporter": {
+            "OnlyreturnAvailableParts": true,
+            "OnlyreturnWorkingparts": false,
+			"ExactTypeOnly":true,
+			"MatchAllDescriptions":true,
+            "Partdescriptions": [
+               "GREEN"
+            ],
+            "Parttype":
+                "REPORTER"
+            
         }
     }
 }

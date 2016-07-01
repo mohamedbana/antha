@@ -1,3 +1,4 @@
+// demo protocol of how to create a dna type from user inputs
 package lib
 
 import (
@@ -31,19 +32,32 @@ func _NewDNASequenceSetup(_ctx context.Context, _input *NewDNASequenceInput) {
 
 // Core process of the protocol: steps to be performed for each input
 func _NewDNASequenceSteps(_ctx context.Context, _input *NewDNASequenceInput, _output *NewDNASequenceOutput) {
-	fmt.Println("In steps!")
+
+	// != is go syntax for not equal to
 	if _input.Plasmid != _input.Linear {
+
+		// equivalent to if Plasmid == true
 		if _input.Plasmid {
+			// different functions exist for making an antha DNA sequence based on the properties
 			_output.DNA = wtype.MakePlasmidDNASequence(_input.Gene_name, _input.DNA_seq)
+
 		} else if _input.Linear {
+
 			_output.DNA = wtype.MakeLinearDNASequence(_input.Gene_name, _input.DNA_seq)
+
 		} else if _input.SingleStranded {
+
 			_output.DNA = wtype.MakeSingleStrandedDNASequence(_input.Gene_name, _input.DNA_seq)
+
 		}
 
+		// use FindallORFs from sequences library
 		orfs := sequences.FindallORFs(_output.DNA.Seq)
+
+		// convert those orfs to features
 		features := sequences.ORFs2Features(orfs)
 
+		// add annotations to sequence from features
 		_output.DNAwithORFs = wtype.Annotate(_output.DNA, features)
 
 		_output.Status = fmt.Sprintln(
@@ -140,8 +154,8 @@ func init() {
 	addComponent(Component{Name: "NewDNASequence",
 		Constructor: NewDNASequenceNew,
 		Desc: ComponentDesc{
-			Desc: "",
-			Path: "antha/component/an/Data/DNA/NewDNASequence/NewDNASequence.an",
+			Desc: "demo protocol of how to create a dna type from user inputs\n",
+			Path: "antha/component/an/AnthaAcademy/Lesson4_DNA/A_NewDNASequence.an",
 			Params: []ParamDesc{
 				{Name: "DNA_seq", Desc: "", Kind: "Parameters"},
 				{Name: "Gene_name", Desc: "", Kind: "Parameters"},
