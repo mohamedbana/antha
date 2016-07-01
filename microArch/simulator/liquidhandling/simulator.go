@@ -40,189 +40,189 @@ func NewVirtualLiquidHandler(props LHProperties) (*VirtualLiquidHandler, error) 
     return &vlh
 }
 
-//Move command
+//Move command - used
 func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []string, reference []int, 
                                        offsetX, offsetY, offsetZ []float64, plate_type []string, 
                                        head int) driver.CommandStatus {
-    panic("unimplemented")
+    driver.CommandStatus{true, driver.OK, "MOVE ACK"}
 }
 
-//Move raw
+//Move raw - not yet implemented in compositerobotinstruction
 func (self *VirtualLiquidHandler) MoveRaw(head int, x, y, z float64) driver.CommandStatus {
     panic("unimplemented")
 }
 
-//Aspirate
+//Aspirate - used
 func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, head int, multi int, 
                                            platetype []string, what []string, llf []bool) 
                                   driver.CommandStatus {
     panic("unimplemented")
 }
 
-//Dispense
+//Dispense - used
 func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, head int, multi int, 
                                            platetype []string, what []string, llf []bool) 
                                   driver.CommandStatus {
     panic("unimplemented")
 }
 
-//Load Tips
+//LoadTips - used
 func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int, 
                                            platetype, position, well []string) driver.CommandStatus {
     panic("unimplemented")
 }
 
-//Unload Tips
+//UnloadTips - used
 func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int, 
                                              platetype, position, well []string) driver.CommandStatus {
     panic("unimplemented")
 }
 
-//SetPipetteSpeed
+//SetPipetteSpeed - used
 func (self *VirtualLiquidHandler) SetPipetteSpeed(head, channel int, rate float64) driver.CommandStatus {
     panic("unimplemented")
 }
 
-//SetDriveSpeed
+//SetDriveSpeed - used
 func (self *VirtualLiquidHandler) SetDriveSpeed(drive string, rate float64) driver.CommandStatus {
     panic("unimplemented")
 }
 
-//Stop
+//Stop - unused
 func (self *VirtualLiquidHandler) Stop() driver.CommandStatus {
     panic("unimplemented")
 }
 
-//Go
+//Go - unused
 func (self *VirtualLiquidHandler) Go() driver.CommandStatus {
     panic("unimplemented")
 }
 
-//Init
+//Initialize - used
 func (self *VirtualLiquidHandler) Initialize() driver.CommandStatus {
     panic("unimplemented")
 }
 
-//Finalize
+//Finalize - used
 func (self *VirtualLiquidHandler) Finalize() driver.CommandStatus {
     panic("unimplemented")
 }
 
-//Wait
+//Wait - used
 func (self *VirtualLiquidHandler) Wait(time float64) driver.CommandStatus {
     panic("unimplemented")
 }
 
-//Mix
+//Mix - used
 func (self *VirtualLiquidHandler) Mix(head int, volume []float64, platetype []string, cycles []int, 
                                       multi int, what []string, blowout []bool) driver.CommandStatus {
     panic("unimplemented")
 }
 
-//ResetPistons
+//ResetPistons - used
 func (self *VirtualLiquidHandler) ResetPistons(head, channel int) driver.CommandStatus {
     panic("unimplemented")
 }
 
-//AddPlateTo
+//AddPlateTo - used
 func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{}, name string) 
                                   driver.CommandStatus {
     panic("unimplemented")
 }
 
-//RemoveAllPlates
+//RemoveAllPlates - used
 func (self *VirtualLiquidHandler) RemoveAllPlates() driver.CommandStatus {
     panic("unimplemented")
 }
 
-//RemovePlateAt
+//RemovePlateAt - unused
 func (self *VirtualLiquidHandler) RemovePlateAt(position string) driver.CommandStatus {
     panic("unimplemented")
 }
 
-//SetPositionState
+//SetPositionState - unused
 func (self *VirtualLiquidHandler) SetPositionState(position string, state driver.PositionState) 
                                   driver.CommandStatus {
     panic("unimplemented")
 }
 
-//GetCapabilites
+//GetCapabilites - used
 func (self *VirtualLiquidHandler) GetCapabilities() (LHProperties, driver.CommandStatus) {
-    panic("unimplemented")
+    return (self.properties, driver.CommandStatus{true, driver.OK, ""}) 
 }
 
-//GetCurrentPosition
+//GetCurrentPosition - unused
 func (self *VirtualLiquidHandler) GetCurrentPosition(head int) (string, driver.CommandStatus) {
     panic("unimplemented")
 }
 
-//GetPositionState
+//GetPositionState - unused
 func (self *VirtualLiquidHandler) GetPositionState(position string) (string, driver.CommandStatus) {
     panic("unimplemented")
 }
 
-//GetHeadState
+//GetHeadState - unused
 func (self *VirtualLiquidHandler) GetHeadState(head int) (string, driver.CommandStatus) {
     panic("unimplemented")
 }
 
-//GetStatus
+//GetStatus - unused
 func (self *VirtualLiquidHandler) GetStatus() (driver.Status, driver.CommandStatus) {
     panic("unimplemented")
 }
 
-//UpdateMetaData
+//UpdateMetaData - used
 func (self *VirtualLiquidHandler) UpdateMetaData(props *LHProperties) driver.CommandStatus {
     panic("unimplemented")
 }
 
-//UnloadHead
+//UnloadHead - unused
 func (self *VirtualLiquidHandler) UnloadHead(param int) driver.CommandStatus {
     panic("unimplemented")
 }
 
-//LoadHead
+//LoadHead - unused
 func (self *VirtualLiquidHandler) LoadHead(param int) driver.CommandStatus {
     panic("unimplemented")
 }
 
-//Lights On
+//Lights On - not implemented in compositerobotinstruction
 func (self *VirtualLiquidHandler) LightsOn() driver.CommandStatus {
     panic("unimplemented")
 }
 
-//Lights Off
+//Lights Off - notimplemented in compositerobotinstruction
 func (self *VirtualLiquidHandler) LightsOff() driver.CommandStatus {
     panic("unimplemented")
 }
 
-//Load Adaptor
+//LoadAdaptor - notimplemented in CRI
 func (self *VirtualLiquidHandler) LoadAdaptor(param int) driver.CommandStatus {
     panic("unimplemented")
 }
 
-//Unload Adaptor
+//UnloadAdaptor - notimplemented in CRI
 func (self *VirtualLiquidHandler) UnloadAdaptor(param int) driver.CommandStatus {
     panic("unimplemented")
 }
 
-//Open
+//Open - notimplemented in CRI
 func (self *VirtualLiquidHandler) Open() driver.CommandStatus {
     panic("unimplemented")
 }
 
-//Close
+//Close - notimplement in CRI
 func (self *VirtualLiquidHandler) Close() driver.CommandStatus {
     panic("unimplemented")
 }
 
-//Message
+//Message - unused
 func (self *VirtualLiquidHandler) Message(level int, title, text string, showcancel bool) 
                                   driver.CommandStatus {
     panic("unimplemented")
 }
 
-//GetOutputFile
+//GetOutputFile - used, but not in instruction stream
 func (self *VirtualLiquidHandler) GetOutputFile() (string, driver.CommandStatus) {
     panic("unimplemented")
 }
