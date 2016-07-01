@@ -26,16 +26,40 @@ import (
 	"github.com/antha-lang/antha/microArch/driver"
 )
 
-// Simulate a liquid handler
-type VirtualLiquidHandler struct {
-    properties LHProperties 
+func Simulate(properties *LHProperties, instructions []TerminalRobotInstruction)
+{
+    vlh := NewVirtualLiquidHandler(properties)
+
+    for _, ins = range instructions {
+        ins.OutputTo(vlh)
+    }
 }
 
-//Create a new VirtualLiquidHandler which mimics the given properties
+// Simulate a liquid handler Driver
+type VirtualLiquidHandler struct {
+    properties LHProperties 
+    //Need to store:
+    // LHProperties
+    // plate(s) at each layout position
+    //   contents of each well of each plate / tip box
+    //     liquid type / tip type
+    // contents of each loaded tip
+    //   liquid type
+    // tips on each adaptor
+    //   LHAdapter know how many tips it has, and what type they are (assumed equal)
+    //   but it can't tell which position they're on
+    //   tip properties
+    // adaptors on each head
+    //   Adapeter properties
+    // head location
+    //   Head properties
+}
+
+//Create a new VirtualLiquidHandler which mimics an LHDriver
 func NewVirtualLiquidHandler(props LHProperties) (*VirtualLiquidHandler, error) {
     var vlh VirtualLiquidHandler
 
-    vlh.properties = props
+    vlh.properties = props.Dup()
 
     return &vlh
 }
