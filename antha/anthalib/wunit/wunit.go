@@ -73,13 +73,13 @@ type Measurement interface {
 	// wrapper for above
 	ConvertToString(s string) float64
 	// add to this measurement
-	Add(m Measurement) Measurement
+	Add(m Measurement)
 	// subtract from this measurement
-	Subtract(m Measurement) Measurement
+	Subtract(m Measurement)
 	// multiply measurement by a factor
-	MultiplyBy(factor float64) (multiplied Measurement)
+	MultiplyBy(factor float64)
 	// divide measurement by a factor
-	DivideBy(factor float64) (divided Measurement)
+	DivideBy(factor float64)
 	// comparison operators
 	LessThan(m Measurement) bool
 	GreaterThan(m Measurement) bool
@@ -167,34 +167,32 @@ func (cm *ConcreteMeasurement) String() string {
 
 // add to this
 
-func (cm *ConcreteMeasurement) Add(m Measurement) Measurement {
+func (cm *ConcreteMeasurement) Add(m Measurement) {
 	if cm == nil {
-		return nil
+		return
 	}
 	// ideally should check these have the same Dimension
 	// need to improve this
 
 	cm.SetValue(m.ConvertTo(cm.Unit()) + cm.RawValue())
 
-	return cm
 }
 
 // subtract
 
-func (cm *ConcreteMeasurement) Subtract(m Measurement) Measurement {
+func (cm *ConcreteMeasurement) Subtract(m Measurement) {
 	if cm == nil {
-		return nil
+		return
 	}
 	// ideally should check these have the same Dimension
 	// need to improve this
 
 	cm.SetValue(cm.RawValue() - m.ConvertTo(cm.Unit()))
 
-	return cm
 }
 
 // multiply
-func (cm *ConcreteMeasurement) MultiplyBy(factor float64) (multiplied Measurement) {
+func (cm *ConcreteMeasurement) MultiplyBy(factor float64) {
 	if cm == nil {
 		return
 	}
@@ -203,11 +201,9 @@ func (cm *ConcreteMeasurement) MultiplyBy(factor float64) (multiplied Measuremen
 
 	cm.SetValue(cm.RawValue() * float64(factor))
 
-	multiplied = cm
-	return
 }
 
-func (cm *ConcreteMeasurement) DivideBy(factor float64) (divided Measurement) {
+func (cm *ConcreteMeasurement) DivideBy(factor float64) {
 
 	if cm == nil {
 		return
@@ -217,8 +213,6 @@ func (cm *ConcreteMeasurement) DivideBy(factor float64) (divided Measurement) {
 
 	cm.SetValue(cm.RawValue() / float64(factor))
 
-	divided = cm
-	return
 }
 
 // define a zero

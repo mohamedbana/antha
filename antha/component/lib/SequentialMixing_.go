@@ -39,13 +39,17 @@ func _SequentialMixingSteps(_ctx context.Context, _input *SequentialMixingInput,
 	var aliquot *wtype.LHComponent
 
 	// calculate solution volume
+
+	// create copy of TotalVolumeperDilution
 	solutionVolume := (wunit.CopyVolume(_input.TotalVolumeperDilution))
 
+	// use divideby method
 	solutionVolume.DivideBy(float64(_input.DilutionFactor))
 
-	// work out diluent volume to add
+	// use same approach to work out diluent volume to add
 	diluentVolume := (wunit.CopyVolume(_input.TotalVolumeperDilution))
 
+	// this time using the substract method
 	diluentVolume.Subtract(solutionVolume)
 
 	// sample diluent

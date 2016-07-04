@@ -166,7 +166,7 @@ func init() {
 		Constructor: SerialDilutionNew,
 		Desc: ComponentDesc{
 			Desc: "Protocol to make a serial dilution series from a solution and diluent\n",
-			Path: "antha/component/an/Liquid_handling/InducerConcScreen/SerialDilution.an",
+			Path: "antha/component/an/Liquid_handling/SerialDilution/SerialDilution.an",
 			Params: []ParamDesc{
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "DilutionFactor", Desc: "", Kind: "Parameters"},
