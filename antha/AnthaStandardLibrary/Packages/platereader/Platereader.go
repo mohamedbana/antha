@@ -30,7 +30,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 )
 
-func ReadAbsorbance(plate wtype.LHPlate, solution wtype.LHComponent, wavelength float64) (abs wtype.Absorbance) {
+func ReadAbsorbance(plate *wtype.LHPlate, solution *wtype.LHComponent, wavelength float64) (abs wtype.Absorbance) {
 	abs.Reading = 1.0 // obviously placeholder
 	abs.Wavelength = wavelength
 	// add calculation to work out pathlength from volume and well geometry abs.Pathlength

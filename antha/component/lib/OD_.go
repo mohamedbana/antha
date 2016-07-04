@@ -63,7 +63,7 @@ func _ODSteps(_ctx context.Context, _input *ODInput, _output *ODOutput) {
 		product = execute.MixInto(_ctx, _input.ODplate, "", mixer.Sample(_input.Sampletotest, _input.Sample_volume), mixer.Sample(_input.Diluent, _input.Diluent_volume))
 		/*Is it necessary to include platetype in Read function?
 		or is the info on volume, opacity, pathlength etc implied in LHComponent?*/
-		_output.Sample_absorbance = platereader.ReadAbsorbance(*_input.ODplate, *product, _input.Wlength)
+		_output.Sample_absorbance = platereader.ReadAbsorbance(_input.ODplate, product, _input.Wlength)
 
 		if _output.Sample_absorbance.Reading < 1 {
 			break

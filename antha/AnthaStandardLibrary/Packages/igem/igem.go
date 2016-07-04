@@ -48,7 +48,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/xml"
-	"fmt"
+	//"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -129,7 +129,7 @@ func MakeXMLURL(partnames []string) (Urlstring string) {
 }
 
 func SlurpOutput(Urlstring string) (output []byte) {
-	fmt.Println("Slurping...", Urlstring)
+	// fmt.Println("Slurping...", Urlstring)
 
 	res, err := http.Get(Urlstring)
 	if err != nil {
@@ -249,7 +249,7 @@ func FastaParse(fastaFh io.Reader) chan FastaPart {
 				if header != "" {
 					// outputChannel <- build_fasta(header, seq.String())
 					outputChannel <- Build_fasta(header, seq)
-					// fmt.Println(record.id, len(record.seq))
+					// // fmt.Println(record.id, len(record.seq))
 					header = ""
 					seq.Reset()
 				}
@@ -280,7 +280,7 @@ func CountPartsinRegistryContaining(keystrings []string) (numberofparts int) {
 	}
 	/*allparts, err := ioutil.ReadFile("iGem_registry.txt")
 	if err != nil {
-		fmt.Println("error:", err)
+		// fmt.Println("error:", err)
 	}*/
 	fastaFh := bytes.NewReader(allparts)
 
@@ -334,7 +334,7 @@ func FilterRegistry(partype string, keystrings []string) (listofpartIDs []string
 		class := "not specified"*/
 
 		if search.Containsallthings(record.Desc, keystrings) && strings.Contains(strings.ToUpper(record.Part_type), strings.ToUpper(partype)) && record.Seq_data != "" {
-			fmt.Println(record.Part_name)
+			// fmt.Println(record.Part_name)
 			listofpartIDs = append(listofpartIDs, record.Part_name)
 		}
 		/*	if strings.Contains(record.Desc, "Amino acid") || strings.Contains(record.Id, "aa") {
@@ -377,10 +377,10 @@ func ParseOutput(xmldata []byte) (parsedxml Rsbpml) {
 
 	err := xml.Unmarshal(xmldata, &parsedxml)
 	if err != nil {
-		fmt.Println("error:", err)
+		// fmt.Println("error:", err)
 	}
 
-	//fmt.Println(parsedxml)
+	//// fmt.Println(parsedxml)
 
 	return parsedxml
 }
@@ -400,11 +400,11 @@ func PartPropertiesChan(parts []string) chan Rsbpml {
 
 	outputChannel := make(chan Fasta)
 
-	fmt.Println("len(parts =", len(parts))
+	// fmt.Println("len(parts =", len(parts))
 	if len(parts) > 14 {
 
 		partslice := parts[0:14]
-		fmt.Println("len(partslice) =", len(partslice))
+		// fmt.Println("len(partslice) =", len(partslice))
 
 		go func() {
 		for parts []string {
@@ -422,7 +422,7 @@ func PartPropertiesChan(parts []string) chan Rsbpml {
 
 		//var parts []Part
 		newparsedxml := make([]Part, 0)
-		fmt.Println("len(parsedxml.Partlist[0].Parts) =", len(parsedxml.Partlist[0].Parts))
+		// fmt.Println("len(parsedxml.Partlist[0].Parts) =", len(parsedxml.Partlist[0].Parts))
 		for _, part := range parsedxml.Partlist[0].Parts {
 			newparsedxml = append(newparsedxml, part)
 		}
@@ -443,14 +443,14 @@ func PartPropertiesChan(parts []string) chan Rsbpml {
 			urloutput := SlurpOutput(url)
 
 			parsedxml = ParseOutput(urloutput)
-			fmt.Println("len(parsedxml.Partlist[0].Parts) =", len(parsedxml.Partlist[0].Parts))
+			// fmt.Println("len(parsedxml.Partlist[0].Parts) =", len(parsedxml.Partlist[0].Parts))
 			for _, part := range parsedxml.Partlist[0].Parts {
 				newparsedxml = append(newparsedxml, part)
-				fmt.Println("len(newparsedxml)", len(newparsedxml))
+				// // fmt.Println("len(newparsedxml)", len(newparsedxml))
 			}
 			var parsedxml Rsbpml
 			partsleft = partsleft - len(partslice)
-			fmt.Println("parts left = ", partsleft)
+			// fmt.Println("parts left = ", partsleft)
 			if partsleft < 10 {
 				//for i := 0; i < len(parts); i = i + 10 {
 				partslice = parts[len(parts)-partsleft : len(parts)]
@@ -462,9 +462,9 @@ func PartPropertiesChan(parts []string) chan Rsbpml {
 
 				for _, part := range parsedxml.Partlist[0].Parts {
 					newparsedxml = append(newparsedxml, part)
-					fmt.Println("len(newparsedxml)", len(newparsedxml))
+					// // fmt.Println("len(newparsedxml)", len(newparsedxml))
 					parsedxml.Partlist[0].Parts = newparsedxml
-					fmt.Println("newparsedxml", newparsedxml)
+					// fmt.Println("newparsedxml", newparsedxml)
 
 				}
 				{
@@ -485,17 +485,17 @@ func PartPropertiesChan(parts []string) chan Rsbpml {
 */
 
 func LookUp(parts []string) (parsedxml Rsbpml) {
-	fmt.Println("number of parts to find in registry", len(parts))
+	// fmt.Println("number of parts to find in registry", len(parts))
 	if len(parts) > 14 {
 
 		partslice := parts[0:14]
-		fmt.Println("len(partslice) =", len(partslice))
+		// fmt.Println("len(partslice) =", len(partslice))
 
 		parsedxml = Partpropertiesmini(partslice)
 
 		//var parts []Part
 		newparsedxml := make([]Part, 0)
-		fmt.Println("len(parsedxml.Partlist[0].Parts) =", len(parsedxml.Partlist[0].Parts))
+		// fmt.Println("len(parsedxml.Partlist[0].Parts) =", len(parsedxml.Partlist[0].Parts))
 		for _, part := range parsedxml.Partlist[0].Parts {
 			newparsedxml = append(newparsedxml, part)
 		}
@@ -512,14 +512,14 @@ func LookUp(parts []string) (parsedxml Rsbpml) {
 		for i := 10; i < len(parts); i = i + 14 {
 			partslice = parts[i : i+14]
 			parsedxml = Partpropertiesmini(partslice)
-			fmt.Println("len(parsedxml.Partlist[0].Parts) =", len(parsedxml.Partlist[0].Parts))
+			// fmt.Println("len(parsedxml.Partlist[0].Parts) =", len(parsedxml.Partlist[0].Parts))
 			for _, part := range parsedxml.Partlist[0].Parts {
 				newparsedxml = append(newparsedxml, part)
-				fmt.Println("len(newparsedxml)", len(newparsedxml))
+				// // fmt.Println("len(newparsedxml)", len(newparsedxml))
 			}
 			var parsedxml Rsbpml
 			partsleft = partsleft - len(partslice)
-			fmt.Println("parts left = ", partsleft)
+			// fmt.Println("parts left = ", partsleft)
 			if partsleft < 14 {
 				//for i := 0; i < len(parts); i = i + 10 {
 				partslice = parts[len(parts)-partsleft : len(parts)]
@@ -527,9 +527,9 @@ func LookUp(parts []string) (parsedxml Rsbpml) {
 
 				for _, part := range parsedxml.Partlist[0].Parts {
 					newparsedxml = append(newparsedxml, part)
-					fmt.Println("len(newparsedxml)", len(newparsedxml))
+					// // fmt.Println("len(newparsedxml)", len(newparsedxml))
 					parsedxml.Partlist[0].Parts = newparsedxml
-					fmt.Println("newparsedxml", newparsedxml)
+					// fmt.Println("newparsedxml", newparsedxml)
 
 				}
 				{

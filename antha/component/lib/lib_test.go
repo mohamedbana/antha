@@ -1,7 +1,7 @@
 package lib
 
 import (
-	"encoding/json"
+	//"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -69,6 +69,7 @@ func findInputs(basePath string) ([]*TInput, error) {
 		}
 
 		if ridx := strings.LastIndex(b, "."); ridx >= 0 && strings.HasSuffix(b[:ridx], "parameters") {
+
 			pfiles[dir] = append(pfiles[dir], pabs)
 		}
 		return nil
@@ -217,6 +218,7 @@ func divide(i, n, l int) (int, int) {
 	return first, last
 }
 
+/*
 func TestElementsWithExampleInputs0(t *testing.T) {
 	t.Parallel()
 
@@ -230,7 +232,7 @@ func TestElementsWithExampleInputs0(t *testing.T) {
 
 	runElements(t, ctx, inputs[first:last])
 }
-
+*/
 func TestElementsWithExampleInputs1(t *testing.T) {
 	t.Parallel()
 

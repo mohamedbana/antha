@@ -38,16 +38,17 @@ Steps {
 	// dilute sample
 	diluentSample:=mixer.Sample(Diluent, DilutionVolume)
 
+	sampleforreading := mixer.SampleAll(SampleForReading)
 	
-	dilutedSample:=Mix(SampleForReading, diluentSample)
+	dilutedSample:=Mix(sampleforreading, diluentSample)
 	
 	// read
-	abs := platereader.ReadAbsorbance(*Plate, *dilutedSample, AbsorbanceWavelength.RawValue())
+	abs := platereader.ReadAbsorbance(Plate, dilutedSample, AbsorbanceWavelength.RawValue())
 	
 	// prepare blank and read
 	blankSample := MixInto(Plate,"",diluentSample)
 	
-	blankabs := platereader.ReadAbsorbance(*Plate, *blankSample, AbsorbanceWavelength.RawValue())
+	blankabs := platereader.ReadAbsorbance(Plate, blankSample, AbsorbanceWavelength.RawValue())
 	
 	// blank correct
 	blankcorrected := platereader.Blankcorrect(blankabs,abs)
