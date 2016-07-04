@@ -61,15 +61,15 @@ func _NewDNASequence_fromLookupSteps(_ctx context.Context, _input *NewDNASequenc
 
 	if _input.BiobrickID {
 		_output.Status = fmt.Sprintln(
-			text.Print(_input.ID+"DNA_Seq: ", _output.DNA),
-			text.Print(_input.ID+"ORFs: ", _output.DNA.Features),
+			text.Print(_input.ID+" DNA_Seq: ", _output.DNA),
+			text.Print(_input.ID+" ORFs: ", _output.DNA.Features),
 			text.Print(_input.ID+" PartDescription", partdetails.Description(_input.ID)),
 		)
 		_output.Description = partdetails.Description(_input.ID)
 	} else {
 		_output.Status = fmt.Sprintln(
-			text.Print(_input.ID+"DNA_Seq: ", _output.DNA),
-			text.Print(_input.ID+"ORFs: ", _output.DNA.Features),
+			text.Print(_input.ID+" DNA_Seq: ", _output.DNA),
+			text.Print(_input.ID+" ORFs: ", _output.DNA.Features),
 		)
 	}
 	_output.Warnings = err

@@ -57,7 +57,6 @@ Setup {}
 Steps {
 	var err error
 
-	samples := make([]*wtype.LHComponent, 0)
         ConstructName = OutputConstructName
 	
         last := len(PartSeqs) - 1
