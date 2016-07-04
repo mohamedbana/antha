@@ -51,13 +51,13 @@ func _NewDNASequence_fromLookupSteps(_ctx context.Context, _input *NewDNASequenc
 
 		_output.DNA = wtype.MakeLinearDNASequence(_input.ID, seq)
 
-	} //else {Status = fmt.Sprintln("correct conditions not met")}
+	}
 
-	orfs := sequences.FindallORFs(_output.DNA.Seq)
-	features := sequences.ORFs2Features(orfs)
-
-	_output.DNA = wtype.Annotate(_output.DNA, features)
-
+	if _input.AddORFS {
+		orfs := sequences.FindallORFs(_output.DNA.Seq)
+		features := sequences.ORFs2Features(orfs)
+		_output.DNA = wtype.Annotate(_output.DNA, features)
+	}
 	_output.Status = fmt.Sprintln(
 		text.Print("DNA_Seq: ", _output.DNA),
 		text.Print("ORFs: ", _output.DNA.Features),
@@ -121,6 +121,7 @@ type NewDNASequence_fromLookupElement struct {
 }
 
 type NewDNASequence_fromLookupInput struct {
+	AddORFS    bool
 	BiobrickID bool
 	DNAID      bool
 	EntrezID   bool
@@ -148,8 +149,9 @@ func init() {
 		Constructor: NewDNASequence_fromLookupNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/Data/DNA/NewDNASequence/NewDNASequence_fromLookup.an",
+			Path: "antha/component/an/AnthaAcademy/Lesson4_DNA/C_NewDNASequence_fromLookup.an",
 			Params: []ParamDesc{
+				{Name: "AddORFS", Desc: "", Kind: "Parameters"},
 				{Name: "BiobrickID", Desc: "", Kind: "Parameters"},
 				{Name: "DNAID", Desc: "", Kind: "Parameters"},
 				{Name: "EntrezID", Desc: "", Kind: "Parameters"},

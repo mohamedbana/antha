@@ -134,11 +134,11 @@ func RetrieveSequence(id string, database string, filename string) (wtype.DNASeq
 		return wtype.DNASequence{}, err
 	}
 
-	contents, err := ioutil.ReadFile(filename)
+	contents, err := ioutil.ReadFile(filepath.Join(anthapath.Path(), filename))
 
 	fmt.Println("ID:", id, "Contents:", string(contents))
 	file := filepath.Join(anthapath.Path(), filename)
-	seq, err := parser.GenbanktoFeaturelessDNASequence(file)
+	seq, err := parser.GenbanktoAnnotatedSeq(file)
 	if err != nil {
 		fmt.Println("File:", file, "Error:", err.Error())
 		return wtype.DNASequence{}, err

@@ -15,7 +15,7 @@ Parameters (
 	BiobrickID bool	
 	EntrezID bool
 	DNAID bool
-	
+	AddORFS bool
 )
 
 // Data which is returned from this protocol
@@ -52,7 +52,7 @@ Steps {
 		
 			if DNAID {
 			
-			DNA, err = entrez.RetrieveSequence(ID, "nucleotide")
+			DNA, err = entrez.RetrieveSequence(ID, "nucleotide",ID+".gb")
 			
 			}
 		} else if BiobrickID {
@@ -65,11 +65,12 @@ Steps {
 			
 		} 
 									
+	
+	if AddORFS {
 	orfs := sequences.FindallORFs(DNA.Seq)
 	features := sequences.ORFs2Features(orfs)
-	
 	DNA = wtype.Annotate(DNA,features)
-	
+	}
 	Status = fmt.Sprintln(
 		text.Print("DNA_Seq: ",DNA),
 		text.Print("ORFs: ", DNA.Features),
