@@ -104,7 +104,7 @@ type SynthesisSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Synthesis",
+	if err := addComponent(Component{Name: "Synthesis",
 		Constructor: SynthesisNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -114,5 +114,7 @@ func init() {
 				{Name: "Components", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

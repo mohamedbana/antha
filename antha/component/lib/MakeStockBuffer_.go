@@ -136,7 +136,7 @@ type MakeStockBufferSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "MakeStockBuffer",
+	if err := addComponent(Component{Name: "MakeStockBuffer",
 		Constructor: MakeStockBufferNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -149,7 +149,9 @@ func init() {
 				{Name: "StockConc", Desc: "Status string\n", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }
 
 /*

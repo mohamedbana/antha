@@ -116,7 +116,7 @@ type LoadGelSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "LoadGel",
+	if err := addComponent(Component{Name: "LoadGel",
 		Constructor: LoadGelNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -134,5 +134,7 @@ func init() {
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

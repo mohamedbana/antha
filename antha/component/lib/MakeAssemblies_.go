@@ -158,7 +158,7 @@ type MakeAssembliesSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "MakeAssemblies",
+	if err := addComponent(Component{Name: "MakeAssemblies",
 		Constructor: MakeAssembliesNew,
 		Desc: ComponentDesc{
 			Desc: "Assemble multiple assemblies using TypeIIs construct assembly\n",
@@ -189,5 +189,7 @@ func init() {
 				{Name: "Reactions", Desc: "List of assembled parts\n", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

@@ -258,7 +258,7 @@ type DNA_gelSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "DNA_gel",
+	if err := addComponent(Component{Name: "DNA_gel",
 		Constructor: DNA_gelNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -279,7 +279,9 @@ func init() {
 				{Name: "Loadedsamples", Desc: "Gel\n", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }
 
 //func cherrypick ()

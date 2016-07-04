@@ -180,7 +180,7 @@ type TypeIISConstructAssemblyMMX_forscreenSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "TypeIISConstructAssemblyMMX_forscreen",
+	if err := addComponent(Component{Name: "TypeIISConstructAssemblyMMX_forscreen",
 		Constructor: TypeIISConstructAssemblyMMX_forscreenNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -210,5 +210,7 @@ func init() {
 				{Name: "Sequence", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

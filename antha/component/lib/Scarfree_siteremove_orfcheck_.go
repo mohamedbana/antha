@@ -373,7 +373,7 @@ type Scarfree_siteremove_orfcheckSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Scarfree_siteremove_orfcheck",
+	if err := addComponent(Component{Name: "Scarfree_siteremove_orfcheck",
 		Constructor: Scarfree_siteremove_orfcheckNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -394,5 +394,7 @@ func init() {
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

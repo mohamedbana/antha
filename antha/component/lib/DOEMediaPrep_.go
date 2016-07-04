@@ -103,7 +103,7 @@ type DOEMediaPrepSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "DOEMediaPrep",
+	if err := addComponent(Component{Name: "DOEMediaPrep",
 		Constructor: DOEMediaPrepNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -121,5 +121,7 @@ func init() {
 				{Name: "GrowthMedium", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

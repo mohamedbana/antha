@@ -156,7 +156,7 @@ type TypeIISConstructAssemblySOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "TypeIISConstructAssembly",
+	if err := addComponent(Component{Name: "TypeIISConstructAssembly",
 		Constructor: TypeIISConstructAssemblyNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -187,5 +187,7 @@ func init() {
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

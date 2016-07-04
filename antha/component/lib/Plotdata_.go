@@ -121,7 +121,7 @@ type PlotdataSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Plotdata",
+	if err := addComponent(Component{Name: "Plotdata",
 		Constructor: PlotdataNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -132,5 +132,7 @@ func init() {
 				{Name: "Yvaluearray", Desc: "", Kind: "Parameters"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

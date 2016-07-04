@@ -103,7 +103,7 @@ type Synthesis_validationSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Synthesis_validation",
+	if err := addComponent(Component{Name: "Synthesis_validation",
 		Constructor: Synthesis_validationNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -117,5 +117,7 @@ func init() {
 				{Name: "ValidationStatus", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

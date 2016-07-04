@@ -142,7 +142,7 @@ type LoadGel_multiSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "LoadGel_multi",
+	if err := addComponent(Component{Name: "LoadGel_multi",
 		Constructor: LoadGel_multiNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -160,5 +160,7 @@ func init() {
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

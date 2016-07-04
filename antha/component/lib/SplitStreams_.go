@@ -105,7 +105,7 @@ type SplitStreamsSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "SplitStreams",
+	if err := addComponent(Component{Name: "SplitStreams",
 		Constructor: SplitStreamsNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -120,5 +120,7 @@ func init() {
 				{Name: "Stream2", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

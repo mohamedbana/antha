@@ -119,7 +119,7 @@ type AnotherSequentialMixTestProtocolSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "AnotherSequentialMixTestProtocol",
+	if err := addComponent(Component{Name: "AnotherSequentialMixTestProtocol",
 		Constructor: AnotherSequentialMixTestProtocolNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -131,5 +131,7 @@ func init() {
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

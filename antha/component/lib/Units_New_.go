@@ -105,7 +105,7 @@ type Units_NewSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Units_New",
+	if err := addComponent(Component{Name: "Units_New",
 		Constructor: Units_NewNew,
 		Desc: ComponentDesc{
 			Desc: "demo of how to create units from raw values and unit strings\n",
@@ -116,5 +116,7 @@ func init() {
 				{Name: "MyVolume", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

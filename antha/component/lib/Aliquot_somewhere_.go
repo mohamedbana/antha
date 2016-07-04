@@ -149,7 +149,7 @@ type Aliquot_somewhereSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Aliquot_somewhere",
+	if err := addComponent(Component{Name: "Aliquot_somewhere",
 		Constructor: Aliquot_somewhereNew,
 		Desc: ComponentDesc{
 			Desc: "example protocol showing the highest level antha mix command which does not specify a plate type, therefore leaving it up to the scheduler to decide\n",
@@ -162,5 +162,7 @@ func init() {
 				{Name: "Aliquots", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

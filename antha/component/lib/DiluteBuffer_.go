@@ -134,7 +134,7 @@ type DiluteBufferSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "DiluteBuffer",
+	if err := addComponent(Component{Name: "DiluteBuffer",
 		Constructor: DiluteBufferNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -154,7 +154,9 @@ func init() {
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }
 
 /*

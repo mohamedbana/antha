@@ -148,7 +148,7 @@ type GeneDesign_seqSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "GeneDesign_seq",
+	if err := addComponent(Component{Name: "GeneDesign_seq",
 		Constructor: GeneDesign_seqNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -167,5 +167,7 @@ func init() {
 				{Name: "ValidationStatus", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

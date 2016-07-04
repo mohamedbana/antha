@@ -247,7 +247,7 @@ type MakePalette_OneByOneSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "MakePalette_OneByOne",
+	if err := addComponent(Component{Name: "MakePalette_OneByOne",
 		Constructor: MakePalette_OneByOneNew,
 		Desc: ComponentDesc{
 			Desc: "Generates instructions to make a pallette of all colours in an image\n",
@@ -271,5 +271,7 @@ func init() {
 				{Name: "Palette", Desc: "Colournames []string\n", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

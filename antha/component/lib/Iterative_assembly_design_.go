@@ -298,7 +298,7 @@ type Iterative_assembly_designSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Iterative_assembly_design",
+	if err := addComponent(Component{Name: "Iterative_assembly_design",
 		Constructor: Iterative_assembly_designNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -317,5 +317,7 @@ func init() {
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

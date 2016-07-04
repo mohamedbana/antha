@@ -281,7 +281,7 @@ type MakePaletteSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "MakePalette",
+	if err := addComponent(Component{Name: "MakePalette",
 		Constructor: MakePaletteNew,
 		Desc: ComponentDesc{
 			Desc: "Generates instructions to make a pallette of all colours in an image\n",
@@ -303,5 +303,7 @@ func init() {
 				{Name: "Palette", Desc: "Colournames []string\n", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

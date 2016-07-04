@@ -248,7 +248,7 @@ type MoClo_designSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "MoClo_design",
+	if err := addComponent(Component{Name: "MoClo_design",
 		Constructor: MoClo_designNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -267,5 +267,7 @@ func init() {
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

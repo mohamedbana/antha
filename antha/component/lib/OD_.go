@@ -168,7 +168,7 @@ type ODSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "OD",
+	if err := addComponent(Component{Name: "OD",
 		Constructor: ODNew,
 		Desc: ComponentDesc{
 			Desc: "Example OD measurement protocol.\nComputes the OD and dry cell weight estimate from absorbance reading\nTODO: implement replicates from parameters\n",
@@ -189,5 +189,7 @@ func init() {
 				{Name: "Sample_absorbance", Desc: "Absorbance\n", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

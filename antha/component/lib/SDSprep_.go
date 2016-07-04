@@ -180,7 +180,7 @@ type SDSprepSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "SDSprep",
+	if err := addComponent(Component{Name: "SDSprep",
 		Constructor: SDSprepNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -203,5 +203,7 @@ func init() {
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

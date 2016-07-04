@@ -125,7 +125,7 @@ type PaintmixSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Paintmix",
+	if err := addComponent(Component{Name: "Paintmix",
 		Constructor: PaintmixNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -141,5 +141,7 @@ func init() {
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

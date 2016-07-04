@@ -134,7 +134,7 @@ type Units_SumSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Units_Sum",
+	if err := addComponent(Component{Name: "Units_Sum",
 		Constructor: Units_SumNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -145,7 +145,9 @@ func init() {
 				{Name: "SumOfVolumes", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }
 
 /*
