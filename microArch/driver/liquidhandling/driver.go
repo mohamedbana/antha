@@ -29,12 +29,18 @@ import (
 // driver interface
 
 type LiquidhandlingDriver interface {
+    //well bottom top liquid level
 	Move(deckposition []string, wellcoords []string, reference []int, offsetX, offsetY, offsetZ []float64, plate_type []string, head int) driver.CommandStatus
 	MoveRaw(head int, x, y, z float64) driver.CommandStatus
+    //overstroke:
+    //muti: how long (8), or how many tips
+    //llf: liquidlevelfollow attempt to follow liquid surface
+    //what: liquid class name, probably not very useful
 	Aspirate(volume []float64, overstroke []bool, head int, multi int, platetype []string, what []string, llf []bool) driver.CommandStatus
 	Dispense(volume []float64, blowout []bool, head int, multi int, platetype []string, what []string, llf []bool) driver.CommandStatus
 	LoadTips(channels []int, head, multi int, platetype, position, well []string) driver.CommandStatus
 	UnloadTips(channels []int, head, multi int, platetype, position, well []string) driver.CommandStatus
+    //rate units... check LHChannelParameters
 	SetPipetteSpeed(head, channel int, rate float64) driver.CommandStatus
 	SetDriveSpeed(drive string, rate float64) driver.CommandStatus
 	Stop() driver.CommandStatus

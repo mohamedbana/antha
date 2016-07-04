@@ -68,11 +68,21 @@ func NewVirtualLiquidHandler(props LHProperties) (*VirtualLiquidHandler, error) 
 func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []string, reference []int, 
                                        offsetX, offsetY, offsetZ []float64, plate_type []string, 
                                        head int) driver.CommandStatus {
+    //Asserts:
+    //deckposition exists - why is it a list?
+    //wellcoords exists within the plate at deckposition
+    //reference is in allowable range
+    //offsetX, offsetY, offsetZ are within the well (but I guess they needn't be...)
+    //plate_type matches the type of plate at deckposition
+    //head is valid
     driver.CommandStatus{true, driver.OK, "MOVE ACK"}
 }
 
 //Move raw - not yet implemented in compositerobotinstruction
 func (self *VirtualLiquidHandler) MoveRaw(head int, x, y, z float64) driver.CommandStatus {
+    //Asserts:
+    //head exists
+    //x,y,x are within the machine
     panic("unimplemented")
 }
 
@@ -80,6 +90,15 @@ func (self *VirtualLiquidHandler) MoveRaw(head int, x, y, z float64) driver.Comm
 func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, head int, multi int, 
                                            platetype []string, what []string, llf []bool) 
                                   driver.CommandStatus {
+    //volumes are equal if adapter isn't independent
+    //tips are loaded in each adapter location the aspirates
+    //volume is smaller that the tips' maximum capacity
+    //the tip hasn't been used for a different liquid
+    //head exists
+    //multi matches number of tips loaded
+    //platetype matches the plate at the location we moved to
+    //what matches the expected liquid class
+    //llf is the right size, cannot vary unless independent
     panic("unimplemented")
 }
 
@@ -87,28 +106,54 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, head int, multi int, 
                                            platetype []string, what []string, llf []bool) 
                                   driver.CommandStatus {
+    //Volumes are equal if adapter isn't indepentent
+    //Volumes are at most equal to the volume in the tip
+    //blowout is the right length
+    //head exists
+    //multi is valid
+    //platetype matches the type of plate that we're next to
+    //what matches the liquid class that was aspirated
+    //llf is the right size and follows independence constraint
     panic("unimplemented")
 }
 
 //LoadTips - used
 func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int, 
                                            platetype, position, well []string) driver.CommandStatus {
+    //channels is correct length and value (how does this work)
+    //head exists
+    //multi is in correct range for adaptor
+    //platetype matches the plate we're over
+    //position is correct, tips still exists there
+    //well exists (difference between platetype and well?)
     panic("unimplemented")
 }
 
 //UnloadTips - used
 func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int, 
                                              platetype, position, well []string) driver.CommandStatus {
+    //Tips are loaded in channels
+    //independence constraints are met
+    //head exists
+    //multi is correct
+    //platetype matches the plate we're over
+    //platetype is tip-waste
+    //position and well are correct
     panic("unimplemented")
 }
 
 //SetPipetteSpeed - used
 func (self *VirtualLiquidHandler) SetPipetteSpeed(head, channel int, rate float64) driver.CommandStatus {
+    //head exists
+    //channel exists
+    //speed is within allowable range
     panic("unimplemented")
 }
 
 //SetDriveSpeed - used
 func (self *VirtualLiquidHandler) SetDriveSpeed(drive string, rate float64) driver.CommandStatus {
+    //drive string?
+    //rate is within allowable range (what is this?)
     panic("unimplemented")
 }
 
@@ -124,43 +169,61 @@ func (self *VirtualLiquidHandler) Go() driver.CommandStatus {
 
 //Initialize - used
 func (self *VirtualLiquidHandler) Initialize() driver.CommandStatus {
+    //check that this is called before anything else?
     panic("unimplemented")
 }
 
 //Finalize - used
 func (self *VirtualLiquidHandler) Finalize() driver.CommandStatus {
+    //check that this is called last, no more calls
     panic("unimplemented")
 }
 
 //Wait - used
 func (self *VirtualLiquidHandler) Wait(time float64) driver.CommandStatus {
+    //time is positive
+    //maybe a warning if it's super-long
     panic("unimplemented")
 }
 
 //Mix - used
 func (self *VirtualLiquidHandler) Mix(head int, volume []float64, platetype []string, cycles []int, 
                                       multi int, what []string, blowout []bool) driver.CommandStatus {
+    //head exists
+    //volume is lte volume in wells
+    //platetype matches the plate we're over
+    //muli is correct
+    //what matches expected liquidclass
+    //volume, platetype, what, blowout match independence constraint
     panic("unimplemented")
 }
 
 //ResetPistons - used
 func (self *VirtualLiquidHandler) ResetPistons(head, channel int) driver.CommandStatus {
+    //head exists
+    //channel exists
+    //what does this do again? probably need to make sure it gets called appropriately
     panic("unimplemented")
 }
 
 //AddPlateTo - used
 func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{}, name string) 
                                   driver.CommandStatus {
+    //position exists
+    //position can accept a plate of this type
+    //plate can be cast to LHPlate. plate type mathes position type
     panic("unimplemented")
 }
 
 //RemoveAllPlates - used
 func (self *VirtualLiquidHandler) RemoveAllPlates() driver.CommandStatus {
+    //remove plates, no checks required.
     panic("unimplemented")
 }
 
 //RemovePlateAt - unused
 func (self *VirtualLiquidHandler) RemovePlateAt(position string) driver.CommandStatus {
+    //plate exists at position
     panic("unimplemented")
 }
 
@@ -172,6 +235,7 @@ func (self *VirtualLiquidHandler) SetPositionState(position string, state driver
 
 //GetCapabilites - used
 func (self *VirtualLiquidHandler) GetCapabilities() (LHProperties, driver.CommandStatus) {
+    //no checks requireds
     return (self.properties, driver.CommandStatus{true, driver.OK, ""}) 
 }
 
@@ -248,6 +312,7 @@ func (self *VirtualLiquidHandler) Message(level int, title, text string, showcan
 
 //GetOutputFile - used, but not in instruction stream
 func (self *VirtualLiquidHandler) GetOutputFile() (string, driver.CommandStatus) {
+    //Probably won't get called on the simulator just yet...
     panic("unimplemented")
 }
 
