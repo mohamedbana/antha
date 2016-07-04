@@ -122,6 +122,7 @@ func _PCR_volSteps(_ctx context.Context, _input *PCR_volInput, _output *PCR_volO
 	}
 	reaction := mastermix
 
+	// this needs to go after an initial denaturation!
 	if _input.Hotstart {
 		polySample := mixer.Sample(_input.PCRPolymerase, _input.PolymeraseVolume)
 

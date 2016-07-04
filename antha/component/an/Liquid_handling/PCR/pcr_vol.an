@@ -148,6 +148,7 @@ Steps {
 	}
 	reaction := mastermix
 
+	// this needs to go after an initial denaturation!
 	if Hotstart {
 	polySample := mixer.Sample(PCRPolymerase, PolymeraseVolume)
 	

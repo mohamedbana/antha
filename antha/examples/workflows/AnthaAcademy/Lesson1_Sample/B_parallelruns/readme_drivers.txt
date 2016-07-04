@@ -12,6 +12,8 @@ A driver can be called from a local port if already running:
 
 Or called directly from source code:
 'antharun --driver go://github.com/antha-lang/manualLiquidHandler/server'
+or
+'antharun --driver go://github.com/Synthace/PipetMaxDriver/server'
 
 
 If running the pipetmax driver this will be launched locally from a binary using the following command in a separate terminal prior to using antharun:

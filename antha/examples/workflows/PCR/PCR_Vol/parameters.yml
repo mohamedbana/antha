@@ -25,7 +25,7 @@
             "RevPrimerVol": "1ul",
             "Template": "pET_GFP",
             "Templatevolume": "2ul",
-			"Hotstart":false,
+			"Hotstart":true,
 			"AddPrimerstoMasterMix":true,
 			"Water":"water"
         }
