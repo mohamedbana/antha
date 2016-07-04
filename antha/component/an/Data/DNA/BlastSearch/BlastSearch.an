@@ -18,8 +18,10 @@ Parameters (
 
 // Data which is returned from this protocol; output data
 Data (
-	Hits string
-	//AnthaSeq wtype.DNASequence
+	Hitssummary string
+	Hits []biogo.Hit
+	AnthaSeq wtype.DNASequence
+	Warning error
 )
 
 // Physical inputs to this protocol
@@ -46,10 +48,11 @@ Steps {
 	
 	var err error
 	var hits []biogo.Hit
+	var hitsummary string	
 	
 	
 	// Convert the sequence to an anthatype
-	AnthaSeq := wtype.MakeLinearDNASequence(Name, DNA)
+	AnthaSeq = wtype.MakeLinearDNASequence(Name, DNA)
 	
 	// look for orfs
 	orf, orftrue := sequences.FindORF(AnthaSeq.Seq)
@@ -65,13 +68,16 @@ Steps {
 	if err !=nil {
 		fmt.Println(err.Error())
 	
-	} //else {
+	} 
+		hitsummary,err = blast.HitSummary(hits)
 	
-		//Hits = fmt.Sprintln(blast.HitSummary(hits))
-		
+		Hits = hits 
+		Hitssummary = hitsummary
+		fmt.Println(Hitssummary)
 		// Rename Sequence with ID of top blast hit
 		AnthaSeq.Nm = hits[0].Id
-	//}
+
+	Warning = err
 	
 	
 }

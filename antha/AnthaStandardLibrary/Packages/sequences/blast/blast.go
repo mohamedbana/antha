@@ -49,7 +49,7 @@ var (
 	//query     = "X14032.1"
 	//query     = "MSFSNYKVIAMPVLVANFVLGAATAWANENYPAKSAGYNQGDWVASFNFSKVYVGEELGDLNVGGGALPNADVSIGNDTTLTFDIAYFVSSNIAVDFFVGVPARAKFQGEKSISSLGRVSEVDYGPAILSLQYHYDSFERLYPYVGVGVGRVLFFDKTDGALSSFDIKDKWAPAFQVGLRYDLGNSWMLNSDVRYIPFKTDVTGTLGPVPVSTKIEVDPFILSLGASYVF"
 	//query   = "atgagtttttctaattataaagtaatcgcgatgccggtgttggttgctaattttgttttgggggcggccactgcatgggcgaatgaaaattatccggcgaaatctgctggctataatcagggtgactgggtcgctagcttcaatttttctaaggtctatgtgggtgaggagcttggcgatctaaatgttggagggggggctttgccaaatgctgatgtaagtattggtaatgatacaacacttacgtttgatatcgcctattttgttagctcaaatatagcggtggatttttttgttggggtgccagctagggctaaatttcaaggtgagaaatcaatctcctcgctgggaagagtcagtgaagttgattacggccctgcaattctttcgcttcaatatcattacgatagctttgagcgactttatccatatgttggggttggtgttggtcgggtgctattttttgataaaaccgacggtgctttgagttcgtttgatattaaggataaatgggcgcctgcttttcaggttggccttagatatgaccttggtaactcatggatgctaaattcagatgtgcgttatattcctttcaaaacggacgtcacaggtactcttggcccggttcctgtttctactaaaattgaggttgatcctttcattctcagtcttggtgcgtcatatgttttctaa"
-	retries = 1
+	retries = 5
 	retry   = retries
 )
 
@@ -67,10 +67,10 @@ func RerunRIDstring(rid string) (o *Output, err error) {
 			fmt.Println(s.Status)
 
 			fmt.Println("hits?", s.HaveHits)
-			if !s.HaveHits {
-				continue
+			if s.HaveHits {
+				o, err = r.GetOutput(&getparams, tool, email)
+				return
 			}
-			o, err = r.GetOutput(&getparams, tool, email)
 
 			if err == nil {
 				break
@@ -96,11 +96,10 @@ func RerunRID(r *Rid) (o *Output, err error) {
 			fmt.Println(s.Status)
 
 			fmt.Println("hits?", s.HaveHits)
-			if !s.HaveHits {
-				continue
+			if s.HaveHits {
+				o, err = r.GetOutput(&getparams, tool, email)
+				return
 			}
-			o, err = r.GetOutput(&getparams, tool, email)
-
 			if err == nil {
 				break
 			}
@@ -200,7 +199,7 @@ func SimpleBlast(query string) (o *Output, err error) {
 		fmt.Println("hits?", s.HaveHits)
 		if s.HaveHits == true {
 			o, err = r.GetOutput(&getparams, tool, email)
-			continue
+			return
 		} else if strings.Contains(s.Status, "WAITING") == true {
 			for {
 				if strings.Contains(s.Status, "WAITING") == true {

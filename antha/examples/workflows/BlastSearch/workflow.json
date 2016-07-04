@@ -6,9 +6,6 @@
         },
         "BlastSearch2": {
             "component": "BlastSearch"
-        },
-        "BlastSearch3": {
-            "component": "BlastSearch"
         }
     }
 }

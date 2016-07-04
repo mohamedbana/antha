@@ -18,8 +18,6 @@ import (
 
 // Data which is returned from this protocol; output data
 
-//AnthaSeq wtype.DNASequence
-
 // Physical inputs to this protocol
 
 // Physical outputs from this protocol
@@ -38,31 +36,35 @@ func _BlastSearchSteps(_ctx context.Context, _input *BlastSearchInput, _output *
 
 	var err error
 	var hits []biogo.Hit
+	var hitsummary string
 
 	// Convert the sequence to an anthatype
-	AnthaSeq := wtype.MakeLinearDNASequence(_input.Name, _input.DNA)
+	_output.AnthaSeq = wtype.MakeLinearDNASequence(_input.Name, _input.DNA)
 
 	// look for orfs
-	orf, orftrue := sequences.FindORF(AnthaSeq.Seq)
+	orf, orftrue := sequences.FindORF(_output.AnthaSeq.Seq)
 
-	if orftrue == true && len(orf.DNASeq) == len(AnthaSeq.Seq) {
+	if orftrue == true && len(orf.DNASeq) == len(_output.AnthaSeq.Seq) {
 		// if open reading frame is detected, we'll perform a blastP search'
-		fmt.Println("ORF detected:", "full sequence length: ", len(AnthaSeq.Seq), "ORF length: ", len(orf.DNASeq))
+		fmt.Println("ORF detected:", "full sequence length: ", len(_output.AnthaSeq.Seq), "ORF length: ", len(orf.DNASeq))
 		hits, err = blast.MegaBlastP(orf.ProtSeq)
 	} else {
 		// otherwise we'll blast the nucleotide sequence
-		hits, err = AnthaSeq.Blast()
+		hits, err = _output.AnthaSeq.Blast()
 	}
 	if err != nil {
 		fmt.Println(err.Error())
 
-	} //else {
+	}
+	hitsummary, err = blast.HitSummary(hits)
 
-	//Hits = fmt.Sprintln(blast.HitSummary(hits))
-
+	_output.Hits = hits
+	_output.Hitssummary = hitsummary
+	fmt.Println(_output.Hitssummary)
 	// Rename Sequence with ID of top blast hit
-	AnthaSeq.Nm = hits[0].Id
-	//}
+	_output.AnthaSeq.Nm = hits[0].Id
+
+	_output.Warning = err
 
 }
 
@@ -127,12 +129,18 @@ type BlastSearchInput struct {
 }
 
 type BlastSearchOutput struct {
-	Hits string
+	AnthaSeq    wtype.DNASequence
+	Hits        []biogo.Hit
+	Hitssummary string
+	Warning     error
 }
 
 type BlastSearchSOutput struct {
 	Data struct {
-		Hits string
+		AnthaSeq    wtype.DNASequence
+		Hits        []biogo.Hit
+		Hitssummary string
+		Warning     error
 	}
 	Outputs struct {
 	}
@@ -147,7 +155,10 @@ func init() {
 			Params: []ParamDesc{
 				{Name: "DNA", Desc: "", Kind: "Parameters"},
 				{Name: "Name", Desc: "", Kind: "Parameters"},
+				{Name: "AnthaSeq", Desc: "", Kind: "Data"},
 				{Name: "Hits", Desc: "", Kind: "Data"},
+				{Name: "Hitssummary", Desc: "", Kind: "Data"},
+				{Name: "Warning", Desc: "", Kind: "Data"},
 			},
 		},
 	})
