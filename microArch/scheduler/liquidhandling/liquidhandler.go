@@ -32,6 +32,7 @@ import (
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
+	simulator_lh "github.com/antha-lang/antha/microArch/simulator/liquidhandling"
 )
 
 // the liquid handler structure defines the interface to a particular liquid handling
@@ -86,12 +87,16 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) error {
 
 	//f := func() {
 	err := this.Plan(request)
-
 	if err != nil {
 		return err
 	}
-	err = this.Execute(request)
 
+	err = this.Simulate(request)
+	if err != nil {
+		return err
+	}
+
+	err = this.Execute(request)
 	if err != nil {
 		return err
 	}
@@ -108,11 +113,40 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) error {
 	return nil
 }
 
+// run the request via the simulator
+func (this *Liquidhandler) Simulate(request *LHRequest) error {
+
+	instructions := (*request).Instructions
+	if instructions == nil {
+		return wtype.LHError(wtype.LH_ERR_OTHER, "Cannot execute request: no instructions")
+	}
+
+	// set up the simulator
+    vlh,err := simulator_lh.NewVirtualLiquidHandler(this.Properties)
+    if err != nil {
+        return err
+    }
+	err = this.do_setup(request, vlh)
+
+	if err != nil {
+		return err
+	}
+
+
+	for _, ins := range instructions {
+		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(vlh)
+	}
+
+    vlh.SaveLog("instructions_log")
+
+	return nil
+}
+
 // run the request via the driver
 func (this *Liquidhandler) Execute(request *LHRequest) error {
 	// set up the robot
-
-	err := this.do_setup(request)
+    driver := this.Properties.Driver.(liquidhandling.ExtendedLiquidhandlingDriver)
+	err := this.do_setup(request, driver)
 
 	if err != nil {
 		return err
@@ -131,7 +165,7 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 
 	for _, ins := range instructions {
 		logger.Debug(fmt.Sprintln(liquidhandling.InsToString(ins)))
-		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(this.Properties.Driver)
+		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(driver)
 
 		if timer != nil {
 			d += timer.TimeFor(ins)
@@ -221,9 +255,9 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 	return nil
 }
 
-func (this *Liquidhandler) do_setup(rq *LHRequest) error {
+func (this *Liquidhandler) do_setup(rq *LHRequest, drv liquidhandling.ExtendedLiquidhandlingDriver) error {
 
-	stat := this.Properties.Driver.RemoveAllPlates()
+	stat := drv.RemoveAllPlates()
 
 	if stat.Errorcode == driver.ERR {
 		return wtype.LHError(wtype.LH_ERR_DRIV, stat.Msg)
@@ -235,14 +269,14 @@ func (this *Liquidhandler) do_setup(rq *LHRequest) error {
 		}
 		plate := this.Properties.PlateLookup[plateid]
 		name := plate.(wtype.Named).GetName()
-		stat = this.Properties.Driver.AddPlateTo(position, plate, name)
+		stat = drv.AddPlateTo(position, plate, name)
 
 		if stat.Errorcode == driver.ERR {
 			return wtype.LHError(wtype.LH_ERR_DRIV, stat.Msg)
 		}
 	}
 
-	stat = this.Properties.Driver.(liquidhandling.ExtendedLiquidhandlingDriver).UpdateMetaData(this.Properties)
+	stat = drv.(liquidhandling.ExtendedLiquidhandlingDriver).UpdateMetaData(this.Properties)
 	if stat.Errorcode == driver.ERR {
 		return wtype.LHError(wtype.LH_ERR_DRIV, stat.Msg)
 	}

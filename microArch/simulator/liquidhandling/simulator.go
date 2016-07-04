@@ -23,23 +23,16 @@
 package liquidhandling
 
 import (
-    "ioutil",
-    "strings",
+    "io/ioutil"
+    "strings"
+    "fmt"
 	"github.com/antha-lang/antha/microArch/driver"
+	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 )
-
-func Simulate(properties *LHProperties, instructions []TerminalRobotInstruction)
-{
-    vlh := NewVirtualLiquidHandler(properties)
-
-    for _, ins = range instructions {
-        ins.OutputTo(vlh)
-    }
-}
 
 // Simulate a liquid handler Driver
 type VirtualLiquidHandler struct {
-    properties LHProperties 
+    properties *liquidhandling.LHProperties 
     //Need to store:
     // LHProperties
     // plate(s) at each layout position
@@ -60,30 +53,30 @@ type VirtualLiquidHandler struct {
 }
 
 //Create a new VirtualLiquidHandler which mimics an LHDriver
-func NewVirtualLiquidHandler(props LHProperties) (*VirtualLiquidHandler, error) {
+func NewVirtualLiquidHandler(props *liquidhandling.LHProperties) (*VirtualLiquidHandler, error) {
     var vlh VirtualLiquidHandler
 
     vlh.properties = props.Dup()
-    vlh.log = make([]string)
+    vlh.log = make([]string, 0)
 
-    return &vlh
+    return &vlh, nil
 }
 
 //Write to the log
-func (self *VirtualLiquidHandler) Log(line string) {
+func (self *VirtualLiquidHandler) LogLine(line string) {
     self.log = append(self.log, line)
 }
 
 //save the log
 func (self *VirtualLiquidHandler) SaveLog(filename string) {
-    ioutil.WriteFile(filename, strings.join(self.log, '\n'), 0644)
+    ioutil.WriteFile(filename, []byte(strings.Join(self.log, "\n")), 0644)
 }
 
 //Move command - used
 func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []string, reference []int, 
                                        offsetX, offsetY, offsetZ []float64, plate_type []string, 
                                        head int) driver.CommandStatus {
-    self.log(fmt.sprintf(`Move(
+    self.LogLine(fmt.Sprintf(`Move(
     deckposition = %v,
     wellcoords = %v,
     reference = %v,
@@ -102,9 +95,9 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
 
 //Move raw - not yet implemented in compositerobotinstruction
 func (self *VirtualLiquidHandler) MoveRaw(head int, x, y, z float64) driver.CommandStatus {
-    self.log(fmt.sprintf(`MoveRaw(
+    self.LogLine(fmt.Sprintf(`MoveRaw(
     head = %v,
-    offsetX,Y,Z = (%v, %v, %v))`, head, offsetX, offsetY, offsetZ))
+    offsetX,Y,Z = (%v, %v, %v))`, head, x,y,z))
     //Asserts:
     //head exists
     //x,y,x are within the machine
@@ -113,9 +106,8 @@ func (self *VirtualLiquidHandler) MoveRaw(head int, x, y, z float64) driver.Comm
 
 //Aspirate - used
 func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, head int, multi int, 
-                                           platetype []string, what []string, llf []bool) 
-                                  driver.CommandStatus {
-    self.log(fmt.sprintf(`Aspirate(
+                                           platetype []string, what []string, llf []bool) driver.CommandStatus {
+    self.LogLine(fmt.Sprintf(`Aspirate(
     volume = %v,
     overstroke = %v,
     head = %v,
@@ -137,9 +129,8 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 
 //Dispense - used
 func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, head int, multi int, 
-                                           platetype []string, what []string, llf []bool) 
-                                  driver.CommandStatus {
-    self.log(fmt.sprintf(`Dispense(
+                                           platetype []string, what []string, llf []bool) driver.CommandStatus {
+    self.LogLine(fmt.Sprintf(`Dispense(
     volume = %v,
     blowout = %v,
     head = %v,
@@ -161,7 +152,7 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 //LoadTips - used
 func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int, 
                                            platetype, position, well []string) driver.CommandStatus {
-    self.log(fmt.sprintf(`LoadTips(
+    self.LogLine(fmt.Sprintf(`LoadTips(
     channels = %v,
     head = %v,
     multi = %v,
@@ -180,7 +171,7 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 //UnloadTips - used
 func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int, 
                                              platetype, position, well []string) driver.CommandStatus {
-    self.log(fmt.sprintf(`UnloadTips(
+    self.LogLine(fmt.Sprintf(`UnloadTips(
     channels = %v,
     head = %v,
     multi = %v,
@@ -199,7 +190,7 @@ func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
 
 //SetPipetteSpeed - used
 func (self *VirtualLiquidHandler) SetPipetteSpeed(head, channel int, rate float64) driver.CommandStatus {
-    self.log(fmt.sprintf(`SetPipetteSpeed(
+    self.LogLine(fmt.Sprintf(`SetPipetteSpeed(
     head = %v,
     channel = %v,
     rate = %v)`, head, channel, rate))
@@ -211,7 +202,7 @@ func (self *VirtualLiquidHandler) SetPipetteSpeed(head, channel int, rate float6
 
 //SetDriveSpeed - used
 func (self *VirtualLiquidHandler) SetDriveSpeed(drive string, rate float64) driver.CommandStatus {
-    self.log(fmt.sprintf(`SetDriveSpeed(
+    self.LogLine(fmt.Sprintf(`SetDriveSpeed(
     drive = %v,
     rate = %v)`, drive, rate))
     //drive string?
@@ -231,21 +222,21 @@ func (self *VirtualLiquidHandler) Go() driver.CommandStatus {
 
 //Initialize - used
 func (self *VirtualLiquidHandler) Initialize() driver.CommandStatus {
-    self.log("Initialize()")
+    self.LogLine("Initialize()")
     //check that this is called before anything else?
     return driver.CommandStatus{true, driver.OK, "INITIALIZE ACK"}
 }
 
 //Finalize - used
 func (self *VirtualLiquidHandler) Finalize() driver.CommandStatus {
-    self.log("Finalize()")
+    self.LogLine("Finalize()")
     //check that this is called last, no more calls
     return driver.CommandStatus{true, driver.OK, "FINALIZE ACK"}
 }
 
 //Wait - used
 func (self *VirtualLiquidHandler) Wait(time float64) driver.CommandStatus {
-    self.log(fmt.sprintf(`Wait(time = %v)`, time))
+    self.LogLine(fmt.Sprintf(`Wait(time = %v)`, time))
     //time is positive
     //maybe a warning if it's super-long
     return driver.CommandStatus{true, driver.OK, "WAIT ACK"}
@@ -254,7 +245,7 @@ func (self *VirtualLiquidHandler) Wait(time float64) driver.CommandStatus {
 //Mix - used
 func (self *VirtualLiquidHandler) Mix(head int, volume []float64, platetype []string, cycles []int, 
                                       multi int, what []string, blowout []bool) driver.CommandStatus {
-    self.log(fmt.sprintf(`Mix(
+    self.LogLine(fmt.Sprintf(`Mix(
     head = %v,
     volume = %v,
     platetype = %v,
@@ -273,7 +264,7 @@ func (self *VirtualLiquidHandler) Mix(head int, volume []float64, platetype []st
 
 //ResetPistons - used
 func (self *VirtualLiquidHandler) ResetPistons(head, channel int) driver.CommandStatus {
-    self.log("ResetPistons()")
+    self.LogLine("ResetPistons()")
     //head exists
     //channel exists
     //what does this do again? probably need to make sure it gets called appropriately
@@ -281,9 +272,8 @@ func (self *VirtualLiquidHandler) ResetPistons(head, channel int) driver.Command
 }
 
 //AddPlateTo - used
-func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{}, name string) 
-                                  driver.CommandStatus {
-    self.log(fmt.sprintf(`AddPlateTo(
+func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{}, name string) driver.CommandStatus {
+    self.LogLine(fmt.Sprintf(`AddPlateTo(
     position = %v,
     plate = %v,
     name = %v)`, position, plate, name))
@@ -295,29 +285,28 @@ func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{},
 
 //RemoveAllPlates - used
 func (self *VirtualLiquidHandler) RemoveAllPlates() driver.CommandStatus {
-    self.log("RemoveAllPlates()")
+    self.LogLine("RemoveAllPlates()")
     //remove plates, no checks required.
     return driver.CommandStatus{true, driver.OK, "REMOVEALLPLATES ACK"}
 }
 
 //RemovePlateAt - unused
 func (self *VirtualLiquidHandler) RemovePlateAt(position string) driver.CommandStatus {
-    self.log(fmt.sprintf("RemovePlateAt(position = %v)", position))
+    self.LogLine(fmt.Sprintf("RemovePlateAt(position = %v)", position))
     //plate exists at position
     return driver.CommandStatus{true, driver.OK, "REMOVEPLATEAT ACK"}
 }
 
 //SetPositionState - unused
-func (self *VirtualLiquidHandler) SetPositionState(position string, state driver.PositionState) 
-                                  driver.CommandStatus {
+func (self *VirtualLiquidHandler) SetPositionState(position string, state driver.PositionState) driver.CommandStatus {
     panic("unimplemented")
 }
 
 //GetCapabilites - used
-func (self *VirtualLiquidHandler) GetCapabilities() (LHProperties, driver.CommandStatus) {
-    self.log("GetCapabilities()")
+func (self *VirtualLiquidHandler) GetCapabilities() (liquidhandling.LHProperties, driver.CommandStatus) {
+    self.LogLine("GetCapabilities()")
     //no checks required
-    return (self.properties, driver.CommandStatus{true, driver.OK, ""}) 
+    return *self.properties, driver.CommandStatus{true, driver.OK, ""} 
 }
 
 //GetCurrentPosition - unused
@@ -341,8 +330,8 @@ func (self *VirtualLiquidHandler) GetStatus() (driver.Status, driver.CommandStat
 }
 
 //UpdateMetaData - used
-func (self *VirtualLiquidHandler) UpdateMetaData(props *LHProperties) driver.CommandStatus {
-    self.log("ResetPistons(props *LHProperties)")
+func (self *VirtualLiquidHandler) UpdateMetaData(props *liquidhandling.LHProperties) driver.CommandStatus {
+    self.LogLine("ResetPistons(props *LHProperties)")
     //check that the props and self.props are the same...
     return driver.CommandStatus{true, driver.OK, "UPDATEMETADATA ACK"}
 }
@@ -388,8 +377,7 @@ func (self *VirtualLiquidHandler) Close() driver.CommandStatus {
 }
 
 //Message - unused
-func (self *VirtualLiquidHandler) Message(level int, title, text string, showcancel bool) 
-                                  driver.CommandStatus {
+func (self *VirtualLiquidHandler) Message(level int, title, text string, showcancel bool) driver.CommandStatus {
     panic("unimplemented")
 }
 
