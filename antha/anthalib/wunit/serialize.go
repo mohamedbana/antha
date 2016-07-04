@@ -75,7 +75,7 @@ func (m *Volume) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (m *Temperature) MarshalJSON() ([]byte, error) {
+func (m Temperature) MarshalJSON() ([]byte, error) {
 	return marshal(m)
 }
 
@@ -91,7 +91,7 @@ func (m *Temperature) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (m *Concentration) MarshalJSON() ([]byte, error) {
+func (m Concentration) MarshalJSON() ([]byte, error) {
 	return marshal(m)
 }
 
@@ -107,9 +107,8 @@ func (m *Concentration) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (m *Time) MarshalJSON() ([]byte, error) {
+func (m Time) MarshalJSON() ([]byte, error) {
 	return marshal(m)
-
 }
 
 func (m *Time) UnmarshalJSON(b []byte) error {
@@ -124,7 +123,7 @@ func (m *Time) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (m *Density) MarshalJSON() ([]byte, error) {
+func (m Density) MarshalJSON() ([]byte, error) {
 	return marshal(m)
 }
 
@@ -140,9 +139,8 @@ func (m *Density) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (m *Mass) MarshalJSON() ([]byte, error) {
+func (m Mass) MarshalJSON() ([]byte, error) {
 	return marshal(m)
-
 }
 
 func (m *Mass) UnmarshalJSON(b []byte) error {
@@ -158,9 +156,8 @@ func (m *Mass) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (m *FlowRate) MarshalJSON() ([]byte, error) {
+func (m FlowRate) MarshalJSON() ([]byte, error) {
 	return marshal(m)
-
 }
 
 func (m *FlowRate) UnmarshalJSON(b []byte) error {
@@ -176,9 +173,8 @@ func (m *FlowRate) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (m *Moles) MarshalJSON() ([]byte, error) {
+func (m Moles) MarshalJSON() ([]byte, error) {
 	return marshal(m)
-
 }
 
 func (m *Moles) UnmarshalJSON(b []byte) error {
@@ -193,9 +189,8 @@ func (m *Moles) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (m *Pressure) MarshalJSON() ([]byte, error) {
+func (m Pressure) MarshalJSON() ([]byte, error) {
 	return marshal(m)
-
 }
 
 func (m *Pressure) UnmarshalJSON(b []byte) error {
@@ -210,9 +205,8 @@ func (m *Pressure) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (m *Length) MarshalJSON() ([]byte, error) {
+func (m Length) MarshalJSON() ([]byte, error) {
 	return marshal(m)
-
 }
 
 func (m *Length) UnmarshalJSON(b []byte) error {
@@ -226,9 +220,9 @@ func (m *Length) UnmarshalJSON(b []byte) error {
 	}
 	return nil
 }
-func (m *Area) MarshalJSON() ([]byte, error) {
-	return marshal(m)
 
+func (m Area) MarshalJSON() ([]byte, error) {
+	return marshal(m)
 }
 
 func (m *Area) UnmarshalJSON(b []byte) error {
@@ -242,9 +236,9 @@ func (m *Area) UnmarshalJSON(b []byte) error {
 	}
 	return nil
 }
-func (m *Angle) MarshalJSON() ([]byte, error) {
-	return marshal(m)
 
+func (m Angle) MarshalJSON() ([]byte, error) {
+	return marshal(m)
 }
 
 func (m *Angle) UnmarshalJSON(b []byte) error {
@@ -259,7 +253,7 @@ func (m *Angle) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (m *Energy) MarshalJSON() ([]byte, error) {
+func (m Energy) MarshalJSON() ([]byte, error) {
 	return marshal(m)
 }
 
@@ -275,7 +269,7 @@ func (m *Energy) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (m *Force) MarshalJSON() ([]byte, error) {
+func (m Force) MarshalJSON() ([]byte, error) {
 	return marshal(m)
 }
 
@@ -291,7 +285,7 @@ func (m *Force) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (m *Velocity) MarshalJSON() ([]byte, error) {
+func (m Velocity) MarshalJSON() ([]byte, error) {
 	return marshal(m)
 }
 
@@ -307,7 +301,7 @@ func (m *Velocity) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (m *Rate) MarshalJSON() ([]byte, error) {
+func (m Rate) MarshalJSON() ([]byte, error) {
 	return marshal(m)
 }
 
