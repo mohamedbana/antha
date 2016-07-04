@@ -1,7 +1,7 @@
 package lib
 
 import (
-	//"encoding/json"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -10,7 +10,10 @@ import (
 	"sort"
 	"strings"
 	"testing"
+	"time"
 
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
@@ -142,22 +145,36 @@ func runElements(t *testing.T, ctx context.Context, inputs []*TInput) {
 	}
 
 	for _, input := range inputs {
+		if n := os.Getenv("TEST_WORKFLOW"); n != "" && input.WorkflowPath != n {
+			continue
+		}
 		if len(input.Dir) != 0 {
 			if err := os.Chdir(input.Dir); err != nil {
 				t.Fatal(err)
 			}
 		}
 		t.Logf("Running %q %q\n", input.WorkflowPath, input.ParamPath)
-		_, err := execute.Run(ctx, execute.Opt{
-			WorkflowData: input.WorkflowData,
-			ParamData:    input.ParamData,
-			Target:       tgt,
-		})
+
+		errs := make(chan error)
+		go func() {
+			_, err := execute.Run(ctx, execute.Opt{
+				WorkflowData: input.WorkflowData,
+				ParamData:    input.ParamData,
+				Target:       tgt,
+			})
+			errs <- err
+		}()
+
+		select {
+		case err = <-errs:
+		case <-time.After(10 * time.Second):
+			err = fmt.Errorf("timeout after %ds", 30)
+		}
 
 		if err == nil {
-			return
+			continue
 		} else if _, ok := err.(*execute.Error); ok {
-			return
+			continue
 		} else {
 			t.Errorf("error running with workflow %q with parameters %q: %s", input.WorkflowPath, input.ParamPath, err)
 		}
@@ -289,6 +306,12 @@ func TestElementsWithExampleInputs4(t *testing.T) {
 	runElements(t, ctx, inputs[first:last])
 }
 
+var (
+	defaultShape = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
+	defaultWell  = wtype.NewLHWell("dummy", "", "", "ul", 250, 5, defaultShape, wtype.LHWBU, 5.5, 5.5, 20.4, 1.4, "mm")
+	defaultPlate = wtype.NewLHPlate("pcrplate_with_cooler", "Unknown", 8, 12, 25.7, "mm", defaultWell, 9, 9, 0.0, 0.0, 15.5)
+)
+
 func TestElementsWithDefaultInputs(t *testing.T) {
 	t.Parallel()
 	type Process struct {
@@ -306,14 +329,43 @@ func TestElementsWithDefaultInputs(t *testing.T) {
 				},
 			},
 		}
-		bs, err := json.Marshal(wf)
+		wbs, err := json.Marshal(wf)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Make default input
+		fn, ok := c.Constructor().(inject.TypedRunner)
+		if !ok {
+			t.Fatalf("not typed runner: %s", c.Name)
+		}
+		input := inject.MakeValue(fn.Input())
+		for k, v := range input {
+			switch v.(type) {
+			case *wtype.LHComponent:
+				c := wtype.NewLHComponent()
+				c.SetVolume(wunit.NewVolume(1, "ul"))
+				input[k] = c
+			case *wtype.LHPlate:
+				input[k] = defaultPlate.Dup()
+			}
+		}
+
+		pm := map[string]map[string]inject.Value{
+			"Parameters": map[string]inject.Value{
+				"Process": input,
+			},
+		}
+		pbs, err := json.Marshal(pm)
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		inputs = append(inputs, &TInput{
 			WorkflowPath: c.Name,
-			WorkflowData: bs,
+			WorkflowData: wbs,
+			ParamPath:    c.Name,
+			ParamData:    pbs,
 		})
 	}
 
