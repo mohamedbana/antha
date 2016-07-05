@@ -28,6 +28,7 @@ import (
     "fmt"
 	"github.com/antha-lang/antha/microArch/driver"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
+	"github.com/antha-lang/antha/microArch/simulator"
 )
 
 // Simulate a liquid handler Driver
