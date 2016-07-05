@@ -3,11 +3,11 @@
         {
             "src": {
                 "port": "Culture",
-                "process": "InitialGrowth1"
+                "process": "Growth1"
             },
             "tgt": {
                 "port": "Inoculum",
-                "process": "InoculateOvernightGrowth1"
+                "process": "InoculateGrowth1"
             }
         },
         {
@@ -17,30 +17,20 @@
             },
             "tgt": {
                 "port": "Medium",
-                "process": "InoculateOvernightGrowth1"
+                "process": "InoculateGrowth1"
             }
         },
-        {
-            "src": {
-                "port": "Seed",
-                "process": "InoculateInitialGrowth1"
-            },
-            "tgt": {
-                "port": "StrainInMedium",
-                "process": "InitialGrowth1"
-            }
-        },
-        {
+ 	{
             "src": {
                 "port": "Culture",
-                "process": "OverNightGrowth1"
+                "process": "Growth1"
             },
             "tgt": {
                 "port": "InputStream",
                 "process": "Split1"
             }
         },
-        {
+ 	{
             "src": {
                 "port": "Stream1",
                 "process": "Split1"
@@ -50,7 +40,7 @@
                 "process": "ProductAssay1"
             }
         },
-        {
+	{
             "src": {
                 "port": "Stream2",
                 "process": "Split1"
@@ -62,25 +52,19 @@
         }
     ],
     "Processes": {
-        "InitialGrowth1": {
+        "Growth1": {
             "Component": "GrowthDOE"
         },
         "MediaPrep1": {
             "Component": "DOEMediaPrep"
         },
-        "InoculateInitialGrowth1": {
+        "InoculateGrowth1": {
             "Component": "InoculateDOE"
         },
-        "InoculateOvernightGrowth1": {
-            "Component": "InoculateDOE"
-        },
-        "OverNightGrowth1": {
-            "Component": "GrowthDOE"
-        },
-        "Split1": {
+ 	"Split1": {
             "Component": "SplitStreams"
         },
-        "ProductAssay1": {
+		"ProductAssay1": {
             "Component": "FluorescenceMeasurement"
         },
         "ODAssay1": {

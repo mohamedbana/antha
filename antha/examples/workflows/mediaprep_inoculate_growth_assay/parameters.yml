@@ -1,9 +1,10 @@
 {
     "Parameters": {
-        "InitialGrowth1": {
+        "Growth1": {
             "Growthtemp": "25C",
             "Growthtime": "3600s",
-            "ShakingSpeed": "800/min"
+            "ShakingSpeed": "800/min",
+	"StrainInMedium":"culture"
         },
         "MediaPrep1": {
             "YeastExtractConc": "30g/l",
@@ -16,27 +17,16 @@
             "Glycerol": "Glycerol",
             "BaseMedium": "LB"
         },
-        "InoculateInitialGrowth1": {
-            "InoculumVolume": "20ul",
-            "Inoculum": "culture",
-            "Medium": "TB"
-        },
-        "InoculateOvernightGrowth1": {
+        "InoculateGrowth1": {
             "InoculumVolume": "20ul"
         },
-        "OverNightGrowth1": {
-            "Growthtemp": "25C",
-            "Growthtime": "86400s",
-            "ShakingSpeed": "800/min",
-	    "StrainInMedium":"culture"
-        },
-        "Split1": {
+	"Split1": {
             "Stream1Vol": "50ul",
             "Stream2Vol": "50ul",
             "Stream1PlateType": "greinerfb96",
             "Stream2PlateType": "greinerfb96"
         },
-        "ProductAssay1": {
+ 	"ProductAssay1": {
             "ExcitationWavelength": "300nm",
             "EmissionWavelength": "450nm",
             "DilutionVolume": "150ul",
@@ -45,15 +35,10 @@
         "ODAssay1": {
             "AbsorbanceWavelength": "600nm",
             "DilutionVolume": "150ul",
-            "Diluent": "water"
+            "Diluent": "water",
+			"Plate":"greiner384_riser"
         }
     },
     "Config": {
-        "InputPlateType": [
-            "pcrplate_skirted_riser"
-        ],
-        "OutputPlateType": [
-            "pcrplate_skirted_riser"
-        ]
     }
 }
