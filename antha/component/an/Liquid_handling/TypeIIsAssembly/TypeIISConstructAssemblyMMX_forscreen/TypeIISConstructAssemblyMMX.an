@@ -23,7 +23,6 @@ Parameters (
 	LHPolicyName				string
         EnzymeName                              string
         PartSeqs                                []wtype.DNASequence
-
 )
 
 // Physical Inputs to this protocol with types
@@ -102,6 +101,7 @@ Steps {
 	// ensure the last step is mixed
 	samples[len(samples)-1].Type=wtype.LTDNAMIX
 	Reaction = MixTo(OutPlate.Type, OutputLocation, OutputPlateNum, samples...)
+        Reaction.Extra["label"] = ConstructName
 
 	// incubate the reaction mixture
 	// commented out pending changes to incubate
