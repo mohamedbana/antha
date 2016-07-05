@@ -119,10 +119,11 @@ func (p *compiler) anthaInit() {
 		"AngularVelocity":      "wunit.AngularVelocity",
 	}
 	p.imports = map[string]string{
-		"github.com/antha-lang/antha/antha/anthalib/wunit":             "wunit.Make_units",
-		"github.com/antha-lang/antha/execute":                          "execute.MixInto",
-		"github.com/antha-lang/antha/inject":                           "",
 		"github.com/antha-lang/antha/bvendor/golang.org/x/net/context": "",
+		"github.com/antha-lang/antha/antha/anthalib/wunit": "wunit.Make_units",
+		"github.com/antha-lang/antha/execute":              "execute.MixInto",
+		"github.com/antha-lang/antha/inject":               "",
+		"github.com/antha-lang/antha/component":            "",
 	}
 }
 
@@ -455,13 +456,13 @@ type {{.Element}}SOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "{{.Element}}",
+	if err := addComponent(component.Component{Name: "{{.Element}}",
 		Constructor: {{.Element}}New, 
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: {{.Desc}},
 			Path: {{.Path}},
-			Params: []ParamDesc{
-				{{range .PDesc}}ParamDesc{Name: {{.Name}}, Desc: {{.Desc}}, Kind: {{.Kind}}},
+			Params: []component.ParamDesc{
+				{{range .PDesc}}component.ParamDesc{Name: {{.Name}}, Desc: {{.Desc}}, Kind: {{.Kind}}},
 				{{end}}
 			},
 		},
