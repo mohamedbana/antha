@@ -699,9 +699,7 @@ func DXXLSXFilefromRuns(runs []Run, outputfilename string) (xlsxfile *xlsx.File)
 
 	// then add subheadings and descriptors
 	for i, descriptor := range runs[0].Factordescriptors {
-
-		letter := strings.ToUpper(wutil.Alphabet[i])
-
+		letter := wutil.NumToAlpha(i + 1)
 		cell = row.AddCell()
 		cell.Value = letter + ":" + descriptor
 

@@ -42,7 +42,6 @@ func _AccuracyTestSteps(_ctx context.Context, _input *AccuracyTestInput, _output
 	var rotate = false
 	var autorotate = true
 	var wellpositionarray = make([]string, 0)
-	var alphabet = wutil.MakeAlphabetArray()
 	_output.Runtowelllocationmap = make(map[string]string)
 	_output.Blankwells = make([]string, 0)
 	counter := 0
@@ -223,7 +222,7 @@ func _AccuracyTestSteps(_ctx context.Context, _input *AccuracyTestInput, _output
 			//eachreaction = append(eachreaction,bufferSample)
 
 			// add blanks to last column of plate
-			well := alphabet[_input.OutPlate.WlsY-1-m] + strconv.Itoa(_input.OutPlate.WlsX)
+			well := wutil.NumToAlpha(_input.OutPlate.WlsY-m) + strconv.Itoa(_input.OutPlate.WlsX)
 
 			reaction := execute.MixTo(_ctx, _input.OutPlate.Type, well, n+1, bufferSample)
 

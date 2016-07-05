@@ -119,6 +119,31 @@ func TestWellCoords(t *testing.T) {
 	if wc.X != 0 || wc.Y != 702 {
 		t.Fatal(fmt.Sprint("Well Coords AAA1 expected {0,702} got ", wc))
 	}
+}
+
+func TestWellCoordsComparison(t *testing.T) {
+	s := []string{"C1", "A2", "HH1"}
+
+	c := [][]int{{0, -1, -1}, {1, 0, 1}, {1, -1, 0}}
+	r := [][]int{{0, 1, -1}, {-1, 0, -1}, {1, 1, 0}}
+
+	for i, _ := range s {
+		for j, _ := range s {
+			cmpCol := CompareStringWellCoordsCol(s[i], s[j])
+			cmpRow := CompareStringWellCoordsRow(s[i], s[j])
+
+			expCol := c[i][j]
+			expRow := r[i][j]
+
+			if cmpCol != expCol {
+				t.Fatal(fmt.Sprintf("Compare WC Column Error: %s vs %s expected %d got %d", s[i], s[j], expCol, cmpCol))
+			}
+			if cmpRow != expRow {
+				t.Fatal(fmt.Sprintf("Compare WC Row Error: %s vs %s expected %d got %d", s[i], s[j], expRow, cmpRow))
+			}
+
+		}
+	}
 
 }
 

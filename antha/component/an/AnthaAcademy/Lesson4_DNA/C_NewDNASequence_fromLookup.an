@@ -23,6 +23,7 @@ Data (
 	DNA wtype.DNASequence
 	Status string
 	Warnings error
+	Description string
 )
 
 // Physical inputs to this protocol
@@ -46,7 +47,9 @@ Setup {
 // Core process of the protocol: steps to be performed for each input
 Steps {
 	
+	
 	var err error
+	var partdetails igem.Rsbpml
 	
 		if EntrezID  {
 		
@@ -57,7 +60,7 @@ Steps {
 			}
 		} else if BiobrickID {
 			
-			partdetails := igem.LookUp([]string{ID})
+			partdetails = igem.LookUp([]string{ID})
 			
 			seq := partdetails.Sequence(ID)
 			
@@ -71,11 +74,23 @@ Steps {
 	features := sequences.ORFs2Features(orfs)
 	DNA = wtype.Annotate(DNA,features)
 	}
-	Status = fmt.Sprintln(
-		text.Print("DNA_Seq: ",DNA),
-		text.Print("ORFs: ", DNA.Features),
+	
+	if BiobrickID {
+		Status = fmt.Sprintln(
+		text.Print(ID +" DNA_Seq: ",DNA),
+		text.Print(ID +" ORFs: ", DNA.Features),
+		text.Print(ID +" PartDescription", partdetails.Description(ID)),
+		)
+		Description = partdetails.Description(ID)
+		}else {
+			Status = fmt.Sprintln(
+		text.Print(ID +" DNA_Seq: ",DNA),
+		text.Print(ID +" ORFs: ", DNA.Features),
+
 	)
+		}
 	Warnings = err
+	fmt.Println(Status)
 }
 
 

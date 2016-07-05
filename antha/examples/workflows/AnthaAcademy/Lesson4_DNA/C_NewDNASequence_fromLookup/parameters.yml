@@ -11,6 +11,12 @@
 			"BiobrickID":true,
 			"EntrezID":false,
 			"DNAID": true
+        },
+        "BiobrickSequenceRecursive": {
+            "ID": "BBa_K314110",
+			"BiobrickID":true,
+			"EntrezID":false,
+			"DNAID": true
         }
     }
 }

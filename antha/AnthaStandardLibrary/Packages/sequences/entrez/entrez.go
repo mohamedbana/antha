@@ -26,6 +26,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -62,10 +63,10 @@ func RetrieveRecords(query string, database string, Max int, ReturnType string, 
 	if out == "" {
 		of = os.Stdout
 	} else {
-		if err := os.Mkdir(filepath.Dir(out), 0777); err != nil {
+		/*if err := os.Mkdir(filepath.Dir(out), 0777); err != nil {
 			return err
-		}
-		of, err = os.Create(out)
+		}*/
+		of, err = os.Create(filepath.Join(anthapath.Path(), out))
 		if err != nil {
 			return err
 		}
@@ -126,13 +127,20 @@ func RetrieveRecords(query string, database string, Max int, ReturnType string, 
 }
 
 // This retrieves sequence of any type from any NCBI sequence database
-func RetrieveSequence(id string, database string) (wtype.DNASequence, error) {
-	if err := RetrieveRecords(id, database, 1, "gb", "temp.gb"); err != nil {
+func RetrieveSequence(id string, database string, filename string) (wtype.DNASequence, error) {
+	if err := RetrieveRecords(id, database, 1, "gb", filename); err != nil {
+		fmt.Println("RetrieveRecordsfail for", id)
+		fmt.Println(err.Error())
 		return wtype.DNASequence{}, err
 	}
-	file := filepath.Join(anthapath.Path(), "temp.gb")
-	seq, err := parser.GenbanktoFeaturelessDNASequence(file)
+
+	contents, err := ioutil.ReadFile(filepath.Join(anthapath.Path(), filename))
+
+	fmt.Println("ID:", id, "Contents:", string(contents))
+	file := filepath.Join(anthapath.Path(), filename)
+	seq, err := parser.GenbanktoAnnotatedSeq(file)
 	if err != nil {
+		fmt.Println("File:", file, "Error:", err.Error())
 		return wtype.DNASequence{}, err
 	}
 	seq.Seq = strings.ToUpper(seq.Seq)
@@ -142,11 +150,11 @@ func RetrieveSequence(id string, database string) (wtype.DNASequence, error) {
 
 // This will retrieve vector using fasta or db
 func RetrieveVector(id string) (wtype.DNASequence, error) {
-	//first check if vector sequence is in fasta file
-	if seq, err := parser.RetrieveSeqFromFASTA(id, "vectors.txt"); err != nil {
-		// if not in refactor, check db
-		return RetrieveSequence(id, "nucleotide")
-	} else {
+	/*//first check if vector sequence is in fasta file
+	if seq, err := parser.RetrieveSeqFromFASTA(id, filepath.Join(anthapath.Path(), "vectors.txt")); err != nil {
+		// if not in refactor, check db*/
+	return RetrieveSequence(id, "nucleotide", id+".gb")
+	/*} else {
 		return seq, nil
-	}
+	}*/
 }

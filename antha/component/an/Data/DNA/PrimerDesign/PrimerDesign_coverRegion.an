@@ -79,7 +79,11 @@ Steps {
 
 	}
 	AllPrimers = allprimers
+	
+	
+	
 }
+
 // Actions to perform after steps block to analyze data
 Analysis {
 

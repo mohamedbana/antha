@@ -91,11 +91,12 @@ Steps {
 
 			partDNA, _ = parser.GenbanktoAnnotatedSeq(part)
 		} else {
-
+			nm := "Part "+strconv.Itoa(i) 
 			if strings.Contains(part, "BBa_") {
+				nm = nm+"_"+part
 				part = igem.GetSequence(part)
 			}
-			partDNA = wtype.MakeLinearDNASequence("Part "+strconv.Itoa(i), part)
+			partDNA = wtype.MakeLinearDNASequence(nm, part)
 		}
 		partsinorder = append(partsinorder, partDNA)
 	}
@@ -156,7 +157,7 @@ Steps {
 							warnings = append(warnings, warning)
 
 						}
-						warning = fmt.Sprintln("modified "+temppart.Nm+"new seq: ", temppart.Seq)
+						warning = fmt.Sprintln("modified "+temppart.Nm+"new seq: ", temppart.Seq, "original seq: ",part.Seq)
 						warnings = append(warnings, warning)
 						part = temppart
 
@@ -178,12 +179,13 @@ Steps {
 			vectordata, _ = parser.GenbanktoAnnotatedSeq(Vector)
 			vectordata.Plasmid = true
 		}else {
-		
-		if strings.Contains(Vector, "BBa_") {
+		vectornm := "Vector"
+		if strings.Contains(Vector, "BBa_")||strings.Contains(Vector, "pSB") {
+			vectornm = Vector
 			Vector = igem.GetSequence(Vector)
 			
 		}
-		vectordata = wtype.MakePlasmidDNASequence("Vector",Vector)
+		vectordata = wtype.MakePlasmidDNASequence(vectornm,Vector)
 		}
 
 	//lookup restriction enzyme
@@ -267,8 +269,9 @@ Steps {
 	for _, part := range PartswithOverhangs {
 		partsummary = append(partsummary, text.Print(part.Nm, part.Seq))
 	}
-
+	partsummary = append(partsummary, text.Print("Vector:"+ vectordata.Nm, vectordata.Seq))
 	partstoorder := text.Print("PartswithOverhangs: ", partsummary)
+	
 
 	// Print status
 	if Status != "all parts available"{

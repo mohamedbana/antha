@@ -28,27 +28,27 @@ pre-build operating system images on your own machine.
      your operating system.
   2. Follow the docker instructions to start the docker server on your machine
   3. Run the antha docker image
-  ```sh
-docker run -it anthalang/antha
-  ```
+```bash
+docker run -it antha/antha
+```
   4. Inside the antha docker image, you can follow the instructions below
      for making and running antha elements
 
 By default, when you run the antha image again, you will get a new machine
 instance and any changes you made in previously will not be available. If you want
-to persist changes you make to antha elements you can mount directories on your
+to persist changes you make to antha elements, you can mount directories on your
 host machine inside docker instances.
 
 For example,
   1. Download the antha github repo on your (host) machine.
-  ```sh
+```bash
 git clone https://github.com/antha-lang/antha
-  ```
+```
   2. Run the antha docker image and mount your host directory to a directory
      inside the docker instance.
-  ```sh
-docker run -it -v `pwd`/antha:/go/src/github.com/antha-lang/antha 
-  ```
+```bash
+docker run -it -v `pwd`/antha:/go/src/github.com/antha-lang/antha antha/antha
+```
 Now, any changes you make to antha on your host machine will be available
 within the docker instance.
 
@@ -60,7 +60,7 @@ First step is to install or upgrade to go 1.6. Follow the instructions at the
 After you install go, if you don't have [Homebrew](http://brew.sh/), please
 install it. Then, follow these steps to setup a working antha development
 environment:
-```sh
+```bash
 # Setup environment variables
 cat<<EOF>>$HOME/.bash_profile
 export GOPATH=$HOME/go
@@ -92,7 +92,7 @@ instructions follow.  If you do not use a Debian based system or if you are not
 using an x86_64 machine, you will have to modify these instructions by
 replacing the go binary with one that corresponds to your platform and
 replacing ``apt-get`` with your package manager.
-```sh
+```bash
 # Install go
 curl -O https://storage.googleapis.com/golang/go1.6.2.linux-amd64.tar.gz
 sudo tar -C /usr/local -xzf go1.6.2.linux-amd64.tar.gz
@@ -138,7 +138,7 @@ procedure with the default options. Caveat emptor.
 
 After following the installation instructions for your machine. You can check
 if Antha is working properly by running a test protocol
-```sh
+```bash
 cd $GOPATH/src/github.com/antha-lang/antha/antha/examples/workflows/constructassembly
 antharun --workflow workflow.json --parameters parameters.yml
 ```
@@ -149,7 +149,7 @@ The easiest way to start developing your own antha components is to place them
 in the ``antha/component/an`` directory and follow the structure of the
 existing components there. Afterwards, you can compile and use your components
 with the following commands:
-```sh
+```bash
 cd $GOPATH/src/github.com/antha-lang/antha
 make
 go get github.com/antha-lang/antha/cmd/...

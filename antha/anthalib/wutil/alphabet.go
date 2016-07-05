@@ -23,28 +23,53 @@
 // Utility package
 package wutil
 
-var Alphabet = []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
-	"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
-	"Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF"}
-
-var (
-	alphabet string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const (
+	numLetters = 26
 )
 
-func MakeAlphabetArray() (alphabetarray []string) {
+// Convert n to a string: 1 to "A", 27 to "AA", 53 to "BA", ...
+//
+// Returns "" when n < 1.
+func NumToAlpha(n int) string {
+	var s []byte
 
-	alphabetarray = make([]string, 0)
-	startercharacter := ""
-
-	for j := 0; j < (len(alphabet)); j++ {
-
-		for i := 0; i < (len(alphabet)); i++ {
-			character := startercharacter + string(alphabet[i])
-
-			alphabetarray = append(alphabetarray, character)
-		}
-		startercharacter = string(alphabet[j])
-
+	if n < 1 {
+		return ""
 	}
-	return
+
+	for {
+		n -= 1
+		r := (n % numLetters)
+		s = append(s, byte('A'+r))
+		n /= numLetters
+		if n <= 0 {
+			break
+		}
+	}
+
+	var t []byte
+
+	for i := len(s) - 1; i >= 0; i-- {
+		t = append(t, s[i])
+	}
+
+	return string(t)
+}
+
+// Convert string to n: "A" to 1, 53 to "BA", ... Returns 0 when s contains [^A-Z]
+//
+// Inverse of NumToAlpha.
+func AlphaToNum(s string) int {
+	v := 0
+
+	for _, b := range s {
+		off := int(b - 'A')
+		if off < 0 || off >= numLetters {
+			return 0
+		}
+		v *= numLetters
+		v += off + 1
+	}
+
+	return v
 }
