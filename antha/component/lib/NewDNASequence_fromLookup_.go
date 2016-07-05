@@ -9,9 +9,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol
@@ -61,15 +62,15 @@ func _NewDNASequence_fromLookupSteps(_ctx context.Context, _input *NewDNASequenc
 
 	if _input.BiobrickID {
 		_output.Status = fmt.Sprintln(
-			text.Print(_input.ID+"DNA_Seq: ", _output.DNA),
-			text.Print(_input.ID+"ORFs: ", _output.DNA.Features),
+			text.Print(_input.ID+" DNA_Seq: ", _output.DNA),
+			text.Print(_input.ID+" ORFs: ", _output.DNA.Features),
 			text.Print(_input.ID+" PartDescription", partdetails.Description(_input.ID)),
 		)
 		_output.Description = partdetails.Description(_input.ID)
 	} else {
 		_output.Status = fmt.Sprintln(
-			text.Print(_input.ID+"DNA_Seq: ", _output.DNA),
-			text.Print(_input.ID+"ORFs: ", _output.DNA.Features),
+			text.Print(_input.ID+" DNA_Seq: ", _output.DNA),
+			text.Print(_input.ID+" ORFs: ", _output.DNA.Features),
 		)
 	}
 	_output.Warnings = err
@@ -157,12 +158,12 @@ type NewDNASequence_fromLookupSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "NewDNASequence_fromLookup",
+	if err := addComponent(component.Component{Name: "NewDNASequence_fromLookup",
 		Constructor: NewDNASequence_fromLookupNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/AnthaAcademy/Lesson4_DNA/C_NewDNASequence_fromLookup.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "BiobrickID", Desc: "", Kind: "Parameters"},
 				{Name: "DNAID", Desc: "", Kind: "Parameters"},
 				{Name: "EntrezID", Desc: "", Kind: "Parameters"},

@@ -8,10 +8,11 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"github.com/disintegration/imaging"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -278,12 +279,12 @@ type PipetteImage_GraySOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "PipetteImage_Gray",
+	if err := addComponent(component.Component{Name: "PipetteImage_Gray",
 		Constructor: PipetteImage_GrayNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "Generates instructions to pipette out a defined image onto a defined plate by blending cyan magenta yellow and black dyes\n",
 			Path: "antha/component/an/Liquid_handling/PipetteImage/PipetteImage_Gray.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "AutoRotate", Desc: "", Kind: "Parameters"},
 				{Name: "Black", Desc: "", Kind: "Inputs"},
 				{Name: "CheckResizeAlgorithms", Desc: "", Kind: "Parameters"},

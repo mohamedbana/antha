@@ -5,9 +5,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 func _AbsorbanceMeasurementRequirements() {
@@ -126,12 +127,12 @@ type AbsorbanceMeasurementSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "AbsorbanceMeasurement",
+	if err := addComponent(component.Component{Name: "AbsorbanceMeasurement",
 		Constructor: AbsorbanceMeasurementNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/DoE/absorbanceassay.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "AbsorbanceWavelength", Desc: "", Kind: "Parameters"},
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "DilutionVolume", Desc: "", Kind: "Parameters"},

@@ -8,9 +8,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"image/color"
 	"strconv"
 )
@@ -247,12 +248,12 @@ type MakePalette_OneByOneSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "MakePalette_OneByOne",
+	if err := addComponent(component.Component{Name: "MakePalette_OneByOne",
 		Constructor: MakePalette_OneByOneNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "Generates instructions to make a pallette of all colours in an image\n",
 			Path: "antha/component/an/Liquid_handling/PipetteImage/MakePalette_OnebyOne.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "AutoRotate", Desc: "", Kind: "Parameters"},
 				{Name: "Black", Desc: "", Kind: "Inputs"},
 				{Name: "Cyan", Desc: "", Kind: "Inputs"},

@@ -6,9 +6,10 @@ import (
 	//"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/buffers"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -136,12 +137,12 @@ type MakeStockBufferSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "MakeStockBuffer",
+	if err := addComponent(component.Component{Name: "MakeStockBuffer",
 		Constructor: MakeStockBufferNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/MakeBuffer/MakeStockBuffer.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Diluent", Desc: "Bufferstock\t\t*wtype.LHComponent\n", Kind: "Inputs"},
 				{Name: "MassAddedinG", Desc: "", Kind: "Parameters"},
 				{Name: "Moleculename", Desc: "", Kind: "Parameters"},

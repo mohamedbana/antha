@@ -8,10 +8,11 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
+	"golang.org/x/net/context"
 	"strconv"
 )
 
@@ -368,12 +369,12 @@ type AccuracyTest_2SOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "AccuracyTest_2",
+	if err := addComponent(component.Component{Name: "AccuracyTest_2",
 		Constructor: AccuracyTest_2New,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Utility/AccuracyTest_2.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "DXORJMP", Desc: "", Kind: "Parameters"},
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},

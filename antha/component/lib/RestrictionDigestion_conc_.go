@@ -6,9 +6,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -181,12 +182,12 @@ type RestrictionDigestion_concSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "RestrictionDigestion_conc",
+	if err := addComponent(component.Component{Name: "RestrictionDigestion_conc",
 		Constructor: RestrictionDigestion_concNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/RestrictionDigestion/set_conc/RestrictionDigestion.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "BSAoptional", Desc: "", Kind: "Inputs"},
 				{Name: "BSAvol", Desc: "", Kind: "Parameters"},
 				{Name: "Buffer", Desc: "", Kind: "Inputs"},

@@ -9,11 +9,12 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/disintegration/imaging"
+	"golang.org/x/net/context"
 	"image/color"
 )
 
@@ -236,12 +237,12 @@ type PipetteImageSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "PipetteImage",
+	if err := addComponent(component.Component{Name: "PipetteImage",
 		Constructor: PipetteImageNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of coloured bacteria\n",
 			Path: "antha/component/an/Liquid_handling/PipetteImage/PipetteImage.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "AutoRotate", Desc: "", Kind: "Parameters"},
 				{Name: "CheckResizeAlgorithms", Desc: "", Kind: "Parameters"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},

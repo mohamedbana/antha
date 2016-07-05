@@ -5,9 +5,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -145,12 +146,12 @@ type Aliquot_SamePositionsMultipleplatesSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Aliquot_SamePositionsMultipleplates",
+	if err := addComponent(component.Component{Name: "Aliquot_SamePositionsMultipleplates",
 		Constructor: Aliquot_SamePositionsMultipleplatesNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "example protocol showing how the MixTo command can be used to specify different plates of the same type  i.e. plate 1 ,2, 3 of type greiner384\n",
 			Path: "antha/component/an/AnthaAcademy/Lesson2_mix/D_AliquotTo_samepositionmultipleplates.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "NumberofPlates", Desc: "number of plates to fill aliquots into\n", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Parameters"},
 				{Name: "Positions", Desc: "positions on each plate to add aliquots\n", Kind: "Parameters"},

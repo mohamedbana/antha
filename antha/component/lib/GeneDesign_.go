@@ -9,9 +9,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/entrez"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // by ncbi Accession numer
@@ -132,12 +133,12 @@ type GeneDesignSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "GeneDesign",
+	if err := addComponent(component.Component{Name: "GeneDesign",
 		Constructor: GeneDesignNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/GeneDesign/GeneDesign.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Parts", Desc: "by ncbi Accession numer\n", Kind: "Parameters"},
 				{Name: "RE", Desc: "restriction enzyme name\n", Kind: "Parameters"},
 				{Name: "Vector", Desc: "by ncbi Accession numer\n", Kind: "Parameters"},

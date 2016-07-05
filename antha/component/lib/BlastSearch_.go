@@ -8,10 +8,11 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/blast"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	biogo "github.com/biogo/ncbi/blast"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol
@@ -139,12 +140,12 @@ type BlastSearchSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "BlastSearch",
+	if err := addComponent(component.Component{Name: "BlastSearch",
 		Constructor: BlastSearchNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/BlastSearch/BlastSearch.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "DNA", Desc: "", Kind: "Parameters"},
 				{Name: "Name", Desc: "", Kind: "Parameters"},
 				{Name: "Hits", Desc: "", Kind: "Data"},

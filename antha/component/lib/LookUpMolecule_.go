@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Pubchem"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Name of compound or array of multiple compounds
@@ -121,12 +122,12 @@ type LookUpMoleculeSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "LookUpMolecule",
+	if err := addComponent(component.Component{Name: "LookUpMolecule",
 		Constructor: LookUpMoleculeNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "example of how to look up molecule properties from pubchem\n",
 			Path: "antha/component/an/Data/LookUpMolecule/LookUpMolecule.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Compound", Desc: "Name of compound or array of multiple compounds\n", Kind: "Parameters"},
 				{Name: "Compoundlist", Desc: "", Kind: "Parameters"},
 				{Name: "Compoundprops", Desc: "molecule type is returned consisting of name, formula, molecular weight and chemical ID (CID)\n", Kind: "Data"},
