@@ -2,7 +2,6 @@ package wutil
 
 import (
 	"math"
-	"math/cmplx"
 )
 
 // function for quadratics
