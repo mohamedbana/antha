@@ -28,7 +28,77 @@ import (
 	. "github.com/antha-lang/antha/microArch/factory"
 )
 
-func SetUpTipsFor(lhp *liquidhandling.LHProperties) *liquidhandling.LHProperties {
+type LayoutParams struct {
+    Name    string
+    Xpos    float32
+    Ypos    float32
+    Zpos    float32
+}
+
+type ChannelParams struct {
+    Name            string
+    Minvol          string
+    Maxvol          string
+    Minrate         string
+    Maxrate         string
+    multi           int
+    Independent     bool
+    Orientation     int
+    Head            int
+}
+
+func makeLHChannelParameter(cp ChannelParams) *wtype.LHChannelParameter {
+    return wtype.NewLHChannelParameter(cp.Name,
+                                       wtype.NewVolume(cp.Minvol),
+                                       wtype.NewVolume(cp.Maxvol),
+                                       wtype.NewFlowRate(cp.Minrate),
+                                       wtype.NewFlowRate(cp.Maxrate),
+                                       cp.multi,
+                                       cp.Independent,
+                                       cp.Orientation,
+                                       cp.Head)
+}
+
+type AdaptorParams struct {
+    ChannelParams
+    Name string
+    Mfg  string
+}
+
+func makeLHAdaptor(ap AdaptorParams) *wtype.LHAdaptor {
+    return wtype.NewLHAdaptor(ap.Name,
+                              ap.Mfg,
+                              makeLHChannelParameter(AdaptorParams.ChannelParams))
+}
+
+type HeadParams struct {
+    ChannelParams
+    Name        string
+    Mfg         string
+    Adaptor     AdaptorParams
+}
+
+func makeLHHead(hp HeadParams) *wtype.LHHead {
+    ret := wtype.NewLHHead(hp.Name, hp.Mfg, makeLHChannelParameter(HeadParams.ChannelParams))
+    ret.Adaptor = makeLHAdaptor(cp.Adaptor)
+    return ret
+}
+
+type LHPropertiesParams struct {
+    Name                    string
+    Mfg                     string
+    Layouts                 []LayoutParams
+    Heads                   []HeadParams
+    Tip_preferences         []string
+	Input_preferences       []string
+	Output_preferences      []string
+	Tipwaste_preferences    []string
+	Wash_preferences        []string
+	Waste_preferences       []string
+}
+    
+
+func AddAllTips(lhp *liquidhandling.LHProperties) *liquidhandling.LHProperties {
 	tips := GetTipList()
 	for _, tt := range tips {
 		tb := GetTipByType(tt)
@@ -40,100 +110,22 @@ func SetUpTipsFor(lhp *liquidhandling.LHProperties) *liquidhandling.LHProperties
 }
 
 
-func getLHProperties() *liquidhandling.LHProperties {
+func makeLHProperties(p LHPropertiesParams) *liquidhandling.LHProperties {
 
-	//	tips := GetTipList()
 
-	// dummy layout of 25 positions... arbitrary limitation
-
-	x := 0.0
-	y := 0.0
-	z := 0.0
-	xinc := 100.0
-	yinc := 100.0
-
-	i := 0
 	layout := make(map[string]wtype.Coordinates)
-	for xi := 0; xi < 5; xi++ {
-		for yi := 0; yi < 5; yi++ {
-			posname := fmt.Sprintf("position_%d", i+1)
-			crds := wtype.Coordinates{x, y, z}
-			layout[posname] = crds
-			i += 1
-			y += yinc
-		}
-		x += xinc
-	}
-	lhp := liquidhandling.NewLHProperties(25, "Human", "MotherNature", "discrete", "disposable", layout)
+    for _, lp := range p.Layouts {
+        layout[lp.Name] = wtype.Coordinates{lp.Xpos, lp.Ypos, lp.Zpos}
+    }
+        
+	lhp := liquidhandling.NewLHProperties(len(layout), p.Name, p.Mfg, "discrete", "disposable", layout)
 
-	SetUpTipsFor(lhp)
+	AddAllTips(lhp)
 
-	lhp.Tip_preferences = []string{"tips1", "tips2", "tips3", "tips4"}
-	lhp.Input_preferences = []string{"in1", "in2", "in3", "in4"}
-	lhp.Output_preferences = []string{"out1", "out2", "out3", "out4"}
-	lhp.Tipwaste_preferences = []string{"tip_waste"}
-	lhp.Wash_preferences = []string{"tip_wash"}
-	lhp.Waste_preferences = []string{"liquid_waste"}
+    lhp.Heads = make([]*wtype.LHHead, 0)
+    for _, hp := range p.Heads {
+        lhp.Heads = append(lhp.Heads, makeLHHead(hp))
+    }
 
-	adaptors := make([]*wtype.LHAdaptor, 0, 1)
-
-	minvol := wunit.NewVolume(200, "ul")
-	maxvol := wunit.NewVolume(1000, "ul")
-	minspd := wunit.NewFlowRate(0.5, "ml/min")
-	maxspd := wunit.NewFlowRate(2, "ml/min")
-
-	hvconfig := wtype.NewLHChannelParameter("P1000Config", minvol, maxvol, minspd, maxspd, 1, false, wtype.LHVChannel, 0)
-	hvadaptor := wtype.NewLHAdaptor("P1000", "Gilson", hvconfig)
-
-	adaptors = append(adaptors, hvadaptor)
-
-	minvol = wunit.NewVolume(20, "ul")
-	maxvol = wunit.NewVolume(200, "ul")
-	minspd = wunit.NewFlowRate(0.1, "ml/min")
-	maxspd = wunit.NewFlowRate(0.5, "ml/min")
-
-	mvconfig := wtype.NewLHChannelParameter("P200Config", minvol, maxvol, minspd, maxspd, 1, false, wtype.LHVChannel, 0)
-	mvadaptor := wtype.NewLHAdaptor("P200", "Gilson", mvconfig)
-
-	adaptors = append(adaptors, mvadaptor)
-
-	minvol = wunit.NewVolume(2, "ul")
-	maxvol = wunit.NewVolume(20, "ul")
-	minspd = wunit.NewFlowRate(0.1, "ml/min")
-	maxspd = wunit.NewFlowRate(0.5, "ml/min")
-
-	lmvconfig := wtype.NewLHChannelParameter("P20Config", minvol, maxvol, minspd, maxspd, 1, false, wtype.LHVChannel, 0)
-	lmvadaptor := wtype.NewLHAdaptor("P20", "Gilson", lmvconfig)
-	adaptors = append(adaptors, lmvadaptor)
-
-	minvol = wunit.NewVolume(1, "ul")
-	maxvol = wunit.NewVolume(10, "ul")
-	minspd = wunit.NewFlowRate(0.1, "ml/min")
-	maxspd = wunit.NewFlowRate(0.5, "ml/min")
-
-	lvconfig := wtype.NewLHChannelParameter("P10Config", minvol, maxvol, minspd, maxspd, 1, false, wtype.LHVChannel, 0)
-	lvadaptor := wtype.NewLHAdaptor("P10", "Gilson", lvconfig)
-	adaptors = append(adaptors, lvadaptor)
-
-	minvol = wunit.NewVolume(0.2, "ul")
-	maxvol = wunit.NewVolume(2, "ul")
-	minspd = wunit.NewFlowRate(0.1, "ml/min")
-	maxspd = wunit.NewFlowRate(0.5, "ml/min")
-
-	vlvconfig := wtype.NewLHChannelParameter("P2Config", minvol, maxvol, minspd, maxspd, 1, false, wtype.LHVChannel, 0)
-	vlvadaptor := wtype.NewLHAdaptor("P2", "Gilson", vlvconfig)
-	adaptors = append(adaptors, vlvadaptor)
-
-	for i, adaptor := range adaptors {
-		maxvol = adaptor.Params.Maxvol
-		minvol = adaptor.Params.Minvol
-		maxspd = adaptor.Params.Maxspd
-		minspd = adaptor.Params.Minspd
-		headparams := wtype.NewLHChannelParameter(fmt.Sprintf("LabHand_%d", i+1), minvol, maxvol, minspd, maxspd, 8, false, wtype.LHVChannel, 0)
-		head := wtype.NewLHHead(fmt.Sprintf("LabHand_%d", i+1), "MotherNature", headparams)
-		head.Adaptor = adaptor
-		lhp.Heads = append(lhp.Heads, head)
-		lhp.HeadsLoaded = append(lhp.HeadsLoaded, head)
-	}
-	return lhp
+    return lhp
 }
