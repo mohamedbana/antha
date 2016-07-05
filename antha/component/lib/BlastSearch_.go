@@ -56,7 +56,7 @@ func _BlastSearchSteps(_ctx context.Context, _input *BlastSearchInput, _output *
 		fmt.Println(err.Error())
 
 	}
-	hitsummary, err = blast.HitSummary(hits)
+	hitsummary, err = blast.HitSummary(hits, 10, 10)
 
 	_output.Hits = hits
 	_output.Hitssummary = hitsummary

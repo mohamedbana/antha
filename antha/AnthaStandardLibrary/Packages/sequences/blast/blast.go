@@ -112,40 +112,80 @@ func RerunRID(r *Rid) (o *Output, err error) {
 	return
 }
 
-func HitSummary(hits []Hit) (summary string, err error) {
+func HitSummary(hits []Hit, topnumberofhits int, topnumberofhsps int) (summary string, err error) {
+
+	summaryarray := make([]string, 0)
 
 	if len(hits) != 0 {
 
-		/*for _, hit := range hits {
-			for _, hsp := range hit.Hsps {
-				fmt.Printf("%+v", hsp)
+		for i, hit := range hits {
+
+			if i >= topnumberofhits {
+				summary = strings.Join(summaryarray, "; ")
+				return
+			}
+
+			summaryarray = append(summaryarray, fmt.Sprintln(ansi.Color("Hits:", "green"), len(hits)))
+
+			for j := range hit.Hsps {
+				// fmt.Printf("%+v", hsp)
+
+				if j >= topnumberofhsps {
+					break
+				}
+
+				seqlength := hits[i].Len
+
+				identity := strconv.Itoa((*hits[i].Hsps[j].HspIdentity/len(hits[i].Hsps[j].QuerySeq))*100) + "%"
+				coverage := strconv.Itoa(len(hits[i].Hsps[j].QuerySeq)/len(hits[i].Hsps[j].SubjectSeq)*100) + "%"
+
+				hitsum := fmt.Sprintln(ansi.Color("Hit:", "blue"), i+1,
+					//	Printfield(hits[0].Id),
+					text.Print("HspIdentity: ", strconv.Itoa(*hits[i].Hsps[j].HspIdentity)),
+					text.Print("queryLen: ", len(hits[i].Hsps[j].QuerySeq)),
+					text.Print("subjectLen: ", len(hits[i].Hsps[j].SubjectSeq)),
+					text.Print("alignLen: ", *hits[i].Hsps[j].AlignLen),
+					text.Print("Identity: ", identity),
+					text.Print("coverage: ", coverage),
+					//Print("HspIdentity", *hits[0].Hsps[0].HspIdentity),
+					ansi.Color("Sequence length:", "red"), seqlength,
+					ansi.Color("high scoring pairs for top match:", "red"), len(hits[0].Hsps),
+					ansi.Color("Id:", "red"), hits[i].Id,
+					ansi.Color("Definition:", "red"), hits[i].Def,
+					ansi.Color("Accession:", "red"), hits[i].Accession,
+					//ansi.Color("Identity: ", "red"), identity, "%",
+					//ansi.Color("Coverage: ", "red"), coverage, "%",
+					ansi.Color("Bitscore", "red"), hits[i].Hsps[j].BitScore,
+					ansi.Color("Score", "red"), hits[i].Hsps[j].Score,
+					ansi.Color("EValue", "red"), hits[i].Hsps[j].EValue)
+
+				summaryarray = append(summaryarray, hitsum)
 
 			}
-		}*/
-		seqlength := hits[0].Len
 
-		identity := strconv.Itoa((*hits[0].Hsps[0].HspIdentity/len(hits[0].Hsps[0].QuerySeq))*100) + "%"
-		coverage := strconv.Itoa(len(hits[0].Hsps[0].QuerySeq)/len(hits[0].Hsps[0].SubjectSeq)*100) + "%"
+		}
+		/*
 
-		summary = fmt.Sprintln(ansi.Color("Hits: ", "red"), len(hits),
-			//	Printfield(hits[0].Id),
-			text.Print("HspIdentity: ", strconv.Itoa(*hits[0].Hsps[0].HspIdentity)),
-			text.Print("queryLen: ", len(hits[0].Hsps[0].QuerySeq)),
-			text.Print("subjectLen: ", len(hits[0].Hsps[0].SubjectSeq)),
-			text.Print("alignLen: ", *hits[0].Hsps[0].AlignLen),
-			text.Print("Identity: ", identity),
-			text.Print("coverage: ", coverage),
-			//Print("HspIdentity", *hits[0].Hsps[0].HspIdentity),
-			ansi.Color("Sequence length:", "red"), seqlength,
-			ansi.Color("high scoring pairs for top match:", "red"), len(hits[0].Hsps),
-			ansi.Color("Id:", "red"), hits[0].Id,
-			ansi.Color("Definition:", "red"), hits[0].Def,
-			ansi.Color("Accession:", "red"), hits[0].Accession,
-			//ansi.Color("Identity: ", "red"), identity, "%",
-			//ansi.Color("Coverage: ", "red"), coverage, "%",
-			ansi.Color("Bitscore", "red"), hits[0].Hsps[0].BitScore,
-			ansi.Color("Score", "red"), hits[0].Hsps[0].Score,
-			ansi.Color("EValue", "red"), hits[0].Hsps[0].EValue)
+			summary = fmt.Sprintln(ansi.Color("Hits: ", "red"), len(hits),
+				//	Printfield(hits[0].Id),
+				text.Print("HspIdentity: ", strconv.Itoa(*hits[0].Hsps[0].HspIdentity)),
+				text.Print("queryLen: ", len(hits[0].Hsps[0].QuerySeq)),
+				text.Print("subjectLen: ", len(hits[0].Hsps[0].SubjectSeq)),
+				text.Print("alignLen: ", *hits[0].Hsps[0].AlignLen),
+				text.Print("Identity: ", identity),
+				text.Print("coverage: ", coverage),
+				//Print("HspIdentity", *hits[0].Hsps[0].HspIdentity),
+				ansi.Color("Sequence length:", "red"), seqlength,
+				ansi.Color("high scoring pairs for top match:", "red"), len(hits[0].Hsps),
+				ansi.Color("Id:", "red"), hits[0].Id,
+				ansi.Color("Definition:", "red"), hits[0].Def,
+				ansi.Color("Accession:", "red"), hits[0].Accession,
+				//ansi.Color("Identity: ", "red"), identity, "%",
+				//ansi.Color("Coverage: ", "red"), coverage, "%",
+				ansi.Color("Bitscore", "red"), hits[0].Hsps[0].BitScore,
+				ansi.Color("Score", "red"), hits[0].Hsps[0].Score,
+				ansi.Color("EValue", "red"), hits[0].Hsps[0].EValue)
+		*/
 	} else {
 		summary = "No hits!"
 		err = fmt.Errorf(summary)
@@ -153,6 +193,34 @@ func HitSummary(hits []Hit) (summary string, err error) {
 	return
 }
 
+/*
+func Summary(hit Hit) (summary string) {
+	seqlength := hits[i].Len
+
+	identity := strconv.Itoa((*hits[i].Hsps[j].HspIdentity/len(hits[i].Hsps[j].QuerySeq))*100) + "%"
+	coverage := strconv.Itoa(len(hits[i].Hsps[j].QuerySeq)/len(hits[i].Hsps[j].SubjectSeq)*100) + "%"
+
+	summary = fmt.Sprintln(text.Print("HspIdentity: ", strconv.Itoa(*hits[i].Hsps[j].HspIdentity)),
+		text.Print("queryLen: ", len(hits[i].Hsps[j].QuerySeq)),
+		text.Print("subjectLen: ", len(hits[i].Hsps[j].SubjectSeq)),
+		text.Print("alignLen: ", *hits[i].Hsps[j].AlignLen),
+		text.Print("Identity: ", identity),
+		text.Print("coverage: ", coverage),
+		//Print("HspIdentity", *hits[0].Hsps[0].HspIdentity),
+		ansi.Color("Sequence length:", "red"), seqlength,
+		ansi.Color("high scoring pairs for top match:", "red"), len(hits[0].Hsps),
+		ansi.Color("Id:", "red"), hits[i].Id,
+		ansi.Color("Definition:", "red"), hits[i].Def,
+		ansi.Color("Accession:", "red"), hits[i].Accession,
+		//ansi.Color("Identity: ", "red"), identity, "%",
+		//ansi.Color("Coverage: ", "red"), coverage, "%",
+		ansi.Color("Bitscore", "red"), hits[i].Hsps[j].BitScore,
+		ansi.Color("Score", "red"), hits[i].Hsps[j].Score,
+		ansi.Color("EValue", "red"), hits[i].Hsps[j].EValue)
+
+	return
+}
+*/
 func MegaBlastP(query string) (hits []Hit, err error) {
 
 	putparams = PutParameters{Program: "blastp", Megablast: true, Database: "nr"}
@@ -241,3 +309,9 @@ func Hits(o *Output) (hits []Hit, err error) {
 
 	return
 }
+
+/*
+func BestHit(hits []Hit) (besthit Hit) {
+
+}
+*/

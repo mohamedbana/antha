@@ -69,7 +69,7 @@ Steps {
 		fmt.Println(err.Error())
 	
 	} 
-		hitsummary,err = blast.HitSummary(hits)
+		hitsummary,err = blast.HitSummary(hits,10,10)
 	
 		Hits = hits 
 		Hitssummary = hitsummary

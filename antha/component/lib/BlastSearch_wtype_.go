@@ -56,11 +56,12 @@ func _BlastSearch_wtypeSteps(_ctx context.Context, _input *BlastSearch_wtypeInpu
 
 	} //else {
 
-	hitsummary, err = blast.HitSummary(hits)
+	hitsummary, err = blast.HitSummary(hits, 10, 10)
 
 	_output.Hits = hits
 	_output.Hitssummary = hitsummary
 	fmt.Println(_output.Hitssummary)
+
 	// Rename Sequence with ID of top blast hit
 	_output.AnthaSeq.Nm = hits[0].Id
 	//}

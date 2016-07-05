@@ -67,11 +67,12 @@ Steps {
 	
 	} //else {
 	
-		hitsummary,err = blast.HitSummary(hits)
+	hitsummary,err = blast.HitSummary(hits,10,10)
 	
 		Hits = hits 
 		Hitssummary = hitsummary
 		fmt.Println(Hitssummary)
+
 		// Rename Sequence with ID of top blast hit
 		AnthaSeq.Nm = hits[0].Id
 	//}
