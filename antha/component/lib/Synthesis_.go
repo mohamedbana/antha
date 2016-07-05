@@ -1,14 +1,14 @@
 package lib
 
 import (
+	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"github.com/antha-lang/antha/microArch/factory"
 )
-
-//"fmt"
 
 // Input parameters for this protocol (data)
 
@@ -25,14 +25,20 @@ func _SynthesisSetup(_ctx context.Context, _input *SynthesisInput) {}
 
 func _SynthesisSteps(_ctx context.Context, _input *SynthesisInput, _output *SynthesisOutput) {
 	// Element with mock synthesises DNA. Converts DNA sequence type to LHComponent.
-	var dna wtype.LHComponent
-	components := make([]*wtype.LHComponent, 4)
+	//var dna *wtype.LHComponent
+	components := make([]*wtype.LHComponent, 0)
 
+	fmt.Println("Parts:", _input.PartsWithOverhangs)
 	for i, part := range _input.PartsWithOverhangs {
+
+		dna := factory.GetComponentByType("dna")
 		dna.CName = part.Nm
-		components[i] = &dna
+		fmt.Println("dna:", i, dna)
+		components = append(components, dna)
 	}
 	_output.Components = components
+
+	fmt.Println("Components source:", _output.Components)
 }
 
 func _SynthesisAnalysis(_ctx context.Context, _input *SynthesisInput, _output *SynthesisOutput) {
@@ -104,7 +110,7 @@ type SynthesisSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Synthesis",
+	if err := addComponent(Component{Name: "Synthesis",
 		Constructor: SynthesisNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -114,5 +120,7 @@ func init() {
 				{Name: "Components", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

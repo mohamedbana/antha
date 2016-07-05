@@ -127,7 +127,7 @@ type SumVolumeSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "SumVolume",
+	if err := addComponent(Component{Name: "SumVolume",
 		Constructor: SumVolumeNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -140,5 +140,7 @@ func init() {
 				{Name: "Sum", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

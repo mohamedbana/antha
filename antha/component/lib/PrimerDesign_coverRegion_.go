@@ -155,7 +155,7 @@ type PrimerDesign_coverRegionSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PrimerDesign_coverRegion",
+	if err := addComponent(Component{Name: "PrimerDesign_coverRegion",
 		Constructor: PrimerDesign_coverRegionNew,
 		Desc: ComponentDesc{
 			Desc: "This element will design primers to cover a specified region of a sequence at the interval specified by the user (e.g. every 800 bp).\nDesign criteria such as maximum gc content, acceptable ranges of melting temperatures and primer length may be specified by the user.\n",
@@ -179,5 +179,7 @@ func init() {
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

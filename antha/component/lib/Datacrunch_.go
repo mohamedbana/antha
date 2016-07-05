@@ -204,7 +204,7 @@ type DatacrunchSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Datacrunch",
+	if err := addComponent(Component{Name: "Datacrunch",
 		Constructor: DatacrunchNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -229,5 +229,7 @@ func init() {
 				{Name: "V", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

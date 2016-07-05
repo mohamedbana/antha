@@ -130,7 +130,7 @@ type SampleSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Sample",
+	if err := addComponent(Component{Name: "Sample",
 		Constructor: SampleNew,
 		Desc: ComponentDesc{
 			Desc: "Example protocol demonstrating the use of the Sample function\n",
@@ -141,5 +141,7 @@ func init() {
 				{Name: "Sample", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

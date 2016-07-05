@@ -154,7 +154,7 @@ type Plotdata_spreadsheetSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Plotdata_spreadsheet",
+	if err := addComponent(Component{Name: "Plotdata_spreadsheet",
 		Constructor: Plotdata_spreadsheetNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -167,5 +167,7 @@ func init() {
 				{Name: "Yminmaxarray", Desc: "= [][]string{[]string{\"b4\", \"b16\"}, []string{\"c4\", \"c16\"}, []string{\"d4\", \"d16\"}} // column in A1 format i.e string{1,12} would indicate all data between those points\n", Kind: "Parameters"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

@@ -125,7 +125,7 @@ type Units_ToStringSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Units_ToString",
+	if err := addComponent(Component{Name: "Units_ToString",
 		Constructor: Units_ToStringNew,
 		Desc: ComponentDesc{
 			Desc: "demo protocol of how to convert units to string\n",
@@ -146,5 +146,7 @@ func init() {
 				{Name: "VolumeasString", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

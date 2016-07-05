@@ -184,7 +184,7 @@ type EvaporationrateSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Evaporationrate",
+	if err := addComponent(Component{Name: "Evaporationrate",
 		Constructor: EvaporationrateNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -204,5 +204,7 @@ func init() {
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

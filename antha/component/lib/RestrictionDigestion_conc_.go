@@ -154,7 +154,6 @@ type RestrictionDigestion_concInput struct {
 	DesiredConcinUperml []int
 	EnzSolutions        []*wtype.LHComponent
 	EnzymeNames         []string
-	InPlate             *wtype.LHPlate
 	InactivationTemp    wunit.Temperature
 	InactivationTime    wunit.Time
 	OutPlate            *wtype.LHPlate
@@ -181,7 +180,7 @@ type RestrictionDigestion_concSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "RestrictionDigestion_conc",
+	if err := addComponent(Component{Name: "RestrictionDigestion_conc",
 		Constructor: RestrictionDigestion_concNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -198,7 +197,6 @@ func init() {
 				{Name: "DesiredConcinUperml", Desc: "", Kind: "Parameters"},
 				{Name: "EnzSolutions", Desc: "", Kind: "Inputs"},
 				{Name: "EnzymeNames", Desc: "", Kind: "Parameters"},
-				{Name: "InPlate", Desc: "", Kind: "Inputs"},
 				{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
 				{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
@@ -212,5 +210,7 @@ func init() {
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

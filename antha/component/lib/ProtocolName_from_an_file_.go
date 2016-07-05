@@ -122,7 +122,7 @@ type ProtocolName_from_an_fileSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "ProtocolName_from_an_file",
+	if err := addComponent(Component{Name: "ProtocolName_from_an_file",
 		Constructor: ProtocolName_from_an_fileNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -137,5 +137,7 @@ func init() {
 				{Name: "PhysicalOutput", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

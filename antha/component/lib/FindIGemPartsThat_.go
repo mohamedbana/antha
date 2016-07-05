@@ -275,7 +275,7 @@ type FindIGemPartsThatSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "FindIGemPartsThat",
+	if err := addComponent(Component{Name: "FindIGemPartsThat",
 		Constructor: FindIGemPartsThatNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -295,5 +295,7 @@ func init() {
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

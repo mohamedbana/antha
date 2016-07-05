@@ -152,7 +152,7 @@ type MastermixSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Mastermix",
+	if err := addComponent(Component{Name: "Mastermix",
 		Constructor: MastermixNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -170,5 +170,7 @@ func init() {
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

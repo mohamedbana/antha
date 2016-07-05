@@ -277,7 +277,7 @@ type TypeIISAssembly_designSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "TypeIISAssembly_design",
+	if err := addComponent(Component{Name: "TypeIISAssembly_design",
 		Constructor: TypeIISAssembly_designNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -299,5 +299,7 @@ func init() {
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

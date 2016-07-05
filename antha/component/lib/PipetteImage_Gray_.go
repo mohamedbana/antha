@@ -278,7 +278,7 @@ type PipetteImage_GraySOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PipetteImage_Gray",
+	if err := addComponent(Component{Name: "PipetteImage_Gray",
 		Constructor: PipetteImage_GrayNew,
 		Desc: ComponentDesc{
 			Desc: "Generates instructions to pipette out a defined image onto a defined plate by blending cyan magenta yellow and black dyes\n",
@@ -310,5 +310,7 @@ func init() {
 				{Name: "Skipped", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

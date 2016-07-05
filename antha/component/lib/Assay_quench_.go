@@ -130,7 +130,7 @@ type Assay_quenchSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Assay_quench",
+	if err := addComponent(Component{Name: "Assay_quench",
 		Constructor: Assay_quenchNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -148,5 +148,7 @@ func init() {
 				{Name: "QuenchedReaction", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

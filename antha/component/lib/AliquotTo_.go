@@ -191,7 +191,7 @@ type AliquotToSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "AliquotTo",
+	if err := addComponent(Component{Name: "AliquotTo",
 		Constructor: AliquotToNew,
 		Desc: ComponentDesc{
 			Desc: "The lowest level example protocol showing The MixTo command being used to specify the specific wells to be aliquoted to;\nBy doing this we are able to specify whether the aliqouts are pipetted by row or by column.\nIn this case the user is still not specifying the well location (i.e. A1) in the parameters, although that would be possible to specify.\nWe don't generally encourage this since Antha is designed to be prodiminantly a high level language which avoids the user specifying well locations but this possibility is there if necessary.\n",
@@ -206,5 +206,7 @@ func init() {
 				{Name: "Aliquots", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

@@ -70,7 +70,7 @@ Steps {
 		aliquot := MixTo(OutPlatetype, "", 1,aliquotSample)
 		aliquots = append(aliquots,aliquot)
 	}
-	Aliquots = aliquots
+	Aliquots = aliquots // 
 }
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results

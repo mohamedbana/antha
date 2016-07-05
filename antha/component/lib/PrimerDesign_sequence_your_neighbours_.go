@@ -296,7 +296,7 @@ type PrimerDesign_sequence_your_neighboursSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PrimerDesign_sequence_your_neighbours",
+	if err := addComponent(Component{Name: "PrimerDesign_sequence_your_neighbours",
 		Constructor: PrimerDesign_sequence_your_neighboursNew,
 		Desc: ComponentDesc{
 			Desc: "This element will design outward facing primers for all .gb file sequences in a specified folder.\nDesign criteria such as maximum gc content, acceptable ranges of melting temperatures and primer length may be specified by the user.\n",
@@ -315,5 +315,7 @@ func init() {
 				{Name: "PrimerPairs", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

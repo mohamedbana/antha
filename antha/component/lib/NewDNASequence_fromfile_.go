@@ -140,7 +140,7 @@ type NewDNASequence_fromfileSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "NewDNASequence_fromfile",
+	if err := addComponent(Component{Name: "NewDNASequence_fromfile",
 		Constructor: NewDNASequence_fromfileNew,
 		Desc: ComponentDesc{
 			Desc: "Protocol for creating a DNASequence from a sequence file format. // Supported formats: .gdx .fasta .gb\n",
@@ -156,5 +156,7 @@ func init() {
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

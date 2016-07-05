@@ -238,7 +238,7 @@ type TypeIISConstructAssembly_simSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "TypeIISConstructAssembly_sim",
+	if err := addComponent(Component{Name: "TypeIISConstructAssembly_sim",
 		Constructor: TypeIISConstructAssembly_simNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -278,7 +278,9 @@ func init() {
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }
 
 /*

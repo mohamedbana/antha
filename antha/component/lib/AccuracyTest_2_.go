@@ -368,7 +368,7 @@ type AccuracyTest_2SOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "AccuracyTest_2",
+	if err := addComponent(Component{Name: "AccuracyTest_2",
 		Constructor: AccuracyTest_2New,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -399,5 +399,7 @@ func init() {
 				{Name: "Wellpositionarray", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

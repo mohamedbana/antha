@@ -132,7 +132,7 @@ type PreProcessImageSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PreProcessImage",
+	if err := addComponent(Component{Name: "PreProcessImage",
 		Constructor: PreProcessImageNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -150,5 +150,7 @@ func init() {
 				{Name: "ProcessedImageFilename", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

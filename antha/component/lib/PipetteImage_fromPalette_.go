@@ -196,7 +196,7 @@ type PipetteImage_fromPaletteSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PipetteImage_fromPalette",
+	if err := addComponent(Component{Name: "PipetteImage_fromPalette",
 		Constructor: PipetteImage_fromPaletteNew,
 		Desc: ComponentDesc{
 			Desc: "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours\n",
@@ -218,5 +218,7 @@ func init() {
 				{Name: "Pixels", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }
