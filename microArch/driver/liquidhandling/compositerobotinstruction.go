@@ -3377,6 +3377,114 @@ func (mi *MixInstruction) OutputTo(driver LiquidhandlingDriver) {
 	driver.Mix(mi.Head, vols, mi.PlateType, mi.Cycles, mi.Multi, mi.What, mi.Blowout)
 }
 
+//RemoveAllPlatesInstruction remove all plates from the machine, returning
+//it to an unconfigured state
+type RemoveAllPlatesInstruction struct {
+	Type      int
+}
+
+func NewRemoveAllPlatesInstruction() *MixInstruction {
+	var rapi RemoveAllPlatesInstruction
+
+	rapi.Type = RAP
+	return &mi
+}
+
+func (self *RemoveAllPlatesInstruction) InstructionType() int {
+	return self.Type
+}
+
+func (self *RemoveAllPlatesInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
+}
+
+func (self *RemoveAllPlatesInstruction) GetParameter(name string) interface{} {
+	switch name {
+	case "INSTRUCTIONTYPE":
+		return self.InstructionType()
+	}
+	return nil
+}
+
+func (self *RemoveAllPlatesInstruction) OutputTo(driver LiquidhandlingDriver) {
+    driver.RemoveAllPlates()
+}
+
+//RemovePlateAt remove the plate at the given location
+type RemovePlateAtInstruction struct {
+	Type      int
+    Location string
+}
+
+func NewRemovePlateAtInstruction() *MixInstruction {
+	var ins RemovePlateAtInstruction
+
+	ins.Type = RPA
+    ins.Location = ""
+	return &ins
+}
+
+func (self *RemovePlateAtInstruction) InstructionType() int {
+	return self.Type
+}
+
+func (self *RemovePlateAtInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
+}
+
+func (self *RemovePlateAtInstruction) GetParameter(name string) interface{} {
+	switch name {
+	case "INSTRUCTIONTYPE":
+		return self.InstructionType()
+    case "POSFROM":
+        return self.Location
+	}
+	return nil
+}
+
+func (self *RemovePlateAtInstruction) OutputTo(driver LiquidhandlingDriver) {
+    driver.RemovePlateAt(self.Location)
+}
+
+//AddPlateToInstruction remove the plate at the given location
+type AddPlateToInstruction struct {
+	Type      int
+    Location  string
+    Plate     interface{}
+    Name      string
+}
+
+func NewAddPlateToInstruction() *AddPlateToInstruction {
+	var ins AddPlateToInstruction
+
+	ins.Type = APT
+	return &ins
+}
+
+func (self *AddPlateToInstruction) InstructionType() int {
+    return self.Type
+}
+
+func (self *AddPlateToInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
+	return nil, nil
+}
+
+func (self *AddPlateToInstruction) GetParameter(name string) interface{} {
+	switch name {
+	case "INSTRUCTIONTYPE":
+		return self.InstructionType()
+    case "POSTO":
+        return self.Location
+    case "TOPLATETYPE":
+        return self.Plate.Type
+	}
+	return nil
+}
+
+func (self *AddPlateToInstruction) OutputTo(driver LiquidhandlingDriver) {
+    driver.AddPlateTo(self.Location, self.Plate, self.Name)
+}
+
 // TODO -- implement MESSAGE
 
 func GetTips(tiptype string, params *LHProperties, channel *wtype.LHChannelParameter, multi int, mirror bool) (RobotInstruction, error) {
