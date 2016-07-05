@@ -5,8 +5,7 @@ import (
 	"math/cmplx"
 )
 
-// inverse function for cubic polynomials
-
+// function for cubics
 type Cubic struct {
 	a float64
 	b float64
@@ -40,11 +39,11 @@ func (c *Cubic) R() float64 {
 	return c.r
 }
 func (c *Cubic) I(v float64) float64 {
-	s := complex128(c.p)
-	vv := cmplx.Pow(c.q, 2.0) + cmplx.Pow(c.r-math.Pow(c.p, 2.0), 0.5)
-	vv1 := cmplx.Pow(complex128(c.q)+vv, 1.0/3.0)
-	vv2 := cmplx.Pow(complex128(c.q)-vv, 1.0/3.0)
+	s := complex128(c.P())
+	vv := cmplx.Pow(c.Q(v), 2.0) + cmplx.Pow(c.R()-math.Pow(c.P(), 2.0), 0.5)
+	vv1 := cmplx.Pow(complex128(c.Q(v))+vv, 1.0/3.0)
+	vv2 := cmplx.Pow(complex128(c.Q(v))-vv, 1.0/3.0)
 
-	// this should be real anyway
+	// this should be real anyway, but Abs should be a bit better than real(...)
 	return cmplx.Abs(s + vv1 + vv2)
 }
