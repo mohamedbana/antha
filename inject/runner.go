@@ -3,7 +3,7 @@ package inject
 import (
 	"fmt"
 
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"golang.org/x/net/context"
 )
 
 // Basic signature of injectable functions
