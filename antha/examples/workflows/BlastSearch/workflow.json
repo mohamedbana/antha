@@ -6,6 +6,9 @@
         },
         "notanorf": {
             "component": "BlastSearch"
+        },
+        "aplasmid": {
+            "component": "BlastSearch"
         }
     }
 }

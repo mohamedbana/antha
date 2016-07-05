@@ -18,6 +18,8 @@ import (
 
 // Data which is returned from this protocol; output data
 
+//AllHits []biogo.Hit
+
 // Physical inputs to this protocol
 
 // Physical outputs from this protocol
@@ -59,12 +61,17 @@ func _BlastSearchSteps(_ctx context.Context, _input *BlastSearchInput, _output *
 		fmt.Println(err.Error())
 
 	}
-	hitsummary, err = blast.HitSummary(hits, 10, 10)
 
+	_output.ExactHits, hitsummary, err = blast.AllExactMatches(hits)
+
+	if len(_output.ExactHits) == 0 {
+		hitsummary, err = blast.HitSummary(hits, 10, 10)
+	}
 	_output.BestHit, identity, coverage, besthitsummary, err = blast.FindBestHit(hits)
 
-	_output.Hits = hits
+	//	AllHits = hits
 	_output.Hitssummary = hitsummary
+	fmt.Println(hitsummary)
 	fmt.Println(besthitsummary)
 	// Rename Sequence with ID of top blast hit
 
@@ -141,7 +148,7 @@ type BlastSearchOutput struct {
 	AnthaSeq    wtype.DNASequence
 	BestHit     biogo.Hit
 	Coverage    float64
-	Hits        []biogo.Hit
+	ExactHits   []biogo.Hit
 	Hitssummary string
 	Identity    float64
 	Warning     error
@@ -152,7 +159,7 @@ type BlastSearchSOutput struct {
 		AnthaSeq    wtype.DNASequence
 		BestHit     biogo.Hit
 		Coverage    float64
-		Hits        []biogo.Hit
+		ExactHits   []biogo.Hit
 		Hitssummary string
 		Identity    float64
 		Warning     error
@@ -173,7 +180,7 @@ func init() {
 				{Name: "AnthaSeq", Desc: "", Kind: "Data"},
 				{Name: "BestHit", Desc: "", Kind: "Data"},
 				{Name: "Coverage", Desc: "", Kind: "Data"},
-				{Name: "Hits", Desc: "", Kind: "Data"},
+				{Name: "ExactHits", Desc: "AllHits []biogo.Hit\n", Kind: "Data"},
 				{Name: "Hitssummary", Desc: "", Kind: "Data"},
 				{Name: "Identity", Desc: "", Kind: "Data"},
 				{Name: "Warning", Desc: "", Kind: "Data"},

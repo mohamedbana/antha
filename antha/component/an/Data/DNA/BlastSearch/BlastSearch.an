@@ -19,7 +19,8 @@ Parameters (
 // Data which is returned from this protocol; output data
 Data (
 	Hitssummary string
-	Hits []biogo.Hit
+	//AllHits []biogo.Hit
+	ExactHits []biogo.Hit
 	BestHit biogo.Hit
 	Identity float64
 	Coverage float64
@@ -75,12 +76,17 @@ Steps {
 		fmt.Println(err.Error())
 	
 	} 
+	
+		ExactHits, hitsummary, err =  blast.AllExactMatches(hits)
+	
+		if len(ExactHits)== 0 {
 		hitsummary,err = blast.HitSummary(hits,10,10)
-		
+		}
 		BestHit,identity, coverage, besthitsummary, err = blast.FindBestHit(hits)
 	
-		Hits = hits 
+	//	AllHits = hits 
 		Hitssummary = hitsummary
+		fmt.Println(hitsummary)
 		fmt.Println(besthitsummary)
 		// Rename Sequence with ID of top blast hit
 		

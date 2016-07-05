@@ -243,6 +243,66 @@ func FindBestHit(hits []Hit) (besthit Hit, identity float64, coverage float64, b
 	return
 }
 
+func AllExactMatches(hits []Hit) (exactmatches []Hit, summary string, err error) {
+
+	summaryarray := make([]string, 0)
+	exactmatches = make([]Hit, 0)
+
+	if len(hits) != 0 {
+
+		summaryarray = append(summaryarray, fmt.Sprintln(ansi.Color("Hits:", "green"), len(hits)))
+
+		for i, hit := range hits {
+
+			for j := range hit.Hsps {
+
+				seqlength := hits[i].Len
+
+				hspidentityfloat := float64(*hits[i].Hsps[j].HspIdentity)
+				querylengthfloat := float64(len(hits[i].Hsps[j].QuerySeq))
+				subjectseqfloat := float64(len(hits[i].Hsps[j].SubjectSeq))
+
+				identityfloat := (hspidentityfloat / querylengthfloat) * 100
+				coveragefloat := (querylengthfloat / subjectseqfloat) * 100
+				identity := strconv.FormatFloat(identityfloat, 'G', -1, 64) + "%"
+				coverage := strconv.FormatFloat(coveragefloat, 'G', -1, 64) + "%"
+
+				if identityfloat == 100 {
+					hitsum := fmt.Sprintln(ansi.Color("Hit:", "blue"), i+1,
+						//	Printfield(hits[0].Id),
+						text.Print("HspIdentity: ", strconv.Itoa(*hits[i].Hsps[j].HspIdentity)),
+						text.Print("queryLen: ", len(hits[i].Hsps[j].QuerySeq)),
+						text.Print("queryFrom: ", hits[i].Hsps[j].QueryFrom),
+						text.Print("queryTo: ", hits[i].Hsps[j].QueryTo),
+						text.Print("subjectLen: ", len(hits[i].Hsps[j].SubjectSeq)),
+						text.Print("HitFrom: ", hits[i].Hsps[j].HitFrom),
+						text.Print("HitTo: ", hits[i].Hsps[j].HitTo),
+						text.Print("alignLen: ", *hits[i].Hsps[j].AlignLen),
+						text.Print("Identity: ", identity),
+						text.Print("coverage: ", coverage),
+						ansi.Color("Sequence length:", "red"), seqlength,
+						ansi.Color("high scoring pairs for top match:", "red"), len(hits[0].Hsps),
+						ansi.Color("Id:", "red"), hits[i].Id,
+						ansi.Color("Definition:", "red"), hits[i].Def,
+						ansi.Color("Accession:", "red"), hits[i].Accession,
+						ansi.Color("Bitscore", "red"), hits[i].Hsps[j].BitScore,
+						ansi.Color("Score", "red"), hits[i].Hsps[j].Score,
+						ansi.Color("EValue", "red"), hits[i].Hsps[j].EValue)
+
+					summaryarray = append(summaryarray, hitsum)
+					exactmatches = append(exactmatches, hit)
+				}
+			}
+
+		}
+
+	} else {
+		summary = "No hits!"
+		err = fmt.Errorf(summary)
+	}
+	return
+}
+
 /*
 func Summary(hit Hit) (summary string) {
 	seqlength := hits[i].Len
