@@ -235,7 +235,6 @@ func divide(i, n, l int) (int, int) {
 	return first, last
 }
 
-/*
 func TestElementsWithExampleInputs0(t *testing.T) {
 	t.Parallel()
 
@@ -249,7 +248,7 @@ func TestElementsWithExampleInputs0(t *testing.T) {
 
 	runElements(t, ctx, inputs[first:last])
 }
-*/
+
 func TestElementsWithExampleInputs1(t *testing.T) {
 	t.Parallel()
 
@@ -352,7 +351,7 @@ func TestElementsWithDefaultInputs(t *testing.T) {
 		}
 
 		pm := map[string]map[string]inject.Value{
-			"Parameters": map[string]inject.Value{
+			"Parameters": {
 				"Process": input,
 			},
 		}

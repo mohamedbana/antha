@@ -35,7 +35,8 @@
         "ODAssay1": {
             "AbsorbanceWavelength": "600nm",
             "DilutionVolume": "150ul",
-            "Diluent": "water"
+            "Diluent": "water",
+			"Plate":"greiner384_riser"
         }
     },
     "Config": {

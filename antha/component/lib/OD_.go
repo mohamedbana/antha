@@ -58,6 +58,10 @@ func _ODSetup(_ctx context.Context, _input *ODInput) {
 func _ODSteps(_ctx context.Context, _input *ODInput, _output *ODOutput) {
 
 	var product *wtype.LHComponent //WaterSolution
+	var counter int
+	if _input.MaxDilutions == 0 {
+		_input.MaxDilutions = 10
+	}
 
 	for {
 		product = execute.MixInto(_ctx, _input.ODplate, "", mixer.Sample(_input.Sampletotest, _input.Sample_volume), mixer.Sample(_input.Diluent, _input.Diluent_volume))
@@ -65,11 +69,11 @@ func _ODSteps(_ctx context.Context, _input *ODInput, _output *ODOutput) {
 		or is the info on volume, opacity, pathlength etc implied in LHComponent?*/
 		_output.Sample_absorbance = platereader.ReadAbsorbance(_input.ODplate, product, _input.Wlength)
 
-		if _output.Sample_absorbance.Reading < 1 {
+		if _output.Sample_absorbance.Reading < 1 || counter > _input.MaxDilutions {
 			break
 		}
 		_input.Diluent_volume.Mvalue += 1 //diluent_volume = diluent_volume + 1
-
+		counter++
 	}
 } // serial dilution or could write element for finding optimum dilution or search historical data
 func _ODAnalysis(_ctx context.Context, _input *ODInput, _output *ODOutput) {
@@ -142,6 +146,7 @@ type ODInput struct {
 	Diluent                 *wtype.LHComponent
 	Diluent_volume          wunit.Volume
 	Heightof100ulinm        float64
+	MaxDilutions            int
 	ODplate                 *wtype.LHPlate
 	ODtoDCWconversionfactor float64
 	Sample_volume           wunit.Volume
@@ -178,6 +183,7 @@ func init() {
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "Diluent_volume", Desc: "= uL(0)\n", Kind: "Parameters"},
 				{Name: "Heightof100ulinm", Desc: "Replicate_count uint32 //= 1 // Note: 1 replicate means experiment is in duplicate, etc.\ncalculate path length? - takes place under plate reader since this will only be necessary for plate reader protocols? labware?\nData which is returned from this protocol, and data types\n\n= 0.0533\n", Kind: "Parameters"},
+				{Name: "MaxDilutions", Desc: "", Kind: "Parameters"},
 				{Name: "ODplate", Desc: "", Kind: "Inputs"},
 				{Name: "ODtoDCWconversionfactor", Desc: "Diluent_type //= (PBS)\n\n= (0.25)\n", Kind: "Parameters"},
 				{Name: "Sample_volume", Desc: "= uL(100)\n", Kind: "Parameters"},

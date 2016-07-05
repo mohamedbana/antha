@@ -64,7 +64,7 @@
  	"Split1": {
             "Component": "SplitStreams"
         },
-	"ProductAssay1": {
+		"ProductAssay1": {
             "Component": "FluorescenceMeasurement"
         },
         "ODAssay1": {

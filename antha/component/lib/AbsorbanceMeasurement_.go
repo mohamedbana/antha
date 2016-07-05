@@ -23,13 +23,14 @@ func _AbsorbanceMeasurementSteps(_ctx context.Context, _input *AbsorbanceMeasure
 
 	sampleforreading := mixer.SampleAll(_input.SampleForReading)
 
-	dilutedSample := execute.Mix(_ctx, sampleforreading, diluentSample)
+	dilutedSample := execute.MixTo(_ctx, _input.Plate.Type, "", 1, sampleforreading, diluentSample)
+	//dilutedSample:=Mix(sampleforreading, diluentSample)
 
 	// read
 	abs := platereader.ReadAbsorbance(_input.Plate, dilutedSample, _input.AbsorbanceWavelength.RawValue())
 
 	// prepare blank and read
-	blankSample := execute.MixInto(_ctx, _input.Plate, "", diluentSample)
+	blankSample := execute.MixTo(_ctx, _input.Plate.Type, "", 1, mixer.Sample(_input.Diluent, dilutedSample.Volume()))
 
 	blankabs := platereader.ReadAbsorbance(_input.Plate, blankSample, _input.AbsorbanceWavelength.RawValue())
 
