@@ -3383,11 +3383,11 @@ type RemoveAllPlatesInstruction struct {
 	Type      int
 }
 
-func NewRemoveAllPlatesInstruction() *MixInstruction {
-	var rapi RemoveAllPlatesInstruction
+func NewRemoveAllPlatesInstruction() *RemoveAllPlatesInstruction {
+	var ins RemoveAllPlatesInstruction
 
-	rapi.Type = RAP
-	return &mi
+	ins.Type = RAP
+	return &ins
 }
 
 func (self *RemoveAllPlatesInstruction) InstructionType() int {
@@ -3416,7 +3416,7 @@ type RemovePlateAtInstruction struct {
     Location string
 }
 
-func NewRemovePlateAtInstruction() *MixInstruction {
+func NewRemovePlateAtInstruction() *RemovePlateAtInstruction {
 	var ins RemovePlateAtInstruction
 
 	ins.Type = RPA
@@ -3449,8 +3449,9 @@ func (self *RemovePlateAtInstruction) OutputTo(driver LiquidhandlingDriver) {
 //AddPlateToInstruction remove the plate at the given location
 type AddPlateToInstruction struct {
 	Type      int
-    Location  string
+    Position  string
     Plate     interface{}
+    PlateType string
     Name      string
 }
 
@@ -3474,15 +3475,15 @@ func (self *AddPlateToInstruction) GetParameter(name string) interface{} {
 	case "INSTRUCTIONTYPE":
 		return self.InstructionType()
     case "POSTO":
-        return self.Location
+        return self.Position
     case "TOPLATETYPE":
-        return self.Plate.Type
+        return self.PlateType
 	}
 	return nil
 }
 
 func (self *AddPlateToInstruction) OutputTo(driver LiquidhandlingDriver) {
-    driver.AddPlateTo(self.Location, self.Plate, self.Name)
+    driver.AddPlateTo(self.Position, self.Plate, self.Name)
 }
 
 // TODO -- implement MESSAGE
