@@ -1,7 +1,7 @@
 package lib
 
 import (
-	"encoding/json"
+	//"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	//"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
@@ -167,8 +167,8 @@ func runElements(t *testing.T, ctx context.Context, inputs []*TInput) {
 
 		select {
 		case err = <-errs:
-		case <-time.After(10 * time.Second):
-			err = fmt.Errorf("timeout after %ds", 30)
+		case <-time.After(60 * time.Second):
+			err = fmt.Errorf("timeout after %ds", 60)
 		}
 
 		if err == nil {
@@ -311,6 +311,7 @@ var (
 	defaultPlate = wtype.NewLHPlate("pcrplate_with_cooler", "Unknown", 8, 12, 25.7, "mm", defaultWell, 9, 9, 0.0, 0.0, 15.5)
 )
 
+/*
 func TestElementsWithDefaultInputs(t *testing.T) {
 	t.Parallel()
 	type Process struct {
@@ -374,3 +375,4 @@ func TestElementsWithDefaultInputs(t *testing.T) {
 	}
 	runElements(t, ctx, inputs)
 }
+*/
