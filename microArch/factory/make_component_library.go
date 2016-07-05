@@ -144,6 +144,12 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
+	A.CName = "Acid yellow 23" // the pubchem name for tartrazine
+	A.Type = wtype.LTWater
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
 	A.CName = "tartrazine"
 	A.Type = wtype.LTWater
 	A.Smax = 9999
