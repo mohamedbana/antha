@@ -1,10 +1,10 @@
 {
     "connections": [],
     "processes": {
-        "BlastSearch1": {
+        "unknownseq": {
             "component": "BlastSearch"
         },
-        "BlastSearch2": {
+        "notanorf": {
             "component": "BlastSearch"
         }
     }

@@ -37,6 +37,9 @@ func _BlastSearchSteps(_ctx context.Context, _input *BlastSearchInput, _output *
 	var err error
 	var hits []biogo.Hit
 	var hitsummary string
+	var identity float64
+	var coverage float64
+	var besthitsummary string
 
 	// Convert the sequence to an anthatype
 	_output.AnthaSeq = wtype.MakeLinearDNASequence(_input.Name, _input.DNA)
@@ -58,13 +61,19 @@ func _BlastSearchSteps(_ctx context.Context, _input *BlastSearchInput, _output *
 	}
 	hitsummary, err = blast.HitSummary(hits, 10, 10)
 
+	_output.BestHit, identity, coverage, besthitsummary, err = blast.FindBestHit(hits)
+
 	_output.Hits = hits
 	_output.Hitssummary = hitsummary
-	fmt.Println(_output.Hitssummary)
+	fmt.Println(besthitsummary)
 	// Rename Sequence with ID of top blast hit
-	_output.AnthaSeq.Nm = hits[0].Id
 
+	if coverage == 100 && identity == 100 {
+		_output.AnthaSeq.Nm = _output.BestHit.Id
+	}
 	_output.Warning = err
+	_output.Identity = identity
+	_output.Coverage = coverage
 
 }
 
@@ -130,16 +139,22 @@ type BlastSearchInput struct {
 
 type BlastSearchOutput struct {
 	AnthaSeq    wtype.DNASequence
+	BestHit     biogo.Hit
+	Coverage    float64
 	Hits        []biogo.Hit
 	Hitssummary string
+	Identity    float64
 	Warning     error
 }
 
 type BlastSearchSOutput struct {
 	Data struct {
 		AnthaSeq    wtype.DNASequence
+		BestHit     biogo.Hit
+		Coverage    float64
 		Hits        []biogo.Hit
 		Hitssummary string
+		Identity    float64
 		Warning     error
 	}
 	Outputs struct {
@@ -156,8 +171,11 @@ func init() {
 				{Name: "DNA", Desc: "", Kind: "Parameters"},
 				{Name: "Name", Desc: "", Kind: "Parameters"},
 				{Name: "AnthaSeq", Desc: "", Kind: "Data"},
+				{Name: "BestHit", Desc: "", Kind: "Data"},
+				{Name: "Coverage", Desc: "", Kind: "Data"},
 				{Name: "Hits", Desc: "", Kind: "Data"},
 				{Name: "Hitssummary", Desc: "", Kind: "Data"},
+				{Name: "Identity", Desc: "", Kind: "Data"},
 				{Name: "Warning", Desc: "", Kind: "Data"},
 			},
 		},
