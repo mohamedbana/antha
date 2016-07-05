@@ -55,7 +55,7 @@ func _Aliquot_PlateTypeSteps(_ctx context.Context, _input *Aliquot_PlateTypeInpu
 		aliquot := execute.MixTo(_ctx, _input.OutPlatetype, "", 1, aliquotSample)
 		aliquots = append(aliquots, aliquot)
 	}
-	_output.Aliquots = aliquots
+	_output.Aliquots = aliquots //
 }
 
 // Run after controls and a steps block are completed to
