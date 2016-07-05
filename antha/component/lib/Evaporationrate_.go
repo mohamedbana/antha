@@ -90,11 +90,9 @@ func _EvaporationrateAnalysis(_ctx context.Context, _input *EvaporationrateInput
 
 	density, ok := liquidclasses.Liquidclass[_input.Liquid.TypeName()]["ro"]
 
-	fmt.Println("ok", ok)
 	if !ok {
 		density = liquidclasses.Liquidclass["water"]["ro"]
 		_output.Warnings = fmt.Errorf("liquid density not found for " + _input.Liquid.TypeName() + " so used water value")
-		fmt.Println(_output.Warnings.Error())
 	}
 
 	evaporatedliquid = (evaporatedliquid * density) / 1000                         // converted to litres
