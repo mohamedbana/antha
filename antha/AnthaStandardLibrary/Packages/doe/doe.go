@@ -259,7 +259,7 @@ func AddAdditionalHeaders(run Run, additionalheader string, additionalsubheader 
 	newrun.AdditionalHeaders = headers
 	newrun.AdditionalSubheaders = subheaders
 
-	fmt.Println("newrun: ", newrun)
+	// fmt.Println("newrun: ", newrun)
 	return
 
 }
@@ -270,7 +270,7 @@ func AddAdditionalHeaderandValue(run Run, additionalheader string, additionalsub
 	if search.InSlice(additionalsubheader, run.AdditionalSubheaders) == false {
 
 		midrun := AddAdditionalHeaders(run, additionalheader, additionalsubheader)
-		fmt.Println("midrun: ", midrun)
+		// fmt.Println("midrun: ", midrun)
 		newrun = AddAdditionalValue(midrun, additionalsubheader, additionalvalue)
 	} else {
 		newrun = ReplaceAdditionalValue(run, additionalsubheader, additionalvalue)
@@ -297,7 +297,7 @@ func (run Run) GetAdditionalInfo(subheader string) (value interface{}, err error
 
 		}
 	}
-	fmt.Println("Header: ", subheader)
+	// fmt.Println("Header: ", subheader)
 	return value, fmt.Errorf("header, ", subheader, " not found in ", run.AdditionalSubheaders)
 }
 
@@ -361,13 +361,13 @@ func RunsFromFixedFactors(fixedfactors []DOEPair) (runswithfixedfactors []Run) {
 }
 
 func AllComboCount(pairs []DOEPair) (numberofuniquecombos int) {
-	fmt.Println("In AllComboCount", "len(pairs)", len(pairs))
+	// fmt.Println("In AllComboCount", "len(pairs)", len(pairs))
 	var movingcount int
 	movingcount = (pairs[0]).LevelCount()
-	fmt.Println("levelcount", movingcount)
-	fmt.Println("len(levels)", len(pairs[0].Levels))
+	// fmt.Println("levelcount", movingcount)
+	// fmt.Println("len(levels)", len(pairs[0].Levels))
 	for i := 1; i < len(pairs); i++ {
-		fmt.Println("levelcount", movingcount)
+		// fmt.Println("levelcount", movingcount)
 		movingcount = movingcount * (pairs[i]).LevelCount()
 	}
 	numberofuniquecombos = movingcount
@@ -462,14 +462,14 @@ func AddWelllocations(DXORJMP string, xlsxfile string, oldsheet int, runnumberto
 
 	_ = file.AddSheet("hello")
 
-	extracolumn := sheet.MaxCol + 1
+	//extracolumn := sheet.MaxCol + 1
 
 	// add extra column headers first
 	for _, extracolumnheader := range extracolumnheaders {
 		xlsxcell = sheet.Rows[0].AddCell()
 
 		xlsxcell.Value = "Extra column added"
-		fmt.Println("CEllll added succesfully", sheet.Cell(0, extracolumn).String())
+		// fmt.Println("CEllll added succesfully", sheet.Cell(0, extracolumn).String())
 		xlsxcell = sheet.Rows[1].AddCell()
 		xlsxcell.Value = extracolumnheader
 	}
@@ -478,7 +478,7 @@ func AddWelllocations(DXORJMP string, xlsxfile string, oldsheet int, runnumberto
 	xlsxcell = sheet.Rows[0].AddCell()
 
 	xlsxcell.Value = "Location"
-	fmt.Println("CEllll added succesfully", sheet.Cell(0, extracolumn).String())
+	// fmt.Println("CEllll added succesfully", sheet.Cell(0, extracolumn).String())
 	xlsxcell = sheet.Rows[1].AddCell()
 	xlsxcell.Value = "Well ID"
 
@@ -579,7 +579,7 @@ func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) 
 			} else if strings.Contains(factororresponse, "Response") {
 				descriptor = sheet.Cell(1, j).String()
 				responsedescriptor := descriptor
-				//fmt.Println("response", i, j, descriptor)
+				//// fmt.Println("response", i, j, descriptor)
 				responsedescriptors = append(responsedescriptors, responsedescriptor)
 
 				cell := sheet.Cell(i, j)

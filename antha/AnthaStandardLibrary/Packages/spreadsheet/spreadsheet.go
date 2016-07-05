@@ -169,7 +169,7 @@ func ConvertMinMaxtoArray(minmax []string) (array []string, err error) {
 	}
 	maxrow, maxcol, err := A1formattorowcolumn(minmax[1])
 	if err != nil {
-		fmt.Println("minmax[1]", minmax[1], "maxrow=", maxrow, "maxcol", maxcol)
+		// fmt.Println("minmax[1]", minmax[1], "maxrow=", maxrow, "maxcol", maxcol)
 		return
 	}
 

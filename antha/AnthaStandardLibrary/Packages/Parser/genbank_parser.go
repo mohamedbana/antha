@@ -162,7 +162,7 @@ func ParseGenbankfile(file *os.File) (annotated wtype.DNASequence, err error) {
 		line = fmt.Sprintln(scanner.Text())
 		genbanklines = append(genbanklines, line)
 	}
-	fmt.Println("lines scanned")
+	// fmt.Println("lines scanned")
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
@@ -175,7 +175,7 @@ func ParseGenbankfile(file *os.File) (annotated wtype.DNASequence, err error) {
 func HandleGenbank(lines []string) (annotatedseq wtype.DNASequence, err error) {
 
 	if lines[0][0:5] == `LOCUS` {
-		// fmt.Println("in Locus")
+		// // fmt.Println("in Locus")
 		name, _, _, circular, _, err := Locusline(lines[0])
 
 		if err != nil {
@@ -187,26 +187,26 @@ func HandleGenbank(lines []string) (annotatedseq wtype.DNASequence, err error) {
 			return annotatedseq, err
 		}*/
 		seq := HandleSequence(lines)
-		// // fmt.Println("foundout this seq", seq)
+		// // // fmt.Println("foundout this seq", seq)
 
 		features := HandleFeatures(lines, seq, "DNA")
-		// // fmt.Println("found these features", features)
+		// // // fmt.Println("found these features", features)
 		annotatedseq, err = wtype.MakeAnnotatedSeq(name, seq, circular, features)
-		// // fmt.Println("annotated", annotatedseq)
+		// // // fmt.Println("annotated", annotatedseq)
 	} else {
-		err = fmt.Errorf("no LOCUS found on first line "+"Found:", lines[0][0:5])
+		err = fmt.Errorf("no LOCUS found on first line")
 	}
 	return
 }
 func Locusline(line string) (name string, seqlength int, seqtype string, circular bool, date string, err error) {
 
 	fields := strings.SplitN(line, " ", 2)
-	//// fmt.Println("length of fields", len(fields))
+	//// // fmt.Println("length of fields", len(fields))
 
 	restofline := fields[1]
 
 	fields = strings.Split(restofline, " ")
-	//// fmt.Println("length of fields", len(fields))
+	//// // fmt.Println("length of fields", len(fields))
 
 	newarray := make([]string, 0)
 	for _, s := range fields {
@@ -215,7 +215,7 @@ func Locusline(line string) (name string, seqlength int, seqtype string, circula
 		}
 	}
 	fields = newarray
-	//// fmt.Println("length of fields", len(fields))
+	//// // fmt.Println("length of fields", len(fields))
 	//// fmt.Println(fields)
 	if len(fields) > 1 {
 		name = fields[0]
@@ -311,14 +311,14 @@ func Featureline1(line string) (reverse bool, class string, startposition int, e
 				}
 				if ss[1][0] == '>' {
 					ss[1] = ss[1][1:]
-					fmt.Println("trimmed", ss[1])
+					// fmt.Println("trimmed", ss[1])
 				} else if ss[1][0] == '<' {
 					ss[1] = ss[1][1:]
-					fmt.Println("trimmed", ss[1])
+					// fmt.Println("trimmed", ss[1])
 				}
 				endposition, err = strconv.Atoi(strings.TrimRight(ss[1], "\n"))
-				fmt.Println("trimmed", ss[1], "endposition", endposition)
-				fmt.Println("trimmed", s[0:index], "startposition", startposition)
+				// fmt.Println("trimmed", ss[1], "endposition", endposition)
+				// fmt.Println("trimmed", s[0:index], "startposition", startposition)
 				if err != nil {
 					fmt.Println(err.Error())
 				}
@@ -332,7 +332,7 @@ func Featureline1(line string) (reverse bool, class string, startposition int, e
 func Featureline2(line string) (description string, found bool) {
 
 	fields := strings.Split(line, " ")
-	//// fmt.Println("length of fields", len(fields))
+	//// // fmt.Println("length of fields", len(fields))
 
 	// reassemble fields to preserve linked items with spaces e.g. "Green fluorescent protein"
 	for i, field := range fields {
@@ -365,12 +365,12 @@ func Featureline2(line string) (description string, found bool) {
 		} else if strings.Contains(line, `/gene`) {
 			parts := strings.SplitAfterN(line, `="`, 2)
 			if len(parts) == 2 {
-				// fmt.Println("line", line)
-				// fmt.Println("parts", parts)
-				// fmt.Println("len(parts) =2 yes")
-				// fmt.Println("parts[1]", parts[1])
+				// // fmt.Println("line", line)
+				// // fmt.Println("parts", parts)
+				// // fmt.Println("len(parts) =2 yes")
+				// // fmt.Println("parts[1]", parts[1])
 				description = parts[1] //strings.Replace(parts[1], " ", "_", -1)
-				// fmt.Println("Huh!", description)
+				// // fmt.Println("Huh!", description)
 				found = true
 				return
 			}
@@ -378,12 +378,12 @@ func Featureline2(line string) (description string, found bool) {
 		} else if strings.Contains(line, `/product`) {
 			parts := strings.SplitAfterN(line, `="`, 2)
 			if len(parts) == 2 {
-				// fmt.Println("line", line)
-				// fmt.Println("parts", parts)
-				// fmt.Println("len(parts) =2 yes")
-				// fmt.Println("parts[1]", parts[1])
+				// // fmt.Println("line", line)
+				// // fmt.Println("parts", parts)
+				// // fmt.Println("len(parts) =2 yes")
+				// // fmt.Println("parts[1]", parts[1])
 				description = parts[1] //strings.Replace(parts[1], " ", "_", -1)
-				// fmt.Println("Huh!", description)
+				// // fmt.Println("Huh!", description)
 				found = true
 				return
 			}
@@ -395,12 +395,12 @@ func Featureline2(line string) (description string, found bool) {
 		if strings.Contains(line, `/product`) {
 			parts := strings.SplitAfterN(line, `="`, 2)
 			if len(parts) == 2 {
-				// fmt.Println("line", line)
-				// fmt.Println("parts", parts)
-				// fmt.Println("len(parts) =2 yes")
-				// fmt.Println("parts[1]", parts[1])
+				// // fmt.Println("line", line)
+				// // fmt.Println("parts", parts)
+				// // fmt.Println("len(parts) =2 yes")
+				// // fmt.Println("parts[1]", parts[1])
 				description = parts[1] //strings.Replace(parts[1], " ", "_", -1)
-				// fmt.Println("Huh!", description)
+				// // fmt.Println("Huh!", description)
 				found = true
 				return
 			}
@@ -439,19 +439,19 @@ func DetectFeature(lines []string) (detected bool, startlineindex int, endlinein
 		}
 		if startlineindex != -1 && endlineindex != 0 {
 			detected = true
-			//		// fmt.Println("Yay, detected")
+			//		// // fmt.Println("Yay, detected")
 			return
 		}
-		// fmt.Println("linerz", lines[i])
+		// // fmt.Println("linerz", lines[i])
 		if string(lines[i][7]) != " " {
 			startlineindex = i
-			// fmt.Println("start:", i, lines[i])
+			// // fmt.Println("start:", i, lines[i])
 		}
 
 		_, found := Featureline2(lines[i])
 		if found {
 			endlineindex = i + 1
-			//		// fmt.Println("end:", i, lines[i])
+			//		// // fmt.Println("end:", i, lines[i])
 		}
 	}
 
@@ -477,14 +477,14 @@ func HandleFeatures(lines []string, seq string, seqtype string) (features []wtyp
 		if lines[i][0:8] == "FEATURES" {
 			// fmt.Println(lines[i])
 			lines = lines[i+1 : len(lines)]
-			// fmt.Println("broken")
+			// // fmt.Println("broken")
 			// fmt.Println(lines)
 			//// fmt.Println(line)
 			//// fmt.Println(lines[i])
 			break
 		}
 	}
-	// fmt.Println("broken again")
+	// // fmt.Println("broken again")
 	linesatstart := lines
 
 	for i := 0; i < len(linesatstart); i++ {
@@ -497,12 +497,12 @@ func HandleFeatures(lines []string, seq string, seqtype string) (features []wtyp
 		}
 
 		detected, start, end := DetectFeature(lines)
-		// fmt.Println("start", start, "end", end)
+		// // fmt.Println("start", start, "end", end)
 		if detected {
-			// fmt.Println("detected!!!!!!!!!!!!!", lines[start:end])
+			// // fmt.Println("detected!!!!!!!!!!!!!", lines[start:end])
 
 			description, reverse, class, startposition, endposition, err := HandleFeature(lines[start:end])
-			// fmt.Println("featuredectected: ", description, reverse, class, startposition, endposition, err)
+			// // fmt.Println("featuredectected: ", description, reverse, class, startposition, endposition, err)
 			if err != nil {
 				panic(err.Error())
 			}
@@ -511,7 +511,7 @@ func HandleFeatures(lines []string, seq string, seqtype string) (features []wtyp
 				rev = "Reverse"
 			}
 
-			fmt.Println("seq,start,end = ", seq, startposition, endposition)
+			// fmt.Println("seq,start,end = ", seq, startposition, endposition)
 
 			// Warning! this needs to change to handle cases where start and position assignment has failed rather than just ignoring the problem
 			if startposition != 0 && endposition != 0 {
@@ -529,7 +529,7 @@ func HandleFeatures(lines []string, seq string, seqtype string) (features []wtyp
 								}
 
 							} else {
-								fmt.Println("sequence", description, seq, "startposition", startposition, "endposition", endposition, " not valid")
+								// fmt.Println("sequence", description, seq, "startposition", startposition, "endposition", endposition, " not valid")
 				*/
 
 			}
@@ -554,7 +554,7 @@ func HandleSequence(lines []string) (dnaseq string) {
 	if len(lines) > 0 {
 		for i := 0; i < originallines; i++ {
 
-			// fmt.Println("lines", lines[i])
+			// // fmt.Println("lines", lines[i])
 			if len([]byte(lines[0])) > 0 {
 				if originfound == false {
 					if lines[i][0:6] == "ORIGIN" {
@@ -563,7 +563,7 @@ func HandleSequence(lines []string) (dnaseq string) {
 				}
 				if originfound {
 
-					// fmt.Println("i+1", i, len(lines))
+					// // fmt.Println("i+1", i, len(lines))
 					// fmt.Println(lines[i+1])
 					lines = lines[i+1 : originallines]
 					seq := strings.Join(lines, "")
@@ -576,7 +576,7 @@ func HandleSequence(lines []string) (dnaseq string) {
 					seq = strings.Replace(seq, "//", "", -1)
 					dnaseq = seq
 
-					// fmt.Println("dnaseq:", dnaseq)
+					// // fmt.Println("dnaseq:", dnaseq)
 					return
 				}
 			}

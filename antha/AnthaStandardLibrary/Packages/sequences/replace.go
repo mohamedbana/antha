@@ -45,11 +45,11 @@ func FindSeqsinSeqs(bigseq string, smallseqs []string) (seqsfound []search.Thing
 
 	var seqfound search.Thingfound
 	seqsfound = make([]search.Thingfound, 0)
-	fmt.Println("looking for ", smallseqs)
+	// fmt.Println("looking for ", smallseqs)
 	for _, seq := range smallseqs {
 		seq = strings.ToUpper(seq)
 		if strings.Contains(bigseq, seq) {
-			fmt.Println("Fwd seq found")
+			// fmt.Println("Fwd seq found")
 			seqfound.Thing = seq
 			seqfound.Positions = search.Findall(bigseq, seq)
 			seqsfound = append(seqsfound, seqfound)
@@ -58,7 +58,7 @@ func FindSeqsinSeqs(bigseq string, smallseqs []string) (seqsfound []search.Thing
 	for _, seq := range smallseqs {
 		revseq := RevComp(seq)
 		if strings.Contains(bigseq, revseq) {
-			fmt.Println("rev seq found")
+			// fmt.Println("rev seq found")
 			seqfound.Thing = revseq
 			seqfound.Positions = search.Findall(bigseq, revseq)
 			seqfound.Reverse = true
@@ -98,7 +98,7 @@ func ReplaceBycomplement(sequence, thingtoreplace string, otherseqstoavoid []str
 			newseq := strings.Replace(sequence, thingtoreplace, replacement, -1)
 			checksitesfoundagain := FindSeqsinSeqs(newseq, allthingstoavoid)
 			if len(checksitesfoundagain) == 0 {
-				fmt.Println("all things removed")
+				// fmt.Println("all things removed")
 				return replacement, err
 			}
 
@@ -111,7 +111,7 @@ func ReplaceBycomplement(sequence, thingtoreplace string, otherseqstoavoid []str
 			newseq := strings.Replace(sequence, thingtoreplace, replacement, -1)
 			checksitesfoundagain := search.Findallthings(newseq, allthingstoavoid)
 			if len(checksitesfoundagain) == 0 {
-				fmt.Println("all things removed, second try")
+				// fmt.Println("all things removed, second try")
 				return replacement, err
 			}
 			if i+2 == len(thingtoreplace) {
@@ -141,7 +141,7 @@ func RemoveSiteOnestrand(sequence wtype.DNASequence, enzymeseq string, otherseqs
 		newseq.Seq = strings.Replace(sequence.Seq, enzymeseq, replacement, -1)
 		checksitesfoundagain := FindSeqsinSeqs(newseq.Seq, allthingstoavoid)
 		if len(checksitesfoundagain) == 0 {
-			fmt.Println("all things removed, first try")
+			// fmt.Println("all things removed, first try")
 			return
 		}
 	}
@@ -153,7 +153,7 @@ func RemoveSiteOnestrand(sequence wtype.DNASequence, enzymeseq string, otherseqs
 		newseq.Seq = strings.Replace(sequence.Seq, enzymeseq, replacement, -1)
 		checksitesfoundagain := search.Findallthings(newseq.Seq, allthingstoavoid)
 		if len(checksitesfoundagain) == 0 {
-			fmt.Println("all things removed, second try")
+			// fmt.Println("all things removed, second try")
 			return
 		}
 		if i+2 == len(enzymeseq) {
@@ -176,7 +176,7 @@ func RemoveSite(sequence wtype.DNASequence, enzyme wtype.RestrictionEnzyme, othe
 	allthingstoavoid = append(allthingstoavoid, RevComp(enzyme.RecognitionSequence))
 
 	seqsfound := FindSeqsinSeqs(sequence.Seq, []string{enzyme.RecognitionSequence})
-	fmt.Println("RemoveSite: ", seqsfound)
+	// fmt.Println("RemoveSite: ", seqsfound)
 	if len(seqsfound) == 0 {
 		return
 	}
@@ -391,7 +391,7 @@ func AAPosition(dnaposition int) (aaposition int) {
 func CodonOptions(codon string) (replacementoptions []string) {
 
 	aa := DNAtoAASeq([]string{codon})
-	fmt.Println("aa: ", aa, "for ", codon)
+	// fmt.Println("aa: ", aa, "for ", codon)
 
 	replacementoptions = RevCodonTable[aa]
 	return
@@ -421,16 +421,16 @@ func ReplaceCodoninORF(sequence wtype.DNASequence, startandendoforf StartEndPair
 			if err != nil {
 				fmt.Println(err.Error())
 			}
-			fmt.Println("STATUS of codon from position:", orf.DNASeq, position, (position - startandendoforf[0] - 1))
-			fmt.Println("codon to change:", codontochange, "pair", pair)
+			// fmt.Println("STATUS of codon from position:", orf.DNASeq, position, (position - startandendoforf[0] - 1))
+			// fmt.Println("codon to change:", codontochange, "pair", pair)
 
 			options := CodonOptions(codontochange)
-			fmt.Println("options:", options)
+			// fmt.Println("options:", options)
 			for _, option := range options {
 				tempseq := ReplacePosition(sequence.Seq, pair, option)
-				fmt.Println("tempseq with replacedcodon: ", tempseq, "pair: ", pair, "option: ", option)
+				// fmt.Println("tempseq with replacedcodon: ", tempseq, "pair: ", pair, "option: ", option)
 				seqslice := tempseq[startandendoforf[0]-1 : startandendoforf[1]]
-				fmt.Println("seqslice!!!", seqslice)
+				// fmt.Println("seqslice!!!", seqslice)
 				temporf, _ := FindORF(seqslice)
 
 				sitesfound := search.Findallthings(tempseq, seqstoavoid)
@@ -465,7 +465,7 @@ func ReplacePosition(sequence string, position StartEndPair, replacement string)
 func Codonfromposition(sequence string, dnaposition int) (codontoreturn string, position StartEndPair, err error) {
 
 	nucleotides := []rune(sequence)
-	//fmt.Println("codons=", string(codons))
+	//// fmt.Println("codons=", string(codons))
 	res := ""
 	aas := make([]string, 0)
 	codon := ""

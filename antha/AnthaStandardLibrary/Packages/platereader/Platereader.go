@@ -31,7 +31,7 @@ import (
 )
 
 func ReadAbsorbance(plate *wtype.LHPlate, solution *wtype.LHComponent, wavelength float64) (abs wtype.Absorbance) {
-	abs.Reading = 1.0 // obviously placeholder
+	abs.Reading = 0.0 // obviously placeholder
 	abs.Wavelength = wavelength
 	// add calculation to work out pathlength from volume and well geometry abs.Pathlength
 
@@ -59,7 +59,7 @@ func EstimatePathLength(plate *wtype.LHPlate, volume wunit.Volume) (pathlength w
 
 	if plate.Welltype.Bottom == 0 /* i.e. flat */ && plate.Welltype.Shape().LengthUnit == "mm" {
 		wellarea, err := plate.Welltype.CalculateMaxCrossSectionArea()
-		fmt.Println("wellarea", wellarea.ToString())
+		// fmt.Println("wellarea", wellarea.ToString())
 		fmt.Println(plate.Welltype.Xdim, plate.Welltype.Ydim, plate.Welltype.Zdim, plate.Welltype.Shape())
 		if err != nil {
 
@@ -72,7 +72,7 @@ func EstimatePathLength(plate *wtype.LHPlate, volume wunit.Volume) (pathlength w
 
 		if volume.Unit().PrefixedSymbol() == "ul" && wellvol.Unit().PrefixedSymbol() == "ul" && wellarea.Unit().PrefixedSymbol() == "mm^2" || wellarea.Unit().PrefixedSymbol() == "mm" /* mm generated previously - wrong and needs fixing */ {
 			ratio := volume.RawValue() / wellvol.RawValue()
-			fmt.Println("ratio", ratio)
+			// fmt.Println("ratio", ratio)
 			wellheightinmm := wellvol.RawValue() / wellarea.RawValue()
 
 			pathlengthinmm := wellheightinmm * ratio
@@ -82,7 +82,7 @@ func EstimatePathLength(plate *wtype.LHPlate, volume wunit.Volume) (pathlength w
 		} else {
 			fmt.Println(volume.Unit().PrefixedSymbol(), wellvol.Unit().PrefixedSymbol(), wellarea.Unit().PrefixedSymbol(), wellarea.ToString())
 		}
-		//fmt.Println("pathlength", pathlength.ToString())
+		//// fmt.Println("pathlength", pathlength.ToString())
 	} else {
 		err = fmt.Errorf("Can't yet estimate pathlength for this welltype shape unit ", plate.Welltype.Shape().LengthUnit, "or non flat bottom type")
 	}
@@ -118,9 +118,9 @@ func Concentration(pathlengthcorrected wtype.Absorbance, molarabsorbtivityatwave
 	ε := molarabsorbtivityatwavelengthLpermolpercm // L/Mol/cm
 
 	concfloat := A.Reading / (float64(l) * ε) // Mol/L
-	fmt.Println("concfloat", concfloat)
+	// fmt.Println("concfloat", concfloat)
 	conc = wunit.NewConcentration(concfloat, "M/l")
-	fmt.Println("concfloat", conc)
+	// fmt.Println("concfloat", conc)
 	return
 }
 

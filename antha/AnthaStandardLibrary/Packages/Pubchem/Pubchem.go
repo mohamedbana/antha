@@ -235,7 +235,7 @@ func MakeMolecule(name string) (molecule Molecule) {
 	var pubchemtable Pubchemtable
 	err := json.Unmarshal(output, &pubchemtable)
 	if err != nil {
-		fmt.Println("error:", err)
+		// fmt.Println("error:", err)
 	}
 
 	molecule.Moleculename = name

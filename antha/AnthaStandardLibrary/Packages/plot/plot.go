@@ -86,7 +86,7 @@ func Plot(Xvalues []float64, Yvaluearray [][]float64) (plt *plot.Plot) {
 	// second, each point is the median x and y value with the
 	// error bars showing the minimum and maximum values.
 	/*
-	   	fmt.Println("pts", pts)
+	   	// fmt.Println("pts", pts)
 	   	mean95, err := plotutil.NewErrorPoints(plotutil.MeanAndConf95, pts...)
 	   	if err != nil {
 	   		panic(err)
@@ -157,27 +157,27 @@ func Plotfromspreadsheet(sheet *xlsx.Sheet, Xdatarange []string, Ydatarangearray
 
 			xys := make(plotter.XYs, len(Ydatarangearray))
 
-			fmt.Println("going here3")
-			fmt.Println("Xdatapoint= ", Xdatapoint)
+			// fmt.Println("going here3")
+			// fmt.Println("Xdatapoint= ", Xdatapoint)
 
 			xrow, xcol, err := spreadsheet.A1formattorowcolumn(Xdatapoint)
 			if err != nil {
 				panic(err)
 			}
-			fmt.Println("row, col line 155:", xrow, xcol)
+			// fmt.Println("row, col line 155:", xrow, xcol)
 			xpoint := sheet.Rows[xcol].Cells[xrow]
-			fmt.Println("datapoint", Xdatarangeindex, Xdatapoint, "xpoint = ", xpoint)
+			// fmt.Println("datapoint", Xdatarangeindex, Xdatapoint, "xpoint = ", xpoint)
 
 			// get each y point and work out average
 
 			//yvalues := make([]xlsx.Cell, 0)
 			yfloats := make([]float64, 0)
-			for ydatarangearrayindex, Ydatarange := range Ydatarangearray {
+			for _, Ydatarange := range Ydatarangearray {
 				yrow, ycol, err := spreadsheet.A1formattorowcolumn(Ydatarange[Xdatarangeindex])
 				if err != nil {
 					panic(err)
 				}
-				fmt.Println("row, col line 148:", yrow, ycol)
+				// fmt.Println("row, col line 148:", yrow, ycol)
 				//ypoint := sheet.Cell(yrow, ycol)
 				ypoint := sheet.Rows[ycol].Cells[yrow]
 				//yvalues = append(yvalues, ypoint)
@@ -186,7 +186,7 @@ func Plotfromspreadsheet(sheet *xlsx.Sheet, Xdatarange []string, Ydatarangearray
 					panic(err)
 				}
 				yfloats = append(yfloats, yfloat)
-				fmt.Println("datapoint", Xdatarangeindex, ydatarangearrayindex, Ydatarange[ydatarangearrayindex], "Ycol", ycol, "yrow", yrow, "ypoint = ", ypoint)
+				// fmt.Println("datapoint", Xdatarangeindex, ydatarangearrayindex, Ydatarange[ydatarangearrayindex], "Ycol", ycol, "yrow", yrow, "ypoint = ", ypoint)
 
 				//n, m := 5, 10
 				//pts := make([]plotter.XYer, len(Xdatarange))
@@ -212,30 +212,30 @@ func Plotfromspreadsheet(sheet *xlsx.Sheet, Xdatarange []string, Ydatarangearray
 				panic(err)
 			}
 
-			fmt.Println("datapoint", Xdatarangeindex, Xdatapoint, "xpoint = ", xpoint)
+			// fmt.Println("datapoint", Xdatarangeindex, Xdatapoint, "xpoint = ", xpoint)
 			if err != nil {
 				panic(err)
 			}
-			fmt.Println("going here2")
+			// fmt.Println("going here2")
 			//center := float64(i)
 			for j := range xys {
-				fmt.Println("going here")
+				// fmt.Println("going here")
 				fmt.Println(ptsindex)
 				//x, _ := pts[l].XY(j)
 				xys[j].X = xfloat
-				fmt.Println("xfloat", j, xfloat)
+				// fmt.Println("xfloat", j, xfloat)
 				xys[j].Y = yfloats[j]
-				fmt.Println("yfloats[j]", j, yfloats[j])
-				fmt.Println("xysssssssssx", Xdatarangeindex, j, xys)
+				// fmt.Println("yfloats[j]", j, yfloats[j])
+				// fmt.Println("xysssssssssx", Xdatarangeindex, j, xys)
 			}
 			fmt.Println(xys)
 			pts = append(pts, xys) //
 			//pts[Xdatarangeindex] = xys
-			fmt.Println("hello:", pts[Xdatarangeindex])
-			fmt.Println("hello again", pts)
+			// fmt.Println("hello:", pts[Xdatarangeindex])
+			// fmt.Println("hello again", pts)
 		}
 
-		fmt.Println("len(pts)", len(pts))
+		// fmt.Println("len(pts)", len(pts))
 	}
 	plt, err := plot.New()
 
@@ -249,7 +249,7 @@ func Plotfromspreadsheet(sheet *xlsx.Sheet, Xdatarange []string, Ydatarangearray
 	// second, each point is the median x and y value with the
 	// error bars showing the minimum and maximum values.
 
-	//	fmt.Println("pts", pts)
+	//	// fmt.Println("pts", pts)
 	//	mean95, err := plotutil.NewErrorPoints(plotutil.MeanAndConf95, pts...)
 	//	if err != nil {
 	//		panic(err)
