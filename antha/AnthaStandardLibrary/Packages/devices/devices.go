@@ -51,7 +51,25 @@ var (
 			"weightinkg":         1.5,
 			"Width":              0.142, // in m
 			"Depth":              0.099,
-			"Height":             0.0575,
+			"Height":             0.0625,
+		},
+		"3000 T-elm_Liquid": map[string]float64{
+			"dt":                 0.002,  //shaking amplitude diameter in m
+			"maxrpm":             3000,   // maximum shaking speed in rpm
+			"minrpm":             200,    // maximum shaking speed in rpm
+			"shakeaccuracy":      25,     // +/- in rpm
+			"zeroposaccuracy":    0.0001, //in m
+			"heatupRate":         7,      // degrees C per minute
+			"maxtemp":            99,     // in deg C
+			"tempaccuracy":       0.1,    // in deg C
+			"tempuniformity":     0.5,    // at 45 deg C
+			"environmaxtemp":     45,     // deg C
+			"environmintemp":     5,
+			"enrironmaxhumidity": 80, //percent
+			"weightinkg":         1.5,
+			"Width":              0.142, // in m
+			"Depth":              0.099,
+			"Height":             0.0430,
 		},
 		"InhecoStaticOnDeck": map[string]float64{
 			"Height": 0.0575, // height in m
