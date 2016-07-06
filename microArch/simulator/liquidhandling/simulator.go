@@ -55,7 +55,7 @@ type VirtualLiquidHandler struct {
 }
 
 //Create a new VirtualLiquidHandler which mimics an LHDriver
-func NewVirtualLiquidHandler(props *liquidhandling.LHProperties) (*VirtualLiquidHandler, error) {
+func NewVirtualLiquidHandler(props *liquidhandling.LHProperties) *VirtualLiquidHandler {
     var vlh VirtualLiquidHandler
 
     vlh.properties = props.Dup()
@@ -63,7 +63,7 @@ func NewVirtualLiquidHandler(props *liquidhandling.LHProperties) (*VirtualLiquid
     vlh.max_error = simulator.SeverityNone
     vlh.errors = make([]*simulator.SimulationError, 0)
 
-    return &vlh, nil
+    return &vlh
 }
 
 //Write to the log

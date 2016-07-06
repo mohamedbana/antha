@@ -23,24 +23,32 @@
 package liquidhandling
 
 import (
-	"github.com/antha-lang/antha/microArch/driver"
+    "testing"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	. "github.com/antha-lang/antha/microArch/factory"
+	"github.com/antha-lang/antha/microArch/simulator"
 )
 
 type LayoutParams struct {
     Name    string
-    Xpos    float32
-    Ypos    float32
-    Zpos    float32
+    Xpos    float64
+    Ypos    float64
+    Zpos    float64
+}
+
+type UnitParams struct {
+    Value   float64
+    Unit    string
 }
 
 type ChannelParams struct {
     Name            string
-    Minvol          string
-    Maxvol          string
-    Minrate         string
-    Maxrate         string
+    Minvol          UnitParams
+    Maxvol          UnitParams
+    Minrate         UnitParams
+    Maxrate         UnitParams
     multi           int
     Independent     bool
     Orientation     int
@@ -49,10 +57,10 @@ type ChannelParams struct {
 
 func makeLHChannelParameter(cp ChannelParams) *wtype.LHChannelParameter {
     return wtype.NewLHChannelParameter(cp.Name,
-                                       wtype.NewVolume(cp.Minvol),
-                                       wtype.NewVolume(cp.Maxvol),
-                                       wtype.NewFlowRate(cp.Minrate),
-                                       wtype.NewFlowRate(cp.Maxrate),
+                                       wunit.NewVolume(cp.Minvol.Value, cp.Minvol.Unit),
+                                       wunit.NewVolume(cp.Maxvol.Value, cp.Maxvol.Unit),
+                                       wunit.NewFlowRate(cp.Minrate.Value, cp.Minrate.Unit),
+                                       wunit.NewFlowRate(cp.Maxrate.Value, cp.Maxrate.Unit),
                                        cp.multi,
                                        cp.Independent,
                                        cp.Orientation,
@@ -60,27 +68,27 @@ func makeLHChannelParameter(cp ChannelParams) *wtype.LHChannelParameter {
 }
 
 type AdaptorParams struct {
-    ChannelParams
-    Name string
-    Mfg  string
+    Name      string
+    Mfg       string
+    Channel   ChannelParams
 }
 
 func makeLHAdaptor(ap AdaptorParams) *wtype.LHAdaptor {
     return wtype.NewLHAdaptor(ap.Name,
                               ap.Mfg,
-                              makeLHChannelParameter(AdaptorParams.ChannelParams))
+                              makeLHChannelParameter(ap.Channel))
 }
 
 type HeadParams struct {
-    ChannelParams
     Name        string
     Mfg         string
+    Channel     ChannelParams
     Adaptor     AdaptorParams
 }
 
 func makeLHHead(hp HeadParams) *wtype.LHHead {
-    ret := wtype.NewLHHead(hp.Name, hp.Mfg, makeLHChannelParameter(HeadParams.ChannelParams))
-    ret.Adaptor = makeLHAdaptor(cp.Adaptor)
+    ret := wtype.NewLHHead(hp.Name, hp.Mfg, makeLHChannelParameter(hp.Channel))
+    ret.Adaptor = makeLHAdaptor(hp.Adaptor)
     return ret
 }
 
@@ -129,3 +137,82 @@ func makeLHProperties(p LHPropertiesParams) *liquidhandling.LHProperties {
 
     return lhp
 }
+
+
+/*
+ *######################################### Test Data
+ */
+
+var valid_props = LHPropertiesParams{
+    "Device Name",
+    "Device Manufacturer",
+    []LayoutParams{
+        LayoutParams{"position1" ,   0.0,   0.0,   0.0},
+        LayoutParams{"position2" , 100.0,   0.0,   0.0,},
+        LayoutParams{"position3" , 200.0,   0.0,   0.0},
+        LayoutParams{"position4" ,   0.0, 100.0,   0.0},
+        LayoutParams{"position5" , 100.0, 100.0,   0.0},
+        LayoutParams{"position6" , 200.0, 100.0,   0.0},
+        LayoutParams{"position7" ,   0.0, 200.0,   0.0},
+        LayoutParams{"position8" , 100.0, 200.0,   0.0},
+        LayoutParams{"position9" , 200.0, 200.0,   0.0},
+    },
+    []HeadParams{
+        HeadParams{
+            "Head0 Name",
+            "Head0 Manufacturer",
+            ChannelParams{
+                "Head0 ChannelParams",      //Name
+                UnitParams{0.1, "ul"},      //min volume
+                UnitParams{1.,  "ml"},      //max volume
+                UnitParams{0.1, "ml/min"},  //min flowrate
+                UnitParams{10., "ml/min",}, //max flowrate
+                8,                          //multi
+                false,                      //independent
+                0,                          //orientation
+                0,                          //head
+            },
+            AdaptorParams{
+                "Head0 Adaptor",
+                "Head0 Adaptor Manufacturer",
+                ChannelParams{
+                    "Head0 Adaptor ChannelParams",  //Name
+                    UnitParams{0.1, "ul"},          //min volume
+                    UnitParams{1.,  "ml"},          //max volume
+                    UnitParams{0.1, "ml/min"},      //min flowrate
+                    UnitParams{10., "ml/min",},     //max flowrate
+                    8,                              //multi
+                    false,                          //independent
+                    0,                              //orientation
+                    0,                              //head
+                },
+            },
+        },
+    },
+    []string{"position1","position2",},             //Tip_preferences
+    []string{"position3","position4",},             //Input_preferences
+    []string{"position5","position6",}, //Output_preferences
+    []string{"position7",},             //Tipwaste_preferences
+    []string{"position8",},             //Wash_preferences
+    []string{"position9",},             //Waste_preferences
+}
+
+
+/*
+ *######################################### Testing Begins
+ */
+
+
+func TestNewVirtualLiquidHandler_ValidProps(t *testing.T) {
+    lhp := makeLHProperties(valid_props)
+    vlh := NewVirtualLiquidHandler(lhp)
+
+    errors, max_severity := vlh.GetErrors()
+    if len(errors) > 0 {
+        t.Error("Unexpected Error: %v", errors)
+    } else if max_severity != simulator.SeverityNone {
+        t.Error("Severty should be SeverityNone, instead got: %v", max_severity)
+    }
+}
+
+
