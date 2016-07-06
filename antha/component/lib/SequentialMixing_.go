@@ -173,7 +173,7 @@ type SequentialMixingSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "SequentialMixing",
+	if err := addComponent(Component{Name: "SequentialMixing",
 		Constructor: SequentialMixingNew,
 		Desc: ComponentDesc{
 			Desc: "Protocol to Demonstrate how to perform sequential mixing using the example of\nmaking a serial dilution series from a solution and diluent\n",
@@ -188,5 +188,7 @@ func init() {
 				{Name: "Dilutions", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

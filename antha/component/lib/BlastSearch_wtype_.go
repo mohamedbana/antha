@@ -36,6 +36,7 @@ func _BlastSearch_wtypeSteps(_ctx context.Context, _input *BlastSearch_wtypeInpu
 
 	var err error
 	var hits []biogo.Hit
+	var hitsummary string
 
 	_output.AnthaSeq = _input.DNA
 
@@ -55,11 +56,16 @@ func _BlastSearch_wtypeSteps(_ctx context.Context, _input *BlastSearch_wtypeInpu
 
 	} //else {
 
-	_output.Hits = fmt.Sprintln(blast.HitSummary(hits))
+	hitsummary, err = blast.HitSummary(hits, 10, 10)
+
+	_output.Hits = hits
+	_output.Hitssummary = hitsummary
+	fmt.Println(_output.Hitssummary)
 
 	// Rename Sequence with ID of top blast hit
 	_output.AnthaSeq.Nm = hits[0].Id
 	//}
+	_output.Warning = err
 
 }
 
@@ -123,14 +129,18 @@ type BlastSearch_wtypeInput struct {
 }
 
 type BlastSearch_wtypeOutput struct {
-	AnthaSeq wtype.DNASequence
-	Hits     string
+	AnthaSeq    wtype.DNASequence
+	Hits        []biogo.Hit
+	Hitssummary string
+	Warning     error
 }
 
 type BlastSearch_wtypeSOutput struct {
 	Data struct {
-		AnthaSeq wtype.DNASequence
-		Hits     string
+		AnthaSeq    wtype.DNASequence
+		Hits        []biogo.Hit
+		Hitssummary string
+		Warning     error
 	}
 	Outputs struct {
 	}
@@ -146,6 +156,8 @@ func init() {
 				{Name: "DNA", Desc: "", Kind: "Parameters"},
 				{Name: "AnthaSeq", Desc: "", Kind: "Data"},
 				{Name: "Hits", Desc: "", Kind: "Data"},
+				{Name: "Hitssummary", Desc: "", Kind: "Data"},
+				{Name: "Warning", Desc: "", Kind: "Data"},
 			},
 		},
 	}); err != nil {
