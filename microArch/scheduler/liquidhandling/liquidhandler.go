@@ -32,6 +32,7 @@ import (
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
 	simulator_lh "github.com/antha-lang/antha/microArch/simulator/liquidhandling"
+	"github.com/antha-lang/antha/microArch/simulator"
 )
 
 // the liquid handler structure defines the interface to a particular liquid handling
@@ -141,9 +142,10 @@ func (this *Liquidhandler) Simulate(request *LHRequest) error {
 	}
 
 	// set up the simulator
-    vlh,err := simulator_lh.NewVirtualLiquidHandler(this.Properties)
-    if err != nil {
-        return err
+    vlh := simulator_lh.NewVirtualLiquidHandler(this.Properties)
+    //check we didn't hit a catastrophic error
+    if vlh.GetErrorSeverity() == simulator.SeverityError {
+        return vlh.GetWorstError()
     }
 
 	for _, ins := range instructions {

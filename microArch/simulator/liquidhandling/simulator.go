@@ -51,6 +51,7 @@ type VirtualLiquidHandler struct {
     //   Head properties
     errors      []*simulator.SimulationError
     max_error   simulator.ErrorSeverity
+    worst_error *simulator.SimulationError
     log []string
 }
 
@@ -60,8 +61,8 @@ func NewVirtualLiquidHandler(props *liquidhandling.LHProperties) *VirtualLiquidH
 
     vlh.properties = props.Dup()
     vlh.log = make([]string, 0)
-    vlh.max_error = simulator.SeverityNone
     vlh.errors = make([]*simulator.SimulationError, 0)
+    vlh.worst_error = nil
 
     return &vlh
 }
@@ -78,15 +79,28 @@ func (self *VirtualLiquidHandler) SaveLog(filename string) {
 
 //Get the list of errors, and the maximum error severity
 func (self *VirtualLiquidHandler) GetErrors() ([]*simulator.SimulationError, simulator.ErrorSeverity) {
-    return self.errors, self.max_error
+    return self.errors, self.GetErrorSeverity()
 }
 
 //AddError Add an error
 func (self *VirtualLiquidHandler) AddError(err *simulator.SimulationError) {
-    if err.Severity() > self.max_error {
-        self.max_error = err.Severity()
+    if err.Severity() > self.GetErrorSeverity() {
+        self.worst_error = err
     }
     self.errors = append(self.errors, err)
+}
+
+//GetErrorSeverity get the severity of the worst error encountered so far
+func (self *VirtualLiquidHandler) GetErrorSeverity() simulator.ErrorSeverity {
+    if self.worst_error != nil {
+        return self.worst_error.Severity()
+    }
+    return simulator.SeverityNone
+}
+
+//GetWorstError get the worst error encountered so far
+func (self *VirtualLiquidHandler) GetWorstError() *simulator.SimulationError {
+    return self.worst_error
 }
 
 //Move command - used
