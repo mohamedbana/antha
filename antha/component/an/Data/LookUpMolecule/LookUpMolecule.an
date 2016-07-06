@@ -32,15 +32,25 @@ Requirements {
 Setup {
 } 
 Steps {
-	
+	var err error
+
 	// method of making molecule from name
-	Compoundprops = pubchem.MakeMolecule(Compound)
+	Compoundprops, err = pubchem.MakeMolecule(Compound)
+        if err != nil {
+                panic(err)
+        }
 	
 	// or returning properties in JSON structure
-	Jsonstring = pubchem.Compoundproperties(Compound)
+	Jsonstring, err = pubchem.Compoundproperties(Compound)
+        if err != nil {
+                panic(err)
+        }
 	
 	// method of making a list of compounds from names
-	List = pubchem.MakeMolecules(Compoundlist)
+	List, err = pubchem.MakeMolecules(Compoundlist)
+        if err != nil {
+                panic(err)
+        }
 	
 	// Print out status 
 	Status = fmt.Sprintln("Returned data from", 

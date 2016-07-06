@@ -29,12 +29,10 @@ import (
 	//"github.com/antha-lang/antha/antha/anthalib/wtype"
 )
 
-func StockConcentration(nameofmolecule string, massofmoleculeactuallyaddedinG wunit.Mass, diluent string, totalvolumeinL wunit.Volume) (actualconc wunit.Concentration) {
+func StockConcentration(nameofmolecule string, massofmoleculeactuallyaddedinG wunit.Mass, diluent string, totalvolumeinL wunit.Volume) (actualconc wunit.Concentration, err error) {
 	molecule, err := pubchem.MakeMolecule(nameofmolecule)
-	// TODO(ddn): review separation of go-style APIs which return errors and
-	// antha-style APIs which don't
 	if err != nil {
-		panic(err)
+		return
 	}
 
 	// in particular, the molecular weight
@@ -51,12 +49,10 @@ func StockConcentration(nameofmolecule string, massofmoleculeactuallyaddedinG wu
 	return
 }
 
-func Dilute(moleculename string, stockconc wunit.Concentration, stockvolume wunit.Volume, diluentname string, diluentvoladded wunit.Volume) (dilutedconc wunit.Concentration) {
+func Dilute(moleculename string, stockconc wunit.Concentration, stockvolume wunit.Volume, diluentname string, diluentvoladded wunit.Volume) (dilutedconc wunit.Concentration, err error) {
 	molecule, err := pubchem.MakeMolecule(moleculename)
-	// TODO(ddn): review separation of go-style APIs which return errors and
-	// antha-style APIs which don't
 	if err != nil {
-		panic(err)
+		return
 	}
 
 	stockMperL := stockconc.MolPerL(molecule.MolecularWeight)
