@@ -297,7 +297,7 @@ type Scarfree_designSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Scarfree_design",
+	if err := addComponent(Component{Name: "Scarfree_design",
 		Constructor: Scarfree_designNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -317,5 +317,7 @@ func init() {
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

@@ -185,7 +185,7 @@ type PipetteImage_CMYK_OneByOneSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PipetteImage_CMYK_OneByOne",
+	if err := addComponent(Component{Name: "PipetteImage_CMYK_OneByOne",
 		Constructor: PipetteImage_CMYK_OneByOneNew,
 		Desc: ComponentDesc{
 			Desc: "Generates instructions to pipette out a defined image onto a defined plate by blending cyan magenta yellow and black dyes\n",
@@ -204,5 +204,7 @@ func init() {
 				{Name: "Pixels", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

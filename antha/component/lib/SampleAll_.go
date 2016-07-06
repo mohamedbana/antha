@@ -120,7 +120,7 @@ type SampleAllSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "SampleAll",
+	if err := addComponent(Component{Name: "SampleAll",
 		Constructor: SampleAllNew,
 		Desc: ComponentDesc{
 			Desc: "example protocol demonstrating the use of the SampleAll function\n",
@@ -131,5 +131,7 @@ func init() {
 				{Name: "Sample", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

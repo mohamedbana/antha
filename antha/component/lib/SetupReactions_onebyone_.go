@@ -142,7 +142,7 @@ type SetupReactions_onebyoneSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "SetupReactions_onebyone",
+	if err := addComponent(Component{Name: "SetupReactions_onebyone",
 		Constructor: SetupReactions_onebyoneNew,
 		Desc: ComponentDesc{
 			Desc: "this protocol will set up a specified number of reactions one reaction at a time, i.e. in the following format:\nadd all components into reaction 1 location,\nadd all components into reaction 2 location,\n...,\nadd all components into reaction n location\n",
@@ -160,5 +160,7 @@ func init() {
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

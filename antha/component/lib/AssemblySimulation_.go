@@ -111,7 +111,7 @@ type AssemblySimulationSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "AssemblySimulation",
+	if err := addComponent(Component{Name: "AssemblySimulation",
 		Constructor: AssemblySimulationNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -130,5 +130,7 @@ func init() {
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

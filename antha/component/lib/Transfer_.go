@@ -117,7 +117,7 @@ type TransferSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Transfer",
+	if err := addComponent(Component{Name: "Transfer",
 		Constructor: TransferNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -131,5 +131,7 @@ func init() {
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

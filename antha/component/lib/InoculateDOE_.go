@@ -93,7 +93,7 @@ type InoculateDOESOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "InoculateDOE",
+	if err := addComponent(Component{Name: "InoculateDOE",
 		Constructor: InoculateDOENew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -105,5 +105,7 @@ func init() {
 				{Name: "Seed", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

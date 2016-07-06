@@ -103,7 +103,7 @@ type VolumeFromMassandConcSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "VolumeFromMassandConc",
+	if err := addComponent(Component{Name: "VolumeFromMassandConc",
 		Constructor: VolumeFromMassandConcNew,
 		Desc: ComponentDesc{
 			Desc: "example of how to convert a concentration and mass to a volume\n",
@@ -114,5 +114,7 @@ func init() {
 				{Name: "DNAVol", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

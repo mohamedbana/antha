@@ -133,7 +133,7 @@ type ReactionMixSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "ReactionMix",
+	if err := addComponent(Component{Name: "ReactionMix",
 		Constructor: ReactionMixNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -160,5 +160,7 @@ func init() {
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

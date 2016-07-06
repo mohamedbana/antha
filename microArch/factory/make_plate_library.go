@@ -34,6 +34,9 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 
 	offset := 0.25
 	riserheightinmm := 40.0 - offset
+	shallowriserheightinmm := 20.0 - offset
+	coolerheight := 15.0
+	pcrtuberack496 := 28.0
 	incubatorheightinmm := devices.Shaker["3000 T-elm"]["Height"] * 1000
 
 	inhecoincubatorinmm := devices.Shaker["InhecoStaticOnDeck"]["Height"] * 1000
@@ -136,7 +139,15 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 250, 5, cone, wtype.LHWBU, 5.5, 5.5, 20.4, 1.4, "mm")
 	//plate = wtype.NewLHPlate("pcrplate", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 6.5)
 	//plates[plate.Type] = plate
-	plate = wtype.NewLHPlate("pcrplate_with_cooler", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 15.5)
+	plate = wtype.NewLHPlate("pcrplate_with_cooler", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, coolerheight+0.5)
+	plates[plate.Type] = plate
+
+	// pcr plate with 496rack
+	cone = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
+	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 250, 5, cone, wtype.LHWBU, 5.5, 5.5, 20.4, 1.4, "mm")
+	//plate = wtype.NewLHPlate("pcrplate", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 6.5)
+	//plates[plate.Type] = plate
+	plate = wtype.NewLHPlate("pcrplate_with_496rack", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, pcrtuberack496-2.5)
 	plates[plate.Type] = plate
 
 	// pcr plate skirted (on riser)
@@ -144,6 +155,14 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 200, 5, cone, wtype.LHWBU, 5.5, 5.5, 20.4, 1.4, "mm")
 
 	plate = wtype.NewLHPlate("pcrplate_skirted_riser", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, riserheightinmm-1.25)
+
+	plates[plate.Type] = plate
+
+	// pcr plate skirted (on riser)
+	cone = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
+	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 200, 5, cone, wtype.LHWBU, 5.5, 5.5, 20.4, 1.4, "mm")
+
+	plate = wtype.NewLHPlate("pcrplate_skirted_shallowriser", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, shallowriserheightinmm-1.25)
 
 	plates[plate.Type] = plate
 
@@ -173,6 +192,22 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 
 	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
 	plate = wtype.NewLHPlate("Kombi2mlEpp", "Unknown", 4, 2, 45, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+	plates[plate.Type] = plate
+
+	// Eppendorfrack
+	eppy = wtype.NewShape("cylinder", "mm", 8.2, 8.2, 45)
+
+	wellxoffset = 18.0 // centre of well to centre of neighbouring well in x direction
+	wellyoffset = 18.0 //centre of well to centre of neighbouring well in y direction
+	xstart = 5.0       // distance from top left side of plate to first well
+	ystart = 5.0       // distance from top left side of plate to first well
+	zstart = 7.0       // offset of bottom of deck to bottom of well
+
+	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
+	welltype = wtype.NewLHWell("1.5mlEpp", "", "", "ul", 1500, 25, eppy, wtype.LHWBV, 8.2, 8.2, 45, 4.7, "mm")
+
+	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
+	plate = wtype.NewLHPlate("eppendorfrack425_1.5ml", "Unknown", 4, 2, 45, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
 
 	// greiner 384 well plate flat bottom
@@ -217,6 +252,28 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 
 	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
 	plate = wtype.NewLHPlate("greiner384_riser", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+	plates[plate.Type] = plate
+
+	// greiner 384 well plate flat bottom on shallow riser
+
+	bottomtype = wtype.LHWBFLAT
+	xdim = 4.0
+	ydim = 4.0
+	zdim = 12.0 // modified from 14
+	bottomh = 1.0
+
+	wellxoffset = 4.5                     // centre of well to centre of neighbouring well in x direction
+	wellyoffset = 4.5                     //centre of well to centre of neighbouring well in y direction
+	xstart = -2.5                         // distance from top left side of plate to first well
+	ystart = -2.5                         // distance from top left side of plate to first well
+	zstart = shallowriserheightinmm + 0.5 // offset of bottom of deck to bottom of well
+
+	square = wtype.NewShape("box", "mm", 4, 4, 14)
+	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
+	welltype = wtype.NewLHWell("384flat", "", "", "ul", 125, 10, square, bottomtype, xdim, ydim, zdim, bottomh, "mm")
+
+	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
+	plate = wtype.NewLHPlate("greiner384_shallowriser", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
 
 	// NUNC 1536 well plate flat bottom on riser
@@ -278,11 +335,11 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	zdim = 14.0
 	bottomh = 1.0
 
-	wellxoffset = 4.5            // centre of well to centre of neighbouring well in x direction
-	wellyoffset = 4.5            //centre of well to centre of neighbouring well in y direction
-	xstart = -2.5                // distance from top left side of plate to first well
-	ystart = -2.5                // distance from top left side of plate to first well
-	zstart = riserheightinmm + 3 // offset of bottom of deck to bottom of well
+	wellxoffset = 4.5              // centre of well to centre of neighbouring well in x direction
+	wellyoffset = 4.5              //centre of well to centre of neighbouring well in y direction
+	xstart = -2.5                  // distance from top left side of plate to first well
+	ystart = -2.5                  // distance from top left side of plate to first well
+	zstart = riserheightinmm + 5.5 // offset of bottom of deck to bottom of well
 
 	square = wtype.NewShape("box", "mm", 4, 4, 14)
 	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
@@ -291,6 +348,29 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
 	// greiner one well with 50ml of agar in
 	plate = wtype.NewLHPlate("Agarplateforpicking384_riser", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+	plates[plate.Type] = plate
+
+	// Onewell SBS format Agarplate with colonies on shallowriser (50ml agar) low res
+
+	bottomtype = wtype.LHWBFLAT
+	xdim = 4.0
+	ydim = 4.0
+	zdim = 14.0
+	bottomh = 1.0
+
+	wellxoffset = 4.5                     // centre of well to centre of neighbouring well in x direction
+	wellyoffset = 4.5                     //centre of well to centre of neighbouring well in y direction
+	xstart = -2.5                         // distance from top left side of plate to first well
+	ystart = -2.5                         // distance from top left side of plate to first well
+	zstart = shallowriserheightinmm + 5.5 // offset of bottom of deck to bottom of well
+
+	square = wtype.NewShape("box", "mm", 4, 4, 14)
+	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
+	welltype = wtype.NewLHWell("384flat", "", "", "ul", 125, 10, square, bottomtype, xdim, ydim, zdim, bottomh, "mm")
+
+	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
+	// greiner one well with 50ml of agar in
+	plate = wtype.NewLHPlate("Agarplateforpicking384_shallowriser", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
 
 	// Onewell SBS format Agarplate with colonies on riser (30ml agar) low res

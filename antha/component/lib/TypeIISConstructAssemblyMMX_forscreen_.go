@@ -75,6 +75,7 @@ func _TypeIISConstructAssemblyMMX_forscreenSteps(_ctx context.Context, _input *T
 	// ensure the last step is mixed
 	samples[len(samples)-1].Type = wtype.LTDNAMIX
 	_output.Reaction = execute.MixTo(_ctx, _input.OutPlate.Type, _input.OutputLocation, _input.OutputPlateNum, samples...)
+	_output.Reaction.Extra["label"] = _output.ConstructName
 
 	// incubate the reaction mixture
 	// commented out pending changes to incubate
@@ -180,7 +181,7 @@ type TypeIISConstructAssemblyMMX_forscreenSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "TypeIISConstructAssemblyMMX_forscreen",
+	if err := addComponent(Component{Name: "TypeIISConstructAssemblyMMX_forscreen",
 		Constructor: TypeIISConstructAssemblyMMX_forscreenNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -210,5 +211,7 @@ func init() {
 				{Name: "Sequence", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

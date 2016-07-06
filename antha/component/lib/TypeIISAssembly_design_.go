@@ -87,7 +87,9 @@ func _TypeIISAssembly_designSteps(_ctx context.Context, _input *TypeIISAssembly_
 	}
 
 	// or Look up parts from registry according to properties (this will take a couple of minutes the first time)
-	subparts := igem.FilterRegistry("REPORTER", []string{"Fluorescent", "A "})
+	exacttypeonly := true
+
+	subparts := igem.FilterRegistry("REPORTER", []string{"Fluorescent", "A "}, exacttypeonly)
 	partdetails := igem.LookUp(subparts)
 	//fmt.Println(partdetails)
 
@@ -275,7 +277,7 @@ type TypeIISAssembly_designSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "TypeIISAssembly_design",
+	if err := addComponent(Component{Name: "TypeIISAssembly_design",
 		Constructor: TypeIISAssembly_designNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -297,5 +299,7 @@ func init() {
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

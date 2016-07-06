@@ -263,7 +263,7 @@ type RemoveRestrictionSitesSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "RemoveRestrictionSites",
+	if err := addComponent(Component{Name: "RemoveRestrictionSites",
 		Constructor: RemoveRestrictionSitesNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -281,5 +281,7 @@ func init() {
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

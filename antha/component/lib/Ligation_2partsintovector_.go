@@ -157,7 +157,7 @@ type Ligation_2partsintovectorSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Ligation_2partsintovector",
+	if err := addComponent(Component{Name: "Ligation_2partsintovector",
 		Constructor: Ligation_2partsintovectorNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -186,5 +186,7 @@ func init() {
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

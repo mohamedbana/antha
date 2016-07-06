@@ -118,7 +118,7 @@ type MultichannelTestProtocolSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "MultichannelTestProtocol",
+	if err := addComponent(Component{Name: "MultichannelTestProtocol",
 		Constructor: MultichannelTestProtocolNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -130,5 +130,7 @@ func init() {
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

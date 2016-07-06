@@ -121,7 +121,7 @@ type LookUpMoleculeSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "LookUpMolecule",
+	if err := addComponent(Component{Name: "LookUpMolecule",
 		Constructor: LookUpMoleculeNew,
 		Desc: ComponentDesc{
 			Desc: "example of how to look up molecule properties from pubchem\n",
@@ -135,5 +135,7 @@ func init() {
 				{Name: "Status", Desc: "status to be printed out in manual driver console\n", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

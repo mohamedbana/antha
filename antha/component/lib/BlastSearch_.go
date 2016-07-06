@@ -38,25 +38,6 @@ func _BlastSearchSteps(_ctx context.Context, _input *BlastSearchInput, _output *
 
 	var err error
 	var hits []biogo.Hit
-	/*
-		if Querytype == "PROTEIN" {
-		hits, err = blast.MegaBlastP(Query)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-
-		Hits = fmt.Sprintln(blast.HitSummary(hits))
-
-
-		} else if Querytype == "DNA" {
-		hits, err = blast.MegaBlastN(Query)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-
-		Hits = fmt.Sprintln(blast.HitSummary(hits))
-		}
-	*/
 
 	// Convert the sequence to an anthatype
 	AnthaSeq := wtype.MakeLinearDNASequence(_input.Name, _input.DNA)
@@ -158,7 +139,7 @@ type BlastSearchSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "BlastSearch",
+	if err := addComponent(Component{Name: "BlastSearch",
 		Constructor: BlastSearchNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -169,5 +150,7 @@ func init() {
 				{Name: "Hits", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

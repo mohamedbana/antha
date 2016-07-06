@@ -21,7 +21,6 @@
                 "EcoRI",
 				"SpeI"
             ],
-            "InPlate": "pcrplate_with_cooler",
             "InactivationTemp": "80C",
             "InactivationTime": "1200s",
             "OutPlate": "pcrplate_with_cooler",
@@ -56,7 +55,6 @@
                 "XbaI",
 				"PstI"
             ],
-            "InPlate": "pcrplate_with_cooler",
             "InactivationTemp": "80C",
             "InactivationTime": "1200s",
             "OutPlate": "pcrplate_with_cooler",
@@ -91,7 +89,6 @@
                 "EcoRI",
 				"PstI"
             ],
-            "InPlate": "pcrplate_with_cooler",
             "InactivationTemp": "80C",
             "InactivationTime": "1200s",
             "OutPlate": "pcrplate_with_cooler",

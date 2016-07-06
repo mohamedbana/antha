@@ -126,7 +126,7 @@ type AbsorbanceMeasurementSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "AbsorbanceMeasurement",
+	if err := addComponent(Component{Name: "AbsorbanceMeasurement",
 		Constructor: AbsorbanceMeasurementNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -142,5 +142,7 @@ func init() {
 				{Name: "ActualConcentration", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

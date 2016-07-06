@@ -139,7 +139,7 @@ type Aliquot_SpecificPlateSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Aliquot_SpecificPlate",
+	if err := addComponent(Component{Name: "Aliquot_SpecificPlate",
 		Constructor: Aliquot_SpecificPlateNew,
 		Desc: ComponentDesc{
 			Desc: "example protocol showing The MixInto command which allows a specifc plate to be specified. i.e. plate with ID blahblahblah\n",
@@ -153,5 +153,7 @@ func init() {
 				{Name: "Aliquots", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

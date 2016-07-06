@@ -106,7 +106,7 @@ type PrintnameSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Printname",
+	if err := addComponent(Component{Name: "Printname",
 		Constructor: PrintnameNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -116,5 +116,7 @@ func init() {
 				{Name: "Fullname", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }
