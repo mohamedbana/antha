@@ -49,7 +49,8 @@ type VirtualLiquidHandler struct {
     //   Adapeter properties
     // head location
     //   Head properties
-
+    errors      []*simulator.SimulationError
+    max_error   simulator.ErrorSeverity
     log []string
 }
 
@@ -59,6 +60,8 @@ func NewVirtualLiquidHandler(props *liquidhandling.LHProperties) (*VirtualLiquid
 
     vlh.properties = props.Dup()
     vlh.log = make([]string, 0)
+    vlh.max_error = simulator.SeverityNone
+    vlh.errors = make([]*simulator.SimulationError, 0)
 
     return &vlh, nil
 }
@@ -71,6 +74,19 @@ func (self *VirtualLiquidHandler) LogLine(line string) {
 //save the log
 func (self *VirtualLiquidHandler) SaveLog(filename string) {
     ioutil.WriteFile(filename, []byte(strings.Join(self.log, "\n")), 0644)
+}
+
+//Get the list of errors, and the maximum error severity
+func (self *VirtualLiquidHandler) GetErrors() ([]*simulator.SimulationError, simulator.ErrorSeverity) {
+    return self.errors, self.max_error
+}
+
+//AddError Add an error
+func (self *VirtualLiquidHandler) AddError(err *simulator.SimulationError) {
+    if err.Severity() > self.max_error {
+        self.max_error = err.Severity()
+    }
+    self.errors = append(self.errors, err)
 }
 
 //Move command - used
