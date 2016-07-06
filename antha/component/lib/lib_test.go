@@ -21,10 +21,6 @@ import (
 	"github.com/antha-lang/antha/target/human"
 )
 
-const (
-	NumConcurrent = 8
-)
-
 type TInput struct {
 	WorkflowPath string
 	WorkflowData []byte
@@ -145,18 +141,20 @@ func runElements(t *testing.T, ctx context.Context, inputs []*TInput) {
 	}
 
 	for _, input := range inputs {
-		if n := os.Getenv("TEST_WORKFLOW"); n != "" && input.WorkflowPath != n {
-			continue
-		}
-		if len(input.Dir) != 0 {
-			if err := os.Chdir(input.Dir); err != nil {
-				t.Fatal(err)
-			}
-		}
-		t.Logf("Running %q %q\n", input.WorkflowPath, input.ParamPath)
-
 		errs := make(chan error)
 		go func() {
+			// HACK(ddn): Sink chdir inside goroutine to "improve" chances that
+			// golang scheduler puts this goroutine on the os thread
+			// corresponding to the chdir call.
+			//
+			// Until elements are refactored to not know their working
+			// directory we can't "go test parallel" these tests
+			if len(input.Dir) != 0 {
+				if err := os.Chdir(input.Dir); err != nil {
+					errs <- err
+					return
+				}
+			}
 			_, err := execute.Run(ctx, execute.Opt{
 				WorkflowData: input.WorkflowData,
 				ParamData:    input.ParamData,
@@ -176,7 +174,7 @@ func runElements(t *testing.T, ctx context.Context, inputs []*TInput) {
 		} else if _, ok := err.(*execute.Error); ok {
 			continue
 		} else {
-			t.Errorf("error running with workflow %q with parameters %q: %s", input.WorkflowPath, input.ParamPath, err)
+			t.Errorf("error running workflow %q with parameters %q: %s", input.WorkflowPath, input.ParamPath, err)
 		}
 	}
 
@@ -200,22 +198,25 @@ func makeContext() (context.Context, error) {
 	return ctx, nil
 }
 
-func getExampleInputs(t *testing.T) []*TInput {
+func getInputDir() string {
 	flag.Parse()
 	args := flag.Args()
-	input := "../../examples"
 	if len(args) != 0 {
-		input = args[0]
+		return args[0]
+	}
+	return ""
+}
+
+func getExampleInputs(t *testing.T) []*TInput {
+	inputDir := getInputDir()
+	if inputDir == "" {
+		inputDir = "../../examples"
 	}
 
-	inputs, err := findInputs(input)
+	inputs, err := findInputs(inputDir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(inputs) == 0 {
-		t.Fatalf("no tests found under path %q", input)
-	}
-
 	sort.Sort(TInputs(inputs))
 
 	return inputs
@@ -236,8 +237,6 @@ func divide(i, n, l int) (int, int) {
 }
 
 func TestElementsWithExampleInputs0(t *testing.T) {
-	t.Parallel()
-
 	ctx, err := makeContext()
 	if err != nil {
 		t.Fatal(err)
@@ -250,8 +249,6 @@ func TestElementsWithExampleInputs0(t *testing.T) {
 }
 
 func TestElementsWithExampleInputs1(t *testing.T) {
-	t.Parallel()
-
 	ctx, err := makeContext()
 	if err != nil {
 		t.Fatal(err)
@@ -264,8 +261,6 @@ func TestElementsWithExampleInputs1(t *testing.T) {
 }
 
 func TestElementsWithExampleInputs2(t *testing.T) {
-	t.Parallel()
-
 	ctx, err := makeContext()
 	if err != nil {
 		t.Fatal(err)
@@ -278,8 +273,6 @@ func TestElementsWithExampleInputs2(t *testing.T) {
 }
 
 func TestElementsWithExampleInputs3(t *testing.T) {
-	t.Parallel()
-
 	ctx, err := makeContext()
 	if err != nil {
 		t.Fatal(err)
@@ -292,8 +285,6 @@ func TestElementsWithExampleInputs3(t *testing.T) {
 }
 
 func TestElementsWithExampleInputs4(t *testing.T) {
-	t.Parallel()
-
 	ctx, err := makeContext()
 	if err != nil {
 		t.Fatal(err)
@@ -313,7 +304,11 @@ var (
 
 /*
 func TestElementsWithDefaultInputs(t *testing.T) {
-	t.Parallel()
+	// Skip default inputs when running a particular input
+	if inputDir := getInputDir(); inputDir != "" {
+		return
+	}
+
 	type Process struct {
 		Component string `json:"component"`
 	}
@@ -321,7 +316,11 @@ func TestElementsWithDefaultInputs(t *testing.T) {
 		Processes map[string]Process `json:"processes"`
 	}
 	var inputs []*TInput
+
 	for _, c := range GetComponents() {
+		if n := os.Getenv("TEST_DEFAULT_FILTER"); n != "" && c.Name != n {
+			continue
+		}
 		wf := &Workflow{
 			Processes: map[string]Process{
 				"Process": {
