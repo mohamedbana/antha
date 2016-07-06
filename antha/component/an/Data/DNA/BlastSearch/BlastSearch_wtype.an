@@ -18,7 +18,11 @@ Parameters (
 // Data which is returned from this protocol; output data
 Data (
 	Hitssummary string
-	Hits []biogo.Hit
+	//AllHits []biogo.Hit
+	ExactHits []biogo.Hit
+	BestHit biogo.Hit
+	Identity float64
+	Coverage float64
 	AnthaSeq wtype.DNASequence
 	Warning error
 )
@@ -44,10 +48,12 @@ Setup {
 // Core process of the protocol: steps to be performed for each input
 Steps {
 	
-	
 	var err error
 	var hits []biogo.Hit
 	var hitsummary string	
+	var identity float64
+	var coverage float64
+	var besthitsummary string
 	
 	AnthaSeq = DNA
 	
@@ -65,18 +71,27 @@ Steps {
 	if err !=nil {
 		fmt.Println(err.Error())
 	
-	} //else {
+	} 
 	
-	hitsummary,err = blast.HitSummary(hits,10,10)
+		ExactHits, hitsummary, err =  blast.AllExactMatches(hits)
 	
-		Hits = hits 
+		if len(ExactHits)== 0 {
+		hitsummary,err = blast.HitSummary(hits,10,10)
+		}
+		BestHit,identity, coverage, besthitsummary, err = blast.FindBestHit(hits)
+	
+	//	AllHits = hits 
 		Hitssummary = hitsummary
-		fmt.Println(Hitssummary)
-
+		fmt.Println(hitsummary)
+		fmt.Println(besthitsummary)
 		// Rename Sequence with ID of top blast hit
-		AnthaSeq.Nm = hits[0].Id
-	//}
+		
+		if coverage == 100 && identity == 100 { 
+		AnthaSeq.Nm = BestHit.Id
+		}
 	Warning = err
+	Identity = identity
+	Coverage = coverage
 	
 }
 
