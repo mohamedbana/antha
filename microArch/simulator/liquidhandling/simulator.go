@@ -64,6 +64,8 @@ func NewVirtualLiquidHandler(props *liquidhandling.LHProperties) *VirtualLiquidH
     vlh.errors = make([]*simulator.SimulationError, 0)
     vlh.worst_error = nil
 
+    vlh.validateProperties()
+
     return &vlh
 }
 
@@ -102,6 +104,42 @@ func (self *VirtualLiquidHandler) GetErrorSeverity() simulator.ErrorSeverity {
 func (self *VirtualLiquidHandler) GetWorstError() *simulator.SimulationError {
     return self.worst_error
 }
+
+func (self *VirtualLiquidHandler) validateProperties() {
+    
+    //check a property
+    check_prop := func(l []string, name string) {
+        //is empty
+        if len(l) == 0 {
+            self.AddError(simulator.NewSimulationError(simulator.SeverityWarning, 
+                                                       fmt.Sprintf("No %s specified", name),
+                                                       nil))
+        }
+        //all locations defined
+        for _,loc := range l {
+            known := false
+            for my_loc := range self.properties.Layout {
+                if loc == my_loc {
+                    known = true
+                }
+            }
+            if !known {
+                self.AddError(simulator.NewSimulationError(simulator.SeverityWarning, 
+                        fmt.Sprintf("Undefined location \"%s\" referenced in %s", loc, name),
+                                                           nil))
+            }
+        }
+    }
+
+    check_prop(self.properties.Tip_preferences, "tip preferences")
+    check_prop(self.properties.Input_preferences, "input preferences")
+    check_prop(self.properties.Output_preferences, "output preferences")
+    check_prop(self.properties.Tipwaste_preferences, "tipwaste preferences")
+    check_prop(self.properties.Wash_preferences, "wash preferences")
+    check_prop(self.properties.Waste_preferences, "waste preferences")
+}
+
+// ------------------------------------------------------------------------ ExtendedLHDriver
 
 //Move command - used
 func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []string, reference []int, 
