@@ -117,13 +117,7 @@ func (self *VirtualLiquidHandler) validateProperties() {
         }
         //all locations defined
         for _,loc := range l {
-            known := false
-            for my_loc := range self.properties.Layout {
-                if loc == my_loc {
-                    known = true
-                }
-            }
-            if !known {
+            if !self.locationIsKnown(loc) {
                 self.AddError(simulator.NewSimulationError(simulator.SeverityWarning, 
                         fmt.Sprintf("Undefined location \"%s\" referenced in %s", loc, name),
                                                            nil))
@@ -137,6 +131,15 @@ func (self *VirtualLiquidHandler) validateProperties() {
     check_prop(self.properties.Tipwaste_preferences, "tipwaste preferences")
     check_prop(self.properties.Wash_preferences, "wash preferences")
     check_prop(self.properties.Waste_preferences, "waste preferences")
+}
+
+func (self *VirtualLiquidHandler) locationIsKnown(location string) bool {
+    for loc := range self.properties.Layout {
+        if loc == location {
+            return true
+        }
+    }
+    return false
 }
 
 // ------------------------------------------------------------------------ ExtendedLHDriver
@@ -347,6 +350,11 @@ func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{},
     plate = %v,
     name = %v)`, position, plate, name))
     //position exists
+    if !self.locationIsKnown(position) {
+        self.AddError(simulator.NewSimulationError(simulator.SeverityWarning,
+            fmt.Sprintf("Adding plate \"%s\" to unknown location \"%s\"", name, position),
+            nil))
+    }
     //position can accept a plate of this type
     //plate can be cast to LHPlate. plate type mathes position type
     return driver.CommandStatus{true, driver.OK, "ADDPLATETO ACK"}
