@@ -30,8 +30,12 @@ import (
 )
 
 func StockConcentration(nameofmolecule string, massofmoleculeactuallyaddedinG wunit.Mass, diluent string, totalvolumeinL wunit.Volume) (actualconc wunit.Concentration) {
-
-	molecule := pubchem.MakeMolecule(nameofmolecule)
+	molecule, err := pubchem.MakeMolecule(nameofmolecule)
+	// TODO(ddn): review separation of go-style APIs which return errors and
+	// antha-style APIs which don't
+	if err != nil {
+		panic(err)
+	}
 
 	// in particular, the molecular weight
 	molecularweight := molecule.MolecularWeight
@@ -48,8 +52,12 @@ func StockConcentration(nameofmolecule string, massofmoleculeactuallyaddedinG wu
 }
 
 func Dilute(moleculename string, stockconc wunit.Concentration, stockvolume wunit.Volume, diluentname string, diluentvoladded wunit.Volume) (dilutedconc wunit.Concentration) {
-
-	molecule := pubchem.MakeMolecule(moleculename)
+	molecule, err := pubchem.MakeMolecule(moleculename)
+	// TODO(ddn): review separation of go-style APIs which return errors and
+	// antha-style APIs which don't
+	if err != nil {
+		panic(err)
+	}
 
 	stockMperL := stockconc.MolPerL(molecule.MolecularWeight)
 

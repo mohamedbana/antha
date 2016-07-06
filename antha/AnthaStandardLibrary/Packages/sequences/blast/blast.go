@@ -26,15 +26,13 @@ package blast
 import (
 	"fmt"
 
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
-	. "github.com/biogo/ncbi/blast"
-	//"github.com/biogo/ncbi/blast_test"
-	//"log"
-	"github.com/mgutz/ansi"
-	//"reflect"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
+	. "github.com/biogo/ncbi/blast"
+	"github.com/mgutz/ansi"
 )
 
 // package for interacting with the ncbi BLAST service

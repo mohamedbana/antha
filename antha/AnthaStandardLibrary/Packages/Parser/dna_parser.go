@@ -26,53 +26,42 @@ package parser
 import (
 	"fmt"
 
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
-	//"github.com/antha-lang/antha/antha/anthalib/wtype"
-	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
-	//"io/ioutil"
 	"bufio"
-	"log"
 	"os"
-	//"strconv"
 	"strings"
 
-	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 )
 
 var (
 	alphabet = sequences.WobbleMap
-	//illegals string =
 )
 
-func SnapGenetoSimpleSeq(filename string) (sequence string, err error) {
+func SnapGenetoSimpleSeq(filename string) (string, error) {
 
 	var line string
 	var snapgenelines []string
-	if strings.Contains(filename, ".dna") {
-		contents, err := os.Open(filename)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer contents.Close()
+	if !strings.Contains(filename, ".dna") {
+		return "", fmt.Errorf("wrong file type, must have file extension .dna")
+	}
+	contents, err := os.Open(filename)
+	if err != nil {
+		return "", err
+	}
+	defer contents.Close()
 
-		scanner := bufio.NewScanner(contents)
-		for scanner.Scan() {
-			line = fmt.Sprintln(scanner.Text())
+	scanner := bufio.NewScanner(contents)
+	for scanner.Scan() {
+		line = fmt.Sprintln(scanner.Text())
 
-			snapgenelines = append(snapgenelines, line)
-		}
-
-		sequence = Handlesnapgenelines(snapgenelines)
-
-		if err := scanner.Err(); err != nil {
-			log.Fatal(err)
-		}
-
-	} else {
-		err = fmt.Errorf("wrong file type, must have file extension .dna")
+		snapgenelines = append(snapgenelines, line)
 	}
 
-	return
+	if err := scanner.Err(); err != nil {
+		return "", err
+	}
+
+	return Handlesnapgenelines(snapgenelines), nil
 }
 
 func Handlesnapgenelines(lines []string) (dnaseq string) {
