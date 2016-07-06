@@ -162,7 +162,7 @@ type SerialDilutionSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "SerialDilution",
+	if err := addComponent(Component{Name: "SerialDilution",
 		Constructor: SerialDilutionNew,
 		Desc: ComponentDesc{
 			Desc: "Protocol to make a serial dilution series from a solution and diluent\n",
@@ -177,5 +177,7 @@ func init() {
 				{Name: "Dilutions", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }
