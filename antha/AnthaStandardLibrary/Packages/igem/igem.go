@@ -363,7 +363,10 @@ func CountPartsinRegistryContaining(keystrings []string) (numberofparts int) {
 	return numberofparts
 }
 
-func FilterRegistry(partype string, keystrings []string, exacttypecodeonly bool) (listofpartIDs []string) {
+func FilterRegistry(partype string, keystrings []string, exacttypecodeonly bool) (listofpartIDs []string, idtodescriptionmap map[string]string) {
+
+	idtodescriptionmap = make(map[string]string)
+
 	allparts, err := makeRegistryfile()
 	if err != nil {
 		return
@@ -386,6 +389,7 @@ func FilterRegistry(partype string, keystrings []string, exacttypecodeonly bool)
 
 		if !exacttypecodeonly && search.Containsallthings(record.Desc, keystrings) && strings.Contains(strings.ToUpper(record.Part_type), strings.ToUpper(partype)) && record.Seq_data != "" {
 			listofpartIDs = append(listofpartIDs, record.Part_name)
+			idtodescriptionmap[record.Part_name] = record.Desc
 		}
 
 		bba_code, ok := IgemTypeCodes[strings.ToUpper(partype)]
@@ -393,6 +397,7 @@ func FilterRegistry(partype string, keystrings []string, exacttypecodeonly bool)
 		if ok && search.Containsallthings(record.Desc, keystrings) && record.Seq_data != "" && strings.Contains(record.Part_name, bba_code) {
 
 			listofpartIDs = append(listofpartIDs, record.Part_name)
+			idtodescriptionmap[record.Part_name] = record.Desc
 			i++
 		}
 		/*	if strings.Contains(record.Desc, "Amino acid") || strings.Contains(record.Id, "aa") {
@@ -407,7 +412,7 @@ func FilterRegistry(partype string, keystrings []string, exacttypecodeonly bool)
 			seq = []string{record.Id, record.Seq, plasmidstatus, seqtype, class}*/
 		/*records = append(records, seq)*/
 	}
-	return listofpartIDs
+	return listofpartIDs, idtodescriptionmap
 }
 
 /*

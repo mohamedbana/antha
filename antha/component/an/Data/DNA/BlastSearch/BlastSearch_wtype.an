@@ -17,8 +17,10 @@ Parameters (
 
 // Data which is returned from this protocol; output data
 Data (
-	Hits string
+	Hitssummary string
+	Hits []biogo.Hit
 	AnthaSeq wtype.DNASequence
+	Warning error
 )
 
 // Physical inputs to this protocol
@@ -45,6 +47,7 @@ Steps {
 	
 	var err error
 	var hits []biogo.Hit
+	var hitsummary string	
 	
 	AnthaSeq = DNA
 	
@@ -64,12 +67,16 @@ Steps {
 	
 	} //else {
 	
-		Hits = fmt.Sprintln(blast.HitSummary(hits))
-		
+	hitsummary,err = blast.HitSummary(hits,10,10)
+	
+		Hits = hits 
+		Hitssummary = hitsummary
+		fmt.Println(Hitssummary)
+
 		// Rename Sequence with ID of top blast hit
 		AnthaSeq.Nm = hits[0].Id
 	//}
-	
+	Warning = err
 	
 }
 
