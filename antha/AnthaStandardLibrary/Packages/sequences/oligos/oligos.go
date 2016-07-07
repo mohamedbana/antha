@@ -117,7 +117,7 @@ func BasicMeltingTemp(primersequence wtype.DNASequence) (meltingtemp wunit.Tempe
 	} else {
 		mt = 64.9 + 41.0*(float64(g+c)-16.4)/float64(a+t+c+g)
 
-		fmt.Println(mt)
+		//fmt.Println(mt)
 
 	}
 
@@ -165,7 +165,7 @@ func FWDOligoSeq(seq wtype.DNASequence, maxGCcontent float64, minlength int, max
 
 			meltingtemp := BasicMeltingTemp(ssoligo)
 
-			fmt.Println(ssoligo.Seq, temppercentage, meltingtemp.ToString())
+			//fmt.Println(ssoligo.Seq, temppercentage, meltingtemp.ToString())
 
 			bindingsites := CheckNonSpecificBinding(seq, ssoligo)
 

@@ -2,7 +2,6 @@
 package lib
 
 import (
-	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -59,7 +58,7 @@ func _MakePalette_OneByOneSteps(_ctx context.Context, _input *MakePalette_OneByO
 	// remove duplicates
 	positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
 
-	fmt.Println("positions", positiontocolourmap)
+	//fmt.Println("positions", positiontocolourmap)
 
 	solutions := make([]*wtype.LHComponent, 0)
 	colourtoComponentMap := make(map[string]*wtype.LHComponent)
@@ -151,7 +150,7 @@ func _MakePalette_OneByOneSteps(_ctx context.Context, _input *MakePalette_OneByO
 	_output.Numberofcolours = len(chosencolourpalette)
 	_output.Palette = chosencolourpalette
 	_output.ColourtoComponentMap = colourtoComponentMap
-	fmt.Println("Unique Colours =", _output.Numberofcolours, "from palette:", chosencolourpalette)
+	//fmt.Println("Unique Colours =",Numberofcolours,"from palette:", chosencolourpalette)
 
 }
 
