@@ -25,6 +25,7 @@ package parser
 import (
 	"bytes"
 	"fmt"
+	"log"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
