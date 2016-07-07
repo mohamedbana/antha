@@ -5,7 +5,6 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
-	"fmt"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"image/color"
 	"strconv"
@@ -80,7 +79,7 @@ Steps {
 	// remove duplicates
 	positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
 	
-	fmt.Println("positions", positiontocolourmap)
+	//fmt.Println("positions", positiontocolourmap)
 	
 	solutions := make([]*wtype.LHComponent, 0)
 	colourtoComponentMap := make(map[string]*wtype.LHComponent)
@@ -177,7 +176,7 @@ Steps {
 	Numberofcolours = len(chosencolourpalette)
 	Palette = chosencolourpalette
 	ColourtoComponentMap = colourtoComponentMap
-	fmt.Println("Unique Colours =",Numberofcolours,"from palette:", chosencolourpalette)
+	//fmt.Println("Unique Colours =",Numberofcolours,"from palette:", chosencolourpalette)
 
 }
 // Run after controls and a steps block are completed to

@@ -152,6 +152,10 @@ func setParam(w *workflow.Workflow, process, name string, data []byte, in map[st
 }
 
 func setParams(ctx context.Context, params *RawParams, w *workflow.Workflow) (*mixer.Opt, error) {
+	if params == nil {
+		return nil, nil
+	}
+
 	for process, params := range params.Parameters {
 		c, err := w.FuncName(process)
 		if err != nil {

@@ -108,12 +108,12 @@ var Moclo = AssemblyStandard{
 func TestRestrictionsitefinder(t *testing.T) {
 	for _, test := range restrictionsitetests {
 		r := Restrictionsitefinder(test.sequence, test.enzymelist)
-		fmt.Println("\x1b[31;1m", "test.sequence=", test.sequence, "\x1b[0m", "\n")
-		fmt.Println("\x1b[31;1m", "test.enzymelist=", test.enzymelist, "\x1b[0m", "\n")
-		fmt.Println("\x1b[31;1m", "RRRRRRRRRRRRRR=", r, "\x1b[0m", "\n")
+		// fmt.Println("\x1b[31;1m", "test.sequence=", test.sequence, "\x1b[0m", "\n")
+		// fmt.Println("\x1b[31;1m", "test.enzymelist=", test.enzymelist, "\x1b[0m", "\n")
+		// fmt.Println("\x1b[31;1m", "RRRRRRRRRRRRRR=", r, "\x1b[0m", "\n")
 		for i := 0; i < len(r); i++ {
 			if r[i].numberofsites != test.sitesfound[i].numberofsites {
-				fmt.Println("\x1b[31;1m", r, "\x1b[0m", "\n")
+				// fmt.Println("\x1b[31;1m", r, "\x1b[0m", "\n")
 				t.Error(
 					"For", test.sequence, "\n",
 					"and", test.enzymelist[i], "\n",
@@ -123,7 +123,7 @@ func TestRestrictionsitefinder(t *testing.T) {
 			}
 			for j := 0; i < len(r[i].forwardpositions); j++ {
 				if r[i].forwardpositions[j] != test.sitesfound[i].forwardpositions[j] {
-					fmt.Println("\x1b[31;1m", r, "\x1b[0m", "\n")
+					// fmt.Println("\x1b[31;1m", r, "\x1b[0m", "\n")
 					t.Error(
 						"For", test.sequence, "\n",
 						"and", test.enzymelist[i], "\n",
@@ -134,7 +134,7 @@ func TestRestrictionsitefinder(t *testing.T) {
 			}
 			for j := 0; i < len(r[i].reversepositions); j++ {
 				if r[i].reversepositions[j] != test.sitesfound[i].reversepositions[j] {
-					fmt.Println("\x1b[31;1m", r, "\x1b[0m", "\n")
+					// fmt.Println("\x1b[31;1m", r, "\x1b[0m", "\n")
 					t.Error(
 						"For", test.sequence, "\n",
 						"and", test.enzymelist[i], "\n",
@@ -149,7 +149,7 @@ func TestRestrictionsitefinder(t *testing.T) {
 
 /*var Fwdsequence = wtype.DNASequence{Nm: "Fwdsequence", Seq: fwdsequence}
 var Reversesequence = wtype.DNASequence{Nm: "Reversecomplement", Seq: reversesequence}
-//formula := fmt.Println("A", numberofAs, "T", numberofTs, "C", numberofCs, "G", numberofGs)
+//formula := // fmt.Println("A", numberofAs, "T", numberofTs, "C", numberofCs, "G", numberofGs)
 Doublestrandedpair = []wtype.DNASequence{Fwdsequence, Reversesequence} */
 
 // create an array of these tests (array of 1 currently)
@@ -175,7 +175,7 @@ func TestDigest(t *testing.T) {
 		v, a, b := Digest(test.sequence, test.enzyme)
 		for i := 0; i < len(v); i++ {
 			if v[i] != test.Finalfragments[i] {
-				fmt.Println("\x1b[31;1m", v, "\x1b[0m", "\n")
+				// fmt.Println("\x1b[31;1m", v, "\x1b[0m", "\n")
 				t.Error(
 					"For", test.sequence, "\n",
 					"and", test.enzyme, "\n",
@@ -186,7 +186,7 @@ func TestDigest(t *testing.T) {
 		}
 		for i := 0; i < len(a); i++ {
 			if a[i] != test.Stickyends_5prime[i] {
-				fmt.Println("\x1b[33;1m", a, "\x1b[0m", "\n")
+				// fmt.Println("\x1b[33;1m", a, "\x1b[0m", "\n")
 				t.Error(
 					"For", test.sequence, "\n",
 					"and", test.enzyme, "\n",
@@ -197,7 +197,7 @@ func TestDigest(t *testing.T) {
 		}
 		for i := 0; i < len(b); i++ {
 			if b[i] != test.Stickyends_3prime[i] {
-				fmt.Println("\x1b[34;1m", b, "\x1b[0m", "\n")
+				// fmt.Println("\x1b[34;1m", b, "\x1b[0m", "\n")
 				t.Error(
 					"For", test.sequence, "\n",
 					"and", test.enzyme, "\n",
@@ -274,9 +274,9 @@ func TestJointwopartsfromsequence(t *testing.T) {
 	desiredproductisamongpossibilities := false
 	for _, assembly := range assemblytests {
 		r, p := Jointwopartsfromsequence(assembly.vector, assembly.parts[0], assembly.enzyme.RestrictionEnzyme)
-		fmt.Println("AAAAAAAAAAAAAAAAASSSSSSSSSSSSSSSSSSSSSembled test sequences", r, "AAAAAAAAAAAAAAAAASSSSSSSSSSSSSSSSSSSSSembled plasmid", p)
-		fmt.Println("\x1b[31;1m", r, len(r), "\x1b[0m")
-		fmt.Println("\x1b[34;1m", p, len(p), "\x1b[0m")
+		// fmt.Println("AAAAAAAAAAAAAAAAASSSSSSSSSSSSSSSSSSSSSembled test sequences", r, "AAAAAAAAAAAAAAAAASSSSSSSSSSSSSSSSSSSSSembled plasmid", p)
+		// fmt.Println("\x1b[31;1m", r, len(r), "\x1b[0m")
+		// fmt.Println("\x1b[34;1m", p, len(p), "\x1b[0m")
 
 		for i := 0; i < len(p)-1; i++ {
 			if p[i] == assembly.desiredassemblyproduct {
@@ -300,11 +300,11 @@ func TestJoinXnumberofparts(t *testing.T) {
 	desiredproductisamongpossibilities := false
 	for _, assembly := range assemblytests {
 		r, p := JoinXnumberofparts(assembly.vector, assembly.parts, assembly.enzyme.RestrictionEnzyme)
-		//fmt.Println("AAAAAAAAAAAAAAAAASSSSSSSSSSSSSSSSSSSSSembled test sequences", r, "AAAAAAAAAAAAAAAAASSSSSSSSSSSSSSSSSSSSSembled plasmid", p)
+		//// fmt.Println("AAAAAAAAAAAAAAAAASSSSSSSSSSSSSSSSSSSSSembled test sequences", r, "AAAAAAAAAAAAAAAAASSSSSSSSSSSSSSSSSSSSSembled plasmid", p)
 
 		fmt.Println(assembly.vector.Nm, assembly.parts)
-		fmt.Println("\x1b[31;1m", r, len(r), len(r), "\x1b[0m")
-		fmt.Println("\x1b[34;1m", p, len(p), len(p), "\x1b[0m")
+		// fmt.Println("\x1b[31;1m", r, len(r), len(r), "\x1b[0m")
+		// fmt.Println("\x1b[34;1m", p, len(p), len(p), "\x1b[0m")
 
 		for i := 0; i < len(p)-1; i++ {
 			if p[i] == assembly.desiredassemblyproduct {
