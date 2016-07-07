@@ -1,0 +1,11 @@
+{
+    "Parameters": {
+        "SeqAnnot": {
+            "ID": "ALKL",
+			"Filename": "",
+			"ReturnType": "docsum",
+			"MaxReturns":1,
+			"Database":"seqannot"
+        }
+    }
+}
