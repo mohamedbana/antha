@@ -67,7 +67,9 @@ func RetrieveRecords(query string, database string, Max int, ReturnType string, 
 
 	var of *os.File
 	if out == "" {
+
 		of = os.Stdout
+		//defer os.Remove(of.Name())
 	} else {
 		/*if err := os.Mkdir(filepath.Dir(out), 0777); err != nil {
 			return err

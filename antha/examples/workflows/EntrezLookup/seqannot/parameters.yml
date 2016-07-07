@@ -1,11 +1,11 @@
 {
     "Parameters": {
         "SeqAnnot": {
-            "ID": "ALKL",
+            "ID": "opuntia[ORGN] accD",
 			"Filename": "",
-			"ReturnType": "docsum",
-			"MaxReturns":1,
-			"Database":"seqannot"
+			"ReturnType": "xml",
+			"MaxReturns":10,
+			"Database":"nucleotide"
         }
     }
 }
