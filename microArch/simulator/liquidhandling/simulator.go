@@ -35,6 +35,8 @@ import (
 // Simulate a liquid handler Driver
 type VirtualLiquidHandler struct {
     properties *liquidhandling.LHProperties 
+    initialized bool
+    finalized   bool
     //Need to store:
     // LHProperties
     // plate(s) at each layout position
@@ -59,6 +61,8 @@ type VirtualLiquidHandler struct {
 //Create a new VirtualLiquidHandler which mimics an LHDriver
 func NewVirtualLiquidHandler(props *liquidhandling.LHProperties) *VirtualLiquidHandler {
     var vlh VirtualLiquidHandler
+    vlh.initialized = false
+    vlh.finalized   = false
 
     vlh.properties = props.Dup()
     vlh.log = make([]string, 0)
@@ -143,12 +147,26 @@ func (self *VirtualLiquidHandler) locationIsKnown(location string) bool {
     return false
 }
 
+func (self *VirtualLiquidHandler) checkReady(fnName string) {
+    if !self.initialized {
+        self.AddError(simulator.NewSimulationError(simulator.SeverityWarning,
+            fmt.Sprintf("Instruction \"%s\" before Initialize", fnName),
+            nil))
+    }
+    if self.finalized {
+        self.AddError(simulator.NewSimulationError(simulator.SeverityWarning,
+            fmt.Sprintf("Instruction \"%s\" after Finalize", fnName),
+            nil))
+    }
+}
+
 // ------------------------------------------------------------------------ ExtendedLHDriver
 
 //Move command - used
 func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []string, reference []int, 
                                        offsetX, offsetY, offsetZ []float64, plate_type []string, 
                                        head int) driver.CommandStatus {
+    self.checkReady("Move")
     self.LogLine(fmt.Sprintf(`Move(
     deckposition = %v,
     wellcoords = %v,
@@ -168,6 +186,7 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
 
 //Move raw - not yet implemented in compositerobotinstruction
 func (self *VirtualLiquidHandler) MoveRaw(head int, x, y, z float64) driver.CommandStatus {
+    self.checkReady("MoveRaw")
     self.LogLine(fmt.Sprintf(`MoveRaw(
     head = %v,
     offsetX,Y,Z = (%v, %v, %v))`, head, x,y,z))
@@ -180,6 +199,7 @@ func (self *VirtualLiquidHandler) MoveRaw(head int, x, y, z float64) driver.Comm
 //Aspirate - used
 func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, head int, multi int, 
                                            platetype []string, what []string, llf []bool) driver.CommandStatus {
+    self.checkReady("Aspirate")
     self.LogLine(fmt.Sprintf(`Aspirate(
     volume = %v,
     overstroke = %v,
@@ -203,6 +223,7 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 //Dispense - used
 func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, head int, multi int, 
                                            platetype []string, what []string, llf []bool) driver.CommandStatus {
+    self.checkReady("Dispense")
     self.LogLine(fmt.Sprintf(`Dispense(
     volume = %v,
     blowout = %v,
@@ -225,6 +246,7 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 //LoadTips - used
 func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int, 
                                            platetype, position, well []string) driver.CommandStatus {
+    self.checkReady("LoadTips")
     self.LogLine(fmt.Sprintf(`LoadTips(
     channels = %v,
     head = %v,
@@ -244,6 +266,7 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 //UnloadTips - used
 func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int, 
                                              platetype, position, well []string) driver.CommandStatus {
+    self.checkReady("UnloadTips")
     self.LogLine(fmt.Sprintf(`UnloadTips(
     channels = %v,
     head = %v,
@@ -263,6 +286,7 @@ func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
 
 //SetPipetteSpeed - used
 func (self *VirtualLiquidHandler) SetPipetteSpeed(head, channel int, rate float64) driver.CommandStatus {
+    self.checkReady("SetPipetteSpeed")
     self.LogLine(fmt.Sprintf(`SetPipetteSpeed(
     head = %v,
     channel = %v,
@@ -275,6 +299,7 @@ func (self *VirtualLiquidHandler) SetPipetteSpeed(head, channel int, rate float6
 
 //SetDriveSpeed - used
 func (self *VirtualLiquidHandler) SetDriveSpeed(drive string, rate float64) driver.CommandStatus {
+    self.checkReady("SetDriveSpeed")
     self.LogLine(fmt.Sprintf(`SetDriveSpeed(
     drive = %v,
     rate = %v)`, drive, rate))
@@ -290,13 +315,20 @@ func (self *VirtualLiquidHandler) Stop() driver.CommandStatus {
 
 //Go - unused
 func (self *VirtualLiquidHandler) Go() driver.CommandStatus {
+    self.checkReady("Go")
     panic("unimplemented")
 }
 
 //Initialize - used
 func (self *VirtualLiquidHandler) Initialize() driver.CommandStatus {
     self.LogLine("Initialize()")
-    //check that this is called before anything else?
+    if self.initialized {
+        self.AddError(simulator.NewSimulationError(simulator.SeverityWarning,
+            fmt.Sprintf("Second call to Initialize"),
+            nil))
+    } else {
+        self.initialized = true
+    }
     return driver.CommandStatus{true, driver.OK, "INITIALIZE ACK"}
 }
 
@@ -304,11 +336,19 @@ func (self *VirtualLiquidHandler) Initialize() driver.CommandStatus {
 func (self *VirtualLiquidHandler) Finalize() driver.CommandStatus {
     self.LogLine("Finalize()")
     //check that this is called last, no more calls
+    if self.finalized {
+        self.AddError(simulator.NewSimulationError(simulator.SeverityWarning,
+            fmt.Sprintf("Second call to Finalize"),
+            nil))
+    } else {
+        self.finalized = true
+    }
     return driver.CommandStatus{true, driver.OK, "FINALIZE ACK"}
 }
 
 //Wait - used
 func (self *VirtualLiquidHandler) Wait(time float64) driver.CommandStatus {
+    self.checkReady("Wait")
     self.LogLine(fmt.Sprintf(`Wait(time = %v)`, time))
     //time is positive
     //maybe a warning if it's super-long
@@ -318,6 +358,7 @@ func (self *VirtualLiquidHandler) Wait(time float64) driver.CommandStatus {
 //Mix - used
 func (self *VirtualLiquidHandler) Mix(head int, volume []float64, platetype []string, cycles []int, 
                                       multi int, what []string, blowout []bool) driver.CommandStatus {
+    self.checkReady("Mix")
     self.LogLine(fmt.Sprintf(`Mix(
     head = %v,
     volume = %v,
@@ -337,6 +378,7 @@ func (self *VirtualLiquidHandler) Mix(head int, volume []float64, platetype []st
 
 //ResetPistons - used
 func (self *VirtualLiquidHandler) ResetPistons(head, channel int) driver.CommandStatus {
+    self.checkReady("ResetPistons")
     self.LogLine("ResetPistons()")
     //head exists
     //channel exists
@@ -346,6 +388,7 @@ func (self *VirtualLiquidHandler) ResetPistons(head, channel int) driver.Command
 
 //AddPlateTo - used
 func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{}, name string) driver.CommandStatus {
+    self.checkReady("AddPlateTo")
     self.LogLine(fmt.Sprintf(`AddPlateTo(
     position = %v,
     plate = %v,
@@ -357,25 +400,36 @@ func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{},
             nil))
     }
     //check that the requested position is empty
-
-    //position can accept a plate of this type
-    switch plate := plate.(type) {
-    case *wtype.LHPlate:
-        
-    case *wtype.LHTipbox:
-
-    case *wtype.LHTipwaste:
-
-    default:
-        self.AddError(simulator.NewSimulationError(simulator.SeverityWarning,
-            fmt.Sprintf("unknown plate of type %T while adding \"%s\" to location \"%s\"", plate, name, position),
+    if self.properties.PosLookup[position] != "" {
+        self.AddError(simulator.NewSimulationError(simulator.SeverityError,
+            fmt.Sprintf("Adding plate \"%s\" to \"%s\" which is already occupied by plate \"%s\"", 
+                name, position, self.properties.PlateLookup[self.properties.PosLookup[position]].(wtype.Named).GetName()),
             nil))
+    } else {
+        //position can accept a plate of this type
+        switch plate := plate.(type) {
+        case *wtype.LHPlate:
+            plate.PlateName = name
+            self.properties.AddPlate(position, plate)
+        case *wtype.LHTipbox:
+            plate.Boxname = name
+            self.properties.AddTipBoxTo(position, plate)
+        case *wtype.LHTipwaste:
+            plate.Type = name
+            self.properties.AddTipWasteTo(position, plate)
+
+        default:
+            self.AddError(simulator.NewSimulationError(simulator.SeverityWarning,
+                fmt.Sprintf("unknown plate of type %T while adding \"%s\" to location \"%s\"", plate, name, position),
+                nil))
+        }
     }
     return driver.CommandStatus{true, driver.OK, "ADDPLATETO ACK"}
 }
 
 //RemoveAllPlates - used
 func (self *VirtualLiquidHandler) RemoveAllPlates() driver.CommandStatus {
+    self.checkReady("RemoveAllPlates")
     self.LogLine("RemoveAllPlates()")
     //remove plates, no checks required.
     return driver.CommandStatus{true, driver.OK, "REMOVEALLPLATES ACK"}
@@ -395,6 +449,7 @@ func (self *VirtualLiquidHandler) SetPositionState(position string, state driver
 
 //GetCapabilites - used
 func (self *VirtualLiquidHandler) GetCapabilities() (liquidhandling.LHProperties, driver.CommandStatus) {
+    self.checkReady("GetCapabilities")
     self.LogLine("GetCapabilities()")
     //no checks required
     return *self.properties, driver.CommandStatus{true, driver.OK, ""} 
@@ -422,6 +477,7 @@ func (self *VirtualLiquidHandler) GetStatus() (driver.Status, driver.CommandStat
 
 //UpdateMetaData - used
 func (self *VirtualLiquidHandler) UpdateMetaData(props *liquidhandling.LHProperties) driver.CommandStatus {
+    self.checkReady("UpdateMetaData")
     self.LogLine("ResetPistons(props *LHProperties)")
     //check that the props and self.props are the same...
     return driver.CommandStatus{true, driver.OK, "UPDATEMETADATA ACK"}

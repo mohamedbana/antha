@@ -351,7 +351,9 @@ func get_valid_props() *LHPropertiesParams {
 }
 
 func get_valid_vlh() *VirtualLiquidHandler {
-    return NewVirtualLiquidHandler(makeLHProperties(get_valid_props()))
+    vlh := NewVirtualLiquidHandler(makeLHProperties(get_valid_props()))
+    vlh.Initialize()
+    return vlh
 }
 
 type LHPropertyTest struct {
@@ -666,5 +668,5 @@ func TestVLH_AddPlateTo_locationFull(t *testing.T) {
     vlh.AddPlateTo("position1", get_lhplate(), "p1")
 
     errors, _ := vlh.GetErrors()
-    compare_errors(t, []string{"(warn) Adding plate \"p1\" to \"position1\" which is already occupied by plate \"p0\""}, errors)
+    compare_errors(t, []string{"(err) Adding plate \"p1\" to \"position1\" which is already occupied by plate \"p0\""}, errors)
 }
