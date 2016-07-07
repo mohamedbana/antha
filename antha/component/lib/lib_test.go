@@ -165,8 +165,8 @@ func runElements(t *testing.T, ctx context.Context, inputs []*TInput) {
 
 		select {
 		case err = <-errs:
-		case <-time.After(60 * time.Second):
-			err = fmt.Errorf("timeout after %ds", 60)
+		case <-time.After(180 * time.Second):
+			err = fmt.Errorf("timeout after %ds", 180)
 		}
 
 		if err == nil {
