@@ -118,12 +118,12 @@ Steps {
 		
 		fullblackuint8 = uint8(MaxBlackPercentagethreshold * float64(maxuint8))
 		
-		fmt.Println("brand new minuint8 ",minuint8,"fullblackuint8 ", fullblackuint8)
+	//	fmt.Println("brand new minuint8 ",minuint8,"fullblackuint8 ", fullblackuint8)
 		
 		if gray.Y < minuint8 {
 			if SkipWhite {
 			skipped = skipped + 1
-		fmt.Println("skipping well:", skipped,locationkey)
+	//	fmt.Println("skipping well:", skipped,locationkey)
 		}else{
 			whitevol := VolumeForFullcolour
 			Diluent.Type,_ = wtype.LiquidTypeFromString(NonMixingClass)
@@ -149,7 +149,7 @@ Steps {
 			
 			if gray.Y < fullblackuint8 /*&& gray.Y >= minuint8*/{
 			watervol := wunit.NewVolume((float64(maxuint8-gray.Y)/float64(maxuint8) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
-			fmt.Println("new well", locationkey, "water vol", watervol.ToString())
+//			fmt.Println("new well", locationkey, "water vol", watervol.ToString())
 			// force hv tip choice
 			if  OnlyHighVolumetips && watervol.RawValue() < 21	 && watervol.Unit().PrefixedSymbol() == "ul"{
 				watervol.SetValue(21)
@@ -160,13 +160,13 @@ Steps {
 		} 
 		if gray.Y >= fullblackuint8{
 			fullblack = fullblack + 1
-			fmt.Println("full colours:", fullblack)
+	//		fmt.Println("full colours:", fullblack)
 			blackvol = VolumeForFullcolour
 		}else {
 		blackvol = wunit.NewVolume((float64(gray.Y)/float64(maxuint8) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
 		}
 		
-		fmt.Println("new well", locationkey, "black vol", blackvol.ToString())
+	//	fmt.Println("new well", locationkey, "black vol", blackvol.ToString())
 		
 		//Black.Type = wtype.LiquidTypeFromString("NeedToMix")
 		

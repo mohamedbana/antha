@@ -3,61 +3,9 @@ package lib
 import (
 	"errors"
 	"fmt"
-	/*
-		"github.com/antha-lang/antha/antha/component/lib/Aliquot"
-		"github.com/antha-lang/antha/antha/component/lib/AliquotTo"
-		"github.com/antha-lang/antha/antha/component/lib/Assaysetup"
-		"github.com/antha-lang/antha/antha/component/lib/BlastSearch"
-		"github.com/antha-lang/antha/antha/component/lib/BlastSearch_wtype"
-		"github.com/antha-lang/antha/antha/component/lib/Colony_PCR"
-		"github.com/antha-lang/antha/antha/component/lib/DNA_gel"
-		"github.com/antha-lang/antha/antha/component/lib/Datacrunch"
-		"github.com/antha-lang/antha/antha/component/lib/Evaporationrate"
-		"github.com/antha-lang/antha/antha/component/lib/FindPartsthat"
-		"github.com/antha-lang/antha/antha/component/lib/Iterative_assembly_design"
-		"github.com/antha-lang/antha/antha/component/lib/Kla"
-		"github.com/antha-lang/antha/antha/component/lib/LoadGel"
-		"github.com/antha-lang/antha/antha/component/lib/LookUpMolecule"
-		"github.com/antha-lang/antha/antha/component/lib/MakeBuffer"
-		"github.com/antha-lang/antha/antha/component/lib/MakeMedia"
-		"github.com/antha-lang/antha/antha/component/lib/Mastermix"
-		"github.com/antha-lang/antha/antha/component/lib/Mastermix_reactions"
-		"github.com/antha-lang/antha/antha/component/lib/MoClo_design"
-		"github.com/antha-lang/antha/antha/component/lib/NewDNASequence"
-		"github.com/antha-lang/antha/antha/component/lib/OD"
-		"github.com/antha-lang/antha/antha/component/lib/PCR"
-		"github.com/antha-lang/antha/antha/component/lib/Paintmix"
-		"github.com/antha-lang/antha/antha/component/lib/Phytip_miniprep"
-		"github.com/antha-lang/antha/antha/component/lib/PipetteImage"
-		"github.com/antha-lang/antha/antha/component/lib/PipetteImage_CMYK"
-		"github.com/antha-lang/antha/antha/component/lib/PipetteImage_living"
-		"github.com/antha-lang/antha/antha/component/lib/PlateOut"
-		"github.com/antha-lang/antha/antha/component/lib/Plotdata"
-		"github.com/antha-lang/antha/antha/component/lib/Plotdata_spreadsheet"
-		"github.com/antha-lang/antha/antha/component/lib/PreIncubation"
-		"github.com/antha-lang/antha/antha/component/lib/Printname"
-		"github.com/antha-lang/antha/antha/component/lib/ProtocolName_from_an_file"
-		"github.com/antha-lang/antha/antha/component/lib/Recovery"
-		"github.com/antha-lang/antha/antha/component/lib/RemoveRestrictionSites"
-		"github.com/antha-lang/antha/antha/component/lib/RestrictionDigestion"
-		"github.com/antha-lang/antha/antha/component/lib/RestrictionDigestion_conc"
-		"github.com/antha-lang/antha/antha/component/lib/SDSprep"
-		"github.com/antha-lang/antha/antha/component/lib/Scarfree_design"
-		"github.com/antha-lang/antha/antha/component/lib/Scarfree_siteremove_orfcheck"
-		"github.com/antha-lang/antha/antha/component/lib/SumVolume"
-		"github.com/antha-lang/antha/antha/component/lib/Test"
-		"github.com/antha-lang/antha/antha/component/lib/Thawtime"
-		"github.com/antha-lang/antha/antha/component/lib/Transfer"
-		"github.com/antha-lang/antha/antha/component/lib/Transformation"
-		"github.com/antha-lang/antha/antha/component/lib/Transformation_complete"
-		"github.com/antha-lang/antha/antha/component/lib/TypeIISAssembly_design"
-		"github.com/antha-lang/antha/antha/component/lib/TypeIISConstructAssembly"
-		"github.com/antha-lang/antha/antha/component/lib/TypeIISConstructAssemblyMMX"
-		"github.com/antha-lang/antha/antha/component/lib/TypeIISConstructAssembly_alt"
-		"github.com/antha-lang/antha/antha/component/lib/TypeIISConstructAssembly_sim"
-	*/
-	"github.com/antha-lang/antha/inject"
 	"reflect"
+
+	"github.com/antha-lang/antha/inject"
 )
 
 var (
@@ -137,6 +85,7 @@ func addComponent(desc Component) error {
 	components = append(components, desc)
 	return nil
 }
+
 func GetComponents() []Component {
 	return components
 }

@@ -614,7 +614,7 @@ func TypeIIDigest(sequence wtype.DNASequence, typeIIenzyme wtype.RestrictionEnzy
 	if len(Finalfragments) == 1 && sequence.Plasmid == true {
 		// TODO
 		// need to really return an uncut plasmid, maybe an error?
-		//	fmt.Println("uncut plasmid returned with no sticky ends!")
+		//	// fmt.Println("uncut plasmid returned with no sticky ends!")
 
 	}
 	if len(Finalfragments) > 1 && sequence.Plasmid == true {
@@ -746,7 +746,7 @@ func TypeIIsdigest(sequence wtype.DNASequence, typeIIsenzyme wtype.TypeIIs) (Fin
 	if len(Finalfragments) == 1 && sequence.Plasmid == true {
 		// TODO
 		// need to really return an uncut plasmid, maybe an error?
-		//	fmt.Println("uncut plasmid returned with no sticky ends!")
+		//	// fmt.Println("uncut plasmid returned with no sticky ends!")
 
 	}
 	if len(Finalfragments) > 1 && sequence.Plasmid == true {

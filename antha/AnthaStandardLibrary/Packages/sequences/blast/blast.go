@@ -146,6 +146,7 @@ func HitSummary(hits []Hit, topnumberofhits int, topnumberofhsps int) (summary s
 					//	Printfield(hits[0].Id),
 					text.Print("HspIdentity: ", strconv.Itoa(*hits[i].Hsps[j].HspIdentity)),
 					text.Print("queryLen: ", len(hits[i].Hsps[j].QuerySeq)),
+
 					text.Print("queryFrom: ", hits[i].Hsps[j].QueryFrom),
 					text.Print("queryTo: ", hits[i].Hsps[j].QueryTo),
 					text.Print("subjectLen: ", len(hits[i].Hsps[j].SubjectSeq)),
@@ -154,11 +155,13 @@ func HitSummary(hits []Hit, topnumberofhits int, topnumberofhsps int) (summary s
 					text.Print("alignLen: ", *hits[i].Hsps[j].AlignLen),
 					text.Print("Identity: ", identity),
 					text.Print("coverage: ", coverage),
+
 					ansi.Color("Sequence length:", "red"), seqlength,
 					ansi.Color("high scoring pairs for top match:", "red"), len(hits[0].Hsps),
 					ansi.Color("Id:", "red"), hits[i].Id,
 					ansi.Color("Definition:", "red"), hits[i].Def,
 					ansi.Color("Accession:", "red"), hits[i].Accession,
+
 					ansi.Color("Bitscore", "red"), hits[i].Hsps[j].BitScore,
 					ansi.Color("Score", "red"), hits[i].Hsps[j].Score,
 					ansi.Color("EValue", "red"), hits[i].Hsps[j].EValue)
@@ -417,3 +420,9 @@ func Hits(o *Output) (hits []Hit, err error) {
 
 	return
 }
+
+/*
+func BestHit(hits []Hit) (besthit Hit) {
+
+}
+*/

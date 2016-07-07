@@ -100,7 +100,7 @@ func init() {
 		Constructor: GrowthDOENew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/DoE/growth.an",
+			Path: "antha/component/an/GrowthAndAssay/growth.an",
 			Params: []ParamDesc{
 				{Name: "Growthtemp", Desc: "", Kind: "Parameters"},
 				{Name: "Growthtime", Desc: "", Kind: "Parameters"},

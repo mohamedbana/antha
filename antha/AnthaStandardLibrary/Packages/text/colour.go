@@ -53,7 +53,7 @@ func Printfield( value interface{}) (fmtd string) {
 		case Hit:
 		fmt.Printf("%+v\n", myValue)
 		default:
-		fmt.Println("Type not handled: ", reflect.TypeOf(value))
+		// fmt.Println("Type not handled: ", reflect.TypeOf(value))
 	}
 
 	//a := &Hsp{Len: "afoo"}

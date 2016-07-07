@@ -41,7 +41,7 @@ func _AliquotToSteps(_ctx context.Context, _input *AliquotToInput, _output *Aliq
 	number := _input.SolutionVolume.SIValue() / _input.VolumePerAliquot.SIValue()
 	possiblenumberofAliquots, _ := wutil.RoundDown(number)
 	if possiblenumberofAliquots < _input.NumberofAliquots {
-		panic("Not enough solution for this many aliquots")
+		execute.Errorf(_ctx, "Not enough solution for this many aliquots")
 	}
 
 	aliquots := make([]*wtype.LHComponent, 0)

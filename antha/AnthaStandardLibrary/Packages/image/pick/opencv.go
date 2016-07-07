@@ -15,8 +15,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"code.google.com/p/draw2d/draw2d"
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	//"code.google.com/p/draw2d/draw2d"
 	"github.com/disintegration/imaging"
 	//"github.com/hybridgroup/go-opencv/opencv"
@@ -108,20 +108,20 @@ func Pick(imagefile string, numbertopick int, setplateperimeterfirst bool, rotat
 					panic(err)
 				}
 				if counter == 1 {
-					fmt.Println("Rotating image")
-					fmt.Println("topleft point:", x, y)
+					// fmt.Println("Rotating image")
+					// fmt.Println("topleft point:", x, y)
 					topleft = opencv.Point{x, y}
 				} else if counter == 2 {
 					topright = opencv.Point{x, y}
-					fmt.Println("topright point:", x, y)
+					// fmt.Println("topright point:", x, y)
 					opposite := float64(topleft.Y) - float64(topright.Y)
 					adjacent := float64(topright.X) - float64(topleft.X)
 					tantheta := opposite / adjacent
-					fmt.Println("adjacent:", adjacent)
-					fmt.Println("opposite:", opposite)
-					fmt.Println("costheta:", tantheta)
+					// fmt.Println("adjacent:", adjacent)
+					// fmt.Println("opposite:", opposite)
+					// fmt.Println("costheta:", tantheta)
 					thetainrad := math.Atan(tantheta)
-					fmt.Println("thetainrad:", thetainrad)
+					// fmt.Println("thetainrad:", thetainrad)
 					degrees := (180 / math.Pi) * thetainrad
 					fmt.Println("degrees:", degrees)
 					tr := draw2d.NewRotationMatrix(thetainrad)
@@ -172,29 +172,29 @@ func Pick(imagefile string, numbertopick int, setplateperimeterfirst bool, rotat
 					defer win.Destroy()
 					// change status
 					rotated = true
-					fmt.Println("Now choose top left of plate")
+					// fmt.Println("Now choose top left of plate")
 
 					*/
 				}
 			} else if rotate && setplateperimeterfirst && counter == 3 && rotated || setplateperimeterfirst && counter == 1 && rotate == false {
 				topleft = opencv.Point{x, y}
-				fmt.Println("Topleft chosen")
-				fmt.Println("Now choose bottom right of plate")
+				// fmt.Println("Topleft chosen")
+				// fmt.Println("Now choose bottom right of plate")
 
 			} else if rotate && setplateperimeterfirst && counter == 4 && rotated || setplateperimeterfirst && counter == 2 && rotate == false {
 				bottomright = opencv.Point{x, y}
-				fmt.Println("plate boundaries", x, y)
+				// fmt.Println("plate boundaries", x, y)
 				opencv.Rectangle(img, topleft, bottomright, rgb, 1, 8, 0)
 				win.ShowImage(img)
 			} else {
 
 				prev_pt = opencv.Point{x, y}
-				fmt.Println("actual pixels:", x, y)
-				fmt.Println("imagesize:", img.ImageSize())
-				fmt.Println("width:", img.Width())
-				fmt.Println("height:", img.Height())
-				fmt.Println("Well:", PixelstoWellPosition(x, y, img))
-				fmt.Println("colony count:", counter)
+				// fmt.Println("actual pixels:", x, y)
+				// fmt.Println("imagesize:", img.ImageSize())
+				// fmt.Println("width:", img.Width())
+				// fmt.Println("height:", img.Height())
+				// fmt.Println("Well:", PixelstoWellPosition(x, y, img))
+				// fmt.Println("colony count:", counter)
 
 				if setplateperimeterfirst {
 					well = PixelstoWellPositionFromRectangle(x, y, topleft, bottomright)
@@ -367,22 +367,22 @@ func PickAgain(imagefile string, numbertopick int, setplateperimeterfirst bool, 
 					panic(err)
 				}
 				if counter == 1 {
-					fmt.Println("Rotating image")
-					fmt.Println("topleft point:", x, y)
+					// fmt.Println("Rotating image")
+					// fmt.Println("topleft point:", x, y)
 					topleft = opencv.Point{x, y}
 				} else if counter == 2 {
 					topright = opencv.Point{x, y}
-					fmt.Println("topright point:", x, y)
+					// fmt.Println("topright point:", x, y)
 					opposite := float64(topleft.Y) - float64(topright.Y)
 					adjacent := float64(topright.X) - float64(topleft.X)
 					tantheta := opposite / adjacent
-					fmt.Println("adjacent:", adjacent)
-					fmt.Println("opposite:", opposite)
-					fmt.Println("costheta:", tantheta)
+					// fmt.Println("adjacent:", adjacent)
+					// fmt.Println("opposite:", opposite)
+					// fmt.Println("costheta:", tantheta)
 					thetainrad := math.Atan(tantheta)
-					fmt.Println("thetainrad:", thetainrad)
+					// fmt.Println("thetainrad:", thetainrad)
 					degrees := (180 / math.Pi) * thetainrad
-					fmt.Println("degrees:", degrees)
+					// fmt.Println("degrees:", degrees)
 					tr := draw2d.NewRotationMatrix(thetainrad)
 
 					//
@@ -427,27 +427,27 @@ func PickAgain(imagefile string, numbertopick int, setplateperimeterfirst bool, 
 					defer win.Destroy()
 					// change status
 					rotated = true
-					fmt.Println("Now choose top left of plate")
+					// fmt.Println("Now choose top left of plate")
 				}
 			} else if rotate && setplateperimeterfirst && counter == 3 && rotated || setplateperimeterfirst && counter == 1 && rotate == false {
 				topleft = opencv.Point{x, y}
-				fmt.Println("Topleft chosen")
-				fmt.Println("Now choose bottom right of plate")
+				// fmt.Println("Topleft chosen")
+				// fmt.Println("Now choose bottom right of plate")
 
 			} else if rotate && setplateperimeterfirst && counter == 4 && rotated || setplateperimeterfirst && counter == 2 && rotate == false {
 				bottomright = opencv.Point{x, y}
-				fmt.Println("plate boundaries", x, y)
+				// fmt.Println("plate boundaries", x, y)
 				opencv.Rectangle(img, topleft, bottomright, rgb, 1, 8, 0)
 				win.ShowImage(img)
 			} else {
 
 				prev_pt = opencv.Point{x, y}
-				fmt.Println("actual pixels:", x, y)
-				fmt.Println("imagesize:", img.ImageSize())
-				fmt.Println("width:", img.Width())
-				fmt.Println("height:", img.Height())
-				fmt.Println("Well:", PixelstoWellPosition(x, y, img))
-				fmt.Println("colony count:", counter)
+				// fmt.Println("actual pixels:", x, y)
+				// fmt.Println("imagesize:", img.ImageSize())
+				// fmt.Println("width:", img.Width())
+				// fmt.Println("height:", img.Height())
+				// fmt.Println("Well:", PixelstoWellPosition(x, y, img))
+				// fmt.Println("colony count:", counter)
 
 				if setplateperimeterfirst {
 					well = PixelstoWellPositionFromRectangle(x, y, topleft, bottomright)
@@ -621,22 +621,22 @@ func Count(imagefile string, setplateperimeterfirst bool, rotate bool) (wells []
 					panic(err)
 				}
 				if counter == 1 {
-					fmt.Println("Rotating image")
-					fmt.Println("topleft point:", x, y)
+					// fmt.Println("Rotating image")
+					// fmt.Println("topleft point:", x, y)
 					topleft = opencv.Point{x, y}
 				} else if counter == 2 {
 					topright = opencv.Point{x, y}
-					fmt.Println("topright point:", x, y)
+					// fmt.Println("topright point:", x, y)
 					opposite := float64(topleft.Y) - float64(topright.Y)
 					adjacent := float64(topright.X) - float64(topleft.X)
 					tantheta := opposite / adjacent
-					fmt.Println("adjacent:", adjacent)
-					fmt.Println("opposite:", opposite)
-					fmt.Println("costheta:", tantheta)
+					// fmt.Println("adjacent:", adjacent)
+					// fmt.Println("opposite:", opposite)
+					// fmt.Println("costheta:", tantheta)
 					thetainrad := math.Atan(tantheta)
-					fmt.Println("thetainrad:", thetainrad)
+					// fmt.Println("thetainrad:", thetainrad)
 					degrees := (180 / math.Pi) * thetainrad
-					fmt.Println("degrees:", degrees)
+					// fmt.Println("degrees:", degrees)
 					tr := draw2d.NewRotationMatrix(thetainrad)
 
 					//
@@ -661,23 +661,23 @@ func Count(imagefile string, setplateperimeterfirst bool, rotate bool) (wells []
 				}
 			} else if rotate && setplateperimeterfirst && counter == 3 && rotated || setplateperimeterfirst && counter == 1 && rotate == false {
 				topleft = opencv.Point{x, y}
-				fmt.Println("Topleft chosen")
-				fmt.Println("Now choose bottom right of plate")
+				// fmt.Println("Topleft chosen")
+				// fmt.Println("Now choose bottom right of plate")
 
 			} else if rotate && setplateperimeterfirst && counter == 4 && rotated || setplateperimeterfirst && counter == 2 && rotate == false {
 				bottomright = opencv.Point{x, y}
-				fmt.Println("plate boundaries", x, y)
+				// fmt.Println("plate boundaries", x, y)
 				opencv.Rectangle(img, topleft, bottomright, rgb, 1, 8, 0)
 				win.ShowImage(img)
 			} else {
 
 				prev_pt = opencv.Point{x, y}
-				fmt.Println("actual pixels:", x, y)
-				fmt.Println("imagesize:", img.ImageSize())
-				fmt.Println("width:", img.Width())
-				fmt.Println("height:", img.Height())
-				fmt.Println("Well:", PixelstoWellPosition(x, y, img))
-				fmt.Println("colony count:", counter)
+				// fmt.Println("actual pixels:", x, y)
+				// fmt.Println("imagesize:", img.ImageSize())
+				// fmt.Println("width:", img.Width())
+				// fmt.Println("height:", img.Height())
+				// fmt.Println("Well:", PixelstoWellPosition(x, y, img))
+				// fmt.Println("colony count:", counter)
 
 				if setplateperimeterfirst {
 					well = PixelstoWellPositionFromRectangle(x, y, topleft, bottomright)
@@ -769,9 +769,9 @@ var alphabet []string = []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J
 
 func PixelstoWellPosition(x, y int, image *opencv.IplImage) (a1 string) {
 
-	fmt.Println("func pixels:", x, y)
-	fmt.Println("func width:", image.Width())
-	fmt.Println("func height:", image.Height())
+	// fmt.Println("func pixels:", x, y)
+	// fmt.Println("func width:", image.Width())
+	// fmt.Println("func height:", image.Height())
 
 	col1536 := (float64(x) / float64(image.Width())) * float64(48)
 	row1536 := (float64(y) / float64(image.Height())) * float64(36)
@@ -789,9 +789,9 @@ func PixelstoWellPosition(x, y int, image *opencv.IplImage) (a1 string) {
 }
 func PixelstoWellPositionFromRectangle(x, y int, topleft, bottomright opencv.Point) (a1 string) {
 
-	fmt.Println("func pixels:", x, y)
-	fmt.Println("rectangle width:", bottomright.X-topleft.X)
-	fmt.Println("rectangle height:", bottomright.Y-topleft.Y)
+	// fmt.Println("func pixels:", x, y)
+	// fmt.Println("rectangle width:", bottomright.X-topleft.X)
+	// fmt.Println("rectangle height:", bottomright.Y-topleft.Y)
 
 	col1536 := (float64(x-topleft.X) / float64(bottomright.X-topleft.X)) * float64(48)
 	row1536 := (float64(y-topleft.Y) / float64(bottomright.Y-topleft.Y)) * float64(36)

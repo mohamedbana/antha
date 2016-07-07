@@ -1,8 +1,0 @@
-{
-    "connections": [],
-    "processes": {
-        "MakeMedia": {
-            "component": "MakeMedia"
-        }
-    }
-}

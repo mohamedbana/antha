@@ -47,6 +47,9 @@ func _AccuracyTestSteps(_ctx context.Context, _input *AccuracyTestInput, _output
 	counter := 0
 	var platenum = 1
 	var runs = make([]doe.Run, 1)
+	var run doe.Run
+	// initialise slice with a run
+	runs[0] = run
 	var err error
 	_output.Errors = make([]error, 0)
 	// work out plate layout based on picture or just in order

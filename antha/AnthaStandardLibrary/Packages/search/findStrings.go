@@ -37,23 +37,23 @@ func Findall(bigthing string, smallthing string) (positions []int) {
 
 	positions = make([]int, 0)
 	count := strings.Count(bigthing, smallthing)
-	//fmt.Println("count", count)
+	//// fmt.Println("count", count)
 	if count != 0 {
 
 		pos := (strings.Index(bigthing, smallthing))
 		restofbigthing := bigthing[(pos + 1):]
-		//fmt.Println("seq", bigthing)
-		//fmt.Println("rest,", restofbigthing)
+		//// fmt.Println("seq", bigthing)
+		//// fmt.Println("rest,", restofbigthing)
 		//pos = pos
-		//fmt.Println("pos = ", pos)
+		//// fmt.Println("pos = ", pos)
 		for i := 0; i < count; i++ {
-			//fmt.Println("pos = ", pos)
+			//// fmt.Println("pos = ", pos)
 			positions = append(positions, (pos + 1))
-			//fmt.Println("positions", positions)
+			//// fmt.Println("positions", positions)
 			pos = pos + (strings.Index(restofbigthing, smallthing) + 1)
-			//fmt.Println("pos2 = ", pos)
+			//// fmt.Println("pos2 = ", pos)
 			restofbigthing = bigthing[(pos + 1):]
-			//fmt.Println("rest2,", restofbigthing)
+			//// fmt.Println("rest2,", restofbigthing)
 		}
 	}
 	return positions
