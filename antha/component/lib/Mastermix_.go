@@ -32,15 +32,14 @@ func _MastermixSetup(_ctx context.Context, _input *MastermixInput) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func _MastermixSteps(_ctx context.Context, _input *MastermixInput, _output *MastermixOutput) {
-
 	if len(_input.OtherComponents) != len(_input.OtherComponentVolumes) {
-		panic("len(OtherComponents) != len(OtherComponentVolumes)")
+		execute.Errorf(_ctx, "%d != %d", len(_input.OtherComponents), len(_input.OtherComponentVolumes))
 	}
 
 	mastermixes := make([]*wtype.LHComponent, 0)
 
 	if _input.AliquotbyRow {
-		panic("MixTo based method coming soon!")
+		execute.Errorf(_ctx, "MixTo based method coming soon!")
 	} else {
 		for i := 0; i < _input.NumberofMastermixes; i++ {
 

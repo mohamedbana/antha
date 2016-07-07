@@ -2,12 +2,12 @@
     "Parameters": {
         "Evaporationrate": {
             "Airvelocity": "0m/s",
-            "Executiontime": "3960s",
-            "Liquid": "water",
-            "Pa": "100800Pa",
-            "Platetype": "SRWFB96",
-            "Relativehumidity": 0.33,
-            "Temp": "23.0C",
+            "Executiontime": "4h",
+            "Liquid": "fluorescein",
+            "Pa": "102000Pa",
+            "Platetype": "pcrplate_skirted",
+            "Relativehumidity": 0.31,
+            "Temp": "31.4C",
             "Volumeperwell": "100ul"
         }
     }

@@ -74,7 +74,7 @@ func ReadGeneFiles(genefiles []string) {
 
 	}
 
-	fmt.Println("number of sequences", len(geneseqs))
+	// fmt.Println("number of sequences", len(geneseqs))
 
 }
 

@@ -87,6 +87,7 @@ func (p *compiler) anthaInit() {
 		"MixInto":      "execute.MixInto",
 		"Mix":          "execute.Mix",
 		"Incubate":     "execute.Incubate",
+		"Errorf":       "execute.Errorf",
 	}
 	p.types = map[string]string{
 		"Temperature":          "wunit.Temperature",
