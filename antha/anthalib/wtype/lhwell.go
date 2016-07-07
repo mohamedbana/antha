@@ -454,3 +454,9 @@ func (well *LHWell) IsAutoallocated() bool {
 	}
 	return false
 }
+
+func (well *LHWell) Evaporate(t wunit.Time, humidity float64, temp wunit.Temperature, pressure wunit.Pressure) wunit.Volume {
+	// given the parameters, how much volume goes away?
+	// this is destructive as usual, returns amount of volume lost
+
+}
