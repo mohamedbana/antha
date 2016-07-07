@@ -25,7 +25,6 @@ package wtype
 
 import (
 	"fmt"
-
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/logger"
 )
@@ -459,4 +458,5 @@ func (well *LHWell) Evaporate(t wunit.Time, humidity float64, temp wunit.Tempera
 	// given the parameters, how much volume goes away?
 	// this is destructive as usual, returns amount of volume lost
 
+	return wunit.NewVolume(0.0, "ul")
 }

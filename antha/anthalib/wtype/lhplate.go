@@ -280,6 +280,10 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit s
 }
 
 func (lhp *LHPlate) Dup() *LHPlate {
+	// protect yourself fgs
+	if lhp == nil {
+		logger.Fatal(fmt.Sprintln("Can't dup nonexistent plate"))
+	}
 	ret := NewLHPlate(lhp.Type, lhp.Mnfr, lhp.WlsY, lhp.WlsX, lhp.Height, lhp.Hunit, lhp.Welltype, lhp.WellXOffset, lhp.WellYOffset, lhp.WellXStart, lhp.WellYStart, lhp.WellZStart)
 
 	ret.PlateName = lhp.PlateName

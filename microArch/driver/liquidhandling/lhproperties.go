@@ -787,3 +787,22 @@ func (lhp *LHProperties) RemoveTemporaryComponents() {
 
 	// good
 }
+
+func (lhp *LHProperties) GetEnvironment() wtype.Environment {
+	// static to start with
+
+	return wtype.Environment{
+		Temperature:         wunit.NewTemperature(25, "C"),
+		Pressure:            wunit.NewPressure(1, "KPa"),
+		Humidity:            0.35,
+		MeanAirFlowVelocity: wunit.NewVelocity(0, "m/s"),
+	}
+}
+
+func (lhp *LHProperties) Evaporate(t wunit.Time) {
+	// TODO: proper environmental calls
+	env := lhp.GetEnvironment()
+	for _, v := range lhp.Plates {
+		v.Evaporate(t, env)
+	}
+}

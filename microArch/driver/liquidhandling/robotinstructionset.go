@@ -43,6 +43,7 @@ func (ri *RobotInstructionSet) Add(ins RobotInstruction) {
 	ri.instructions = append(ri.instructions, ris)
 }
 
+// destructive of state of robot
 func (ri *RobotInstructionSet) Generate(lhpr *LHPolicyRuleSet, lhpm *LHProperties) ([]RobotInstruction, error) {
 	ret := make([]RobotInstruction, 0, 1)
 
@@ -82,6 +83,9 @@ func (ri *RobotInstructionSet) Generate(lhpr *LHPolicyRuleSet, lhpm *LHPropertie
 		fin := NewFinalizeInstruction()
 		newret = append(newret, fin)
 		ret = newret
+	} else if ri.parent.Type == TFR {
+		// update the vols
+		prms.Evaporate()
 	}
 
 	return ret, nil
