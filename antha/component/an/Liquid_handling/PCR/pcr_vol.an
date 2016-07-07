@@ -49,6 +49,7 @@ Parameters (
 	Extensiontime Time // should be calculated from template length and polymerase rate
 	Finalextensiontime Time
 	Hotstart bool
+	AddPrimerstoMasterMix bool
 )
 
 // Data which is returned from this protocol, and data types
@@ -103,7 +104,7 @@ Steps {
 	}
 	
 	for i := range Additives {
-		additiveSample := mixer.SampleForConcentration(Additives[i], AdditiveVols[i])
+		additiveSample := mixer.Sample(Additives[i], AdditiveVols[i])
 		samples = append(samples, additiveSample)
 	}
 
@@ -126,7 +127,7 @@ Steps {
 	mastermix := MixInto(OutPlate, "", samples...)
 	
 	// rest samples to zero
-	samples := make([]*wtype.LHComponent, 0)
+	samples = make([]*wtype.LHComponent, 0)
 	
 	// if this is false do stuff inside {}
 	if !AddPrimerstoMasterMix {
@@ -142,8 +143,12 @@ Steps {
 	samples = append(samples, templateSample)
 
 	
-	reaction := Mix(mastermix, samples...)
+	for j := range samples { 
+	mastermix = Mix(mastermix, samples[j])
+	}
+	reaction := mastermix
 
+	// this needs to go after an initial denaturation!
 	if Hotstart {
 	polySample := mixer.Sample(PCRPolymerase, PolymeraseVolume)
 	

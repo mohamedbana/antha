@@ -1,29 +1,35 @@
 {
     "Parameters": {
         "PCR": {
-            "Additiveconc": "0.0001g/l",
+            "AdditiveVols": [
+			],
             "Additives": [],
+			"BufferConcinX":10,
+			"PolymeraseVolume":"1ul",
             "AnnealingTemp": "60C",
             "Annealingtime": "10s",
-            "Buffer": "Q5buffer",
+            "Buffer": "HC",
             "DNTPS": "DNTPs",
-            "DNTPconc": "0.0001g/l",
+            "DNTPVol": "1ul",
             "Denaturationtime": "5s",
-            "Extensiontemp": "72\u02daC",
             "Extensiontime": "60s",
             "Finalextensiontime": "600s",
             "FwdPrimer": "PrimerFw",
-            "FwdPrimerConc": "0.0001g/l",
+            "FwdPrimerVol": "1ul",
             "InitDenaturationtime": "30s",
             "Numberofcycles": 25,
             "OutPlate": "pcrplate_with_cooler",
             "PCRPolymerase": "Q5Polymerase",
             "ReactionVolume": "20ul",
             "RevPrimer": "PrimerRev",
-            "RevPrimerConc": "0.0001g/l",
-            "TargetpolymeraseConcentration": "0.0001g/l",
+            "RevPrimerVol": "1ul",
             "Template": "pET_GFP",
-            "Templatevolume": "2ul"
+            "Templatevolume": "2ul",
+			"Hotstart":true,
+			"AddPrimerstoMasterMix":true,
+			"Water":"water"
         }
     }
 }
+
+

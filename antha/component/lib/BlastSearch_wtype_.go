@@ -59,7 +59,7 @@ func _BlastSearch_wtypeSteps(_ctx context.Context, _input *BlastSearch_wtypeInpu
 	if err != nil {
 		fmt.Println(err.Error())
 
-	} //else {
+	}
 
 	_output.ExactHits, hitsummary, err = blast.AllExactMatches(hits)
 
