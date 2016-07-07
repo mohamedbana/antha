@@ -46,8 +46,11 @@ Setup {}
 // for every input
 Steps {
 	//Bufferstockvolume := wunit.NewVolume((FinalVolume.SIValue() * FinalConcentration.SIValue()/Bufferstockconc.SIValue()),"l")
-		
-	StockConc = buffers.StockConcentration(Moleculename, MassAddedinG, Diluent.CName, TotalVolume) 
+	var err error
+	StockConc, err = buffers.StockConcentration(Moleculename, MassAddedinG, Diluent.CName, TotalVolume) 
+        if err != nil {
+                panic(err)
+        }
 	
 	/*	
 	Buffer = MixInto(OutPlate,"",

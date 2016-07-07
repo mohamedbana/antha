@@ -81,11 +81,12 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 
 			partDNA, _ = parser.GenbanktoAnnotatedSeq(part)
 		} else {
-
+			nm := "Part " + strconv.Itoa(i)
 			if strings.Contains(part, "BBa_") {
+				nm = nm + "_" + part
 				part = igem.GetSequence(part)
 			}
-			partDNA = wtype.MakeLinearDNASequence("Part "+strconv.Itoa(i), part)
+			partDNA = wtype.MakeLinearDNASequence(nm, part)
 		}
 		partsinorder = append(partsinorder, partDNA)
 	}
@@ -146,7 +147,7 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 							warnings = append(warnings, warning)
 
 						}
-						warning = fmt.Sprintln("modified "+temppart.Nm+"new seq: ", temppart.Seq)
+						warning = fmt.Sprintln("modified "+temppart.Nm+"new seq: ", temppart.Seq, "original seq: ", part.Seq)
 						warnings = append(warnings, warning)
 						part = temppart
 
@@ -168,12 +169,13 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 		vectordata, _ = parser.GenbanktoAnnotatedSeq(_input.Vector)
 		vectordata.Plasmid = true
 	} else {
-
-		if strings.Contains(_input.Vector, "BBa_") {
+		vectornm := "Vector"
+		if strings.Contains(_input.Vector, "BBa_") || strings.Contains(_input.Vector, "pSB") {
+			vectornm = _input.Vector
 			_input.Vector = igem.GetSequence(_input.Vector)
 
 		}
-		vectordata = wtype.MakePlasmidDNASequence("Vector", _input.Vector)
+		vectordata = wtype.MakePlasmidDNASequence(vectornm, _input.Vector)
 	}
 
 	//lookup restriction enzyme
@@ -258,7 +260,7 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 	for _, part := range _output.PartswithOverhangs {
 		partsummary = append(partsummary, text.Print(part.Nm, part.Seq))
 	}
-
+	partsummary = append(partsummary, text.Print("Vector:"+vectordata.Nm, vectordata.Seq))
 	partstoorder := text.Print("PartswithOverhangs: ", partsummary)
 
 	// Print status

@@ -25,9 +25,7 @@ package pubchem
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 	//"time"
@@ -184,8 +182,7 @@ func MakeOutputspec(spec string, optionalcallbackname string) (outputspec string
 	return outputspec
 }
 
-func PugLookup(inputspec string, operationspec string, outputspec string, operation_options string) (output []byte) {
-
+func PugLookup(inputspec string, operationspec string, outputspec string, operation_options string) ([]byte, error) {
 	pugprepend := "http://pubchem.ncbi.nlm.nih.gov/rest/pug"
 
 	array := make([]string, 0)
@@ -200,49 +197,55 @@ func PugLookup(inputspec string, operationspec string, outputspec string, operat
 	*/
 	res, err := http.Get(Urlstring)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	output, err = ioutil.ReadAll(res.Body)
-	res.Body.Close()
+	if res != nil {
+		defer res.Body.Close()
+	}
+
+	output, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	fmt.Println(Urlstring, "=", string(output))
-	return output
+	return output, nil
 }
 
-func Compoundproperties(name string) (jsonstring string) {
+func Compoundproperties(name string) (string, error) {
 	// need this structure: http://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/glucose/property/MolecularFormula,MolecularWeight/JSON
 
 	inputspec := MakeInputspec("compound", "name", []string{name})
 	operationspec := MakeOperationspec("property", []string{"MolecularFormula", "MolecularWeight"})
 	outputspec := MakeOutputspec("JSON", "")
-	output := PugLookup(inputspec, operationspec, outputspec, "")
+	output, err := PugLookup(inputspec, operationspec, outputspec, "")
+	if err != nil {
+		return "", err
+	}
 
-	jsonstring = string(output)
-
-	return jsonstring
+	return string(output), nil
 }
 
-func MakeMolecule(name string) (molecule Molecule) {
+func MakeMolecule(name string) (Molecule, error) {
 	// need this structure: http://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/glucose/property/MolecularFormula,MolecularWeight/JSON
 
 	inputspec := MakeInputspec("compound", "name", []string{name})
 	operationspec := MakeOperationspec("property", []string{"MolecularFormula", "MolecularWeight"})
 	outputspec := MakeOutputspec("JSON", "")
-	output := PugLookup(inputspec, operationspec, outputspec, "")
+	output, err := PugLookup(inputspec, operationspec, outputspec, "")
+	if err != nil {
+		return Molecule{}, err
+	}
 
 	var pubchemtable Pubchemtable
-	err := json.Unmarshal(output, &pubchemtable)
-	if err != nil {
-		fmt.Println("error:", err)
+	if err := json.Unmarshal(output, &pubchemtable); err != nil {
+		return Molecule{}, err
 	}
 
+	var molecule Molecule
 	molecule.Moleculename = name
 	molecule.CID = pubchemtable.Propertytable[0].CID
 	molecule.MolecularFormula = pubchemtable.Propertytable[0].MolecularFormula
 	molecule.MolecularWeight = pubchemtable.Propertytable[0].MolecularWeight
-	return molecule
+	return molecule, nil
 }
 
 type Pubchemtable struct {
@@ -276,13 +279,15 @@ type Substance struct {
 	SID           int `json:"SID"`
 }
 
-func MakeMolecules(names []string) (molecules []Molecule) {
-
-	molecules = make([]Molecule, 0)
+func MakeMolecules(names []string) ([]Molecule, error) {
+	var molecules []Molecule
 
 	for _, name := range names {
-		molecule := MakeMolecule(name)
+		molecule, err := MakeMolecule(name)
+		if err != nil {
+			return nil, err
+		}
 		molecules = append(molecules, molecule)
 	}
-	return molecules
+	return molecules, nil
 }

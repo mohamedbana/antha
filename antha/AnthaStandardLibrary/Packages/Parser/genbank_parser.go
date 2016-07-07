@@ -30,19 +30,17 @@ import (
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	//"io/ioutil"
 	"bufio"
-	"log"
 	"os"
 	"strconv"
 	"strings"
 )
 
-func GenbanktoSimpleSeq(filename string) (seq string) {
-
+func GenbanktoSimpleSeq(filename string) (string, error) {
 	var line string
 	genbanklines := make([]string, 0)
 	file, err := os.Open(filename)
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 	defer file.Close()
 
@@ -53,51 +51,19 @@ func GenbanktoSimpleSeq(filename string) (seq string) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
-	seq = HandleSequence(genbanklines)
-
-	return
-
+	return HandleSequence(genbanklines), nil
 }
 
-func GenbanktoFeaturelessDNASequence(filename string) (standardseq wtype.DNASequence, err error) {
-	var annotated wtype.DNASequence
+func GenbanktoFeaturelessDNASequence(filename string) (wtype.DNASequence, error) {
 	line := ""
 	genbanklines := make([]string, 0)
 	var file *os.File
-	file, err = os.Open(filename)
-	if err != nil {
-		return
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line = fmt.Sprintln(scanner.Text())
-		genbanklines = append(genbanklines, line)
-	}
-
-	if err = scanner.Err(); err != nil {
-		return
-	}
-
-	annotated, err = HandleGenbank(genbanklines)
-
-	standardseq = annotated
-
-	return
-}
-
-func GenbankFeaturetoDNASequence(filename string, featurename string) (standardseq wtype.DNASequence, err error) {
-
-	var annotated wtype.DNASequence
-	line := ""
-	genbanklines := make([]string, 0)
 	file, err := os.Open(filename)
 	if err != nil {
-		log.Fatal(err)
+		return wtype.DNASequence{}, err
 	}
 	defer file.Close()
 
@@ -108,31 +74,54 @@ func GenbankFeaturetoDNASequence(filename string, featurename string) (standards
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+		return wtype.DNASequence{}, err
 	}
 
-	annotated, err = HandleGenbank(genbanklines)
+	return HandleGenbank(genbanklines)
+}
 
+func GenbankFeaturetoDNASequence(filename string, featurename string) (wtype.DNASequence, error) {
+	line := ""
+	genbanklines := make([]string, 0)
+	file, err := os.Open(filename)
+	if err != nil {
+		return wtype.DNASequence{}, err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line = fmt.Sprintln(scanner.Text())
+		genbanklines = append(genbanklines, line)
+	}
+
+	if err := scanner.Err(); err != nil {
+		return wtype.DNASequence{}, err
+	}
+
+	annotated, err := HandleGenbank(genbanklines)
+	if err != nil {
+		return wtype.DNASequence{}, err
+	}
+
+	var standardseq wtype.DNASequence
 	for _, feature := range annotated.Features {
-
 		if strings.Contains(feature.Name, featurename) {
 			standardseq.Nm = feature.Name
 			standardseq.Seq = feature.DNASeq
-			return
+			break
 		}
-
 	}
 
-	return
-
+	return standardseq, nil
 }
 
-func GenbanktoAnnotatedSeq(filename string) (annotated wtype.DNASequence, err error) {
+func GenbanktoAnnotatedSeq(filename string) (wtype.DNASequence, error) {
 	line := ""
 	genbanklines := make([]string, 0)
 	file, err := os.Open(filename)
 	if err != nil {
-		log.Fatal(err)
+		return wtype.DNASequence{}, err
 	}
 	defer file.Close()
 
@@ -143,16 +132,13 @@ func GenbanktoAnnotatedSeq(filename string) (annotated wtype.DNASequence, err er
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+		return wtype.DNASequence{}, err
 	}
 
-	annotated, err = HandleGenbank(genbanklines)
-
-	return
-
+	return HandleGenbank(genbanklines)
 }
 
-func ParseGenbankfile(file *os.File) (annotated wtype.DNASequence, err error) {
+func ParseGenbankfile(file *os.File) (wtype.DNASequence, error) {
 	line := ""
 	genbanklines := make([]string, 0)
 	defer file.Close()
@@ -162,18 +148,15 @@ func ParseGenbankfile(file *os.File) (annotated wtype.DNASequence, err error) {
 		line = fmt.Sprintln(scanner.Text())
 		genbanklines = append(genbanklines, line)
 	}
-	fmt.Println("lines scanned")
+
 	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+		return wtype.DNASequence{}, err
 	}
 
-	annotated, err = HandleGenbank(genbanklines)
-
-	return
-
+	return HandleGenbank(genbanklines)
 }
-func HandleGenbank(lines []string) (annotatedseq wtype.DNASequence, err error) {
 
+func HandleGenbank(lines []string) (annotatedseq wtype.DNASequence, err error) {
 	if lines[0][0:5] == `LOCUS` {
 		// fmt.Println("in Locus")
 		name, _, _, circular, _, err := Locusline(lines[0])

@@ -77,7 +77,8 @@ func Containsallthings(bigthing string, smallthings []string) (trueornot bool) {
 	i := 0
 	for _, thing := range smallthings {
 
-		if strings.Contains(strings.ToUpper(bigthing), strings.ToUpper(thing)) {
+		//	if strings.Contains(strings.ToUpper(bigthing), strings.ToUpper(thing)) {
+		if strings.Contains(bigthing, thing) {
 			i = i + 1
 		}
 	}

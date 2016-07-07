@@ -19,7 +19,7 @@ import (
 
 // Data which is returned from this protocol; output data
 
-//AnthaSeq wtype.DNASequence
+//AllHits []biogo.Hit
 
 // Physical inputs to this protocol
 
@@ -39,31 +39,49 @@ func _BlastSearchSteps(_ctx context.Context, _input *BlastSearchInput, _output *
 
 	var err error
 	var hits []biogo.Hit
+	var hitsummary string
+	var identity float64
+	var coverage float64
+	var besthitsummary string
 
 	// Convert the sequence to an anthatype
-	AnthaSeq := wtype.MakeLinearDNASequence(_input.Name, _input.DNA)
+	_output.AnthaSeq = wtype.MakeLinearDNASequence(_input.Name, _input.DNA)
 
 	// look for orfs
-	orf, orftrue := sequences.FindORF(AnthaSeq.Seq)
+	orf, orftrue := sequences.FindORF(_output.AnthaSeq.Seq)
 
-	if orftrue == true && len(orf.DNASeq) == len(AnthaSeq.Seq) {
+	if orftrue == true && len(orf.DNASeq) == len(_output.AnthaSeq.Seq) {
 		// if open reading frame is detected, we'll perform a blastP search'
-		fmt.Println("ORF detected:", "full sequence length: ", len(AnthaSeq.Seq), "ORF length: ", len(orf.DNASeq))
+		fmt.Println("ORF detected:", "full sequence length: ", len(_output.AnthaSeq.Seq), "ORF length: ", len(orf.DNASeq))
 		hits, err = blast.MegaBlastP(orf.ProtSeq)
 	} else {
 		// otherwise we'll blast the nucleotide sequence
-		hits, err = AnthaSeq.Blast()
+		hits, err = _output.AnthaSeq.Blast()
 	}
 	if err != nil {
 		fmt.Println(err.Error())
 
-	} //else {
+	}
 
-	//Hits = fmt.Sprintln(blast.HitSummary(hits))
+	_output.ExactHits, hitsummary, err = blast.AllExactMatches(hits)
 
+	if len(_output.ExactHits) == 0 {
+		hitsummary, err = blast.HitSummary(hits, 10, 10)
+	}
+	_output.BestHit, identity, coverage, besthitsummary, err = blast.FindBestHit(hits)
+
+	//	AllHits = hits
+	_output.Hitssummary = hitsummary
+	fmt.Println(hitsummary)
+	fmt.Println(besthitsummary)
 	// Rename Sequence with ID of top blast hit
-	AnthaSeq.Nm = hits[0].Id
-	//}
+
+	if coverage == 100 && identity == 100 {
+		_output.AnthaSeq.Nm = _output.BestHit.Id
+	}
+	_output.Warning = err
+	_output.Identity = identity
+	_output.Coverage = coverage
 
 }
 
@@ -128,12 +146,24 @@ type BlastSearchInput struct {
 }
 
 type BlastSearchOutput struct {
-	Hits string
+	AnthaSeq    wtype.DNASequence
+	BestHit     biogo.Hit
+	Coverage    float64
+	ExactHits   []biogo.Hit
+	Hitssummary string
+	Identity    float64
+	Warning     error
 }
 
 type BlastSearchSOutput struct {
 	Data struct {
-		Hits string
+		AnthaSeq    wtype.DNASequence
+		BestHit     biogo.Hit
+		Coverage    float64
+		ExactHits   []biogo.Hit
+		Hitssummary string
+		Identity    float64
+		Warning     error
 	}
 	Outputs struct {
 	}
@@ -148,7 +178,13 @@ func init() {
 			Params: []component.ParamDesc{
 				{Name: "DNA", Desc: "", Kind: "Parameters"},
 				{Name: "Name", Desc: "", Kind: "Parameters"},
-				{Name: "Hits", Desc: "", Kind: "Data"},
+				{Name: "AnthaSeq", Desc: "", Kind: "Data"},
+				{Name: "BestHit", Desc: "", Kind: "Data"},
+				{Name: "Coverage", Desc: "", Kind: "Data"},
+				{Name: "ExactHits", Desc: "AllHits []biogo.Hit\n", Kind: "Data"},
+				{Name: "Hitssummary", Desc: "", Kind: "Data"},
+				{Name: "Identity", Desc: "", Kind: "Data"},
+				{Name: "Warning", Desc: "", Kind: "Data"},
 			},
 		},
 	}); err != nil {

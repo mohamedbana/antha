@@ -90,7 +90,7 @@ func _TypeIISAssembly_designSteps(_ctx context.Context, _input *TypeIISAssembly_
 	// or Look up parts from registry according to properties (this will take a couple of minutes the first time)
 	exacttypeonly := true
 
-	subparts := igem.FilterRegistry("REPORTER", []string{"Fluorescent", "A "}, exacttypeonly)
+	subparts, _ := igem.FilterRegistry("REPORTER", []string{"Fluorescent", "A "}, exacttypeonly)
 	partdetails := igem.LookUp(subparts)
 	//fmt.Println(partdetails)
 
