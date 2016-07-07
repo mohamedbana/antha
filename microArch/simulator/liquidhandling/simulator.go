@@ -29,6 +29,7 @@ import (
 	"github.com/antha-lang/antha/microArch/driver"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/simulator"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 )
 
 // Simulate a liquid handler Driver
@@ -349,14 +350,27 @@ func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{},
     position = %v,
     plate = %v,
     name = %v)`, position, plate, name))
-    //position exists
+    //check that the requested position exists
     if !self.locationIsKnown(position) {
         self.AddError(simulator.NewSimulationError(simulator.SeverityWarning,
             fmt.Sprintf("Adding plate \"%s\" to unknown location \"%s\"", name, position),
             nil))
     }
+    //check that the requested position is empty
+
     //position can accept a plate of this type
-    //plate can be cast to LHPlate. plate type mathes position type
+    switch plate := plate.(type) {
+    case *wtype.LHPlate:
+        
+    case *wtype.LHTipbox:
+
+    case *wtype.LHTipwaste:
+
+    default:
+        self.AddError(simulator.NewSimulationError(simulator.SeverityWarning,
+            fmt.Sprintf("unknown plate of type %T while adding \"%s\" to location \"%s\"", plate, name, position),
+            nil))
+    }
     return driver.CommandStatus{true, driver.OK, "ADDPLATETO ACK"}
 }
 

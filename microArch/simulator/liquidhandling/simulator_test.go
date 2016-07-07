@@ -119,7 +119,7 @@ func AddAllTips(lhp *liquidhandling.LHProperties) *liquidhandling.LHProperties {
 }
 
 
-func makeLHProperties(p LHPropertiesParams) *liquidhandling.LHProperties {
+func makeLHProperties(p *LHPropertiesParams) *liquidhandling.LHProperties {
 
 
 	layout := make(map[string]wtype.Coordinates)
@@ -146,6 +146,147 @@ func makeLHProperties(p LHPropertiesParams) *liquidhandling.LHProperties {
     return lhp
 }
 
+type ShapeParams struct {
+    name            string 
+    lengthunit      string 
+    h               float64
+    w               float64
+    d               float64
+}
+
+func makeShape(p *ShapeParams) *wtype.Shape {
+    return wtype.NewShape(p.name, p.lengthunit, p.h, p.w, p.d)
+}
+
+type LHWellParams struct {
+    platetype       string 
+    plateid         string 
+    crds            string
+    vunit           string 
+    vol             float64
+    rvol            float64 
+    shape           ShapeParams 
+    bott            int 
+    xdim            float64
+    ydim            float64 
+    zdim            float64 
+    bottomh         float64 
+    dunit           string
+}
+
+func makeLHWell(p *LHWellParams) *wtype.LHWell {
+    return wtype.NewLHWell(p.platetype, 
+                           p.plateid, 
+                           p.crds, 
+                           p.vunit, 
+                           p.vol, 
+                           p.rvol,
+                           makeShape(&p.shape),
+                           p.bott,
+                           p.xdim,
+                           p.ydim,
+                           p.zdim,
+                           p.bottomh,
+                           p.dunit)
+}
+
+type LHPlateParams struct {
+    platetype       string 
+    mfr             string 
+    nrows           int 
+    ncols           int 
+    height          float64
+    hunit           string
+    welltype        LHWellParams
+    wellXOffset     float64 
+    wellYOffset     float64 
+    wellXStart      float64
+    wellYStart      float64
+    wellZStart      float64
+}
+
+func makeLHPlate(p *LHPlateParams) *wtype.LHPlate {
+    return wtype.NewLHPlate(p.platetype,
+                            p.mfr,
+                            p.nrows,
+                            p.ncols,
+                            p.height,
+                            p.hunit,
+                            makeLHWell(&p.welltype),
+                            p.wellXOffset,
+                            p.wellYOffset,
+                            p.wellXStart,
+                            p.wellYStart,
+                            p.wellZStart)
+}
+
+type LHTipParams struct {
+    mfr         string
+    ttype       string 
+    minvol      float64
+    maxvol      float64 
+    volunit     string
+}
+
+func makeLHTip(p *LHTipParams) *wtype.LHTip {
+    return wtype.NewLHTip(p.mfr,
+                         p.ttype,
+                         p.minvol,
+                         p.maxvol,
+                         p.volunit)
+}
+
+type LHTipboxParams struct {
+    nrows           int 
+    ncols           int 
+    height          float64 
+    manufacturer    string
+    boxtype         string 
+    tiptype         LHTipParams
+    well            LHWellParams 
+    tipxoffset      float64
+    tipyoffset      float64
+    tipxstart       float64
+    tipystart       float64
+    tipzstart       float64
+}
+
+func makeLHTipbox(p *LHTipboxParams) *wtype.LHTipbox {
+    return wtype.NewLHTipbox(p.nrows,
+                             p.ncols,
+                             p.height,
+                             p.manufacturer,
+                             p.boxtype,
+                             makeLHTip(&p.tiptype),
+                             makeLHWell(&p.well),
+                             p.tipxoffset,
+                             p.tipyoffset,
+                             p.tipystart,
+                             p.tipxstart,
+                             p.tipzstart)
+}
+
+type LHTipwasteParams struct {
+    capacity        int 
+    typ             string
+    mfr             string 
+    height          float64 
+    w               LHWellParams 
+    wellxstart      float64
+    wellystart      float64
+    wellzstart      float64
+}
+
+func makeLHTipWaste(p *LHTipwasteParams) *wtype.LHTipwaste {
+    return wtype.NewLHTipwaste(p.capacity,
+                               p.typ,
+                               p.mfr,
+                               p.height,
+                               makeLHWell(&p.w),
+                               p.wellxstart,
+                               p.wellystart,
+                               p.wellzstart)
+}
 
 /*
  *######################################### Test Data
@@ -200,13 +341,17 @@ func get_valid_props() *LHPropertiesParams {
         },
         []string{"position1","position2",},             //Tip_preferences
         []string{"position3","position4",},             //Input_preferences
-        []string{"position5","position6",}, //Output_preferences
-        []string{"position7",},             //Tipwaste_preferences
-        []string{"position8",},             //Wash_preferences
-        []string{"position9",},             //Waste_preferences
+        []string{"position5","position6",},             //Output_preferences
+        []string{"position7",},                         //Tipwaste_preferences
+        []string{"position8",},                         //Wash_preferences
+        []string{"position9",},                         //Waste_preferences
     }
 
     return &valid_props
+}
+
+func get_valid_vlh() *VirtualLiquidHandler {
+    return NewVirtualLiquidHandler(makeLHProperties(get_valid_props()))
 }
 
 type LHPropertyTest struct {
@@ -274,6 +419,124 @@ func get_missing_prefs() []LHPropertyTest {
     return ret
 }
 
+func get_lhplate() *wtype.LHPlate {
+    params := LHPlateParams {
+        "test_plate_type",  // platetype       string 
+        "test_plate_mfr",   // mfr             string 
+        8,                  // nrows           int 
+        12,                 // ncols           int 
+        25.7,               // height          float64
+        "mm",               // hunit           string
+        LHWellParams{           // welltype
+            "test_welltype",    // platetype       string 
+            "test_wellid",      // plateid         string 
+            "",                 // crds            string
+            "ul",               // vunit           string 
+            200,                // vol             float64
+            5,                  // rvol            float64 
+            ShapeParams{            // shape           ShapeParams struct {
+               "test_shape",        // name            string 
+               "mm",                // lengthunit      string 
+               5.5,                 // h               float64
+               5.5,                 // w               float64
+               20.4,                // d               float64
+            },
+           wtype.LHWBV,         // bott            int 
+           5.5,                 // xdim            float64
+           5.5,                 // ydim            float64 
+           20.4,                // zdim            float64 
+           1.4,                 // bottomh         float64 
+           "mm",                // dunit           string
+        },
+        9.,        // wellXOffset     float64 
+        9.,        // wellYOffset     float64 
+        0.,        // wellXStart      float64
+        0.,        // wellYStart      float64
+        18.5,      // wellZStart      float64
+    }
+
+    return makeLHPlate(&params)
+}
+
+func get_lhtipbox() *wtype.LHTipbox {
+    params := LHTipboxParams{
+        8,                      //nrows           int 
+        12,                     //ncols           int 
+        60.13,                  //height          float64 
+        "test Tipbox mfg",      //manufacturer    string
+        "test Tipbox type",     //boxtype         string 
+        LHTipParams {           //tiptype
+            "test_tip mfg",         //mfr         string
+            "test_tip type",        //ttype       string 
+            50,                     //minvol      float64
+            1000,                   //maxvol      float64 
+            "ul",                   //volunit     string
+        },
+        LHWellParams{           // well
+            "test_welltype",        // platetype       string 
+            "test_wellid",          // plateid         string 
+            "",                     // crds            string
+            "ul",                   // vunit           string 
+            1000,                   // vol             float64
+            50,                     // rvol            float64 
+            ShapeParams{            // shape           ShapeParams struct {
+               "test_shape",            // name            string 
+               "mm",                    // lengthunit      string 
+               7.3,                     // h               float64
+               7.3,                     // w               float64
+               51.2,                    // d               float64
+            },
+           wtype.LHWBV,             // bott            int 
+           7.3,                     // xdim            float64
+           7.3,                     // ydim            float64 
+           51.2,                    // zdim            float64 
+           0.0,                     // bottomh         float64 
+           "mm",                    // dunit           string
+        },
+        9.,                     //tipxoffset      float64
+        9.,                     //tipyoffset      float64
+        0.,                     //tipxstart       float64
+        0.,                     //tipystart       float64
+        0.,                     //tipzstart       float64
+    }
+
+    return makeLHTipbox(&params)
+}
+
+func get_lhtipwaste() *wtype.LHTipwaste {
+    params := LHTipwasteParams {
+        700,                    //capacity        int 
+        "test tipwaste",        //typ             string
+        "testTipwaste mfr",     //mfr             string 
+        92.0,                   //height          float64 
+        LHWellParams{           // w               LHWellParams
+            "test_tipwaste_well",   // platetype       string 
+            "test_wellid",          // plateid         string 
+            "",                     // crds            string
+            "ul",                   // vunit           string 
+            800000.0,                   // vol             float64
+            800000.0,                     // rvol            float64 
+            ShapeParams{            // shape           ShapeParams struct {
+               "test_tipbox",           // name            string 
+               "mm",                    // lengthunit      string 
+               123.0,                   // h               float64
+               80.0,                    // w               float64
+               92.0,                    // d               float64
+            },
+           wtype.LHWBV,             // bott            int 
+           123.0,                   // xdim            float64
+           80.0,                    // ydim            float64 
+           92.0,                    // zdim            float64 
+           0.0,                     // bottomh         float64 
+           "mm",                    // dunit           string
+        },
+        85.5,               //wellxstart      float64
+        45.5,               //wellystart      float64
+        0.0,                //wellzstart      float64
+    }
+    return makeLHTipWaste(&params)
+}
+
 /*
  * ######################################## utils
  */
@@ -294,16 +557,12 @@ func test_worst(t *testing.T, errors []*simulator.SimulationError, worst simulat
 
 
 func run_prop_test(t *testing.T, pt LHPropertyTest) {
-    vlh := NewVirtualLiquidHandler(makeLHProperties(*pt.Properties))
+    vlh := NewVirtualLiquidHandler(makeLHProperties(pt.Properties))
     errors, worst := vlh.GetErrors()
     test_worst(t, errors, worst)
 
-    actual_errors := make([]string, 0)
-    for _,err := range errors {
-        actual_errors = append(actual_errors, err.Error())
-    }
 
-    compare_errors(t, pt.ErrorStrings, actual_errors)
+    compare_errors(t, pt.ErrorStrings, errors)
 }
 
 //return subset of a not in b
@@ -321,11 +580,15 @@ func get_not_in(a, b []string) []string {
 
 
 
-func compare_errors(t *testing.T, expected []string, actual []string) {
+func compare_errors(t *testing.T, expected []string, actual []*simulator.SimulationError) {
+    string_errors := make([]string, 0)
+    for _,err := range actual {
+        string_errors = append(string_errors, err.Error())
+    }
     // maybe sort alphabetically?
     
-    missing := get_not_in(expected, actual)
-    extra := get_not_in(actual, expected)
+    missing := get_not_in(expected, string_errors)
+    extra := get_not_in(string_errors, expected)
 
     if len(missing) != 0 {
         t.Error(fmt.Sprintf("missing expected error(s): %v", missing))
@@ -341,7 +604,7 @@ func compare_errors(t *testing.T, expected []string, actual []string) {
 
 
 func TestNewVirtualLiquidHandler_ValidProps(t *testing.T) {
-    lhp := makeLHProperties(*get_valid_props())
+    lhp := makeLHProperties(get_valid_props())
     vlh := NewVirtualLiquidHandler(lhp)
 
     errors, max_severity := vlh.GetErrors()
@@ -366,4 +629,42 @@ func TestNewVirtualLiquidHandler_MissingPrefs(t *testing.T) {
     }
 }
 
+func TestVLH_AddPlateTo_Valid(t *testing.T) {
+    vlh := get_valid_vlh()
+    //try adding a test LHplate to preferred inputs and outputs
+    for i,loc := range []string{"position3","position4","position5","position6",} {
+        vlh.AddPlateTo(loc, get_lhplate(), fmt.Sprintf("LHPlate_%v", i))
+    }
+    //try adding a test LHTipBox to preferred Tips
+    for i,loc := range []string{"position1","position2",} {
+        vlh.AddPlateTo(loc, get_lhtipbox(), fmt.Sprintf("LHTipbox_%v", i))
+    }
+    //try adding a test LHTipWaste to preferred TipWaste
+    for i,loc := range []string{"position7"} {
+        vlh.AddPlateTo(loc, get_lhtipwaste(), fmt.Sprintf("LHTipwaste_%v", i))
+    }
 
+    errors, _ := vlh.GetErrors()
+    compare_errors(t, []string{}, errors)
+}
+
+func TestVLH_AddPlateTo_NotPlateType(t *testing.T) {
+    vlh := get_valid_vlh()
+    //try adding something that's the wrong type
+    vlh.AddPlateTo("position2", "my plate's gone stringy", "not_a_plate")
+
+    errors, _ := vlh.GetErrors()
+    compare_errors(t, []string{"(warn) unknown plate of type string while adding \"not_a_plate\" to location \"position2\""}, errors)
+}
+
+func TestVLH_AddPlateTo_locationFull(t *testing.T) {
+    vlh := get_valid_vlh()
+    
+    //add a plate
+    vlh.AddPlateTo("position1", get_lhplate(), "p0")
+    //try to add another plate in the same location
+    vlh.AddPlateTo("position1", get_lhplate(), "p1")
+
+    errors, _ := vlh.GetErrors()
+    compare_errors(t, []string{"(warn) Adding plate \"p1\" to \"position1\" which is already occupied by plate \"p0\""}, errors)
+}
