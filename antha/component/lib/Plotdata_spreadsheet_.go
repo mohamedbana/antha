@@ -53,7 +53,7 @@ func _Plotdata_spreadsheetSteps(_ctx context.Context, _input *Plotdata_spreadshe
 		fmt.Println(_input.Xminmax, Xdatarange)
 		panic(err)
 	}
-	fmt.Println(Xdatarange)
+	//	fmt.Println(Xdatarange)
 
 	Ydatarangearray := make([][]string, 0)
 	for i, Yminmax := range _input.Yminmaxarray {
@@ -66,7 +66,7 @@ func _Plotdata_spreadsheetSteps(_ctx context.Context, _input *Plotdata_spreadshe
 			panic(panicmessage.Error())
 		}
 		Ydatarangearray = append(Ydatarangearray, Ydatarange)
-		fmt.Println(Ydatarange)
+		//	fmt.Println(Ydatarange)
 	}
 
 	// now plot the graph
