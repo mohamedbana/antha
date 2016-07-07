@@ -8,7 +8,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/export"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/entrez"
-
+	"path/filepath"
 )
 
 Parameters (
@@ -46,7 +46,9 @@ Steps {
 	
 	// Retrieve part seqs from entrez
 	for _, part := range Parts {
-		DNA, _ := entrez.RetrieveSequence(part, "nucleotide",part+".gb")
+		//desiredfilename := filepath.Join(anthapath.Path(), part+".gb")
+		desiredfilename := filepath.Join(ConstructName, part+".gb")
+		DNA,_, _ := entrez.RetrieveSequence(part, "nucleotide",desiredfilename)
 		PartDNA =append(PartDNA, DNA)
 	}
 	
@@ -54,7 +56,11 @@ Steps {
 	EnzymeInf, _ := lookup.TypeIIsLookup(RE)
 	
 	// look up vector sequence
-	VectorSeq, _ := entrez.RetrieveVector(Vector)
+	
+	//desiredvectorfilename := filepath.Join(anthapath.Path(), Vector+".gb")
+	desiredvectorfilename := filepath.Join(ConstructName, Vector+".gb")
+	
+	VectorSeq,_, _ := entrez.RetrieveVector(Vector,desiredvectorfilename)
 
 	// Add overhangs
 	if EndsAlreadyAdded {

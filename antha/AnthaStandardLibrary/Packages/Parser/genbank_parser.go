@@ -23,6 +23,7 @@
 package parser
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
@@ -122,6 +123,28 @@ func GenbankFeaturetoDNASequence(filename string, featurename string) (standards
 		}
 
 	}
+
+	return
+
+}
+
+func GenbankContentstoAnnotatedSeq(contentsinbytes []byte) (annotated wtype.DNASequence, err error) {
+	line := ""
+	genbanklines := make([]string, 0)
+
+	file := bytes.NewBuffer(contentsinbytes)
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line = fmt.Sprintln(scanner.Text())
+		genbanklines = append(genbanklines, line)
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	annotated, err = HandleGenbank(genbanklines)
 
 	return
 

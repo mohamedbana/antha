@@ -12,6 +12,7 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"path/filepath"
 )
 
 // dna sequences as strings "ACTTGCGTC","GGTCCA"
@@ -35,7 +36,9 @@ func _GeneDesignSteps(_ctx context.Context, _input *GeneDesignInput, _output *Ge
 
 	// Retrieve part seqs from entrez
 	for _, part := range _input.Parts {
-		DNA, _ := entrez.RetrieveSequence(part, "nucleotide", part+".gb")
+		//desiredfilename := filepath.Join(anthapath.Path(), part+".gb")
+		desiredfilename := filepath.Join(_input.ConstructName, part+".gb")
+		DNA, _, _ := entrez.RetrieveSequence(part, "nucleotide", desiredfilename)
 		PartDNA = append(PartDNA, DNA)
 	}
 
@@ -43,7 +46,11 @@ func _GeneDesignSteps(_ctx context.Context, _input *GeneDesignInput, _output *Ge
 	EnzymeInf, _ := lookup.TypeIIsLookup(_input.RE)
 
 	// look up vector sequence
-	VectorSeq, _ := entrez.RetrieveVector(_input.Vector)
+
+	//desiredvectorfilename := filepath.Join(anthapath.Path(), Vector+".gb")
+	desiredvectorfilename := filepath.Join(_input.ConstructName, _input.Vector+".gb")
+
+	VectorSeq, _, _ := entrez.RetrieveVector(_input.Vector, desiredvectorfilename)
 
 	// Add overhangs
 	if _input.EndsAlreadyAdded {

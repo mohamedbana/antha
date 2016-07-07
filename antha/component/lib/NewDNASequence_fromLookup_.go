@@ -3,6 +3,7 @@ package lib
 import (
 	"fmt"
 	//"math"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/entrez"
@@ -12,6 +13,7 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"path/filepath"
 )
 
 // Input parameters for this protocol
@@ -41,7 +43,9 @@ func _NewDNASequence_fromLookupSteps(_ctx context.Context, _input *NewDNASequenc
 
 		if _input.DNAID {
 
-			_output.DNA, err = entrez.RetrieveSequence(_input.ID, "nucleotide", _input.ID+".gb")
+			filename := filepath.Join(anthapath.Path(), _input.ID+".gb")
+
+			_output.DNA, _, err = entrez.RetrieveSequence(_input.ID, "nucleotide", filename)
 
 		}
 	} else if _input.BiobrickID {
