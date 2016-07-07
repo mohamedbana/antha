@@ -54,7 +54,7 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 	// remove duplicates
 	positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
 
-	fmt.Println("positions", positiontocolourmap)
+	//fmt.Println("positions", positiontocolourmap)
 
 	solutions := make([]*wtype.LHComponent, 0)
 	colourtoComponentMap := make(map[string]*wtype.LHComponent)

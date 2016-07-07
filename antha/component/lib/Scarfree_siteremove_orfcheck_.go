@@ -139,8 +139,8 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 					} else {
 						allsitestoavoid := make([]string, 0)
 						temppart, err := sequences.RemoveSite(part, anysites.Enzyme, allsitestoavoid)
-						fmt.Println("part= ", part)
-						fmt.Println("temppart= ", temppart)
+						//		fmt.Println("part= ", part)
+						//		fmt.Println("temppart= ", temppart)
 						if err != nil {
 							warning := text.Print("removal of site failed! improve your algorithm!", err.Error())
 							warnings = append(warnings, warning)
