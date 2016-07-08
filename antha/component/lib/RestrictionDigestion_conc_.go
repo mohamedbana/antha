@@ -154,7 +154,6 @@ type RestrictionDigestion_concInput struct {
 	DesiredConcinUperml []int
 	EnzSolutions        []*wtype.LHComponent
 	EnzymeNames         []string
-	InPlate             *wtype.LHPlate
 	InactivationTemp    wunit.Temperature
 	InactivationTime    wunit.Time
 	OutPlate            *wtype.LHPlate
@@ -198,7 +197,6 @@ func init() {
 				{Name: "DesiredConcinUperml", Desc: "", Kind: "Parameters"},
 				{Name: "EnzSolutions", Desc: "", Kind: "Inputs"},
 				{Name: "EnzymeNames", Desc: "", Kind: "Parameters"},
-				{Name: "InPlate", Desc: "", Kind: "Inputs"},
 				{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
 				{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},

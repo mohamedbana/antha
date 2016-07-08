@@ -1,10 +1,13 @@
 {
     "connections": [],
     "processes": {
-        "RBS": {
+        "PROMOTER": {
             "component": "FindIGemPartsThat"
         },
-		"CyanReporter": {
+		"RBS": {
+            "component": "FindIGemPartsThat"
+        },
+		"RedReporter": {
             "component": "FindIGemPartsThat"
         },
 		"YellowReporter": {

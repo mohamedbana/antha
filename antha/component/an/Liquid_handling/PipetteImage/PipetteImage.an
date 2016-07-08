@@ -108,7 +108,7 @@ Steps {
 		componentmap[componentname] = factory.GetComponentByType(componentname)
 
 	}
-	fmt.Println(componentmap)
+	//fmt.Println(componentmap)
 
 	solutions := make([]*wtype.LHComponent, 0)
 
@@ -124,7 +124,7 @@ Steps {
 		// make sure liquid class is appropriate for cell culture in case this is not set elsewhere
 		component.Type,_ = wtype.LiquidTypeFromString(UseLiquidClass)//wtype.LTCulture
 		
-		fmt.Println(image.Colourcomponentmap[colour])
+		//fmt.Println(image.Colourcomponentmap[colour])
 		
 		// if the option to only print a single colour is not selected then the pipetting actions for all colours (apart from if not this colour is not empty) will follow
 		if OnlythisColour !="" {
@@ -134,7 +134,7 @@ Steps {
 			UniqueComponents = append(UniqueComponents,component.CName)
 			
 			counter = counter + 1
-			fmt.Println("wells",OnlythisColour, counter)
+		//	fmt.Println("wells",OnlythisColour, counter)
 	
 		pixelSample := mixer.Sample(component, VolumePerWell)
 	
@@ -149,7 +149,7 @@ Steps {
 			UniqueComponents = append(UniqueComponents,component.CName)
 			
 			counter = counter + 1
-			fmt.Println("wells not ",Notthiscolour,counter)
+		//	fmt.Println("wells not ",Notthiscolour,counter)
 	
 		component.Type,_ = wtype.LiquidTypeFromString(UseLiquidClass)
 		pixelSample := mixer.Sample(component, VolumePerWell)

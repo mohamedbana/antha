@@ -1,0 +1,14 @@
+{
+    "connections": [],
+    "processes": {
+        "unknownseq": {
+            "component": "BlastSearch"
+        },
+        "notanorf": {
+            "component": "BlastSearch"
+        },
+        "aplasmid": {
+            "component": "BlastSearch"
+        }
+    }
+}

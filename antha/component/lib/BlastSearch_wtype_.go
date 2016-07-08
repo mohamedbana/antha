@@ -18,6 +18,8 @@ import (
 
 // Data which is returned from this protocol; output data
 
+//AllHits []biogo.Hit
+
 // Physical inputs to this protocol
 
 // Physical outputs from this protocol
@@ -36,6 +38,10 @@ func _BlastSearch_wtypeSteps(_ctx context.Context, _input *BlastSearch_wtypeInpu
 
 	var err error
 	var hits []biogo.Hit
+	var hitsummary string
+	var identity float64
+	var coverage float64
+	var besthitsummary string
 
 	_output.AnthaSeq = _input.DNA
 
@@ -53,13 +59,27 @@ func _BlastSearch_wtypeSteps(_ctx context.Context, _input *BlastSearch_wtypeInpu
 	if err != nil {
 		fmt.Println(err.Error())
 
-	} //else {
+	}
 
-	_output.Hits = fmt.Sprintln(blast.HitSummary(hits))
+	_output.ExactHits, hitsummary, err = blast.AllExactMatches(hits)
 
+	if len(_output.ExactHits) == 0 {
+		hitsummary, err = blast.HitSummary(hits, 10, 10)
+	}
+	_output.BestHit, identity, coverage, besthitsummary, err = blast.FindBestHit(hits)
+
+	//	AllHits = hits
+	_output.Hitssummary = hitsummary
+	fmt.Println(hitsummary)
+	fmt.Println(besthitsummary)
 	// Rename Sequence with ID of top blast hit
-	_output.AnthaSeq.Nm = hits[0].Id
-	//}
+
+	if coverage == 100 && identity == 100 {
+		_output.AnthaSeq.Nm = _output.BestHit.Id
+	}
+	_output.Warning = err
+	_output.Identity = identity
+	_output.Coverage = coverage
 
 }
 
@@ -123,14 +143,24 @@ type BlastSearch_wtypeInput struct {
 }
 
 type BlastSearch_wtypeOutput struct {
-	AnthaSeq wtype.DNASequence
-	Hits     string
+	AnthaSeq    wtype.DNASequence
+	BestHit     biogo.Hit
+	Coverage    float64
+	ExactHits   []biogo.Hit
+	Hitssummary string
+	Identity    float64
+	Warning     error
 }
 
 type BlastSearch_wtypeSOutput struct {
 	Data struct {
-		AnthaSeq wtype.DNASequence
-		Hits     string
+		AnthaSeq    wtype.DNASequence
+		BestHit     biogo.Hit
+		Coverage    float64
+		ExactHits   []biogo.Hit
+		Hitssummary string
+		Identity    float64
+		Warning     error
 	}
 	Outputs struct {
 	}
@@ -145,7 +175,12 @@ func init() {
 			Params: []ParamDesc{
 				{Name: "DNA", Desc: "", Kind: "Parameters"},
 				{Name: "AnthaSeq", Desc: "", Kind: "Data"},
-				{Name: "Hits", Desc: "", Kind: "Data"},
+				{Name: "BestHit", Desc: "", Kind: "Data"},
+				{Name: "Coverage", Desc: "", Kind: "Data"},
+				{Name: "ExactHits", Desc: "AllHits []biogo.Hit\n", Kind: "Data"},
+				{Name: "Hitssummary", Desc: "", Kind: "Data"},
+				{Name: "Identity", Desc: "", Kind: "Data"},
+				{Name: "Warning", Desc: "", Kind: "Data"},
 			},
 		},
 	}); err != nil {

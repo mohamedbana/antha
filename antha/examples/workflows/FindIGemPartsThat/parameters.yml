@@ -1,6 +1,19 @@
 {
     "Parameters": {
-        "RBS": {
+        "PROMOTER": {
+            "OnlyreturnAvailableParts": false,
+            "OnlyreturnWorkingparts": false,
+			"ExactTypeOnly":true,
+			"MatchAllDescriptions":false,
+            "Partdescriptions": [
+				"PROMOTER",
+				"T5"
+            ],
+            "Parttype":
+                "REGULATORY"
+            
+        },
+		"RBS": {
             "OnlyreturnAvailableParts": true,
             "OnlyreturnWorkingparts": true,
 			"ExactTypeOnly":true,
@@ -13,14 +26,16 @@
                 "GENERIC"
             
         },
-		"CyanReporter": {
-            "OnlyreturnAvailableParts": true,
+		"RedReporter": {
+            "OnlyreturnAvailableParts": false,
             "OnlyreturnWorkingparts": false,
 			"ExactTypeOnly":true,
-			"MatchAllDescriptions":true,
+			"MatchAllDescriptions":false,
             "Partdescriptions": [
-               "cyan",
-			   "fluorescent"
+               "RED",
+			   "Red",
+			   "RFP",
+			   "mCherry"
             ],
             "Parttype":
                 "REPORTER"
@@ -39,12 +54,16 @@
             
         },
 		"GreenReporter": {
-            "OnlyreturnAvailableParts": true,
+            "OnlyreturnAvailableParts": false,
             "OnlyreturnWorkingparts": false,
 			"ExactTypeOnly":true,
-			"MatchAllDescriptions":true,
+			"MatchAllDescriptions":false,
             "Partdescriptions": [
-               "GREEN"
+               "GREEN",
+			   "Green",
+			   "green",
+			   "GFP",
+			   "gfp"
             ],
             "Parttype":
                 "REPORTER"
