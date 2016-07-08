@@ -1,0 +1,45 @@
+EGEL96_1,PCRAssembleandRungelouput,,,
+A1,water+1kb DNA Ladder,dna,15,ul
+A2,water+lefthomologyarm1kb,dna,15,ul
+A3,water+lefthomologyarm3kb,dna,15,ul
+A4,water+lefthomologyarm2.5kbA,dna,15,ul
+A5,water+lefthomologyarm2.5kbB,dna,15,ul
+A6,water+righthomologyarm1kb,dna,15,ul
+A7,water+righthomologyarm3kb,dna,15,ul
+A8,water+righthomologyarm2.5kbA,dna,15,ul
+A9,water+righthomologyarm2.5kbB,dna,15,ul
+A10,water+lefthomologyarm1kb,dna,15,ul
+A11,water+lefthomologyarm3kb,dna,15,ul
+A12,water+lefthomologyarm2.5kbA,dna,15,ul
+A13,water+lefthomologyarm2.5kbB,dna,15,ul
+B1,water+1kb DNA Ladder,dna,15,ul
+B2,water+righthomologyarm1kb,dna,15,ul
+B3,water+righthomologyarm3kb,dna,15,ul
+B4,water+righthomologyarm2.5kbA,dna,15,ul
+B5,water+righthomologyarm2.5kbB,dna,15,ul
+B6,water+lefthomologyarm1kb,dna,15,ul
+B7,water+lefthomologyarm3kb,dna,15,ul
+B8,water+lefthomologyarm2.5kbA,dna,15,ul
+B9,water+lefthomologyarm2.5kbB,dna,15,ul
+B10,water+righthomologyarm1kb,dna,15,ul
+B11,water+righthomologyarm3kb,dna,15,ul
+B12,water+righthomologyarm2.5kbA,dna,15,ul
+B13,water+righthomologyarm2.5kbB,dna,15,ul
+C1,water+1kb DNA Ladder,dna,15,ul
+C2,water+lefthomologyarm1kb,dna,15,ul
+C3,water+lefthomologyarm3kb,dna,15,ul
+C4,water+lefthomologyarm2.5kbA,dna,15,ul
+C5,water+lefthomologyarm2.5kbB,dna,15,ul
+C6,water+righthomologyarm1kb,dna,15,ul
+C7,water+righthomologyarm3kb,dna,15,ul
+C8,water+righthomologyarm2.5kbA,dna,15,ul
+C9,water+righthomologyarm2.5kbB,dna,15,ul
+C10,water+lefthomologyarm1kb,dna,15,ul
+C11,water+lefthomologyarm3kb,dna,15,ul
+C12,water+lefthomologyarm2.5kbA,dna,15,ul
+C13,water+lefthomologyarm2.5kbB,dna,15,ul
+D1,water+1kb DNA Ladder,dna,15,ul
+D2,water+righthomologyarm1kb,dna,15,ul
+D3,water+righthomologyarm3kb,dna,15,ul
+D4,water+righthomologyarm2.5kbA,dna,15,ul
+D5,water+righthomologyarm2.5kbB,dna,15,ul

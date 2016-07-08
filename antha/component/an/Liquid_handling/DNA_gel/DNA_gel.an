@@ -2,7 +2,7 @@
 
 protocol DNA_gel
 import (
-
+	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 
@@ -110,7 +110,7 @@ Steps {
 		
 	// subtract volume of water
 	samplevolume.Subtract(Watervol)
-	
+	/*
 	// add ladder sample to first column
 	loadedsample = MixInto(
 	DNAgel,
@@ -123,7 +123,7 @@ Steps {
 	wells = append(wells,DNAgel.AllWellPositions(wtype.BYROW)[counter])
 	volumes = append(volumes,loadedsample.Volume())
 	counter++
-	
+	*/
 	for j:=0;j< Samplenumber;j++{
 	for i:= 0;i < len(Samplenames);i++{
 		
@@ -132,30 +132,29 @@ Steps {
 	
 	// get position, ensuring the list is by row rather than by column
 	position := DNAgel.AllWellPositions(wtype.BYROW)[counter]
+
+		//get well coordinates
+	wellcoords := wtype.MakeWellCoordsA1(position)
+	fmt.Println("wellcoords.X",wellcoords.X)
 	
 	
-	position = DNAgel.AllWellPositions(wtype.BYROW)[counter]
-		
-	//get well coordinates
-	//wellcoords := wtype.MakeWellCoordsA1(position)
-	/*
 	// if first column add ladder sample 
-	if wellcoords.X == 1 {
+	if wellcoords.X == 0 {
 		
-		loadedsample = MixInto(
-	DNAgel,
-	position,
-	waterSample,
+		laddersample := MixInto(
+		DNAgel,
+	DNAgel.AllWellPositions(wtype.BYROW)[counter],
+	mixer.Sample(Water,Watervol),
 	mixer.Sample(Ladder, samplevolume),
 	)
 
-	loadedsamples = append(Loadedsamples,loadedsample)
+	loadedsamples = append(loadedsamples,laddersample)
 	wells = append(wells,position)
-	volumes = append(volumes,loadedsample.Volume())
+	volumes = append(volumes,laddersample.Volume())
 	counter++
 		
 	}
-	*/
+	
 	// refresh position in case ladder was added
 	position = DNAgel.AllWellPositions(wtype.BYROW)[counter]
 	

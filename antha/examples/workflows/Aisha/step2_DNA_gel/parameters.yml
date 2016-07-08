@@ -3,8 +3,7 @@
         "gelof1stpcrstep": {
             "DNAgel": "EGEL96_1",
             "DNAgelrunvolume": "15ul",
-            "Ladder": "1kb DNA Ladder"
-			,
+            "Ladder": "1kb DNA Ladder",
             "Loadingdye": "blue",
             "Loadingdyeinsample": true,
             "Loadingdyevolume": "1ul",
@@ -21,7 +20,7 @@
                 "righthomologyarm2.5kbA",
                 "righthomologyarm2.5kbB"
             ],
-            "Samplenumber": 1,
+            "Samplenumber": 5,
             "Sampletotest": "dna_part",
             "Water": "water",
             "Watervol": "10ul"

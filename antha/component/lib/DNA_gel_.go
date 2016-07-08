@@ -99,19 +99,20 @@ func _DNA_gelSteps(_ctx context.Context, _input *DNA_gelInput, _output *DNA_gelO
 
 	// subtract volume of water
 	samplevolume.Subtract(_input.Watervol)
+	/*
+		// add ladder sample to first column
+		loadedsample = MixInto(
+		DNAgel,
+		DNAgel.AllWellPositions(wtype.BYROW)[counter],
+		mixer.Sample(Water,Watervol),
+		mixer.Sample(Ladder, samplevolume),
+		)
 
-	// add ladder sample to first column
-	loadedsample = execute.MixInto(_ctx, _input.DNAgel,
-		_input.DNAgel.AllWellPositions(wtype.BYROW)[counter],
-		mixer.Sample(_input.Water, _input.Watervol),
-		mixer.Sample(_input.Ladder, samplevolume),
-	)
-
-	loadedsamples = append(_output.Loadedsamples, loadedsample)
-	wells = append(wells, _input.DNAgel.AllWellPositions(wtype.BYROW)[counter])
-	volumes = append(volumes, loadedsample.Volume())
-	counter++
-
+		loadedsamples = append(Loadedsamples,loadedsample)
+		wells = append(wells,DNAgel.AllWellPositions(wtype.BYROW)[counter])
+		volumes = append(volumes,loadedsample.Volume())
+		counter++
+	*/
 	for j := 0; j < _input.Samplenumber; j++ {
 		for i := 0; i < len(_input.Samplenames); i++ {
 
@@ -121,28 +122,25 @@ func _DNA_gelSteps(_ctx context.Context, _input *DNA_gelInput, _output *DNA_gelO
 			// get position, ensuring the list is by row rather than by column
 			position := _input.DNAgel.AllWellPositions(wtype.BYROW)[counter]
 
-			position = _input.DNAgel.AllWellPositions(wtype.BYROW)[counter]
-
 			//get well coordinates
-			//wellcoords := wtype.MakeWellCoordsA1(position)
-			/*
-				// if first column add ladder sample
-				if wellcoords.X == 1 {
+			wellcoords := wtype.MakeWellCoordsA1(position)
+			fmt.Println("wellcoords.X", wellcoords.X)
+			// if first column add ladder sample
+			if wellcoords.X == 0 {
 
-					loadedsample = MixInto(
-				DNAgel,
-				position,
-				waterSample,
-				mixer.Sample(Ladder, samplevolume),
+				laddersample := execute.MixInto(_ctx, _input.DNAgel,
+					_input.DNAgel.AllWellPositions(wtype.BYROW)[counter],
+					mixer.Sample(_input.Water, _input.Watervol),
+					mixer.Sample(_input.Ladder, samplevolume),
 				)
 
-				loadedsamples = append(Loadedsamples,loadedsample)
-				wells = append(wells,position)
-				volumes = append(volumes,loadedsample.Volume())
+				loadedsamples = append(loadedsamples, laddersample)
+				wells = append(wells, position)
+				volumes = append(volumes, laddersample.Volume())
 				counter++
 
-				}
-			*/
+			}
+
 			// refresh position in case ladder was added
 			position = _input.DNAgel.AllWellPositions(wtype.BYROW)[counter]
 
@@ -191,14 +189,10 @@ func _DNA_gelSteps(_ctx context.Context, _input *DNA_gelInput, _output *DNA_gelO
 
 	}
 	_output.Loadedsamples = loadedsamples
-	fmt.Println(_input.ProjectName + ".csv")
-	fmt.Println(_input.DNAgel)
-	fmt.Println(wells, len(wells))
-	fmt.Println(_output.Loadedsamples, len(_output.Loadedsamples), loadedsamples)
-	fmt.Println(volumes, len(volumes))
+
 	// export to file
 	//wtype.AutoExportPlateCSV(ProjectName+".csv",DNAgel)
-	_output.Error = wtype.ExportPlateCSV(_input.ProjectName+".csv", _input.DNAgel, _input.ProjectName+"gelouput", wells, _output.Loadedsamples, volumes)
+	_output.Error = wtype.ExportPlateCSV(_input.ProjectName+"_gelouput"+".csv", _input.DNAgel, _input.ProjectName+"gelouput", wells, _output.Loadedsamples, volumes)
 	// Then run the gel
 	/* DNAgel := electrophoresis.Run(Loadedgel,Runvoltage,DNAgelruntime)
 
