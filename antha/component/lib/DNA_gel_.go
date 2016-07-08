@@ -3,12 +3,6 @@
 package lib
 
 import (
-	//"LiquidHandler"
-	//"Labware"
-	//"coldplate"
-	//"reagents"
-	//"Devices"
-	//"strconv"
 	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -48,7 +42,8 @@ import (
 //WaterSolution
 //WaterSolution //Chemspiderlink // not correct link but similar desirable
 
-//Gel
+// gel
+// plate to mix samples if required
 
 //DNAladder *wtype.LHComponent//NucleicacidSolution
 //Water *wtype.LHComponent//WaterSolution
@@ -87,50 +82,123 @@ func _DNA_gelSetup(_ctx context.Context, _input *DNA_gelInput) {
 // for every input
 func _DNA_gelSteps(_ctx context.Context, _input *DNA_gelInput, _output *DNA_gelOutput) {
 
-	if len(_input.Samplenames) != _input.Samplenumber {
-		panic(fmt.Sprintln("length of sample names:", len(_input.Samplenames), "is not equal to sample number:", _input.Samplenumber))
-	}
-
 	loadedsamples := make([]*wtype.LHComponent, 0)
+	wells := make([]string, 0)
+	volumes := make([]wunit.Volume, 0)
 
 	var DNAgelloadmix *wtype.LHComponent
-
+	var loadedsample *wtype.LHComponent
 	_input.Water.Type = wtype.LTloadwater
 
-	for i := 0; i < _input.Samplenumber; i++ {
-		// ready to add water to well
-		waterSample := mixer.Sample(_input.Water, _input.Watervol)
+	var counter int
 
-		// load gel
-		if _input.Loadingdyeinsample == false {
-			DNAgelloadmixsolution := execute.MixInto(_ctx, _input.DNAgel,
-				"",
-				mixer.Sample(_input.Loadingdye, _input.Loadingdyevolume),
-				mixer.SampleForTotalVolume(_input.Sampletotest, _input.DNAgelrunvolume),
+	// work out sample volume
+
+	// copy volume
+	samplevolume := (wunit.CopyVolume(_input.DNAgelrunvolume))
+
+	// subtract volume of water
+	samplevolume.Subtract(_input.Watervol)
+
+	// add ladder sample to first column
+	loadedsample = execute.MixInto(_ctx, _input.DNAgel,
+		_input.DNAgel.AllWellPositions(wtype.BYROW)[counter],
+		mixer.Sample(_input.Water, _input.Watervol),
+		mixer.Sample(_input.Ladder, samplevolume),
+	)
+
+	loadedsamples = append(_output.Loadedsamples, loadedsample)
+	wells = append(wells, _input.DNAgel.AllWellPositions(wtype.BYROW)[counter])
+	volumes = append(volumes, loadedsample.Volume())
+	counter++
+
+	for j := 0; j < _input.Samplenumber; j++ {
+		for i := 0; i < len(_input.Samplenames); i++ {
+
+			// ready to add water to well
+			waterSample := mixer.Sample(_input.Water, _input.Watervol)
+
+			// get position, ensuring the list is by row rather than by column
+			position := _input.DNAgel.AllWellPositions(wtype.BYROW)[counter]
+
+			position = _input.DNAgel.AllWellPositions(wtype.BYROW)[counter]
+
+			//get well coordinates
+			//wellcoords := wtype.MakeWellCoordsA1(position)
+			/*
+				// if first column add ladder sample
+				if wellcoords.X == 1 {
+
+					loadedsample = MixInto(
+				DNAgel,
+				position,
+				waterSample,
+				mixer.Sample(Ladder, samplevolume),
+				)
+
+				loadedsamples = append(Loadedsamples,loadedsample)
+				wells = append(wells,position)
+				volumes = append(volumes,loadedsample.Volume())
+				counter++
+
+				}
+			*/
+			// refresh position in case ladder was added
+			position = _input.DNAgel.AllWellPositions(wtype.BYROW)[counter]
+
+			_input.Sampletotest.CName = _input.Samplenames[i]
+
+			// load gel
+
+			// add loading dye if necessary
+			if _input.Loadingdyeinsample == false {
+
+				_input.Loadingdye.Type, _ = wtype.LiquidTypeFromString("NeedToMix")
+
+				DNAgelloadmixsolution := execute.MixInto(_ctx, _input.MixPlate,
+					"",
+					mixer.Sample(_input.Sampletotest, samplevolume),
+					mixer.Sample(_input.Loadingdye, _input.Loadingdyevolume),
+				)
+				DNAgelloadmix = DNAgelloadmixsolution
+			} else {
+
+				DNAgelloadmix = _input.Sampletotest
+
+			}
+
+			// Ensure  sample will be dispensed appropriately:
+
+			// comment this line out to repeat load of same sample in all wells using first sample name
+			DNAgelloadmix.CName = _input.Samplenames[i] //[i] //originalname + strconv.Itoa(i)
+
+			// replacing following line with temporary hard code whilst developing protocol:
+			DNAgelloadmix.Type, _ = wtype.LiquidTypeFromString(_input.Mixingpolicy)
+			//DNAgelloadmix.Type = "loadwater"
+
+			loadedsample = execute.MixInto(_ctx, _input.DNAgel,
+				position,
+				waterSample,
+				mixer.Sample(DNAgelloadmix, samplevolume),
 			)
-			DNAgelloadmix = DNAgelloadmixsolution
-		} else {
-			DNAgelloadmix = _input.Sampletotest
+
+			loadedsamples = append(loadedsamples, loadedsample)
+			wells = append(wells, position)
+			volumes = append(volumes, loadedsample.Volume())
+			counter++
+
 		}
 
-		// Ensure  sample will be dispensed appropriately:
-
-		// comment this line out to repeat load of same sample in all wells using first sample name
-		DNAgelloadmix.CName = _input.Samplenames[0] //[i] //originalname + strconv.Itoa(i)
-
-		// replacing following line with temporary hard code whilst developing protocol:
-		DNAgelloadmix.Type, _ = wtype.LiquidTypeFromString(_input.Mixingpolicy)
-		//DNAgelloadmix.Type = "loadwater"
-
-		loadedsample := execute.MixInto(_ctx, _input.DNAgel,
-			"",
-			waterSample,
-			mixer.Sample(DNAgelloadmix, _input.DNAgelrunvolume),
-		)
-
-		loadedsamples = append(_output.Loadedsamples, loadedsample)
 	}
 	_output.Loadedsamples = loadedsamples
+	fmt.Println(_input.ProjectName + ".csv")
+	fmt.Println(_input.DNAgel)
+	fmt.Println(wells, len(wells))
+	fmt.Println(_output.Loadedsamples, len(_output.Loadedsamples), loadedsamples)
+	fmt.Println(volumes, len(volumes))
+	// export to file
+	//wtype.AutoExportPlateCSV(ProjectName+".csv",DNAgel)
+	_output.Error = wtype.ExportPlateCSV(_input.ProjectName+".csv", _input.DNAgel, _input.ProjectName+"gelouput", wells, _output.Loadedsamples, volumes)
 	// Then run the gel
 	/* DNAgel := electrophoresis.Run(Loadedgel,Runvoltage,DNAgelruntime)
 
@@ -234,10 +302,13 @@ type DNA_gelInput struct {
 	DNAgel             *wtype.LHPlate
 	DNAgelrunvolume    wunit.Volume
 	InPlate            *wtype.LHPlate
+	Ladder             *wtype.LHComponent
 	Loadingdye         *wtype.LHComponent
 	Loadingdyeinsample bool
 	Loadingdyevolume   wunit.Volume
+	MixPlate           *wtype.LHPlate
 	Mixingpolicy       string
+	ProjectName        string
 	Samplenames        []string
 	Samplenumber       int
 	Sampletotest       *wtype.LHComponent
@@ -246,11 +317,13 @@ type DNA_gelInput struct {
 }
 
 type DNA_gelOutput struct {
+	Error         error
 	Loadedsamples []*wtype.LHComponent
 }
 
 type DNA_gelSOutput struct {
 	Data struct {
+		Error error
 	}
 	Outputs struct {
 		Loadedsamples []*wtype.LHComponent
@@ -264,18 +337,22 @@ func init() {
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/DNA_gel/DNA_gel.an",
 			Params: []ParamDesc{
-				{Name: "DNAgel", Desc: "Gel\n", Kind: "Inputs"},
+				{Name: "DNAgel", Desc: "gel\n", Kind: "Inputs"},
 				{Name: "DNAgelrunvolume", Desc: "", Kind: "Parameters"},
 				{Name: "InPlate", Desc: "", Kind: "Inputs"},
+				{Name: "Ladder", Desc: "", Kind: "Inputs"},
 				{Name: "Loadingdye", Desc: "WaterSolution //Chemspiderlink // not correct link but similar desirable\n", Kind: "Inputs"},
 				{Name: "Loadingdyeinsample", Desc: "", Kind: "Parameters"},
 				{Name: "Loadingdyevolume", Desc: "", Kind: "Parameters"},
+				{Name: "MixPlate", Desc: "plate to mix samples if required\n", Kind: "Inputs"},
 				{Name: "Mixingpolicy", Desc: "wtype.LiquidType\n", Kind: "Parameters"},
+				{Name: "ProjectName", Desc: "", Kind: "Parameters"},
 				{Name: "Samplenames", Desc: "", Kind: "Parameters"},
 				{Name: "Samplenumber", Desc: "", Kind: "Parameters"},
 				{Name: "Sampletotest", Desc: "WaterSolution\n", Kind: "Inputs"},
 				{Name: "Water", Desc: "", Kind: "Inputs"},
 				{Name: "Watervol", Desc: "", Kind: "Parameters"},
+				{Name: "Error", Desc: "\tNumberofBands[] int\nBandsizes[] Length\nBandconc[]Concentration\nPass bool\nPhotoofDNAgel Image\n", Kind: "Data"},
 				{Name: "Loadedsamples", Desc: "Gel\n", Kind: "Outputs"},
 			},
 		},

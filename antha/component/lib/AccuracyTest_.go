@@ -72,7 +72,7 @@ func _AccuracyTestSteps(_ctx context.Context, _input *AccuracyTestInput, _output
 
 	} else {
 
-		wellpositionarray = _input.OutPlate.AllWellPositions()
+		wellpositionarray = _input.OutPlate.AllWellPositions(wtype.BYCOLUMN)
 
 	}
 	reactions := make([]*wtype.LHComponent, 0)

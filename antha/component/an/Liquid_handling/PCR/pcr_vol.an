@@ -22,6 +22,7 @@ import (
 // Input parameters for this protocol (data)
 Parameters (
 	// PCRprep parameters:
+	WaterVolume Volume
 	ReactionVolume Volume
 	BufferConcinX int
 	FwdPrimerVol Volume
@@ -34,7 +35,7 @@ Parameters (
 	TemplateName string
 	FwdPrimerName string
 	RevPrimerName string
-	
+	WellPosition string
 	/*
 	// let's be ambitious and try this as part of type polymerase Polymeraseconc Volume
 	
@@ -92,7 +93,7 @@ Setup {
 Steps {
 	
 	// rename components
-	
+		
 
 	Template.CName = TemplateName
 	FwdPrimer.CName = FwdPrimerName
@@ -101,12 +102,11 @@ Steps {
 	
 	
 	bufferVolume := (wunit.CopyVolume(ReactionVolume))
-	
 	bufferVolume.DivideBy(float64(BufferConcinX))
 	
 	// Make a mastermix
 	samples := make([]*wtype.LHComponent, 0)
-	waterSample := mixer.SampleForTotalVolume(Water, ReactionVolume)
+	waterSample := mixer.Sample(Water, WaterVolume)
 	bufferSample := mixer.Sample(Buffer,bufferVolume)
 	samples = append(samples, waterSample, bufferSample)
 

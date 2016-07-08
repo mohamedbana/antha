@@ -68,12 +68,11 @@ func _PCR_volSteps(_ctx context.Context, _input *PCR_volInput, _output *PCR_volO
 	_input.RevPrimer.CName = _input.RevPrimerName
 
 	bufferVolume := (wunit.CopyVolume(_input.ReactionVolume))
-
 	bufferVolume.DivideBy(float64(_input.BufferConcinX))
 
 	// Make a mastermix
 	samples := make([]*wtype.LHComponent, 0)
-	waterSample := mixer.SampleForTotalVolume(_input.Water, _input.ReactionVolume)
+	waterSample := mixer.Sample(_input.Water, _input.WaterVolume)
 	bufferSample := mixer.Sample(_input.Buffer, bufferVolume)
 	samples = append(samples, waterSample, bufferSample)
 
@@ -258,6 +257,8 @@ type PCR_volInput struct {
 	TemplateName          string
 	Templatevolume        wunit.Volume
 	Water                 *wtype.LHComponent
+	WaterVolume           wunit.Volume
+	WellPosition          string
 }
 
 type PCR_volOutput struct {
@@ -301,7 +302,7 @@ func init() {
 				{Name: "PCRPolymerase", Desc: "", Kind: "Inputs"},
 				{Name: "PolymeraseVolume", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionName", Desc: "", Kind: "Parameters"},
-				{Name: "ReactionVolume", Desc: "PCRprep parameters:\n", Kind: "Parameters"},
+				{Name: "ReactionVolume", Desc: "", Kind: "Parameters"},
 				{Name: "RevPrimer", Desc: "", Kind: "Inputs"},
 				{Name: "RevPrimerName", Desc: "", Kind: "Parameters"},
 				{Name: "RevPrimerVol", Desc: "", Kind: "Parameters"},
@@ -309,6 +310,8 @@ func init() {
 				{Name: "TemplateName", Desc: "", Kind: "Parameters"},
 				{Name: "Templatevolume", Desc: "", Kind: "Parameters"},
 				{Name: "Water", Desc: "", Kind: "Inputs"},
+				{Name: "WaterVolume", Desc: "PCRprep parameters:\n", Kind: "Parameters"},
+				{Name: "WellPosition", Desc: "", Kind: "Parameters"},
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
 			},
 		},

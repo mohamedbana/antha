@@ -9,12 +9,14 @@ import (
 // Input parameters for this protocol (data)
 Parameters (
 // PCRprep parameters
+Projectname string
 Reactiontotemplate map[string]string // e.g. ["left homology arm"]:"templatename"
 Reactiontoprimerpair map[string][2]string // e.g. ["left homology arm"]:"fwdprimer","revprimer"
 )
 
 // Data which is returned from this protocol, and data types
 Data (
+	Error error
 )
 
 
@@ -41,11 +43,21 @@ Setup {
 // The core process for this protocol, with the steps to be performed
 // for every input
 Steps {
+	
+	var counter int
+	
 Reactions = make([]*wtype.LHComponent,0)
+volumes := make([]wunit.Volume,0)
+welllocations := make([]string,0)
+
 for reactionname, templatename := range Reactiontotemplate {
+	
+	wellposition := Plate.AllWellPositions(wtype.BYCOLUMN)[counter]
+	
 result := RunSteps(PCR_vol,
                Parameters{
-                    ReactionVolume: wunit.NewVolume(25,"ul"),
+                    WaterVolume: wunit.NewVolume(10,"ul"),
+					ReactionVolume: wunit.NewVolume(25,"ul"),
           BufferConcinX: 5,
     FwdPrimerName: Reactiontoprimerpair[reactionname][0],
     RevPrimerName: Reactiontoprimerpair[reactionname][1],
@@ -65,7 +77,8 @@ result := RunSteps(PCR_vol,
           Extensiontime: wunit.NewTime(60,"s"), // should be calculated from template length and polymerase rate
           Finalextensiontime: wunit.NewTime(180,"s"),
           Hotstart: false,
-          AddPrimerstoMasterMix: false, 
+          AddPrimerstoMasterMix: false,
+		WellPosition: wellposition,
                 }, Inputs{
           FwdPrimer:FwdPrimertype,
           RevPrimer: RevPrimertype,
@@ -81,8 +94,14 @@ result := RunSteps(PCR_vol,
 
 
     Reactions = append(Reactions, result.Outputs.Reaction)
-    
+    volumes = append(volumes,result.Outputs.Reaction.Volume())
+	welllocations = append(welllocations,wellposition)
+	counter++
+	
     }
+	
+	Error = wtype.ExportPlateCSV(Projectname+".csv", Plate,Projectname+"outputPlate", welllocations, Reactions, volumes) 
+	
 }
 
 // Run after controls and a steps block are completed to

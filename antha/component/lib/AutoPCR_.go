@@ -12,6 +12,7 @@ import (
 // Input parameters for this protocol (data)
 
 // PCRprep parameters
+
 // e.g. ["left homology arm"]:"templatename"
 // e.g. ["left homology arm"]:"fwdprimer","revprimer"
 
@@ -31,9 +32,19 @@ func _AutoPCRSetup(_ctx context.Context, _input *AutoPCRInput) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func _AutoPCRSteps(_ctx context.Context, _input *AutoPCRInput, _output *AutoPCROutput) {
+
+	var counter int
+
 	_output.Reactions = make([]*wtype.LHComponent, 0)
+	volumes := make([]wunit.Volume, 0)
+	welllocations := make([]string, 0)
+
 	for reactionname, templatename := range _input.Reactiontotemplate {
-		result := PCR_volRunSteps(_ctx, &PCR_volInput{ReactionVolume: wunit.NewVolume(25, "ul"),
+
+		wellposition := _input.Plate.AllWellPositions(wtype.BYCOLUMN)[counter]
+
+		result := PCR_volRunSteps(_ctx, &PCR_volInput{WaterVolume: wunit.NewVolume(10, "ul"),
+			ReactionVolume:        wunit.NewVolume(25, "ul"),
 			BufferConcinX:         5,
 			FwdPrimerName:         _input.Reactiontoprimerpair[reactionname][0],
 			RevPrimerName:         _input.Reactiontoprimerpair[reactionname][1],
@@ -54,6 +65,7 @@ func _AutoPCRSteps(_ctx context.Context, _input *AutoPCRInput, _output *AutoPCRO
 			Finalextensiontime:    wunit.NewTime(180, "s"),
 			Hotstart:              false,
 			AddPrimerstoMasterMix: false,
+			WellPosition:          wellposition,
 
 			FwdPrimer:     _input.FwdPrimertype,
 			RevPrimer:     _input.RevPrimertype,
@@ -67,8 +79,14 @@ func _AutoPCRSteps(_ctx context.Context, _input *AutoPCRInput, _output *AutoPCRO
 		)
 
 		_output.Reactions = append(_output.Reactions, result.Outputs.Reaction)
+		volumes = append(volumes, result.Outputs.Reaction.Volume())
+		welllocations = append(welllocations, wellposition)
+		counter++
 
 	}
+
+	_output.Error = wtype.ExportPlateCSV(_input.Projectname+".csv", _input.Plate, _input.Projectname+"outputPlate", welllocations, _output.Reactions, volumes)
+
 }
 
 // Run after controls and a steps block are completed to
@@ -131,6 +149,7 @@ type AutoPCRElement struct {
 type AutoPCRInput struct {
 	FwdPrimertype        *wtype.LHComponent
 	Plate                *wtype.LHPlate
+	Projectname          string
 	Reactiontoprimerpair map[string][]string
 	Reactiontotemplate   map[string]string
 	RevPrimertype        *wtype.LHComponent
@@ -138,11 +157,13 @@ type AutoPCRInput struct {
 }
 
 type AutoPCROutput struct {
+	Error     error
 	Reactions []*wtype.LHComponent
 }
 
 type AutoPCRSOutput struct {
 	Data struct {
+		Error error
 	}
 	Outputs struct {
 		Reactions []*wtype.LHComponent
@@ -158,10 +179,12 @@ func init() {
 			Params: []ParamDesc{
 				{Name: "FwdPrimertype", Desc: "", Kind: "Inputs"},
 				{Name: "Plate", Desc: "", Kind: "Inputs"},
+				{Name: "Projectname", Desc: "PCRprep parameters\n", Kind: "Parameters"},
 				{Name: "Reactiontoprimerpair", Desc: "e.g. [\"left homology arm\"]:\"fwdprimer\",\"revprimer\"\n", Kind: "Parameters"},
-				{Name: "Reactiontotemplate", Desc: "PCRprep parameters\n\ne.g. [\"left homology arm\"]:\"templatename\"\n", Kind: "Parameters"},
+				{Name: "Reactiontotemplate", Desc: "e.g. [\"left homology arm\"]:\"templatename\"\n", Kind: "Parameters"},
 				{Name: "RevPrimertype", Desc: "", Kind: "Inputs"},
 				{Name: "Templatetype", Desc: "", Kind: "Inputs"},
+				{Name: "Error", Desc: "", Kind: "Data"},
 				{Name: "Reactions", Desc: "", Kind: "Outputs"},
 			},
 		},
