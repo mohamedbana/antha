@@ -47,7 +47,7 @@ kla = dimensionless
 package setpoints //masstransfer
 
 import (
-	"fmt"
+	//"fmt"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Labware"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Liquidclasses"
@@ -81,19 +81,19 @@ func CalculateKlasquaremicrowell(Platetype string, liquid string, rpm float64, S
 	Re := eng.RE(ro, n, mu, dv)
 	//Necessaryshakerspeed := eng.Shakerspeed(TargetRE, ro, mu, dv)
 	//r, _ := stats.Round(Necessaryshakerspeed*60, 3)
-	//fmt.Println("shakerspeedrequired= ", r)
+	//// fmt.Println("shakerspeedrequired= ", r)
 	//r, _ = stats.Round(Re, 3)
-	//fmt.Println("Reynolds number = ", r)
+	//// fmt.Println("Reynolds number = ", r)
 	if Re > 5E3 {
-		fmt.Println("Turbulent flow")
+		// fmt.Println("Turbulent flow")
 	}
 
 	//r, _ = stats.Round(Fr, 3)
-	//fmt.Println("Froude number = ", r)
+	//// fmt.Println("Froude number = ", r)
 	CalculatedKla = eng.KLa_squaremicrowell(D, dv, ai, Re, a, Fr, b)
 
 	//r, _ = stats.Round(CalculatedKla, 3)
-	//fmt.Println("kla =", r)
+	//// fmt.Println("kla =", r)
 
 	// trouble shooting
 	/*

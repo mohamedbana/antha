@@ -3,6 +3,7 @@ package lib
 import (
 	"fmt"
 	//"math"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/entrez"
@@ -13,6 +14,7 @@ import (
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"golang.org/x/net/context"
+	"path/filepath"
 )
 
 // Input parameters for this protocol
@@ -42,7 +44,9 @@ func _NewDNASequence_fromLookupSteps(_ctx context.Context, _input *NewDNASequenc
 
 		if _input.DNAID {
 
-			_output.DNA, err = entrez.RetrieveSequence(_input.ID, "nucleotide")
+			filename := filepath.Join(anthapath.Path(), _input.ID+".gb")
+
+			_output.DNA, _, err = entrez.RetrieveSequence(_input.ID, "nucleotide", filename)
 
 		}
 	} else if _input.BiobrickID {
@@ -55,10 +59,11 @@ func _NewDNASequence_fromLookupSteps(_ctx context.Context, _input *NewDNASequenc
 
 	}
 
-	orfs := sequences.FindallORFs(_output.DNA.Seq)
-	features := sequences.ORFs2Features(orfs)
-
-	_output.DNA = wtype.Annotate(_output.DNA, features)
+	if _input.AddORFS {
+		orfs := sequences.FindallORFs(_output.DNA.Seq)
+		features := sequences.ORFs2Features(orfs)
+		_output.DNA = wtype.Annotate(_output.DNA, features)
+	}
 
 	if _input.BiobrickID {
 		_output.Status = fmt.Sprintln(
@@ -133,6 +138,7 @@ type NewDNASequence_fromLookupElement struct {
 }
 
 type NewDNASequence_fromLookupInput struct {
+	AddORFS    bool
 	BiobrickID bool
 	DNAID      bool
 	EntrezID   bool
@@ -164,6 +170,7 @@ func init() {
 			Desc: "",
 			Path: "antha/component/an/AnthaAcademy/Lesson4_DNA/C_NewDNASequence_fromLookup.an",
 			Params: []component.ParamDesc{
+				{Name: "AddORFS", Desc: "", Kind: "Parameters"},
 				{Name: "BiobrickID", Desc: "", Kind: "Parameters"},
 				{Name: "DNAID", Desc: "", Kind: "Parameters"},
 				{Name: "EntrezID", Desc: "", Kind: "Parameters"},

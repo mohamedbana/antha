@@ -21,6 +21,7 @@ func _InoculateDOESteps(_ctx context.Context, _input *InoculateDOEInput, _output
 	inocsample := mixer.Sample(_input.Inoculum, _input.InoculumVolume)
 	fmt.Println("Inoculum ", _input.Inoculum.CName, "Inoculum Volume ", _input.InoculumVolume.ToString(), "Medium", _input.Medium.CName)
 	_output.Seed = execute.Mix(_ctx, _input.Medium, inocsample)
+	fmt.Println("Seed:", _output.Seed.CName)
 }
 
 func _InoculateDOEAnalysis(_ctx context.Context, _input *InoculateDOEInput, _output *InoculateDOEOutput) {
@@ -98,7 +99,7 @@ func init() {
 		Constructor: InoculateDOENew,
 		Desc: component.ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/DoE/inoculate.an",
+			Path: "antha/component/an/GrowthAndAssay/inoculate.an",
 			Params: []component.ParamDesc{
 				{Name: "Inoculum", Desc: "", Kind: "Inputs"},
 				{Name: "InoculumVolume", Desc: "", Kind: "Parameters"},

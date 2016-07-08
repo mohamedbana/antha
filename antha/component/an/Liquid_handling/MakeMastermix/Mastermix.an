@@ -44,15 +44,14 @@ Setup {
 // The core process for this protocol, with the steps to be performed
 // for every input
 Steps {
-	
 	if len(OtherComponents) != len(OtherComponentVolumes){
-		panic("len(OtherComponents) != len(OtherComponentVolumes)")
+		Errorf("%d != %d", len(OtherComponents), len(OtherComponentVolumes))
 	}
 	
 	mastermixes := make([]*wtype.LHComponent,0)
 	
 	if AliquotbyRow {
-			panic("MixTo based method coming soon!")
+			Errorf("MixTo based method coming soon!")
 		}else {
 	for i := 0; i < NumberofMastermixes; i++ {
 		

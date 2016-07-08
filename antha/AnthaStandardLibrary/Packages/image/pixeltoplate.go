@@ -48,7 +48,7 @@ var Visibleequivalentmaps = map[string]map[color.Color]string{
 }
 
 func ColourtoCMYK(colour color.Color) (cmyk color.CMYK) {
-	fmt.Println("colour", colour)
+	// fmt.Println("colour", colour)
 	r, g, b, _ := colour.RGBA()
 	cmyk.C, cmyk.M, cmyk.Y, cmyk.K = color.RGBToCMYK(uint8(r), uint8(g), uint8(b))
 	return
@@ -152,7 +152,7 @@ func reversepalettemap(colourmap map[color.Color]string) (stringmap map[string]c
 		} else {
 			stringmap[value] = key
 		}
-		fmt.Println("key:", key, "value", value)
+		// fmt.Println("key:", key, "value", value)
 	}
 	return
 }
@@ -423,7 +423,7 @@ func Posterize(imagefilename string, levels int) (posterized *goimage.NRGBA, new
 			}
 			newcolor.B = uint8(bint)
 
-			fmt.Println("x,y", x, y, "r,g,b,a", r, g, b, a, "newcolour", newcolor)
+			// fmt.Println("x,y", x, y, "r,g,b,a", r, g, b, a, "newcolour", newcolor)
 
 			posterized.Set(x, y, newcolor)
 
@@ -456,7 +456,7 @@ func ResizeImagetoPlate(imagefilename string, plate *wtype.LHPlate, algorithm im
 	}
 
 	if img.Bounds().Dy() != plate.WellsY() {
-		fmt.Println("hey we're not so different", img.Bounds().Dy(), plate.WellsY())
+		// fmt.Println("hey we're not so different", img.Bounds().Dy(), plate.WellsY())
 		// have the option of changing the resize algorithm here
 
 		if rotate {
@@ -465,7 +465,7 @@ func ResizeImagetoPlate(imagefilename string, plate *wtype.LHPlate, algorithm im
 		plateimage = imaging.Resize(img, 0, plate.WlsY, algorithm)
 		//plateimages = append(plateimages,plateimage)
 	} else {
-		fmt.Println("i'm the same!!!")
+		// fmt.Println("i'm the same!!!")
 		plateimage = toNRGBA(img)
 	}
 	return
@@ -488,17 +488,17 @@ func ResizeImagetoPlateAutoRotate(imagefilename string, plate *wtype.LHPlate, al
 	}
 
 	if img.Bounds().Dy() != plate.WellsY() {
-		fmt.Println("hey we're not so different", img.Bounds().Dy(), plate.WellsY())
+		// fmt.Println("hey we're not so different", img.Bounds().Dy(), plate.WellsY())
 		// have the option of changing the resize algorithm here
 
 		if img.Bounds().Dy() > img.Bounds().Dx() {
-			fmt.Println("Auto Rotating image")
+			// fmt.Println("Auto Rotating image")
 			img = imaging.Rotate270(img)
 		}
 		plateimage = imaging.Resize(img, 0, plate.WlsY, algorithm)
 		//plateimages = append(plateimages,plateimage)
 	} else {
-		fmt.Println("i'm the same!!!")
+		// fmt.Println("i'm the same!!!")
 		plateimage = toNRGBA(img)
 	}
 	return
@@ -529,12 +529,12 @@ func CheckAllResizealgorithms(imagefilename string, plate *wtype.LHPlate, rotate
 		}
 
 		if img.Bounds().Dy() != plate.WellsY() {
-			fmt.Println("hey we're not so different", img.Bounds().Dy(), plate.WellsY())
+			// fmt.Println("hey we're not so different", img.Bounds().Dy(), plate.WellsY())
 			// have the option of changing the resize algorithm here
 			plateimage = imaging.Resize(img, 0, plate.WlsY, algorithm)
 			//plateimages = append(plateimages,plateimage)
 		} else {
-			fmt.Println("i'm the same!!!")
+			// fmt.Println("i'm the same!!!")
 			plateimage = toNRGBA(img)
 		}
 
@@ -648,14 +648,14 @@ func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolour
 		for x := 0; x < plateimage.Bounds().Dx(); x++ {
 			// colour or pixel in RGB
 			colour := plateimage.At(x, y)
-			fmt.Println("x,y,colour, palette", x, y, colour, chosencolourpalette)
+			// fmt.Println("x,y,colour, palette", x, y, colour, chosencolourpalette)
 
 			if colour != nil {
 
 				if chosencolourpalette != nil && chosencolourpalette != &Emptycolourarray && len([]color.Color(*chosencolourpalette)) > 0 {
 					// change colour to colour from a palette
 					colour = chosencolourpalette.Convert(colour)
-					fmt.Println("x,y,colour", x, y, colour)
+					// fmt.Println("x,y,colour", x, y, colour)
 					plateimage.Set(x, y, colour)
 				}
 				// equivalent well position
@@ -682,20 +682,20 @@ func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolour
 	// choose colour palette from top
 
 	//arrayfrompalette := make([]color.Color, 0)
+	/*
+		for i, combo := range colourarray {
+			// fmt.Println("for well position ", wellpositionarray[i], ":")
+			r, g, b, a := combo.RGBA()
 
-	for i, combo := range colourarray {
-		fmt.Println("for well position ", wellpositionarray[i], ":")
-		r, g, b, a := combo.RGBA()
+			// fmt.Println("colour (r,g,b,a)= ", r/256, g/256, b/256, a/256)
 
-		fmt.Println("colour (r,g,b,a)= ", r/256, g/256, b/256, a/256)
-
-		// closest palette colour
-		fmt.Println("palette colour:", chosencolourpalette.Convert(combo))
-		fmt.Println("palette colour number:", chosencolourpalette.Index(combo))
-	}
-
+			// closest palette colour
+			// fmt.Println("palette colour:", chosencolourpalette.Convert(combo))
+			// fmt.Println("palette colour number:", chosencolourpalette.Index(combo))
+		}
+	*/
 	numberofpixels = len(colourarray)
-	fmt.Println("numberofpixels:", numberofpixels)
+	// fmt.Println("numberofpixels:", numberofpixels)
 
 	return
 }
@@ -740,23 +740,23 @@ func PrintFPImagePreview(imagefile string, plate *wtype.LHPlate, rotate bool, vi
 			colour := plateimage.At(x, y)
 			r, g, b, a := colour.RGBA()
 			rgba := color.RGBA{R: uint8(r), G: uint8(g), B: uint8(b), A: uint8(a)}
-			fmt.Println("colour", colour)
-			fmt.Println("visiblemap", visiblemap)
-			fmt.Println("uvmap", uvmap)
+			// fmt.Println("colour", colour)
+			// fmt.Println("visiblemap", visiblemap)
+			// fmt.Println("uvmap", uvmap)
 			colourstring := uvmap[rgba]
-			fmt.Println("colourstring", colourstring)
+			// fmt.Println("colourstring", colourstring)
 			// change colour to colour of same cell + fluorescent protein under visible light
 			stringkeymap, err := reversepalettemap(visiblemap)
 			if err != nil {
 				panic(err)
 			}
-			fmt.Println("stringkeymap", stringkeymap)
+			// fmt.Println("stringkeymap", stringkeymap)
 			viscolour, ok := stringkeymap[colourstring]
 			if ok != true {
 				errmessage := fmt.Sprintln("colourstring", colourstring, "not found in map", stringkeymap, "len", len(stringkeymap))
 				panic(errmessage)
 			}
-			fmt.Println("viscolour", viscolour)
+			// fmt.Println("viscolour", viscolour)
 			plateimage.Set(x, y, viscolour)
 
 		}

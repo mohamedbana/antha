@@ -23,6 +23,7 @@ Parameters (
 		Heightof100ulinm float64 //= 0.0533
 		//WellCrosssectionalArea float64// should be calculated from plate and well type automatically
 		Blank_absorbance wtype.Absorbance
+		MaxDilutions int
 )
 
 Data (
@@ -56,16 +57,20 @@ Setup {
 Steps {
 
 var product *wtype.LHComponent//WaterSolution
+var counter int
+if MaxDilutions == 0 {
+	MaxDilutions = 10
+}
 
 	for {
 	product = MixInto(ODplate,"", mixer.Sample(Sampletotest,Sample_volume),mixer.Sample(Diluent,Diluent_volume))
 	/*Is it necessary to include platetype in Read function? 
 	or is the info on volume, opacity, pathlength etc implied in LHComponent?*/
-	Sample_absorbance = platereader.ReadAbsorbance(*ODplate,*product, Wlength)
+	Sample_absorbance = platereader.ReadAbsorbance(ODplate,product, Wlength)
 	
-	if Sample_absorbance.Reading < 1 {break}
+	if Sample_absorbance.Reading < 1 || counter > MaxDilutions {break}
 	Diluent_volume.Mvalue +=1 //diluent_volume = diluent_volume + 1
-	
+	counter++
 }
 } // serial dilution or could write element for finding optimum dilution or search historical data
 Analysis {

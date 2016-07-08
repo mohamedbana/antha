@@ -236,8 +236,10 @@ func MakeMolecule(name string) (Molecule, error) {
 	}
 
 	var pubchemtable Pubchemtable
+
 	if err := json.Unmarshal(output, &pubchemtable); err != nil {
 		return Molecule{}, err
+
 	}
 
 	var molecule Molecule

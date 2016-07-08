@@ -40,7 +40,7 @@ func StockConcentration(nameofmolecule string, massofmoleculeactuallyaddedinG wu
 
 	//diluentmolecule := pubchem.MakeMolecule(diluent)
 
-	//fmt.Println("SI value of mass:", massofmoleculeactuallyaddedinG.SIValue())
+	//// fmt.Println("SI value of mass:", massofmoleculeactuallyaddedinG.SIValue())
 
 	actualconcfloat := (massofmoleculeactuallyaddedinG.SIValue() * 1000) / (molecularweight * totalvolumeinL.SIValue())
 

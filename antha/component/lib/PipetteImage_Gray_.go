@@ -90,12 +90,12 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 
 		fullblackuint8 = uint8(_input.MaxBlackPercentagethreshold * float64(maxuint8))
 
-		fmt.Println("brand new minuint8 ", minuint8, "fullblackuint8 ", fullblackuint8)
+		//	fmt.Println("brand new minuint8 ",minuint8,"fullblackuint8 ", fullblackuint8)
 
 		if gray.Y < minuint8 {
 			if _input.SkipWhite {
 				skipped = skipped + 1
-				fmt.Println("skipping well:", skipped, locationkey)
+				//	fmt.Println("skipping well:", skipped,locationkey)
 			} else {
 				whitevol := _input.VolumeForFullcolour
 				_input.Diluent.Type, _ = wtype.LiquidTypeFromString(_input.NonMixingClass)
@@ -121,7 +121,7 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 
 			if gray.Y < fullblackuint8 /*&& gray.Y >= minuint8*/ {
 				watervol := wunit.NewVolume((float64(maxuint8-gray.Y) / float64(maxuint8) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
-				fmt.Println("new well", locationkey, "water vol", watervol.ToString())
+				//			fmt.Println("new well", locationkey, "water vol", watervol.ToString())
 				// force hv tip choice
 				if _input.OnlyHighVolumetips && watervol.RawValue() < 21 && watervol.Unit().PrefixedSymbol() == "ul" {
 					watervol.SetValue(21)
@@ -132,13 +132,13 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 			}
 			if gray.Y >= fullblackuint8 {
 				fullblack = fullblack + 1
-				fmt.Println("full colours:", fullblack)
+				//		fmt.Println("full colours:", fullblack)
 				blackvol = _input.VolumeForFullcolour
 			} else {
 				blackvol = wunit.NewVolume((float64(gray.Y) / float64(maxuint8) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
 			}
 
-			fmt.Println("new well", locationkey, "black vol", blackvol.ToString())
+			//	fmt.Println("new well", locationkey, "black vol", blackvol.ToString())
 
 			//Black.Type = wtype.LiquidTypeFromString("NeedToMix")
 

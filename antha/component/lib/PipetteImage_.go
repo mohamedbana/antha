@@ -84,7 +84,7 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 		componentmap[componentname] = factory.GetComponentByType(componentname)
 
 	}
-	fmt.Println(componentmap)
+	//fmt.Println(componentmap)
 
 	solutions := make([]*wtype.LHComponent, 0)
 
@@ -99,7 +99,7 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 		// make sure liquid class is appropriate for cell culture in case this is not set elsewhere
 		component.Type, _ = wtype.LiquidTypeFromString(_input.UseLiquidClass) //wtype.LTCulture
 
-		fmt.Println(image.Colourcomponentmap[colour])
+		//fmt.Println(image.Colourcomponentmap[colour])
 
 		// if the option to only print a single colour is not selected then the pipetting actions for all colours (apart from if not this colour is not empty) will follow
 		if _input.OnlythisColour != "" {
@@ -109,7 +109,7 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 				_output.UniqueComponents = append(_output.UniqueComponents, component.CName)
 
 				counter = counter + 1
-				fmt.Println("wells", _input.OnlythisColour, counter)
+				//	fmt.Println("wells",OnlythisColour, counter)
 
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
 
@@ -124,7 +124,7 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 				_output.UniqueComponents = append(_output.UniqueComponents, component.CName)
 
 				counter = counter + 1
-				fmt.Println("wells not ", _input.Notthiscolour, counter)
+				//	fmt.Println("wells not ",Notthiscolour,counter)
 
 				component.Type, _ = wtype.LiquidTypeFromString(_input.UseLiquidClass)
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)

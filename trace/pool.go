@@ -150,7 +150,7 @@ func Go(parent context.Context, fn func(ctx context.Context) error) {
 		}()
 		defer func() {
 			if res := recover(); res != nil {
-				err = &goError{BaseError: res, Stack: debug.Stack()}
+				err = &Error{BaseError: res, Stack: debug.Stack()}
 			}
 		}()
 		err = fn(ctx)

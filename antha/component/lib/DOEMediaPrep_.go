@@ -108,7 +108,7 @@ func init() {
 		Constructor: DOEMediaPrepNew,
 		Desc: component.ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/DoE/mediaprep.an",
+			Path: "antha/component/an/GrowthAndAssay/mediaprep.an",
 			Params: []component.ParamDesc{
 				{Name: "BaseMedium", Desc: "", Kind: "Inputs"},
 				{Name: "Glycerol", Desc: "", Kind: "Inputs"},
