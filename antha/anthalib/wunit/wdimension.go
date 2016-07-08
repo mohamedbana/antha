@@ -364,7 +364,7 @@ type FlowRate struct {
 
 func NewFlowRate(v float64, unit string) FlowRate {
 	if unit != "ml/min" {
-		panic("Can't make flow rate which aren't in ml/min")
+		panic("Can't make flow rate not in ml/min")
 	}
 	fr := FlowRate{NewMeasurement(v, "", unit)}
 
@@ -380,7 +380,7 @@ type Velocity struct {
 func NewVelocity(v float64, unit string) Velocity {
 
 	if unit != "m/s" {
-		panic("Can't make flow rate which aren't in m/s")
+		panic("Can't make flow rate which isn't in m/s")
 	}
 	fr := Velocity{NewMeasurement(v, "", unit)}
 
