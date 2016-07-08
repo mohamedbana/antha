@@ -61,6 +61,12 @@ func _PCR_volSetup(_ctx context.Context, _input *PCR_volInput) {
 // for every input
 func _PCR_volSteps(_ctx context.Context, _input *PCR_volInput, _output *PCR_volOutput) {
 
+	// rename components
+
+	_input.Template.CName = _input.TemplateName
+	_input.FwdPrimer.CName = _input.FwdPrimerName
+	_input.RevPrimer.CName = _input.RevPrimerName
+
 	bufferVolume := (wunit.CopyVolume(_input.ReactionVolume))
 
 	bufferVolume.DivideBy(float64(_input.BufferConcinX))
@@ -160,6 +166,8 @@ func _PCR_volSteps(_ctx context.Context, _input *PCR_volInput, _output *PCR_volO
 
 	// all done
 	_output.Reaction = r1
+
+	_output.Reaction.CName = _input.ReactionName
 }
 
 // Run after controls and a steps block are completed to
@@ -233,6 +241,7 @@ type PCR_volInput struct {
 	Extensiontime         wunit.Time
 	Finalextensiontime    wunit.Time
 	FwdPrimer             *wtype.LHComponent
+	FwdPrimerName         string
 	FwdPrimerVol          wunit.Volume
 	Hotstart              bool
 	InitDenaturationtime  wunit.Time
@@ -240,10 +249,13 @@ type PCR_volInput struct {
 	OutPlate              *wtype.LHPlate
 	PCRPolymerase         *wtype.LHComponent
 	PolymeraseVolume      wunit.Volume
+	ReactionName          string
 	ReactionVolume        wunit.Volume
 	RevPrimer             *wtype.LHComponent
+	RevPrimerName         string
 	RevPrimerVol          wunit.Volume
 	Template              *wtype.LHComponent
+	TemplateName          string
 	Templatevolume        wunit.Volume
 	Water                 *wtype.LHComponent
 }
@@ -280,6 +292,7 @@ func init() {
 				{Name: "Extensiontime", Desc: "should be calculated from template length and polymerase rate\n", Kind: "Parameters"},
 				{Name: "Finalextensiontime", Desc: "", Kind: "Parameters"},
 				{Name: "FwdPrimer", Desc: "", Kind: "Inputs"},
+				{Name: "FwdPrimerName", Desc: "", Kind: "Parameters"},
 				{Name: "FwdPrimerVol", Desc: "", Kind: "Parameters"},
 				{Name: "Hotstart", Desc: "", Kind: "Parameters"},
 				{Name: "InitDenaturationtime", Desc: "", Kind: "Parameters"},
@@ -287,10 +300,13 @@ func init() {
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "PCRPolymerase", Desc: "", Kind: "Inputs"},
 				{Name: "PolymeraseVolume", Desc: "", Kind: "Parameters"},
+				{Name: "ReactionName", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionVolume", Desc: "PCRprep parameters:\n", Kind: "Parameters"},
 				{Name: "RevPrimer", Desc: "", Kind: "Inputs"},
+				{Name: "RevPrimerName", Desc: "", Kind: "Parameters"},
 				{Name: "RevPrimerVol", Desc: "", Kind: "Parameters"},
 				{Name: "Template", Desc: "", Kind: "Inputs"},
+				{Name: "TemplateName", Desc: "", Kind: "Parameters"},
 				{Name: "Templatevolume", Desc: "", Kind: "Parameters"},
 				{Name: "Water", Desc: "", Kind: "Inputs"},
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},

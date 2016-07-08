@@ -1,9 +1,0 @@
-{
-    "connections": [
-    ],
-    "processes": {
-        "SeqAnnot": {
-            "component": "EntrezLookup"
-        }
-	}
-}

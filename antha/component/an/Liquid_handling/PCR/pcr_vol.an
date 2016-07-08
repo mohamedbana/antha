@@ -30,6 +30,11 @@ Parameters (
 	Templatevolume Volume
 	PolymeraseVolume Volume
 	DNTPVol Volume
+	ReactionName string
+	TemplateName string
+	FwdPrimerName string
+	RevPrimerName string
+	
 	/*
 	// let's be ambitious and try this as part of type polymerase Polymeraseconc Volume
 	
@@ -85,6 +90,15 @@ Setup {
 // The core process for this protocol, with the steps to be performed
 // for every input
 Steps {
+	
+	// rename components
+	
+
+	Template.CName = TemplateName
+	FwdPrimer.CName = FwdPrimerName
+	RevPrimer.CName = RevPrimerName
+	
+	
 	
 	bufferVolume := (wunit.CopyVolume(ReactionVolume))
 	
@@ -188,6 +202,8 @@ Steps {
 
 	// all done
 	Reaction = r1
+	
+	Reaction.CName = ReactionName
 }
 
 // Run after controls and a steps block are completed to
