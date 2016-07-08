@@ -10,3 +10,6 @@ modules:
     testpackages:
     - ~vendor
     - ~bvendor
+    image:
+      copyhostpaths:
+      - github.com/antha-lang/antha:antha/examples:/root/examples
