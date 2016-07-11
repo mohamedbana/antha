@@ -51,7 +51,6 @@ Inputs (
 	Ladder *wtype.LHComponent
 	Sampletotest *wtype.LHComponent//WaterSolution
 	Loadingdye *wtype.LHComponent//WaterSolution //Chemspiderlink // not correct link but similar desirable
-	InPlate *wtype.LHPlate
 	DNAgel *wtype.LHPlate  // gel
 	MixPlate *wtype.LHPlate// plate to mix samples if required
 
@@ -142,6 +141,8 @@ Steps {
 	// if first column add ladder sample 
 	if wellcoords.X == 0 {
 		
+	Ladder.Type,_ = wtype.LiquidTypeFromString(Mixingpolicy)	
+	
 		laddersample := MixInto(
 		DNAgel,
 	DNAgel.AllWellPositions(wtype.BYROW)[counter],

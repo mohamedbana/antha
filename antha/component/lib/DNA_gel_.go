@@ -129,8 +129,11 @@ func _DNA_gelSteps(_ctx context.Context, _input *DNA_gelInput, _output *DNA_gelO
 			// if first column add ladder sample
 			if wellcoords.X == 0 {
 
-				laddersample := execute.MixInto(_ctx, _input.DNAgel,
+				_input.Ladder.Type, _ = wtype.LiquidTypeFromString(_input.Mixingpolicy)
+
+				laddersample := execute.MixTo(_ctx, _input.DNAgel.Type,
 					_input.DNAgel.AllWellPositions(wtype.BYROW)[counter],
+					1,
 					mixer.SampleForTotalVolume(_input.Water, _input.DNAgelrunvolume),
 					mixer.Sample(_input.Ladder, _input.LadderVolume),
 				)
@@ -175,8 +178,9 @@ func _DNA_gelSteps(_ctx context.Context, _input *DNA_gelInput, _output *DNA_gelO
 			DNAgelloadmix.Type, _ = wtype.LiquidTypeFromString(_input.Mixingpolicy)
 			//DNAgelloadmix.Type = "loadwater"
 
-			loadedsample = execute.MixInto(_ctx, _input.DNAgel,
+			loadedsample = execute.MixTo(_ctx, _input.DNAgel.Type,
 				position,
+				1,
 				waterSample,
 				mixer.Sample(DNAgelloadmix, samplevolume),
 			)
