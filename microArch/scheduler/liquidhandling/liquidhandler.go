@@ -59,12 +59,12 @@ import (
 // send it in as an argument
 
 type Liquidhandler struct {
-	Properties        *liquidhandling.LHProperties
-	InitialProperties *liquidhandling.LHProperties
-	SetupAgent        func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
-	LayoutAgent       func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
-	ExecutionPlanner  func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
-	PolicyManager     *LHPolicyManager
+	Properties       *liquidhandling.LHProperties
+	FinalProperties  *liquidhandling.LHProperties
+	SetupAgent       func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
+	LayoutAgent      func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
+	ExecutionPlanner func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
+	PolicyManager    *LHPolicyManager
 }
 
 // initialize the liquid handling structure
@@ -74,7 +74,7 @@ func Init(properties *liquidhandling.LHProperties) *Liquidhandler {
 	lh.LayoutAgent = ImprovedLayoutAgent
 	lh.ExecutionPlanner = ImprovedExecutionPlanner
 	lh.Properties = properties
-	lh.InitialProperties = properties
+	lh.FinalProperties = properties
 	return &lh
 }
 
@@ -161,7 +161,7 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 			lastPos := ins.GetParameter("POSTO").([]string)
 
 			for i, p := range lastPos {
-				lastPlate[i] = this.Properties.PosLookup[p]
+				lastPlate[i] = this.FinalProperties.PosLookup[p]
 			}
 
 			lastWell = ins.GetParameter("WELLTO").([]string)
@@ -197,10 +197,8 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 	// now go through and set the plates up appropriately
 
 	for plateID, wellmap := range vols {
-		// this one won't correct volumes
-		plate, ok := this.Properties.Plates[this.Properties.PlateIDLookup[plateID]]
-		// this one will
-		plate2, _ := this.InitialProperties.Plates[this.Properties.PlateIDLookup[plateID]]
+		plate, ok := this.FinalProperties.Plates[this.FinalProperties.PlateIDLookup[plateID]]
+		plate2, _ := this.Properties.Plates[this.FinalProperties.PlateIDLookup[plateID]]
 		// nb the above is not necessarily safe; should rerun program until convergence
 
 		if !ok {
@@ -224,12 +222,12 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 	// finally get rid of any temporary stuff
 
 	this.Properties.RemoveTemporaryComponents()
-	this.InitialProperties.RemoveTemporaryComponents()
+	this.FinalProperties.RemoveTemporaryComponents()
 
 	// let's take a look
 
 	fmt.Println("INITIAL")
-	for _, p := range this.InitialProperties.Plates {
+	for _, p := range this.Properties.Plates {
 		fmt.Println(p.Name())
 
 		for _, w := range p.Wellcoords {
@@ -241,7 +239,7 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 	}
 
 	fmt.Println("FINAL")
-	for _, p := range this.Properties.Plates {
+	for _, p := range this.FinalProperties.Plates {
 		fmt.Println(p.Name())
 
 		for _, w := range p.Wellcoords {
@@ -625,9 +623,9 @@ func (this *Liquidhandler) Layout(request *LHRequest) (*LHRequest, error) {
 // make the instructions for executing this request
 func (this *Liquidhandler) ExecutionPlan(request *LHRequest) (*LHRequest, error) {
 	//rbtcpy := this.Properties.Dup()
-	this.InitialProperties = this.Properties.Dup()
+	this.FinalProperties = this.Properties.Dup()
 
-	rq, err := this.ExecutionPlanner(request, this.Properties)
+	rq, err := this.ExecutionPlanner(request, this.FinalProperties)
 
 	// ensure any relevant state changes are noted
 
