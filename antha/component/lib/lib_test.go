@@ -211,6 +211,10 @@ func getExampleInputs(t *testing.T) []*TInput {
 	inputDir := getInputDir()
 	if inputDir == "" {
 		inputDir = "../../examples"
+		_, err := os.Stat(inputDir)
+		if err != nil {
+			inputDir = "examples"
+		}
 	}
 
 	inputs, err := findInputs(inputDir)
