@@ -3,6 +3,7 @@
         "gelof1stpcrstep": {
             "DNAgel": "EGEL96_1",
             "DNAgelrunvolume": "15ul",
+			"LadderVolume":"10ul",
             "Ladder": "1kb DNA Ladder",
             "Loadingdye": "blue",
             "Loadingdyeinsample": true,

@@ -125,13 +125,14 @@ func _DNA_gelSteps(_ctx context.Context, _input *DNA_gelInput, _output *DNA_gelO
 			//get well coordinates
 			wellcoords := wtype.MakeWellCoordsA1(position)
 			fmt.Println("wellcoords.X", wellcoords.X)
+
 			// if first column add ladder sample
 			if wellcoords.X == 0 {
 
 				laddersample := execute.MixInto(_ctx, _input.DNAgel,
 					_input.DNAgel.AllWellPositions(wtype.BYROW)[counter],
-					mixer.Sample(_input.Water, _input.Watervol),
-					mixer.Sample(_input.Ladder, samplevolume),
+					mixer.SampleForTotalVolume(_input.Water, _input.DNAgelrunvolume),
+					mixer.Sample(_input.Ladder, _input.LadderVolume),
 				)
 
 				loadedsamples = append(loadedsamples, laddersample)
@@ -297,6 +298,7 @@ type DNA_gelInput struct {
 	DNAgelrunvolume    wunit.Volume
 	InPlate            *wtype.LHPlate
 	Ladder             *wtype.LHComponent
+	LadderVolume       wunit.Volume
 	Loadingdye         *wtype.LHComponent
 	Loadingdyeinsample bool
 	Loadingdyevolume   wunit.Volume
@@ -335,6 +337,7 @@ func init() {
 				{Name: "DNAgelrunvolume", Desc: "", Kind: "Parameters"},
 				{Name: "InPlate", Desc: "", Kind: "Inputs"},
 				{Name: "Ladder", Desc: "", Kind: "Inputs"},
+				{Name: "LadderVolume", Desc: "", Kind: "Parameters"},
 				{Name: "Loadingdye", Desc: "WaterSolution //Chemspiderlink // not correct link but similar desirable\n", Kind: "Inputs"},
 				{Name: "Loadingdyeinsample", Desc: "", Kind: "Parameters"},
 				{Name: "Loadingdyevolume", Desc: "", Kind: "Parameters"},

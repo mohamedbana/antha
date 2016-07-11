@@ -15,6 +15,7 @@ Parameters (
 	Samplenames []string
 	Samplenumber int
 	Watervol	Volume
+	LadderVolume Volume
 	Loadingdyevolume Volume
 	DNAgelrunvolume Volume
 	
@@ -144,8 +145,8 @@ Steps {
 		laddersample := MixInto(
 		DNAgel,
 	DNAgel.AllWellPositions(wtype.BYROW)[counter],
-	mixer.Sample(Water,Watervol),
-	mixer.Sample(Ladder, samplevolume),
+	mixer.SampleForTotalVolume(Water,DNAgelrunvolume),
+	mixer.Sample(Ladder, LadderVolume),
 	)
 
 	loadedsamples = append(loadedsamples,laddersample)
