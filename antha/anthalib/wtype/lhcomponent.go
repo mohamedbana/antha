@@ -129,6 +129,8 @@ func (lhc *LHComponent) Dup() *LHComponent {
 	}
 	c.Loc = lhc.Loc
 	c.Destination = lhc.Destination
+	c.ParentID = lhc.ParentID
+	c.DaughterID = lhc.DaughterID
 	return c
 }
 

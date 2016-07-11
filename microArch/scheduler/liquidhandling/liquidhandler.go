@@ -199,7 +199,6 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 	for plateID, wellmap := range vols {
 		plate, ok := this.FinalProperties.Plates[this.FinalProperties.PlateIDLookup[plateID]]
 		plate2, _ := this.Properties.Plates[this.FinalProperties.PlateIDLookup[plateID]]
-		// nb the above is not necessarily safe; should rerun program until convergence
 
 		if !ok {
 			err := wtype.LHError(wtype.LH_ERR_DIRE, fmt.Sprint("NO SUCH PLATE: ", plateID))
@@ -232,7 +231,7 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 
 		for _, w := range p.Wellcoords {
 			if !w.Empty() {
-				fmt.Println(w.Crds, " ", w.WContents.CName, " ", w.CurrVolume().ToString())
+				fmt.Println(w.Crds, " ", w.WContents.CName, " ", w.CurrVolume().ToString(), " P: ", w.WContents.ParentID, " D: ", w.WContents.DaughterID)
 			}
 
 		}
@@ -244,7 +243,7 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 
 		for _, w := range p.Wellcoords {
 			if !w.Empty() {
-				fmt.Println(w.Crds, " ", w.WContents.CName, " ", w.CurrVolume().ToString())
+				fmt.Println(w.Crds, " ", w.WContents.CName, " ", w.CurrVolume().ToString(), " P: ", w.WContents.ParentID, " D: ", w.WContents.DaughterID)
 			}
 
 		}
