@@ -290,6 +290,10 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties, 
 		ptwy[ix] = tlhp.WellsY()
 		ptt[ix] = tlhp.Type
 
+		// add component to destination
+
+		wlt.Add(v)
+
 		wlf, ok := flhp.WellAtString(fromWells[ix])
 
 		if !ok {

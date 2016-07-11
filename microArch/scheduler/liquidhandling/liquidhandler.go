@@ -59,11 +59,12 @@ import (
 // send it in as an argument
 
 type Liquidhandler struct {
-	Properties       *liquidhandling.LHProperties
-	SetupAgent       func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
-	LayoutAgent      func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
-	ExecutionPlanner func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
-	PolicyManager    *LHPolicyManager
+	Properties        *liquidhandling.LHProperties
+	InitialProperties *liquidhandling.LHProperties
+	SetupAgent        func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
+	LayoutAgent       func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
+	ExecutionPlanner  func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
+	PolicyManager     *LHPolicyManager
 }
 
 // initialize the liquid handling structure
@@ -73,6 +74,7 @@ func Init(properties *liquidhandling.LHProperties) *Liquidhandler {
 	lh.LayoutAgent = ImprovedLayoutAgent
 	lh.ExecutionPlanner = ImprovedExecutionPlanner
 	lh.Properties = properties
+	lh.InitialProperties = properties
 	return &lh
 }
 
@@ -195,7 +197,11 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 	// now go through and set the plates up appropriately
 
 	for plateID, wellmap := range vols {
+		// this one won't correct volumes
 		plate, ok := this.Properties.Plates[this.Properties.PlateIDLookup[plateID]]
+		// this one will
+		plate2, _ := this.InitialProperties.Plates[this.Properties.PlateIDLookup[plateID]]
+		// nb the above is not necessarily safe; should rerun program until convergence
 
 		if !ok {
 			err := wtype.LHError(wtype.LH_ERR_DIRE, fmt.Sprint("NO SUCH PLATE: ", plateID))
@@ -204,10 +210,13 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 
 		for crd, vol := range wellmap {
 			well := plate.Wellcoords[crd]
+			well2 := plate2.Wellcoords[crd]
 			if well.IsAutoallocated() {
 				vol.Add(well.ResidualVolume())
-				well.WContents.SetVolume(vol)
+				well2.WContents.SetVolume(vol)
+				well.WContents.SetVolume(well.ResidualVolume())
 				well.DeclareNotTemporary()
+				well2.DeclareNotTemporary()
 			}
 		}
 	}
@@ -215,6 +224,34 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 	// finally get rid of any temporary stuff
 
 	this.Properties.RemoveTemporaryComponents()
+	this.InitialProperties.RemoveTemporaryComponents()
+
+	// let's take a look
+
+	fmt.Println("INITIAL")
+	for _, p := range this.InitialProperties.Plates {
+		fmt.Println(p.Name())
+
+		for _, w := range p.Wellcoords {
+			if !w.Empty() {
+				fmt.Println(w.Crds, " ", w.WContents.CName, " ", w.CurrVolume().ToString())
+			}
+
+		}
+	}
+
+	fmt.Println("FINAL")
+	for _, p := range this.Properties.Plates {
+		fmt.Println(p.Name())
+
+		for _, w := range p.Wellcoords {
+			if !w.Empty() {
+				fmt.Println(w.Crds, " ", w.WContents.CName, " ", w.CurrVolume().ToString())
+			}
+
+		}
+
+	}
 
 	// all done
 
@@ -587,11 +624,23 @@ func (this *Liquidhandler) Layout(request *LHRequest) (*LHRequest, error) {
 
 // make the instructions for executing this request
 func (this *Liquidhandler) ExecutionPlan(request *LHRequest) (*LHRequest, error) {
-	rbtcpy := this.Properties.Dup()
+	//rbtcpy := this.Properties.Dup()
+	this.InitialProperties = this.Properties.Dup()
 
-	rq, err := this.ExecutionPlanner(request, rbtcpy)
+	rq, err := this.ExecutionPlanner(request, this.Properties)
 
 	// ensure any relevant state changes are noted
+
+	/*
+		for _, v := range rbtcpy.Plates {
+			fmt.Println("PLATE NAME: ", v.Name())
+			for _, w := range v.Wellcoords {
+				if !w.Empty() {
+					fmt.Println("WELL: ", w.Crds, " HAS: ", w.WContents.Volume().ToString(), " of ", w.WContents.CName)
+				}
+			}
+		}
+	*/
 
 	return rq, err
 }
