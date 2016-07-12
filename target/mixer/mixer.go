@@ -282,7 +282,7 @@ func New(opt Opt, d driver.ExtendedLiquidhandlingDriver) (*Mixer, error) {
 	if !status.OK {
 		return nil, fmt.Errorf("cannot get capabilities: %s", status.Msg)
 	}
-	if len(opt.DriverSpecificTipPreferences) != 0 {
+	if len(opt.DriverSpecificTipPreferences) != 0 && p.CheckTipPrefCompatibility(opt.DriverSpecificTipPreferences) {
 		p.Tip_preferences = opt.DriverSpecificTipPreferences
 	}
 	p.Driver = d
