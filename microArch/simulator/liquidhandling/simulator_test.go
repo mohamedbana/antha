@@ -901,6 +901,10 @@ func Test_LoadTips_OK(t *testing.T) {
             t.Errorf("Wrong number of tips loaded, expected %v, got %v", len(test.loaded_tips), adaptor.Ntipsloaded)
         }
 
+
+        //check that there are no errors/warnings in the vlh
+        errors, _ := vlh.GetErrors()
+        compare_errors(t, []string{}, errors)
     }
 
 
