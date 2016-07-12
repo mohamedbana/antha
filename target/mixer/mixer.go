@@ -22,9 +22,10 @@ var (
 )
 
 type Mixer struct {
-	driver     driver.ExtendedLiquidhandlingDriver
-	properties driver.LHProperties
-	opt        Opt
+	driver          driver.ExtendedLiquidhandlingDriver
+	properties      driver.LHProperties
+	finalproperties driver.LHProperties
+	opt             Opt
 }
 
 func (a *Mixer) String() string {
@@ -254,6 +255,10 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 		}
 	}
 
+	// save final state... this includes output info
+
+	a.finalproperties = *(r.Liquidhandler.FinalProperties)
+
 	// TODO: Desired filename not exposed in current driver interface, so pick
 	// a name. So far, at least Gilson software cares what the filename is, so
 	// use .sqlite for compatibility
@@ -267,9 +272,10 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 		ftype = fmt.Sprintf("application/%s", strings.ToLower(a.properties.Mnfr))
 	}
 	return &target.Mix{
-		Dev:        a,
-		Request:    r.LHRequest,
-		Properties: a.properties,
+		Dev:             a,
+		Request:         r.LHRequest,
+		Properties:      a.properties,
+		Finalproperties: a.finalproperties,
 		Files: target.Files{
 			Tarball: tarball,
 			Type:    ftype,
@@ -282,7 +288,7 @@ func New(opt Opt, d driver.ExtendedLiquidhandlingDriver) (*Mixer, error) {
 	if !status.OK {
 		return nil, fmt.Errorf("cannot get capabilities: %s", status.Msg)
 	}
-	if len(opt.DriverSpecificTipPreferences) != 0 {
+	if len(opt.DriverSpecificTipPreferences) != 0 && p.CheckTipPrefCompatibility(opt.DriverSpecificTipPreferences) {
 		p.Tip_preferences = opt.DriverSpecificTipPreferences
 	}
 	p.Driver = d
