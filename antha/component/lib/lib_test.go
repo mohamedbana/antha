@@ -1,7 +1,6 @@
 package lib
 
 import (
-	//"encoding/json"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -15,7 +14,6 @@ import (
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	//"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
