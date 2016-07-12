@@ -174,7 +174,7 @@ func (cmp *LHComponent) AddParentComponent(cmp2 *LHComponent) {
 	if cmp.ParentID != "" {
 		cmp.ParentID += "_"
 	}
-	//cmp.ParentID += cmp2.String() + ":(" + cmp2.ParentID + ")"
+	//cmp.ParentID += cmp2.String() + "(" + cmp2.ParentID + ")"
 	cmp.ParentID += cmp2.ID + "(" + cmp2.ParentID + ")"
 }
 
@@ -188,6 +188,7 @@ func (cmp *LHComponent) AddDaughterComponent(cmp2 *LHComponent) {
 	cmp.DaughterID += cmp2.ID
 }
 
+/*
 func (cmp *LHComponent) AddParent(parentID string) {
 	if cmp.ParentID != "" {
 		cmp.ParentID += "+"
@@ -201,6 +202,7 @@ func (cmp *LHComponent) AddDaughter(daughterID string) {
 	}
 	cmp.DaughterID += daughterID
 }
+*/
 
 func (cmp *LHComponent) Mix(cmp2 *LHComponent) {
 	//wasEmpty := cmp.IsZero()
@@ -288,7 +290,6 @@ func (cmp *LHComponent) String() string {
 func (cmp *LHComponent) ParentTree() graph.StringGraph {
 	g := graph.StringGraph{Nodes: make([]string, 0, 3), Outs: make(map[string][]string)}
 	parseTree(cmp.ID+"("+cmp.ParentID+")", &g)
-
 	return g
 }
 
