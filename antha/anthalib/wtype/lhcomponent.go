@@ -24,11 +24,12 @@
 package wtype
 
 import (
-	//"fmt"
 	"strings"
 
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	//"github.com/antha-lang/antha/microArch/logger"
+	"github.com/antha-lang/antha/graph"
 )
 
 // structure describing a liquid component and its desired properties
@@ -173,7 +174,8 @@ func (cmp *LHComponent) AddParentComponent(cmp2 *LHComponent) {
 	if cmp.ParentID != "" {
 		cmp.ParentID += "_"
 	}
-	cmp.ParentID += cmp2.String() + ":(" + cmp2.ParentID + ")"
+	//cmp.ParentID += cmp2.String() + ":(" + cmp2.ParentID + ")"
+	cmp.ParentID += cmp2.ID + "(" + cmp2.ParentID + ")"
 }
 
 func (cmp *LHComponent) AddDaughterComponent(cmp2 *LHComponent) {
@@ -181,7 +183,9 @@ func (cmp *LHComponent) AddDaughterComponent(cmp2 *LHComponent) {
 		cmp.DaughterID += "_"
 	}
 
-	cmp.DaughterID += cmp2.String()
+	//cmp.DaughterID += cmp2.String()
+
+	cmp.DaughterID += cmp2.ID
 }
 
 func (cmp *LHComponent) AddParent(parentID string) {
@@ -279,4 +283,75 @@ func (cmp *LHComponent) String() string {
 	}
 
 	return id + ":" + l
+}
+
+func (cmp *LHComponent) ParentTree() graph.StringGraph {
+	g := graph.StringGraph{Nodes: make([]string, 0, 3), Outs: make(map[string][]string)}
+	parseTree(cmp.ID+"("+cmp.ParentID+")", &g)
+
+	return g
+}
+
+//   a(b_c_d)_e()_f(g_h)
+//   nodes: [abcdefgh]
+//   outs : a:[] b[a] c[a] d[a] e[] f[] g[f] h[f]
+//
+
+func parseTree(p string, g *graph.StringGraph) []string {
+	newnodes := make([]string, 0, 3)
+	if p[0] == '(' {
+		// strip brackets
+		p = p[1 : len(p)-1]
+	}
+
+	if len(p) == 0 {
+		// empty bracket pair
+		return newnodes
+	}
+
+	bc := 0
+
+	splits := make([]int, 0, len(p))
+
+	for i, c := range p {
+		if c == '(' {
+			bc += 1
+			continue
+		} else if c == ')' {
+			bc -= 1
+			continue
+		}
+
+		if bc == 0 && c == '_' {
+			splits = append(splits, i)
+		}
+		//   a(b()_c()_d())_e()_f(g()_h())
+		//                 s   s
+	}
+
+	splits = append(splits, len(p))
+
+	// carve up
+
+	b := 0
+
+	for _, e := range splits {
+		tok := p[b:e]
+		lb := strings.Index(tok, "(")
+		node := tok[:lb]
+		if !wutil.StrInStrArray(node, g.Nodes) {
+			g.Nodes = append(g.Nodes, node)
+			g.Outs[node] = make([]string, 0, 3)
+			newnodes = append(newnodes, node)
+		}
+
+		childnodes := parseTree(tok[lb:], g)
+
+		for _, child := range childnodes {
+			g.Outs[child] = append(g.Outs[child], node)
+		}
+		b = e + 1
+	}
+
+	return newnodes
 }

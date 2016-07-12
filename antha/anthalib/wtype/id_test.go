@@ -16,7 +16,6 @@ func makeWell() *LHWell {
 
 func makeComponent() *LHComponent {
 	A := NewLHComponent()
-	A.CName = GetRUID(1)
 	A.Type = LTWater
 	A.Smax = 9999
 	A.Vol = rand.Float64() * 10.0
@@ -89,4 +88,16 @@ func TestFullWellMix(t *testing.T) {
 		t.Fatal("Well contents should have all parents set...2")
 	}
 
+	/*
+		gra := w2.WContents.ParentTree()
+		fmt.Println(w2.WContents.ParentID)
+		fmt.Println(gra.Nodes)
+		for n, a := range gra.Outs {
+			fmt.Println(n, ":::", a)
+		}
+
+		s := graph.Print(graph.PrintOpt{Graph: &gra})
+
+		fmt.Println(s)
+	*/
 }

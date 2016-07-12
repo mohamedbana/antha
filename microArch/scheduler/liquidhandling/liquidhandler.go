@@ -132,7 +132,7 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 	var d time.Duration
 
 	for _, ins := range instructions {
-		logger.Debug(fmt.Sprintln(liquidhandling.InsToString(ins)))
+		//logger.Debug(fmt.Sprintln(liquidhandling.InsToString(ins)))
 		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(this.Properties.Driver)
 
 		if timer != nil {
@@ -227,7 +227,7 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 
 	fmt.Println("INITIAL")
 	for _, p := range this.Properties.Plates {
-		fmt.Println(p.Name())
+		fmt.Println(p.Name(), " : ", p.ID)
 
 		for _, w := range p.Wellcoords {
 			if !w.Empty() {
@@ -392,6 +392,7 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) (*LHRequest, error) {
 		components := instruction.Components
 
 		for _, component := range components {
+			fmt.Println("INS COMPONENT: ", component.CName, " ID: ", component.ID)
 			// ignore anything which is made in another mix
 
 			if component.HasAnyParent() {
