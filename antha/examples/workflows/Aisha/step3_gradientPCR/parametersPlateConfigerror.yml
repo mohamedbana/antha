@@ -1,13 +1,12 @@
 {
 
-    "Parameters": {
-		
 	    "Config": {
 	           "inputPlates": [
 	               "Q5Mastermix.csv"
 	           ]
 	       },
-		
+
+    "Parameters": {
         "GradientPCR": {
             "Projectname": "gradientPCRlividans",
 			"RowGradientRatherthanColumn":false,
