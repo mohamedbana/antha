@@ -319,7 +319,7 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties, 
 
 		// add daughter ID to component in
 
-		wlf.WContents.AddDaughter(wlt.WContents.ID)
+		wlf.WContents.AddDaughterComponent(wlt.WContents)
 
 		//fmt.Println("HERE GOES: ", i, wh[i], vf[i].ToString(), vt[i].ToString(), va[i].ToString(), pt[i], wt[i], pf[i], wf[i], pfwx[i], pfwy[i], ptwx[i], ptwy[i])
 

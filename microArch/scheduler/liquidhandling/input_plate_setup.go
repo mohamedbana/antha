@@ -203,7 +203,7 @@ func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 				// first we don't allow these to have the same ID
 				newcomponent.ID = wtype.GetUUID()
 				// second we add a parent
-				newcomponent.AddParent(component.ID)
+				newcomponent.AddParentComponent(component)
 				newcomponent.Vol = curr_well.MaxVol
 				newcomponent.Loc = location
 				volume.Subtract(curr_well.WorkingVolume())
