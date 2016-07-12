@@ -508,7 +508,7 @@ func get_lhtipbox() *wtype.LHTipbox {
 func get_lhtipwaste() *wtype.LHTipwaste {
     params := LHTipwasteParams {
         700,                    //capacity        int 
-        "test tipwaste",        //typ             string
+        "tipwaste",             //typ             string
         "testTipwaste mfr",     //mfr             string 
         92.0,                   //height          float64 
         LHWellParams{           // w               LHWellParams
@@ -669,4 +669,162 @@ func TestVLH_AddPlateTo_locationFull(t *testing.T) {
 
     errors, _ := vlh.GetErrors()
     compare_errors(t, []string{"(err) Adding plate \"p1\" to \"position1\" which is already occupied by plate \"p0\""}, errors)
+}
+
+// ########################################################################################################################
+// ########################################################## Tip Loading/Unloading
+// ########################################################################################################################
+
+
+func get_tip_test_vlh() *VirtualLiquidHandler {
+    props := LHPropertiesParams{
+        "Device Name",
+        "Device Manufacturer",
+        []LayoutParams{
+            LayoutParams{"tip_loc" ,   0.0,   0.0,   0.0},
+            LayoutParams{"tipwaste_loc" , 100.0,   0.0,   0.0,},
+            LayoutParams{"input_loc" , 200.0,   0.0,   0.0},
+            LayoutParams{"output_loc" ,   0.0, 100.0,   0.0},
+            LayoutParams{"wash_loc" , 100.0, 100.0,   0.0},
+            LayoutParams{"waste_loc" , 200.0, 100.0,   0.0},
+        },
+        []HeadParams{
+            HeadParams{
+                "Head0 Name",
+                "Head0 Manufacturer",
+                ChannelParams{
+                    "Head0 ChannelParams",      //Name
+                    UnitParams{0.1, "ul"},      //min volume
+                    UnitParams{1.,  "ml"},      //max volume
+                    UnitParams{0.1, "ml/min"},  //min flowrate
+                    UnitParams{10., "ml/min",}, //max flowrate
+                    8,                          //multi
+                    false,                      //independent
+                    0,                          //orientation
+                    0,                          //head
+                },
+                AdaptorParams{
+                    "Head0 Adaptor",
+                    "Head0 Adaptor Manufacturer",
+                    ChannelParams{
+                        "Head0 Adaptor ChannelParams",  //Name
+                        UnitParams{0.1, "ul"},          //min volume
+                        UnitParams{1.,  "ml"},          //max volume
+                        UnitParams{0.1, "ml/min"},      //min flowrate
+                        UnitParams{10., "ml/min",},     //max flowrate
+                        8,                              //multi
+                        false,                          //independent
+                        0,                              //orientation
+                        0,                              //head
+                    },
+                },
+            },
+        },
+        []string{"tip_loc",},               //Tip_preferences
+        []string{"input_loc",},             //Input_preferences
+        []string{"output_loc",},            //Output_preferences
+        []string{"tipwaste_loc",},          //Tipwaste_preferences
+        []string{"wash_loc",},              //Wash_preferences
+        []string{"waste_loc",},             //Waste_preferences
+    }
+
+    vlh := NewVirtualLiquidHandler(makeLHProperties(&props))
+    vlh.Initialize()
+    vlh.AddPlateTo("tip_loc", get_lhtipbox(), "tipbox1")
+    vlh.AddPlateTo("tipwaste_loc", get_lhtipwaste(), "tipwaste1")
+    return vlh
+}
+
+type LoadTipsParams struct {
+    channels        []int
+    head            int
+    multi           int
+    platetype       []string
+    position        []string
+    well            []string
+}
+
+func (s *LoadTipsParams) apply(vlh *VirtualLiquidHandler) {
+    vlh.LoadTips(s.channels,
+                 s.head,
+                 s.multi,
+                 s.platetype,
+                 s.position,
+                 s.well)
+}
+
+type TipLoc struct {
+    row     int
+    col     int
+}
+
+func contains(s []TipLoc, row, col int) bool {
+    for _, l := range s {
+        if l.row == row && l.col == col {
+            return true
+        }
+    }
+    return false
+}
+
+func Test_LoadTips_OK(t *testing.T) {
+    type LoadTipsOKParams struct {
+        params              LoadTipsParams
+        missing_tips        []TipLoc
+        loaded_tips         []int
+    }
+
+    tests := []LoadTipsOKParams{
+        LoadTipsOKParams{
+            //load a single tip in the first position
+            LoadTipsParams{
+                []int{0},                   //channels
+                0,                          //head
+                1,                          //multi
+                []string{"tipbox"},         //platetype
+                []string{"tip_loc"},        //position
+                []string{"H12"},            //well
+            },
+            []TipLoc{TipLoc{7,11}},     //missing_tips
+            []int{0},                   //loaded_tips
+        },
+    }
+
+    for _, test := range tests {
+        vlh := get_tip_test_vlh()
+        test.params.apply(vlh)
+        
+        //get the tipbox
+        props := vlh.properties
+        tipbox := props.PlateLookup[props.PosLookup["tip_loc"]].(*wtype.LHTipbox)
+        
+        //check that tips are missing iff they're in missing_tips
+        for i := 0; i < tipbox.Ncols; i++ {
+            for j := 0; j < tipbox.Nrows; j++ {
+                if tipbox.Tips[i][j] == nil {
+                    //must be in missing tips
+                    if !contains(test.missing_tips,j,i) {
+                        t.Errorf("Unexpected tip missing in tipbox(%v,%v)", i, j)
+                    }
+                } else {
+                    //mustn't be in missing tips
+                    if contains(test.missing_tips,j,i) {
+                        t.Errorf("Unexpected tip present in tipbox(%v,%v)", i, j)
+                    }
+                }
+            }
+        }
+
+        //get the adaptor
+        adaptor := props.Heads[0].Adaptor
+        //test the tips were loaded in the right place
+        //TODO: Update LHAdaptor to track which heads are loaded
+        if adaptor.Ntipsloaded != len(test.loaded_tips) {
+            t.Errorf("Wrong number of tips loaded, expected %v, got %v", len(test.loaded_tips), adaptor.Ntipsloaded)
+        }
+
+    }
+
+
+    
 }
