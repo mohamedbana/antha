@@ -50,16 +50,16 @@ import (
 
 // Physical outputs from this protocol with types
 
-func _PCR_volRequirements() {
+func _PCR_vol_onebyoneRequirements() {
 }
 
 // Conditions to run on startup
-func _PCR_volSetup(_ctx context.Context, _input *PCR_volInput) {
+func _PCR_vol_onebyoneSetup(_ctx context.Context, _input *PCR_vol_onebyoneInput) {
 }
 
 // The core process for this protocol, with the steps to be performed
 // for every input
-func _PCR_volSteps(_ctx context.Context, _input *PCR_volInput, _output *PCR_volOutput) {
+func _PCR_vol_onebyoneSteps(_ctx context.Context, _input *PCR_vol_onebyoneInput, _output *PCR_vol_onebyoneOutput) {
 
 	// rename components
 
@@ -104,14 +104,7 @@ func _PCR_volSteps(_ctx context.Context, _input *PCR_volInput, _output *PCR_volO
 	}
 
 	// pipette out to make mastermix
-	var mastermix *wtype.LHComponent
-	for j := range samples {
-		if j == 0 {
-			mastermix = execute.MixInto(_ctx, _input.OutPlate, "", samples[j])
-		} else {
-			mastermix = execute.Mix(_ctx, mastermix, samples[j])
-		}
-	}
+	mastermix := execute.MixInto(_ctx, _input.OutPlate, "", samples...)
 
 	// rest samples to zero
 	samples = make([]*wtype.LHComponent, 0)
@@ -178,26 +171,26 @@ func _PCR_volSteps(_ctx context.Context, _input *PCR_volInput, _output *PCR_volO
 
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
-func _PCR_volAnalysis(_ctx context.Context, _input *PCR_volInput, _output *PCR_volOutput) {
+func _PCR_vol_onebyoneAnalysis(_ctx context.Context, _input *PCR_vol_onebyoneInput, _output *PCR_vol_onebyoneOutput) {
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
-func _PCR_volValidation(_ctx context.Context, _input *PCR_volInput, _output *PCR_volOutput) {
+func _PCR_vol_onebyoneValidation(_ctx context.Context, _input *PCR_vol_onebyoneInput, _output *PCR_vol_onebyoneOutput) {
 }
-func _PCR_volRun(_ctx context.Context, input *PCR_volInput) *PCR_volOutput {
-	output := &PCR_volOutput{}
-	_PCR_volSetup(_ctx, input)
-	_PCR_volSteps(_ctx, input, output)
-	_PCR_volAnalysis(_ctx, input, output)
-	_PCR_volValidation(_ctx, input, output)
+func _PCR_vol_onebyoneRun(_ctx context.Context, input *PCR_vol_onebyoneInput) *PCR_vol_onebyoneOutput {
+	output := &PCR_vol_onebyoneOutput{}
+	_PCR_vol_onebyoneSetup(_ctx, input)
+	_PCR_vol_onebyoneSteps(_ctx, input, output)
+	_PCR_vol_onebyoneAnalysis(_ctx, input, output)
+	_PCR_vol_onebyoneValidation(_ctx, input, output)
 	return output
 }
 
-func PCR_volRunSteps(_ctx context.Context, input *PCR_volInput) *PCR_volSOutput {
-	soutput := &PCR_volSOutput{}
-	output := _PCR_volRun(_ctx, input)
+func PCR_vol_onebyoneRunSteps(_ctx context.Context, input *PCR_vol_onebyoneInput) *PCR_vol_onebyoneSOutput {
+	soutput := &PCR_vol_onebyoneSOutput{}
+	output := _PCR_vol_onebyoneRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
 		panic(err)
 	}
@@ -207,19 +200,19 @@ func PCR_volRunSteps(_ctx context.Context, input *PCR_volInput) *PCR_volSOutput 
 	return soutput
 }
 
-func PCR_volNew() interface{} {
-	return &PCR_volElement{
+func PCR_vol_onebyoneNew() interface{} {
+	return &PCR_vol_onebyoneElement{
 		inject.CheckedRunner{
 			RunFunc: func(_ctx context.Context, value inject.Value) (inject.Value, error) {
-				input := &PCR_volInput{}
+				input := &PCR_vol_onebyoneInput{}
 				if err := inject.Assign(value, input); err != nil {
 					return nil, err
 				}
-				output := _PCR_volRun(_ctx, input)
+				output := _PCR_vol_onebyoneRun(_ctx, input)
 				return inject.MakeValue(output), nil
 			},
-			In:  &PCR_volInput{},
-			Out: &PCR_volOutput{},
+			In:  &PCR_vol_onebyoneInput{},
+			Out: &PCR_vol_onebyoneOutput{},
 		},
 	}
 }
@@ -229,11 +222,11 @@ var (
 	_ = wunit.Make_units
 )
 
-type PCR_volElement struct {
+type PCR_vol_onebyoneElement struct {
 	inject.CheckedRunner
 }
 
-type PCR_volInput struct {
+type PCR_vol_onebyoneInput struct {
 	AddPrimerstoMasterMix bool
 	AdditiveVols          []wunit.Volume
 	Additives             []*wtype.LHComponent
@@ -268,11 +261,11 @@ type PCR_volInput struct {
 	WellPosition          string
 }
 
-type PCR_volOutput struct {
+type PCR_vol_onebyoneOutput struct {
 	Reaction *wtype.LHComponent
 }
 
-type PCR_volSOutput struct {
+type PCR_vol_onebyoneSOutput struct {
 	Data struct {
 	}
 	Outputs struct {
@@ -281,11 +274,11 @@ type PCR_volSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "PCR_vol",
-		Constructor: PCR_volNew,
+	if err := addComponent(Component{Name: "PCR_vol_onebyone",
+		Constructor: PCR_vol_onebyoneNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/Liquid_handling/PCR/pcr_vol.an",
+			Path: "antha/component/an/Liquid_handling/PCR/pcr_vol_onebyone.an",
 			Params: []ParamDesc{
 				{Name: "AddPrimerstoMasterMix", Desc: "", Kind: "Parameters"},
 				{Name: "AdditiveVols", Desc: "", Kind: "Parameters"},

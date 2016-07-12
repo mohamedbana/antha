@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -37,11 +36,6 @@ import (
 */
 // Reaction parameters: (could be a entered as thermocycle parameters type possibly?)
 
-//Denaturationtemp Temperature
-
-// Should be calculated from primer and template binding
-// should be calculated from template length and polymerase rate
-
 // Data which is returned from this protocol, and data types
 
 // Physical Inputs to this protocol with types
@@ -50,22 +44,18 @@ import (
 
 // Physical outputs from this protocol with types
 
-func _PCR_volRequirements() {
+func _MakePCRmmxRequirements() {
 }
 
 // Conditions to run on startup
-func _PCR_volSetup(_ctx context.Context, _input *PCR_volInput) {
+func _MakePCRmmxSetup(_ctx context.Context, _input *MakePCRmmxInput) {
 }
 
 // The core process for this protocol, with the steps to be performed
 // for every input
-func _PCR_volSteps(_ctx context.Context, _input *PCR_volInput, _output *PCR_volOutput) {
+func _MakePCRmmxSteps(_ctx context.Context, _input *MakePCRmmxInput, _output *MakePCRmmxOutput) {
 
 	// rename components
-
-	_input.Template.CName = _input.TemplateName
-	_input.FwdPrimer.CName = _input.FwdPrimerName
-	_input.RevPrimer.CName = _input.RevPrimerName
 
 	bufferVolume := (wunit.CopyVolume(_input.ReactionVolume))
 	bufferVolume.DivideBy(float64(_input.BufferConcinX))
@@ -80,7 +70,7 @@ func _PCR_volSteps(_ctx context.Context, _input *PCR_volInput, _output *PCR_volO
 	samples = append(samples, dntpSample)
 
 	if len(_input.Additives) != len(_input.AdditiveVols) {
-		panic("Bad things are going to happen if you have different numbers of additives and additivevolumes")
+		execute.Errorf(_ctx, "Bad things are going to happen if you have different numbers of additives and additivevolumes")
 	}
 
 	for i := range _input.Additives {
@@ -104,14 +94,7 @@ func _PCR_volSteps(_ctx context.Context, _input *PCR_volInput, _output *PCR_volO
 	}
 
 	// pipette out to make mastermix
-	var mastermix *wtype.LHComponent
-	for j := range samples {
-		if j == 0 {
-			mastermix = execute.MixInto(_ctx, _input.OutPlate, "", samples[j])
-		} else {
-			mastermix = execute.Mix(_ctx, mastermix, samples[j])
-		}
-	}
+	mastermix := execute.MixInto(_ctx, _input.OutPlate, "", samples...)
 
 	// rest samples to zero
 	samples = make([]*wtype.LHComponent, 0)
@@ -126,9 +109,6 @@ func _PCR_volSteps(_ctx context.Context, _input *PCR_volInput, _output *PCR_volO
 
 	}
 
-	templateSample := mixer.Sample(_input.Template, _input.Templatevolume)
-	samples = append(samples, templateSample)
-
 	for j := range samples {
 		mastermix = execute.Mix(_ctx, mastermix, samples[j])
 	}
@@ -141,63 +121,33 @@ func _PCR_volSteps(_ctx context.Context, _input *PCR_volInput, _output *PCR_volO
 		reaction = execute.Mix(_ctx, reaction, polySample)
 	}
 
-	// thermocycle parameters called from enzyme lookup:
-
-	polymerase := _input.PCRPolymerase.CName
-
-	extensionTemp := enzymes.DNApolymerasetemps[polymerase]["extensiontemp"]
-	meltingTemp := enzymes.DNApolymerasetemps[polymerase]["meltingtemp"]
-
-	// initial Denaturation
-
-	r1 := execute.Incubate(_ctx, reaction, meltingTemp, _input.InitDenaturationtime, false)
-
-	for i := 0; i < _input.Numberofcycles; i++ {
-
-		// Denature
-
-		r1 = execute.Incubate(_ctx, r1, meltingTemp, _input.Denaturationtime, false)
-
-		// Anneal
-		r1 = execute.Incubate(_ctx, r1, _input.AnnealingTemp, _input.Annealingtime, false)
-
-		//extensiontime := TargetTemplatelengthinBP/PCRPolymerase.RateBPpers // we'll get type issues here so leave it out for now
-
-		// Extend
-		r1 = execute.Incubate(_ctx, r1, extensionTemp, _input.Extensiontime, false)
-
-	}
-	// Final Extension
-	r1 = execute.Incubate(_ctx, r1, extensionTemp, _input.Finalextensiontime, false)
-
 	// all done
-	_output.Reaction = r1
+	_output.Reaction = reaction
 
-	_output.Reaction.CName = _input.ReactionName
 }
 
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
-func _PCR_volAnalysis(_ctx context.Context, _input *PCR_volInput, _output *PCR_volOutput) {
+func _MakePCRmmxAnalysis(_ctx context.Context, _input *MakePCRmmxInput, _output *MakePCRmmxOutput) {
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
-func _PCR_volValidation(_ctx context.Context, _input *PCR_volInput, _output *PCR_volOutput) {
+func _MakePCRmmxValidation(_ctx context.Context, _input *MakePCRmmxInput, _output *MakePCRmmxOutput) {
 }
-func _PCR_volRun(_ctx context.Context, input *PCR_volInput) *PCR_volOutput {
-	output := &PCR_volOutput{}
-	_PCR_volSetup(_ctx, input)
-	_PCR_volSteps(_ctx, input, output)
-	_PCR_volAnalysis(_ctx, input, output)
-	_PCR_volValidation(_ctx, input, output)
+func _MakePCRmmxRun(_ctx context.Context, input *MakePCRmmxInput) *MakePCRmmxOutput {
+	output := &MakePCRmmxOutput{}
+	_MakePCRmmxSetup(_ctx, input)
+	_MakePCRmmxSteps(_ctx, input, output)
+	_MakePCRmmxAnalysis(_ctx, input, output)
+	_MakePCRmmxValidation(_ctx, input, output)
 	return output
 }
 
-func PCR_volRunSteps(_ctx context.Context, input *PCR_volInput) *PCR_volSOutput {
-	soutput := &PCR_volSOutput{}
-	output := _PCR_volRun(_ctx, input)
+func MakePCRmmxRunSteps(_ctx context.Context, input *MakePCRmmxInput) *MakePCRmmxSOutput {
+	soutput := &MakePCRmmxSOutput{}
+	output := _MakePCRmmxRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
 		panic(err)
 	}
@@ -207,19 +157,19 @@ func PCR_volRunSteps(_ctx context.Context, input *PCR_volInput) *PCR_volSOutput 
 	return soutput
 }
 
-func PCR_volNew() interface{} {
-	return &PCR_volElement{
+func MakePCRmmxNew() interface{} {
+	return &MakePCRmmxElement{
 		inject.CheckedRunner{
 			RunFunc: func(_ctx context.Context, value inject.Value) (inject.Value, error) {
-				input := &PCR_volInput{}
+				input := &MakePCRmmxInput{}
 				if err := inject.Assign(value, input); err != nil {
 					return nil, err
 				}
-				output := _PCR_volRun(_ctx, input)
+				output := _MakePCRmmxRun(_ctx, input)
 				return inject.MakeValue(output), nil
 			},
-			In:  &PCR_volInput{},
-			Out: &PCR_volOutput{},
+			In:  &MakePCRmmxInput{},
+			Out: &MakePCRmmxOutput{},
 		},
 	}
 }
@@ -229,50 +179,39 @@ var (
 	_ = wunit.Make_units
 )
 
-type PCR_volElement struct {
+type MakePCRmmxElement struct {
 	inject.CheckedRunner
 }
 
-type PCR_volInput struct {
+type MakePCRmmxInput struct {
 	AddPrimerstoMasterMix bool
 	AdditiveVols          []wunit.Volume
 	Additives             []*wtype.LHComponent
-	AnnealingTemp         wunit.Temperature
-	Annealingtime         wunit.Time
 	Buffer                *wtype.LHComponent
 	BufferConcinX         int
 	DNTPS                 *wtype.LHComponent
 	DNTPVol               wunit.Volume
-	Denaturationtime      wunit.Time
-	Extensiontime         wunit.Time
-	Finalextensiontime    wunit.Time
 	FwdPrimer             *wtype.LHComponent
 	FwdPrimerName         string
 	FwdPrimerVol          wunit.Volume
 	Hotstart              bool
-	InitDenaturationtime  wunit.Time
-	Numberofcycles        int
 	OutPlate              *wtype.LHPlate
 	PCRPolymerase         *wtype.LHComponent
 	PolymeraseVolume      wunit.Volume
-	ReactionName          string
 	ReactionVolume        wunit.Volume
 	RevPrimer             *wtype.LHComponent
 	RevPrimerName         string
 	RevPrimerVol          wunit.Volume
-	Template              *wtype.LHComponent
-	TemplateName          string
 	Templatevolume        wunit.Volume
 	Water                 *wtype.LHComponent
 	WaterVolume           wunit.Volume
-	WellPosition          string
 }
 
-type PCR_volOutput struct {
+type MakePCRmmxOutput struct {
 	Reaction *wtype.LHComponent
 }
 
-type PCR_volSOutput struct {
+type MakePCRmmxSOutput struct {
 	Data struct {
 	}
 	Outputs struct {
@@ -281,44 +220,33 @@ type PCR_volSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "PCR_vol",
-		Constructor: PCR_volNew,
+	if err := addComponent(Component{Name: "MakePCRmmx",
+		Constructor: MakePCRmmxNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/Liquid_handling/PCR/pcr_vol.an",
+			Path: "antha/component/an/Liquid_handling/PCR/MakePCRmmx.an",
 			Params: []ParamDesc{
 				{Name: "AddPrimerstoMasterMix", Desc: "", Kind: "Parameters"},
 				{Name: "AdditiveVols", Desc: "", Kind: "Parameters"},
 				{Name: "Additives", Desc: "e.g. DMSO\n", Kind: "Inputs"},
-				{Name: "AnnealingTemp", Desc: "Should be calculated from primer and template binding\n", Kind: "Parameters"},
-				{Name: "Annealingtime", Desc: "Denaturationtemp Temperature\n", Kind: "Parameters"},
 				{Name: "Buffer", Desc: "", Kind: "Inputs"},
 				{Name: "BufferConcinX", Desc: "", Kind: "Parameters"},
 				{Name: "DNTPS", Desc: "", Kind: "Inputs"},
 				{Name: "DNTPVol", Desc: "", Kind: "Parameters"},
-				{Name: "Denaturationtime", Desc: "", Kind: "Parameters"},
-				{Name: "Extensiontime", Desc: "should be calculated from template length and polymerase rate\n", Kind: "Parameters"},
-				{Name: "Finalextensiontime", Desc: "", Kind: "Parameters"},
 				{Name: "FwdPrimer", Desc: "", Kind: "Inputs"},
 				{Name: "FwdPrimerName", Desc: "", Kind: "Parameters"},
 				{Name: "FwdPrimerVol", Desc: "", Kind: "Parameters"},
 				{Name: "Hotstart", Desc: "", Kind: "Parameters"},
-				{Name: "InitDenaturationtime", Desc: "", Kind: "Parameters"},
-				{Name: "Numberofcycles", Desc: "\t// let's be ambitious and try this as part of type polymerase Polymeraseconc Volume\n\n\t//Templatetype string  // e.g. colony, genomic, pure plasmid... will effect efficiency. We could get more sophisticated here later on...\n\t//FullTemplatesequence string // better to use Sid's type system here after proof of concept\n\t//FullTemplatelength int\t// clearly could be calculated from the sequence... Sid will have a method to do this already so check!\n\t//TargetTemplatesequence string // better to use Sid's type system here after proof of concept\n\t//TargetTemplatelengthinBP int\n\nReaction parameters: (could be a entered as thermocycle parameters type possibly?)\n", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "PCRPolymerase", Desc: "", Kind: "Inputs"},
 				{Name: "PolymeraseVolume", Desc: "", Kind: "Parameters"},
-				{Name: "ReactionName", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionVolume", Desc: "", Kind: "Parameters"},
 				{Name: "RevPrimer", Desc: "", Kind: "Inputs"},
 				{Name: "RevPrimerName", Desc: "", Kind: "Parameters"},
 				{Name: "RevPrimerVol", Desc: "", Kind: "Parameters"},
-				{Name: "Template", Desc: "", Kind: "Inputs"},
-				{Name: "TemplateName", Desc: "", Kind: "Parameters"},
-				{Name: "Templatevolume", Desc: "", Kind: "Parameters"},
+				{Name: "Templatevolume", Desc: "\t// let's be ambitious and try this as part of type polymerase Polymeraseconc Volume\n\n\t//Templatetype string  // e.g. colony, genomic, pure plasmid... will effect efficiency. We could get more sophisticated here later on...\n\t//FullTemplatesequence string // better to use Sid's type system here after proof of concept\n\t//FullTemplatelength int\t// clearly could be calculated from the sequence... Sid will have a method to do this already so check!\n\t//TargetTemplatesequence string // better to use Sid's type system here after proof of concept\n\t//TargetTemplatelengthinBP int\n\nReaction parameters: (could be a entered as thermocycle parameters type possibly?)\n", Kind: "Parameters"},
 				{Name: "Water", Desc: "", Kind: "Inputs"},
 				{Name: "WaterVolume", Desc: "PCRprep parameters:\n", Kind: "Parameters"},
-				{Name: "WellPosition", Desc: "", Kind: "Parameters"},
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
 			},
 		},

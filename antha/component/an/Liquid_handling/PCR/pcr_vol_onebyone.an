@@ -1,4 +1,4 @@
-protocol PCR_vol
+protocol PCR_vol_onebyone
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -138,14 +138,7 @@ Steps {
 	}
 	
 	// pipette out to make mastermix
-	var mastermix *wtype.LHComponent
-	for j := range samples { 
-	if j == 0  {
-	mastermix = MixInto(OutPlate, "", samples[j])
-	}else{
-	mastermix = Mix(mastermix, samples[j])
-	}
-	}
+	mastermix := MixInto(OutPlate, "", samples...)
 	
 	// rest samples to zero
 	samples = make([]*wtype.LHComponent, 0)

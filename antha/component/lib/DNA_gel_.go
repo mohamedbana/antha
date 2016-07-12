@@ -41,7 +41,6 @@ import (
 
 //WaterSolution
 //WaterSolution //Chemspiderlink // not correct link but similar desirable
-
 // gel
 // plate to mix samples if required
 
@@ -131,9 +130,8 @@ func _DNA_gelSteps(_ctx context.Context, _input *DNA_gelInput, _output *DNA_gelO
 
 				_input.Ladder.Type, _ = wtype.LiquidTypeFromString(_input.Mixingpolicy)
 
-				laddersample := execute.MixTo(_ctx, _input.DNAgel.Type,
+				laddersample := execute.MixInto(_ctx, _input.DNAgel,
 					_input.DNAgel.AllWellPositions(wtype.BYROW)[counter],
-					1,
 					mixer.SampleForTotalVolume(_input.Water, _input.DNAgelrunvolume),
 					mixer.Sample(_input.Ladder, _input.LadderVolume),
 				)
@@ -178,9 +176,8 @@ func _DNA_gelSteps(_ctx context.Context, _input *DNA_gelInput, _output *DNA_gelO
 			DNAgelloadmix.Type, _ = wtype.LiquidTypeFromString(_input.Mixingpolicy)
 			//DNAgelloadmix.Type = "loadwater"
 
-			loadedsample = execute.MixTo(_ctx, _input.DNAgel.Type,
+			loadedsample = execute.MixInto(_ctx, _input.DNAgel,
 				position,
-				1,
 				waterSample,
 				mixer.Sample(DNAgelloadmix, samplevolume),
 			)
@@ -300,7 +297,6 @@ type DNA_gelElement struct {
 type DNA_gelInput struct {
 	DNAgel             *wtype.LHPlate
 	DNAgelrunvolume    wunit.Volume
-	InPlate            *wtype.LHPlate
 	Ladder             *wtype.LHComponent
 	LadderVolume       wunit.Volume
 	Loadingdye         *wtype.LHComponent
@@ -339,7 +335,6 @@ func init() {
 			Params: []ParamDesc{
 				{Name: "DNAgel", Desc: "gel\n", Kind: "Inputs"},
 				{Name: "DNAgelrunvolume", Desc: "", Kind: "Parameters"},
-				{Name: "InPlate", Desc: "", Kind: "Inputs"},
 				{Name: "Ladder", Desc: "", Kind: "Inputs"},
 				{Name: "LadderVolume", Desc: "", Kind: "Parameters"},
 				{Name: "Loadingdye", Desc: "WaterSolution //Chemspiderlink // not correct link but similar desirable\n", Kind: "Inputs"},

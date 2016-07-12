@@ -1,9 +1,9 @@
-protocol PCR_vol
+protocol MakePCRmmx
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
+
 )
 
 /*type Polymerase struct {
@@ -25,17 +25,13 @@ Parameters (
 	WaterVolume Volume
 	ReactionVolume Volume
 	BufferConcinX int
-	FwdPrimerVol Volume
-	RevPrimerVol Volume
+
 	AdditiveVols []Volume
-	Templatevolume Volume
+
 	PolymeraseVolume Volume
 	DNTPVol Volume
-	ReactionName string
-	TemplateName string
 	FwdPrimerName string
 	RevPrimerName string
-	WellPosition string
 	/*
 	// let's be ambitious and try this as part of type polymerase Polymeraseconc Volume
 	
@@ -46,14 +42,9 @@ Parameters (
 	//TargetTemplatelengthinBP int
 	*/
 	// Reaction parameters: (could be a entered as thermocycle parameters type possibly?)
-	Numberofcycles int 
-	InitDenaturationtime Time
-	Denaturationtime Time
-	//Denaturationtemp Temperature
-	Annealingtime Time
-	AnnealingTemp Temperature // Should be calculated from primer and template binding
-	Extensiontime Time // should be calculated from template length and polymerase rate
-	Finalextensiontime Time
+	Templatevolume Volume
+	FwdPrimerVol Volume
+	RevPrimerVol Volume
 	Hotstart bool
 	AddPrimerstoMasterMix bool
 )
@@ -71,7 +62,6 @@ Inputs (
 	PCRPolymerase *wtype.LHComponent
 	Buffer *wtype.LHComponent
 	Water *wtype.LHComponent
-	Template *wtype.LHComponent
 	Additives []*wtype.LHComponent // e.g. DMSO
 	OutPlate *wtype.LHPlate
 )
@@ -93,13 +83,6 @@ Setup {
 Steps {
 	
 	// rename components
-		
-
-	Template.CName = TemplateName
-	FwdPrimer.CName = FwdPrimerName
-	RevPrimer.CName = RevPrimerName
-	
-	
 	
 	bufferVolume := (wunit.CopyVolume(ReactionVolume))
 	bufferVolume.DivideBy(float64(BufferConcinX))
@@ -114,7 +97,7 @@ Steps {
 	samples = append(samples, dntpSample)
 	
 	if len(Additives)!=len(AdditiveVols){
-		panic("Bad things are going to happen if you have different numbers of additives and additivevolumes")
+		Errorf("Bad things are going to happen if you have different numbers of additives and additivevolumes")
 	}
 	
 	for i := range Additives {
@@ -138,14 +121,7 @@ Steps {
 	}
 	
 	// pipette out to make mastermix
-	var mastermix *wtype.LHComponent
-	for j := range samples { 
-	if j == 0  {
-	mastermix = MixInto(OutPlate, "", samples[j])
-	}else{
-	mastermix = Mix(mastermix, samples[j])
-	}
-	}
+	mastermix := MixInto(OutPlate, "", samples...)
 	
 	// rest samples to zero
 	samples = make([]*wtype.LHComponent, 0)
@@ -159,9 +135,6 @@ Steps {
 	samples = append(samples, RevPrimerSample)
 	
 	}
-	
-	templateSample := mixer.Sample(Template, Templatevolume)
-	samples = append(samples, templateSample)
 
 	
 	for j := range samples { 
@@ -176,41 +149,10 @@ Steps {
 	reaction = Mix(reaction,polySample)
 	}
 
-	// thermocycle parameters called from enzyme lookup:
-
-	polymerase := PCRPolymerase.CName
-
-	extensionTemp := enzymes.DNApolymerasetemps[polymerase]["extensiontemp"]
-	meltingTemp := enzymes.DNApolymerasetemps[polymerase]["meltingtemp"]
-
-
-	// initial Denaturation
-
-	r1 := Incubate(reaction, meltingTemp, InitDenaturationtime, false)
 	
-	for i:=0; i < Numberofcycles; i++ {
-		
-		// Denature
-
-	r1 = Incubate(r1, meltingTemp, Denaturationtime, false)
-	
-		// Anneal
-	r1 = Incubate(r1, AnnealingTemp, Annealingtime, false)
-	
-	//extensiontime := TargetTemplatelengthinBP/PCRPolymerase.RateBPpers // we'll get type issues here so leave it out for now
-	
-		// Extend
-	r1 = Incubate(r1, extensionTemp, Extensiontime, false)
-		
-	}
-		// Final Extension
-	r1 = Incubate(r1, extensionTemp, Finalextensiontime, false)
-	
-
 	// all done
-	Reaction = r1
-	
-	Reaction.CName = ReactionName
+	Reaction = reaction
+
 }
 
 // Run after controls and a steps block are completed to
