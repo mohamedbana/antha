@@ -254,7 +254,17 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
     platetype = %v,
     position = %v,
     well = %v)`, channels, head, multi, platetype, position, well))
-    //channels is correct length and value (how does this work)
+    
+    adaptor := self.properties.Heads[head].Adaptor
+    
+    //channels is correct length and value
+    for _, channel := range channels {
+        if channel < 0 || channel >= adaptor.Params.Multi {
+            self.AddError(simulator.NewSimulationError(simulator.SeverityError, 
+                fmt.Sprintf("Cannot load tip to channel %v of %v-channel adaptor", 
+                            channel, adaptor.Params.Multi), nil))
+        }
+    }
     //head exists
     //multi is in correct range for adaptor
     //platetype matches the plate we're over
@@ -264,7 +274,6 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
     //Assuming that all is well for now
     
     //move the tips from the plate and add them to the adaptor
-    adaptor := self.properties.Heads[head].Adaptor
     var tip *wtype.LHTip
     for i := range well {
         tipbox := self.properties.PlateLookup[self.properties.PosLookup[position[i]]].(*wtype.LHTipbox)

@@ -907,6 +907,74 @@ func Test_LoadTips_OK(t *testing.T) {
         compare_errors(t, []string{}, errors)
     }
 
+}
 
+type LoadTipsErrorParams struct {
+    params      LoadTipsParams
+    errors      []string
+}
+
+func (p *LoadTipsErrorParams) apply(t *testing.T, vlh *VirtualLiquidHandler) {
+    p.params.apply(vlh)
+    errors, _ := vlh.GetErrors()
+    compare_errors(t, p.errors, errors)
+}
+
+func Test_LoadTips_BadChannel(t *testing.T) {
+    tests := []LoadTipsErrorParams{
+        LoadTipsErrorParams{
+            //invalid channel value
+            LoadTipsParams{
+                []int{8},                   //channels
+                0,                          //head
+                1,                          //multi
+                []string{"tipbox"},         //platetype
+                []string{"tip_loc"},        //position
+                []string{"H12"},            //well
+            },
+            []string{"(err) Cannot load tip to channel 8 of 8-channel adaptor"},
+        },
+        LoadTipsErrorParams{
+            //invalid channel value
+            LoadTipsParams{
+                []int{-1},                  //channels
+                0,                          //head
+                1,                          //multi
+                []string{"tipbox"},         //platetype
+                []string{"tip_loc"},        //position
+                []string{"H12"},            //well
+            },
+            []string{"(err) Cannot load tip to channel -1 of 8-channel adaptor"},
+        },/*
+        LoadTipsErrorParams{
+            //can't extend an individual channel
+            LoadTipsParams{
+                []int{1},                   //channels
+                0,                          //head
+                1,                          //multi
+                []string{"tipbox"},         //platetype
+                []string{"tip_loc"},        //position
+                []string{"H12"},            //well
+            },
+            []string{"(err) Cannot load tip to channel 1 due to tip at channel 0 and independent is false"},
+        },
+        LoadTipsErrorParams{
+            //can't extend an individual channel
+            LoadTipsParams{
+                []int{7},                   //channels
+                0,                          //head
+                1,                          //multi
+                []string{"tipbox"},         //platetype
+                []string{"tip_loc"},        //position
+                []string{"H12"},            //well
+            },
+            []string{"(err) Cannot load tip to channel 1 due to tip at channel 0 and independent is false"},
+        }, 
+        */
+    }
     
+    for _,test := range tests {
+        vlh := get_tip_test_vlh()
+        test.apply(t, vlh)
+    }
 }
