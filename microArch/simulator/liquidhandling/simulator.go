@@ -260,6 +260,21 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
     //platetype matches the plate we're over
     //position is correct, tips still exists there
     //well exists (difference between platetype and well?)
+
+    //Assuming that all is well for now
+    
+    //move the tips from the plate and add them to the adaptor
+    adaptor := self.properties.Heads[head].Adaptor
+    var tip *wtype.LHTip
+    for i := range well {
+        tipbox := self.properties.PlateLookup[self.properties.PosLookup[position[i]]].(*wtype.LHTipbox)
+        wc := wtype.MakeWellCoords(well[i])
+        tip = tipbox.Tips[wc.X][wc.Y]
+        tipbox.Tips[wc.X][wc.Y] = nil
+        //TODO: add the tip to the particular location in the adaptor
+    }
+    adaptor.LoadTips(multi, tip)
+
     return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
 }
 
