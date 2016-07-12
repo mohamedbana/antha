@@ -478,7 +478,7 @@ func (self *VirtualLiquidHandler) GetStatus() (driver.Status, driver.CommandStat
 //UpdateMetaData - used
 func (self *VirtualLiquidHandler) UpdateMetaData(props *liquidhandling.LHProperties) driver.CommandStatus {
     self.checkReady("UpdateMetaData")
-    self.LogLine("ResetPistons(props *LHProperties)")
+    self.LogLine("UpdateMetaData(props *LHProperties)")
     //check that the props and self.props are the same...
     return driver.CommandStatus{true, driver.OK, "UPDATEMETADATA ACK"}
 }
