@@ -23,8 +23,8 @@
 package wtype
 
 import (
+	"github.com/dustinkirkland/golang-petname"
 	"github.com/twinj/uuid"
-	//"github.com/dustinkirkland/golang-petname"
 )
 
 // this package wraps the uuid library appropriately
@@ -39,6 +39,10 @@ func GetUUID() string {
 	return petname.Generate(2, "_")
 }
 */
+
+func GetRUID(k int) string {
+	return petname.Generate(k, "_")
+}
 
 func NewUUID() string {
 	return GetUUID()

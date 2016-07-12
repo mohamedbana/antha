@@ -24,12 +24,11 @@
 package wtype
 
 import (
-	"encoding/json"
-	"fmt"
+	//"fmt"
 	"strings"
 
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/microArch/logger"
+	//"github.com/antha-lang/antha/microArch/logger"
 )
 
 // structure describing a liquid component and its desired properties
@@ -170,25 +169,37 @@ func (cmp *LHComponent) HasAnyParent() bool {
 	return false
 }
 
+func (cmp *LHComponent) AddParentComponent(cmp2 *LHComponent) {
+	if cmp.ParentID != "" {
+		cmp.ParentID += "_"
+	}
+	cmp.ParentID += cmp2.String() + ":(" + cmp2.ParentID + ")"
+}
+
+func (cmp *LHComponent) AddDaughterComponent(cmp2 *LHComponent) {
+	if cmp.DaughterID != "" {
+		cmp.DaughterID += "_"
+	}
+
+	cmp.DaughterID += cmp2.String()
+}
+
 func (cmp *LHComponent) AddParent(parentID string) {
-	cmp.ParentID += parentID + "_"
+	if cmp.ParentID != "" {
+		cmp.ParentID += "+"
+	}
+	cmp.ParentID += parentID
 }
 
 func (cmp *LHComponent) AddDaughter(daughterID string) {
-	cmp.DaughterID += daughterID + "_"
+	if cmp.DaughterID != "" {
+		cmp.DaughterID += "+"
+	}
+	cmp.DaughterID += daughterID
 }
 
 func (cmp *LHComponent) Mix(cmp2 *LHComponent) {
-	// if this component is zero we inherit the id of the other one
-	// unless the other component is a sample: in this case it retains
-	// the parent ID so this would not be safe
-	// do I want to do this at all?
-	/*
-		if cmp.IsZero() && !cmp2.IsSample() {
-			fmt.Println("CMP IS ZERO: REDEFINING ID")
-			cmp.ID = cmp2.ID
-		}
-	*/
+	//wasEmpty := cmp.IsZero()
 	cmp.Smax = mergeSolubilities(cmp, cmp2)
 	// determine type of final
 	cmp.Type = mergeTypes(cmp, cmp2)
@@ -199,7 +210,18 @@ func (cmp *LHComponent) Mix(cmp2 *LHComponent) {
 	cmp.Vol = vcmp.RawValue() // same units
 	cmp.CName = mergeNames(cmp.CName, cmp2.CName)
 	// allow trace back
-	logger.Track(fmt.Sprintf("MIX %s %s %s", cmp.ID, cmp2.ID, vcmp.ToString()))
+	//logger.Track(fmt.Sprintf("MIX %s %s %s", cmp.ID, cmp2.ID, vcmp.ToString()))
+
+	// add parent IDs... this is recursive
+
+	/*
+		if !wasEmpty {
+			cmp.AddParentComponent(cmp)
+		}
+	*/
+	cmp.AddParentComponent(cmp2)
+	cmp.ID = GetUUID()
+	cmp2.AddDaughterComponent(cmp)
 }
 
 // @implement Liquid
@@ -247,15 +269,14 @@ func NewLHComponent() *LHComponent {
 	return &lhc
 }
 
-// XXX -- why is this different from Dup?
-func CopyLHComponent(lhc *LHComponent) *LHComponent {
-	tmp, _ := json.Marshal(lhc)
-	var lhc2 LHComponent
-	json.Unmarshal(tmp, &lhc2)
-	lhc2.ID = GetUUID()
-	if lhc2.Inst != "" {
-		lhc2.Inst = GetUUID()
-		// this needs some thought
+func (cmp *LHComponent) String() string {
+	id := cmp.ID
+
+	l := cmp.Loc
+
+	if l == "" {
+		l = "NOPLATE:NOWELL"
 	}
-	return &lhc2
+
+	return id + ":" + l
 }

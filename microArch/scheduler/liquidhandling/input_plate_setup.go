@@ -147,8 +147,12 @@ func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 			continue
 		}
 
+		// inputs[cname][0] -- this is the first little spritz required
+		// should probably refactor this to aggregate first
 		component := inputs[cname][0]
 		//logger.Debug(fmt.Sprintln("Plate_setup - component", cname, ":"))
+
+		fmt.Println("COMPONENT: ", cname, " ID: ", component.ID)
 
 		well_assignments, ok := well_count_assignments[cname]
 
@@ -201,6 +205,7 @@ func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 				// second we add a parent
 				newcomponent.AddParent(component.ID)
 				newcomponent.Vol = curr_well.MaxVol
+				newcomponent.Loc = location
 				volume.Subtract(curr_well.WorkingVolume())
 				curr_well.Add(newcomponent)
 				input_plates[curr_plate.ID] = curr_plate

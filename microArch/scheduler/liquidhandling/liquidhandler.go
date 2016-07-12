@@ -231,7 +231,7 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 
 		for _, w := range p.Wellcoords {
 			if !w.Empty() {
-				fmt.Println(w.Crds, " ", w.WContents.CName, " ", w.CurrVolume().ToString(), " P: ", w.WContents.ParentID, " D: ", w.WContents.DaughterID)
+				fmt.Println(w.Crds, " ", w.WContents.CName, " I: ", w.WContents.ID, " ", w.CurrVolume().ToString(), " P: ", w.WContents.ParentID, " D: ", w.WContents.DaughterID)
 			}
 
 		}
@@ -243,7 +243,7 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 
 		for _, w := range p.Wellcoords {
 			if !w.Empty() {
-				fmt.Println(w.Crds, " ", w.WContents.CName, " ", w.CurrVolume().ToString(), " P: ", w.WContents.ParentID, " D: ", w.WContents.DaughterID)
+				fmt.Println(w.Crds, " ", w.WContents.CName, " I: ", w.WContents.ID, " ", w.CurrVolume().ToString(), " P: ", w.WContents.ParentID, " D: ", w.WContents.DaughterID)
 			}
 
 		}
@@ -461,6 +461,7 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) (*LHRequest, error) {
 	(*request).Input_order = component_order
 
 	// work out how much we have and how much we need
+	// need to consider what to do with IDs
 
 	var requestinputs map[string][]*wtype.LHComponent
 	requestinputs = request.Input_solutions
