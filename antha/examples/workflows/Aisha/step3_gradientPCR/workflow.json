@@ -1,7 +1,7 @@
 {
     "connections": [],
     "processes": {
-        "PCR": {
+        "GradientPCR": {
             "component": "AutoPCR_Gradient_mmx"
         }
     }

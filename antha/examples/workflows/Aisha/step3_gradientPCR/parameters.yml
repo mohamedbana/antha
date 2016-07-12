@@ -1,6 +1,7 @@
 {
+
     "Parameters": {
-        "PCR": {
+        "GradientPCR": {
             "Projectname": "gradientPCRlividans",
 			"RowGradientRatherthanColumn":false,
             "Reactiontoprimerpair": {
