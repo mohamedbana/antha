@@ -188,22 +188,6 @@ func (cmp *LHComponent) AddDaughterComponent(cmp2 *LHComponent) {
 	cmp.DaughterID += cmp2.ID
 }
 
-/*
-func (cmp *LHComponent) AddParent(parentID string) {
-	if cmp.ParentID != "" {
-		cmp.ParentID += "+"
-	}
-	cmp.ParentID += parentID
-}
-
-func (cmp *LHComponent) AddDaughter(daughterID string) {
-	if cmp.DaughterID != "" {
-		cmp.DaughterID += "+"
-	}
-	cmp.DaughterID += daughterID
-}
-*/
-
 func (cmp *LHComponent) Mix(cmp2 *LHComponent) {
 	//wasEmpty := cmp.IsZero()
 	cmp.Smax = mergeSolubilities(cmp, cmp2)
@@ -291,6 +275,12 @@ func (cmp *LHComponent) ParentTree() graph.StringGraph {
 	g := graph.StringGraph{Nodes: make([]string, 0, 3), Outs: make(map[string][]string)}
 	parseTree(cmp.ID+"("+cmp.ParentID+")", &g)
 	return g
+}
+
+func (cmp *LHComponent) ParentTreeString() string {
+	g := cmp.ParentTree()
+	s := graph.Print(graph.PrintOpt{Graph: &g})
+	return s
 }
 
 //   a(b_c_d)_e()_f(g_h)

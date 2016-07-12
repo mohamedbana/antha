@@ -224,31 +224,33 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 	this.FinalProperties.RemoveTemporaryComponents()
 
 	// let's take a look
+	/*
+		fmt.Println("INITIAL")
+		for _, p := range this.Properties.Plates {
+			fmt.Println(p.Name(), " : ", p.ID)
 
-	fmt.Println("INITIAL")
-	for _, p := range this.Properties.Plates {
-		fmt.Println(p.Name(), " : ", p.ID)
+			for _, w := range p.Wellcoords {
+				if !w.Empty() {
+					fmt.Println(w.Crds, " ", w.WContents.CName, " I: ", w.WContents.ID, " ", w.CurrVolume().ToString(), " P: ", w.WContents.ParentID, " D: ", w.WContents.DaughterID)
+				}
 
-		for _, w := range p.Wellcoords {
-			if !w.Empty() {
-				fmt.Println(w.Crds, " ", w.WContents.CName, " I: ", w.WContents.ID, " ", w.CurrVolume().ToString(), " P: ", w.WContents.ParentID, " D: ", w.WContents.DaughterID)
+			}
+		}
+
+		fmt.Println("FINAL")
+		for _, p := range this.FinalProperties.Plates {
+			fmt.Println(p.Name())
+
+			for _, w := range p.Wellcoords {
+				if !w.Empty() {
+					fmt.Println(w.Crds, " ", w.WContents.CName, " I: ", w.WContents.ID, " ", w.CurrVolume().ToString(), " P: ", w.WContents.ParentID, " D: ", w.WContents.DaughterID)
+					fmt.Println(w.WContents.ParentTreeString())
+				}
+
 			}
 
 		}
-	}
-
-	fmt.Println("FINAL")
-	for _, p := range this.FinalProperties.Plates {
-		fmt.Println(p.Name())
-
-		for _, w := range p.Wellcoords {
-			if !w.Empty() {
-				fmt.Println(w.Crds, " ", w.WContents.CName, " I: ", w.WContents.ID, " ", w.CurrVolume().ToString(), " P: ", w.WContents.ParentID, " D: ", w.WContents.DaughterID)
-			}
-
-		}
-
-	}
+	*/
 
 	// all done
 

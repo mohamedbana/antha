@@ -199,11 +199,6 @@ func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 				ass = append(ass, location)
 
 				newcomponent := component.Dup()
-				// sort out parent issue
-				// first we don't allow these to have the same ID
-				newcomponent.ID = wtype.GetUUID()
-				// second we add a parent
-				newcomponent.AddParentComponent(component)
 				newcomponent.Vol = curr_well.MaxVol
 				newcomponent.Loc = location
 				volume.Subtract(curr_well.WorkingVolume())
@@ -219,6 +214,8 @@ func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 
 	for _, v := range inputs {
 		for _, vv := range v {
+			// this now means input assignments is always set...
+			// previously this was empty
 			if vv.Loc != "" {
 				// append it
 
