@@ -788,6 +788,84 @@ func Test_LoadTips_OK(t *testing.T) {
             []TipLoc{TipLoc{7,11}},     //missing_tips
             []int{0},                   //loaded_tips
         },
+        LoadTipsOKParams{
+            //load eight tips all at once
+            LoadTipsParams{
+                []int{0,1,2,3,4,5,6,7},     //channels
+                0,                          //head
+                8,                          //multi
+                []string{                   //platetype
+                    "tipbox",
+                    "tipbox",
+                    "tipbox",
+                    "tipbox",
+                    "tipbox",
+                    "tipbox",
+                    "tipbox",
+                    "tipbox",
+                },
+                []string{                   //position
+                    "tip_loc",
+                    "tip_loc",
+                    "tip_loc",
+                    "tip_loc",
+                    "tip_loc",
+                    "tip_loc",
+                    "tip_loc",
+                    "tip_loc",
+                },
+                []string{                   //well
+                    "A12",
+                    "B12",
+                    "C12",
+                    "D12",
+                    "E12",
+                    "F12",
+                    "G12",
+                    "H12",
+                },
+            },
+            []TipLoc{                   //missing_tips
+                TipLoc{0,11},
+                TipLoc{1,11},
+                TipLoc{2,11},
+                TipLoc{3,11},
+                TipLoc{4,11},
+                TipLoc{5,11},
+                TipLoc{6,11},
+                TipLoc{7,11},
+            },
+            []int{0,1,2,3,4,5,6,7,},    //loaded_tips
+        },
+        LoadTipsOKParams{
+            //load three tips all at once
+            LoadTipsParams{
+                []int{0,1,2,},     //channels
+                0,                          //head
+                3,                          //multi
+                []string{                   //platetype
+                    "tipbox",
+                    "tipbox",
+                    "tipbox",
+                },
+                []string{                   //position
+                    "tip_loc",
+                    "tip_loc",
+                    "tip_loc",
+                },
+                []string{                   //well,
+                    "F1",
+                    "G1",
+                    "H1",
+                },
+            },
+            []TipLoc{                   //missing_tips
+                TipLoc{5,0},
+                TipLoc{6,0},
+                TipLoc{7,0},
+            },
+            []int{0,1,2,},    //loaded_tips
+        },
     }
 
     for _, test := range tests {
