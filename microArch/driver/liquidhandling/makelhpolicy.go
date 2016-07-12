@@ -722,7 +722,7 @@ func MakeDefaultPolicy() LHPolicy {
 	defaultpolicy["ASPZOFFSET"] = 0.5
 	defaultpolicy["DSPREFERENCE"] = 0
 	defaultpolicy["DSPZOFFSET"] = 0.5
-	defaultpolicy["CAN_MULTI"] = false
+	defaultpolicy["CAN_MULTI"] = true
 	defaultpolicy["CAN_MSA"] = false
 	defaultpolicy["CAN_SDD"] = true
 	defaultpolicy["TIP_REUSE_LIMIT"] = 100
