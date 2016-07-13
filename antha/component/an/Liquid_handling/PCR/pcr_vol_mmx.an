@@ -86,7 +86,6 @@ Setup {
 Steps {
 	
 	// rename components
-		
 
 	Template.CName = TemplateName
 	FwdPrimer.CName = FwdPrimerName
