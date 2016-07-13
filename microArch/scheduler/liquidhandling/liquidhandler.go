@@ -65,7 +65,7 @@ type Liquidhandler struct {
 	LayoutAgent      func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
 	ExecutionPlanner func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
 	PolicyManager    *LHPolicyManager
-	PlateIDMap       map[string]string // which plates are before / after versions
+	plateIDMap       map[string]string // which plates are before / after versions
 }
 
 // initialize the liquid handling structure
@@ -76,8 +76,18 @@ func Init(properties *liquidhandling.LHProperties) *Liquidhandler {
 	lh.ExecutionPlanner = ImprovedExecutionPlanner
 	lh.Properties = properties
 	lh.FinalProperties = properties
-	lh.PlateIDMap = make(map[string]string)
+	lh.plateIDMap = make(map[string]string)
 	return &lh
+}
+
+func (this *Liquidhandler) PlateIDMap() map[string]string {
+	ret := make(map[string]string, len(this.plateIDMap))
+
+	for k, v := range this.plateIDMap {
+		ret[k] = v
+	}
+
+	return ret
 }
 
 // high-level function which requests planning and execution for an incoming set of
@@ -237,7 +247,7 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 
 		plate2 := this.Properties.Plates[pos]
 
-		this.PlateIDMap[plate2.ID] = plate.ID
+		this.plateIDMap[plate2.ID] = plate.ID
 	}
 
 	// all done
