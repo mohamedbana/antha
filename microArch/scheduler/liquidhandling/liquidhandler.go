@@ -65,6 +65,7 @@ type Liquidhandler struct {
 	LayoutAgent      func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
 	ExecutionPlanner func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
 	PolicyManager    *LHPolicyManager
+	PlateIDMap       map[string]string // which plates are before / after versions
 }
 
 // initialize the liquid handling structure
@@ -75,6 +76,7 @@ func Init(properties *liquidhandling.LHProperties) *Liquidhandler {
 	lh.ExecutionPlanner = ImprovedExecutionPlanner
 	lh.Properties = properties
 	lh.FinalProperties = properties
+	lh.PlateIDMap = make(map[string]string)
 	return &lh
 }
 
@@ -147,8 +149,6 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 }
 
 func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
-	// just count up the volumes... add a fudge for additional volume perhaps
-
 	// XXX -- HARD CODE 8 here
 	lastPlate := make([]string, 8)
 	lastWell := make([]string, 8)
@@ -223,34 +223,22 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 	this.Properties.RemoveTemporaryComponents()
 	this.FinalProperties.RemoveTemporaryComponents()
 
-	// let's take a look
-	/*
-		fmt.Println("INITIAL")
-		for _, p := range this.Properties.Plates {
-			fmt.Println(p.Name(), " : ", p.ID)
+	// now ensure the mapping, excluding any temp plates added above, is recorded
 
-			for _, w := range p.Wellcoords {
-				if !w.Empty() {
-					fmt.Println(w.Crds, " ", w.WContents.CName, " I: ", w.WContents.ID, " ", w.CurrVolume().ToString(), " P: ", w.WContents.ParentID, " D: ", w.WContents.DaughterID)
-				}
+	for plateID, _ := range vols {
+		plate, ok := this.FinalProperties.Plates[this.FinalProperties.PlateIDLookup[plateID]]
 
-			}
+		if !ok {
+			// plate deleted
+			continue
 		}
 
-		fmt.Println("FINAL")
-		for _, p := range this.FinalProperties.Plates {
-			fmt.Println(p.Name())
+		pos := this.FinalProperties.PlateIDLookup[plateID]
 
-			for _, w := range p.Wellcoords {
-				if !w.Empty() {
-					fmt.Println(w.Crds, " ", w.WContents.CName, " I: ", w.WContents.ID, " ", w.CurrVolume().ToString(), " P: ", w.WContents.ParentID, " D: ", w.WContents.DaughterID)
-					fmt.Println(w.WContents.ParentTreeString())
-				}
+		plate2 := this.Properties.Plates[pos]
 
-			}
-
-		}
-	*/
+		this.PlateIDMap[plate2.ID] = plate.ID
+	}
 
 	// all done
 

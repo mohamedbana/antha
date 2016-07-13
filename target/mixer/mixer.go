@@ -25,6 +25,7 @@ type Mixer struct {
 	driver          driver.ExtendedLiquidhandlingDriver
 	properties      driver.LHProperties
 	finalproperties driver.LHProperties
+	plateidmap      map[string]string // IDs of plates before and after
 	opt             Opt
 }
 
@@ -258,6 +259,7 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 	// save final state... this includes output info
 
 	a.finalproperties = *(r.Liquidhandler.FinalProperties)
+	a.plateidmap = r.Liquidhandler.PlateIDMap
 
 	// TODO: Desired filename not exposed in current driver interface, so pick
 	// a name. So far, at least Gilson software cares what the filename is, so
