@@ -24,10 +24,10 @@
 package wtype
 
 import (
-	"strings"
-
+	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
+	"strings"
 	//"github.com/antha-lang/antha/microArch/logger"
 	"github.com/antha-lang/antha/graph"
 )
@@ -174,8 +174,8 @@ func (cmp *LHComponent) AddParentComponent(cmp2 *LHComponent) {
 	if cmp.ParentID != "" {
 		cmp.ParentID += "_"
 	}
-	//cmp.ParentID += cmp2.String() + "(" + cmp2.ParentID + ")"
-	cmp.ParentID += cmp2.ID + "(" + cmp2.ParentID + ")"
+	cmp.ParentID += cmp2.String() + "(" + cmp2.ParentID + ")"
+	//cmp.ParentID += cmp2.ID + "(" + cmp2.ParentID + ")"
 }
 
 func (cmp *LHComponent) AddDaughterComponent(cmp2 *LHComponent) {
@@ -264,11 +264,13 @@ func (cmp *LHComponent) String() string {
 
 	l := cmp.Loc
 
+	v := fmt.Sprintf("%-6.3f:%s", cmp.Vol, cmp.Vunit)
+
 	if l == "" {
 		l = "NOPLATE:NOWELL"
 	}
 
-	return id + ":" + l
+	return id + ":" + l + ":" + v
 }
 
 func (cmp *LHComponent) ParentTree() graph.StringGraph {
@@ -277,6 +279,7 @@ func (cmp *LHComponent) ParentTree() graph.StringGraph {
 	return g
 }
 
+// graphviz format
 func (cmp *LHComponent) ParentTreeString() string {
 	g := cmp.ParentTree()
 	s := graph.Print(graph.PrintOpt{Graph: &g})
