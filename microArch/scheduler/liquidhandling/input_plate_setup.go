@@ -152,8 +152,6 @@ func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 		component := inputs[cname][0]
 		//logger.Debug(fmt.Sprintln("Plate_setup - component", cname, ":"))
 
-		fmt.Println("COMPONENT: ", cname, " ID: ", component.ID)
-
 		well_assignments, ok := well_count_assignments[cname]
 
 		if !ok {

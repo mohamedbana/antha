@@ -394,7 +394,6 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) (*LHRequest, error) {
 		components := instruction.Components
 
 		for _, component := range components {
-			fmt.Println("INS COMPONENT: ", component.CName, " ID: ", component.ID)
 			// ignore anything which is made in another mix
 
 			if component.HasAnyParent() {
