@@ -131,6 +131,19 @@ func (tb *LHTipbox) N_clean_tips() int {
 	return c
 }
 
+//ContainsCoord
+func (tb *LHTipbox) ContainsCoords(c *WellCoords) bool {
+    return c.X >= 0 &&
+           c.Y >= 0 &&
+           c.X < tb.Ncols &&
+           c.Y < tb.Nrows
+}
+
+//HasTipAt
+func (tb *LHTipbox) HasTipAt(c *WellCoords) bool {
+    return tb.ContainsCoords(c) && tb.Tips[c.X][c.Y] != nil
+}
+
 // actually useful functions
 // TODO implement Mirror
 
