@@ -14,7 +14,7 @@ type LessThan func(Node, Node) bool
 
 type NodeSet interface {
 	Has(Node) bool
-	Range() <-chan Node
+	Range() []Node
 	Len() int
 }
 
@@ -28,15 +28,11 @@ func (a nodeSet) Len() int {
 	return len(a)
 }
 
-func (a nodeSet) Range() <-chan Node {
-	ch := make(chan Node)
-	go func() {
-		defer close(ch)
-		for k := range a {
-			ch <- k
-		}
-	}()
-	return ch
+func (a nodeSet) Range() (ret []Node) {
+	for k := range a {
+		ret = append(ret, k)
+	}
+	return
 }
 
 // Reverse edges

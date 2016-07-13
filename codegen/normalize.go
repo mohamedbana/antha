@@ -36,7 +36,7 @@ func makeRoot(nodes []ast.Node) (ast.Node, error) {
 				return nil
 			},
 		})
-		for k := range results.Seen.Range() {
+		for _, k := range results.Seen.Range() {
 			seen[k] = true
 		}
 	}
