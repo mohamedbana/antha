@@ -1018,10 +1018,53 @@ func Test_LoadTips_Errors(t *testing.T) {
             []string{"(err) Cannot load tip to channel -1 of 8-channel adaptor"},
         },
         LoadTipsErrorParams{
+            "too many channels",
+            LoadTipsParams{
+                []int{0,1,2,3,4,5,6,7,7},   //channels
+                0,                          //head
+                9,                          //multi
+                []string{                   //platetype
+                    "tipbox",
+                    "tipbox",
+                    "tipbox",
+                    "tipbox",
+                    "tipbox",
+                    "tipbox",
+                    "tipbox",
+                    "tipbox",
+                    "tipbox",
+                },
+                []string{                   //position
+                    "tip_loc",
+                    "tip_loc",
+                    "tip_loc",
+                    "tip_loc",
+                    "tip_loc",
+                    "tip_loc",
+                    "tip_loc",
+                    "tip_loc",
+                    "tip_loc",
+                },
+                []string{                   //well
+                    "A12",
+                    "B12",
+                    "C12",
+                    "D12",
+                    "E12",
+                    "F12",
+                    "G12",
+                    "H12",
+                    "H12",
+                },
+            },
+            nil,                            //setup
+            []string{"(err) LoadTips: Channel7 listed twice"},
+        },
+        LoadTipsErrorParams{
             "invalid head",
             LoadTipsParams{
                 []int{0},                  //channels
-                2,                          //head
+                1,                          //head
                 1,                          //multi
                 []string{"tipbox"},         //platetype
                 []string{"tip_loc"},        //position
@@ -1113,15 +1156,28 @@ func Test_LoadTips_Errors(t *testing.T) {
         LoadTipsErrorParams{
             "loading collision",
             LoadTipsParams{
-                []int{7},                   //channels
+                []int{0,7},                   //channels
                 0,                          //head
-                1,                          //multi
-                []string{"tipbox"},         //platetype
-                []string{"tip_loc"},        //position
-                []string{"H12"},            //well
+                2,                          //multi
+                []string{"tipbox","tipbox"},         //platetype
+                []string{"tip_loc","tip_loc"},        //position
+                []string{"A12", "H12"},            //well
             },
             nil,                            //setup
-            []string{"(err) LoadTips: Cannot load H12->channel7 due to tips at A12,B12,C12,D12,E12,F12,G12 (Head0 is not independent)"},
+            []string{"(err) LoadTips: Cannot load A12->channel0, H12->channel7 due to tips at B12,C12,D12,E12,F12,G12 (Head0 is not independent)"},
+        }, 
+        LoadTipsErrorParams{
+            "non-contiguous wells",
+            LoadTipsParams{
+                []int{0,1},                   //channels
+                0,                          //head
+                2,                          //multi
+                []string{"tipbox","tipbox"},         //platetype
+                []string{"tip_loc","tip_loc"},        //position
+                []string{"F12", "H12"},     //well
+            },
+            nil,                            //setup
+            []string{"(err) LoadTips: Cannot load F12->channel0, H12->channel1, tip spacing doesn't match channel spacing"},
         }, 
         LoadTipsErrorParams{
             "missing tip",
