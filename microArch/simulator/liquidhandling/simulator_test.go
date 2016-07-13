@@ -754,6 +754,29 @@ func get_tip_test_vlh() *VirtualLiquidHandler {
     return vlh
 }
 
+func removeTips(wells []string) *func(*VirtualLiquidHandler) {
+    ret := func(vlh *VirtualLiquidHandler) {
+        tipbox := vlh.properties.PlateLookup[vlh.properties.PosLookup["tip_loc"]].(*wtype.LHTipbox)
+        for _,well := range wells {
+            wc := wtype.MakeWellCoords(well)
+            tipbox.Tips[wc.X][wc.Y] = nil
+        }
+    }
+    return &ret
+}
+
+func preloadTips(channels []int, head int) *func(*VirtualLiquidHandler) {
+    ret := func(vlh *VirtualLiquidHandler) {
+        p := vlh.properties
+        adaptor := p.Heads[head].Adaptor
+        tipbox := p.PlateLookup[p.PosLookup["tip_loc"]].(*wtype.LHTipbox)
+        //TODO: update for new adaptor interface
+        adaptor.Ntipsloaded = len(channels)
+        adaptor.Tiptypeloaded = tipbox.Tiptype
+    }
+    return &ret
+}
+
 type LoadTipsParams struct {
     channels        []int
     head            int
@@ -790,6 +813,7 @@ func Test_LoadTips_OK(t *testing.T) {
     type LoadTipsOKParams struct {
         desc                string
         params              LoadTipsParams
+        setup               *func(*VirtualLiquidHandler)
         missing_tips        []TipLoc
         loaded_tips         []int
     }
@@ -805,6 +829,7 @@ func Test_LoadTips_OK(t *testing.T) {
                 []string{"tip_loc"},        //position
                 []string{"H12"},            //well
             },
+            nil,
             []TipLoc{TipLoc{7,11}},     //missing_tips
             []int{0},                   //loaded_tips
         },
@@ -845,6 +870,7 @@ func Test_LoadTips_OK(t *testing.T) {
                     "H12",
                 },
             },
+            nil,
             []TipLoc{                   //missing_tips
                 TipLoc{0,11},
                 TipLoc{1,11},
@@ -879,6 +905,7 @@ func Test_LoadTips_OK(t *testing.T) {
                     "H1",
                 },
             },
+            nil,
             []TipLoc{                   //missing_tips
                 TipLoc{5,0},
                 TipLoc{6,0},
@@ -886,10 +913,27 @@ func Test_LoadTips_OK(t *testing.T) {
             },
             []int{0,1,2,},    //loaded_tips
         },
+        LoadTipsOKParams{
+            "loading a single tip above a missing tip",
+            LoadTipsParams{
+                []int{0},                   //channels
+                0,                          //head
+                1,                          //multi
+                []string{"tipbox"},         //platetype
+                []string{"tip_loc"},        //position
+                []string{"G12"},            //well
+            },
+            removeTips([]string{"H12"}),
+            []TipLoc{TipLoc{7,11},TipLoc{6,11}},     //missing_tips
+            []int{0},                   //loaded_tips
+        },
     }
 
     for _, test := range tests {
         vlh := get_tip_test_vlh()
+        if test.setup != nil {
+            (*test.setup)(vlh)
+        }
         test.params.apply(vlh)
         
         //get the tipbox
@@ -902,12 +946,12 @@ func Test_LoadTips_OK(t *testing.T) {
                 if tipbox.Tips[i][j] == nil {
                     //must be in missing tips
                     if !contains(test.missing_tips,j,i) {
-                        t.Errorf("Unexpected tip missing in tipbox(%v,%v)", i, j)
+                        t.Errorf("%v: Unexpected tip missing in tipbox(%v,%v)", test.desc, i, j)
                     }
                 } else {
                     //mustn't be in missing tips
                     if contains(test.missing_tips,j,i) {
-                        t.Errorf("Unexpected tip present in tipbox(%v,%v)", i, j)
+                        t.Errorf("%v: Unexpected tip present in tipbox(%v,%v)", test.desc, i, j)
                     }
                 }
             }
@@ -918,7 +962,7 @@ func Test_LoadTips_OK(t *testing.T) {
         //test the tips were loaded in the right place
         //TODO: Update LHAdaptor to track which heads are loaded
         if adaptor.Ntipsloaded != len(test.loaded_tips) {
-            t.Errorf("Wrong number of tips loaded, expected %v, got %v", len(test.loaded_tips), adaptor.Ntipsloaded)
+            t.Errorf("%v: Wrong number of tips loaded, expected %v, got %v", test.desc, len(test.loaded_tips), adaptor.Ntipsloaded)
         }
 
 
@@ -932,10 +976,14 @@ func Test_LoadTips_OK(t *testing.T) {
 type LoadTipsErrorParams struct {
     desc        string
     params      LoadTipsParams
+    setup       *func(*VirtualLiquidHandler)
     errors      []string
 }
 
 func (p *LoadTipsErrorParams) apply(t *testing.T, vlh *VirtualLiquidHandler) {
+    if p.setup != nil {
+        (*p.setup)(vlh)
+    }
     p.params.apply(vlh)
     errors, _ := vlh.GetErrors()
     compare_errors(t, p.desc, p.errors, errors)
@@ -953,6 +1001,7 @@ func Test_LoadTips_Errors(t *testing.T) {
                 []string{"tip_loc"},        //position
                 []string{"H12"},            //well
             },
+            nil,                            //setup
             []string{"(err) Cannot load tip to channel 8 of 8-channel adaptor"},
         },
         LoadTipsErrorParams{
@@ -965,22 +1014,104 @@ func Test_LoadTips_Errors(t *testing.T) {
                 []string{"tip_loc"},        //position
                 []string{"H12"},            //well
             },
+            nil,                            //setup
             []string{"(err) Cannot load tip to channel -1 of 8-channel adaptor"},
-        },/*
+        },
         LoadTipsErrorParams{
-            "can't extend an individual channel",
+            "invalid head",
             LoadTipsParams{
-                []int{1},                   //channels
-                0,                          //head
+                []int{0},                  //channels
+                2,                          //head
                 1,                          //multi
                 []string{"tipbox"},         //platetype
                 []string{"tip_loc"},        //position
                 []string{"H12"},            //well
             },
-            []string{"(err) Cannot load tip to channel 1 due to tip at channel 0 and independent is false"},
+            nil,                            //setup
+            []string{"(err) LoadTips: request for invalid Head 1"},
         },
         LoadTipsErrorParams{
-            "can't extend an individual channel",
+            "invalid head",
+            LoadTipsParams{
+                []int{0},                  //channels
+                -1,                          //head
+                1,                          //multi
+                []string{"tipbox"},         //platetype
+                []string{"tip_loc"},        //position
+                []string{"H12"},            //well
+            },
+            nil,                            //setup
+            []string{"(err) LoadTips: request for invalid Head -1"},
+        },
+        LoadTipsErrorParams{
+            "mismatching multi",
+            LoadTipsParams{
+                []int{0},                  //channels
+                0,                          //head
+                2,                          //multi
+                []string{"tipbox"},         //platetype
+                []string{"tip_loc"},        //position
+                []string{"H12"},            //well
+            },
+            nil,                            //setup
+            []string{"(err) LoadTips: channels, platetype, position, well should be of length multi=2"},
+        },
+        LoadTipsErrorParams{
+            "mismatching multi",
+            LoadTipsParams{
+                []int{0,1},                  //channels
+                0,                          //head
+                2,                          //multi
+                []string{"tipbox",
+                         "tipbox"},         //platetype
+                []string{"tip_loc", 
+                         "tip_loc"},        //position
+                []string{"H12"},            //well
+            },
+            nil,                            //setup
+            []string{"(err) LoadTips: well should be of length multi=2"},
+        },
+        LoadTipsErrorParams{
+            "invalid well",
+            LoadTipsParams{
+                []int{0},                  //channels
+                0,                          //head
+                1,                          //multi
+                []string{"tipbox"},         //platetype
+                []string{"tip_loc"},        //position
+                []string{"H13"},            //well
+            },
+            nil,                            //setup
+            []string{"(err) LoadTips: Request for well H13, but tipbox size is [12x8]"},
+        },
+        LoadTipsErrorParams{
+            "invalid well",
+            LoadTipsParams{
+                []int{0},                  //channels
+                0,                          //head
+                1,                          //multi
+                []string{"tipbox"},         //platetype
+                []string{"tip_loc"},        //position
+                []string{"not_a_well"},            //well
+            },
+            nil,                            //setup
+            []string{"(err) LoadTips: Couldn't parse well \"not_a_well\""},
+        },
+        LoadTipsErrorParams{
+            "loading collision",
+            LoadTipsParams{
+                []int{0},                   //channels
+                0,                          //head
+                1,                          //multi
+                []string{"tipbox"},         //platetype
+                []string{"tip_loc"},        //position
+                []string{"G12"},            //well
+            },
+            nil,                            //setup
+            []string{"(err) LoadTips: Cannot load H11->channel0 due to tip at H12 (Head0 is not independent)"},
+        },
+        LoadTipsErrorParams{
+            "loading collision",
             LoadTipsParams{
                 []int{7},                   //channels
                 0,                          //head
@@ -989,9 +1120,35 @@ func Test_LoadTips_Errors(t *testing.T) {
                 []string{"tip_loc"},        //position
                 []string{"H12"},            //well
             },
-            []string{"(err) Cannot load tip to channel 1 due to tip at channel 0 and independent is false"},
+            nil,                            //setup
+            []string{"(err) LoadTips: Cannot load H12->channel7 due to tips at A12,B12,C12,D12,E12,F12,G12 (Head0 is not independent)"},
         }, 
-        */
+        LoadTipsErrorParams{
+            "missing tip",
+            LoadTipsParams{
+                []int{0},                   //channels
+                0,                          //head
+                1,                          //multi
+                []string{"tipbox"},         //platetype
+                []string{"tip_loc"},        //position
+                []string{"H12"},            //well
+            },
+            removeTips([]string{"H12"}),     //setup
+            []string{"(err) LoadTips: Cannot load H12->channel0 as H12 is empty"},
+        }, 
+        LoadTipsErrorParams{
+            "tip already loaded",
+            LoadTipsParams{
+                []int{0},                   //channels
+                0,                          //head
+                1,                          //multi
+                []string{"tipbox"},         //platetype
+                []string{"tip_loc"},        //position
+                []string{"H12"},            //well
+            },
+            preloadTips([]int{0}, 0),     //setup
+            []string{"(err) LoadTips: Cannot load H12->channel0 as channel0 is already loaded"},
+        },
     }
     
     for _,test := range tests {
