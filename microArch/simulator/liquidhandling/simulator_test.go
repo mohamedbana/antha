@@ -357,6 +357,7 @@ func get_valid_vlh() *VirtualLiquidHandler {
 }
 
 type LHPropertyTest struct {
+    desc            string
     Properties      *LHPropertiesParams
     ErrorStrings    []string
 }
@@ -366,27 +367,33 @@ func get_unknown_locations() []LHPropertyTest {
 
     lhp := get_valid_props()
     lhp.Tip_preferences = append(lhp.Tip_preferences, "undefined_tip_pref")
-    ret = append(ret, LHPropertyTest{lhp, []string{"(warn) Undefined location \"undefined_tip_pref\" referenced in tip preferences"}})
+    ret = append(ret, LHPropertyTest{"passing undefined Tip_preference", lhp, 
+        []string{"(warn) Undefined location \"undefined_tip_pref\" referenced in tip preferences"}})
 
     lhp = get_valid_props()
     lhp.Input_preferences = append(lhp.Tip_preferences, "undefined_input_pref")
-    ret = append(ret, LHPropertyTest{lhp, []string{"(warn) Undefined location \"undefined_input_pref\" referenced in input preferences"}})
+    ret = append(ret, LHPropertyTest{"passing undefined Input_preference", lhp, 
+        []string{"(warn) Undefined location \"undefined_input_pref\" referenced in input preferences"}})
 
     lhp = get_valid_props()
     lhp.Output_preferences = append(lhp.Tip_preferences, "undefined_output_pref")
-    ret = append(ret, LHPropertyTest{lhp, []string{"(warn) Undefined location \"undefined_output_pref\" referenced in output preferences"}})
+    ret = append(ret, LHPropertyTest{"passing undefined Output_preference", lhp, 
+        []string{"(warn) Undefined location \"undefined_output_pref\" referenced in output preferences"}})
 
     lhp = get_valid_props()
     lhp.Tipwaste_preferences = append(lhp.Tip_preferences, "undefined_tipwaste_pref")
-    ret = append(ret, LHPropertyTest{lhp, []string{"(warn) Undefined location \"undefined_tipwaste_pref\" referenced in tipwaste preferences"}})
+    ret = append(ret, LHPropertyTest{"passing undefined Tipwaste_preference", lhp, 
+        []string{"(warn) Undefined location \"undefined_tipwaste_pref\" referenced in tipwaste preferences"}})
 
     lhp = get_valid_props()
     lhp.Wash_preferences = append(lhp.Tip_preferences, "undefined_wash_pref")
-    ret = append(ret, LHPropertyTest{lhp, []string{"(warn) Undefined location \"undefined_wash_pref\" referenced in wash preferences"}})
+    ret = append(ret, LHPropertyTest{"passing undefined Wash_preference", lhp, 
+        []string{"(warn) Undefined location \"undefined_wash_pref\" referenced in wash preferences"}})
 
     lhp = get_valid_props()
     lhp.Waste_preferences = append(lhp.Tip_preferences, "undefined_waste_pref")
-    ret = append(ret, LHPropertyTest{lhp, []string{"(warn) Undefined location \"undefined_waste_pref\" referenced in waste preferences"}})
+    ret = append(ret, LHPropertyTest{"passing undefined Waste_preference", lhp, 
+        []string{"(warn) Undefined location \"undefined_waste_pref\" referenced in waste preferences"}})
 
     return ret
 }
@@ -396,27 +403,33 @@ func get_missing_prefs() []LHPropertyTest {
 
     lhp := get_valid_props()
     lhp.Tip_preferences = make([]string, 0)
-    ret = append(ret, LHPropertyTest{lhp, []string{"(warn) No tip preferences specified"}})
+    ret = append(ret, LHPropertyTest{"passing missing Tip_preferences", lhp, 
+        []string{"(warn) No tip preferences specified"}})
 
     lhp = get_valid_props()
     lhp.Input_preferences = make([]string, 0)
-    ret = append(ret, LHPropertyTest{lhp, []string{"(warn) No input preferences specified"}})
+    ret = append(ret, LHPropertyTest{"passing missing Input_preferences", lhp, 
+        []string{"(warn) No input preferences specified"}})
 
     lhp = get_valid_props()
     lhp.Output_preferences = make([]string, 0)
-    ret = append(ret, LHPropertyTest{lhp, []string{"(warn) No output preferences specified"}})
+    ret = append(ret, LHPropertyTest{"passing missing Output_preferences", lhp, 
+        []string{"(warn) No output preferences specified"}})
 
     lhp = get_valid_props()
     lhp.Tipwaste_preferences = make([]string, 0)
-    ret = append(ret, LHPropertyTest{lhp, []string{"(warn) No tipwaste preferences specified"}})
+    ret = append(ret, LHPropertyTest{"passing missing TipWaste_preferences", lhp, 
+        []string{"(warn) No tipwaste preferences specified"}})
 
     lhp = get_valid_props()
     lhp.Wash_preferences = make([]string, 0)
-    ret = append(ret, LHPropertyTest{lhp, []string{"(warn) No wash preferences specified"}})
+    ret = append(ret, LHPropertyTest{"passing missing Wash_preferences", lhp, 
+        []string{"(warn) No wash preferences specified"}})
 
     lhp = get_valid_props()
     lhp.Waste_preferences = make([]string, 0)
-    ret = append(ret, LHPropertyTest{lhp, []string{"(warn) No waste preferences specified"}})
+    ret = append(ret, LHPropertyTest{"passing missing Waste_preferences", lhp, 
+        []string{"(warn) No waste preferences specified"}})
 
     return ret
 }
@@ -564,7 +577,7 @@ func run_prop_test(t *testing.T, pt LHPropertyTest) {
     test_worst(t, errors, worst)
 
 
-    compare_errors(t, pt.ErrorStrings, errors)
+    compare_errors(t, pt.desc, pt.ErrorStrings, errors)
 }
 
 //return subset of a not in b
@@ -582,7 +595,7 @@ func get_not_in(a, b []string) []string {
 
 
 
-func compare_errors(t *testing.T, expected []string, actual []*simulator.SimulationError) {
+func compare_errors(t *testing.T, desc string, expected []string, actual []*simulator.SimulationError) {
     string_errors := make([]string, 0)
     for _,err := range actual {
         string_errors = append(string_errors, err.Error())
@@ -592,11 +605,15 @@ func compare_errors(t *testing.T, expected []string, actual []*simulator.Simulat
     missing := get_not_in(expected, string_errors)
     extra := get_not_in(string_errors, expected)
 
-    if len(missing) != 0 {
-        t.Error(fmt.Sprintf("missing expected error(s): %v", missing))
+    err_string := fmt.Sprintf("Errors didn't match while %v:\n", desc)
+    for _,s := range missing {
+        err_string += fmt.Sprintf("\t\t--\"%v\"\n", s)
     }
-    if len(extra) != 0 {
-        t.Error(fmt.Sprintf("got extra error(s): %v", extra))
+    for _,s := range extra {
+        err_string += fmt.Sprintf("\t\t++\"%v\"\n", s)
+    }
+    if len(missing) > 0 || len(extra) > 0 {
+        t.Error(err_string)
     }
 }
 
@@ -647,7 +664,7 @@ func TestVLH_AddPlateTo_Valid(t *testing.T) {
     }
 
     errors, _ := vlh.GetErrors()
-    compare_errors(t, []string{}, errors)
+    compare_errors(t, "adding valid plates", []string{}, errors)
 }
 
 func TestVLH_AddPlateTo_NotPlateType(t *testing.T) {
@@ -656,7 +673,8 @@ func TestVLH_AddPlateTo_NotPlateType(t *testing.T) {
     vlh.AddPlateTo("position2", "my plate's gone stringy", "not_a_plate")
 
     errors, _ := vlh.GetErrors()
-    compare_errors(t, []string{"(warn) unknown plate of type string while adding \"not_a_plate\" to location \"position2\""}, errors)
+    compare_errors(t, "adding string plate", 
+        []string{"(warn) unknown plate of type string while adding \"not_a_plate\" to location \"position2\""}, errors)
 }
 
 func TestVLH_AddPlateTo_locationFull(t *testing.T) {
@@ -668,7 +686,8 @@ func TestVLH_AddPlateTo_locationFull(t *testing.T) {
     vlh.AddPlateTo("position1", get_lhplate(), "p1")
 
     errors, _ := vlh.GetErrors()
-    compare_errors(t, []string{"(err) Adding plate \"p1\" to \"position1\" which is already occupied by plate \"p0\""}, errors)
+    compare_errors(t, "adding plate to full location", 
+    []string{"(err) Adding plate \"p1\" to \"position1\" which is already occupied by plate \"p0\""}, errors)
 }
 
 // ########################################################################################################################
@@ -769,6 +788,7 @@ func contains(s []TipLoc, row, col int) bool {
 
 func Test_LoadTips_OK(t *testing.T) {
     type LoadTipsOKParams struct {
+        desc                string
         params              LoadTipsParams
         missing_tips        []TipLoc
         loaded_tips         []int
@@ -776,7 +796,7 @@ func Test_LoadTips_OK(t *testing.T) {
 
     tests := []LoadTipsOKParams{
         LoadTipsOKParams{
-            //load a single tip in the first position
+            "correctly loading a single tip",
             LoadTipsParams{
                 []int{0},                   //channels
                 0,                          //head
@@ -789,7 +809,7 @@ func Test_LoadTips_OK(t *testing.T) {
             []int{0},                   //loaded_tips
         },
         LoadTipsOKParams{
-            //load eight tips all at once
+            "correctly loading eight tips at once",
             LoadTipsParams{
                 []int{0,1,2,3,4,5,6,7},     //channels
                 0,                          //head
@@ -838,7 +858,7 @@ func Test_LoadTips_OK(t *testing.T) {
             []int{0,1,2,3,4,5,6,7,},    //loaded_tips
         },
         LoadTipsOKParams{
-            //load three tips all at once
+            "correctly loading three tips at once",
             LoadTipsParams{
                 []int{0,1,2,},     //channels
                 0,                          //head
@@ -904,12 +924,13 @@ func Test_LoadTips_OK(t *testing.T) {
 
         //check that there are no errors/warnings in the vlh
         errors, _ := vlh.GetErrors()
-        compare_errors(t, []string{}, errors)
+        compare_errors(t, test.desc, []string{}, errors)
     }
 
 }
 
 type LoadTipsErrorParams struct {
+    desc        string
     params      LoadTipsParams
     errors      []string
 }
@@ -917,13 +938,13 @@ type LoadTipsErrorParams struct {
 func (p *LoadTipsErrorParams) apply(t *testing.T, vlh *VirtualLiquidHandler) {
     p.params.apply(vlh)
     errors, _ := vlh.GetErrors()
-    compare_errors(t, p.errors, errors)
+    compare_errors(t, p.desc, p.errors, errors)
 }
 
-func Test_LoadTips_BadChannel(t *testing.T) {
+func Test_LoadTips_Errors(t *testing.T) {
     tests := []LoadTipsErrorParams{
         LoadTipsErrorParams{
-            //invalid channel value
+            "invalid channel value",
             LoadTipsParams{
                 []int{8},                   //channels
                 0,                          //head
@@ -935,7 +956,7 @@ func Test_LoadTips_BadChannel(t *testing.T) {
             []string{"(err) Cannot load tip to channel 8 of 8-channel adaptor"},
         },
         LoadTipsErrorParams{
-            //invalid channel value
+            "invalid channel value",
             LoadTipsParams{
                 []int{-1},                  //channels
                 0,                          //head
@@ -947,7 +968,7 @@ func Test_LoadTips_BadChannel(t *testing.T) {
             []string{"(err) Cannot load tip to channel -1 of 8-channel adaptor"},
         },/*
         LoadTipsErrorParams{
-            //can't extend an individual channel
+            "can't extend an individual channel",
             LoadTipsParams{
                 []int{1},                   //channels
                 0,                          //head
@@ -959,7 +980,7 @@ func Test_LoadTips_BadChannel(t *testing.T) {
             []string{"(err) Cannot load tip to channel 1 due to tip at channel 0 and independent is false"},
         },
         LoadTipsErrorParams{
-            //can't extend an individual channel
+            "can't extend an individual channel",
             LoadTipsParams{
                 []int{7},                   //channels
                 0,                          //head
