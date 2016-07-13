@@ -479,7 +479,7 @@ func get_lhtipbox() *wtype.LHTipbox {
         12,                     //ncols           int 
         60.13,                  //height          float64 
         "test Tipbox mfg",      //manufacturer    string
-        "test Tipbox type",     //boxtype         string 
+        "tipbox",     //boxtype         string 
         LHTipParams {           //tiptype
             "test_tip mfg",         //mfr         string
             "test_tip type",        //ttype       string 
@@ -1058,7 +1058,7 @@ func Test_LoadTips_Errors(t *testing.T) {
                 },
             },
             nil,                            //setup
-            []string{"(err) LoadTips: Channel7 listed twice"},
+            []string{"(err) LoadTips: Channel7 appears more than once"},
         },
         LoadTipsErrorParams{
             "invalid head",
@@ -1098,6 +1098,51 @@ func Test_LoadTips_Errors(t *testing.T) {
             },
             nil,                            //setup
             []string{"(err) LoadTips: channels, platetype, position, well should be of length multi=2"},
+        },
+        LoadTipsErrorParams{
+            "mismatching location",
+            LoadTipsParams{
+                []int{0,1},                  //channels
+                0,                          //head
+                2,                          //multi
+                []string{"tipbox",
+                         "tipbox"},         //platetype
+                []string{"tip_loc", 
+                         "tipwaste_loc"},        //position
+                []string{"G12", "H12"},            //well
+            },
+            nil,                            //setup
+            []string{"(err) LoadTips: Cannot load tips from multiple locations"},
+        },
+        LoadTipsErrorParams{
+            "mismatching platetype",
+            LoadTipsParams{
+                []int{0,1},                  //channels
+                0,                          //head
+                2,                          //multi
+                []string{"tipbox",
+                         "tipwaste"},         //platetype
+                []string{"tip_loc", 
+                         "tip_loc"},        //position
+                []string{"G12", "H12"},            //well
+            },
+            nil,                            //setup
+            []string{"(warn) LoadTips: platetype should all be the same"},
+        },
+        LoadTipsErrorParams{
+            "wrong platetype",
+            LoadTipsParams{
+                []int{0,1},                  //channels
+                0,                          //head
+                2,                          //multi
+                []string{"tipbox",
+                         "tipbox"},         //platetype
+                []string{"tipwaste_loc", 
+                         "tipwaste_loc"},        //position
+                []string{"G12", "H12"},            //well
+            },
+            nil,                            //setup
+            []string{"(err) LoadTips: location \"tipwaste_loc\" doesn't contain a tipbox"},
         },
         LoadTipsErrorParams{
             "mismatching multi",
@@ -1151,7 +1196,7 @@ func Test_LoadTips_Errors(t *testing.T) {
                 []string{"G12"},            //well
             },
             nil,                            //setup
-            []string{"(err) LoadTips: Cannot load H11->channel0 due to tip at H12 (Head0 is not independent)"},
+            []string{"(err) LoadTips: Cannot load G12->channel0 due to tip at H12 (Head0 is not independent)"},
         },
         LoadTipsErrorParams{
             "loading collision",
@@ -1203,7 +1248,7 @@ func Test_LoadTips_Errors(t *testing.T) {
                 []string{"H12"},            //well
             },
             preloadTips([]int{0}, 0),     //setup
-            []string{"(err) LoadTips: Cannot load H12->channel0 as channel0 is already loaded"},
+            []string{"(err) LoadTips: Cannot load tips while adaptor already contains 1 tip"},
         },
     }
     

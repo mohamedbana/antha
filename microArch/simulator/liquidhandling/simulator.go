@@ -32,6 +32,14 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 )
 
+func summariseWell2Channel(well []string, channels []int) string {
+    ret := make([]string, len(well))
+    for i := range well {
+        ret[i] = fmt.Sprintf("%s->channel%v", well[i], channels[i])
+    }
+    return strings.Join(ret, ", ")
+}
+
 // Simulate a liquid handler Driver
 type VirtualLiquidHandler struct {
     properties *liquidhandling.LHProperties 
@@ -103,6 +111,11 @@ func (self *VirtualLiquidHandler) GetErrorSeverity() simulator.ErrorSeverity {
         return self.worst_error.Severity()
     }
     return simulator.SeverityNone
+}
+
+//IsError return true iff an error has been raised with SeverityError
+func (self *VirtualLiquidHandler) IsError() bool {
+    return self.GetErrorSeverity() == simulator.SeverityError
 }
 
 //GetWorstError get the worst error encountered so far
@@ -255,31 +268,198 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
     position = %v,
     well = %v)`, channels, head, multi, platetype, position, well))
     
-    adaptor := self.properties.Heads[head].Adaptor
     
-    //channels is correct length and value
+    //test length of channel, platetype, position, and well
+    wrong_length := make([]string, 0)
+    if len(channels) != multi {
+        wrong_length = append(wrong_length, "channels")
+    }
+    if len(platetype) != multi {
+        wrong_length = append(wrong_length, "platetype")
+    }
+    if len(position) != multi {
+        wrong_length = append(wrong_length, "position")
+    }
+    if len(well) != multi {
+        wrong_length = append(wrong_length, "well")
+    }
+    if len(wrong_length) > 0 {
+        self.AddError(simulator.NewSimulationError(simulator.SeverityError,
+            fmt.Sprintf("LoadTips: %s should be of length multi=%v",
+                strings.Join(wrong_length, ", "),
+                multi), nil))
+        return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
+    }
+
+    //check head exists
+    if head < 0 || head >= len(self.properties.Heads) {
+        self.AddError(simulator.NewSimulationError(simulator.SeverityError,
+            fmt.Sprintf("LoadTips: request for invalid Head %v", head), 
+            nil))
+        return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
+    }
+
+    //check that the adaptor is currently empty
+    adaptor := self.properties.Heads[head].Adaptor
+    if adaptor.Ntipsloaded != 0 {
+        //because not having a ternary operator is so cool.
+        stip := "tip"
+        if adaptor.Ntipsloaded > 1 {
+            stip = "tips"
+        }
+        self.AddError(simulator.NewSimulationError(simulator.SeverityError,
+            fmt.Sprintf("LoadTips: Cannot load tips while adaptor already contains %v %s", 
+                adaptor.Ntipsloaded, stip), 
+            nil))
+        return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
+    }
+
+    //check that channel values are valid and there are no duplicates
+    encountered := map[int]bool{}
     for _, channel := range channels {
         if channel < 0 || channel >= adaptor.Params.Multi {
             self.AddError(simulator.NewSimulationError(simulator.SeverityError, 
                 fmt.Sprintf("Cannot load tip to channel %v of %v-channel adaptor", 
                             channel, adaptor.Params.Multi), nil))
+            return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
+        }
+        if encountered[channel] {
+            self.AddError(simulator.NewSimulationError(simulator.SeverityError,
+                fmt.Sprintf("LoadTips: Channel%v appears more than once", channel),
+                nil))
+            return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
+        } else {
+            encountered[channel] = true
         }
     }
-    //head exists
-    //multi is in correct range for adaptor
-    //platetype matches the plate we're over
-    //position is correct, tips still exists there
-    //well exists (difference between platetype and well?)
 
-    //Assuming that all is well for now
+
+    //check that position are all equal and point to a tipbox
+    tipbox_pos := position[0]
+    positions_equal := true
+    for _,pos := range position {
+        positions_equal = positions_equal && (pos == tipbox_pos)
+    }
+    if !positions_equal {
+        self.AddError(simulator.NewSimulationError(simulator.SeverityError, 
+            "LoadTips: Cannot load tips from multiple locations", 
+            nil))
+    }
+    tipbox, ok := self.properties.PlateLookup[self.properties.PosLookup[tipbox_pos]].(*wtype.LHTipbox)
+    if !ok {
+        self.AddError(simulator.NewSimulationError(simulator.SeverityError,
+            fmt.Sprintf("LoadTips: location \"%s\" doesn't contain a tipbox", tipbox_pos),
+            nil))
+        return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
+    }
+    
+
+    //check that platetype are all the same, and match the type of the tipbox
+    ptype := platetype[0]
+    ptype_equal := true
+    for _,p := range platetype {
+        ptype_equal = ptype_equal && (ptype == p)
+    }
+    if !ptype_equal {
+        self.AddError(simulator.NewSimulationError(simulator.SeverityWarning,
+            "LoadTips: platetype should all be the same",
+            nil))
+    }
+    if ptype != tipbox.Type {
+        self.AddError(simulator.NewSimulationError(simulator.SeverityWarning,
+            fmt.Sprintf("LoadTips: Requested plate type \"%s\" but plate at %s is of type \"%s\"", ptype, tipbox_pos, tipbox.Type),
+            nil))
+    }
+
+    //check that well is valid
+    wellcoords := make([]wtype.WellCoords, multi)
+    for i := range well {
+        wellcoords[i] = wtype.MakeWellCoords(well[i])
+        
+        //check range
+        if wellcoords[i].IsZero() {
+            self.AddError(simulator.NewSimulationError(simulator.SeverityError,
+                fmt.Sprintf("LoadTips: Couldn't parse well \"%s\"", well[i]),
+                nil))
+            continue
+        }
+        if !tipbox.ContainsCoords(&wellcoords[i]) {
+            self.AddError(simulator.NewSimulationError(simulator.SeverityError,
+                fmt.Sprintf("LoadTips: Request for well %s, but tipbox size is [%vx%v]", well[i], tipbox.Ncols, tipbox.Nrows),
+                nil))
+            continue
+        }
+    }
+
+    //Check that the head origin is sane
+    head_origin_ := make([]wtype.WellCoords, multi)
+    for i,wc := range wellcoords {
+        head_origin_[i] = wc
+        if adaptor.Params.Orientation == wtype.LHVChannel {
+            head_origin_[i].Y -= channels[i]
+        } else if adaptor.Params.Orientation == wtype.LHHChannel {
+            head_origin_[i].X -= channels[i]
+        }
+    }
+    head_origin := head_origin_[0]
+    origins_equal := true
+    for _,o := range head_origin_ {
+        origins_equal = origins_equal && head_origin.Equals(o)
+    }
+    if !origins_equal {
+        self.AddError(simulator.NewSimulationError(simulator.SeverityError,
+            fmt.Sprintf("LoadTips: Cannot load %s, tip spacing doesn't match channel spacing",
+                summariseWell2Channel(well, channels)),
+            nil))
+        return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
+    }
+
+    //check for tip collisions on other channels
+    if !adaptor.Params.Independent {
+        collisions := []string{}
+        for i := 0; i < adaptor.Params.Multi; i++ {
+            pos := head_origin
+            if adaptor.Params.Orientation == wtype.LHVChannel {
+                pos.Y += i
+            } else if adaptor.Params.Orientation == wtype.LHHChannel {
+                pos.X += i
+            }
+            
+            //if there's a tip at this location, and we don't intend to pick it up, and the adaptor is not independent
+            if tipbox.HasTipAt(&pos) && !encountered[i] {
+               collisions = append(collisions, pos.FormatA1()) 
+            }
+        }
+        if len(collisions) > 0 {
+            stip := "tip"
+            if len(collisions) > 1 {
+                stip = "tips"
+            }
+            self.AddError(simulator.NewSimulationError(simulator.SeverityError,
+                fmt.Sprintf("LoadTips: Cannot load %s due to %s at %s (Head%v is not independent)",
+                    summariseWell2Channel(well, channels), stip, strings.Join(collisions, ","), head),
+                nil))
+        }
+    }
+
+
+    //if we found an error, bail on the operation
+    if self.IsError() {
+        return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
+    }
     
     //move the tips from the plate and add them to the adaptor
     var tip *wtype.LHTip
     for i := range well {
-        tipbox := self.properties.PlateLookup[self.properties.PosLookup[position[i]]].(*wtype.LHTipbox)
-        wc := wtype.MakeWellCoords(well[i])
-        tip = tipbox.Tips[wc.X][wc.Y]
-        tipbox.Tips[wc.X][wc.Y] = nil
+        
+        tip = tipbox.Tips[wellcoords[i].X][wellcoords[i].Y]
+        if tip == nil {
+            self.AddError(simulator.NewSimulationError(simulator.SeverityError,
+                fmt.Sprintf("LoadTips: Cannot load %s->channel%v as %s is empty", well[i], channels[i], well[i]),
+                nil))
+            continue
+        }
+        tipbox.Tips[wellcoords[i].X][wellcoords[i].Y] = nil
         //TODO: add the tip to the particular location in the adaptor
     }
     adaptor.LoadTips(multi, tip)
