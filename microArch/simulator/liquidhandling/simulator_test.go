@@ -605,15 +605,16 @@ func compare_errors(t *testing.T, desc string, expected []string, actual []*simu
     missing := get_not_in(expected, string_errors)
     extra := get_not_in(string_errors, expected)
 
-    err_string := fmt.Sprintf("Errors didn't match in test \"%v\":\n", desc)
+    errs := []string{}
     for _,s := range missing {
-        err_string += fmt.Sprintf("\t\t--\"%v\"\n", s)
+        errs = append(errs, fmt.Sprintf("--\"%v\"", s))
     }
     for _,s := range extra {
-        err_string += fmt.Sprintf("\t\t++\"%v\"\n", s)
+        errs = append(errs, fmt.Sprintf("++\"%v\"", s))
     }
     if len(missing) > 0 || len(extra) > 0 {
-        t.Error(err_string)
+        t.Errorf("Errors didn't match in test \"%v\":\n%s", 
+            desc, strings.Join(errs, "\n"))
     }
 }
 
@@ -744,7 +745,7 @@ func get_tip_test_vlh() *VirtualLiquidHandler {
     vlh := NewVirtualLiquidHandler(makeLHProperties(&props))
     vlh.Initialize()
     vlh.AddPlateTo("tip_loc", get_lhtipbox(), "tipbox1")
-    vlh.AddPlateTo("tipwaste_loc", get_lhtipwaste(), "tipwaste1")
+    vlh.AddPlateTo("tipwaste_loc", get_lhtipwaste(), "tipwaste")
     return vlh
 }
 
@@ -853,7 +854,12 @@ func (test *LoadTipsTest) run(t *testing.T, vlh *VirtualLiquidHandler) {
 }
 
 type UnloadTipsParams struct {
-    LoadTipsParams
+    channels        []int
+    head            int
+    multi           int
+    platetype       []string
+    position        []string
+    well            []string
 }
 
 func (s *UnloadTipsParams) apply(vlh *VirtualLiquidHandler) {
@@ -868,17 +874,23 @@ func (s *UnloadTipsParams) apply(vlh *VirtualLiquidHandler) {
 type UnloadTipsTest struct {
     testName        string
     params          UnloadTipsParams
-    setup           *func(*VirtualLiquidHandler)
+    setup           []*func(*VirtualLiquidHandler)
     expected_errors []string
     remaining_tips  []int
+    tips_in_waste   int
 }
 
 func (self *UnloadTipsTest) run(t *testing.T, vlh *VirtualLiquidHandler) {
     if self.setup != nil {
-        (*self.setup)(vlh)
+        for _,f := range self.setup {
+            (*f)(vlh)
+        }
     }
     self.params.apply(vlh)
 
+    if self.expected_errors == nil {
+        self.expected_errors = []string{}
+    }
     compare_errors(t, self.testName, self.expected_errors, vlh.GetErrors())
 
     //Don't worry about tip locations if we were expecting errors anyway
@@ -887,6 +899,9 @@ func (self *UnloadTipsTest) run(t *testing.T, vlh *VirtualLiquidHandler) {
     }
 
 
+    if self.remaining_tips == nil {
+        self.remaining_tips = []int{}
+    }
     expected_tips := map[int]bool{}
     for _,c := range self.remaining_tips {
         expected_tips[c] = true
@@ -895,10 +910,18 @@ func (self *UnloadTipsTest) run(t *testing.T, vlh *VirtualLiquidHandler) {
 
     //TODO: check that the tips are actually in the right place
     if adaptor.Ntipsloaded != len(expected_tips) {
-        t.Errorf("Incorrect number of tips remain in test \"%s\" after UnloadTips (expected %v, got %v)",
+        t.Errorf("Incorrect tips in adaptor after \"%s\" (expected %v, got %v)",
                  self.testName,
                  len(expected_tips),
                  adaptor.Ntipsloaded)
+    }
+
+    tipwaste := vlh.properties.PlateLookup[vlh.properties.PosLookup["tipwaste_loc"]].(*wtype.LHTipwaste)
+    if self.tips_in_waste != tipwaste.Contents {
+        t.Errorf("Incorrect tipwaste contents after \"%s\", expected %v tips, got %v tips",
+                 self.testName,
+                 self.tips_in_waste,
+                 tipwaste.Contents)
     }
 
 }
@@ -1184,7 +1207,7 @@ func Test_LoadTips(t *testing.T) {
                 []string{"G12", "H12"},            //well
             },
             nil,                            //setup
-            []string{"(err) LoadTips: platetype should all be the same"},
+            []string{"(err) LoadTips: platetype should be equal"},
             nil,                            //missing_tips
             nil,                            //loaded_tips
         },
@@ -1201,7 +1224,7 @@ func Test_LoadTips(t *testing.T) {
                 []string{"G12", "H12"},            //well
             },
             nil,                            //setup
-            []string{"(err) LoadTips: location \"tipwaste_loc\" doesn't contain a tipbox"},
+            []string{"(err) LoadTips: Cannot load tips from location \"tipwaste_loc\", no tipbox found"},
             nil,                            //missing_tips
             nil,                            //loaded_tips
         },
@@ -1336,4 +1359,211 @@ func Test_LoadTips(t *testing.T) {
 
 }
 
+func Test_UnloadTips(t *testing.T) {
 
+    tests := []UnloadTipsTest {
+        UnloadTipsTest{
+            "unload a tip",     //testName        string
+            UnloadTipsParams{   //params          UnloadTipsParams
+                []int{0},                   //channels        []int
+                0,                          //head            int
+                1,                          //multi           int
+                []string{"tipwaste"},       //platetype       []string
+                []string{"tipwaste_loc"},   //position        []string
+                []string{"A1"},             //well            []string
+            },
+            []*func(*VirtualLiquidHandler){ //setup           []*func(*VirtualLiquidHandler)
+                preloadTips([]int{0}, 0),
+            },
+            nil,                            //expected_errors []string
+            nil,                            //remaining_tips  []int
+            1,                              //tips_in_waste   int
+        },
+        UnloadTipsTest{
+            "unload 8 tips",     //testName        string
+            UnloadTipsParams{   //params          UnloadTipsParams
+                []int{0,1,2,3,4,5,6,7},     //channels        []int
+                0,                          //head            int
+                8,                          //multi           int
+                []string{"tipwaste",        //platetype       []string
+                         "tipwaste",
+                         "tipwaste",
+                         "tipwaste",
+                         "tipwaste",
+                         "tipwaste",
+                         "tipwaste",
+                         "tipwaste"},
+                []string{"tipwaste_loc",    //position        []string
+                         "tipwaste_loc",
+                         "tipwaste_loc",
+                         "tipwaste_loc",
+                         "tipwaste_loc",
+                         "tipwaste_loc",
+                         "tipwaste_loc",
+                         "tipwaste_loc"},
+                []string{"A1",              //well            []string
+                         "A1",
+                         "A1",
+                         "A1",
+                         "A1",
+                         "A1",
+                         "A1",
+                         "A1"},
+            },
+            []*func(*VirtualLiquidHandler){ //setup           []*func(*VirtualLiquidHandler)
+                preloadTips([]int{0,1,2,3,4,5,6,7}, 0),
+            },
+            nil,                            //expected_errors []string
+            nil,                            //remaining_tips  []int
+            8,                              //tips_in_waste   int
+        },
+        UnloadTipsTest{
+            "can only unload all tips",     //testName        string
+            UnloadTipsParams{   //params          UnloadTipsParams
+                []int{0,7},                 //channels        []int
+                0,                          //head            int
+                2,                          //multi           int
+                []string{"tipwaste",        //platetype       []string
+                         "tipwaste"},
+                []string{"tipwaste_loc",    //position        []string
+                         "tipwaste_loc"},
+                []string{"A1",              //well            []string
+                         "A1"},
+            },
+            []*func(*VirtualLiquidHandler){ //setup           []*func(*VirtualLiquidHandler)
+                preloadTips([]int{0,1,2,3,4,5,6,7}, 0),
+            },
+            []string{"(err) UnloadTips: Cannot unload tips from Head0(channels 0,7) due to other tips on the adaptor (independent is false)"},
+            nil,                        //remaining_tips  []int
+            0,                          //tips_in_waste   int
+        },
+        UnloadTipsTest{
+            "multi is wrong",     //testName        string
+            UnloadTipsParams{   //params          UnloadTipsParams
+                []int{0,7},                 //channels        []int
+                0,                          //head            int
+                3,                          //multi           int
+                []string{"tipwaste",        //platetype       []string
+                         "tipwaste"},
+                []string{"tipwaste_loc",    //position        []string
+                         "tipwaste_loc"},
+                []string{"A1",              //well            []string
+                         "A1"},
+            },
+            []*func(*VirtualLiquidHandler){ //setup           []*func(*VirtualLiquidHandler)
+                preloadTips([]int{0,7}, 0),
+            },
+            []string{"(err) UnloadTips: channels, platetype, position, well should be of length multi=3"},
+            nil,                        //remaining_tips  []int
+            0,                          //tips_in_waste   int
+        },
+        UnloadTipsTest{
+            "wrong location",     //testName        string
+            UnloadTipsParams{   //params          UnloadTipsParams
+                []int{0,7},                 //channels        []int
+                0,                          //head            int
+                2,                          //multi           int
+                []string{"tipbox",        //platetype       []string
+                         "tipbox"},
+                []string{"tip_loc",         //position        []string
+                         "tip_loc"},
+                []string{"A1",              //well            []string
+                         "A1"},
+            },
+            []*func(*VirtualLiquidHandler){ //setup           []*func(*VirtualLiquidHandler)
+                preloadTips([]int{0,7}, 0),
+            },
+            []string{"(err) UnloadTips: Cannot unload tips at location \"tip_loc\", no tipwaste found"},
+            nil,                        //remaining_tips  []int
+            0,                          //tips_in_waste   int
+        },
+        UnloadTipsTest{
+            "wrong platetype",     //testName        string
+            UnloadTipsParams{   //params          UnloadTipsParams
+                []int{0,7},                 //channels        []int
+                0,                          //head            int
+                2,                          //multi           int
+                []string{"tipbox",        //platetype       []string
+                         "tipbox"},
+                []string{"tipwaste_loc",         //position        []string
+                         "tipwaste_loc"},
+                []string{"A1",              //well            []string
+                         "A1"},
+            },
+            []*func(*VirtualLiquidHandler){ //setup           []*func(*VirtualLiquidHandler)
+                preloadTips([]int{0,7}, 0),
+            },
+            []string{"(err) UnloadTips: Requested plate type \"tipbox\" but plate at tipwaste_loc is of type \"tipwaste\""},
+            nil,                        //remaining_tips  []int
+            0,                          //tips_in_waste   int
+        },
+        UnloadTipsTest{
+            "mixed location",     //testName        string
+            UnloadTipsParams{   //params          UnloadTipsParams
+                []int{0,7},                 //channels        []int
+                0,                          //head            int
+                2,                          //multi           int
+                []string{"tipwaste",        //platetype       []string
+                         "tipwaste"},
+                []string{"tipwaste_loc",         //position        []string
+                         "tip_loc"},
+                []string{"A1",              //well            []string
+                         "A1"},
+            },
+            []*func(*VirtualLiquidHandler){ //setup           []*func(*VirtualLiquidHandler)
+                preloadTips([]int{0,7}, 0),
+            },
+            []string{"(err) UnloadTips: Cannot unload tips to multiple locations"},
+            nil,                        //remaining_tips  []int
+            0,                          //tips_in_waste   int
+        },
+        UnloadTipsTest{
+            "unload too many",     //testName        string
+            UnloadTipsParams{   //params          UnloadTipsParams
+                []int{0,7},                 //channels        []int
+                0,                          //head            int
+                2,                          //multi           int
+                []string{"tipwaste",        //platetype       []string
+                         "tipwaste"},
+                []string{"tipwaste_loc",         //position        []string
+                         "tipwaste_loc"},
+                []string{"A1",              //well            []string
+                         "A1"},
+            },
+            []*func(*VirtualLiquidHandler){ //setup           []*func(*VirtualLiquidHandler)
+                preloadTips([]int{0}, 0),
+            },
+            []string{"(err) UnloadTips: Cannot unload 2 tips as adaptor only has one tip loaded"},
+            nil,                        //remaining_tips  []int
+            0,                          //tips_in_waste   int
+        },
+        UnloadTipsTest{
+            "unload too many",     //testName        string
+            UnloadTipsParams{   //params          UnloadTipsParams
+                []int{0,7,4},                 //channels        []int
+                0,                          //head            int
+                3,                          //multi           int
+                []string{"tipwaste",        //platetype       []string
+                         "tipwaste",
+                         "tipwaste"},
+                []string{"tipwaste_loc",         //position        []string
+                         "tipwaste_loc",
+                         "tipwaste_loc"},
+                []string{"A1",              //well            []string
+                         "A1",
+                         "A1"},
+            },
+            []*func(*VirtualLiquidHandler){ //setup           []*func(*VirtualLiquidHandler)
+                preloadTips([]int{0,1}, 0),
+            },
+            []string{"(err) UnloadTips: Cannot unload 3 tips as adaptor only has 2 tips loaded"},
+            nil,                        //remaining_tips  []int
+            0,                          //tips_in_waste   int
+        },
+    }
+
+    for _,test := range tests {
+        vlh := get_tip_test_vlh()
+        test.run(t, vlh)
+    }
+}
