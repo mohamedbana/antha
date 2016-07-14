@@ -74,6 +74,9 @@ func (self *VirtualLiquidHandler) SaveLog(filename string) {
     ioutil.WriteFile(filename, []byte(strings.Join(self.log, "\n")), 0644)
 }
 
+
+// ------------------------------------------------------------------------------- Useful Utilities
+
 func (self *VirtualLiquidHandler) validateProperties() {
     
     //check a property
@@ -114,6 +117,101 @@ func (self *VirtualLiquidHandler) checkReady(fnName string) {
     if self.finalized {
         self.AddWarning(fnName, "Instruction given after Finalize")
     }
+}
+
+func (self *VirtualLiquidHandler) validateTipArgs(fnname string, 
+                                        channels []int, head, multi int, 
+                                        platetype, position, well []string) bool {
+    //test length of channel, platetype, position, and well
+    wrong_length := make([]string, 0)
+    if len(channels) != multi {
+        wrong_length = append(wrong_length, "channels")
+    }
+    if len(platetype) != multi {
+        wrong_length = append(wrong_length, "platetype")
+    }
+    if len(position) != multi {
+        wrong_length = append(wrong_length, "position")
+    }
+    if len(well) != multi {
+        wrong_length = append(wrong_length, "well")
+    }
+    if len(wrong_length) > 0 {
+        self.AddErrorf(fnname, "%s should be of length multi=%v",
+                strings.Join(wrong_length, ", "),
+                multi)
+        return false
+    }
+
+    //check head exists
+    if head < 0 || head >= len(self.properties.Heads) {
+        self.AddErrorf(fnname, "Request for invalid Head %v", head)
+        return false
+    }
+
+    //check that the adaptor is currently empty
+    adaptor := self.properties.Heads[head].Adaptor
+    if adaptor.Ntipsloaded != 0 {
+        //because not having a ternary operator is so cool.
+        stip := "tip"
+        if adaptor.Ntipsloaded > 1 {
+            stip = "tips"
+        }
+        self.AddErrorf(fnname, "Cannot load tips while adaptor already contains %v %s", 
+                adaptor.Ntipsloaded, stip)
+        return false
+    }
+
+    //check that channel values are valid and there are no duplicates
+    encountered := map[int]bool{}
+    for _, channel := range channels {
+        if channel < 0 || channel >= adaptor.Params.Multi {
+            self.AddErrorf(fnname, "Cannot load tip to channel %v of %v-channel adaptor", 
+                            channel, adaptor.Params.Multi)
+            return false
+        }
+        if encountered[channel] {
+            self.AddErrorf(fnname, "Channel%v appears more than once", channel)
+            return false
+        } else {
+            encountered[channel] = true
+        }
+    }
+
+
+    //check that position are all equal and point to a tipbox
+    tipbox_pos := position[0]
+    positions_equal := true
+    for _,pos := range position {
+        positions_equal = positions_equal && (pos == tipbox_pos)
+    }
+    if !positions_equal {
+        self.AddError(fnname, "Cannot load tips from multiple locations")
+        return false
+    }
+    tipbox, ok := self.properties.PlateLookup[self.properties.PosLookup[tipbox_pos]].(*wtype.LHTipbox)
+    if !ok {
+        self.AddErrorf(fnname, "location \"%s\" doesn't contain a tipbox", tipbox_pos)
+        return false
+    }
+    
+
+    //check that platetype are all the same, and match the type of the tipbox
+    ptype := platetype[0]
+    ptype_equal := true
+    for _,p := range platetype {
+        ptype_equal = ptype_equal && (ptype == p)
+    }
+    if !ptype_equal {
+        self.AddError(fnname, "platetype should all be the same")
+        return false
+    }
+    if ptype != tipbox.Type {
+        self.AddErrorf(fnname, "Requested plate type \"%s\" but plate at %s is of type \"%s\"", ptype, tipbox_pos, tipbox.Type)
+        return false
+    }
+                    
+    return true
 }
 
 // ------------------------------------------------------------------------ ExtendedLHDriver
@@ -211,107 +309,39 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
     position = %v,
     well = %v)`, channels, head, multi, platetype, position, well))
     
-    
-    //test length of channel, platetype, position, and well
-    wrong_length := make([]string, 0)
-    if len(channels) != multi {
-        wrong_length = append(wrong_length, "channels")
-    }
-    if len(platetype) != multi {
-        wrong_length = append(wrong_length, "platetype")
-    }
-    if len(position) != multi {
-        wrong_length = append(wrong_length, "position")
-    }
-    if len(well) != multi {
-        wrong_length = append(wrong_length, "well")
-    }
-    if len(wrong_length) > 0 {
-        self.AddErrorf("LoadTips", "%s should be of length multi=%v",
-                strings.Join(wrong_length, ", "),
-                multi)
-        return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
-    }
-
-    //check head exists
-    if head < 0 || head >= len(self.properties.Heads) {
-        self.AddErrorf("LoadTips", "Request for invalid Head %v", head)
-        return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
-    }
-
-    //check that the adaptor is currently empty
-    adaptor := self.properties.Heads[head].Adaptor
-    if adaptor.Ntipsloaded != 0 {
-        //because not having a ternary operator is so cool.
-        stip := "tip"
-        if adaptor.Ntipsloaded > 1 {
-            stip = "tips"
-        }
-        self.AddErrorf("LoadTips", "Cannot load tips while adaptor already contains %v %s", 
-                adaptor.Ntipsloaded, stip)
-        return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
-    }
-
-    //check that channel values are valid and there are no duplicates
-    encountered := map[int]bool{}
-    for _, channel := range channels {
-        if channel < 0 || channel >= adaptor.Params.Multi {
-            self.AddErrorf("LoadTips", "Cannot load tip to channel %v of %v-channel adaptor", 
-                            channel, adaptor.Params.Multi)
-            return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
-        }
-        if encountered[channel] {
-            self.AddErrorf("LoadTips", "Channel%v appears more than once", channel)
-            return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
-        } else {
-            encountered[channel] = true
-        }
-    }
-
-
-    //check that position are all equal and point to a tipbox
-    tipbox_pos := position[0]
-    positions_equal := true
-    for _,pos := range position {
-        positions_equal = positions_equal && (pos == tipbox_pos)
-    }
-    if !positions_equal {
-        self.AddError("LoadTips", "Cannot load tips from multiple locations")
-    }
-    tipbox, ok := self.properties.PlateLookup[self.properties.PosLookup[tipbox_pos]].(*wtype.LHTipbox)
+    ok := self.validateTipArgs("LoadTips", channels, head, multi, platetype, position, well)
     if !ok {
-        self.AddErrorf("LoadTips", "location \"%s\" doesn't contain a tipbox", tipbox_pos)
         return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
     }
     
+    is_in_channels := map[int]bool{}
+    for _,c := range channels {
+        is_in_channels[c] = true
+    }
 
-    //check that platetype are all the same, and match the type of the tipbox
-    ptype := platetype[0]
-    ptype_equal := true
-    for _,p := range platetype {
-        ptype_equal = ptype_equal && (ptype == p)
-    }
-    if !ptype_equal {
-        self.AddError("LoadTips", "platetype should all be the same")
-    }
-    if ptype != tipbox.Type {
-        self.AddErrorf("LoadTips", "Requested plate type \"%s\" but plate at %s is of type \"%s\"", ptype, tipbox_pos, tipbox.Type)
-    }
+    adaptor := self.properties.Heads[head].Adaptor
+    tipbox := self.properties.PlateLookup[self.properties.PosLookup[position[0]]].(*wtype.LHTipbox)
 
     //check that well is valid
     wellcoords := make([]wtype.WellCoords, multi)
+    wc_ok := true
     for i := range well {
         wellcoords[i] = wtype.MakeWellCoords(well[i])
         
         //check range
         if wellcoords[i].IsZero() {
             self.AddErrorf("LoadTips", "Couldn't parse well \"%s\"", well[i])
+            wc_ok = false
             continue
         }
         if !tipbox.ContainsCoords(&wellcoords[i]) {
             self.AddErrorf("LoadTips", "Request for well %s, but tipbox size is [%vx%v]", well[i], tipbox.Ncols, tipbox.Nrows)
+            wc_ok = false
             continue
         }
+    }
+    if !wc_ok {
+        return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
     }
 
     //Check that the head origin is sane
@@ -334,7 +364,7 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
                 summariseWell2Channel(well, channels))
         return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
     }
-
+   
     //check for tip collisions on other channels
     if !adaptor.Params.Independent {
         collisions := []string{}
@@ -347,7 +377,7 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
             }
             
             //if there's a tip at this location, and we don't intend to pick it up, and the adaptor is not independent
-            if tipbox.HasTipAt(&pos) && !encountered[i] {
+            if tipbox.HasTipAt(&pos) && !is_in_channels[i] {
                collisions = append(collisions, pos.FormatA1()) 
             }
         }
