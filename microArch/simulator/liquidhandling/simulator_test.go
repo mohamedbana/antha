@@ -375,32 +375,32 @@ func get_unknown_locations() []LHPropertyTest {
     lhp := get_valid_props()
     lhp.Tip_preferences = append(lhp.Tip_preferences, "undefined_tip_pref")
     ret = append(ret, LHPropertyTest{"passing undefined Tip_preference", lhp, 
-        []string{"(warn) Undefined location \"undefined_tip_pref\" referenced in tip preferences"}})
+        []string{"(warn) NewVirtualLiquidHandler: Undefined location \"undefined_tip_pref\" referenced in tip preferences"}})
 
     lhp = get_valid_props()
     lhp.Input_preferences = append(lhp.Tip_preferences, "undefined_input_pref")
     ret = append(ret, LHPropertyTest{"passing undefined Input_preference", lhp, 
-        []string{"(warn) Undefined location \"undefined_input_pref\" referenced in input preferences"}})
+        []string{"(warn) NewVirtualLiquidHandler: Undefined location \"undefined_input_pref\" referenced in input preferences"}})
 
     lhp = get_valid_props()
     lhp.Output_preferences = append(lhp.Tip_preferences, "undefined_output_pref")
     ret = append(ret, LHPropertyTest{"passing undefined Output_preference", lhp, 
-        []string{"(warn) Undefined location \"undefined_output_pref\" referenced in output preferences"}})
+        []string{"(warn) NewVirtualLiquidHandler: Undefined location \"undefined_output_pref\" referenced in output preferences"}})
 
     lhp = get_valid_props()
     lhp.Tipwaste_preferences = append(lhp.Tip_preferences, "undefined_tipwaste_pref")
     ret = append(ret, LHPropertyTest{"passing undefined Tipwaste_preference", lhp, 
-        []string{"(warn) Undefined location \"undefined_tipwaste_pref\" referenced in tipwaste preferences"}})
+        []string{"(warn) NewVirtualLiquidHandler: Undefined location \"undefined_tipwaste_pref\" referenced in tipwaste preferences"}})
 
     lhp = get_valid_props()
     lhp.Wash_preferences = append(lhp.Tip_preferences, "undefined_wash_pref")
     ret = append(ret, LHPropertyTest{"passing undefined Wash_preference", lhp, 
-        []string{"(warn) Undefined location \"undefined_wash_pref\" referenced in wash preferences"}})
+        []string{"(warn) NewVirtualLiquidHandler: Undefined location \"undefined_wash_pref\" referenced in wash preferences"}})
 
     lhp = get_valid_props()
     lhp.Waste_preferences = append(lhp.Tip_preferences, "undefined_waste_pref")
     ret = append(ret, LHPropertyTest{"passing undefined Waste_preference", lhp, 
-        []string{"(warn) Undefined location \"undefined_waste_pref\" referenced in waste preferences"}})
+        []string{"(warn) NewVirtualLiquidHandler: Undefined location \"undefined_waste_pref\" referenced in waste preferences"}})
 
     return ret
 }
@@ -411,32 +411,32 @@ func get_missing_prefs() []LHPropertyTest {
     lhp := get_valid_props()
     lhp.Tip_preferences = make([]string, 0)
     ret = append(ret, LHPropertyTest{"passing missing Tip_preferences", lhp, 
-        []string{"(warn) No tip preferences specified"}})
+        []string{"(warn) NewVirtualLiquidHandler: No tip preferences specified"}})
 
     lhp = get_valid_props()
     lhp.Input_preferences = make([]string, 0)
     ret = append(ret, LHPropertyTest{"passing missing Input_preferences", lhp, 
-        []string{"(warn) No input preferences specified"}})
+        []string{"(warn) NewVirtualLiquidHandler: No input preferences specified"}})
 
     lhp = get_valid_props()
     lhp.Output_preferences = make([]string, 0)
     ret = append(ret, LHPropertyTest{"passing missing Output_preferences", lhp, 
-        []string{"(warn) No output preferences specified"}})
+        []string{"(warn) NewVirtualLiquidHandler: No output preferences specified"}})
 
     lhp = get_valid_props()
     lhp.Tipwaste_preferences = make([]string, 0)
     ret = append(ret, LHPropertyTest{"passing missing TipWaste_preferences", lhp, 
-        []string{"(warn) No tipwaste preferences specified"}})
+        []string{"(warn) NewVirtualLiquidHandler: No tipwaste preferences specified"}})
 
     lhp = get_valid_props()
     lhp.Wash_preferences = make([]string, 0)
     ret = append(ret, LHPropertyTest{"passing missing Wash_preferences", lhp, 
-        []string{"(warn) No wash preferences specified"}})
+        []string{"(warn) NewVirtualLiquidHandler: No wash preferences specified"}})
 
     lhp = get_valid_props()
     lhp.Waste_preferences = make([]string, 0)
     ret = append(ret, LHPropertyTest{"passing missing Waste_preferences", lhp, 
-        []string{"(warn) No waste preferences specified"}})
+        []string{"(warn) NewVirtualLiquidHandler: No waste preferences specified"}})
 
     return ret
 }
@@ -666,7 +666,7 @@ func TestVLH_AddPlateTo_NotPlateType(t *testing.T) {
     vlh.AddPlateTo("position2", "my plate's gone stringy", "not_a_plate")
 
     compare_errors(t, "adding string plate", 
-        []string{"(err) AddPlate: Cannot add plate \"not_a_plate\" of type string to location \"position2\""},
+        []string{"(err) AddPlateTo: Cannot add plate \"not_a_plate\" of type string to location \"position2\""},
         vlh.GetErrors())
 }
 
@@ -679,7 +679,7 @@ func TestVLH_AddPlateTo_locationFull(t *testing.T) {
     vlh.AddPlateTo("position1", get_lhplate(), "p1")
 
     compare_errors(t, "adding plate to full location", 
-        []string{"(err) Adding plate \"p1\" to \"position1\" which is already occupied by plate \"p0\""},
+        []string{"(err) AddPlateTo: Cannot add plate \"p1\" to location \"position1\" which is already occupied by plate \"p0\""},
         vlh.GetErrors())
 }
 
@@ -993,7 +993,7 @@ func Test_LoadTips_Errors(t *testing.T) {
                 []string{"H12"},            //well
             },
             nil,                            //setup
-            []string{"(err) Cannot load tip to channel 8 of 8-channel adaptor"},
+            []string{"(err) LoadTips: Cannot load tip to channel 8 of 8-channel adaptor"},
         },
         LoadTipsErrorParams{
             "invalid channel value",
@@ -1006,7 +1006,7 @@ func Test_LoadTips_Errors(t *testing.T) {
                 []string{"H12"},            //well
             },
             nil,                            //setup
-            []string{"(err) Cannot load tip to channel -1 of 8-channel adaptor"},
+            []string{"(err) LoadTips: Cannot load tip to channel -1 of 8-channel adaptor"},
         },
         LoadTipsErrorParams{
             "too many channels",
@@ -1062,7 +1062,7 @@ func Test_LoadTips_Errors(t *testing.T) {
                 []string{"H12"},            //well
             },
             nil,                            //setup
-            []string{"(err) LoadTips: request for invalid Head 1"},
+            []string{"(err) LoadTips: Request for invalid Head 1"},
         },
         LoadTipsErrorParams{
             "invalid head",
@@ -1075,7 +1075,7 @@ func Test_LoadTips_Errors(t *testing.T) {
                 []string{"H12"},            //well
             },
             nil,                            //setup
-            []string{"(err) LoadTips: request for invalid Head -1"},
+            []string{"(err) LoadTips: Request for invalid Head -1"},
         },
         LoadTipsErrorParams{
             "mismatching multi",

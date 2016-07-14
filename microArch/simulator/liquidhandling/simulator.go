@@ -80,12 +80,12 @@ func (self *VirtualLiquidHandler) validateProperties() {
     check_prop := func(l []string, name string) {
         //is empty
         if len(l) == 0 {
-            self.AddWarningf("No %s specified", name)
+            self.AddWarningf("NewVirtualLiquidHandler", "No %s specified", name)
         }
         //all locations defined
         for _,loc := range l {
             if !self.locationIsKnown(loc) {
-                self.AddWarningf("Undefined location \"%s\" referenced in %s", loc, name)
+                self.AddWarningf("NewVirtualLiquidHandler", "Undefined location \"%s\" referenced in %s", loc, name)
             }
         }
     }
@@ -109,10 +109,10 @@ func (self *VirtualLiquidHandler) locationIsKnown(location string) bool {
 
 func (self *VirtualLiquidHandler) checkReady(fnName string) {
     if !self.initialized {
-        self.AddWarningf("Instruction \"%s\" before Initialize", fnName)
+        self.AddWarning(fnName, "Instruction given before Initialize")
     }
     if self.finalized {
-        self.AddWarningf("Instruction \"%s\" after Finalize", fnName)
+        self.AddWarning(fnName, "Instruction given after Finalize")
     }
 }
 
@@ -227,7 +227,7 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
         wrong_length = append(wrong_length, "well")
     }
     if len(wrong_length) > 0 {
-        self.AddErrorf("LoadTips: %s should be of length multi=%v",
+        self.AddErrorf("LoadTips", "%s should be of length multi=%v",
                 strings.Join(wrong_length, ", "),
                 multi)
         return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
@@ -235,7 +235,7 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 
     //check head exists
     if head < 0 || head >= len(self.properties.Heads) {
-        self.AddErrorf("LoadTips: request for invalid Head %v", head)
+        self.AddErrorf("LoadTips", "Request for invalid Head %v", head)
         return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
     }
 
@@ -247,7 +247,7 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
         if adaptor.Ntipsloaded > 1 {
             stip = "tips"
         }
-        self.AddErrorf("LoadTips: Cannot load tips while adaptor already contains %v %s", 
+        self.AddErrorf("LoadTips", "Cannot load tips while adaptor already contains %v %s", 
                 adaptor.Ntipsloaded, stip)
         return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
     }
@@ -256,12 +256,12 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
     encountered := map[int]bool{}
     for _, channel := range channels {
         if channel < 0 || channel >= adaptor.Params.Multi {
-            self.AddErrorf("Cannot load tip to channel %v of %v-channel adaptor", 
+            self.AddErrorf("LoadTips", "Cannot load tip to channel %v of %v-channel adaptor", 
                             channel, adaptor.Params.Multi)
             return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
         }
         if encountered[channel] {
-            self.AddErrorf("LoadTips: Channel%v appears more than once", channel)
+            self.AddErrorf("LoadTips", "Channel%v appears more than once", channel)
             return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
         } else {
             encountered[channel] = true
@@ -276,11 +276,11 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
         positions_equal = positions_equal && (pos == tipbox_pos)
     }
     if !positions_equal {
-        self.AddError("LoadTips: Cannot load tips from multiple locations")
+        self.AddError("LoadTips", "Cannot load tips from multiple locations")
     }
     tipbox, ok := self.properties.PlateLookup[self.properties.PosLookup[tipbox_pos]].(*wtype.LHTipbox)
     if !ok {
-        self.AddErrorf("LoadTips: location \"%s\" doesn't contain a tipbox", tipbox_pos)
+        self.AddErrorf("LoadTips", "location \"%s\" doesn't contain a tipbox", tipbox_pos)
         return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
     }
     
@@ -292,10 +292,10 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
         ptype_equal = ptype_equal && (ptype == p)
     }
     if !ptype_equal {
-        self.AddError("LoadTips: platetype should all be the same")
+        self.AddError("LoadTips", "platetype should all be the same")
     }
     if ptype != tipbox.Type {
-        self.AddErrorf("LoadTips: Requested plate type \"%s\" but plate at %s is of type \"%s\"", ptype, tipbox_pos, tipbox.Type)
+        self.AddErrorf("LoadTips", "Requested plate type \"%s\" but plate at %s is of type \"%s\"", ptype, tipbox_pos, tipbox.Type)
     }
 
     //check that well is valid
@@ -305,11 +305,11 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
         
         //check range
         if wellcoords[i].IsZero() {
-            self.AddErrorf("LoadTips: Couldn't parse well \"%s\"", well[i])
+            self.AddErrorf("LoadTips", "Couldn't parse well \"%s\"", well[i])
             continue
         }
         if !tipbox.ContainsCoords(&wellcoords[i]) {
-            self.AddErrorf("LoadTips: Request for well %s, but tipbox size is [%vx%v]", well[i], tipbox.Ncols, tipbox.Nrows)
+            self.AddErrorf("LoadTips", "Request for well %s, but tipbox size is [%vx%v]", well[i], tipbox.Ncols, tipbox.Nrows)
             continue
         }
     }
@@ -330,7 +330,7 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
         origins_equal = origins_equal && head_origin.Equals(o)
     }
     if !origins_equal {
-        self.AddErrorf("LoadTips: Cannot load %s, tip spacing doesn't match channel spacing",
+        self.AddErrorf("LoadTips", "Cannot load %s, tip spacing doesn't match channel spacing",
                 summariseWell2Channel(well, channels))
         return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
     }
@@ -356,7 +356,7 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
             if len(collisions) > 1 {
                 stip = "tips"
             }
-            self.AddErrorf("LoadTips: Cannot load %s due to %s at %s (Head%v is not independent)",
+            self.AddErrorf("LoadTips", "Cannot load %s due to %s at %s (Head%v is not independent)",
                     summariseWell2Channel(well, channels), stip, strings.Join(collisions, ","), head)
         }
     }
@@ -373,7 +373,7 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
         
         tip = tipbox.Tips[wellcoords[i].X][wellcoords[i].Y]
         if tip == nil {
-            self.AddErrorf("LoadTips: Cannot load %s->channel%v as %s is empty", well[i], channels[i], well[i])
+            self.AddErrorf("LoadTips", "Cannot load %s->channel%v as %s is empty", well[i], channels[i], well[i])
             continue
         }
         tipbox.Tips[wellcoords[i].X][wellcoords[i].Y] = nil
@@ -444,7 +444,7 @@ func (self *VirtualLiquidHandler) Go() driver.CommandStatus {
 func (self *VirtualLiquidHandler) Initialize() driver.CommandStatus {
     self.LogLine("Initialize()")
     if self.initialized {
-        self.AddWarningf("Multiple calls to Initialize")
+        self.AddWarningf("Initialize", "Multiple calls to Initialize")
     } else {
         self.initialized = true
     }
@@ -456,7 +456,7 @@ func (self *VirtualLiquidHandler) Finalize() driver.CommandStatus {
     self.LogLine("Finalize()")
     //check that this is called last, no more calls
     if self.finalized {
-        self.AddWarningf("Multiple calls to Finalize")
+        self.AddWarningf("Finalize", "Multiple calls to Finalize")
     } else {
         self.finalized = true
     }
@@ -512,11 +512,11 @@ func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{},
     name = %v)`, position, plate, name))
     //check that the requested position exists
     if !self.locationIsKnown(position) {
-        self.AddWarningf("Adding plate \"%s\" to unknown location \"%s\"", name, position)
+        self.AddWarningf("AddPlateTo", "Adding plate \"%s\" to unknown location \"%s\"", name, position)
     }
     //check that the requested position is empty
     if self.properties.PosLookup[position] != "" {
-        self.AddErrorf("Adding plate \"%s\" to \"%s\" which is already occupied by plate \"%s\"", 
+        self.AddErrorf("AddPlateTo", "Cannot add plate \"%s\" to location \"%s\" which is already occupied by plate \"%s\"", 
                 name, 
                 position, 
                 self.properties.PlateLookup[self.properties.PosLookup[position]].(wtype.Named).GetName())
@@ -534,7 +534,7 @@ func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{},
             self.properties.AddTipWasteTo(position, plate)
 
         default:
-            self.AddErrorf("AddPlate: Cannot add plate \"%s\" of type %T to location \"%s\"", name, plate, position)
+            self.AddErrorf("AddPlateTo", "Cannot add plate \"%s\" of type %T to location \"%s\"", name, plate, position)
         }
     }
     return driver.CommandStatus{true, driver.OK, "ADDPLATETO ACK"}
