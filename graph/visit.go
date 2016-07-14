@@ -26,7 +26,7 @@ func (a dists) Len() int {
 	return len(a)
 }
 
-func (a dists) Range() (ret []Node) {
+func (a dists) Values() (ret []Node) {
 	for k := range a {
 		ret = append(ret, k)
 	}

@@ -14,7 +14,7 @@ type LessThan func(Node, Node) bool
 
 type NodeSet interface {
 	Has(Node) bool
-	Range() []Node
+	Values() []Node
 	Len() int
 }
 
@@ -28,7 +28,7 @@ func (a nodeSet) Len() int {
 	return len(a)
 }
 
-func (a nodeSet) Range() (ret []Node) {
+func (a nodeSet) Values() (ret []Node) {
 	for k := range a {
 		ret = append(ret, k)
 	}

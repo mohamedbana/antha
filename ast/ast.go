@@ -266,7 +266,7 @@ func ToGraph(opt ToGraphOpt) *Graph {
 			},
 		})
 
-		for _, k := range results.Seen.Range() {
+		for _, k := range results.Seen.Values() {
 			if seen[k] {
 				continue
 			}
