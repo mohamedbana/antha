@@ -42,40 +42,22 @@ func summariseWell2Channel(well []string, channels []int) string {
 
 // Simulate a liquid handler Driver
 type VirtualLiquidHandler struct {
+    simulator.ErrorReporter
     properties *liquidhandling.LHProperties 
     initialized bool
     finalized   bool
-    //Need to store:
-    // LHProperties
-    // plate(s) at each layout position
-    //   contents of each well of each plate / tip box
-    //     liquid type / tip type
-    // contents of each loaded tip
-    //   liquid type
-    // tips on each adaptor
-    //   LHAdapter know how many tips it has, and what type they are (assumed equal)
-    //   but it can't tell which position they're on
-    //   tip properties
-    // adaptors on each head
-    //   Adapeter properties
-    // head location
-    //   Head properties
-    errors      []*simulator.SimulationError
-    max_error   simulator.ErrorSeverity
-    worst_error *simulator.SimulationError
     log []string
 }
 
 //Create a new VirtualLiquidHandler which mimics an LHDriver
 func NewVirtualLiquidHandler(props *liquidhandling.LHProperties) *VirtualLiquidHandler {
     var vlh VirtualLiquidHandler
+    vlh.ErrorReporter = *simulator.NewErrorReporter()
     vlh.initialized = false
     vlh.finalized   = false
 
     vlh.properties = props.Dup()
     vlh.log = make([]string, 0)
-    vlh.errors = make([]*simulator.SimulationError, 0)
-    vlh.worst_error = nil
 
     vlh.validateProperties()
 
@@ -92,53 +74,18 @@ func (self *VirtualLiquidHandler) SaveLog(filename string) {
     ioutil.WriteFile(filename, []byte(strings.Join(self.log, "\n")), 0644)
 }
 
-//Get the list of errors, and the maximum error severity
-func (self *VirtualLiquidHandler) GetErrors() ([]*simulator.SimulationError, simulator.ErrorSeverity) {
-    return self.errors, self.GetErrorSeverity()
-}
-
-//AddError Add an error
-func (self *VirtualLiquidHandler) AddError(err *simulator.SimulationError) {
-    if err.Severity() > self.GetErrorSeverity() {
-        self.worst_error = err
-    }
-    self.errors = append(self.errors, err)
-}
-
-//GetErrorSeverity get the severity of the worst error encountered so far
-func (self *VirtualLiquidHandler) GetErrorSeverity() simulator.ErrorSeverity {
-    if self.worst_error != nil {
-        return self.worst_error.Severity()
-    }
-    return simulator.SeverityNone
-}
-
-//IsError return true iff an error has been raised with SeverityError
-func (self *VirtualLiquidHandler) IsError() bool {
-    return self.GetErrorSeverity() == simulator.SeverityError
-}
-
-//GetWorstError get the worst error encountered so far
-func (self *VirtualLiquidHandler) GetWorstError() *simulator.SimulationError {
-    return self.worst_error
-}
-
 func (self *VirtualLiquidHandler) validateProperties() {
     
     //check a property
     check_prop := func(l []string, name string) {
         //is empty
         if len(l) == 0 {
-            self.AddError(simulator.NewSimulationError(simulator.SeverityWarning, 
-                                                       fmt.Sprintf("No %s specified", name),
-                                                       nil))
+            self.AddWarningf("No %s specified", name)
         }
         //all locations defined
         for _,loc := range l {
             if !self.locationIsKnown(loc) {
-                self.AddError(simulator.NewSimulationError(simulator.SeverityWarning, 
-                        fmt.Sprintf("Undefined location \"%s\" referenced in %s", loc, name),
-                                                           nil))
+                self.AddWarningf("Undefined location \"%s\" referenced in %s", loc, name)
             }
         }
     }
@@ -162,14 +109,10 @@ func (self *VirtualLiquidHandler) locationIsKnown(location string) bool {
 
 func (self *VirtualLiquidHandler) checkReady(fnName string) {
     if !self.initialized {
-        self.AddError(simulator.NewSimulationError(simulator.SeverityWarning,
-            fmt.Sprintf("Instruction \"%s\" before Initialize", fnName),
-            nil))
+        self.AddWarningf("Instruction \"%s\" before Initialize", fnName)
     }
     if self.finalized {
-        self.AddError(simulator.NewSimulationError(simulator.SeverityWarning,
-            fmt.Sprintf("Instruction \"%s\" after Finalize", fnName),
-            nil))
+        self.AddWarningf("Instruction \"%s\" after Finalize", fnName)
     }
 }
 
@@ -284,18 +227,15 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
         wrong_length = append(wrong_length, "well")
     }
     if len(wrong_length) > 0 {
-        self.AddError(simulator.NewSimulationError(simulator.SeverityError,
-            fmt.Sprintf("LoadTips: %s should be of length multi=%v",
+        self.AddErrorf("LoadTips: %s should be of length multi=%v",
                 strings.Join(wrong_length, ", "),
-                multi), nil))
+                multi)
         return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
     }
 
     //check head exists
     if head < 0 || head >= len(self.properties.Heads) {
-        self.AddError(simulator.NewSimulationError(simulator.SeverityError,
-            fmt.Sprintf("LoadTips: request for invalid Head %v", head), 
-            nil))
+        self.AddErrorf("LoadTips: request for invalid Head %v", head)
         return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
     }
 
@@ -307,10 +247,8 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
         if adaptor.Ntipsloaded > 1 {
             stip = "tips"
         }
-        self.AddError(simulator.NewSimulationError(simulator.SeverityError,
-            fmt.Sprintf("LoadTips: Cannot load tips while adaptor already contains %v %s", 
-                adaptor.Ntipsloaded, stip), 
-            nil))
+        self.AddErrorf("LoadTips: Cannot load tips while adaptor already contains %v %s", 
+                adaptor.Ntipsloaded, stip)
         return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
     }
 
@@ -318,15 +256,12 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
     encountered := map[int]bool{}
     for _, channel := range channels {
         if channel < 0 || channel >= adaptor.Params.Multi {
-            self.AddError(simulator.NewSimulationError(simulator.SeverityError, 
-                fmt.Sprintf("Cannot load tip to channel %v of %v-channel adaptor", 
-                            channel, adaptor.Params.Multi), nil))
+            self.AddErrorf("Cannot load tip to channel %v of %v-channel adaptor", 
+                            channel, adaptor.Params.Multi)
             return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
         }
         if encountered[channel] {
-            self.AddError(simulator.NewSimulationError(simulator.SeverityError,
-                fmt.Sprintf("LoadTips: Channel%v appears more than once", channel),
-                nil))
+            self.AddErrorf("LoadTips: Channel%v appears more than once", channel)
             return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
         } else {
             encountered[channel] = true
@@ -341,15 +276,11 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
         positions_equal = positions_equal && (pos == tipbox_pos)
     }
     if !positions_equal {
-        self.AddError(simulator.NewSimulationError(simulator.SeverityError, 
-            "LoadTips: Cannot load tips from multiple locations", 
-            nil))
+        self.AddError("LoadTips: Cannot load tips from multiple locations")
     }
     tipbox, ok := self.properties.PlateLookup[self.properties.PosLookup[tipbox_pos]].(*wtype.LHTipbox)
     if !ok {
-        self.AddError(simulator.NewSimulationError(simulator.SeverityError,
-            fmt.Sprintf("LoadTips: location \"%s\" doesn't contain a tipbox", tipbox_pos),
-            nil))
+        self.AddErrorf("LoadTips: location \"%s\" doesn't contain a tipbox", tipbox_pos)
         return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
     }
     
@@ -361,14 +292,10 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
         ptype_equal = ptype_equal && (ptype == p)
     }
     if !ptype_equal {
-        self.AddError(simulator.NewSimulationError(simulator.SeverityWarning,
-            "LoadTips: platetype should all be the same",
-            nil))
+        self.AddError("LoadTips: platetype should all be the same")
     }
     if ptype != tipbox.Type {
-        self.AddError(simulator.NewSimulationError(simulator.SeverityWarning,
-            fmt.Sprintf("LoadTips: Requested plate type \"%s\" but plate at %s is of type \"%s\"", ptype, tipbox_pos, tipbox.Type),
-            nil))
+        self.AddErrorf("LoadTips: Requested plate type \"%s\" but plate at %s is of type \"%s\"", ptype, tipbox_pos, tipbox.Type)
     }
 
     //check that well is valid
@@ -378,15 +305,11 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
         
         //check range
         if wellcoords[i].IsZero() {
-            self.AddError(simulator.NewSimulationError(simulator.SeverityError,
-                fmt.Sprintf("LoadTips: Couldn't parse well \"%s\"", well[i]),
-                nil))
+            self.AddErrorf("LoadTips: Couldn't parse well \"%s\"", well[i])
             continue
         }
         if !tipbox.ContainsCoords(&wellcoords[i]) {
-            self.AddError(simulator.NewSimulationError(simulator.SeverityError,
-                fmt.Sprintf("LoadTips: Request for well %s, but tipbox size is [%vx%v]", well[i], tipbox.Ncols, tipbox.Nrows),
-                nil))
+            self.AddErrorf("LoadTips: Request for well %s, but tipbox size is [%vx%v]", well[i], tipbox.Ncols, tipbox.Nrows)
             continue
         }
     }
@@ -407,10 +330,8 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
         origins_equal = origins_equal && head_origin.Equals(o)
     }
     if !origins_equal {
-        self.AddError(simulator.NewSimulationError(simulator.SeverityError,
-            fmt.Sprintf("LoadTips: Cannot load %s, tip spacing doesn't match channel spacing",
-                summariseWell2Channel(well, channels)),
-            nil))
+        self.AddErrorf("LoadTips: Cannot load %s, tip spacing doesn't match channel spacing",
+                summariseWell2Channel(well, channels))
         return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
     }
 
@@ -435,16 +356,14 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
             if len(collisions) > 1 {
                 stip = "tips"
             }
-            self.AddError(simulator.NewSimulationError(simulator.SeverityError,
-                fmt.Sprintf("LoadTips: Cannot load %s due to %s at %s (Head%v is not independent)",
-                    summariseWell2Channel(well, channels), stip, strings.Join(collisions, ","), head),
-                nil))
+            self.AddErrorf("LoadTips: Cannot load %s due to %s at %s (Head%v is not independent)",
+                    summariseWell2Channel(well, channels), stip, strings.Join(collisions, ","), head)
         }
     }
 
 
     //if we found an error, bail on the operation
-    if self.IsError() {
+    if self.HasError() {
         return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
     }
     
@@ -454,9 +373,7 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
         
         tip = tipbox.Tips[wellcoords[i].X][wellcoords[i].Y]
         if tip == nil {
-            self.AddError(simulator.NewSimulationError(simulator.SeverityError,
-                fmt.Sprintf("LoadTips: Cannot load %s->channel%v as %s is empty", well[i], channels[i], well[i]),
-                nil))
+            self.AddErrorf("LoadTips: Cannot load %s->channel%v as %s is empty", well[i], channels[i], well[i])
             continue
         }
         tipbox.Tips[wellcoords[i].X][wellcoords[i].Y] = nil
@@ -527,9 +444,7 @@ func (self *VirtualLiquidHandler) Go() driver.CommandStatus {
 func (self *VirtualLiquidHandler) Initialize() driver.CommandStatus {
     self.LogLine("Initialize()")
     if self.initialized {
-        self.AddError(simulator.NewSimulationError(simulator.SeverityWarning,
-            fmt.Sprintf("Second call to Initialize"),
-            nil))
+        self.AddWarningf("Multiple calls to Initialize")
     } else {
         self.initialized = true
     }
@@ -541,9 +456,7 @@ func (self *VirtualLiquidHandler) Finalize() driver.CommandStatus {
     self.LogLine("Finalize()")
     //check that this is called last, no more calls
     if self.finalized {
-        self.AddError(simulator.NewSimulationError(simulator.SeverityWarning,
-            fmt.Sprintf("Second call to Finalize"),
-            nil))
+        self.AddWarningf("Multiple calls to Finalize")
     } else {
         self.finalized = true
     }
@@ -599,16 +512,14 @@ func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{},
     name = %v)`, position, plate, name))
     //check that the requested position exists
     if !self.locationIsKnown(position) {
-        self.AddError(simulator.NewSimulationError(simulator.SeverityWarning,
-            fmt.Sprintf("Adding plate \"%s\" to unknown location \"%s\"", name, position),
-            nil))
+        self.AddWarningf("Adding plate \"%s\" to unknown location \"%s\"", name, position)
     }
     //check that the requested position is empty
     if self.properties.PosLookup[position] != "" {
-        self.AddError(simulator.NewSimulationError(simulator.SeverityError,
-            fmt.Sprintf("Adding plate \"%s\" to \"%s\" which is already occupied by plate \"%s\"", 
-                name, position, self.properties.PlateLookup[self.properties.PosLookup[position]].(wtype.Named).GetName()),
-            nil))
+        self.AddErrorf("Adding plate \"%s\" to \"%s\" which is already occupied by plate \"%s\"", 
+                name, 
+                position, 
+                self.properties.PlateLookup[self.properties.PosLookup[position]].(wtype.Named).GetName())
     } else {
         //position can accept a plate of this type
         switch plate := plate.(type) {
@@ -623,9 +534,7 @@ func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{},
             self.properties.AddTipWasteTo(position, plate)
 
         default:
-            self.AddError(simulator.NewSimulationError(simulator.SeverityWarning,
-                fmt.Sprintf("unknown plate of type %T while adding \"%s\" to location \"%s\"", plate, name, position),
-                nil))
+            self.AddErrorf("AddPlate: Cannot add plate \"%s\" of type %T to location \"%s\"", name, plate, position)
         }
     }
     return driver.CommandStatus{true, driver.OK, "ADDPLATETO ACK"}

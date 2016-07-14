@@ -362,6 +362,13 @@ type LHPropertyTest struct {
     ErrorStrings    []string
 }
 
+func (pt *LHPropertyTest) apply(t *testing.T) {
+    vlh := NewVirtualLiquidHandler(makeLHProperties(pt.Properties))
+    errors := vlh.GetErrors()
+    test_worst(t, errors, vlh.GetErrorSeverity())
+    compare_errors(t, pt.desc, pt.ErrorStrings, errors)
+}
+
 func get_unknown_locations() []LHPropertyTest {
     ret := make([]LHPropertyTest, 0)
 
@@ -571,14 +578,6 @@ func test_worst(t *testing.T, errors []*simulator.SimulationError, worst simulat
 }
 
 
-func run_prop_test(t *testing.T, pt LHPropertyTest) {
-    vlh := NewVirtualLiquidHandler(makeLHProperties(pt.Properties))
-    errors, worst := vlh.GetErrors()
-    test_worst(t, errors, worst)
-
-
-    compare_errors(t, pt.desc, pt.ErrorStrings, errors)
-}
 
 //return subset of a not in b
 func get_not_in(a, b []string) []string {
@@ -605,7 +604,7 @@ func compare_errors(t *testing.T, desc string, expected []string, actual []*simu
     missing := get_not_in(expected, string_errors)
     extra := get_not_in(string_errors, expected)
 
-    err_string := fmt.Sprintf("Errors didn't match while %v:\n", desc)
+    err_string := fmt.Sprintf("Errors didn't match in test \"%v\":\n", desc)
     for _,s := range missing {
         err_string += fmt.Sprintf("\t\t--\"%v\"\n", s)
     }
@@ -626,25 +625,20 @@ func TestNewVirtualLiquidHandler_ValidProps(t *testing.T) {
     lhp := makeLHProperties(get_valid_props())
     vlh := NewVirtualLiquidHandler(lhp)
 
-    errors, max_severity := vlh.GetErrors()
-    if len(errors) > 0 {
-        t.Error("Unexpected Error: %v", errors)
-    } else if max_severity != simulator.SeverityNone {
-        t.Error("Severty should be SeverityNone, instead got: %v", max_severity)
-    }
+    compare_errors(t, "NewVLH with valid props", []string{}, vlh.GetErrors())
 }
 
 func TestNewVirtualLiquidHandler_UnknownLocation(t *testing.T) {
     tests := get_unknown_locations()
     for _,test := range tests {
-        run_prop_test(t, test)
+        test.apply(t)
     }
 }
 
 func TestNewVirtualLiquidHandler_MissingPrefs(t *testing.T) {
     tests := get_missing_prefs()
     for _,test := range tests {
-        run_prop_test(t, test)
+        test.apply(t)
     }
 }
 
@@ -663,8 +657,7 @@ func TestVLH_AddPlateTo_Valid(t *testing.T) {
         vlh.AddPlateTo(loc, get_lhtipwaste(), fmt.Sprintf("LHTipwaste_%v", i))
     }
 
-    errors, _ := vlh.GetErrors()
-    compare_errors(t, "adding valid plates", []string{}, errors)
+    compare_errors(t, "adding valid plates", []string{}, vlh.GetErrors())
 }
 
 func TestVLH_AddPlateTo_NotPlateType(t *testing.T) {
@@ -672,9 +665,9 @@ func TestVLH_AddPlateTo_NotPlateType(t *testing.T) {
     //try adding something that's the wrong type
     vlh.AddPlateTo("position2", "my plate's gone stringy", "not_a_plate")
 
-    errors, _ := vlh.GetErrors()
     compare_errors(t, "adding string plate", 
-        []string{"(warn) unknown plate of type string while adding \"not_a_plate\" to location \"position2\""}, errors)
+        []string{"(err) AddPlate: Cannot add plate \"not_a_plate\" of type string to location \"position2\""},
+        vlh.GetErrors())
 }
 
 func TestVLH_AddPlateTo_locationFull(t *testing.T) {
@@ -685,9 +678,9 @@ func TestVLH_AddPlateTo_locationFull(t *testing.T) {
     //try to add another plate in the same location
     vlh.AddPlateTo("position1", get_lhplate(), "p1")
 
-    errors, _ := vlh.GetErrors()
     compare_errors(t, "adding plate to full location", 
-    []string{"(err) Adding plate \"p1\" to \"position1\" which is already occupied by plate \"p0\""}, errors)
+        []string{"(err) Adding plate \"p1\" to \"position1\" which is already occupied by plate \"p0\""},
+        vlh.GetErrors())
 }
 
 // ########################################################################################################################
@@ -967,8 +960,7 @@ func Test_LoadTips_OK(t *testing.T) {
 
 
         //check that there are no errors/warnings in the vlh
-        errors, _ := vlh.GetErrors()
-        compare_errors(t, test.desc, []string{}, errors)
+        compare_errors(t, test.desc, []string{}, vlh.GetErrors())
     }
 
 }
@@ -985,8 +977,7 @@ func (p *LoadTipsErrorParams) apply(t *testing.T, vlh *VirtualLiquidHandler) {
         (*p.setup)(vlh)
     }
     p.params.apply(vlh)
-    errors, _ := vlh.GetErrors()
-    compare_errors(t, p.desc, p.errors, errors)
+    compare_errors(t, p.desc, p.errors, vlh.GetErrors())
 }
 
 func Test_LoadTips_Errors(t *testing.T) {
@@ -1127,7 +1118,7 @@ func Test_LoadTips_Errors(t *testing.T) {
                 []string{"G12", "H12"},            //well
             },
             nil,                            //setup
-            []string{"(warn) LoadTips: platetype should all be the same"},
+            []string{"(err) LoadTips: platetype should all be the same"},
         },
         LoadTipsErrorParams{
             "wrong platetype",
