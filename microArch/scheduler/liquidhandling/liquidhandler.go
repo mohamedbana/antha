@@ -145,7 +145,7 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 
 	for _, ins := range instructions {
 		//logger.Debug(fmt.Sprintln(liquidhandling.InsToString(ins)))
-		fmt.Println(liquidhandling.InsToString(ins))
+		//fmt.Println(liquidhandling.InsToString(ins))
 		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(this.Properties.Driver)
 
 		if timer != nil {
@@ -489,8 +489,8 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) (*LHRequest, error) {
 		if volb.GreaterThanFloat(0.0001) {
 			vmap3[k] = volb
 		}
-		volc := vmap[k]
-		logger.Debug(fmt.Sprint("COMPONENT ", k, " HAVE : ", vola.ToString(), " WANT: ", volc.ToString(), " DIFF: ", volb.ToString()))
+		//	volc := vmap[k]
+		//logger.Debug(fmt.Sprint("COMPONENT ", k, " HAVE : ", vola.ToString(), " WANT: ", volc.ToString(), " DIFF: ", volb.ToString()))
 	}
 
 	(*request).Input_vols_required = vmap

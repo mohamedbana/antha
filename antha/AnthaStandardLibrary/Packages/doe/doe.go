@@ -547,7 +547,7 @@ func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) 
 
 				descriptor = strings.Split(sheet.Cell(1, j).String(), ":")[1]
 				factrodescriptor := descriptor
-				fmt.Println(i, j, descriptor)
+				//fmt.Println(i, j, descriptor)
 
 				cell := sheet.Cell(i, j)
 
