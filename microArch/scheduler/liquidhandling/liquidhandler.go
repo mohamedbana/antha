@@ -145,6 +145,7 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 
 	for _, ins := range instructions {
 		//logger.Debug(fmt.Sprintln(liquidhandling.InsToString(ins)))
+		fmt.Println(liquidhandling.InsToString(ins))
 		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(this.Properties.Driver)
 
 		if timer != nil {
@@ -363,7 +364,6 @@ func (this *Liquidhandler) Plan(request *LHRequest) error {
 		return err
 	}
 	// fix the deck setup
-
 	request, err = this.Tip_box_setup(request)
 	if err != nil {
 		return err
