@@ -307,14 +307,14 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
     }
 
     //check that the adapter is empty
-    if adaptor.Ntipsloaded != 0 {
+    if adaptor.NTipsLoaded() != 0 {
         //because not having a ternary operator is so cool.
         stip := "tip"
-        if adaptor.Ntipsloaded > 1 {
+        if adaptor.NTipsLoaded() > 1 {
             stip = "tips"
         }
         self.AddErrorf("LoadTips", "Cannot load tips while adaptor already contains %v %s", 
-                adaptor.Ntipsloaded, stip)
+                adaptor.NTipsLoaded(), stip)
         return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
     }
 
@@ -404,8 +404,8 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
         }
         tipbox.Tips[wellcoords[i].X][wellcoords[i].Y] = nil
         //TODO: add the tip to the particular location in the adaptor
+        adaptor.AddTip(channels[i], tip)
     }
-    adaptor.LoadTips(multi, tip)
 
     return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
 }
@@ -450,7 +450,7 @@ func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
     }
 
     //if not independent, check we're unloading all tips
-    if !adaptor.Params.Independent && len(channels) < adaptor.Ntipsloaded {
+    if !adaptor.Params.Independent && len(channels) < adaptor.NTipsLoaded() {
         channel_str := "channel"
         if len(channels) > 1 {
             channel_str = "channels"
@@ -468,21 +468,21 @@ func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
 
     //check there's a tip at every channel
     //TODO:
-    if len(channels) > adaptor.Ntipsloaded {
-        if adaptor.Ntipsloaded == 0 {
+    if len(channels) > adaptor.NTipsLoaded() {
+        if adaptor.NTipsLoaded() == 0 {
             self.AddErrorf("UnloadTips", "Cannot unload %v tips as no tips are loaded", len(channels))
-        } else if adaptor.Ntipsloaded == 1 {
+        } else if adaptor.NTipsLoaded() == 1 {
             self.AddErrorf("UnloadTips", "Cannot unload %v tips as adaptor only has one tip loaded", len(channels))
         } else {
-            self.AddErrorf("UnloadTips", "Cannot unload %v tips as adaptor only has %v tips loaded", len(channels), adaptor.Ntipsloaded)
+            self.AddErrorf("UnloadTips", "Cannot unload %v tips as adaptor only has %v tips loaded", len(channels), adaptor.NTipsLoaded())
         }
         return ret
     }
 
-
     //Actually unload the adaptor
-    //TODO: remove each specific tip
-    adaptor.Ntipsloaded -= len(channels)
+    for _,ch := range channels {
+        adaptor.RemoveTip(ch)
+    }
     tipwaste.Contents += len(channels)
 
     return ret
