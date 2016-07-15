@@ -277,7 +277,7 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 		Dev:             a,
 		Request:         r.LHRequest,
 		Properties:      a.properties,
-		Finalproperties: a.finalproperties,
+		FinalProperties: a.finalproperties,
 		Files: target.Files{
 			Tarball: tarball,
 			Type:    ftype,

@@ -101,7 +101,7 @@ type Mix struct {
 	Depends         []Inst
 	Request         *lh.LHRequest
 	Properties      liquidhandling.LHProperties
-	Finalproperties liquidhandling.LHProperties
+	FinalProperties liquidhandling.LHProperties
 	Files           Files
 }
 
