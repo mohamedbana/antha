@@ -136,7 +136,7 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 
 	// pcr plate with cooler
 	cone := wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
-	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 250, 5, cone, wtype.LHWBU, 5.5, 5.5, 20.4, 1.4, "mm")
+	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 200, 5, cone, wtype.LHWBU, 5.5, 5.5, 20.4, 1.4, "mm")
 	//plate = wtype.NewLHPlate("pcrplate", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, 6.5)
 	//plates[plate.Type] = plate
 	plate = wtype.NewLHPlate("pcrplate_with_cooler", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, coolerheight+0.5)
@@ -437,7 +437,7 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	plates[plate.Type] = plate
 
 	// 2nd type
-	plate = wtype.NewLHPlate("EGEL96_2", "Invitrogen", 4, 13, 48.5, "mm", welltype, 9, 18.0, 4.0, 7.5, riserheightinmm+5.5)
+	plate = wtype.NewLHPlate("EGEL96_2", "Invitrogen", 4, 13, 48.5, "mm", welltype, 9, 18.0, 4.0, 8, riserheightinmm+5.5)
 	//plate = wtype.NewLHPlate("greiner384", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 
 	consar = []string{"position_9"}
