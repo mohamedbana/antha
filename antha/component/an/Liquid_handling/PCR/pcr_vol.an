@@ -141,7 +141,7 @@ Steps {
 	var mastermix *wtype.LHComponent
 	for j := range samples { 
 	if j == 0  {
-	mastermix = MixInto(OutPlate, "", samples[j])
+	mastermix = MixInto(OutPlate, WellPosition, samples[j])
 	}else{
 	mastermix = Mix(mastermix, samples[j])
 	}

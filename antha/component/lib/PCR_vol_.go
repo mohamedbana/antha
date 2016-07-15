@@ -107,7 +107,7 @@ func _PCR_volSteps(_ctx context.Context, _input *PCR_volInput, _output *PCR_volO
 	var mastermix *wtype.LHComponent
 	for j := range samples {
 		if j == 0 {
-			mastermix = execute.MixInto(_ctx, _input.OutPlate, "", samples[j])
+			mastermix = execute.MixInto(_ctx, _input.OutPlate, _input.WellPosition, samples[j])
 		} else {
 			mastermix = execute.Mix(_ctx, mastermix, samples[j])
 		}

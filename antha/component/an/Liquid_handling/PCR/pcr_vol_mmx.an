@@ -98,7 +98,7 @@ Steps {
 	
 	
 	// pipette out to make mastermix
-	mastermix := MixInto(OutPlate, "", mmxSample)
+	mastermix := MixInto(OutPlate, WellPosition, mmxSample)
 	
 	// rest samples to zero
 	samples := make([]*wtype.LHComponent, 0)

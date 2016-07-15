@@ -70,7 +70,7 @@ func _PCR_vol_mmxSteps(_ctx context.Context, _input *PCR_vol_mmxInput, _output *
 	mmxSample := mixer.Sample(_input.MasterMix, _input.MasterMixVolume)
 
 	// pipette out to make mastermix
-	mastermix := execute.MixInto(_ctx, _input.OutPlate, "", mmxSample)
+	mastermix := execute.MixInto(_ctx, _input.OutPlate, _input.WellPosition, mmxSample)
 
 	// rest samples to zero
 	samples := make([]*wtype.LHComponent, 0)

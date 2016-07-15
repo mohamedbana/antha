@@ -1,5 +1,11 @@
 {
 
+	    "Config": {
+	           "inputPlateType": [
+	               "pcrplate_with_cooler"
+	           ]
+	       },
+
     "Parameters": {
         "GradientPCR": {
             "Projectname": "gradientPCRlividans",
@@ -51,7 +57,7 @@
             "FwdPrimertype": "PrimerFw",
             "RevPrimertype": "PrimerRev",
             "Templatetype": "dna_part",
-			"Plate": "pcrplate_with_cooler"
+			"Plate": "pcrplate_skirted_riser"
         }
     }
 }

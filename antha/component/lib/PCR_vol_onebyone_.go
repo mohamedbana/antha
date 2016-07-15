@@ -104,7 +104,7 @@ func _PCR_vol_onebyoneSteps(_ctx context.Context, _input *PCR_vol_onebyoneInput,
 	}
 
 	// pipette out to make mastermix
-	mastermix := execute.MixInto(_ctx, _input.OutPlate, "", samples...)
+	mastermix := execute.MixInto(_ctx, _input.OutPlate, _input.WellPosition, samples...)
 
 	// rest samples to zero
 	samples = make([]*wtype.LHComponent, 0)

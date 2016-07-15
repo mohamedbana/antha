@@ -1,4 +1,4 @@
-// The lowest level example protocol showing The MixTo command being used to specify the specific wells to be aliquoted to;
+// Extra fields to Pre mix, and start at specific columns or rows. The lowest level example protocol showing The MixTo command being used to specify the specific wells to be aliquoted to;
 // By doing this we are able to specify whether the aliqouts are pipetted by row or by column.
 // In this case the user is still not specifying the well location (i.e. A1) in the parameters, although that would be possible to specify.
 // We don't generally encourage this since Antha is designed to be prodiminantly a high level language which avoids the user specifying well locations but this possibility is there if necessary.
@@ -209,7 +209,7 @@ func init() {
 	if err := addComponent(Component{Name: "AliquotStartatRowColumn",
 		Constructor: AliquotStartatRowColumnNew,
 		Desc: ComponentDesc{
-			Desc: "The lowest level example protocol showing The MixTo command being used to specify the specific wells to be aliquoted to;\nBy doing this we are able to specify whether the aliqouts are pipetted by row or by column.\nIn this case the user is still not specifying the well location (i.e. A1) in the parameters, although that would be possible to specify.\nWe don't generally encourage this since Antha is designed to be prodiminantly a high level language which avoids the user specifying well locations but this possibility is there if necessary.\n",
+			Desc: "Extra fields to Pre mix, and start at specific columns or rows. The lowest level example protocol showing The MixTo command being used to specify the specific wells to be aliquoted to;\nBy doing this we are able to specify whether the aliqouts are pipetted by row or by column.\nIn this case the user is still not specifying the well location (i.e. A1) in the parameters, although that would be possible to specify.\nWe don't generally encourage this since Antha is designed to be prodiminantly a high level language which avoids the user specifying well locations but this possibility is there if necessary.\n",
 			Path: "antha/component/an/AnthaAcademy/Lesson2_mix/F_AliquotSolutions_wellpositions.an",
 			Params: []ParamDesc{
 				{Name: "ByRow", Desc: "", Kind: "Parameters"},
