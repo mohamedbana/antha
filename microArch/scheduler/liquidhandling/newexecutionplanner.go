@@ -24,23 +24,32 @@ package liquidhandling
 
 import (
 	"fmt"
-
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
+	"time"
 )
 
 // robot here should be a copy... this routine will be destructive of state
 func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProperties) (*LHRequest, error) {
+	// get timer to assess evaporation etc.
+
+	timer := robot.GetTimer()
+
 	// 1 -- generate high level instructions
 	// also work out which ones can be aggregated
 	agg := make(map[string][]int)
 	transfers := make([]liquidhandling.RobotInstruction, 0, len(request.LHInstructions))
 	for ix, insID := range request.Output_order {
 		//	request.InstructionSet.Add(ConvertInstruction(request.LHInstructions[insID], robot))
+
+		ris := liquidhandling.NewRobotInstructionSet(nil)
+
 		transIns, err := ConvertInstruction(request.LHInstructions[insID], robot, request.CarryVolume)
 
 		if err != nil {
 			return request, err
 		}
+
+		ris.Add(transIns)
 
 		transfers = append(transfers, transIns)
 		cmp := fmt.Sprintf("%s_%s", request.LHInstructions[insID].ComponentsMoving(), request.LHInstructions[insID].Generation())
@@ -52,6 +61,21 @@ func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProper
 
 		ar = append(ar, ix)
 		agg[cmp] = ar
+
+		// now assuming we don't change instruction order below (Safe?)
+		// we should be able to model evaporation here
+
+		instrx, _ := ris.Generate(request.Policies, robot)
+
+		var totaltime time.Duration
+		for _, instr := range instrx {
+			totaltime += timer.TimeFor(instr)
+		}
+
+		// evaporate stuff
+
+		robot.Evaporate(totaltime)
+
 	}
 
 	// sort the above out

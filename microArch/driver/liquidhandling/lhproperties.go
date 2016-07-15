@@ -24,15 +24,15 @@ package liquidhandling
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
-
 	"github.com/antha-lang/antha/antha/anthalib/material"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
 	"github.com/antha-lang/antha/microArch/sampletracker"
+	"strconv"
+	"strings"
+	"time"
 )
 
 // describes a liquid handler, its capabilities and current state
@@ -799,7 +799,7 @@ func (lhp *LHProperties) GetEnvironment() wtype.Environment {
 	}
 }
 
-func (lhp *LHProperties) Evaporate(t wunit.Time) {
+func (lhp *LHProperties) Evaporate(t time.Duration) {
 	// TODO: proper environmental calls
 	env := lhp.GetEnvironment()
 	for _, v := range lhp.Plates {

@@ -25,8 +25,10 @@ package wtype
 
 import (
 	"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/eng"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/logger"
+	"time"
 )
 
 const (
@@ -264,6 +266,15 @@ func (lhw *LHWell) CalculateMaxCrossSectionArea() (ca wunit.Area, err error) {
 	return
 }
 
+func (lhw *LHWell) AreaForVolume() wunit.Area {
+
+	return wunit.NewArea(0.0, "m^2")
+}
+
+func (lhw *LHWell) HeightForVolume() wunit.Length {
+	return wunit.NewLength(0.0, "m")
+}
+
 func (lhw *LHWell) CalculateMaxVolume() (vol wunit.Volume, err error) {
 
 	if lhw.Bottom == 0 { // flat
@@ -454,9 +465,18 @@ func (well *LHWell) IsAutoallocated() bool {
 	return false
 }
 
-func (well *LHWell) Evaporate(t wunit.Time, humidity float64, temp wunit.Temperature, pressure wunit.Pressure) wunit.Volume {
-	// given the parameters, how much volume goes away?
-	// this is destructive as usual, returns amount of volume lost
+func (well *LHWell) Evaporate(time time.Duration, env Environment) {
+	// don't let this happen
+	if well == nil {
+		return
+	}
 
-	return wunit.NewVolume(0.0, "ul")
+	// we need to use the evaporation calculator
+	// we should likely decorate wells since we have different capabilities
+	// for different well types
+
+	vol := eng.EvaporationVolume(env.Temperature, "water", env.Humidity, time.Seconds(), env.MeanAirFlowVelocity, well.AreaForVolume(), env.Pressure)
+
+	// TODO... record evaporation
+	well.Remove(vol)
 }

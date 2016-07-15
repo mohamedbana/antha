@@ -26,12 +26,12 @@ package wtype
 import (
 	"encoding/csv"
 	"fmt"
-	"os"
-	"strconv"
-
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/microArch/logger"
+	"os"
+	"strconv"
+	"time"
 )
 
 // structure describing a microplate
@@ -444,4 +444,13 @@ func (p *LHPlate) IsConstrainedOn(platform string) ([]string, bool) {
 
 	return pos, false
 
+}
+
+func (p *LHPlate) Evaporate(time time.Duration, env Environment) {
+	if p == nil {
+		return
+	}
+	for _, w := range p.Wellcoords {
+		w.Evaporate(time, env)
+	}
 }

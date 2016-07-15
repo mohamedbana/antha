@@ -1,7 +1,7 @@
 package wtype
 
 import (
-	"wunit"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 )
 
 type Environment struct {

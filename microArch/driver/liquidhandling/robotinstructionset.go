@@ -83,10 +83,15 @@ func (ri *RobotInstructionSet) Generate(lhpr *LHPolicyRuleSet, lhpm *LHPropertie
 		fin := NewFinalizeInstruction()
 		newret = append(newret, fin)
 		ret = newret
-	} else if ri.parent.Type == TFR {
-		// update the vols
-		prms.Evaporate()
 	}
+
+	// might need to do this instead of current version
+	/*
+		else if ri.parent.Type == TFR {
+			// update the vols
+			prms.Evaporate()
+		}
+	*/
 
 	return ret, nil
 }

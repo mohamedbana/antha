@@ -24,7 +24,9 @@ package wunit
 
 import (
 	"fmt"
+	"github.com/antha-lang/antha/microArch/logger"
 	"strings"
+	"time"
 )
 
 // length
@@ -147,6 +149,22 @@ func NewTime(v float64, unit string) Time {
 
 func (t Time) Seconds() float64 {
 	return t.SIValue()
+}
+
+func (t Time) AsDuration() time.Duration {
+	// simply use the parser
+
+	d, e := time.ParseDuration(t.ToString())
+
+	if e != nil {
+		logger.Fatal(e.Error())
+	}
+
+	return d
+}
+
+func FromDuration(t time.Duration) Time {
+	return NewTime(float64(t.Seconds()), "s")
 }
 
 // mass
