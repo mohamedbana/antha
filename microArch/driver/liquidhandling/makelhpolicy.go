@@ -617,7 +617,7 @@ func MakeLoadWaterPolicy() LHPolicy {
 	loadpolicy["DSPSPEED"] = 0.1
 	loadpolicy["CAN_MULTI"] = false
 	loadpolicy["CAN_MSA"] = false
-	loadpolicy["CAN_SDD"] = false
+	//loadpolicy["CAN_SDD"] = false
 	loadpolicy["TOUCHOFF"] = false
 	loadpolicy["NO_AIR_DISPENSE"] = true
 	loadpolicy["TOUCHOFF"] = false
