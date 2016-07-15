@@ -1,0 +1,8 @@
+{
+    "connections": [],
+    "processes": {
+        "gelofgradientpcrstep": {
+            "component": "DNA_gel"
+        }
+    }
+}

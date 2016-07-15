@@ -1,0 +1,8 @@
+{
+    "connections": [],
+    "processes": {
+        "gelof1stpcrstep": {
+            "component": "DNA_gel"
+        }
+    }
+}
