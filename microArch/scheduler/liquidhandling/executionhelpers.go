@@ -307,6 +307,20 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties, 
 		pfwy[ix] = flhp.WellsY()
 		ptf[ix] = flhp.Type
 
+		if v.Loc == "" {
+			v.Loc = fromPlateID[ix] + ":" + fromWells[ix]
+		}
+		// add component to destination
+		// need to ensure data are consistent
+		vd := v.Dup()
+		vd.ID = wlf.WContents.ID
+		vd.ParentID = wlf.WContents.ParentID
+		wlt.Add(vd)
+
+		// add daughter ID to component in
+
+		wlf.WContents.AddDaughterComponent(wlt.WContents)
+
 		//fmt.Println("HERE GOES: ", i, wh[i], vf[i].ToString(), vt[i].ToString(), va[i].ToString(), pt[i], wt[i], pf[i], wf[i], pfwx[i], pfwy[i], ptwx[i], ptwy[i])
 
 		ix += 1

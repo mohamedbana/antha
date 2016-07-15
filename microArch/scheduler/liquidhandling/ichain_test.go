@@ -35,19 +35,20 @@ func TestIChain2(t *testing.T) {
 
 	cmps := make([]*wtype.LHComponent, 0, 1)
 
-	for i, k := range s {
+	for _, k := range s {
 
 		cmp := wtype.NewLHComponent()
 
 		cmp.ID = k
+		cmps = append(cmps, cmp)
+	}
+	for i, cmp := range cmps {
 		if i != 0 {
-			cmp.AddParent(s[i-1])
+			cmp.AddParentComponent(cmps[i-1])
 		}
 		if i != len(s)-1 {
-			cmp.AddDaughter(s[i+1])
+			cmp.AddDaughterComponent(cmps[i+1])
 		}
-
-		cmps = append(cmps, cmp)
 	}
 
 	for i, k := range cmps {
@@ -72,24 +73,25 @@ func TestIChain3(t *testing.T) {
 
 	cmps := make([]*wtype.LHComponent, 0, 1)
 
-	for i, k := range s {
+	for _, k := range s {
 
 		cmp := wtype.NewLHComponent()
 
 		cmp.ID = k
+		cmps = append(cmps, cmp)
+	}
+	for i, cmp := range cmps {
 		if i != 0 {
-			cmp.AddParent(s[i-1])
+			cmp.AddParentComponent(cmps[i-1])
 		}
 		if i != len(s)-1 {
-			cmp.AddDaughter(s[i+1])
+			cmp.AddDaughterComponent(cmps[i+1])
 		}
-
-		cmps = append(cmps, cmp)
 	}
 
 	cmp := wtype.NewLHComponent()
 	cmp.ID = "Z"
-	cmp.AddParent("C")
+	cmp.AddParentComponent(cmps[2])
 	cmps = append(cmps, cmp)
 
 	cmp = wtype.NewLHComponent()
