@@ -7,9 +7,10 @@ import (
 	graph "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/plot"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -53,7 +54,7 @@ func _Plotdata_spreadsheetSteps(_ctx context.Context, _input *Plotdata_spreadshe
 		fmt.Println(_input.Xminmax, Xdatarange)
 		panic(err)
 	}
-	fmt.Println(Xdatarange)
+	//	fmt.Println(Xdatarange)
 
 	Ydatarangearray := make([][]string, 0)
 	for i, Yminmax := range _input.Yminmaxarray {
@@ -66,7 +67,7 @@ func _Plotdata_spreadsheetSteps(_ctx context.Context, _input *Plotdata_spreadshe
 			panic(panicmessage.Error())
 		}
 		Ydatarangearray = append(Ydatarangearray, Ydatarange)
-		fmt.Println(Ydatarange)
+		//	fmt.Println(Ydatarange)
 	}
 
 	// now plot the graph
@@ -154,12 +155,12 @@ type Plotdata_spreadsheetSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Plotdata_spreadsheet",
+	if err := addComponent(component.Component{Name: "Plotdata_spreadsheet",
 		Constructor: Plotdata_spreadsheetNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/plotdata/Plotdata_fromxlsx.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Exportedfilename", Desc: "= \"Excelfile.jpg\"\n", Kind: "Parameters"},
 				{Name: "Filename", Desc: "                                                                        = \"plotinumdata.xlsx\"\n", Kind: "Parameters"},
 				{Name: "Sheet", Desc: "                                                                       = 0\n", Kind: "Parameters"},

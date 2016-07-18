@@ -9,9 +9,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -142,12 +143,12 @@ type SetupReactions_onebyoneSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "SetupReactions_onebyone",
+	if err := addComponent(component.Component{Name: "SetupReactions_onebyone",
 		Constructor: SetupReactions_onebyoneNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "this protocol will set up a specified number of reactions one reaction at a time, i.e. in the following format:\nadd all components into reaction 1 location,\nadd all components into reaction 2 location,\n...,\nadd all components into reaction n location\n",
 			Path: "antha/component/an/AnthaAcademy/Lesson3_MixPart2/B_Assaysetup_reactionbyreaction.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Buffer", Desc: "", Kind: "Inputs"},
 				{Name: "Enzyme", Desc: "", Kind: "Inputs"},
 				{Name: "EnzymeVolume", Desc: "", Kind: "Parameters"},

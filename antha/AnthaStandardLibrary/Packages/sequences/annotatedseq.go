@@ -24,7 +24,7 @@
 package sequences
 
 import (
-	"fmt"
+	//"fmt"
 	//. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"strconv"
 	"strings"
@@ -55,19 +55,19 @@ func MakeFeature(name string, seq string, sequencetype string, class string, rev
 
 	//features := make([]Feature,0)
 	//feature := Feature
-	//fmt.Println("len seq =", len(seq))
+	//// fmt.Println("len seq =", len(seq))
 	feature.Class = class
 	if sequencetype == "aa" {
 		feature.DNASeq = RevTranslatetoNstring(seq)
 		feature.Protseq = seq
 		feature.StartPosition = 1
 		feature.EndPosition = len(feature.DNASeq)
-		fmt.Println("len seq =", len(feature.DNASeq))
+		// fmt.Println("len seq =", len(feature.DNASeq))
 	} else {
 		feature.DNASeq = seq
 		feature.StartPosition = 1
 		feature.EndPosition = len(seq)
-		fmt.Println("len seq =", len(seq))
+		// fmt.Println("len seq =", len(seq))
 	}
 
 	if reverse == "Reverse" {
@@ -76,7 +76,7 @@ func MakeFeature(name string, seq string, sequencetype string, class string, rev
 	if feature.Class == "orf" {
 		orf, orftrue := FindORF(seq)
 		if orftrue == true {
-			fmt.Println("orftrue!)")
+			// fmt.Println("orftrue!)")
 			feature.Protseq = orf.ProtSeq
 			feature.StartPosition = orf.StartPosition
 			feature.EndPosition = orf.EndPosition

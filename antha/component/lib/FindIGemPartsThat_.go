@@ -12,9 +12,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"strconv"
 	"strings"
 )
@@ -30,6 +31,8 @@ import (
 
 // Data which is returned from this protocol, and data types
 
+//FulllistBackupParts []string
+//WorkingBackupParts []string
 // i.e. map[description]list of parts matching description
 // i.e. map[biobrickID]description
 
@@ -48,12 +51,13 @@ func _FindIGemPartsThatSteps(_ctx context.Context, _input *FindIGemPartsThatInpu
 	Parttypes := []string{_input.Parttype}
 
 	BackupParts := make([]string, 0)
-	_output.WorkingBackupParts = make([]string, 0)
+	WorkingBackupParts := make([]string, 0)
 
 	// initialise some variables for use later
 	parts := make([][]string, 0)
 	OriginalPartMap := make(map[string][]string)
 	_output.PartMap = make(map[string][]string)
+	parttypemap := make(map[string]string)
 	_output.BiobrickDescriptions = make(map[string]string)
 	subparts := make([]string, 0)
 	var highestrating int
@@ -67,7 +71,7 @@ func _FindIGemPartsThatSteps(_ctx context.Context, _input *FindIGemPartsThatInpu
 	// first we'll parse the igem registry based on the short description contained in the fasta header for each part sequence
 	for _, parttype := range Parttypes {
 
-		subparts = igem.FilterRegistry(parttype, []string{partstatus}, _input.ExactTypeOnly)
+		subparts, parttypemap = igem.FilterRegistry(parttype, []string{partstatus}, _input.ExactTypeOnly)
 		parts = append(parts, subparts)
 		OriginalPartMap[parttype+"_"+partstatus] = subparts
 		_output.PartMap[parttype+"_"+partstatus] = subparts
@@ -91,7 +95,7 @@ func _FindIGemPartsThatSteps(_ctx context.Context, _input *FindIGemPartsThatInpu
 
 				// check if key words are in description and that status == "WORKS if only working parts are desired
 				if _input.MatchAllDescriptions == false && strings.Contains(strings.ToUpper(partdetails.Description(subpart)), strings.ToUpper(_input.Partdescriptions[i])) &&
-					strings.Contains(partdetails.Results(subpart), othercriteria) {
+					strings.Contains(strings.ToUpper(partdetails.Results(subpart)), strings.ToUpper(othercriteria)) {
 
 					if !search.InSlice(subpart, BackupParts) {
 						BackupParts = append(BackupParts, subpart)
@@ -127,13 +131,13 @@ func _FindIGemPartsThatSteps(_ctx context.Context, _input *FindIGemPartsThatInpu
 				}
 				if _input.MatchAllDescriptions == false && strings.Contains(strings.ToUpper(partdetails.Description(subpart)), strings.ToUpper(_input.Partdescriptions[i])) &&
 					strings.Contains(partdetails.Results(subpart), "WORKS") {
-					if !search.InSlice(subpart, _output.WorkingBackupParts) {
-						_output.WorkingBackupParts = append(_output.WorkingBackupParts, subpart)
+					if !search.InSlice(subpart, WorkingBackupParts) {
+						WorkingBackupParts = append(WorkingBackupParts, subpart)
 					}
 				} else if _input.MatchAllDescriptions && search.Containsallthings((partdetails.Description(subpart)), _input.Partdescriptions) &&
 					strings.Contains(partdetails.Results(subpart), "WORKS") {
-					if !search.InSlice(subpart, _output.WorkingBackupParts) {
-						_output.WorkingBackupParts = append(_output.WorkingBackupParts, subpart)
+					if !search.InSlice(subpart, WorkingBackupParts) {
+						WorkingBackupParts = append(WorkingBackupParts, subpart)
 					}
 				}
 				// add to look up table to report back to user
@@ -144,24 +148,33 @@ func _FindIGemPartsThatSteps(_ctx context.Context, _input *FindIGemPartsThatInpu
 						partdesc = partdesc + "_" + descriptor
 					}
 					_output.PartMap[desc+"_"+partdesc] = BackupParts
-					_output.PartMap[desc+"_"+partdesc+"+WORKS"] = _output.WorkingBackupParts
+					_output.PartMap[desc+"_"+partdesc+"+WORKS"] = WorkingBackupParts
 
 				} else if _input.MatchAllDescriptions == false {
 
 					_output.PartMap[desc+"_"+_input.Partdescriptions[i]] = BackupParts
-					_output.PartMap[desc+"_"+_input.Partdescriptions[i]+"+WORKS"] = _output.WorkingBackupParts
+					_output.PartMap[desc+"_"+_input.Partdescriptions[i]+"+WORKS"] = WorkingBackupParts
 				}
 
-				_output.FulllistBackupParts = BackupParts
 			}
+			//FulllistBackupParts = BackupParts
+			BackupParts = make([]string, 0)
+			WorkingBackupParts = make([]string, 0)
+
 			i = i + 1
 			if _input.MatchAllDescriptions {
 				// don't need to loop through each description if we're matching all
-				break
+				continue
 			}
 		}
-		for _, subpart := range BackupParts {
-			_output.BiobrickDescriptions[subpart] = partdetails.Description(subpart)
+		for _, subpartarray := range _output.PartMap {
+			for _, subpart := range subpartarray {
+				if partdetails.Description(subpart) != "" {
+					_output.BiobrickDescriptions[subpart] = partdetails.Description(subpart)
+				} else {
+					_output.BiobrickDescriptions[subpart] = parttypemap[subpart]
+				}
+			}
 		}
 	}
 
@@ -242,37 +255,33 @@ type FindIGemPartsThatInput struct {
 
 type FindIGemPartsThatOutput struct {
 	BiobrickDescriptions         map[string]string
-	FulllistBackupParts          []string
 	HighestRatedMatch            string
 	HighestRatedMatchDNASequence wtype.DNASequence
 	HighestRatedMatchScore       int
 	PartMap                      map[string][]string
 	Warnings                     error
-	WorkingBackupParts           []string
 }
 
 type FindIGemPartsThatSOutput struct {
 	Data struct {
 		BiobrickDescriptions         map[string]string
-		FulllistBackupParts          []string
 		HighestRatedMatch            string
 		HighestRatedMatchDNASequence wtype.DNASequence
 		HighestRatedMatchScore       int
 		PartMap                      map[string][]string
 		Warnings                     error
-		WorkingBackupParts           []string
 	}
 	Outputs struct {
 	}
 }
 
 func init() {
-	if err := addComponent(Component{Name: "FindIGemPartsThat",
+	if err := addComponent(component.Component{Name: "FindIGemPartsThat",
 		Constructor: FindIGemPartsThatNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/FindIGemPartsThat/FindIGemPartsThat.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "ExactTypeOnly", Desc: "", Kind: "Parameters"},
 				{Name: "MatchAllDescriptions", Desc: "", Kind: "Parameters"},
 				{Name: "OnlyreturnAvailableParts", Desc: "", Kind: "Parameters"},
@@ -280,13 +289,11 @@ func init() {
 				{Name: "Partdescriptions", Desc: "e.g. strong, arsenic, fluorescent, alkane, logic gate\n", Kind: "Parameters"},
 				{Name: "Parttype", Desc: "e.g. rbs, reporter\n", Kind: "Parameters"},
 				{Name: "BiobrickDescriptions", Desc: "i.e. map[biobrickID]description\n", Kind: "Data"},
-				{Name: "FulllistBackupParts", Desc: "", Kind: "Data"},
 				{Name: "HighestRatedMatch", Desc: "", Kind: "Data"},
 				{Name: "HighestRatedMatchDNASequence", Desc: "", Kind: "Data"},
 				{Name: "HighestRatedMatchScore", Desc: "", Kind: "Data"},
-				{Name: "PartMap", Desc: "i.e. map[description]list of parts matching description\n", Kind: "Data"},
+				{Name: "PartMap", Desc: "FulllistBackupParts []string\nWorkingBackupParts []string\n\ni.e. map[description]list of parts matching description\n", Kind: "Data"},
 				{Name: "Warnings", Desc: "", Kind: "Data"},
-				{Name: "WorkingBackupParts", Desc: "", Kind: "Data"},
 			},
 		},
 	}); err != nil {

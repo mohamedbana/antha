@@ -1,6 +1,10 @@
 package wtype
 
-import "testing"
+import (
+	"fmt"
+	"strings"
+	"testing"
+)
 
 // platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64
 
@@ -43,8 +47,27 @@ func validatePlate(t *testing.T, plate *LHPlate) {
 	for _, w := range plate.HWells {
 		ws1 = append(ws1, w)
 	}
-	for _, w := range plate.Wellcoords {
+	for crds, w := range plate.Wellcoords {
 		ws2 = append(ws2, w)
+
+		if w.Crds != crds {
+			t.Fatal(fmt.Sprintf("ERROR: Well coords not consistent -- %s != %s", w.Crds, crds))
+		}
+
+		if w.WContents.Loc == "" {
+			t.Fatal(fmt.Sprintf("ERROR: Well contents do not have loc set"))
+		}
+
+		ltx := strings.Split(w.WContents.Loc, ":")
+
+		if ltx[0] != plate.ID {
+			t.Fatal(fmt.Sprintf("ERROR: Plate ID for component not consistent -- %s != %s", ltx[0], plate.ID))
+		}
+
+		if ltx[1] != crds {
+			t.Fatal(fmt.Sprintf("ERROR: Coords for component not consistent: -- %s != %s", ltx[1], crds))
+		}
+
 	}
 
 	for _, ws := range plate.Rows {

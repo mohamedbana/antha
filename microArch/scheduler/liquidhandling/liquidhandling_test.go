@@ -175,8 +175,8 @@ func TestPlateReuse(t *testing.T) {
 
 	// if we added nothing, input assignments should be empty
 
-	if len(rq.Input_assignments) != 0 {
-		t.Fatal(fmt.Sprint("Resimulation failed: needed to add ", len(rq.Input_assignments), " components"))
+	if rq.NewComponentsAdded() {
+		t.Fatal(fmt.Sprint("Resimulation failed: needed to add ", len(rq.Input_vols_wanting), " components"))
 	}
 
 	// now try a deliberate fail

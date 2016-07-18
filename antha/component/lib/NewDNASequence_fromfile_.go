@@ -8,9 +8,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol
@@ -140,12 +141,12 @@ type NewDNASequence_fromfileSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "NewDNASequence_fromfile",
+	if err := addComponent(component.Component{Name: "NewDNASequence_fromfile",
 		Constructor: NewDNASequence_fromfileNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "Protocol for creating a DNASequence from a sequence file format. // Supported formats: .gdx .fasta .gb\n",
 			Path: "antha/component/an/AnthaAcademy/Lesson4_DNA/B_NewDNASequence_fromfile.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Filename", Desc: "", Kind: "Parameters"},
 				{Name: "Gene_name", Desc: "", Kind: "Parameters"},
 				{Name: "Linear", Desc: "", Kind: "Parameters"},

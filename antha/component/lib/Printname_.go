@@ -3,9 +3,10 @@ package lib
 import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol
@@ -106,12 +107,12 @@ type PrintnameSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Printname",
+	if err := addComponent(component.Component{Name: "Printname",
 		Constructor: PrintnameNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/Printname/Printname.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Name", Desc: "", Kind: "Parameters"},
 				{Name: "Fullname", Desc: "", Kind: "Data"},
 			},

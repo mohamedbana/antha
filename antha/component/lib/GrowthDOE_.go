@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 //AngularVelocity
@@ -96,12 +97,12 @@ type GrowthDOESOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "GrowthDOE",
+	if err := addComponent(component.Component{Name: "GrowthDOE",
 		Constructor: GrowthDOENew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/DoE/growth.an",
-			Params: []ParamDesc{
+			Path: "antha/component/an/GrowthAndAssay/growth.an",
+			Params: []component.ParamDesc{
 				{Name: "Growthtemp", Desc: "", Kind: "Parameters"},
 				{Name: "Growthtime", Desc: "", Kind: "Parameters"},
 				{Name: "ShakingSpeed", Desc: "AngularVelocity\n", Kind: "Parameters"},

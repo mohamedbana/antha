@@ -7,9 +7,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 //"image/color"
@@ -243,12 +244,12 @@ type PipetteImage_CMYKSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "PipetteImage_CMYK",
+	if err := addComponent(component.Component{Name: "PipetteImage_CMYK",
 		Constructor: PipetteImage_CMYKNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "Generates instructions to pipette out a defined image onto a defined plate by blending cyan magenta yellow and black dyes\n",
 			Path: "antha/component/an/Liquid_handling/PipetteImage/PipetteImage_CMYK.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "AutoRotate", Desc: "", Kind: "Parameters"},
 				{Name: "Black", Desc: "", Kind: "Inputs"},
 				{Name: "Cyan", Desc: "", Kind: "Inputs"},

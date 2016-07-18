@@ -24,7 +24,7 @@
 package enzymes
 
 import (
-	"fmt"
+	//"fmt"
 	"strings"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
@@ -41,13 +41,13 @@ func LengthofPrefixOverlap(seq string, subseq string) (number int, end string) {
 
 	i:=0;i<len(subseq);i++{
 	truncated := subseq[i:]
-	fmt.Println("truncated", truncated)
+	// fmt.Println("truncated", truncated)
 	if strings.HasPrefix(part.Seq, truncated) == true {
 		number = i
 		end = "end"
 	}
 	/*start := subseq[:i]
-	fmt.Println("start", start)
+	// fmt.Println("start", start)
 	if strings.HasPrefix(part.Seq, start) == true {
 		number = i
 		end = "start"
@@ -132,19 +132,19 @@ func AddStandardStickyEnds(part wtype.DNASequence, assemblystandard string, leve
 		// This code will look for subparts of a standard overhang to add the minimum number of additional nucleotides with a partial match e.g. AATG contains ATG only so we just add A
 
 		truncated := bittoadd[1:]
-		fmt.Println("truncated", truncated)
+		// fmt.Println("truncated", truncated)
 		if strings.HasPrefix(part.Seq, truncated) == true {
 			//truncated = bittoadd[:1]
-			//fmt.Println("truncated", truncated)
+			//// fmt.Println("truncated", truncated)
 			bittoadd = bittoadd[:1]
 		}
 
 		bittoadd5prime := Makeoverhang(enzyme, "5prime", bittoadd, ChooseSpacer(enzyme.Topstrand3primedistancefromend, "", []string{}))
-		fmt.Println("bittoadd5prime", bittoadd5prime)
+		// fmt.Println("bittoadd5prime", bittoadd5prime)
 		partwith5primeend := Addoverhang(part.Seq, bittoadd5prime, "5prime")
 
 		bittoadd3 := Endlinks[assemblystandard][level][numberofparts][position+1]
-		fmt.Println("bittoadd3", bittoadd3)
+		// fmt.Println("bittoadd3", bittoadd3)
 
 		if numberofparts == position {
 			bittoadd3 = RevComp(vectorends[0])
@@ -152,9 +152,9 @@ func AddStandardStickyEnds(part wtype.DNASequence, assemblystandard string, leve
 		if strings.HasSuffix(part.Seq, bittoadd3) == true {
 			bittoadd3 = ""
 		}
-		//fmt.Println("bittoadd3", bittoadd3)
+		//// fmt.Println("bittoadd3", bittoadd3)
 		bittoadd3prime := Makeoverhang(enzyme, "3prime", bittoadd3, ChooseSpacer(enzyme.Topstrand3primedistancefromend, "", []string{}))
-		fmt.Println("bittoadd3prime", bittoadd3prime)
+		// fmt.Println("bittoadd3prime", bittoadd3prime)
 		partwithends := Addoverhang(partwith5primeend, bittoadd3prime, "3prime")
 
 		Partwithends.Nm = part.Nm
@@ -180,26 +180,26 @@ func AddStandardStickyEndsfromClass(part wtype.DNASequence, assemblystandard str
 	// This code will look for subparts of a standard overhang to add the minimum number of additional nucleotides with a partial match e.g. AATG contains ATG only so we just add A
 
 	truncated := bittoadd[1:]
-	fmt.Println("truncated", truncated)
+	// fmt.Println("truncated", truncated)
 	if strings.HasPrefix(part.Seq, truncated) == true {
 		//truncated = bittoadd[:1]
-		//fmt.Println("truncated", truncated)
+		//// fmt.Println("truncated", truncated)
 		bittoadd = bittoadd[:1]
 	}
 
 	bittoadd5prime := Makeoverhang(enzyme, "5prime", bittoadd, ChooseSpacer(enzyme.Topstrand3primedistancefromend, "", []string{}))
-	fmt.Println("bittoadd5prime", bittoadd5prime)
+	// fmt.Println("bittoadd5prime", bittoadd5prime)
 	partwith5primeend := Addoverhang(part.Seq, bittoadd5prime, "5prime")
 
 	bittoadd3 := bitstoadd[1]
-	fmt.Println("bittoadd3", bittoadd3)
+	// fmt.Println("bittoadd3", bittoadd3)
 
 	if strings.HasSuffix(part.Seq, bittoadd3) == true {
 		bittoadd3 = ""
 	}
-	//fmt.Println("bittoadd3", bittoadd3)
+	//// fmt.Println("bittoadd3", bittoadd3)
 	bittoadd3prime := Makeoverhang(enzyme, "3prime", bittoadd3, ChooseSpacer(enzyme.Topstrand3primedistancefromend, "", []string{}))
-	fmt.Println("bittoadd3prime", bittoadd3prime)
+	// fmt.Println("bittoadd3prime", bittoadd3prime)
 	partwithends := Addoverhang(partwith5primeend, bittoadd3prime, "3prime")
 
 	Partwithends.Nm = part.Nm

@@ -35,9 +35,10 @@ import (
 	//"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 //"github.com/antha-lang/antha/microArch/factory"
@@ -78,16 +79,25 @@ func _EvaporationrateAnalysis(_ctx context.Context, _input *EvaporationrateInput
 		fmt.Println(_input.Platetype.Welltype.Xdim, _input.Platetype.Welltype.Ydim, _input.Platetype.Welltype.Zdim, _input.Platetype.Welltype.Shape())
 		surfacearea = wellarea
 	} else {
-		panic("plate " + _input.Platetype.String() + " Wellshape " + _input.Platetype.Welltype.String() + " surface area not yet calculated due to bottom type")
+		_output.Warnings = fmt.Errorf("plate " + _input.Platetype.String() + " Wellshape " + _input.Platetype.Welltype.String() + " surface area not yet calculated due to bottom type")
+		execute.Errorf(_ctx, "plate "+_input.Platetype.String()+" Wellshape "+_input.Platetype.Welltype.String()+" surface area not yet calculated due to bottom type")
 	}
 	var PWS float64 = eng.Pws(_input.Temp)
 	var pw float64 = eng.Pw(_input.Relativehumidity, PWS) // vapour partial pressure in Pascals
 	var Gh = (eng.Θ(_input.Liquid.TypeName(), _input.Airvelocity) *
 		((surfacearea.RawValue() / 1000000) *
 			((eng.Xs(PWS, _input.Pa)) - (eng.X(pw, _input.Pa))))) // Gh is rate of evaporation in kg/h
-	evaporatedliquid := (Gh * (_input.Executiontime.SIValue() / 3600))                                       // in kg
-	evaporatedliquid = (evaporatedliquid * liquidclasses.Liquidclass[_input.Liquid.TypeName()]["ro"]) / 1000 // converted to litres
-	_output.Evaporatedliquid = wunit.NewVolume((evaporatedliquid * 1000000), "ul")                           // convert to ul
+	evaporatedliquid := (Gh * (_input.Executiontime.SIValue() / 3600)) // in kg
+
+	density, ok := liquidclasses.Liquidclass[_input.Liquid.TypeName()]["ro"]
+
+	if !ok {
+		density = liquidclasses.Liquidclass["water"]["ro"]
+		_output.Warnings = fmt.Errorf("liquid density not found for " + _input.Liquid.TypeName() + " so used water value")
+	}
+
+	evaporatedliquid = (evaporatedliquid * density) / 1000                         // converted to litres
+	_output.Evaporatedliquid = wunit.NewVolume((evaporatedliquid * 1000000), "ul") // convert to ul
 
 	_output.Evaporationrateestimate = Gh * 1000000 // ul/h if declared in parameters or data it doesn't need declaring again
 
@@ -98,13 +108,14 @@ func _EvaporationrateAnalysis(_ctx context.Context, _input *EvaporationrateInput
 		surfacearea.ToString(),
 		"evaporation rate =", Gh*1000000, "ul/h",
 		"total evaporated liquid =", _output.Evaporatedliquid.ToString(), "after", _input.Executiontime.ToString(),
-		"estimated evaporation time = ", _output.Estimatedevaporationtime.ToString())
+		"estimated evaporation time = ", _output.Estimatedevaporationtime.ToString(),
+		"Warnings =", _output.Warnings)
 
 } // works in either analysis or steps sections
 
 func _EvaporationrateValidation(_ctx context.Context, _input *EvaporationrateInput, _output *EvaporationrateOutput) {
 	if _output.Evaporatedliquid.SIValue() > _input.Volumeperwell.SIValue() {
-		panic("not enough liquid, Expected that liquid volume " + _input.Volumeperwell.ToString() + " will evaporate during this time " + _input.Executiontime.ToString() + " Status:  " + _output.Status)
+		execute.Errorf(_ctx, "not enough liquid, Expected that liquid volume "+_input.Volumeperwell.ToString()+" will evaporate during this time "+_input.Executiontime.ToString()+" Status:  "+_output.Status)
 	}
 }
 func _EvaporationrateRun(_ctx context.Context, input *EvaporationrateInput) *EvaporationrateOutput {
@@ -170,6 +181,7 @@ type EvaporationrateOutput struct {
 	Evaporatedliquid         wunit.Volume
 	Evaporationrateestimate  float64
 	Status                   string
+	Warnings                 error
 }
 
 type EvaporationrateSOutput struct {
@@ -178,18 +190,19 @@ type EvaporationrateSOutput struct {
 		Evaporatedliquid         wunit.Volume
 		Evaporationrateestimate  float64
 		Status                   string
+		Warnings                 error
 	}
 	Outputs struct {
 	}
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Evaporationrate",
+	if err := addComponent(component.Component{Name: "Evaporationrate",
 		Constructor: EvaporationrateNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/eng/Evaporationrate/Evaporationrate.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Airvelocity", Desc: "// velocity of air above water in m/s ; could be calculated or measured by an anemometer\n", Kind: "Parameters"},
 				{Name: "Executiontime", Desc: "time\n", Kind: "Parameters"},
 				{Name: "Liquid", Desc: "", Kind: "Inputs"},
@@ -202,6 +215,7 @@ func init() {
 				{Name: "Evaporatedliquid", Desc: "ul\n", Kind: "Data"},
 				{Name: "Evaporationrateestimate", Desc: "ul/h\n", Kind: "Data"},
 				{Name: "Status", Desc: "", Kind: "Data"},
+				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
 	}); err != nil {
