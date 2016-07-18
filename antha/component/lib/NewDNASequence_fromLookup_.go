@@ -10,9 +10,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"path/filepath"
 )
 
@@ -163,12 +164,12 @@ type NewDNASequence_fromLookupSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "NewDNASequence_fromLookup",
+	if err := addComponent(component.Component{Name: "NewDNASequence_fromLookup",
 		Constructor: NewDNASequence_fromLookupNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/AnthaAcademy/Lesson4_DNA/C_NewDNASequence_fromLookup.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "AddORFS", Desc: "", Kind: "Parameters"},
 				{Name: "BiobrickID", Desc: "", Kind: "Parameters"},
 				{Name: "DNAID", Desc: "", Kind: "Parameters"},

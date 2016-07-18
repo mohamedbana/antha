@@ -17,9 +17,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"strconv"
 	"strings"
 )
@@ -297,12 +298,12 @@ type Scarfree_designSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Scarfree_design",
+	if err := addComponent(component.Component{Name: "Scarfree_design",
 		Constructor: Scarfree_designNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/Scarfree_design.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Constructname", Desc: "", Kind: "Parameters"},
 				{Name: "EndsAlreadyadded", Desc: "", Kind: "Parameters"},
 				{Name: "Enzymename", Desc: "", Kind: "Parameters"},

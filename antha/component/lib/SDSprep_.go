@@ -5,9 +5,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 //Input parameters for this protocol. Single instance of an SDS-PAGE sample preperation step.
@@ -180,12 +181,12 @@ type SDSprepSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "SDSprep",
+	if err := addComponent(component.Component{Name: "SDSprep",
 		Constructor: SDSprepNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/SDSprep/SDSprep.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Buffer", Desc: "", Kind: "Inputs"},
 				{Name: "BufferName", Desc: "SDSBuffer\n", Kind: "Parameters"},
 				{Name: "BufferStockConc", Desc: "100g/L\n", Kind: "Parameters"},

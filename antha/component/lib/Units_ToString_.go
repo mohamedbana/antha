@@ -3,9 +3,10 @@ package lib
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol
@@ -125,12 +126,12 @@ type Units_ToStringSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Units_ToString",
+	if err := addComponent(component.Component{Name: "Units_ToString",
 		Constructor: Units_ToStringNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "demo protocol of how to convert units to string\n",
 			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/B_units_toString.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "MyConc", Desc: "", Kind: "Parameters"},
 				{Name: "MyFlowrate", Desc: "", Kind: "Parameters"},
 				{Name: "MyMass", Desc: "", Kind: "Parameters"},

@@ -9,9 +9,10 @@ import (
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"strings"
 )
 
@@ -155,12 +156,12 @@ type PrimerDesign_coverRegionSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "PrimerDesign_coverRegion",
+	if err := addComponent(component.Component{Name: "PrimerDesign_coverRegion",
 		Constructor: PrimerDesign_coverRegionNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "This element will design primers to cover a specified region of a sequence at the interval specified by the user (e.g. every 800 bp).\nDesign criteria such as maximum gc content, acceptable ranges of melting temperatures and primer length may be specified by the user.\n",
 			Path: "antha/component/an/Data/DNA/PrimerDesign/PrimerDesign_coverRegion.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "DNASeqfile", Desc: "genbank file (.gb)\n", Kind: "Parameters"},
 				{Name: "Maxgc", Desc: "as a proportion of 1, i.e. 1 == 100%\n", Kind: "Parameters"},
 				{Name: "Maxlength", Desc: "", Kind: "Parameters"},

@@ -2,9 +2,10 @@ package lib
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol
@@ -107,12 +108,12 @@ type Units_ConcentrationSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Units_Concentration",
+	if err := addComponent(component.Component{Name: "Units_Concentration",
 		Constructor: Units_ConcentrationNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/D_units_Conc.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "MolecularWeight", Desc: "", Kind: "Parameters"},
 				{Name: "MyConc", Desc: "", Kind: "Parameters"},
 				{Name: "ConcinGperL", Desc: "", Kind: "Data"},

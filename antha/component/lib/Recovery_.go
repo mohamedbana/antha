@@ -4,9 +4,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -119,12 +120,12 @@ type RecoverySOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Recovery",
+	if err := addComponent(component.Component{Name: "Recovery",
 		Constructor: RecoveryNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/Transformation/Recovery.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Recoverymedium", Desc: "", Kind: "Inputs"},
 				{Name: "Recoverytemp", Desc: "", Kind: "Parameters"},
 				{Name: "Recoverytime", Desc: "e.g. = 2 hours\n", Kind: "Parameters"},

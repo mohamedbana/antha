@@ -6,9 +6,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -181,12 +182,12 @@ type TypeIISConstructAssemblyMMX_forscreenSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "TypeIISConstructAssemblyMMX_forscreen",
+	if err := addComponent(component.Component{Name: "TypeIISConstructAssemblyMMX_forscreen",
 		Constructor: TypeIISConstructAssemblyMMX_forscreenNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/TypeIIsAssembly/TypeIISConstructAssemblyMMX_forscreen/TypeIISConstructAssemblyMMX.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "EnzymeName", Desc: "", Kind: "Parameters"},
 				{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
 				{Name: "InactivationTime", Desc: "", Kind: "Parameters"},

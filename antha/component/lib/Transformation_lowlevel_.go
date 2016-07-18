@@ -4,9 +4,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -153,12 +154,12 @@ type Transformation_lowlevelSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Transformation_lowlevel",
+	if err := addComponent(component.Component{Name: "Transformation_lowlevel",
 		Constructor: Transformation_lowlevelNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/Transformation/Transformation_lowlevel.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Postplasmidtemp", Desc: "", Kind: "Parameters"},
 				{Name: "Postplasmidtime", Desc: "", Kind: "Parameters"},
 				{Name: "Reactions", Desc: "", Kind: "Inputs"},

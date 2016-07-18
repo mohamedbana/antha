@@ -13,9 +13,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Pubchem"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol
@@ -207,12 +208,12 @@ type DatacrunchSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Datacrunch",
+	if err := addComponent(component.Component{Name: "Datacrunch",
 		Constructor: DatacrunchNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/AnthaAcademy/Lesson5_Units2/A_Datacrunch.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "DNAConc", Desc: "", Kind: "Parameters"},
 				{Name: "DNA_seq", Desc: "", Kind: "Parameters"},
 				{Name: "Gene_name", Desc: "", Kind: "Parameters"},
