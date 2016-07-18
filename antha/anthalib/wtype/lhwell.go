@@ -268,11 +268,32 @@ func (lhw *LHWell) CalculateMaxCrossSectionArea() (ca wunit.Area, err error) {
 
 func (lhw *LHWell) AreaForVolume() wunit.Area {
 
-	return wunit.NewArea(0.0, "m^2")
+	ret := wunit.NewArea(0.0, "m^2")
+
+	//	qt := Quartic{a: -3.3317851312e-09, b: 0.00000225834467, c: -0.0006305492472, d: 0.1328156706978, e: 0}
+
+	vf := lhw.GetAfVFunc()
+
+	if vf == nil {
+		ret, _ := lhw.CalculateMaxCrossSectionArea()
+		return ret
+	} else {
+		vol := lhw.WContents.Volume()
+		r := vf.Call(vol.SIValue())
+		ret = wunit.NewArea(r, "m^2")
+	}
+
+	return ret
 }
 
 func (lhw *LHWell) HeightForVolume() wunit.Length {
-	return wunit.NewLength(0.0, "m")
+	ret := wunit.NewLength(0.0, "m")
+
+	return ret
+}
+
+func (lhw *LHWell) GetAfVFunc() Func1Prm {
+	// TODO -- define syntax; funcs need to serialize themselves
 }
 
 func (lhw *LHWell) CalculateMaxVolume() (vol wunit.Volume, err error) {
@@ -476,6 +497,8 @@ func (well *LHWell) Evaporate(time time.Duration, env Environment) {
 	// for different well types
 
 	vol := eng.EvaporationVolume(env.Temperature, "water", env.Humidity, time.Seconds(), env.MeanAirFlowVelocity, well.AreaForVolume(), env.Pressure)
+
+	fmt.Println("Evaporation: lost ", vol.ToString(), " in ", time)
 
 	// TODO... record evaporation
 	well.Remove(vol)

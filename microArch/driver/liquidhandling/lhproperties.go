@@ -793,7 +793,7 @@ func (lhp *LHProperties) GetEnvironment() wtype.Environment {
 
 	return wtype.Environment{
 		Temperature:         wunit.NewTemperature(25, "C"),
-		Pressure:            wunit.NewPressure(1, "KPa"),
+		Pressure:            wunit.NewPressure(1000, "Pa"),
 		Humidity:            0.35,
 		MeanAirFlowVelocity: wunit.NewVelocity(0, "m/s"),
 	}

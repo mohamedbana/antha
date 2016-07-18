@@ -58,11 +58,9 @@ type Area struct {
 
 // make an area unit
 func NewArea(v float64, unit string) (a Area) {
-
 	if unit == "m^2" {
 		a = Area{NewMeasurement(v, "", unit)}
-	}
-	if unit == "mm^2" {
+	} else if unit == "mm^2" {
 		a = Area{NewPMeasurement(v /**0.000001*/, unit)}
 	} else {
 		panic("Can't make areas which aren't square metres")

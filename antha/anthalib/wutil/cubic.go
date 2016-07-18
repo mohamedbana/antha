@@ -7,47 +7,35 @@ import (
 
 // function for cubics
 type Cubic struct {
-	a float64
-	b float64
-	c float64
-	d float64
-	p float64
-	r float64
-}
-
-func (c *Cubic) A() float64 {
-	return c.a
-}
-func (c *Cubic) B() float64 {
-	return c.b
-}
-func (c *Cubic) C() float64 {
-	return c.c
-}
-func (c *Cubic) D() float64 {
-	return c.d
+	Func string
+	A    float64
+	B    float64
+	C    float64
+	D    float64
+	p    float64
+	r    float64
 }
 
 func (c *Cubic) F(v float64) float64 {
-	return c.a*math.Pow(v, 3.0) + c.b*math.Pow(v, 2.0) + c.c*v + c.d
+	return c.A*math.Pow(v, 3.0) + c.B*math.Pow(v, 2.0) + c.C*v + c.D
 }
 
 func (c *Cubic) P() float64 {
-	if c.p == 0.0 && c.a != 0.0 {
-		c.p = (-1.0 * c.b) / (3.0 * c.a)
+	if c.p == 0.0 && c.A != 0.0 {
+		c.p = (-1.0 * c.B) / (3.0 * c.A)
 	}
 
 	return c.p
 }
 
 func (c *Cubic) Q(v float64) float64 {
-	q := math.Pow(c.P(), 3.0) + ((c.b*c.c)-(3.0*c.a*(c.d-v)))/(6.0*math.Pow(c.a, 2.0))
+	q := math.Pow(c.P(), 3.0) + ((c.B*c.C)-(3.0*c.A*(c.D-v)))/(6.0*math.Pow(c.A, 2.0))
 	return q
 }
 
 func (c *Cubic) R() float64 {
 	if c.r == 0.0 {
-		c.r = c.c / (3.0 * c.a)
+		c.r = c.C / (3.0 * c.A)
 	}
 	return c.r
 }

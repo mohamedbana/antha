@@ -6,21 +6,12 @@ import (
 
 // function for quadratics
 type Quadratic struct {
-	a float64
-	b float64
-	c float64
-}
-
-func (c *Quadratic) A() float64 {
-	return c.a
-}
-func (c *Quadratic) B() float64 {
-	return c.b
-}
-func (c *Quadratic) C() float64 {
-	return c.c
+	Func string
+	A    float64
+	B    float64
+	C    float64
 }
 
 func (c *Quadratic) F(v float64) float64 {
-	return c.a*math.Pow(v, 2.0) + c.b*v + c.c
+	return c.A*math.Pow(v, 2.0) + c.B*v + c.C
 }
