@@ -487,7 +487,9 @@ func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
     for _,ch := range channels {
         adaptor.RemoveTip(ch)
     }
-    tipwaste.Contents += len(channels)
+    if !tipwaste.Dispose(len(channels)) {
+        self.AddErrorf("UnloadTips", "Tipwaste at \"%s\" is overfull", position[0])
+    }
 
     return ret
 }

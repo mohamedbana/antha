@@ -773,6 +773,15 @@ func preloadTips(channels []int, head int) *func(*VirtualLiquidHandler) {
     return &ret
 }
 
+func fillWaste(count int) *func(*VirtualLiquidHandler) {
+    ret := func(vlh *VirtualLiquidHandler) {
+        p := vlh.properties
+        tipwaste := p.PlateLookup[p.PosLookup["tipwaste_loc"]].(*wtype.LHTipwaste)
+        tipwaste.Contents += count
+    }
+    return &ret
+}
+
 type LoadTipsParams struct {
     channels        []int
     head            int
@@ -1670,6 +1679,25 @@ func Test_UnloadTips(t *testing.T) {
             []string{"(err) UnloadTips: Cannot unload tips from channels 7,4 as no tips are loaded there"},
             nil,                        //remaining_tips  []int
             0,                          //tips_in_waste   int
+        },
+        UnloadTipsTest{
+            "waste is full",     //testName        string
+            false,              //independent
+            UnloadTipsParams{   //params          UnloadTipsParams
+                []int{0},                   //channels        []int
+                0,                          //head            int
+                1,                          //multi           int
+                []string{"tipwaste"},       //platetype       []string
+                []string{"tipwaste_loc"},   //position        []string
+                []string{"A1"},             //well            []string
+            },
+            []*func(*VirtualLiquidHandler){ //setup           []*func(*VirtualLiquidHandler)
+                preloadTips([]int{0}, 0),
+                fillWaste(700),
+            },
+            []string{"(err) UnloadTips: Tipwaste at \"tipwaste_loc\" is overfull"},//expected_errors []string
+            nil,                            //remaining_tips  []int
+            1,                              //tips_in_waste   int
         },
     }
 
