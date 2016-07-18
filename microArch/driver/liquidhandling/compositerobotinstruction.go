@@ -84,6 +84,7 @@ func NewMultiTransferParams(multi int) MultiTransferParams {
 // TODO -- refactor to pass actual plates through
 type TransferInstruction struct {
 	Type       int
+	Platform   string
 	What       []string
 	PltFrom    []string
 	PltTo      []string
@@ -188,6 +189,8 @@ func (ins *TransferInstruction) GetParameter(name string) interface{} {
 		return ins.TPlateWY
 	case "INSTRUCTIONTYPE":
 		return ins.InstructionType()
+	case "PLATFORM":
+		return ins.Platform
 	}
 	return nil
 }
@@ -571,7 +574,6 @@ func (ins *TransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProper
 			tp.FPlateType = FPlateType
 			tp.TPlateType = TPlateType
 			tp.Channel = mci.Prms
-
 			mci.AddTransferParams(tp)
 		}
 
@@ -608,7 +610,6 @@ func (ins *TransferInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProper
 		tp.TVolume = wunit.CopyVolume(ins.TVolume[i])
 		tp.FPlateType = ins.FPlateType[i]
 		tp.TPlateType = ins.TPlateType[i]
-
 		sci.AddTransferParams(tp)
 
 		// make sure we keep volumes up to date
@@ -692,7 +693,10 @@ func (ins *SingleChannelBlockInstruction) GetParameter(name string) interface{} 
 	case "PARAMS":
 		return ins.Prms
 	case "PLATFORM":
-		return ins.Prms.Name
+		if ins.Prms == nil {
+			return ""
+		}
+		return ins.Prms.Platform
 	case "WELLTO":
 		return ins.WellTo
 	case "WELLTOVOLUME":
@@ -706,10 +710,11 @@ func (ins *SingleChannelBlockInstruction) GetParameter(name string) interface{} 
 }
 
 func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
-	pol := policy.GetPolicyFor(ins)
 	ret := make([]RobotInstruction, 0)
 	// get tips
 	channel, tiptype := ChooseChannel(ins.Volume[0], prms)
+	ins.Prms = channel
+	pol := policy.GetPolicyFor(ins)
 	tipget, err := GetTips(tiptype, prms, channel, 1, false)
 
 	if err != nil {
@@ -789,7 +794,6 @@ func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms
 			stci.FVolume = wunit.CopyVolume(ins.FVolume[t])
 			stci.TVolume = wunit.CopyVolume(ins.TVolume[t])
 			stci.Prms = channel
-
 			ret = append(ret, stci)
 			last_thing = this_thing
 
@@ -891,7 +895,10 @@ func (ins *MultiChannelBlockInstruction) GetParameter(name string) interface{} {
 	case "PARAMS":
 		return ins.Prms
 	case "PLATFORM":
-		return ins.Prms.Name
+		if ins.Prms == nil {
+			return ""
+		}
+		return ins.Prms.Platform
 	case "WELLTO":
 		return ins.WellTo
 	case "WELLTOVOLUME":
@@ -1092,7 +1099,10 @@ func (ins *SingleChannelTransferInstruction) GetParameter(name string) interface
 	case "PARAMS":
 		return ins.Prms
 	case "PLATFORM":
-		return ins.Prms.Name
+		if ins.Prms == nil {
+			return ""
+		}
+		return ins.Prms.Platform
 	case "WELLTO":
 		return ins.WellTo
 	case "WELLTOVOLUME":
@@ -1204,7 +1214,10 @@ func (ins *MultiChannelTransferInstruction) GetParameter(name string) interface{
 	case "PARAMS":
 		return ins.Prms
 	case "PLATFORM":
-		return ins.Prms.Name
+		if ins.Prms == nil {
+			return ""
+		}
+		return ins.Prms.Platform
 	case "WELLTO":
 		return ins.WellTo
 	case "WELLTOVOLUME":
@@ -1228,17 +1241,14 @@ func (ins *MultiChannelTransferInstruction) Generate(policy *LHPolicyRuleSet, pr
 	blowinstruction.Multi = ins.Multi
 	suckinstruction.Prms = ins.Prms
 	blowinstruction.Prms = ins.Prms
-	resetinstruction := NewResetInstruction()
 
 	for i := 0; i < len(ins.Volume); i++ {
 		suckinstruction.AddTransferParams(ins.Params(i))
 		blowinstruction.AddTransferParams(ins.Params(i))
-		resetinstruction.AddTransferParams(ins.Params(i))
 	}
 
 	ret = append(ret, suckinstruction)
 	ret = append(ret, blowinstruction)
-	ret = append(ret, resetinstruction)
 
 	return ret, nil
 }
@@ -1283,9 +1293,10 @@ type ChangeAdaptorInstruction struct {
 	GetPosition    string
 	OldAdaptorType string
 	NewAdaptorType string
+	Platform       string
 }
 
-func NewChangeAdaptorInstruction(head int, droppos, getpos, oldad, newad string) *ChangeAdaptorInstruction {
+func NewChangeAdaptorInstruction(head int, droppos, getpos, oldad, newad, platform string) *ChangeAdaptorInstruction {
 	var v ChangeAdaptorInstruction
 	v.Type = CHA
 	v.Head = head
@@ -1293,6 +1304,7 @@ func NewChangeAdaptorInstruction(head int, droppos, getpos, oldad, newad string)
 	v.GetPosition = getpos
 	v.OldAdaptorType = oldad
 	v.NewAdaptorType = newad
+	v.Platform = platform
 	return &v
 }
 func (ins *ChangeAdaptorInstruction) InstructionType() int {
@@ -1313,6 +1325,8 @@ func (ins *ChangeAdaptorInstruction) GetParameter(name string) interface{} {
 		return ins.NewAdaptorType
 	case "INSTRUCTIONTYPE":
 		return ins.InstructionType()
+	case "PLATFORM":
+		return ins.Platform
 	}
 	return nil
 }
@@ -1336,6 +1350,7 @@ type LoadTipsMoveInstruction struct {
 	FPosition  []string
 	FPlateType []string
 	Multi      int
+	Platform   string
 }
 
 func NewLoadTipsMoveInstruction() *LoadTipsMoveInstruction {
@@ -1364,6 +1379,8 @@ func (ins *LoadTipsMoveInstruction) GetParameter(name string) interface{} {
 		return ins.Multi
 	case "INSTRUCTIONTYPE":
 		return ins.InstructionType()
+	case "PLATFORM":
+		return ins.Platform
 	}
 	return nil
 }
@@ -1382,6 +1399,7 @@ func (ins *LoadTipsMoveInstruction) Generate(policy *LHPolicyRuleSet, prms *LHPr
 	mov.OffsetX = append(mov.OffsetX, 0.0)
 	mov.OffsetY = append(mov.OffsetY, 0.0)
 	mov.OffsetZ = append(mov.OffsetZ, 0.0)
+	mov.Platform = ins.Platform
 	ret[0] = mov
 
 	// load tips
@@ -1394,6 +1412,7 @@ func (ins *LoadTipsMoveInstruction) Generate(policy *LHPolicyRuleSet, prms *LHPr
 	lod.Pos = ins.FPosition
 	lod.HolderType = ins.FPlateType
 	lod.Well = ins.Well
+	lod.Platform = ins.Platform
 	ret[1] = lod
 
 	return ret, nil
@@ -1406,6 +1425,7 @@ type UnloadTipsMoveInstruction struct {
 	WellTo     []string
 	TPlateType []string
 	Multi      int
+	Platform   string
 }
 
 func NewUnloadTipsMoveInstruction() *UnloadTipsMoveInstruction {
@@ -1434,6 +1454,8 @@ func (ins *UnloadTipsMoveInstruction) GetParameter(name string) interface{} {
 		return ins.InstructionType()
 	case "MULTI":
 		return ins.Multi
+	case "PLATFORM":
+		return ins.Platform
 	}
 	return nil
 }
@@ -1452,6 +1474,7 @@ func (ins *UnloadTipsMoveInstruction) Generate(policy *LHPolicyRuleSet, prms *LH
 	mov.OffsetX = append(mov.OffsetX, 0.0)
 	mov.OffsetY = append(mov.OffsetY, 0.0)
 	mov.OffsetZ = append(mov.OffsetZ, 0.0)
+	mov.Platform = ins.Platform
 	ret[0] = mov
 
 	// unload tips
@@ -1464,6 +1487,7 @@ func (ins *UnloadTipsMoveInstruction) Generate(policy *LHPolicyRuleSet, prms *LH
 	uld.Pos = ins.PltTo
 	uld.HolderType = ins.TPlateType
 	uld.Well = ins.WellTo
+	uld.Platform = ins.Platform
 	ret[1] = uld
 
 	return ret, nil
@@ -1478,6 +1502,7 @@ type AspirateInstruction struct {
 	Plt        []string
 	What       []string
 	LLF        []bool
+	Platform   string
 }
 
 func NewAspirateInstruction() *AspirateInstruction {
@@ -1511,6 +1536,8 @@ func (ins *AspirateInstruction) GetParameter(name string) interface{} {
 		return ins.Plt
 	case "LLF":
 		return ins.LLF
+	case "PLATFORM":
+		return ins.Platform
 	}
 	return nil
 }
@@ -1530,13 +1557,14 @@ func (ins *AspirateInstruction) OutputTo(driver LiquidhandlingDriver) {
 }
 
 type DispenseInstruction struct {
-	Type   int
-	Head   int
-	Volume []wunit.Volume
-	Multi  int
-	Plt    []string
-	What   []string
-	LLF    []bool
+	Type     int
+	Head     int
+	Volume   []wunit.Volume
+	Multi    int
+	Plt      []string
+	What     []string
+	LLF      []bool
+	Platform string
 }
 
 func NewDispenseInstruction() *DispenseInstruction {
@@ -1568,6 +1596,8 @@ func (ins *DispenseInstruction) GetParameter(name string) interface{} {
 		return ins.LLF
 	case "PLT":
 		return ins.Plt
+	case "PLATFORM":
+		return ins.Platform
 	}
 	return nil
 }
@@ -1587,13 +1617,14 @@ func (ins *DispenseInstruction) OutputTo(driver LiquidhandlingDriver) {
 }
 
 type BlowoutInstruction struct {
-	Type   int
-	Head   int
-	Volume []wunit.Volume
-	Multi  int
-	Plt    []string
-	What   []string
-	LLF    []bool
+	Type     int
+	Head     int
+	Volume   []wunit.Volume
+	Multi    int
+	Plt      []string
+	What     []string
+	LLF      []bool
+	Platform string
 }
 
 func NewBlowoutInstruction() *BlowoutInstruction {
@@ -1622,6 +1653,8 @@ func (ins *BlowoutInstruction) GetParameter(name string) interface{} {
 		return ins.LLF
 	case "PLT":
 		return ins.Plt
+	case "PLATFORM":
+		return ins.Platform
 	}
 	return nil
 }
@@ -1688,6 +1721,7 @@ type MoveInstruction struct {
 	OffsetX   []float64
 	OffsetY   []float64
 	OffsetZ   []float64
+	Platform  string
 }
 
 func NewMoveInstruction() *MoveInstruction {
@@ -1729,6 +1763,8 @@ func (ins *MoveInstruction) GetParameter(name string) interface{} {
 		return ins.OffsetZ
 	case "INSTRUCTIONTYPE":
 		return ins.InstructionType()
+	case "PLATFORM":
+		return ins.Platform
 	}
 	return nil
 }
@@ -1801,7 +1837,10 @@ func (ins *MoveRawInstruction) GetParameter(name string) interface{} {
 	case "PARAMS":
 		return ins.Prms
 	case "PLATFORM":
-		return ins.Prms.Name
+		if ins.Prms == nil {
+			return ""
+		}
+		return ins.Prms.Platform
 	case "INSTRUCTIONTYPE":
 		return ins.InstructionType()
 	}
@@ -1826,6 +1865,7 @@ type LoadTipsInstruction struct {
 	TipType    []string
 	HolderType []string
 	Multi      int
+	Platform   string
 }
 
 func NewLoadTipsInstruction() *LoadTipsInstruction {
@@ -1862,6 +1902,8 @@ func (ins *LoadTipsInstruction) GetParameter(name string) interface{} {
 		return ins.HolderType
 	case "POS":
 		return ins.Pos
+	case "PLATFORM":
+		return ins.Platform
 	}
 	return nil
 }
@@ -1883,6 +1925,7 @@ type UnloadTipsInstruction struct {
 	Multi      int
 	Pos        []string
 	Well       []string
+	Platform   string
 }
 
 func NewUnloadTipsInstruction() *UnloadTipsInstruction {
@@ -1917,6 +1960,8 @@ func (ins *UnloadTipsInstruction) GetParameter(name string) interface{} {
 		return ins.Well
 	case "POS":
 		return ins.Pos
+	case "PLATFORM":
+		return ins.Platform
 	}
 	return nil
 }
@@ -1992,7 +2037,10 @@ func (ins *SuckInstruction) GetParameter(name string) interface{} {
 	case "OVERSTROKE":
 		return ins.Overstroke
 	case "PLATFORM":
-		return ins.Prms.Name
+		if ins.Prms == nil {
+			return ""
+		}
+		return ins.Prms.Platform
 	case "INSTRUCTIONTYPE":
 		return ins.InstructionType()
 	}
@@ -2314,7 +2362,10 @@ func (ins *BlowInstruction) GetParameter(name string) interface{} {
 	case "PARAMS":
 		return ins.Prms
 	case "PLATFORM":
-		return ins.Prms.Name
+		if ins.Prms == nil {
+			return ""
+		}
+		return ins.Prms.Platform
 	case "MULTI":
 		return ins.Multi
 	case "INSTRUCTIONTYPE":
@@ -2643,7 +2694,11 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 
 	// now do we reset?
 
-	if weneedtoreset {
+	// allow policies to override completely
+
+	overridereset := SafeGetBool(pol, "RESET_OVERRIDE")
+
+	if weneedtoreset && !overridereset {
 		resetinstruction := NewResetInstruction()
 		resetinstruction.AddMultiTransferParams(ins.Params())
 		resetinstruction.Prms = ins.Prms
@@ -3123,7 +3178,10 @@ func (ins *ResetInstruction) GetParameter(name string) interface{} {
 	case "PARAMS":
 		return ins.Prms
 	case "PLATFORM":
-		return ins.Prms.Name
+		if ins.Prms == nil {
+			return ""
+		}
+		return ins.Prms.Platform
 	case "INSTRUCTIONTYPE":
 		return ins.InstructionType()
 	}

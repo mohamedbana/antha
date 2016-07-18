@@ -2260,28 +2260,22 @@ func (m *ArrayOfPtrToLHHeadMessage) GetArg_1() []*PtrToLHHeadMessage {
 
 type LHChannelParameterMessage struct {
 	Arg_1  string           `protobuf:"bytes,1,opt,name=Arg_1,json=arg1" json:"Arg_1,omitempty"`
-	Arg_2  string           `protobuf:"bytes,2,opt,name=Arg_2,json=arg2" json:"Arg_2,omitempty"`
-	Arg_3  *VolumeMessage   `protobuf:"bytes,3,opt,name=Arg_3,json=arg3" json:"Arg_3,omitempty"`
-	Arg_4  *VolumeMessage   `protobuf:"bytes,4,opt,name=Arg_4,json=arg4" json:"Arg_4,omitempty"`
-	Arg_5  *FlowRateMessage `protobuf:"bytes,5,opt,name=Arg_5,json=arg5" json:"Arg_5,omitempty"`
-	Arg_6  *FlowRateMessage `protobuf:"bytes,6,opt,name=Arg_6,json=arg6" json:"Arg_6,omitempty"`
-	Arg_7  int64            `protobuf:"varint,7,opt,name=Arg_7,json=arg7" json:"Arg_7,omitempty"`
-	Arg_8  bool             `protobuf:"varint,8,opt,name=Arg_8,json=arg8" json:"Arg_8,omitempty"`
-	Arg_9  int64            `protobuf:"varint,9,opt,name=Arg_9,json=arg9" json:"Arg_9,omitempty"`
-	Arg_10 int64            `protobuf:"varint,10,opt,name=Arg_10,json=arg10" json:"Arg_10,omitempty"`
+	Arg_2  string           `protobuf:"bytes,1,opt,name=Arg_2,json=arg2" json:"Arg_2,omitempty"`
+	Arg_3  string           `protobuf:"bytes,2,opt,name=Arg_3,json=arg3" json:"Arg_3,omitempty"`
+	Arg_4  *VolumeMessage   `protobuf:"bytes,3,opt,name=Arg_4,json=arg4" json:"Arg_4,omitempty"`
+	Arg_5  *VolumeMessage   `protobuf:"bytes,4,opt,name=Arg_5,json=arg5" json:"Arg_5,omitempty"`
+	Arg_6  *FlowRateMessage `protobuf:"bytes,5,opt,name=Arg_6,json=arg6" json:"Arg_6,omitempty"`
+	Arg_7  *FlowRateMessage `protobuf:"bytes,6,opt,name=Arg_7,json=arg7" json:"Arg_7,omitempty"`
+	Arg_8  int64            `protobuf:"varint,7,opt,name=Arg_8,json=arg8" json:"Arg_8,omitempty"`
+	Arg_9  bool             `protobuf:"varint,8,opt,name=Arg_9,json=arg9" json:"Arg_9,omitempty"`
+	Arg_10 int64            `protobuf:"varint,9,opt,name=Arg_10,json=arg10" json:"Arg_10,omitempty"`
+	Arg_11 int64            `protobuf:"varint,10,opt,name=Arg_11,json=arg11" json:"Arg_11,omitempty"`
 }
 
 func (m *LHChannelParameterMessage) Reset()                    { *m = LHChannelParameterMessage{} }
 func (m *LHChannelParameterMessage) String() string            { return proto.CompactTextString(m) }
 func (*LHChannelParameterMessage) ProtoMessage()               {}
 func (*LHChannelParameterMessage) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{109} }
-
-func (m *LHChannelParameterMessage) GetArg_3() *VolumeMessage {
-	if m != nil {
-		return m.Arg_3
-	}
-	return nil
-}
 
 func (m *LHChannelParameterMessage) GetArg_4() *VolumeMessage {
 	if m != nil {
@@ -2290,7 +2284,7 @@ func (m *LHChannelParameterMessage) GetArg_4() *VolumeMessage {
 	return nil
 }
 
-func (m *LHChannelParameterMessage) GetArg_5() *FlowRateMessage {
+func (m *LHChannelParameterMessage) GetArg_5() *VolumeMessage {
 	if m != nil {
 		return m.Arg_5
 	}
@@ -2300,6 +2294,13 @@ func (m *LHChannelParameterMessage) GetArg_5() *FlowRateMessage {
 func (m *LHChannelParameterMessage) GetArg_6() *FlowRateMessage {
 	if m != nil {
 		return m.Arg_6
+	}
+	return nil
+}
+
+func (m *LHChannelParameterMessage) GetArg_7() *FlowRateMessage {
+	if m != nil {
+		return m.Arg_7
 	}
 	return nil
 }
