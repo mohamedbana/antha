@@ -1558,7 +1558,7 @@ func Test_UnloadTips(t *testing.T) {
             []*func(*VirtualLiquidHandler){ //setup           []*func(*VirtualLiquidHandler)
                 preloadTips([]int{0}, 0),
             },
-            []string{"(err) UnloadTips: Cannot unload 2 tips as adaptor only has one tip loaded"},
+            []string{"(err) UnloadTips: Cannot unload tip from channel 7 as no tip is loaded there"},
             nil,                        //remaining_tips  []int
             0,                          //tips_in_waste   int
         },
@@ -1581,7 +1581,7 @@ func Test_UnloadTips(t *testing.T) {
             []*func(*VirtualLiquidHandler){ //setup           []*func(*VirtualLiquidHandler)
                 preloadTips([]int{0,1}, 0),
             },
-            []string{"(err) UnloadTips: Cannot unload 3 tips as adaptor only has 2 tips loaded"},
+            []string{"(err) UnloadTips: Cannot unload tips from channels 7,4 as no tips are loaded there"},
             nil,                        //remaining_tips  []int
             0,                          //tips_in_waste   int
         },

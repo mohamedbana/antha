@@ -403,7 +403,6 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
             continue
         }
         tipbox.Tips[wellcoords[i].X][wellcoords[i].Y] = nil
-        //TODO: add the tip to the particular location in the adaptor
         adaptor.AddTip(channels[i], tip)
     }
 
@@ -466,17 +465,22 @@ func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
         return ret
     }
 
-    //check there's a tip at every channel
-    //TODO:
-    if len(channels) > adaptor.NTipsLoaded() {
-        if adaptor.NTipsLoaded() == 0 {
-            self.AddErrorf("UnloadTips", "Cannot unload %v tips as no tips are loaded", len(channels))
-        } else if adaptor.NTipsLoaded() == 1 {
-            self.AddErrorf("UnloadTips", "Cannot unload %v tips as adaptor only has one tip loaded", len(channels))
-        } else {
-            self.AddErrorf("UnloadTips", "Cannot unload %v tips as adaptor only has %v tips loaded", len(channels), adaptor.NTipsLoaded())
+    //check there's a tip at every channel we want to unload
+    channel_errors := []string{}
+    for _,ch :=  range channels {
+        if !adaptor.IsTipLoaded(ch) {
+            channel_errors = append(channel_errors, fmt.Sprintf("%v", ch))
         }
-        return ret
+    }
+    if len(channel_errors) > 0 {
+        if len(channel_errors) > 1 {
+            self.AddErrorf("UnloadTips", "Cannot unload tips from channels %s as no tips are loaded there",
+                strings.Join(channel_errors, ","))
+
+        } else {
+            self.AddErrorf("UnloadTips", "Cannot unload tip from channel %s as no tip is loaded there",
+                channel_errors[0])
+        }
     }
 
     //Actually unload the adaptor
