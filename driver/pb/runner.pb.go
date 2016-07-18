@@ -104,6 +104,10 @@ func init() {
 var _ context.Context
 var _ grpc.ClientConn
 
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion3
+
 // Client API for Runner service
 
 type RunnerClient interface {
@@ -178,52 +182,76 @@ func RegisterRunnerServer(s *grpc.Server, srv RunnerServer) {
 	s.RegisterService(&_Runner_serviceDesc, srv)
 }
 
-func _Runner_Run_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+func _Runner_Run_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RunRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(RunnerServer).Run(ctx, in)
-	if err != nil {
-		return nil, err
+	if interceptor == nil {
+		return srv.(RunnerServer).Run(ctx, in)
 	}
-	return out, nil
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/driver.Runner/Run",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RunnerServer).Run(ctx, req.(*RunRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-func _Runner_Messages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+func _Runner_Messages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MessagesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(RunnerServer).Messages(ctx, in)
-	if err != nil {
-		return nil, err
+	if interceptor == nil {
+		return srv.(RunnerServer).Messages(ctx, in)
 	}
-	return out, nil
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/driver.Runner/Messages",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RunnerServer).Messages(ctx, req.(*MessagesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-func _Runner_SupportedRunTypes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+func _Runner_SupportedRunTypes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SupportedRunTypesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(RunnerServer).SupportedRunTypes(ctx, in)
-	if err != nil {
-		return nil, err
+	if interceptor == nil {
+		return srv.(RunnerServer).SupportedRunTypes(ctx, in)
 	}
-	return out, nil
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/driver.Runner/SupportedRunTypes",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RunnerServer).SupportedRunTypes(ctx, req.(*SupportedRunTypesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-func _Runner_DriverType_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+func _Runner_DriverType_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TypeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(RunnerServer).DriverType(ctx, in)
-	if err != nil {
-		return nil, err
+	if interceptor == nil {
+		return srv.(RunnerServer).DriverType(ctx, in)
 	}
-	return out, nil
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/driver.Runner/DriverType",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RunnerServer).DriverType(ctx, req.(*TypeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 var _Runner_serviceDesc = grpc.ServiceDesc{
@@ -247,8 +275,11 @@ var _Runner_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Runner_DriverType_Handler,
 		},
 	},
-	Streams: []grpc.StreamDesc{},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: fileDescriptor1,
 }
+
+func init() { proto.RegisterFile("runner.proto", fileDescriptor1) }
 
 var fileDescriptor1 = []byte{
 	// 311 bytes of a gzipped FileDescriptorProto

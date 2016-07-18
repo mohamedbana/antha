@@ -384,8 +384,7 @@ message LHAdaptorMessage {
 	string Arg_2 = 2;
 	string Arg_3 = 3;
 	PtrToLHChannelParameterMessage Arg_4 = 4;
-	int64 Arg_5 = 5;
-	PtrToLHTipMessage Arg_6 = 6;
+	ArrayOfPtrToLHTipMessage Arg_5 = 5;
 }
 message PtrToLHTipMessage{
 	LHTipMessage arg_1=1;

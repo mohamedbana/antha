@@ -557,11 +557,19 @@ func DecodeMapstringPtrToLHTipboxMessageFieldEntry(arg *pb.MapstringPtrToLHTipbo
 	return k, v
 }
 func EncodeLHAdaptor(arg wtype.LHAdaptor) *pb.LHAdaptorMessage {
-	ret := pb.LHAdaptorMessage{(string)(arg.Name), (string)(arg.ID), (string)(arg.Manufacturer), EncodePtrToLHChannelParameter(arg.Params), int64(arg.Ntipsloaded), EncodePtrToLHTip(arg.Tiptypeloaded)}
+	ret := pb.LHAdaptorMessage{(string)(arg.Name), 
+                               (string)(arg.ID), 
+                               (string)(arg.Manufacturer), 
+                               EncodePtrToLHChannelParameter(arg.Params), 
+                               EncodeArrayOfPtrToLHTip(arg.Tips)}
 	return &ret
 }
 func DecodeLHAdaptor(arg *pb.LHAdaptorMessage) wtype.LHAdaptor {
-	ret := wtype.LHAdaptor{(string)(arg.Arg_1), (string)(arg.Arg_2), (string)(arg.Arg_3), (*wtype.LHChannelParameter)(DecodePtrToLHChannelParameter(arg.Arg_4)), (int)(arg.Arg_5), (*wtype.LHTip)(DecodePtrToLHTip(arg.Arg_6))}
+	ret := wtype.LHAdaptor{(string)(arg.Arg_1), 
+                           (string)(arg.Arg_2), 
+                           (string)(arg.Arg_3), 
+                           (*wtype.LHChannelParameter)(DecodePtrToLHChannelParameter(arg.Arg_4)), 
+                           ([]*wtype.LHTip)(DecodeArrayOfPtrToLHTip(arg.Arg_5))}
 	return ret
 }
 func EncodePtrToLHPlate(arg *wtype.LHPlate) *pb.PtrToLHPlateMessage {
