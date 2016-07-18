@@ -42,10 +42,10 @@ func _TypeIISConstructAssemblyMMX_forscreenSteps(_ctx context.Context, _input *T
 		Partsinorder:  _input.PartSeqs[:last],
 	})
 	if err != nil {
-		panic(fmt.Sprintf("%s: %s", output, err))
+		execute.Errorf(_ctx, "%s: %s", output, err)
 	}
 	if count != 1 {
-		panic("no successful assembly")
+		execute.Errorf(_ctx, "no successful assembly")
 	}
 
 	_output.Sequence = seq
@@ -62,8 +62,7 @@ func _TypeIISConstructAssemblyMMX_forscreenSteps(_ctx context.Context, _input *T
 		part.Type, err = wtype.LiquidTypeFromString(_input.LHPolicyName)
 
 		if err != nil {
-			panic(fmt.Sprintf("cannot find liquid type: %s", err))
-			return
+			execute.Errorf(_ctx, "cannot find liquid type: %s", err)
 		}
 
 		partSample := mixer.Sample(part, _input.PartVols[k])
