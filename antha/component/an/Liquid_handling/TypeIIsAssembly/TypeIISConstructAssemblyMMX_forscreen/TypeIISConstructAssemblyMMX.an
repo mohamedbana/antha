@@ -66,10 +66,10 @@ Steps {
             Partsinorder: PartSeqs[:last],
         })
         if err != nil {
-          panic(fmt.Sprintf("%s: %s", output, err))
+          Errorf("%s: %s", output, err)
         }
         if count != 1 {
-          panic("no successful assembly")
+          Errorf("no successful assembly")
         }
 
         Sequence = seq
@@ -86,8 +86,7 @@ Steps {
 		part.Type, err = wtype.LiquidTypeFromString(LHPolicyName)
 		
 		if err != nil {
-                        panic(fmt.Sprintf("cannot find liquid type: %s", err))
-                        return
+                        Errorf("cannot find liquid type: %s", err)
 		}
 		
 		partSample := mixer.Sample(part, PartVols[k])
