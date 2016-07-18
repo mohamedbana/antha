@@ -690,7 +690,7 @@ func TestVLH_AddPlateTo_locationFull(t *testing.T) {
 // ########################################################################################################################
 
 
-func get_tip_test_vlh() *VirtualLiquidHandler {
+func get_tip_test_vlh(independent bool) *VirtualLiquidHandler {
     props := LHPropertiesParams{
         "Device Name",
         "Device Manufacturer",
@@ -713,7 +713,7 @@ func get_tip_test_vlh() *VirtualLiquidHandler {
                     UnitParams{0.1, "ml/min"},  //min flowrate
                     UnitParams{10., "ml/min",}, //max flowrate
                     8,                          //multi
-                    false,                      //independent
+                    independent,                //independent
                     0,                          //orientation
                     0,                          //head
                 },
@@ -727,7 +727,7 @@ func get_tip_test_vlh() *VirtualLiquidHandler {
                         UnitParams{0.1, "ml/min"},      //min flowrate
                         UnitParams{10., "ml/min",},     //max flowrate
                         8,                              //multi
-                        false,                          //independent
+                        independent,                    //independent
                         0,                              //orientation
                         0,                              //head
                     },
@@ -793,6 +793,7 @@ func (s *LoadTipsParams) apply(vlh *VirtualLiquidHandler) {
 
 type LoadTipsTest struct {
     desc                string
+    independent         bool
     params              LoadTipsParams
     setup               *func(*VirtualLiquidHandler)
     expected_errors     []string
@@ -890,6 +891,7 @@ func (s *UnloadTipsParams) apply(vlh *VirtualLiquidHandler) {
 
 type UnloadTipsTest struct {
     testName        string
+    independent     bool
     params          UnloadTipsParams
     setup           []*func(*VirtualLiquidHandler)
     expected_errors []string
@@ -951,6 +953,7 @@ func Test_LoadTips(t *testing.T) {
     tests := []LoadTipsTest{
         LoadTipsTest{
             "correctly loading a single tip",
+            false,                      //independent
             LoadTipsParams{
                 []int{0},                   //channels
                 0,                          //head
@@ -966,6 +969,7 @@ func Test_LoadTips(t *testing.T) {
         },
         LoadTipsTest{
             "correctly loading eight tips at once",
+            false,                      //independent
             LoadTipsParams{
                 []int{0,1,2,3,4,5,6,7},     //channels
                 0,                          //head
@@ -1017,6 +1021,7 @@ func Test_LoadTips(t *testing.T) {
         },
         LoadTipsTest{
             "correctly loading three tips at once",
+            false,                      //independent
             LoadTipsParams{
                 []int{0,1,2,},     //channels
                 0,                          //head
@@ -1047,7 +1052,40 @@ func Test_LoadTips(t *testing.T) {
             []int{0,1,2,},    //loaded_tips
         },
         LoadTipsTest{
+            "independently load three non-contiguous tips at once",
+            true,                       //independent
+            LoadTipsParams{
+                []int{0,4,6,},     //channels
+                0,                          //head
+                3,                          //multi
+                []string{                   //platetype
+                    "tipbox",
+                    "tipbox",
+                    "tipbox",
+                },
+                []string{                   //position
+                    "tip_loc",
+                    "tip_loc",
+                    "tip_loc",
+                },
+                []string{                   //well,
+                    "A1",
+                    "E1",
+                    "G1",
+                },
+            },
+            nil,                        //setup
+            nil,                        //expected_error
+            []TipLoc{                   //missing_tips
+                TipLoc{0,0},
+                TipLoc{4,0},
+                TipLoc{6,0},
+            },
+            []int{0,4,6,},    //loaded_tips
+        },
+        LoadTipsTest{
             "loading a single tip above a missing tip",
+            false,                      //independent
             LoadTipsParams{
                 []int{0},                   //channels
                 0,                          //head
@@ -1064,6 +1102,7 @@ func Test_LoadTips(t *testing.T) {
         // and now the error tests
         LoadTipsTest{
             "invalid channel value",
+            false,                      //independent
             LoadTipsParams{
                 []int{8},                   //channels
                 0,                          //head
@@ -1079,6 +1118,7 @@ func Test_LoadTips(t *testing.T) {
         },
         LoadTipsTest{
             "invalid channel value",
+            false,                      //independent
             LoadTipsParams{
                 []int{-1},                  //channels
                 0,                          //head
@@ -1094,6 +1134,7 @@ func Test_LoadTips(t *testing.T) {
         },
         LoadTipsTest{
             "too many channels",
+            false,                      //independent
             LoadTipsParams{
                 []int{0,1,2,3,4,5,6,7,7},   //channels
                 0,                          //head
@@ -1139,6 +1180,7 @@ func Test_LoadTips(t *testing.T) {
         },
         LoadTipsTest{
             "invalid head",
+            false,                      //independent
             LoadTipsParams{
                 []int{0},                  //channels
                 1,                          //head
@@ -1154,6 +1196,7 @@ func Test_LoadTips(t *testing.T) {
         },
         LoadTipsTest{
             "invalid head",
+            false,                      //independent
             LoadTipsParams{
                 []int{0},                  //channels
                 -1,                          //head
@@ -1169,6 +1212,7 @@ func Test_LoadTips(t *testing.T) {
         },
         LoadTipsTest{
             "mismatching multi",
+            false,                      //independent
             LoadTipsParams{
                 []int{0},                  //channels
                 0,                          //head
@@ -1184,6 +1228,7 @@ func Test_LoadTips(t *testing.T) {
         },
         LoadTipsTest{
             "mismatching location",
+            false,                      //independent
             LoadTipsParams{
                 []int{0,1},                  //channels
                 0,                          //head
@@ -1201,6 +1246,7 @@ func Test_LoadTips(t *testing.T) {
         },
         LoadTipsTest{
             "mismatching platetype",
+            false,                      //independent
             LoadTipsParams{
                 []int{0,1},                  //channels
                 0,                          //head
@@ -1218,6 +1264,7 @@ func Test_LoadTips(t *testing.T) {
         },
         LoadTipsTest{
             "wrong platetype",
+            false,                      //independent
             LoadTipsParams{
                 []int{0,1},                  //channels
                 0,                          //head
@@ -1235,6 +1282,7 @@ func Test_LoadTips(t *testing.T) {
         },
         LoadTipsTest{
             "mismatching multi",
+            false,                      //independent
             LoadTipsParams{
                 []int{0,1},                  //channels
                 0,                          //head
@@ -1252,6 +1300,7 @@ func Test_LoadTips(t *testing.T) {
         },
         LoadTipsTest{
             "invalid well",
+            false,                      //independent
             LoadTipsParams{
                 []int{0},                  //channels
                 0,                          //head
@@ -1267,6 +1316,7 @@ func Test_LoadTips(t *testing.T) {
         },
         LoadTipsTest{
             "invalid well",
+            false,                      //independent
             LoadTipsParams{
                 []int{0},                  //channels
                 0,                          //head
@@ -1282,6 +1332,7 @@ func Test_LoadTips(t *testing.T) {
         },
         LoadTipsTest{
             "loading collision",
+            false,                      //independent
             LoadTipsParams{
                 []int{0},                   //channels
                 0,                          //head
@@ -1297,6 +1348,7 @@ func Test_LoadTips(t *testing.T) {
         },
         LoadTipsTest{
             "loading collision",
+            false,                      //independent
             LoadTipsParams{
                 []int{0,7},                   //channels
                 0,                          //head
@@ -1312,6 +1364,7 @@ func Test_LoadTips(t *testing.T) {
         }, 
         LoadTipsTest{
             "non-contiguous wells",
+            false,                      //independent
             LoadTipsParams{
                 []int{0,1},                   //channels
                 0,                          //head
@@ -1327,6 +1380,7 @@ func Test_LoadTips(t *testing.T) {
         }, 
         LoadTipsTest{
             "missing tip",
+            false,                      //independent
             LoadTipsParams{
                 []int{0},                   //channels
                 0,                          //head
@@ -1342,6 +1396,7 @@ func Test_LoadTips(t *testing.T) {
         }, 
         LoadTipsTest{
             "tip already loaded",
+            false,                      //independent
             LoadTipsParams{
                 []int{0},                   //channels
                 0,                          //head
@@ -1358,7 +1413,7 @@ func Test_LoadTips(t *testing.T) {
     }
 
     for _, test := range tests {
-        vlh := get_tip_test_vlh()
+        vlh := get_tip_test_vlh(test.independent)
         test.run(t, vlh)
     }
 
@@ -1369,6 +1424,7 @@ func Test_UnloadTips(t *testing.T) {
     tests := []UnloadTipsTest {
         UnloadTipsTest{
             "unload a tip",     //testName        string
+            false,              //independent
             UnloadTipsParams{   //params          UnloadTipsParams
                 []int{0},                   //channels        []int
                 0,                          //head            int
@@ -1386,6 +1442,7 @@ func Test_UnloadTips(t *testing.T) {
         },
         UnloadTipsTest{
             "unload 8 tips",     //testName        string
+            false,              //independent
             UnloadTipsParams{   //params          UnloadTipsParams
                 []int{0,1,2,3,4,5,6,7},     //channels        []int
                 0,                          //head            int
@@ -1423,7 +1480,29 @@ func Test_UnloadTips(t *testing.T) {
             8,                              //tips_in_waste   int
         },
         UnloadTipsTest{
+            "independently unload 2 of 8 tips",     //testName        string
+            true,              //independent
+            UnloadTipsParams{   //params          UnloadTipsParams
+                []int{0,7},                 //channels        []int
+                0,                          //head            int
+                2,                          //multi           int
+                []string{"tipwaste",        //platetype       []string
+                         "tipwaste"},
+                []string{"tipwaste_loc",    //position        []string
+                         "tipwaste_loc"},
+                []string{"A1",              //well            []string
+                         "A1"},
+            },
+            []*func(*VirtualLiquidHandler){ //setup           []*func(*VirtualLiquidHandler)
+                preloadTips([]int{0,1,2,3,4,5,6,7}, 0),
+            },
+            nil,
+            []int{1,2,3,4,5,6},         //remaining_tips  []int
+            2,                          //tips_in_waste   int
+        },
+        UnloadTipsTest{
             "can only unload all tips",     //testName        string
+            false,              //independent
             UnloadTipsParams{   //params          UnloadTipsParams
                 []int{0,7},                 //channels        []int
                 0,                          //head            int
@@ -1444,6 +1523,7 @@ func Test_UnloadTips(t *testing.T) {
         },
         UnloadTipsTest{
             "multi is wrong",     //testName        string
+            false,              //independent
             UnloadTipsParams{   //params          UnloadTipsParams
                 []int{0,7},                 //channels        []int
                 0,                          //head            int
@@ -1464,6 +1544,7 @@ func Test_UnloadTips(t *testing.T) {
         },
         UnloadTipsTest{
             "wrong location",     //testName        string
+            false,              //independent
             UnloadTipsParams{   //params          UnloadTipsParams
                 []int{0,7},                 //channels        []int
                 0,                          //head            int
@@ -1484,6 +1565,7 @@ func Test_UnloadTips(t *testing.T) {
         },/*
         UnloadTipsTest{
             "wrong well",       //testName        string
+            false,              //independent
             UnloadTipsParams{   //params          UnloadTipsParams
                 []int{0,7},                 //channels        []int
                 0,                          //head            int
@@ -1504,6 +1586,7 @@ func Test_UnloadTips(t *testing.T) {
         },*/
         UnloadTipsTest{
             "wrong platetype",     //testName        string
+            false,              //independent
             UnloadTipsParams{   //params          UnloadTipsParams
                 []int{0,7},                 //channels        []int
                 0,                          //head            int
@@ -1524,6 +1607,7 @@ func Test_UnloadTips(t *testing.T) {
         },
         UnloadTipsTest{
             "mixed location",     //testName        string
+            false,              //independent
             UnloadTipsParams{   //params          UnloadTipsParams
                 []int{0,7},                 //channels        []int
                 0,                          //head            int
@@ -1544,6 +1628,7 @@ func Test_UnloadTips(t *testing.T) {
         },
         UnloadTipsTest{
             "unload too many",     //testName        string
+            false,              //independent
             UnloadTipsParams{   //params          UnloadTipsParams
                 []int{0,7},                 //channels        []int
                 0,                          //head            int
@@ -1564,6 +1649,7 @@ func Test_UnloadTips(t *testing.T) {
         },
         UnloadTipsTest{
             "unload too many",     //testName        string
+            false,              //independent
             UnloadTipsParams{   //params          UnloadTipsParams
                 []int{0,7,4},                 //channels        []int
                 0,                          //head            int
@@ -1588,7 +1674,7 @@ func Test_UnloadTips(t *testing.T) {
     }
 
     for _,test := range tests {
-        vlh := get_tip_test_vlh()
+        vlh := get_tip_test_vlh(test.independent)
         test.run(t, vlh)
     }
 }
