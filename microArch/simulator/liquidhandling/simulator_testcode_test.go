@@ -28,8 +28,10 @@ import (
     "strings"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-    "github.com/microArch/simulator"
-    lh "github.com/microArch/simulator/liquidhandling"
+    "github.com/antha-lang/antha/microArch/simulator"
+    lh "github.com/antha-lang/antha/microArch/simulator/liquidhandling"
+	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
+	"github.com/antha-lang/antha/microArch/factory"
 )
 
 //
@@ -111,9 +113,9 @@ type LHPropertiesParams struct {
 }
 
 func AddAllTips(lhp *liquidhandling.LHProperties) *liquidhandling.LHProperties {
-	tips := GetTipList()
+	tips := factory.GetTipList()
 	for _, tt := range tips {
-		tb := GetTipByType(tt)
+		tb := factory.GetTipByType(tt)
 		if tb.Mnfr == lhp.Mnfr || lhp.Mnfr == "MotherNature" {
 			lhp.Tips = append(lhp.Tips, tb.Tips[0][0])
 		}
@@ -471,20 +473,20 @@ func default_lhtipwaste() *wtype.LHTipwaste {
     return makeLHTipWaste(&params)
 }
 
-func default_lhproperties() *LHProperties {
+func default_lhproperties() *liquidhandling.LHProperties {
     valid_props := LHPropertiesParams{
         "Device Name",
         "Device Manufacturer",
         []LayoutParams{
-            LayoutParams{"position1" ,   0.0,   0.0,   0.0},
-            LayoutParams{"position2" , 100.0,   0.0,   0.0,},
-            LayoutParams{"position3" , 200.0,   0.0,   0.0},
-            LayoutParams{"position4" ,   0.0, 100.0,   0.0},
-            LayoutParams{"position5" , 100.0, 100.0,   0.0},
-            LayoutParams{"position6" , 200.0, 100.0,   0.0},
-            LayoutParams{"position7" ,   0.0, 200.0,   0.0},
-            LayoutParams{"position8" , 100.0, 200.0,   0.0},
-            LayoutParams{"position9" , 200.0, 200.0,   0.0},
+            LayoutParams{"tipbox_1" ,   0.0,   0.0,   0.0},
+            LayoutParams{"tipbox_2" , 100.0,   0.0,   0.0,},
+            LayoutParams{"input_1" , 200.0,   0.0,   0.0},
+            LayoutParams{"input_2" ,   0.0, 100.0,   0.0},
+            LayoutParams{"output_1" , 100.0, 100.0,   0.0},
+            LayoutParams{"output_2" , 200.0, 100.0,   0.0},
+            LayoutParams{"tipwaste" ,   0.0, 200.0,   0.0},
+            LayoutParams{"wash" , 100.0, 200.0,   0.0},
+            LayoutParams{"waste" , 200.0, 200.0,   0.0},
         },
         []HeadParams{
             HeadParams{
@@ -518,18 +520,18 @@ func default_lhproperties() *LHProperties {
                 },
             },
         },
-        []string{"position1","position2",},             //Tip_preferences
-        []string{"position3","position4",},             //Input_preferences
-        []string{"position5","position6",},             //Output_preferences
-        []string{"position7",},                         //Tipwaste_preferences
-        []string{"position8",},                         //Wash_preferences
-        []string{"position9",},                         //Waste_preferences
+        []string{"tipbox_1","tipbox_2",},             //Tip_preferences
+        []string{"input_1", "input_2",},             //Input_preferences
+        []string{"output_1","output_2",},             //Output_preferences
+        []string{"tipwaste",},                         //Tipwaste_preferences
+        []string{"wash",},                         //Wash_preferences
+        []string{"waste",},                         //Waste_preferences
     }
 
     return makeLHProperties(&valid_props)
 }
 
-func default_vlh() *VirtualLiquidHandler {
+func default_vlh() *lh.VirtualLiquidHandler {
     vlh := lh.NewVirtualLiquidHandler(default_lhproperties())
     return vlh
 }
@@ -603,8 +605,8 @@ func (self *UnloadTips) Apply(vlh *lh.VirtualLiquidHandler) {
 type SetupFn func(*lh.VirtualLiquidHandler)
 
 func removeTipboxTips(tipbox_loc string, wells []string) *SetupFn {
-    ret := func(vlh *VirtualLiquidHandler) {
-        tipbox := vlh.properties.PlateLookup[vlh.properties.PosLookup[tipbox_loc]].(*wtype.LHTipbox)
+    var ret SetupFn = func(vlh *lh.VirtualLiquidHandler) {
+        tipbox := vlh.GetPlateAt(tipbox_loc).(*wtype.LHTipbox)
         for _,well := range wells {
             wc := wtype.MakeWellCoords(well)
             tipbox.Tips[wc.X][wc.Y] = nil
@@ -614,10 +616,9 @@ func removeTipboxTips(tipbox_loc string, wells []string) *SetupFn {
 }
 
 func preloadAdaptorTips(head int, tipbox_loc string, channels []int) *SetupFn {
-    ret := func(vlh *VirtualLiquidHandler) {
-        p := vlh.properties
-        adaptor := p.Heads[head].Adaptor
-        tipbox := p.PlateLookup[p.PosLookup[tipbox_loc]].(*wtype.LHTipbox)
+    var ret SetupFn = func(vlh *lh.VirtualLiquidHandler) {
+        adaptor := vlh.GetHeadAdaptor(head)
+        tipbox := vlh.GetPlateAt(tipbox_loc).(*wtype.LHTipbox)
 
         for _,ch := range channels {
             adaptor.AddTip(ch, tipbox.Tiptype.Dup());
@@ -627,9 +628,8 @@ func preloadAdaptorTips(head int, tipbox_loc string, channels []int) *SetupFn {
 }
 
 func fillTipwaste(tipwaste_loc string, count int) *SetupFn {
-    ret := func(vlh *VirtualLiquidHandler) {
-        p := vlh.properties
-        tipwaste := p.PlateLookup[p.PosLookup[tipwaste_loc]].(*wtype.LHTipwaste)
+    var ret SetupFn = func(vlh *lh.VirtualLiquidHandler) {
+        tipwaste := vlh.GetPlateAt(tipwaste_loc).(*wtype.LHTipwaste)
         tipwaste.Contents += count
     }
     return &ret
@@ -642,10 +642,10 @@ func fillTipwaste(tipwaste_loc string, count int) *SetupFn {
 type AssertionFn func(string, *testing.T, *lh.VirtualLiquidHandler)
 
 //tipboxAssertion assert that the tipbox has tips missing in the given locations only
-func tipboxAssertion(tipbox_loc string, missing_tips []string) *assertionFn {
-    ret := func(name string, t *testing.T, vlh *VirtualLiquidHandler) {
+func tipboxAssertion(tipbox_loc string, missing_tips []string) *AssertionFn {
+    var ret AssertionFn = func(name string, t *testing.T, vlh *lh.VirtualLiquidHandler) {
         mmissing_tips := make(map[string]bool)
-        for _,tl := missing_tips {
+        for _,tl := range missing_tips {
             mmissing_tips[tl] = true
         }
 
@@ -670,20 +670,20 @@ func tipboxAssertion(tipbox_loc string, missing_tips []string) *assertionFn {
 }
 
 //adaptorAssertion assert that the adaptor has tips in the given positions
-func adaptorAssertion(head int, tip_channels []int) *assertionFn {
-    ret := func(name string, t *testing.T, vlh *VirtualLiquidHandler) {
+func adaptorAssertion(head int, tip_channels []int) *AssertionFn {
+    var ret AssertionFn = func(name string, t *testing.T, vlh *lh.VirtualLiquidHandler) {
         mtips := make(map[int]bool)
-        for _,tl := tip_channels {
+        for _,tl := range tip_channels {
             mtips[tl] = true
         }
 
-        adaptor := vlh.properties.Heads[head].Adaptor
+        adaptor := vlh.GetHeadAdaptor(head)
         errors := []string{}
         for ch := 0; ch < adaptor.Params.Multi; ch++ {
             if itl, et := adaptor.IsTipLoaded(ch), mtips[ch]; itl && !et {
-                errors := append(errors, fmt.Sprintf("Unexpected tip on channel %v", ch))
-            } else !itl && et {
-                errors := append(errors, fmt.Sprintf("Expected tip on channel %v", ch))
+                errors = append(errors, fmt.Sprintf("Unexpected tip on channel %v", ch))
+            } else if !itl && et {
+                errors = append(errors, fmt.Sprintf("Expected tip on channel %v", ch))
             }
         }
         if len(errors) > 0 {
@@ -694,8 +694,8 @@ func adaptorAssertion(head int, tip_channels []int) *assertionFn {
 }
 
 //tipwasteAssertion assert the number of tips which should be in the tipwaste
-func tipwasteAssertion(tipwaste_loc string, expected_contents int) *assertionFn {
-    ret := func(name string, t *testing.T, vlh *VirtualLiquidHandler) {
+func tipwasteAssertion(tipwaste_loc string, expected_contents int) *AssertionFn {
+    var ret AssertionFn = func(name string, t *testing.T, vlh *lh.VirtualLiquidHandler) {
         tipwaste := vlh.GetPlateAt(tipwaste_loc).(wtype.LHTipwaste)
         
         if tipwaste.Contents != expected_contents {
@@ -712,7 +712,7 @@ func tipwasteAssertion(tipwaste_loc string, expected_contents int) *assertionFn 
 
 type SimulatorTest struct {
     Name            string
-    Props           *LHPropertiesParams 
+    Props           *liquidhandling.LHProperties
     Setup           []*SetupFn
     Instructions    []TestRobotInstruction
     ExpectedErrors  []string

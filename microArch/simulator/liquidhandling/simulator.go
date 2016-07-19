@@ -179,6 +179,18 @@ func elements_equal(slice []string) bool {
     return true
 }
 
+func (self *VirtualLiquidHandler) GetPlateAt(loc string) interface{} {
+    return self.properties.PlateLookup[self.properties.PosLookup[loc]]
+}
+
+func (self *VirtualLiquidHandler) GetHead(head int) *wtype.LHHead {
+    return self.properties.Heads[head]
+}
+
+func (self *VirtualLiquidHandler) GetHeadAdaptor(head int) *wtype.LHAdaptor {
+    return self.properties.Heads[head].Adaptor
+}
+
 // ------------------------------------------------------------------------ ExtendedLHDriver
 
 //Move command - used
