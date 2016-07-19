@@ -531,6 +531,64 @@ func default_lhproperties() *liquidhandling.LHProperties {
     return makeLHProperties(&valid_props)
 }
 
+func independent_lhproperties() *liquidhandling.LHProperties {
+    valid_props := LHPropertiesParams{
+        "Device Name",
+        "Device Manufacturer",
+        []LayoutParams{
+            LayoutParams{"tipbox_1" ,   0.0,   0.0,   0.0},
+            LayoutParams{"tipbox_2" , 100.0,   0.0,   0.0,},
+            LayoutParams{"input_1" , 200.0,   0.0,   0.0},
+            LayoutParams{"input_2" ,   0.0, 100.0,   0.0},
+            LayoutParams{"output_1" , 100.0, 100.0,   0.0},
+            LayoutParams{"output_2" , 200.0, 100.0,   0.0},
+            LayoutParams{"tipwaste" ,   0.0, 200.0,   0.0},
+            LayoutParams{"wash" , 100.0, 200.0,   0.0},
+            LayoutParams{"waste" , 200.0, 200.0,   0.0},
+        },
+        []HeadParams{
+            HeadParams{
+                "Head0 Name",
+                "Head0 Manufacturer",
+                ChannelParams{
+                    "Head0 ChannelParams",      //Name
+                    UnitParams{0.1, "ul"},      //min volume
+                    UnitParams{1.,  "ml"},      //max volume
+                    UnitParams{0.1, "ml/min"},  //min flowrate
+                    UnitParams{10., "ml/min",}, //max flowrate
+                    8,                          //multi
+                    true,                       //independent
+                    0,                          //orientation
+                    0,                          //head
+                },
+                AdaptorParams{
+                    "Head0 Adaptor",
+                    "Head0 Adaptor Manufacturer",
+                    ChannelParams{
+                        "Head0 Adaptor ChannelParams",  //Name
+                        UnitParams{0.1, "ul"},          //min volume
+                        UnitParams{1.,  "ml"},          //max volume
+                        UnitParams{0.1, "ml/min"},      //min flowrate
+                        UnitParams{10., "ml/min",},     //max flowrate
+                        8,                              //multi
+                        true,                           //independent
+                        0,                              //orientation
+                        0,                              //head
+                    },
+                },
+            },
+        },
+        []string{"tipbox_1","tipbox_2",},             //Tip_preferences
+        []string{"input_1", "input_2",},             //Input_preferences
+        []string{"output_1","output_2",},             //Output_preferences
+        []string{"tipwaste",},                         //Tipwaste_preferences
+        []string{"wash",},                         //Wash_preferences
+        []string{"waste",},                         //Waste_preferences
+    }
+
+    return makeLHProperties(&valid_props)
+}
+
 func default_vlh() *lh.VirtualLiquidHandler {
     vlh := lh.NewVirtualLiquidHandler(default_lhproperties())
     return vlh

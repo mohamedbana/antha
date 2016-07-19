@@ -145,7 +145,7 @@ func (self *VirtualLiquidHandler) validateTipArgs(fnname string,
 
     //check head exists
     if head < 0 || head >= len(self.properties.Heads) {
-        self.AddErrorf(fnname, "Request for invalid Head %v", head)
+        self.AddErrorf(fnname, "Request for unknown head %v", head)
         return false
     }
 
@@ -310,7 +310,7 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
     adaptor := self.properties.Heads[head].Adaptor
     tipbox, ok := self.properties.PlateLookup[self.properties.PosLookup[position[0]]].(*wtype.LHTipbox)
     if !ok {
-        self.AddErrorf("LoadTips", "Cannot load tips from location \"%s\", no tipbox found", position[0])
+        self.AddErrorf("LoadTips", "No tipbox found at location \"%s\"", position[0])
         return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
     }
     if platetype[0] != tipbox.Type {
