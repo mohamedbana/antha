@@ -448,11 +448,17 @@ func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
         self.AddError("UnloadTips", "platetype should be equal")
         return ret
     }
+    for _,w := range well {
+        wc := wtype.MakeWellCoords(w)
+        if wc.X != 0 || wc.Y != 0 {
+            self.AddErrorf("UnloadTips", "Tipwaste at \"%s\" has no well %s", position[0], w)
+        }
+    }
 
     adaptor := self.properties.Heads[head].Adaptor
     tipwaste, ok := self.properties.PlateLookup[self.properties.PosLookup[position[0]]].(*wtype.LHTipwaste)
     if !ok {
-        self.AddErrorf("UnloadTips", "Cannot unload tips at location \"%s\", no tipwaste found", position[0])
+        self.AddErrorf("UnloadTips", "No tipwaste found at location \"%s\"", position[0])
         return ret
     }
     if platetype[0] != tipwaste.Type {
