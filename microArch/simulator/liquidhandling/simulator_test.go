@@ -139,35 +139,49 @@ func TestVLH_AddPlateTo(t *testing.T) {
             nil,        //no errors
             nil,        //no assertions
         },
+        SimulatorTest{
+            "non plate type",       //name
+            nil,                    //default params
+            nil,                    //no setup
+            []TestRobotInstruction{
+                &Initialize{},
+                &AddPlateTo{"tipbox_1", "my plate's gone stringy", "not_a_plate"},
+            },
+            []string{"(err) AddPlateTo: Cannot add plate \"not_a_plate\" of type string to location \"tipbox_1\""},
+            nil,        //no assertions
+        },
+        SimulatorTest{
+            "location full",        //name
+            nil,                    //default params
+            nil,                    //no setup
+            []TestRobotInstruction{
+                &Initialize{},
+                &AddPlateTo{"tipbox_1", default_lhtipbox(), "p0"},
+                &AddPlateTo{"tipbox_1", default_lhtipbox(), "p1"},
+            },
+            []string{"(err) AddPlateTo: Cannot add plate \"p1\" to location \"tipbox_1\" which is already occupied by plate \"p0\""},
+            nil,        //no assertions
+        },
+//        SimulatorTest{   -- We'll probably want a test along these lines at some point, but Preferences aren't very strict at the moment
+//            "wrong plate type",     //name
+//            nil,                    //default params
+//            nil,                    //no setup
+//            []TestRobotInstruction{
+//                &Initialize{},
+//                &AddPlateTo{"tipbox_1", default_lhplate(), "tipbox"},
+//            },
+//            []string{"(warn) AddPlateTo: Added type Plate to location \"tipbox_1\", when preferences requested Tipbox"},
+//            nil,        //no assertions
+//        },
     }
 
     for _,test := range tests {
         test.run(t)
     }
 }
+
 /*
-func TestVLH_AddPlateTo_NotPlateType(t *testing.T) {
-    vlh := get_valid_vlh()
-    //try adding something that's the wrong type
-    vlh.AddPlateTo("position2", "my plate's gone stringy", "not_a_plate")
 
-    compare_errors(t, "adding string plate", 
-        []string{"(err) AddPlateTo: Cannot add plate \"not_a_plate\" of type string to location \"position2\""},
-        vlh.GetErrors())
-}
-
-func TestVLH_AddPlateTo_locationFull(t *testing.T) {
-    vlh := get_valid_vlh()
-    
-    //add a plate
-    vlh.AddPlateTo("position1", get_lhplate(), "p0")
-    //try to add another plate in the same location
-    vlh.AddPlateTo("position1", get_lhplate(), "p1")
-
-    compare_errors(t, "adding plate to full location", 
-        []string{"(err) AddPlateTo: Cannot add plate \"p1\" to location \"position1\" which is already occupied by plate \"p0\""},
-        vlh.GetErrors())
-}
 
 // ########################################################################################################################
 // ########################################################## Tip Loading/Unloading
