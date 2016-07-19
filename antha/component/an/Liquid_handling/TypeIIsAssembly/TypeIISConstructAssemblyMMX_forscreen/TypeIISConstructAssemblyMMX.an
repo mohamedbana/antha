@@ -41,7 +41,6 @@ Outputs (
 
 // Data which is returned from this protocol, and data types
 Data (
-	Errors        []string
         ConstructName string
         Sequence      wtype.DNASequence
 )
@@ -67,12 +66,10 @@ Steps {
             Partsinorder: PartSeqs[:last],
         })
         if err != nil {
-          Errors = append(Errors, fmt.Sprintf("%s: %s", output, err))
-          return
+          Errorf("%s: %s", output, err)
         }
         if count != 1 {
-          Errors = append(Errors, fmt.Sprintf("no successful assembly"))
-          return
+          Errorf("no successful assembly")
         }
 
         Sequence = seq
@@ -89,8 +86,7 @@ Steps {
 		part.Type, err = wtype.LiquidTypeFromString(LHPolicyName)
 		
 		if err != nil {
-			Errors = append(Errors, fmt.Sprintf("cannot find liquid type: %s", err))
-                        return
+                        Errorf("cannot find liquid type: %s", err)
 		}
 		
 		partSample := mixer.Sample(part, PartVols[k])
