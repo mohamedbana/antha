@@ -1,0 +1,14 @@
+{
+    "connections": [],
+    "processes": {
+        "BothPrimersOri": {
+            "component": "PrimerDesign_ColonyPCR"
+        },
+        "BothPrimersOriRevComp": {
+            "component": "PrimerDesign_ColonyPCR"
+        },
+        "BothPrimersTetA": {
+            "component": "PrimerDesign_ColonyPCR"
+        }
+    }
+}

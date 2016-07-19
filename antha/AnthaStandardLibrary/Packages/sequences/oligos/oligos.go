@@ -203,6 +203,7 @@ func FWDOligoSeq(seq wtype.DNASequence, maxGCcontent float64, minlength int, max
 	return
 }
 
+// directionless Positions
 func FindPositioninSequence(largeSequence wtype.DNASequence, smallSequence wtype.DNASequence) (start int, end int, err error) {
 	//positions, err := search.Findall(largeSequence.Sequence(), smallSequence.Sequence())
 
@@ -214,9 +215,34 @@ func FindPositioninSequence(largeSequence wtype.DNASequence, smallSequence wtype
 		err = fmt.Errorf(strconv.Itoa(len(seqsfound)), " seqs found of ", smallSequence.Nm, " in ", largeSequence.Nm)
 		return
 	}
-	// fmt.Println("seqs found", seqsfound)
+	//if !seqsfound[0].Reverse {
 	start = seqsfound[0].Positions[0]
-	end = seqsfound[0].Positions[1]
+	end = seqsfound[0].Positions[0] + len(smallSequence.Sequence())
+	//}
+	fmt.Println("rev? ", seqsfound[0].Reverse, start, end)
+	return
+}
+
+// Directional Positions
+func FindDirectionalPositioninSequence(largeSequence wtype.DNASequence, smallSequence wtype.DNASequence) (start int, end int, err error) {
+	//positions, err := search.Findall(largeSequence.Sequence(), smallSequence.Sequence())
+
+	seqsfound := sequences.FindSeqsinSeqs(largeSequence.Sequence(), []string{smallSequence.Sequence()})
+
+	/*if err != nil {
+		return
+	} else */if len(seqsfound) != 1 {
+		err = fmt.Errorf(strconv.Itoa(len(seqsfound)), " seqs found of ", smallSequence.Nm, " in ", largeSequence.Nm)
+		return
+	}
+	if !seqsfound[0].Reverse {
+		start = seqsfound[0].Positions[0]
+		end = seqsfound[0].Positions[0] + len(smallSequence.Sequence())
+	} else {
+		end = seqsfound[0].Positions[0]
+		start = seqsfound[0].Positions[0] + len(smallSequence.Sequence())
+	}
+	fmt.Println("rev? ", seqsfound[0].Reverse, start, end)
 	return
 }
 
@@ -286,6 +312,45 @@ func DesignFWDPRimerstoCoverRegion(seq wtype.DNASequence, regionstart, regionend
 	}
 	return
 }
+
+/*
+func DesignPrimerstoFlankRegion(seq wtype.DNASequence, regionstart, regionend int, maxGCcontent float64, minlength int, maxlength int, minmeltingtemp wunit.Temperature, maxmeltingtemp wunit.Temperature, seqstoavoid []string, overlapthresholdwithseqstoavoid int) (primers [2]Primer) {
+
+	primers = make([]Primer, 2)
+
+	avoidthese := make([]string, 0)
+
+	if len(seqstoavoid) != 0 {
+		for _, seq := range seqstoavoid {
+			avoidthese = append(avoidthese, seq)
+		}
+	}
+
+	if regionstart-100 > 0 {
+		regionstart = regionstart - 100
+	} else {
+		regionstart = 0
+	}
+
+	for i := regionstart; i < regionend; i = i + sequenceinterval {
+
+		region := DNAregion(seq, i, len(seq.Sequence()))
+
+		primer, err := FWDOligoSeq(region, maxGCcontent, minlength, maxlength, minmeltingtemp, maxmeltingtemp, avoidthese, overlapthresholdwithseqstoavoid)
+
+		if err != nil {
+			panic(err.Error() + " for " + region.Nm)
+		}
+
+		primer.Nm = "primer_" + seq.Nm + "_" + strconv.Itoa(i) + ":" + strconv.Itoa(i-1+sequenceinterval)
+
+		primers = append(primers, primer)
+
+		avoidthese = append(avoidthese, primer.Sequence())
+	}
+	return
+}
+*/
 
 func DesignFWDPRimerstoCoverSequence(seq wtype.DNASequence, targetseq string, sequenceinterval int, maxGCcontent float64, minlength int, maxlength int, minmeltingtemp wunit.Temperature, maxmeltingtemp wunit.Temperature, seqstoavoid []string, overlapthresholdwithseqstoavoid int) (primers []Primer) {
 
