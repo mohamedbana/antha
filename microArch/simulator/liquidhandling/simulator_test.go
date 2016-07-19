@@ -24,6 +24,7 @@ package liquidhandling_test
 
 import (
     "testing"
+    lh "github.com/antha-lang/antha/microArch/simulator/liquidhandling"
 )
 
 
@@ -180,14 +181,204 @@ func TestVLH_AddPlateTo(t *testing.T) {
     }
 }
 
-/*
+
 
 
 // ########################################################################################################################
 // ########################################################## Tip Loading/Unloading
 // ########################################################################################################################
 
+func tipTestLayout() *SetupFn {
+    var ret SetupFn = func(vlh *lh.VirtualLiquidHandler) {
+        vlh.Initialize()
+        vlh.AddPlateTo("tipbox_1",  default_lhtipbox(), "tipbox1")
+        vlh.AddPlateTo("tipbox_2",  default_lhtipbox(), "tipbox2")
+        vlh.AddPlateTo("tipwaste", default_lhtipwaste(), "tipwaste")
+    }
+    return &ret
+}
 
+func TestLoadTips(t *testing.T) {
+    tests := []SimulatorTest{
+        SimulatorTest{
+            "OK - single tip",
+            nil,
+            []*SetupFn{
+                tipTestLayout(),
+            },
+            []TestRobotInstruction{
+                &LoadTips{
+                    []int{0},               //channels
+                    0,                      //head
+                    1,                      //multi
+                    []string{"tipbox"},     //tipbox
+                    []string{"tipbox_1"},    //location
+                    []string{"H11"},        //well
+                },
+            },
+            nil,            //errors
+            []*AssertionFn{ //assertions
+                tipboxAssertion("tipbox_1", []string{"H11"}),
+                tipboxAssertion("tipbox_2", []string{}),
+                adaptorAssertion(0, []int{0}),
+                tipwasteAssertion("tipwaste", 0),
+            },
+        },
+        SimulatorTest{
+            "OK - single tip (alt)",
+            nil,
+            []*SetupFn{
+                tipTestLayout(),
+            },
+            []TestRobotInstruction{
+                &LoadTips{
+                    []int{7},               //channels
+                    0,                      //head
+                    1,                      //multi
+                    []string{"tipbox"},     //tipbox
+                    []string{"tipbox_1"},    //location
+                    []string{"A1"},        //well
+                },
+            },
+            nil,            //errors
+            []*AssertionFn{ //assertions
+                tipboxAssertion("tipbox_1", []string{"A1"}),
+                tipboxAssertion("tipbox_2", []string{}),
+                adaptorAssertion(0, []int{7}),
+                tipwasteAssertion("tipwaste", 0),
+            },
+        },
+        SimulatorTest{
+            "OK - single tip above space",
+            nil,
+            []*SetupFn{
+                tipTestLayout(),
+                removeTipboxTips("tipbox_1", []string{"H11"}),
+            },
+            []TestRobotInstruction{
+                &LoadTips{
+                    []int{0},               //channels
+                    0,                      //head
+                    1,                      //multi
+                    []string{"tipbox"},     //tipbox
+                    []string{"tipbox_1"},   //location
+                    []string{"G11"},        //well
+                },
+            },
+            nil,            //errors
+            []*AssertionFn{ //assertions
+                tipboxAssertion("tipbox_1", []string{"H11","G11"}),
+                tipboxAssertion("tipbox_2", []string{}),
+                adaptorAssertion(0, []int{0}),
+                tipwasteAssertion("tipwaste", 0),
+            },
+        }, 
+        SimulatorTest{
+            "OK - single tip above space (alt)",
+            nil,
+            []*SetupFn{
+                tipTestLayout(),
+                removeTipboxTips("tipbox_1", []string{"A1"}),
+            },
+            []TestRobotInstruction{
+                &LoadTips{
+                    []int{7},               //channels
+                    0,                      //head
+                    1,                      //multi
+                    []string{"tipbox"},     //tipbox
+                    []string{"tipbox_1"},    //location
+                    []string{"B1"},        //well
+                },
+            },
+            nil,            //errors
+            []*AssertionFn{ //assertions
+                tipboxAssertion("tipbox_1", []string{"A1","B1"}),
+                tipboxAssertion("tipbox_2", []string{}),
+                adaptorAssertion(0, []int{7}),
+                tipwasteAssertion("tipwaste", 0),
+            },
+        },
+        SimulatorTest{
+            "OK - 3 tips",
+            nil,
+            []*SetupFn{
+                tipTestLayout(),
+            },
+            []TestRobotInstruction{
+                &LoadTips{
+                    []int{0,1,2}, //channels
+                    0,                      //head
+                    3,                      //multi
+                    []string{"tipbox","tipbox","tipbox"},     //tipbox
+                    []string{"tipbox_1","tipbox_1","tipbox_1"},   //location
+                    []string{"F11","G11","H11"},        //well
+                },
+            },
+            nil,            //errors
+            []*AssertionFn{ //assertions
+                tipboxAssertion("tipbox_1", []string{"F11","G11","H11"}),
+                tipboxAssertion("tipbox_2", []string{}),
+                adaptorAssertion(0, []int{0,1,2}),
+                tipwasteAssertion("tipwaste", 0),
+            },
+        },
+        SimulatorTest{
+            "OK - 3 tips (alt)",
+            nil,
+            []*SetupFn{
+                tipTestLayout(),
+            },
+            []TestRobotInstruction{
+                &LoadTips{
+                    []int{5,6,7}, //channels
+                    0,                      //head
+                    3,                      //multi
+                    []string{"tipbox","tipbox","tipbox"},     //tipbox
+                    []string{"tipbox_1","tipbox_1","tipbox_1"},   //location
+                    []string{"A1","B1","C1"},        //well
+                },
+            },
+            nil,            //errors
+            []*AssertionFn{ //assertions
+                tipboxAssertion("tipbox_1", []string{"A1","B1","C1"}),
+                tipboxAssertion("tipbox_2", []string{}),
+                adaptorAssertion(0, []int{5,6,7}),
+                tipwasteAssertion("tipwaste", 0),
+            },
+        },
+        SimulatorTest{
+            "OK - 8 tips",
+            nil,
+            []*SetupFn{
+                tipTestLayout(),
+            },
+            []TestRobotInstruction{
+                &LoadTips{
+                    []int{0,1,2,3,4,5,6,7}, //channels
+                    0,                      //head
+                    8,                      //multi
+                    []string{"tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox"},     //tipbox
+                    []string{"tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1"},   //location
+                    []string{"A11","B11","C11","D11","E11","F11","G11","H11"},        //well
+                },
+            },
+            nil,            //errors
+            []*AssertionFn{ //assertions
+                tipboxAssertion("tipbox_1", []string{"A11","B11","C11","D11","E11","F11","G11","H11"}),
+                tipboxAssertion("tipbox_2", []string{}),
+                adaptorAssertion(0, []int{0,1,2,3,4,5,6,7}),
+                tipwasteAssertion("tipwaste", 0),
+            },
+        }, 
+    }
+
+    for _,test := range tests {
+        test.run(t)
+    }
+}
+
+
+/*
 func get_tip_test_vlh(independent bool) *VirtualLiquidHandler {
     props := LHPropertiesParams{
         "Device Name",

@@ -696,7 +696,7 @@ func adaptorAssertion(head int, tip_channels []int) *AssertionFn {
 //tipwasteAssertion assert the number of tips which should be in the tipwaste
 func tipwasteAssertion(tipwaste_loc string, expected_contents int) *AssertionFn {
     var ret AssertionFn = func(name string, t *testing.T, vlh *lh.VirtualLiquidHandler) {
-        tipwaste := vlh.GetPlateAt(tipwaste_loc).(wtype.LHTipwaste)
+        tipwaste := vlh.GetPlateAt(tipwaste_loc).(*wtype.LHTipwaste)
         
         if tipwaste.Contents != expected_contents {
             t.Errorf("TipwasteAssertion failed in test \"%s\" at location %s: expected %v tips, got %v", 
