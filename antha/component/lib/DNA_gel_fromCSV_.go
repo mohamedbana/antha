@@ -158,49 +158,54 @@ func _DNA_gel_fromCSVSteps(_ctx context.Context, _input *DNA_gel_fromCSVInput, _
 				position = _input.DNAgel.AllWellPositions(wtype.BYROW)[counter]
 
 				// temporarily avoiding using last column; remove later
-				if wellcoords.X != _input.DNAgel.WlsX-1 {
-					_input.Sampletotest = inputplate.WellMap()[wellcontents].WContents
-
-					// load gel
-
-					// add loading dye if necessary
-					if _input.Loadingdyeinsample == false {
-
-						_input.Loadingdye.Type, _ = wtype.LiquidTypeFromString("NeedToMix")
-
-						DNAgelloadmixsolution := execute.MixInto(_ctx, _input.MixPlate,
-							"",
-							mixer.Sample(_input.Sampletotest, samplevolume),
-							mixer.Sample(_input.Loadingdye, _input.Loadingdyevolume),
-						)
-						DNAgelloadmix = DNAgelloadmixsolution
-					} else {
-
-						DNAgelloadmix = _input.Sampletotest
-
+				// skips contents so fix properly!!
+				/*
+					if wellcoords.X == DNAgel.WlsX-1{
+						counter++
+						position = DNAgel.AllWellPositions(wtype.BYROW)[counter]
 					}
+				*/
+				_input.Sampletotest = inputplate.WellMap()[wellcontents].WContents
 
-					// Ensure  sample will be dispensed appropriately:
+				// load gel
 
-					// comment this line out to repeat load of same sample in all wells using first sample name
-					//DNAgelloadmix.CName = Samplenames[i]//[i] //originalname + strconv.Itoa(i)
+				// add loading dye if necessary
+				if _input.Loadingdyeinsample == false {
 
-					// replacing following line with temporary hard code whilst developing protocol:
-					DNAgelloadmix.Type, _ = wtype.LiquidTypeFromString(_input.Mixingpolicy)
-					//DNAgelloadmix.Type = "loadwater"
+					_input.Loadingdye.Type, _ = wtype.LiquidTypeFromString("NeedToMix")
 
-					loadedsample = execute.MixInto(_ctx, _input.DNAgel,
-						position,
-						waterSample,
+					DNAgelloadmixsolution := execute.MixInto(_ctx, _input.MixPlate,
+						"",
+						mixer.Sample(_input.Sampletotest, samplevolume),
+						mixer.Sample(_input.Loadingdye, _input.Loadingdyevolume),
 					)
+					DNAgelloadmix = DNAgelloadmixsolution
+				} else {
 
-					loadedsample = execute.Mix(_ctx, loadedsample, mixer.Sample(DNAgelloadmix, samplevolume))
-
-					loadedsamples = append(loadedsamples, loadedsample)
-					wells = append(wells, position)
-					volumes = append(volumes, loadedsample.Volume())
+					DNAgelloadmix = _input.Sampletotest
 
 				}
+
+				// Ensure  sample will be dispensed appropriately:
+
+				// comment this line out to repeat load of same sample in all wells using first sample name
+				//DNAgelloadmix.CName = Samplenames[i]//[i] //originalname + strconv.Itoa(i)
+
+				// replacing following line with temporary hard code whilst developing protocol:
+				DNAgelloadmix.Type, _ = wtype.LiquidTypeFromString(_input.Mixingpolicy)
+				//DNAgelloadmix.Type = "loadwater"
+
+				loadedsample = execute.MixInto(_ctx, _input.DNAgel,
+					position,
+					waterSample,
+				)
+
+				loadedsample = execute.Mix(_ctx, loadedsample, mixer.Sample(DNAgelloadmix, samplevolume))
+
+				loadedsamples = append(loadedsamples, loadedsample)
+				wells = append(wells, position)
+				volumes = append(volumes, loadedsample.Volume())
+
 				counter++
 			}
 		}

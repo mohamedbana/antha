@@ -172,7 +172,13 @@ Steps {
 	
 	
 	// temporarily avoiding using last column; remove later
-	if wellcoords.X != DNAgel.WlsX-1{
+	// skips contents so fix properly!!
+	/*
+	if wellcoords.X == DNAgel.WlsX-1{
+		counter++
+		position = DNAgel.AllWellPositions(wtype.BYROW)[counter]
+	}
+		*/
 	Sampletotest =  inputplate.WellMap()[wellcontents].WContents
 	
 	
@@ -218,7 +224,7 @@ Steps {
 	wells = append(wells,position)
 	volumes = append(volumes,loadedsample.Volume())
 	
-	}
+	
 	counter++
 	}
 	}
