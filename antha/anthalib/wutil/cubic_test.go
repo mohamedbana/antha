@@ -15,14 +15,12 @@ func TestCubic(t *testing.T) {
 	for k := 0; k < 15; k++ {
 		v := c.F(i)
 		iv := c.I(v)
-		fmt.Println(i, " ", v, " ", iv, " ", q.F(v), qt.F(v))
-
 		i += 1.0
 	}
 }
 
 func TestSerialize(t *testing.T) {
-	c := Cubic{Func: "cubic", A: 0.00769276, B: 0.40223723, C: 7.06878347, D: 0.0}
+	c := Cubic{A: 0.00769276, B: 0.40223723, C: 7.06878347, D: 0.0}
 
 	m, _ := json.Marshal(c)
 

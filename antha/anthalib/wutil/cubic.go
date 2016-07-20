@@ -7,16 +7,20 @@ import (
 
 // function for cubics
 type Cubic struct {
-	Func string
-	A    float64
-	B    float64
-	C    float64
-	D    float64
-	p    float64
-	r    float64
+	Cubic string
+	A     float64
+	B     float64
+	C     float64
+	D     float64
+	p     float64
+	r     float64
 }
 
-func (c *Cubic) F(v float64) float64 {
+func (c Cubic) Name() string {
+	return "Cubic"
+}
+
+func (c Cubic) F(v float64) float64 {
 	return c.A*math.Pow(v, 3.0) + c.B*math.Pow(v, 2.0) + c.C*v + c.D
 }
 
@@ -41,7 +45,7 @@ func (c *Cubic) R() float64 {
 }
 
 // should decide when this is safe
-func (c *Cubic) I(v float64) float64 {
+func (c Cubic) I(v float64) float64 {
 	s := complex(c.P(), 0.0)
 	vv := cmplx.Pow(cmplx.Pow(complex(c.Q(v), 0.0), 2.0)+cmplx.Pow(complex(c.R(), 0.0)-cmplx.Pow(complex(c.P(), 0.0), 2.0), 3.0), 0.5)
 	vv1 := cmplx.Pow(complex(c.Q(v), 0.0)+vv, 1.0/3.0)

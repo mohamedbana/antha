@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/eng"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/microArch/logger"
 	"time"
 )
@@ -270,8 +271,6 @@ func (lhw *LHWell) AreaForVolume() wunit.Area {
 
 	ret := wunit.NewArea(0.0, "m^2")
 
-	//	qt := Quartic{a: -3.3317851312e-09, b: 0.00000225834467, c: -0.0006305492472, d: 0.1328156706978, e: 0}
-
 	vf := lhw.GetAfVFunc()
 
 	if vf == nil {
@@ -279,8 +278,8 @@ func (lhw *LHWell) AreaForVolume() wunit.Area {
 		return ret
 	} else {
 		vol := lhw.WContents.Volume()
-		r := vf.Call(vol.SIValue())
-		ret = wunit.NewArea(r, "m^2")
+		r := vf.F(vol.ConvertToString("ul"))
+		ret = wunit.NewArea(r, "mm^2")
 	}
 
 	return ret
@@ -292,8 +291,23 @@ func (lhw *LHWell) HeightForVolume() wunit.Length {
 	return ret
 }
 
-func (lhw *LHWell) GetAfVFunc() Func1Prm {
-	// TODO -- define syntax; funcs need to serialize themselves
+func (lhw *LHWell) SetAfVFunc(f string) {
+	lhw.Extra["afvfunc"] = f
+}
+
+func (lhw *LHWell) GetAfVFunc() wutil.Func1Prm {
+	f, ok := lhw.Extra["afvfunc"]
+
+	if !ok {
+		return nil
+	} else {
+		x, err := wutil.UnmarshalFunc([]byte(f.(string)))
+		if err != nil {
+			logger.Fatal(fmt.Sprintf("Can't unmarshal function, error: %s", err.Error))
+		}
+		return x
+	}
+	return nil
 }
 
 func (lhw *LHWell) CalculateMaxVolume() (vol wunit.Volume, err error) {
@@ -498,8 +512,5 @@ func (well *LHWell) Evaporate(time time.Duration, env Environment) {
 
 	vol := eng.EvaporationVolume(env.Temperature, "water", env.Humidity, time.Seconds(), env.MeanAirFlowVelocity, well.AreaForVolume(), env.Pressure)
 
-	fmt.Println("Evaporation: lost ", vol.ToString(), " in ", time)
-
-	// TODO... record evaporation
 	well.Remove(vol)
 }

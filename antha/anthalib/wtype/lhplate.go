@@ -451,6 +451,8 @@ func (p *LHPlate) Evaporate(time time.Duration, env Environment) {
 		return
 	}
 	for _, w := range p.Wellcoords {
-		w.Evaporate(time, env)
+		if !w.Empty() {
+			w.Evaporate(time, env)
+		}
 	}
 }

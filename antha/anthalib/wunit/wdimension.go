@@ -61,9 +61,11 @@ func NewArea(v float64, unit string) (a Area) {
 	if unit == "m^2" {
 		a = Area{NewMeasurement(v, "", unit)}
 	} else if unit == "mm^2" {
-		a = Area{NewPMeasurement(v /**0.000001*/, unit)}
+		//a = Area{NewPMeasurement(v /**0.000001*/, unit)}
+		a = Area{NewMeasurement(v, "", unit)}
+		// should be OK
 	} else {
-		panic("Can't make areas which aren't square metres")
+		panic("Can't make areas which aren't square (milli)metres")
 	}
 
 	return
@@ -76,26 +78,21 @@ type Volume struct {
 
 // make a volume
 func NewVolume(v float64, unit string) (o Volume) {
-	if unit == "" && v == 0 {
-		return NewVolume(0.0, "ul")
-	}
-
 	if len(strings.TrimSpace(unit)) == 0 {
-		fmt.Println("warning no units found so returned 0.0 ul")
-		return NewVolume(0.0, "ul")
-
+		return ZeroVolume()
 	}
+
 	/*if len(strings.TrimSpace(unit)) == 0 {
 		panic("Can't make Volumes without unit")
-	}*/
+	}
 
 	if len(strings.TrimSpace(unit)) == 1 {
 		o = Volume{NewMeasurement(v, "", unit)}
 	}
-	if len(strings.TrimSpace(unit)) > 1 {
+	*/
 
-		o = Volume{NewPMeasurement(v, unit)}
-	}
+	o = Volume{NewPMeasurement(v, unit)}
+
 	return
 }
 
