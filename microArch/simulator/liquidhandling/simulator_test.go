@@ -984,7 +984,7 @@ func Test_UnloadTips(t *testing.T) {
 }
 
 
-func Test_MoveSimple(t *testing.T) {
+func Test_Move(t *testing.T) {
 
     tests := []SimulatorTest{
         SimulatorTest{
@@ -1195,6 +1195,74 @@ func Test_MoveSimple(t *testing.T) {
             },
             []string{       //errors
                 "(err) Move: Offsets cannot differ between channels when independent is false",
+            },
+            nil,            //assertions
+        },
+        SimulatorTest{
+            "layout mismatch",
+            nil,
+            []*SetupFn{
+                tipTestLayout(),
+            },
+            []TestRobotInstruction{
+                &Move{
+                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"A1","B2","C1","D2","E1","F2","G1","H2"}, //wellcoords
+                    []int{1,1,1,1,1,1,1,1}, //reference
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetY
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetZ
+                    []string{"tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox"}, //plate_type
+                    0, //head
+                },
+            },
+            []string{       //errors
+                "(err) Move: Requested wells do not match adaptor layout",
+            },
+            nil,            //assertions
+        },
+        SimulatorTest{
+            "crashes",
+            nil,
+            []*SetupFn{
+                tipTestLayout(),
+            },
+            []TestRobotInstruction{
+                &Move{
+                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
+                    []int{1,1,1,1,1,1,1,1}, //reference
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetY
+                    []float64{-50.,-50.,-50.,0.,-50.,-50.,-50.,-50.,}, //offsetZ
+                    []string{"tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox"}, //plate_type
+                    0, //head
+                },
+                &Move{
+                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
+                    []int{0,0,0,0,0,0,0,0}, //reference
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetY
+                    []float64{-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,-0.1,}, //offsetZ
+                    []string{"tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox"}, //plate_type
+                    0, //head
+                },
+                &Move{
+                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
+                    []int{0,0,0,0,0,0,0,0}, //reference
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetY
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetZ
+                    []string{"tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox"}, //plate_type
+                    0, //head
+                },
+            },
+            []string{       //errors
+                "(err) Move: Crash predicted, tip intersects with well base",
+                "(err) Move: Crash predicted, tip intersects with well base",
+                "(err) Move: Crash predicted, tip intersects with well side",
             },
             nil,            //assertions
         },
