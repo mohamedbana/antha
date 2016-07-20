@@ -3,9 +3,10 @@ package lib
 import (
 	graph "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/plot"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -121,12 +122,12 @@ type PlotdataSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Plotdata",
+	if err := addComponent(component.Component{Name: "Plotdata",
 		Constructor: PlotdataNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/plotdata/Plotdata.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Exportedfilename", Desc: "", Kind: "Parameters"},
 				{Name: "Xvalues", Desc: "", Kind: "Parameters"},
 				{Name: "Yvaluearray", Desc: "", Kind: "Parameters"},

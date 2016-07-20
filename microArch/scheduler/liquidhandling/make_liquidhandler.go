@@ -80,7 +80,7 @@ func makeGilson() *liquidhandling.LHProperties {
 	minspd := wunit.NewFlowRate(0.5, "ml/min")
 	maxspd := wunit.NewFlowRate(2, "ml/min")
 
-	hvconfig := wtype.NewLHChannelParameter("HVconfig", minvol, maxvol, minspd, maxspd, 8, false, wtype.LHVChannel, 0)
+	hvconfig := wtype.NewLHChannelParameter("HVconfig", "GilsonPipetmax", minvol, maxvol, minspd, maxspd, 8, false, wtype.LHVChannel, 0)
 	hvadaptor := wtype.NewLHAdaptor("DummyAdaptor", "Gilson", hvconfig)
 	hvhead := wtype.NewLHHead("HVHead", "Gilson", hvconfig)
 	hvhead.Adaptor = hvadaptor
@@ -89,7 +89,7 @@ func makeGilson() *liquidhandling.LHProperties {
 	newminspd := wunit.NewFlowRate(0.1, "ml/min")
 	newmaxspd := wunit.NewFlowRate(0.5, "ml/min")
 
-	lvconfig := wtype.NewLHChannelParameter("LVconfig", newminvol, newmaxvol, newminspd, newmaxspd, 8, false, wtype.LHVChannel, 1)
+	lvconfig := wtype.NewLHChannelParameter("LVconfig", "GilsonPipetmax", newminvol, newmaxvol, newminspd, newmaxspd, 8, false, wtype.LHVChannel, 1)
 	lvadaptor := wtype.NewLHAdaptor("DummyAdaptor", "Gilson", lvconfig)
 	lvhead := wtype.NewLHHead("LVHead", "Gilson", lvconfig)
 	lvhead.Adaptor = lvadaptor

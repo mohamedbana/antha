@@ -133,12 +133,31 @@ type Time struct {
 }
 
 // make a time unit
-func NewTime(v float64, unit string) Time {
-	if unit != "s" {
-		panic("Can't make times which aren't in seconds")
+func NewTime(v float64, unit string) (t Time) {
+
+	approvedunits := []string{"days", "h", "min", "s", "ms"}
+
+	var approved bool
+	for i := range approvedunits {
+
+		if unit == approvedunits[i] {
+			approved = true
+			break
+		}
 	}
 
-	t := Time{NewMeasurement(v, "", unit)}
+	if !approved {
+		panic("Can't make Time with non approved unit of " + unit + ". Approved units are: " + strings.Join(approvedunits, ", "))
+	}
+	if unit == "s" {
+		t = Time{NewMeasurement(v, "", unit)}
+	} else if unit == "ms" {
+		t = Time{NewMeasurement(v/1000, "", "s")}
+	} else if unit == "min" {
+		t = Time{NewMeasurement(v*60, "", "s")}
+	} else if unit == "h" {
+		t = Time{NewMeasurement(v*3600, "", "s")}
+	}
 	return t
 }
 

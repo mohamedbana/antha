@@ -360,10 +360,10 @@ func FindORF(seq string) (orf ORF, orftrue bool) { // finds an orf in the forwar
 	if strings.Contains(seq, "ATG") {
 		index := strings.Index(seq, "ATG")
 		tempstart := index + 1
-		//fmt.Println("index=", index)
+		//// fmt.Println("index=", index)
 		restofsequence := seq[index:]
 		codons := []rune(restofsequence)
-		//fmt.Println("codons=", string(codons))
+		//// fmt.Println("codons=", string(codons))
 		res := ""
 		aas := make([]string, 0)
 		for i, r := range codons {
@@ -375,33 +375,33 @@ func FindORF(seq string) (orf ORF, orftrue bool) { // finds an orf in the forwar
 				codon := res
 				aas = append(aas, res)
 				res = ""
-				//fmt.Println("codon=", codon)
+				//// fmt.Println("codon=", codon)
 				if codon == "TAA" {
 					ORFcodons := aas
-					//	fmt.Println("orfcodons", ORFcodons)
+					//	// fmt.Println("orfcodons", ORFcodons)
 					orf.StartPosition = tempstart
 					orf.DNASeq = strings.Join(ORFcodons, "")
 					orf.ProtSeq = DNAtoAASeq(ORFcodons)
 					orf.EndPosition = orf.StartPosition + len(orf.DNASeq) - 1
-					//fmt.Println("translated=", translated)
+					//// fmt.Println("translated=", translated)
 				}
 				if codon == "TGA" {
 					ORFcodons := aas
-					//	fmt.Println("orfcodons", ORFcodons)
+					//	// fmt.Println("orfcodons", ORFcodons)
 					orf.StartPosition = tempstart
 					orf.DNASeq = strings.Join(ORFcodons, "")
 					orf.ProtSeq = DNAtoAASeq(ORFcodons)
 					orf.EndPosition = orf.StartPosition + len(orf.DNASeq) - 1
-					//fmt.Println("translated=", translated)
+					//// fmt.Println("translated=", translated)
 				}
 				if codon == "TAG" {
 					ORFcodons := aas
-					//	fmt.Println("orfcodons", ORFcodons)
+					//	// fmt.Println("orfcodons", ORFcodons)
 					orf.StartPosition = tempstart
 					orf.DNASeq = strings.Join(ORFcodons, "")
 					orf.ProtSeq = DNAtoAASeq(ORFcodons)
 					orf.EndPosition = orf.StartPosition + len(orf.DNASeq) - 1
-					//fmt.Println("translated=", translated)
+					//// fmt.Println("translated=", translated)
 				}
 				if codon == "TAA" {
 					orftrue = true
@@ -433,10 +433,10 @@ func FindBiggestORF(seq string) (finalorf ORF, orftrue bool) { // finds an orf i
 	if strings.Contains(seq, "ATG") {
 		index := strings.Index(seq, "ATG")
 		tempstart := index + 1
-		//fmt.Println("index=", index)
+		//// fmt.Println("index=", index)
 		restofsequence := seq[index:]
 		codons := []rune(restofsequence)
-		//fmt.Println("codons=", string(codons))
+		//// fmt.Println("codons=", string(codons))
 		res := ""
 		aas := make([]string, 0)
 		for i, r := range codons {
@@ -448,33 +448,33 @@ func FindBiggestORF(seq string) (finalorf ORF, orftrue bool) { // finds an orf i
 				codon := res
 				aas = append(aas, res)
 				res = ""
-				//fmt.Println("codon=", codon)
+				//// fmt.Println("codon=", codon)
 				if codon == "TAA" {
 					ORFcodons := aas
-					//	fmt.Println("orfcodons", ORFcodons)
+					//	// fmt.Println("orfcodons", ORFcodons)
 					orf.StartPosition = tempstart
 					orf.DNASeq = strings.Join(ORFcodons, "")
 					orf.ProtSeq = DNAtoAASeq(ORFcodons)
 					orf.EndPosition = orf.StartPosition + len(orf.DNASeq) - 1
-					//fmt.Println("translated=", translated)
+					//// fmt.Println("translated=", translated)
 				}
 				if codon == "TGA" {
 					ORFcodons := aas
-					//	fmt.Println("orfcodons", ORFcodons)
+					//	// fmt.Println("orfcodons", ORFcodons)
 					orf.StartPosition = tempstart
 					orf.DNASeq = strings.Join(ORFcodons, "")
 					orf.ProtSeq = DNAtoAASeq(ORFcodons)
 					orf.EndPosition = orf.StartPosition + len(orf.DNASeq) - 1
-					//fmt.Println("translated=", translated)
+					//// fmt.Println("translated=", translated)
 				}
 				if codon == "TAG" {
 					ORFcodons := aas
-					//	fmt.Println("orfcodons", ORFcodons)
+					//	// fmt.Println("orfcodons", ORFcodons)
 					orf.StartPosition = tempstart
 					orf.DNASeq = strings.Join(ORFcodons, "")
 					orf.ProtSeq = DNAtoAASeq(ORFcodons)
 					orf.EndPosition = orf.StartPosition + len(orf.DNASeq) - 1
-					//fmt.Println("translated=", translated)
+					//// fmt.Println("translated=", translated)
 				}
 				if codon == "TAA" {
 					orftrue = true
@@ -507,25 +507,25 @@ func Findorfsinstrand(seq string) (orfs []ORF) {
 	orfs = make([]ORF, 0)
 	neworf, orftrue := FindORF(seq)
 	if orftrue == false {
-		fmt.Println("no orfs:", neworf)
+		// fmt.Println("no orfs:", neworf)
 		return
 	}
 	if len(neworf.ProtSeq) > 20 {
 		orfs = append(orfs, neworf)
 	}
-	//fmt.Println("LEEEEEEEEEEENNNGth of Orfs", orfs)
+	//// fmt.Println("LEEEEEEEEEEENNNGth of Orfs", orfs)
 	newseq := seq[(neworf.StartPosition):]
 	//for _, s := range newseq
 	orf1 := neworf
 	i := 0
 	for {
 
-		fmt.Println("orf1 start=", orf1.StartPosition)
+		// fmt.Println("orf1 start=", orf1.StartPosition)
 		neworf, orftrue := FindORF(newseq)
 		if orftrue == false {
 			return
 		}
-		fmt.Println("Prior to start position reassignment=", neworf)
+		// fmt.Println("Prior to start position reassignment=", neworf)
 		newseq = newseq[(neworf.StartPosition):]
 		neworf.StartPosition = (neworf.StartPosition + orf1.StartPosition)
 		neworf.EndPosition = (neworf.EndPosition + orf1.StartPosition)
@@ -534,10 +534,10 @@ func Findorfsinstrand(seq string) (orfs []ORF) {
 		if len(neworf.ProtSeq) > 20 {
 			orfs = append(orfs, neworf)
 		}
-		fmt.Println("orfs", orfs, "len(orfs)", len(orfs))
+		// fmt.Println("orfs", orfs, "len(orfs)", len(orfs))
 		i++
-		fmt.Println("i=", i)
-		fmt.Println("newseq", newseq, "neworf", neworf, "orftrue", orftrue)
+		// fmt.Println("i=", i)
+		// fmt.Println("newseq", newseq, "neworf", neworf, "orftrue", orftrue)
 	}
 	/**/
 
@@ -549,26 +549,26 @@ func FindNonOverlappingORFsinstrand(seq string) (orfs []ORF) {
 	orfs = make([]ORF, 0)
 	neworf, orftrue := FindORF(seq)
 	if orftrue == false {
-		fmt.Println("no orfs")
+		// fmt.Println("no orfs")
 		return
 	}
 	if len(neworf.ProtSeq) > 20 {
 		orfs = append(orfs, neworf)
 	}
 
-	//fmt.Println("LEEEEEEEEEEENNNGth of Orfs", orfs)
+	//// fmt.Println("LEEEEEEEEEEENNNGth of Orfs", orfs)
 	newseq := seq[(neworf.StartPosition):]
 	//for _, s := range newseq
 	orf1 := neworf
 	i := 0
 	for {
 
-		fmt.Println("orf1 start=", orf1.StartPosition)
+		// fmt.Println("orf1 start=", orf1.StartPosition)
 		neworf, orftrue := FindORF(newseq)
 		if orftrue == false {
 			break
 		}
-		fmt.Println("Prior to start position reassignment=", neworf)
+		// fmt.Println("Prior to start position reassignment=", neworf)
 		newseq = newseq[(neworf.EndPosition):]
 		neworf.StartPosition = (neworf.StartPosition + orf1.StartPosition)
 		neworf.EndPosition = (neworf.EndPosition + orf1.StartPosition)
@@ -576,10 +576,10 @@ func FindNonOverlappingORFsinstrand(seq string) (orfs []ORF) {
 		if len(neworf.ProtSeq) > 20 {
 			orfs = append(orfs, neworf)
 		}
-		fmt.Println("orfs", orfs, "len(orfs)", len(orfs))
+		// fmt.Println("orfs", orfs, "len(orfs)", len(orfs))
 		i++
-		fmt.Println("i=", i)
-		fmt.Println("newseq", newseq, "neworf", neworf, "orftrue", orftrue)
+		// fmt.Println("i=", i)
+		// fmt.Println("newseq", newseq, "neworf", neworf, "orftrue", orftrue)
 	}
 	/**/
 
@@ -611,30 +611,30 @@ func FindFullorfs(seq string) (orfs []ORF) {
 	orfs = make([]ORF, 0)
 	neworf, orftrue := FindORF(seq)
 	if orftrue == false {
-		fmt.Println("no orfs")
+		// fmt.Println("no orfs")
 	}
 	orfs = append(orfs, neworf)
 
-	//fmt.Println("LEEEEEEEEEEENNNGth of Orfs", orfs)
+	//// fmt.Println("LEEEEEEEEEEENNNGth of Orfs", orfs)
 	newseq := seq[(neworf.EndPosition):]
 	//for _, s := range newseq
 	orf1 := neworf
 	i := 0
 	for {
 
-		fmt.Println("FULLL ORF orf1 start=", orf1.StartPosition)
+		// fmt.Println("FULLL ORF orf1 start=", orf1.StartPosition)
 		neworf, orftrue := FindORF(newseq)
 		if orftrue == false {
 			break
 		}
-		fmt.Println("FULLL ORF Prior to start position reassignment=", neworf)
+		// fmt.Println("FULLL ORF Prior to start position reassignment=", neworf)
 		// New code to fix incorrect position assignment
 		//position := Findall(seq, neworf.DNASeq)
 		//neworf.StartPosition = position[0]
 		//neworf.EndPosition = (position[0] + (len(neworf.DNASeq)) - 1)
 
 		newseq = newseq[(neworf.EndPosition):]
-		fmt.Println("FULLL seq after cut=", newseq)
+		// fmt.Println("FULLL seq after cut=", newseq)
 
 		//old code
 		neworf.StartPosition = (neworf.StartPosition + orf1.StartPosition)
@@ -642,10 +642,10 @@ func FindFullorfs(seq string) (orfs []ORF) {
 
 		orf1 = neworf
 		orfs = append(orfs, neworf)
-		fmt.Println("orfs", orfs, "len(orfs)", len(orfs))
+		// fmt.Println("orfs", orfs, "len(orfs)", len(orfs))
 		i++
-		fmt.Println("i=", i)
-		fmt.Println("newseq", newseq, "neworf", neworf, "orftrue", orftrue)
+		// fmt.Println("i=", i)
+		// fmt.Println("newseq", newseq, "neworf", neworf, "orftrue", orftrue)
 	}
 
 
@@ -664,10 +664,10 @@ func FindallNonOverlappingORFS(seq string) []ORF {
 
 func DoublestrandedORFS(seq string) (features features) {
 	forwardorfs := Findorfsinstrand(seq)
-	fmt.Println("features.Top: ", features.TopstrandORFS)
+	// fmt.Println("features.Top: ", features.TopstrandORFS)
 	revseq := RevComp(strings.ToUpper(seq))
 	reverseorfs := Findorfsinstrand(revseq)
-	fmt.Println("features.Bottom: ", reverseorfs)
+	// fmt.Println("features.Bottom: ", reverseorfs)
 	revORFpositionsreassigned := make([]ORF, 0)
 	for _, orf := range reverseorfs {
 		orf.Direction = "Reverse"
@@ -700,7 +700,7 @@ func MergeORFs(feats features) (orfs []ORF) {
 	for _, top := range feats.TopstrandORFS {
 		orfs = append(orfs, top)
 	}
-	fmt.Println("TopStrandORFS: ", orfs)
+	// fmt.Println("TopStrandORFS: ", orfs)
 	for _, bottom := range feats.BottomstrandORFS {
 		orfs = append(orfs, bottom)
 	}
@@ -716,9 +716,9 @@ type features struct {
 /*
 func DoublestrandedFullORFS(seq string) (features features) {
 	features.TopstrandORFS = FindFullorfs(seq)
-	//fmt.Println("SEEEEEEEEEQQQQQQQQQQQ", seq)
+	//// fmt.Println("SEEEEEEEEEQQQQQQQQQQQ", seq)
 	revseq := RevComp(strings.ToUpper(seq))
-	//fmt.Println("REEEVVVVSEQ", revseq)
+	//// fmt.Println("REEEVVVVSEQ", revseq)
 	// numbering needs to be reversed!
 	features.BottomstrandORFS = FindFullorfs(revseq)
 	return features

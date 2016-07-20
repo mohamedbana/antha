@@ -13,9 +13,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Pubchem"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol
@@ -52,7 +53,10 @@ func _DatacrunchSteps(_ctx context.Context, _input *DatacrunchInput, _output *Da
 	// Now working out Molarity of Substrate based on conc and looking up molecular weight in pubchem
 
 	// Look up properties
-	substrate_mw := pubchem.MakeMolecule(_input.Substrate_name)
+	substrate_mw, err := pubchem.MakeMolecule(_input.Substrate_name)
+	if err != nil {
+		panic(err)
+	}
 
 	// calculate moles
 	submoles := sequences.Moles(_input.SubstrateConc, substrate_mw.MolecularWeight, _input.SubstrateVol)
@@ -204,12 +208,12 @@ type DatacrunchSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Datacrunch",
+	if err := addComponent(component.Component{Name: "Datacrunch",
 		Constructor: DatacrunchNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/AnthaAcademy/Lesson5_Units2/A_Datacrunch.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "DNAConc", Desc: "", Kind: "Parameters"},
 				{Name: "DNA_seq", Desc: "", Kind: "Parameters"},
 				{Name: "Gene_name", Desc: "", Kind: "Parameters"},

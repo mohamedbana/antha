@@ -48,8 +48,11 @@ Setup {}
 // for every input
 Steps {
 	//Bufferstockvolume := wunit.NewVolume((FinalVolume.SIValue() * FinalConcentration.SIValue()/Bufferstockconc.SIValue()),"l")
-		
-	FinalConcentration = buffers.Dilute(Bufferstock.CName, Bufferstockconc, BufferVolumeAdded, Diluent.CName, DiluentVolume)
+	var err error
+	FinalConcentration, err = buffers.Dilute(Bufferstock.CName, Bufferstockconc, BufferVolumeAdded, Diluent.CName, DiluentVolume)
+        if err != nil {
+                panic(err)
+        }
 		
 	Buffer = MixInto(OutPlate,"",
 	mixer.Sample(Bufferstock,BufferVolumeAdded),

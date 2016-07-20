@@ -29,7 +29,6 @@ import (
 	"os"
 	"path"
 
-	"github.com/antha-lang/antha/antha/component/lib"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/cmd/antharun/frontend"
 	"github.com/antha-lang/antha/cmd/antharun/param"
@@ -79,7 +78,7 @@ func makeMixerOpt() mixer.Opt {
 
 func makeContext() (context.Context, error) {
 	ctx := inject.NewContext(context.Background())
-	for _, desc := range lib.GetComponents() {
+	for _, desc := range library {
 		obj := desc.Constructor()
 		runner, ok := obj.(inject.Runner)
 		if !ok {

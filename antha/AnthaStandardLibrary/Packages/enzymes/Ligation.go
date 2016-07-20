@@ -209,7 +209,7 @@ func JoinXnumberofparts(vector wtype.DNASequence, partsinorder []wtype.DNASequen
 	doublestrandedpart := MakedoublestrandedDNA(partsinorder[0])
 	digestedpart := DigestionPairs(doublestrandedpart, enzyme)
 	assembledfragments, plasmidproducts = Jointwoparts(digestedvector, digestedpart)
-	//fmt.Println("vector + part1 product = ", assembledfragments, plasmidproducts)
+	//// fmt.Println("vector + part1 product = ", assembledfragments, plasmidproducts)
 	for i := 1; i < len(partsinorder); i++ {
 		doublestrandedpart = MakedoublestrandedDNA(partsinorder[i])
 		digestedpart := DigestionPairs(doublestrandedpart, enzyme)

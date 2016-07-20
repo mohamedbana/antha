@@ -8,9 +8,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"image/color"
 	"strconv"
 )
@@ -54,7 +55,7 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 	// remove duplicates
 	positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)
 
-	fmt.Println("positions", positiontocolourmap)
+	//fmt.Println("positions", positiontocolourmap)
 
 	solutions := make([]*wtype.LHComponent, 0)
 	colourtoComponentMap := make(map[string]*wtype.LHComponent)
@@ -281,12 +282,12 @@ type MakePaletteSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "MakePalette",
+	if err := addComponent(component.Component{Name: "MakePalette",
 		Constructor: MakePaletteNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "Generates instructions to make a pallette of all colours in an image\n",
 			Path: "antha/component/an/Liquid_handling/PipetteImage/MakePallete.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "AutoRotate", Desc: "", Kind: "Parameters"},
 				{Name: "Black", Desc: "", Kind: "Inputs"},
 				{Name: "Cyan", Desc: "", Kind: "Inputs"},

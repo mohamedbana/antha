@@ -44,9 +44,9 @@ func Illegalnucleotides(fwdsequence wtype.DNASequence) (pass bool, illegalfound 
 	if strings.ContainsAny(strings.ToUpper(fwdsequence.Seq), (strings.ToUpper(illegal))) || strings.ContainsAny(fwdsequence.Seq, strings.ToLower(illegal)) == true {
 		fmt.Println(pass)
 		pass = false
-		fmt.Println("Contains illegal characters")
+		// fmt.Println("Contains illegal characters")
 		illegalarray := strings.Split(illegal, "")
-		//	fmt.Println("iiiiiilllllllllegal array!!!", illegalarray)
+		//	// fmt.Println("iiiiiilllllllllegal array!!!", illegalarray)
 		illegalfound = Findallthings((strings.ToUpper(fwdsequence.Seq)), illegalarray)
 		//fmt.Println(len(illegalfound))
 
@@ -54,15 +54,15 @@ func Illegalnucleotides(fwdsequence wtype.DNASequence) (pass bool, illegalfound 
 
 	if strings.ContainsAny(strings.ToUpper(fwdsequence.Seq), (strings.ToUpper(wobble))) == true {
 		pass = false
-		fmt.Println("Contains wobble nucleotides")
+		// fmt.Println("Contains wobble nucleotides")
 		wobblearray := strings.Split(wobble, "")
-		//fmt.Println("wobble array!!!", wobblearray)
+		//// fmt.Println("wobble array!!!", wobblearray)
 		wobblefound = Findallthings((strings.ToUpper(fwdsequence.Seq)), wobblearray)
 		//fmt.Println(len(wobblefound))
 
 	} else {
 		pass = true
-		fmt.Println("illegal characters pass")
+		// fmt.Println("illegal characters pass")
 	}
 	//wtype.Makeseq(Foldername, &sequence)
 
@@ -148,7 +148,7 @@ func Wobble(seq string) (alloptions []string) {
 
 		optionsforcharacterx := WobbleMap[string(character)]
 		arrayofarray = append(arrayofarray, optionsforcharacterx)
-		//fmt.Println("arrayofarray", arrayofarray)
+		//// fmt.Println("arrayofarray", arrayofarray)
 	}
 
 	alloptions = AllCombinations(arrayofarray)

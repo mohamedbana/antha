@@ -6,9 +6,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -31,8 +32,11 @@ func _DiluteBufferSetup(_ctx context.Context, _input *DiluteBufferInput) {}
 // for every input
 func _DiluteBufferSteps(_ctx context.Context, _input *DiluteBufferInput, _output *DiluteBufferOutput) {
 	//Bufferstockvolume := wunit.NewVolume((FinalVolume.SIValue() * FinalConcentration.SIValue()/Bufferstockconc.SIValue()),"l")
-
-	_output.FinalConcentration = buffers.Dilute(_input.Bufferstock.CName, _input.Bufferstockconc, _input.BufferVolumeAdded, _input.Diluent.CName, _input.DiluentVolume)
+	var err error
+	_output.FinalConcentration, err = buffers.Dilute(_input.Bufferstock.CName, _input.Bufferstockconc, _input.BufferVolumeAdded, _input.Diluent.CName, _input.DiluentVolume)
+	if err != nil {
+		panic(err)
+	}
 
 	_output.Buffer = execute.MixInto(_ctx, _input.OutPlate, "",
 		mixer.Sample(_input.Bufferstock, _input.BufferVolumeAdded),
@@ -134,12 +138,12 @@ type DiluteBufferSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "DiluteBuffer",
+	if err := addComponent(component.Component{Name: "DiluteBuffer",
 		Constructor: DiluteBufferNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/MakeBuffer/DiluteBuffer.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "BufferVolumeAdded", Desc: "", Kind: "Parameters"},
 				{Name: "Buffername", Desc: "", Kind: "Parameters"},
 				{Name: "Bufferstock", Desc: "", Kind: "Inputs"},

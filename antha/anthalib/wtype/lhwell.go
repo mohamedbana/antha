@@ -160,7 +160,7 @@ func (w *LHWell) MaxVolume() wunit.Volume {
 	return wunit.NewVolume(w.MaxVol, w.Vunit)
 }
 func (w *LHWell) Add(c *LHComponent) {
-	wasEmpty := w.Empty()
+	//wasEmpty := w.Empty()
 	mv := wunit.NewVolume(w.MaxVol, w.Vunit)
 	cv := wunit.NewVolume(c.Vol, c.Vunit)
 	wv := w.CurrentVolume()
@@ -173,11 +173,11 @@ func (w *LHWell) Add(c *LHComponent) {
 
 	w.Contents().Mix(c)
 
-	if wasEmpty {
-		// get rid of junk ID
-		logger.Track(fmt.Sprintf("MIX REPLACED WELL CONTENTS ID WAS %s NOW %s", w.WContents.ID, c.ID))
-		w.WContents.ID = c.ID
-	}
+	//if wasEmpty {
+	// get rid of junk ID
+	//	logger.Track(fmt.Sprintf("MIX REPLACED WELL CONTENTS ID WAS %s NOW %s", w.WContents.ID, c.ID))
+	//w.WContents.ID = c.ID
+	//}
 }
 
 func (w *LHWell) Remove(v wunit.Volume) *LHComponent {
@@ -248,6 +248,7 @@ func (w *LHWell) Empty() bool {
 	}
 }
 
+// copy of instance
 func (lhw *LHWell) Dup() *LHWell {
 	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, lhw.Dunit)
 
@@ -256,6 +257,16 @@ func (lhw *LHWell) Dup() *LHWell {
 	}
 
 	cp.WContents = lhw.Contents().Dup()
+
+	return cp
+}
+
+// copy of type
+func (lhw *LHWell) CDup() *LHWell {
+	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, lhw.Dunit)
+	for k, v := range lhw.Extra {
+		cp.Extra[k] = v
+	}
 
 	return cp
 }

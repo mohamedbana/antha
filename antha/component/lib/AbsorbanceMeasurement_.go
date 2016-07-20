@@ -5,9 +5,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 func _AbsorbanceMeasurementRequirements() {
@@ -20,17 +21,19 @@ func _AbsorbanceMeasurementSteps(_ctx context.Context, _input *AbsorbanceMeasure
 
 	// dilute sample
 	diluentSample := mixer.Sample(_input.Diluent, _input.DilutionVolume)
-	execute.Mix(_ctx, _input.SampleForReading, diluentSample)
 
-	dilutedSample := execute.Mix(_ctx, _input.SampleForReading, diluentSample)
+	sampleforreading := mixer.SampleAll(_input.SampleForReading)
+
+	dilutedSample := execute.MixTo(_ctx, _input.Plate.Type, "", 1, sampleforreading, diluentSample)
+	//dilutedSample:=Mix(sampleforreading, diluentSample)
 
 	// read
-	abs := platereader.ReadAbsorbance(*_input.Plate, *dilutedSample, _input.AbsorbanceWavelength.RawValue())
+	abs := platereader.ReadAbsorbance(_input.Plate, dilutedSample, _input.AbsorbanceWavelength.RawValue())
 
 	// prepare blank and read
-	blankSample := execute.MixInto(_ctx, _input.Plate, "", diluentSample)
+	blankSample := execute.MixTo(_ctx, _input.Plate.Type, "", 1, mixer.Sample(_input.Diluent, dilutedSample.Volume()))
 
-	blankabs := platereader.ReadAbsorbance(*_input.Plate, *blankSample, _input.AbsorbanceWavelength.RawValue())
+	blankabs := platereader.ReadAbsorbance(_input.Plate, blankSample, _input.AbsorbanceWavelength.RawValue())
 
 	// blank correct
 	blankcorrected := platereader.Blankcorrect(blankabs, abs)
@@ -126,12 +129,12 @@ type AbsorbanceMeasurementSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "AbsorbanceMeasurement",
+	if err := addComponent(component.Component{Name: "AbsorbanceMeasurement",
 		Constructor: AbsorbanceMeasurementNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/DoE/absorbanceassay.an",
-			Params: []ParamDesc{
+			Path: "antha/component/an/GrowthAndAssay/absorbanceassay.an",
+			Params: []component.ParamDesc{
 				{Name: "AbsorbanceWavelength", Desc: "", Kind: "Parameters"},
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "DilutionVolume", Desc: "", Kind: "Parameters"},

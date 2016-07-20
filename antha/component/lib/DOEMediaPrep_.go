@@ -4,9 +4,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 func _DOEMediaPrepRequirements() {
@@ -103,12 +104,12 @@ type DOEMediaPrepSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "DOEMediaPrep",
+	if err := addComponent(component.Component{Name: "DOEMediaPrep",
 		Constructor: DOEMediaPrepNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/DoE/mediaprep.an",
-			Params: []ParamDesc{
+			Path: "antha/component/an/GrowthAndAssay/mediaprep.an",
+			Params: []component.ParamDesc{
 				{Name: "BaseMedium", Desc: "", Kind: "Inputs"},
 				{Name: "Glycerol", Desc: "", Kind: "Inputs"},
 				{Name: "GlycerolConc", Desc: "", Kind: "Parameters"},

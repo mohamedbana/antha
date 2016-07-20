@@ -74,7 +74,10 @@ Steps {
 	// Now working out Molarity of Substrate based on conc and looking up molecular weight in pubchem
 	
 	// Look up properties 
-	substrate_mw := pubchem.MakeMolecule(Substrate_name)
+	substrate_mw, err := pubchem.MakeMolecule(Substrate_name)
+        if err != nil {
+                panic(err)
+        }
 	
 	// calculate moles
 	submoles := sequences.Moles(SubstrateConc, substrate_mw.MolecularWeight, SubstrateVol)
