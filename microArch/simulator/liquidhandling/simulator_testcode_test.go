@@ -655,6 +655,21 @@ func (self *UnloadTips) Apply(vlh *lh.VirtualLiquidHandler) {
     vlh.UnloadTips(self.channels, self.head, self.multi, self.platetype, self.position, self.well)
 }
 
+//Move
+type Move struct {
+    deckposition        []string
+    wellcoords          []string
+    reference           []int
+    offsetX             []float64
+    offsetY             []float64
+    offsetZ             []float64
+    plate_type          []string
+    head                int
+}
+
+func (self *Move) Apply(vlh *lh.VirtualLiquidHandler) {
+    vlh.Move(self.deckposition, self.wellcoords, self.reference, self.offsetX, self.offsetY, self.offsetZ, self.plate_type, self.head)
+}
 
 /*
  * ######################################## Setup

@@ -983,3 +983,226 @@ func Test_UnloadTips(t *testing.T) {
     }
 }
 
+
+func Test_MoveSimple(t *testing.T) {
+
+    tests := []SimulatorTest{
+        SimulatorTest{
+            "OK",
+            nil,
+            []*SetupFn{
+                tipTestLayout(),
+            },
+            []TestRobotInstruction{
+                &Move{
+                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
+                    []int{1,1,1,1,1,1,1,1}, //reference
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetY
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetZ
+                    []string{"tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox"}, //plate_type
+                    0, //head
+                },
+                &Move{
+                    []string{"tipwaste","tipwaste","tipwaste","tipwaste","tipwaste","tipwaste","tipwaste","tipwaste"}, //deckposition
+                    []string{"A1","A1","A1","A1","A1","A1","A1","A1"}, //wellcoords
+                    []int{1,1,1,1,1,1,1,1}, //reference
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetY
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetZ
+                    []string{"tipwaste","tipwaste","tipwaste","tipwaste","tipwaste","tipwaste","tipwaste","tipwaste"}, //plate_type
+                    0, //head
+                },
+                &Move{
+                    []string{"","","","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"","","","A1","B1","C1","D1","E1"}, //wellcoords
+                    []int{0,0,0,1,1,1,1,1}, //reference (first 3 should be ignored)
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetY
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetZ
+                    []string{"","","","tipbox","tipbox","tipbox","tipbox","tipbox"}, //plate_type
+                    0, //head
+                },
+            },
+            nil,            //errors
+            nil,            //assertions
+        },
+        SimulatorTest{
+            "unknown location",
+            nil,
+            []*SetupFn{
+                tipTestLayout(),
+            },
+            []TestRobotInstruction{
+                &Move{
+                    []string{"tipbox7","tipbox7","tipbox7","tipbox7","tipbox7","tipbox7","tipbox7","tipbox7"}, //deckposition
+                    []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
+                    []int{1,1,1,1,1,1,1,1}, //reference
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetY
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetZ
+                    []string{"tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox"}, //plate_type
+                    0, //head
+                },
+                &Move{
+                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
+                    []int{1,1,1,1,1,1,1,1}, //reference
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetY
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetZ
+                    []string{"tipwaste","tipwaste","tipwaste","tipwaste","tipwaste","tipwaste","tipwaste","tipwaste"}, //plate_type
+                    0, //head
+                },
+            },
+            []string{       //errors
+                "(err) Move: Unknown location \"tipbox7\"",
+                "(err) Move: Location \"tipbox1\" has no plate of type \"tipwaste\"",
+            },
+            nil,            //assertions
+        },
+        SimulatorTest{
+            "unknown head",
+            nil,
+            []*SetupFn{
+                tipTestLayout(),
+            },
+            []TestRobotInstruction{
+                &Move{
+                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
+                    []int{1,1,1,1,1,1,1,1}, //reference
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetY
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetZ
+                    []string{"tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox"}, //plate_type
+                    1, //head
+                },
+                &Move{
+                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
+                    []int{1,1,1,1,1,1,1,1}, //reference
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetY
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetZ
+                    []string{"tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox"}, //plate_type
+                    -1, //head
+                },
+            },
+            []string{       //errors
+                "(err) Move: Unknown head 1",
+                "(err) Move: Unknown head -1",
+            },
+            nil,            //assertions
+        },
+        SimulatorTest{
+            "invalid wellcoords",
+            nil,
+            []*SetupFn{
+                tipTestLayout(),
+            },
+            []TestRobotInstruction{
+                &Move{
+                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"B1","C1","D1","E1","F1","G1","H1","I1"}, //wellcoords
+                    []int{1,1,1,1,1,1,1,1}, //reference
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetY
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetZ
+                    []string{"tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox"}, //plate_type
+                    0, //head
+                },
+                &Move{
+                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"B1","C1","D1","E1","F1","G1","H1","not_a_well"}, //wellcoords
+                    []int{1,1,1,1,1,1,1,1}, //reference
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetY
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetZ
+                    []string{"tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox"}, //plate_type
+                    0, //head
+                },
+            },
+            []string{       //errors
+                "(err) Move: Request for well I1 in tipbox at \"tipbox1\", size [8x12]",
+                "(err) Move: Couldn't parse well \"not_a_well\"",
+            },
+            nil,            //assertions
+        },
+        SimulatorTest{
+            "Invalid reference",
+            nil,
+            []*SetupFn{
+                tipTestLayout(),
+            },
+            []TestRobotInstruction{
+                &Move{
+                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
+                    []int{-1,-1,-1,-1,-1,-1,-1,-1,}, //reference
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetY
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetZ
+                    []string{"tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox"}, //plate_type
+                    0, //head
+                },
+                &Move{
+                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
+                    []int{2,2,2,2,2,2,2,2,}, //reference
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetY
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetZ
+                    []string{"tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox"}, //plate_type
+                    0, //head
+                },
+                &Move{
+                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
+                    []int{0,0,0,0,1,1,1,1}, //reference
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetY
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetZ
+                    []string{"tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox"}, //plate_type
+                    0, //head
+                },
+            },
+            []string{       //errors
+                "(err) Move: Invalid reference -1",
+                "(err) Move: Invalid reference 2",
+                "(err) Move: References must be equal as adaptor is not independent",
+            },
+            nil,            //assertions
+        },
+        SimulatorTest{
+            "offsets differ",
+            nil,
+            []*SetupFn{
+                tipTestLayout(),
+            },
+            []TestRobotInstruction{
+                &Move{
+                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
+                    []int{1,1,1,1,1,1,1,1}, //reference
+                    []float64{0.,0.,0.,0.,0.,3.,0.,0.,}, //offsetX
+                    []float64{0.,0.,0.,1.,0.,0.,0.,0.,}, //offsetY
+                    []float64{0.,0.,0.,0.,1.,0.,0.,0.,}, //offsetZ
+                    []string{"tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox"}, //plate_type
+                    0, //head
+                },
+            },
+            []string{       //errors
+                "(err) Move: Offsets cannot differ between channels when independent is false",
+            },
+            nil,            //assertions
+        },
+    }
+
+    for _,test := range tests {
+        test.run(t)
+    }
+}
+
+
