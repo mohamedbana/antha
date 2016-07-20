@@ -26,15 +26,11 @@ func (a dists) Len() int {
 	return len(a)
 }
 
-func (a dists) Range() <-chan Node {
-	ch := make(chan Node)
-	go func() {
-		defer close(ch)
-		for k := range a {
-			ch <- k
-		}
-	}()
-	return ch
+func (a dists) Values() (ret []Node) {
+	for k := range a {
+		ret = append(ret, k)
+	}
+	return
 }
 
 // Apply a visitor to each node reachable from root in some order. Return nodes
