@@ -315,15 +315,19 @@ func test_worst(t *testing.T, errors []*simulator.SimulationError, worst simulat
 
 //return subset of a not in b
 func get_not_in(a, b []string) []string {
-    for _,vb := range b {
-        for i,va := range a {
+    ret := []string{}
+    for _,va := range a {
+        c := false
+        for _,vb := range b {
             if va == vb {
-                a = append(a[:i], a[i+1:]...)
-                break
+                c = true
             }
         }
+        if !c {
+            ret = append(ret, va)
+        }
     }
-    return a
+    return ret
 }
 
 
