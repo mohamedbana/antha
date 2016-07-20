@@ -436,6 +436,37 @@ var EndlinksString = map[string]map[string]map[string][]string{
 			"Ter":         []string{"GGTA", "CGCT"},
 			"3U + Ter":    []string{"GCTT", "CGCT"},
 		},
+		"Level1": map[string][]string{
+			"Device1": []string{"GAA", "TACT"},
+			"Device2": []string{"TACT", "CCAT"},
+			"Device3": []string{"TACT", "CCAT"},
+		},
+	},
+	"Custom": map[string]map[string][]string{
+		"Level0": map[string][]string{
+			"Pro":         []string{"GGAG", "TACT"},
+			"5U":          []string{"TACT", "CCAT"},
+			"5U(f)":       []string{"TACT", "CCAT"},
+			"Pro + 5U(f)": []string{"GGAG", "CCAT"},
+			"Pro + 5U":    []string{"GGAG", "AATG"},
+			"NT1":         []string{"CCAT", "AATG"},
+			"5U + NT1":    []string{"TACT", "AATG"},
+			"CDS1":        []string{"AATG", "GCTT"},
+			"CDS1 ns":     []string{"AATG", "TTCG"},
+			"NT2":         []string{"AATG", "AGGT"},
+			"SP":          []string{"AATG", "AGGT"},
+			"CDS2 ns":     []string{"AGGT", "TTCG"},
+			"CDS2":        []string{"AGGT", "GCTT"},
+			"CT":          []string{"TTCG", "GCTT"},
+			"3U":          []string{"GCTT", "GGTA"},
+			"Ter":         []string{"GGTA", "CGCT"},
+			"3U + Ter":    []string{"GCTT", "CGCT"},
+		},
+		"Level1": map[string][]string{
+			"Device1": []string{"GAG", "ACC"},
+			"Device2": []string{"ACC", "TGT"},
+			"Device3": []string{"TGT", "GGT"},
+		},
 	},
 	"MoClo_Raven": map[string]map[string][]string{
 		"Level0": map[string][]string{
@@ -484,6 +515,10 @@ var Vectorends = map[string]map[string][]string{
 		"Level0": []string{"GGT", "GAA"},
 		"Level1": []string{"", ""},
 	},
+	"Custom": map[string][]string{
+		"Level0": []string{"CGCT", "GGAG"},
+		"Level1": []string{"GGT", "GAA"},
+	},
 	"Electra": map[string][]string{
 		"Level0": []string{"GGT", "ATG"},
 		"Level1": []string{"", ""},
@@ -500,6 +535,10 @@ var Enzymelookup = map[string]map[string]wtype.TypeIIs{
 	"MoClo": map[string]wtype.TypeIIs{
 		"Level0": BsaIenz,
 		"Level1": BpiIenz,
+	},
+	"Custom": map[string]wtype.TypeIIs{
+		"Level0": BsaIenz,
+		"Level1": SapIenz,
 	},
 	"Electra": map[string]wtype.TypeIIs{
 		"Level0": SapIenz,
