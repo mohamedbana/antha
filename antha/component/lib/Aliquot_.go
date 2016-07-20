@@ -5,9 +5,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -131,12 +132,12 @@ type AliquotSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Aliquot",
+	if err := addComponent(component.Component{Name: "Aliquot",
 		Constructor: AliquotNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/Aliquot/Aliquot.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "NumberofAliquots", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
 				{Name: "OutPlatetype", Desc: "", Kind: "Parameters"},

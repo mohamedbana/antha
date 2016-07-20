@@ -8,10 +8,11 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
+	"golang.org/x/net/context"
 	"strconv"
 )
 
@@ -47,6 +48,9 @@ func _AccuracyTestSteps(_ctx context.Context, _input *AccuracyTestInput, _output
 	counter := 0
 	var platenum = 1
 	var runs = make([]doe.Run, 1)
+	var run doe.Run
+	// initialise slice with a run
+	runs[0] = run
 	var err error
 	_output.Errors = make([]error, 0)
 	// work out plate layout based on picture or just in order
@@ -343,12 +347,12 @@ type AccuracyTestSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "AccuracyTest",
+	if err := addComponent(component.Component{Name: "AccuracyTest",
 		Constructor: AccuracyTestNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Utility/AccuracyTest.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "DXORJMP", Desc: "", Kind: "Parameters"},
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},

@@ -6,9 +6,10 @@ import (
 	"fmt"                                                                 // we need this go library to print
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/eng" // all of our functions used here are in the Thaw.go file in the eng package which this points to
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Many of the real parameters required will be looked up via the specific labware (platetype) and liquid type which are being used.
@@ -156,12 +157,12 @@ type ThawtimeSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Thawtime",
+	if err := addComponent(component.Component{Name: "Thawtime",
 		Constructor: ThawtimeNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "status = compiles and calculates; need to fill in correct parameters and check units\ncurrently using dummy values only so won't be accurate yet!\n",
 			Path: "antha/component/an/eng/Thawtime/Thawtime.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Airvelocity", Desc: "These should be captured via sensors just prior to execution\n", Kind: "Parameters"},
 				{Name: "BulkTemp", Desc: "This will be monitored via the thermometer in the freezer in which the sample was stored\n", Kind: "Parameters"},
 				{Name: "Fillvolume", Desc: " e.g. the sample volume as frozen by a previous storage protocol;\n\tcould be known or measured via liquid height detection on some liquid handlers\n", Kind: "Parameters"},

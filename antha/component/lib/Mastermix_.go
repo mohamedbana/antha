@@ -4,9 +4,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -32,15 +33,14 @@ func _MastermixSetup(_ctx context.Context, _input *MastermixInput) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func _MastermixSteps(_ctx context.Context, _input *MastermixInput, _output *MastermixOutput) {
-
 	if len(_input.OtherComponents) != len(_input.OtherComponentVolumes) {
-		panic("len(OtherComponents) != len(OtherComponentVolumes)")
+		execute.Errorf(_ctx, "%d != %d", len(_input.OtherComponents), len(_input.OtherComponentVolumes))
 	}
 
 	mastermixes := make([]*wtype.LHComponent, 0)
 
 	if _input.AliquotbyRow {
-		panic("MixTo based method coming soon!")
+		execute.Errorf(_ctx, "MixTo based method coming soon!")
 	} else {
 		for i := 0; i < _input.NumberofMastermixes; i++ {
 
@@ -152,12 +152,12 @@ type MastermixSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Mastermix",
+	if err := addComponent(component.Component{Name: "Mastermix",
 		Constructor: MastermixNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/MakeMastermix/Mastermix.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "AliquotbyRow", Desc: "", Kind: "Parameters"},
 				{Name: "Buffer", Desc: "optional if nil this is ignored\n", Kind: "Inputs"},
 				{Name: "Inplate", Desc: "", Kind: "Inputs"},

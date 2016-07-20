@@ -147,6 +147,8 @@ func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 			continue
 		}
 
+		// inputs[cname][0] -- this is the first little spritz required
+		// should probably refactor this to aggregate first
 		component := inputs[cname][0]
 		//logger.Debug(fmt.Sprintln("Plate_setup - component", cname, ":"))
 
@@ -195,12 +197,8 @@ func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 				ass = append(ass, location)
 
 				newcomponent := component.Dup()
-				// sort out parent issue
-				// first we don't allow these to have the same ID
-				newcomponent.ID = wtype.GetUUID()
-				// second we add a parent
-				newcomponent.AddParent(component.ID)
 				newcomponent.Vol = curr_well.MaxVol
+				newcomponent.Loc = location
 				volume.Subtract(curr_well.WorkingVolume())
 				curr_well.Add(newcomponent)
 				input_plates[curr_plate.ID] = curr_plate
@@ -214,6 +212,8 @@ func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 
 	for _, v := range inputs {
 		for _, vv := range v {
+			// this now means input assignments is always set...
+			// previously this was empty
 			if vv.Loc != "" {
 				// append it
 

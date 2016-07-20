@@ -7,10 +7,12 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/entrez"
+	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"strconv"
 )
 
@@ -63,6 +65,8 @@ func _GeneDesign_seqSteps(_ctx context.Context, _input *GeneDesign_seqInput, _ou
 	if _input.ExporttoFastaFile {
 		export.Makefastaserial2(_input.ConstructName, _output.PartsWithOverhangs)
 	}
+
+	fmt.Println("Parts Source: ", _output.PartsWithOverhangs)
 }
 
 func _GeneDesign_seqAnalysis(_ctx context.Context, _input *GeneDesign_seqInput, _output *GeneDesign_seqOutput) {
@@ -148,12 +152,12 @@ type GeneDesign_seqSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "GeneDesign_seq",
+	if err := addComponent(component.Component{Name: "GeneDesign_seq",
 		Constructor: GeneDesign_seqNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/GeneDesign/GeneDesign_seq.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "ConstructName", Desc: "name you want to give your construct\n", Kind: "Parameters"},
 				{Name: "EndsAlreadyAdded", Desc: "have the typeIIs assembly ends been added already? true/false\n", Kind: "Parameters"},
 				{Name: "ExporttoFastaFile", Desc: "Whether or not you want to export the sequences generated to a fasta file\n", Kind: "Parameters"},

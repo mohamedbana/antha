@@ -96,12 +96,15 @@ func (a *Incubate) GetTimeEstimate() float64 {
 	return a.Time
 }
 
+// TODO: merge with microArch/report?
 type Mix struct {
-	Dev        Device
-	Depends    []Inst
-	Request    *lh.LHRequest
-	Properties liquidhandling.LHProperties
-	Files      Files
+	Dev             Device
+	Depends         []Inst
+	Request         *lh.LHRequest
+	Properties      *liquidhandling.LHProperties
+	FinalProperties *liquidhandling.LHProperties
+	Final           map[string]string // Map from ids in Properties to FinalProperties
+	Files           Files
 }
 
 func (a *Mix) Data() Files {

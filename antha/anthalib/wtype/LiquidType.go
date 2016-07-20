@@ -46,8 +46,9 @@ func LiquidTypeFromString(s string) (LiquidType, error) {
 
 	switch s {
 	case "water":
-	case "":
 		return LTWater, nil
+	case "":
+		return LTWater, fmt.Errorf("no liquid policy specified so using default water policy")
 	case "glycerol":
 		return LTGlycerol, nil
 	case "ethanol":
@@ -94,7 +95,7 @@ func LiquidTypeFromString(s string) (LiquidType, error) {
 		return LTWater, nil
 	}
 
-	return LTWater, fmt.Errorf("no liquid policy found so using default water policy")
+	return LTWater, fmt.Errorf("no liquid policy found for " + s + " so using default water policy")
 }
 
 func LiquidTypeName(lt LiquidType) string {

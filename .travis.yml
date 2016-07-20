@@ -5,6 +5,7 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y libglpk-dev
   - sudo apt-get install -y libopencv-dev libcv-dev libhighgui-dev
+  - go get golang.org/x/net/context
 script: make test
 notifications:
   hipchat:

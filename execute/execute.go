@@ -57,14 +57,23 @@ func Run(parent context.Context, opt Opt) (*Result, error) {
 
 	r := &resolver{}
 
-	if err := w.Run(trace.WithResolver(ctx, func(ctx context.Context, insts []interface{}) (map[int]interface{}, error) {
+	err = w.Run(trace.WithResolver(ctx, func(ctx context.Context, insts []interface{}) (map[int]interface{}, error) {
 		return r.resolve(ctx, insts)
-	})); err != nil {
-		return nil, err
+	}))
+
+	if err == nil {
+		return &Result{
+			Workflow: w,
+			Insts:    r.insts,
+		}, nil
 	}
 
-	return &Result{
-		Workflow: w,
-		Insts:    r.insts,
-	}, nil
+	// Unwrap error
+	if terr, ok := err.(*trace.Error); ok {
+		if eerr, ok := terr.BaseError.(error); ok {
+			err = eerr
+		}
+	}
+
+	return nil, err
 }

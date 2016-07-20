@@ -1,7 +1,7 @@
 {
   "Parameters": {
     "PipetteImage": {
-		"Imagefilename":"8-Bit-Pixel-Handlebar-Moustache.png",
+		"Imagefilename":"vader.jpeg",
 		"Rotate": false,
 		"AutoRotate": true,
 		"Diluent":"water",

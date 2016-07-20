@@ -9,9 +9,10 @@ import
 	"github.com/antha-lang/antha/antha/anthalib/wtype" // the LHComponent type is imported from this library
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // the Sample function is imported from mixer
@@ -41,7 +42,7 @@ func _Aliquot_somewhereSteps(_ctx context.Context, _input *Aliquot_somewhereInpu
 	number := _input.SolutionVolume.SIValue() / _input.VolumePerAliquot.SIValue()
 	possiblenumberofAliquots, _ := wutil.RoundDown(number)
 	if possiblenumberofAliquots < _input.NumberofAliquots {
-		panic("Not enough solution for this many aliquots")
+		execute.Errorf(_ctx, "Not enough solution for this many aliquots")
 	}
 
 	// make a slice of components which we'll fill with aliquots;
@@ -149,12 +150,12 @@ type Aliquot_somewhereSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Aliquot_somewhere",
+	if err := addComponent(component.Component{Name: "Aliquot_somewhere",
 		Constructor: Aliquot_somewhereNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "example protocol showing the highest level antha mix command which does not specify a plate type, therefore leaving it up to the scheduler to decide\n",
 			Path: "antha/component/an/AnthaAcademy/Lesson2_mix/A_Aliquot_somewhereorother.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "NumberofAliquots", Desc: "", Kind: "Parameters"},
 				{Name: "Solution", Desc: "", Kind: "Inputs"},
 				{Name: "SolutionVolume", Desc: "", Kind: "Parameters"},

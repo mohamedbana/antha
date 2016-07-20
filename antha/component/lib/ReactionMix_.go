@@ -1,15 +1,15 @@
 package lib
 
 import (
+	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
-
-//"fmt"
 
 // Input parameters for this protocol (data)
 
@@ -25,6 +25,9 @@ func _ReactionMixRequirements() {}
 func _ReactionMixSetup(_ctx context.Context, _input *ReactionMixInput) {}
 
 func _ReactionMixSteps(_ctx context.Context, _input *ReactionMixInput, _output *ReactionMixOutput) {
+
+	fmt.Println("Components:", _input.Components)
+
 	samples := make([]*wtype.LHComponent, 0)
 
 	VectorS := mixer.Sample(_input.Vector, _input.VectorV)
@@ -133,12 +136,12 @@ type ReactionMixSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "ReactionMix",
+	if err := addComponent(component.Component{Name: "ReactionMix",
 		Constructor: ReactionMixNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/GeneDesign/ReactionMix.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "ATP", Desc: "", Kind: "Inputs"},
 				{Name: "ATPV", Desc: "", Kind: "Parameters"},
 				{Name: "Buffer", Desc: "", Kind: "Inputs"},

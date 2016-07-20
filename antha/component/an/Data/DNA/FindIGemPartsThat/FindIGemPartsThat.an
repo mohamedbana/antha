@@ -38,8 +38,8 @@ Outputs (
 // Data which is returned from this protocol, and data types
 Data (
 	Warnings error
-	FulllistBackupParts []string 
-	WorkingBackupParts []string
+	//FulllistBackupParts []string 
+	//WorkingBackupParts []string
 	PartMap map[string][]string // i.e. map[description]list of parts matching description
 	BiobrickDescriptions map[string]string // i.e. map[biobrickID]description
 	HighestRatedMatch string
@@ -61,13 +61,14 @@ Steps {
 	Parttypes := []string{Parttype}
 
 	BackupParts := make([]string,0)
-	WorkingBackupParts = make([]string,0)
+	WorkingBackupParts := make([]string,0)
 
 	
 	// initialise some variables for use later
 	parts := make([][]string,0)
 	OriginalPartMap := make(map[string][]string)
 	PartMap = make(map[string][]string)
+	parttypemap := make(map[string]string)
 	BiobrickDescriptions = make(map[string]string)
 	subparts := make([]string,0)
 	var highestrating int
@@ -81,7 +82,7 @@ Steps {
 	// first we'll parse the igem registry based on the short description contained in the fasta header for each part sequence
 	for _, parttype := range Parttypes {
 	
-	subparts = igem.FilterRegistry(parttype,[]string{partstatus},ExactTypeOnly)
+	subparts, parttypemap = igem.FilterRegistry(parttype,[]string{partstatus},ExactTypeOnly)
 	parts = append(parts,subparts)
 	OriginalPartMap[parttype+"_"+partstatus]=subparts
 	PartMap[parttype+"_"+partstatus]=subparts
@@ -108,7 +109,7 @@ Steps {
 		
 		// check if key words are in description and that status == "WORKS if only working parts are desired
 		 if MatchAllDescriptions == false && strings.Contains(strings.ToUpper(partdetails.Description(subpart)),strings.ToUpper(Partdescriptions[i])) &&
-			strings.Contains(partdetails.Results(subpart), othercriteria) {
+			strings.Contains(strings.ToUpper(partdetails.Results(subpart)), strings.ToUpper(othercriteria)) {
 				
 			if !search.InSlice(subpart,BackupParts){
 			BackupParts = append(BackupParts, subpart)
@@ -169,16 +170,24 @@ Steps {
 		PartMap[desc+"_"+Partdescriptions[i]+"+WORKS"]=WorkingBackupParts
 		}
 		
-		FulllistBackupParts = BackupParts 
+		
 	}
+		//FulllistBackupParts = BackupParts 
+		BackupParts = make([]string,0)
+		WorkingBackupParts = make([]string,0)
+	
 	i = i + 1
 	if MatchAllDescriptions {
 		// don't need to loop through each description if we're matching all
-		break
+		continue
 	}
 	}
-	for _, subpart := range BackupParts {
+	for _, subpartarray := range PartMap {
+		for _,subpart := range subpartarray {
+	if partdetails.Description(subpart) != ""{
 	BiobrickDescriptions[subpart]= partdetails.Description(subpart)
+	}else BiobrickDescriptions[subpart] = parttypemap[subpart]
+	}
 	}
 	}
 	

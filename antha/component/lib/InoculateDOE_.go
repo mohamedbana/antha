@@ -5,9 +5,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 func _InoculateDOERequirements() {
@@ -20,6 +21,7 @@ func _InoculateDOESteps(_ctx context.Context, _input *InoculateDOEInput, _output
 	inocsample := mixer.Sample(_input.Inoculum, _input.InoculumVolume)
 	fmt.Println("Inoculum ", _input.Inoculum.CName, "Inoculum Volume ", _input.InoculumVolume.ToString(), "Medium", _input.Medium.CName)
 	_output.Seed = execute.Mix(_ctx, _input.Medium, inocsample)
+	fmt.Println("Seed:", _output.Seed.CName)
 }
 
 func _InoculateDOEAnalysis(_ctx context.Context, _input *InoculateDOEInput, _output *InoculateDOEOutput) {
@@ -93,12 +95,12 @@ type InoculateDOESOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "InoculateDOE",
+	if err := addComponent(component.Component{Name: "InoculateDOE",
 		Constructor: InoculateDOENew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/DoE/inoculate.an",
-			Params: []ParamDesc{
+			Path: "antha/component/an/GrowthAndAssay/inoculate.an",
+			Params: []component.ParamDesc{
 				{Name: "Inoculum", Desc: "", Kind: "Inputs"},
 				{Name: "InoculumVolume", Desc: "", Kind: "Parameters"},
 				{Name: "Medium", Desc: "", Kind: "Inputs"},

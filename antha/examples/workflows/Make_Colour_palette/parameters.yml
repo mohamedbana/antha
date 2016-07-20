@@ -1,7 +1,7 @@
 {
   "Parameters": {
     "PipetteImage": {
-		"Imagefilename":"jenkins_plateformat.jpeg",
+		"Imagefilename":"cmyk2.jpg",
 		"Rotate": false,
 		"AutoRotate": true,
       "Cyan": "Cyan",

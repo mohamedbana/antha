@@ -36,16 +36,34 @@ var (
 	dataCounter    int
 )
 
-type testMiddleware struct{}
+type testMiddleware struct {
+	sync.Mutex
+}
 
-func (t testMiddleware) Log(l LogLevel, ts int64, s string, m string, e ...interface{}) { logCounter++ }
-func (t testMiddleware) Measure(ts int64, s, m string, e ...interface{})                { measureCounter++ }
-func (t testMiddleware) Sensor(ts int64, s, m string, e ...interface{})                 { sensorCounter++ }
-func (t testMiddleware) Data(ts int64, d interface{}, e ...interface{})                 { dataCounter++ }
+func (t *testMiddleware) Log(l LogLevel, ts int64, s string, m string, e ...interface{}) {
+	t.Mutex.Lock()
+	defer t.Mutex.Unlock()
+	logCounter++
+}
+func (t *testMiddleware) Measure(ts int64, s, m string, e ...interface{}) {
+	t.Mutex.Lock()
+	defer t.Mutex.Unlock()
+	measureCounter++
+}
+func (t *testMiddleware) Sensor(ts int64, s, m string, e ...interface{}) {
+	t.Mutex.Lock()
+	defer t.Mutex.Unlock()
+	sensorCounter++
+}
+func (t *testMiddleware) Data(ts int64, d interface{}, e ...interface{}) {
+	t.Mutex.Lock()
+	defer t.Mutex.Unlock()
+	dataCounter++
+}
 
 func TestRegisterMiddleware(t *testing.T) {
 	midCount := len(middlewares)
-	RegisterMiddleware(testMiddleware{})
+	RegisterMiddleware(&testMiddleware{})
 	if l := len(middlewares); l != 1+midCount {
 		t.Error("middlewares size err. Expecting ", 1+midCount, " got ", l)
 	}
@@ -57,7 +75,7 @@ func TestMiddlewareCalls(t *testing.T) {
 	logCounter = 0
 	measureCounter = 0
 	sensorCounter = 0
-	RegisterMiddleware(testMiddleware{})
+	RegisterMiddleware(&testMiddleware{})
 	Info("")
 	Debug("")
 	Warning("")
@@ -102,7 +120,7 @@ func TestMiddlewareCallsSync(t *testing.T) {
 	sensorCounter = 0
 
 	syncCount := 5
-	RegisterMiddleware(testMiddleware{})
+	RegisterMiddleware(&testMiddleware{})
 	wg := sync.WaitGroup{}
 	wg.Add(syncCount)
 
@@ -141,7 +159,7 @@ func TestLogLogger(t *testing.T) {
 	}
 	cleanMiddleware() //MUST!
 	before := logCounter
-	RegisterMiddleware(testMiddleware{})
+	RegisterMiddleware(&testMiddleware{})
 	Info("test")
 	if logCounter != before+1 {
 		t.Errorf("expected %d calls found %d", before+1, logCounter)

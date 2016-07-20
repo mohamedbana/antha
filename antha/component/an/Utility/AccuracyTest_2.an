@@ -106,7 +106,7 @@ Steps {
 	// use first policy as reference to ensure consistent range through map values
 	referencepolicy,found := liquidhandling.GetPolicyByName(LHPolicy)
 	if found == false {
-		panic("policy "+LHPolicy+" not found")
+		Errorf("policy "+LHPolicy+" not found")
 		Errors = append(Errors,fmt.Errorf("policy ",LHPolicy," not found"))
 	}
 	

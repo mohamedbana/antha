@@ -56,6 +56,7 @@ Data (
 	Evaporationrateestimate float64 // ul/h
 	Evaporatedliquid Volume // ul
 	Estimatedevaporationtime Time
+	Warnings error
 )
 Inputs (
 	Platetype *wtype.LHPlate
@@ -83,7 +84,8 @@ Analysis {
 		fmt.Println(Platetype.Welltype.Xdim, Platetype.Welltype.Ydim, Platetype.Welltype.Zdim, Platetype.Welltype.Shape())
 	surfacearea = wellarea
 	}else {
-		panic("plate "+ Platetype.String() +" Wellshape "+ Platetype.Welltype.String() +" surface area not yet calculated due to bottom type")
+		Warnings = fmt.Errorf("plate "+ Platetype.String() +" Wellshape "+ Platetype.Welltype.String() +" surface area not yet calculated due to bottom type")
+		Errorf("plate "+ Platetype.String() +" Wellshape "+ Platetype.Welltype.String() +" surface area not yet calculated due to bottom type")
 	}
 	var PWS float64 = eng.Pws(Temp)
 	var pw float64 = eng.Pw(Relativehumidity, PWS) // vapour partial pressure in Pascals
@@ -91,7 +93,15 @@ Analysis {
 	((surfacearea.RawValue()/1000000)* 
 	((eng.Xs(PWS, Pa)) - (eng.X(pw, Pa))))) // Gh is rate of evaporation in kg/h
 	evaporatedliquid := (Gh * (Executiontime.SIValue()/3600)) // in kg
-	evaporatedliquid = (evaporatedliquid * liquidclasses.Liquidclass[Liquid.TypeName()]["ro"])/1000 // converted to litres
+	
+	density, ok := liquidclasses.Liquidclass[Liquid.TypeName()]["ro"]
+	
+	if !ok {
+		density = liquidclasses.Liquidclass["water"]["ro"]
+		Warnings = fmt.Errorf("liquid density not found for "+ Liquid.TypeName() +" so used water value")
+	}
+	
+	evaporatedliquid = (evaporatedliquid * density)/1000 // converted to litres
 	Evaporatedliquid = wunit.NewVolume((evaporatedliquid*1000000),"ul") // convert to ul
 	
 	Evaporationrateestimate = Gh*1000000 // ul/h if declared in parameters or data it doesn't need declaring again
@@ -99,17 +109,19 @@ Analysis {
 	estimatedevaporationtime  := Volumeperwell.ConvertTo(wunit.ParsePrefixedUnit("ul")) / Evaporationrateestimate 
 	Estimatedevaporationtime = wunit.NewTime((estimatedevaporationtime*3600),"s") 
 	
+	
 	Status = fmt.Sprintln("Well Surface Area=", 
 				surfacearea.ToString(),
 				"evaporation rate =", Gh*1000000, "ul/h", 
 				"total evaporated liquid =", Evaporatedliquid.ToString(), "after", Executiontime.ToString(),
-				"estimated evaporation time = ", Estimatedevaporationtime.ToString())
+				"estimated evaporation time = ", Estimatedevaporationtime.ToString(),
+				"Warnings =", Warnings)
 	
 } // works in either analysis or steps sections
 
 Validation {
 	if Evaporatedliquid.SIValue() > Volumeperwell.SIValue() {
-	panic("not enough liquid, Expected that liquid volume " + Volumeperwell.ToString() +" will evaporate during this time " + Executiontime.ToString()  + " Status:  "+ Status)
+	Errorf("not enough liquid, Expected that liquid volume " + Volumeperwell.ToString() +" will evaporate during this time " + Executiontime.ToString()  + " Status:  "+ Status)
 	}
 }
 

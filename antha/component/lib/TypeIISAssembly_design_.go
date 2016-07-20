@@ -15,9 +15,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"strings"
 )
 
@@ -89,7 +90,7 @@ func _TypeIISAssembly_designSteps(_ctx context.Context, _input *TypeIISAssembly_
 	// or Look up parts from registry according to properties (this will take a couple of minutes the first time)
 	exacttypeonly := true
 
-	subparts := igem.FilterRegistry("REPORTER", []string{"Fluorescent", "A "}, exacttypeonly)
+	subparts, _ := igem.FilterRegistry("REPORTER", []string{"Fluorescent", "A "}, exacttypeonly)
 	partdetails := igem.LookUp(subparts)
 	//fmt.Println(partdetails)
 
@@ -277,12 +278,12 @@ type TypeIISAssembly_designSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "TypeIISAssembly_design",
+	if err := addComponent(component.Component{Name: "TypeIISAssembly_design",
 		Constructor: TypeIISAssembly_designNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/TypeIISAssembly_design.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "AssemblyStandard", Desc: "", Kind: "Parameters"},
 				{Name: "Constructname", Desc: "", Kind: "Parameters"},
 				{Name: "Level", Desc: "", Kind: "Parameters"},

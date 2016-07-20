@@ -2,9 +2,10 @@ package injectutil
 
 import (
 	"fmt"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
-	"github.com/antha-lang/antha/inject"
 	"testing"
+
+	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 func TestProduct(t *testing.T) {

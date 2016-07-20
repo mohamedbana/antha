@@ -8,9 +8,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol
@@ -151,12 +152,12 @@ type NewDNASequenceSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "NewDNASequence",
+	if err := addComponent(component.Component{Name: "NewDNASequence",
 		Constructor: NewDNASequenceNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "demo protocol of how to create a dna type from user inputs\n",
 			Path: "antha/component/an/AnthaAcademy/Lesson4_DNA/A_NewDNASequence.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "DNA_seq", Desc: "", Kind: "Parameters"},
 				{Name: "Gene_name", Desc: "", Kind: "Parameters"},
 				{Name: "Linear", Desc: "", Kind: "Parameters"},
