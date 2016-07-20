@@ -180,6 +180,7 @@ func TestVarScope(t *testing.T) {
 }
 
 func TestObjects(t *testing.T) {
+	t.Skip("file assets not supported in test yet")
 	const src = `
 package p
 import fmt "fmt"
