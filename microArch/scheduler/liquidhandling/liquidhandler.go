@@ -29,6 +29,7 @@ import (
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/microArch/driver"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
@@ -235,7 +236,9 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 			return err
 		}
 
-		for crd, vol := range wellmap {
+		for crd, unroundedvol := range wellmap {
+			rv, _ := wutil.Roundto(unroundedvol.RawValue(), 1)
+			vol := wunit.NewVolume(rv, unroundedvol.Unit().PrefixedSymbol())
 			well := plate.Wellcoords[crd]
 			well2 := plate2.Wellcoords[crd]
 			if well.IsAutoallocated() {
