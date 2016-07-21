@@ -995,7 +995,7 @@ func Test_Move(t *testing.T) {
             },
             []TestRobotInstruction{
                 &Move{
-                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1"}, //deckposition
                     []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
                     []int{1,1,1,1,1,1,1,1}, //reference
                     []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
@@ -1015,7 +1015,7 @@ func Test_Move(t *testing.T) {
                     0, //head
                 },
                 &Move{
-                    []string{"","","","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"","","","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1"}, //deckposition
                     []string{"","","","A1","B1","C1","D1","E1"}, //wellcoords
                     []int{0,0,0,1,1,1,1,1}, //reference (first 3 should be ignored)
                     []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
@@ -1046,7 +1046,7 @@ func Test_Move(t *testing.T) {
                     0, //head
                 },
                 &Move{
-                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1"}, //deckposition
                     []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
                     []int{1,1,1,1,1,1,1,1}, //reference
                     []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
@@ -1058,7 +1058,7 @@ func Test_Move(t *testing.T) {
             },
             []string{       //errors
                 "(err) Move: Unknown location \"tipbox7\"",
-                "(err) Move: Location \"tipbox1\" has no plate of type \"tipwaste\"",
+                "(err) Move: Location \"tipbox_1\" has no plate of type \"tipwaste\"",
             },
             nil,            //assertions
         },
@@ -1070,7 +1070,7 @@ func Test_Move(t *testing.T) {
             },
             []TestRobotInstruction{
                 &Move{
-                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1"}, //deckposition
                     []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
                     []int{1,1,1,1,1,1,1,1}, //reference
                     []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
@@ -1080,7 +1080,7 @@ func Test_Move(t *testing.T) {
                     1, //head
                 },
                 &Move{
-                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1"}, //deckposition
                     []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
                     []int{1,1,1,1,1,1,1,1}, //reference
                     []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
@@ -1104,7 +1104,7 @@ func Test_Move(t *testing.T) {
             },
             []TestRobotInstruction{
                 &Move{
-                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1"}, //deckposition
                     []string{"B1","C1","D1","E1","F1","G1","H1","I1"}, //wellcoords
                     []int{1,1,1,1,1,1,1,1}, //reference
                     []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
@@ -1114,7 +1114,7 @@ func Test_Move(t *testing.T) {
                     0, //head
                 },
                 &Move{
-                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1"}, //deckposition
                     []string{"B1","C1","D1","E1","F1","G1","H1","not_a_well"}, //wellcoords
                     []int{1,1,1,1,1,1,1,1}, //reference
                     []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
@@ -1125,7 +1125,7 @@ func Test_Move(t *testing.T) {
                 },
             },
             []string{       //errors
-                "(err) Move: Request for well I1 in tipbox at \"tipbox1\", size [8x12]",
+                "(err) Move: Request for well I1 in tipbox at \"tipbox_1\", size [8x12]",
                 "(err) Move: Couldn't parse well \"not_a_well\"",
             },
             nil,            //assertions
@@ -1138,7 +1138,7 @@ func Test_Move(t *testing.T) {
             },
             []TestRobotInstruction{
                 &Move{
-                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1"}, //deckposition
                     []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
                     []int{-1,-1,-1,-1,-1,-1,-1,-1,}, //reference
                     []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
@@ -1148,7 +1148,7 @@ func Test_Move(t *testing.T) {
                     0, //head
                 },
                 &Move{
-                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1"}, //deckposition
                     []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
                     []int{2,2,2,2,2,2,2,2,}, //reference
                     []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
@@ -1158,7 +1158,7 @@ func Test_Move(t *testing.T) {
                     0, //head
                 },
                 &Move{
-                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1"}, //deckposition
                     []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
                     []int{0,0,0,0,1,1,1,1}, //reference
                     []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
@@ -1183,7 +1183,7 @@ func Test_Move(t *testing.T) {
             },
             []TestRobotInstruction{
                 &Move{
-                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1"}, //deckposition
                     []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
                     []int{1,1,1,1,1,1,1,1}, //reference
                     []float64{0.,0.,0.,0.,0.,3.,0.,0.,}, //offsetX
@@ -1206,7 +1206,7 @@ func Test_Move(t *testing.T) {
             },
             []TestRobotInstruction{
                 &Move{
-                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1"}, //deckposition
                     []string{"A1","B2","C1","D2","E1","F2","G1","H2"}, //wellcoords
                     []int{1,1,1,1,1,1,1,1}, //reference
                     []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
@@ -1229,7 +1229,7 @@ func Test_Move(t *testing.T) {
             },
             []TestRobotInstruction{
                 &Move{
-                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1"}, //deckposition
                     []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
                     []int{1,1,1,1,1,1,1,1}, //reference
                     []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
@@ -1239,7 +1239,7 @@ func Test_Move(t *testing.T) {
                     0, //head
                 },
                 &Move{
-                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1"}, //deckposition
                     []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
                     []int{0,0,0,0,0,0,0,0}, //reference
                     []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX
@@ -1249,7 +1249,7 @@ func Test_Move(t *testing.T) {
                     0, //head
                 },
                 &Move{
-                    []string{"tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1","tipbox1"}, //deckposition
+                    []string{"tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1"}, //deckposition
                     []string{"A1","B1","C1","D1","E1","F1","G1","H1"}, //wellcoords
                     []int{0,0,0,0,0,0,0,0}, //reference
                     []float64{0.,0.,0.,0.,0.,0.,0.,0.,}, //offsetX

@@ -205,14 +205,70 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
     offsetX,Y,Z = (%v, %v, %v),
     plate_type = %v,
     head = %v)`, deckposition, wellcoords, reference, offsetX, offsetY, offsetZ, plate_type, head))
-    //Asserts:
-    //deckposition exists - why is it a list?
-    //wellcoords exists within the plate at deckposition
-    //reference is in allowable range
-    //offsetX, offsetY, offsetZ are within the well (but I guess they needn't be...)
-    //plate_type matches the type of plate at deckposition
-    //head is valid
-    return driver.CommandStatus{true, driver.OK, "MOVE ACK"}
+    
+    ret := driver.CommandStatus{true, driver.OK, "MOVE ACK"}
+
+    if head < 0 || head >= len(self.properties.Heads) {
+        self.AddErrorf("Move", "Unknown head %v", head)
+        return ret
+    }
+    adaptor := self.GetHeadAdaptor(head)
+
+    multi := len(deckposition)
+    if (len(wellcoords) != multi || len(reference) != multi || len(offsetX) != multi ||
+            len(offsetY) != multi || len(offsetZ) != multi || len(plate_type) != multi) {
+        self.AddError("Move", "Deckposition, wellcoords, reference, offsetX,Y,Z, and plate_type should be the same length")
+        return ret
+    }
+
+    //which items in the list are nil (this allows channels to be off the edge of the plate)
+    isNil := make(map[int]bool)
+    for i := range wellcoords {
+        isNil[i] = wellcoords[i] == nil
+    }
+    
+    plates := make(map[string]interface{})
+    for _,dp := range deckposition {
+        if dp == "" {
+            continue
+        }
+        if !self.locationIsKnown(dp) {
+            self.AddErrorf("Move", "Unknown location \"%s\"", dp)
+            return ret
+        }
+        if plates[dp] == nil {
+            plates[dp] = self.GetPlateAt(dp)
+        }
+    }
+
+    if !adaptor.Params.Independent && len(plates) > 1 {
+        self.AddErrorf("Move", "Cannot move to multiple locations as adaptor is not independent")
+    }
+
+    //check that plate_type makes sense
+    for i := range plate_type {
+        if plate_type[i] == "" {
+            continue
+        }
+        if plates[deckposition[i]] == nil || plates[deckposition[i]].(wtype.Typed).GetType() != plate_type[i] {
+            self.AddErrorf("Move", "Location \"%s\" has no plate of type \"%s\"", deckposition[i], plate_type[i])
+            return ret
+        }
+    }
+
+    //check references
+    for _,r := range reference {
+        if r < 0 || r > 1 {
+            self.AddErrorf("Move", "Invalid reference %v", r)
+        }
+        if !adaptor.Params.Independent && r != reference[0] {
+            self.AddError("Move", "References must be equal as adaptor is not independent")
+        }
+    }
+
+
+    
+    return ret
 }
 
 //Move raw - not yet implemented in compositerobotinstruction
