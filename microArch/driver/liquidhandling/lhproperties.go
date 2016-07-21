@@ -805,25 +805,6 @@ func (lhp *LHProperties) Evaporate(t time.Duration) []wtype.VolumeCorrection {
 	return ret
 }
 
-func (lhp *LHProperties) GetEnvironment() wtype.Environment {
-	// static to start with
-
-	return wtype.Environment{
-		Temperature:         wunit.NewTemperature(25, "C"),
-		Pressure:            wunit.NewPressure(100000, "Pa"),
-		Humidity:            0.35,
-		MeanAirFlowVelocity: wunit.NewVelocity(0, "m/s"),
-	}
-}
-
-func (lhp *LHProperties) Evaporate(t time.Duration) {
-	// TODO: proper environmental calls
-	env := lhp.GetEnvironment()
-	for _, v := range lhp.Plates {
-		v.Evaporate(t, env)
-	}
-}
-
 // TODO -- allow drivers to provide relevant constraint info... not all positions
 // can be used for tip loading
 func (lhp *LHProperties) CheckTipPrefCompatibility(prefs []string) bool {
