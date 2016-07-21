@@ -234,3 +234,8 @@ func (wca WellCoordArrayCol) Less(i, j int) bool { return wca[i].RowLessThan(wca
 func (wca WellCoordArrayRow) Len() int           { return len(wca) }
 func (wca WellCoordArrayRow) Swap(i, j int)      { t := wca[i]; wca[i] = wca[j]; wca[j] = t }
 func (wca WellCoordArrayRow) Less(i, j int) bool { return wca[i].ColLessThan(wca[j]) }
+
+type Coordinated interface {
+    ContainsCoords(*WellCoords) bool
+}
+

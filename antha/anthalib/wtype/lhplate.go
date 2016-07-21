@@ -63,6 +63,14 @@ func (lhp LHPlate) Name() string {
 	return lhp.PlateName
 }
 
+func (lhp LHPlate) GetType() string {
+    return lhp.Type
+}
+
+func (lhp LHPlate) ContainsCoords(wc *WellCoords) bool {
+    return wc.X >= 0 && wc.Y >= 0 && wc.X < self.WlsX && wc.Y < self.WlsY
+}    
+
 func (lhp LHPlate) String() string {
 	return fmt.Sprintf(
 		`LHPlate {

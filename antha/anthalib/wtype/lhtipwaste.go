@@ -58,6 +58,14 @@ func (tw *LHTipwaste) GetName() string {
 	return tw.Type
 }
 
+func (tw *LHTipwaste) GetType() string {
+    return tw.Type
+}
+
+func (tw *LHTipwaste) ContainsCoords(wc *WellCoords) {
+    return wc.X == 0 && wc.Y == 0
+}
+
 func NewLHTipwaste(capacity int, typ, mfr string, height float64, w *LHWell, wellxstart, wellystart, wellzstart float64) *LHTipwaste {
 	var lht LHTipwaste
 	lht.ID = GetUUID()

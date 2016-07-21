@@ -25,3 +25,8 @@ package wtype
 type Named interface {
 	GetName() string
 }
+
+type Typed interface {
+    GetType() string
+}
+
