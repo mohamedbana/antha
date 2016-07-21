@@ -34,7 +34,6 @@ func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProper
 	// get timer to assess evaporation etc.
 
 	timer := robot.GetTimer()
-
 	// 1 -- generate high level instructions
 	// also work out which ones can be aggregated
 	agg := make(map[string][]int)
@@ -69,16 +68,17 @@ func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProper
 
 		instrx, _ := ris.Generate(request.Policies, robot)
 
-		var totaltime time.Duration
-		for _, instr := range instrx {
-			totaltime += timer.TimeFor(instr)
+		if timer != nil {
+			var totaltime time.Duration
+			for _, instr := range instrx {
+				totaltime += timer.TimeFor(instr)
+			}
+
+			// evaporate stuff
+
+			myevap := robot.Evaporate(totaltime)
+			evaps = append(evaps, myevap...)
 		}
-
-		// evaporate stuff
-
-		myevap := robot.Evaporate(totaltime)
-		evaps = append(evaps, myevap...)
-
 	}
 
 	// sort the above out

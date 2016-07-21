@@ -276,7 +276,6 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 }
 
 func (this *Liquidhandler) do_setup(rq *LHRequest) error {
-
 	stat := this.Properties.Driver.RemoveAllPlates()
 
 	if stat.Errorcode == driver.ERR {
@@ -357,12 +356,12 @@ func (this *Liquidhandler) Plan(request *LHRequest) error {
 	}
 	// define the input plates
 	// should be merged with the above
-
 	request, err = input_plate_setup(request)
 
 	if err != nil {
 		return err
 	}
+
 	// set up the mapping of the outputs
 	request, err = this.Layout(request)
 

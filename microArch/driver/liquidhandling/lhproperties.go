@@ -278,6 +278,10 @@ func (lhp *LHProperties) Dup() *LHProperties {
 
 	r.MaterialType = lhp.MaterialType
 
+	// copy the driver
+
+	r.Driver = lhp.Driver
+
 	return r
 }
 
