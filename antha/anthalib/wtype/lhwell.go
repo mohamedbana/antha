@@ -29,6 +29,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/microArch/logger"
+	"strings"
 	"time"
 )
 
@@ -511,10 +512,12 @@ func (well *LHWell) IsAutoallocated() bool {
 	return false
 }
 
-func (well *LHWell) Evaporate(time time.Duration, env Environment) {
+func (well *LHWell) Evaporate(time time.Duration, env Environment) VolumeCorrection {
+	var ret VolumeCorrection
+
 	// don't let this happen
 	if well == nil {
-		return
+		return ret
 	}
 
 	// we need to use the evaporation calculator
@@ -524,4 +527,16 @@ func (well *LHWell) Evaporate(time time.Duration, env Environment) {
 	vol := eng.EvaporationVolume(env.Temperature, "water", env.Humidity, time.Seconds(), env.MeanAirFlowVelocity, well.AreaForVolume(), env.Pressure)
 
 	well.Remove(vol)
+
+	ret.Type = "Evaporation"
+	ret.Volume = vol.Dup()
+	ret.Location = well.WContents.Loc
+
+	return ret
+}
+
+func (w *LHWell) ResetPlateID(newID string) {
+	ltx := strings.Split(w.WContents.Loc, ":")
+	w.WContents.Loc = newID + ":" + ltx[1]
+	w.Plateid = newID
 }

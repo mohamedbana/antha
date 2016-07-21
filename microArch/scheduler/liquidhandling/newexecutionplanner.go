@@ -24,6 +24,7 @@ package liquidhandling
 
 import (
 	"fmt"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"time"
 )
@@ -38,6 +39,7 @@ func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProper
 	// also work out which ones can be aggregated
 	agg := make(map[string][]int)
 	transfers := make([]liquidhandling.RobotInstruction, 0, len(request.LHInstructions))
+	evaps := make([]wtype.VolumeCorrection, 0, 10)
 	for ix, insID := range request.Output_order {
 		//	request.InstructionSet.Add(ConvertInstruction(request.LHInstructions[insID], robot))
 
@@ -74,7 +76,8 @@ func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProper
 
 		// evaporate stuff
 
-		robot.Evaporate(totaltime)
+		myevap := robot.Evaporate(totaltime)
+		evaps = append(evaps, myevap...)
 
 	}
 
@@ -106,6 +109,8 @@ func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProper
 		instrx[i] = inx[i].(liquidhandling.TerminalRobotInstruction)
 	}
 	request.Instructions = instrx
+
+	request.Evaps = evaps
 
 	return request, nil
 }

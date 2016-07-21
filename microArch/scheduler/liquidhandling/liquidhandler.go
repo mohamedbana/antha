@@ -24,6 +24,7 @@ package liquidhandling
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -145,7 +146,6 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 
 	for _, ins := range instructions {
 		//logger.Debug(fmt.Sprintln(liquidhandling.InsToString(ins)))
-		//fmt.Println(liquidhandling.InsToString(ins))
 		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(this.Properties.Driver)
 
 		if timer != nil {
@@ -203,6 +203,25 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 				v.Add(rq.CarryVolume)
 			}
 		}
+	}
+
+	// apply evaporation
+	for _, vc := range rq.Evaps {
+		loctox := strings.Split(vc.Location, ":")
+		plateID := loctox[0]
+		wellcrds := loctox[1]
+
+		wellmap, ok := vols[plateID]
+
+		if !ok {
+			//err := wtype.LHError(wtype.LH_ERR_DIRE, fmt.Sprint("NO SUCH PLATE: ", plateID))
+			//return err
+
+			continue
+		}
+
+		vol := wellmap[wellcrds]
+		vol.Add(vc.Volume)
 	}
 
 	// now go through and set the plates up appropriately
@@ -624,21 +643,13 @@ func (this *Liquidhandler) Layout(request *LHRequest) (*LHRequest, error) {
 func (this *Liquidhandler) ExecutionPlan(request *LHRequest) (*LHRequest, error) {
 	//rbtcpy := this.Properties.Dup()
 	this.FinalProperties = this.Properties.Dup()
+	temprobot := this.Properties.Dup()
+	rq, err := this.ExecutionPlanner(request, this.Properties)
 
-	rq, err := this.ExecutionPlanner(request, this.FinalProperties)
+	// switcherooo
 
-	// ensure any relevant state changes are noted
-
-	/*
-		for _, v := range rbtcpy.Plates {
-			fmt.Println("PLATE NAME: ", v.Name())
-			for _, w := range v.Wellcoords {
-				if !w.Empty() {
-					fmt.Println("WELL: ", w.Crds, " HAS: ", w.WContents.Volume().ToString(), " of ", w.WContents.CName)
-				}
-			}
-		}
-	*/
+	this.FinalProperties = this.Properties
+	this.Properties = temprobot
 
 	return rq, err
 }
