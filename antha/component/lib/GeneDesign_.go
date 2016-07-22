@@ -69,7 +69,7 @@ func _GeneDesignSteps(_ctx context.Context, _input *GeneDesignInput, _output *Ge
 
 	// export sequence to fasta
 	if _input.ExporttoFastaFile {
-		export.Makefastaserial2(_input.ConstructName, _output.PartsWithOverhangs)
+		export.Makefastaserial2(export.LOCAL, _input.ConstructName, _output.PartsWithOverhangs)
 	}
 
 	fmt.Println("Parts Source: ", _output.PartsWithOverhangs)
