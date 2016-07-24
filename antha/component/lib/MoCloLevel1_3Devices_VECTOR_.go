@@ -53,6 +53,7 @@ func _MoCloLevel1_3Devices_VECTORSteps(_ctx context.Context, _input *MoCloLevel1
 	// set warnings reported back to user to none initially
 	warnings := make([]string, 1)
 	warnings[0] = "none"
+	var err error
 
 	/* find sequence data from keyword; looking it up by a given name in an inventory
 	   or by biobrick ID from iGem parts registry */
@@ -67,7 +68,12 @@ func _MoCloLevel1_3Devices_VECTORSteps(_ctx context.Context, _input *MoCloLevel1
 	restrictionenzyme := enzymes.Enzymelookup[_input.AssemblyStandard][Level]
 
 	// (1) Add standard overhangs using chosen assembly standard
-	_output.PartswithOverhangs = enzymes.MakeStandardTypeIIsassemblyParts(partsinorder, _input.AssemblyStandard, Level, []string{"Device1", "Device2", "Device3"})
+	_output.PartswithOverhangs, err = enzymes.MakeStandardTypeIIsassemblyParts(partsinorder, _input.AssemblyStandard, Level, []string{"Device1", "Device2", "Device3"})
+
+	if err != nil {
+		warnings = append(warnings, text.Print("Error", err.Error()))
+		execute.Errorf(_ctx, err.Error())
+	}
 
 	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
 	assembly := enzymes.Assemblyparameters{_input.Constructname, restrictionenzyme.Name, vectordata, _output.PartswithOverhangs}

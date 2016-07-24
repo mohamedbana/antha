@@ -63,6 +63,7 @@ Steps {
 	// set warnings reported back to user to none initially
 	warnings := make([]string,1)
 	warnings[0] = "none"
+	var err error 
 	
 	/* find sequence data from keyword; looking it up by a given name in an inventory 
 	   or by biobrick ID from iGem parts registry */
@@ -77,8 +78,12 @@ Steps {
 	restrictionenzyme := enzymes.Enzymelookup[AssemblyStandard][Level]
 
 	// (1) Add standard overhangs using chosen assembly standard
-	PartswithOverhangs = enzymes.MakeStandardTypeIIsassemblyParts(partsinorder, AssemblyStandard, Level, []string{"Device1","Device2","Device3"})
+	PartswithOverhangs,err = enzymes.MakeStandardTypeIIsassemblyParts(partsinorder, AssemblyStandard, Level, []string{"Device1","Device2","Device3"})
 	
+	if err !=nil{
+		warnings = append(warnings, text.Print("Error", err.Error()))
+		Errorf(err.Error())
+	}
 	
 	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
 	assembly := enzymes.Assemblyparameters{Constructname, restrictionenzyme.Name,vectordata,PartswithOverhangs}
