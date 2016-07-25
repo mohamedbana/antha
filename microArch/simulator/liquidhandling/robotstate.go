@@ -35,14 +35,16 @@ import (
 
 //ChannelState Represent the physical state of a single channel
 type ChannelState struct {
+    number          int
     tip             *wtype.LHTip        //Nil if no tip loaded, otherwise the tip that's loaded
     contents        *wtype.LHComponent  //What's in the tip?
     position        wtype.Coordinates  //position relative to the adaptor
     adaptor         *AdaptorState       //the channel's adaptor
 }
 
-func NewChannelState(adaptor *AdaptorState, position wtype.Coordinates) *ChannelState {
+func NewChannelState(number int, adaptor *AdaptorState, position wtype.Coordinates) *ChannelState {
     r := ChannelState{}
+    r.number = number
     r.position = position
     r.adaptor = adaptor
 
@@ -99,12 +101,13 @@ func (self *ChannelState) Dispense(volume *wunit.Volume) error {
 }
 
 //LoadTip
-func (self *ChannelState) LoadTip(tip *wtype.LHTip) error {
-    
+func (self *ChannelState) LoadTip(platetype, position, well string) error {
+    p := self.GetAbsolutePosition()
+    plate, rel_p := self.adaptor.GetRobot().GetDeck().GetPlateBelow(p)
 }
 
 //UnloadTip
-func (self *ChannelState) UnloadTip() *wtype.LHTip {
+func (self *ChannelState) UnloadTip(platetype, position, well string) *wtype.LHTip, error {
     
 }
 
@@ -129,7 +132,7 @@ func NewAdaptorState(robot *RobotState,
         robot}
 
     for i := 0; i < channels; i++ {
-        as.channels = append(as.channels, NewChannelState(&as, channel_offset.Multiply(i)))
+        as.channels = append(as.channels, NewChannelState(i, &as, channel_offset.Multiply(i)))
     }
 
     return &as
@@ -165,14 +168,124 @@ func (self *AdaptorState) GetRobot() *RobotState {
 }
 
 // -------------------------------------------------------------------------------
+//                            PlateLocation
+// -------------------------------------------------------------------------------
+
+//PlateLocation a wrapper for an LHObject
+type PlateLocation struct {
+    offset  wtype.Coordinates
+    size    wtype.Coordinates
+    plate   interface{}
+}
+
+func NewPlateLocation(plate wtype.LHObject, position wtype.Coordinates) *PlateLocation {
+    r := PlateLocation{
+        position,
+        plate.GetSize(),
+        plate.(interface{})}
+    return &r
+}
+
+func (self *PlateLocation) GetPlate() interface{} {
+    return self.plate
+}
+
+func (self *PlateLocation) GetOffset() wtype.Coordinates {
+    return self.offset
+}
+
+func (self *PlateLocation) ContainsXY(p wtype.Coordinates) bool {
+    d := self.offset.Subtract(p)
+    return d.X >=0 && d.Y >= 0 && d.X < self.size.X && d.Y < self.size.X
+}
+
+func (self *PlateLocation) Intersects(rhs *PlateLocation) bool {
+    //test a single dimension. 
+    //(a,b) are the start and end of the first position
+    //(c,d) are the start and end of the second pos
+    // assert(a > b  and  d > c)
+    f := func(a,b,c,d float64) bool {
+        return !(c >= b || d <= a)
+    }
+
+    return (f(self.offset.X, self.offset.X + self.size.X,
+               rhs.offset.X,  rhs.offset.X +  rhs.size.X) &&
+            f(self.offset.Y, self.offset.Y + self.size.Y,
+               rhs.offset.Y,  rhs.offset.Y +  rhs.size.Y) &&
+            f(self.offset.Z, self.offset.Z + self.size.Z,
+               rhs.offset.Z,  rhs.offset.Z +  rhs.size.Z))
+}
+
+// -------------------------------------------------------------------------------
+//                            DeckState
+// -------------------------------------------------------------------------------
+
+//DeckState Represent the physical state of an LH robot's deck
+type DeckState struct {
+    named_positions         map[string]*wtype.Coordinates
+    positions               map[string][]interface{}
+    plate_locations         []*PlateLocation
+}
+
+func NewDeckState(positions map[string]*wtype.Coordinates) *DeckState {
+    r := DeckState{
+        positions,
+        make(map[string][]interface{}),
+        make([]*PlateLocation, 0)
+    }
+    for k := range positions {
+        r.positions[k] = make([]interface{}, 0)
+    }
+    return &r
+}
+
+func (self *DeckState) AddPlate(plate interface{}, position wtype.Coordinates) bool {
+    to_add := NewPlateLocation(plate.(wtype.LHObject), position)
+    for _,pl := range self.plate_locations {
+        if pl.Intersects(to_add) {
+            return false
+        }
+    }
+    self.plate_locations = append(self.plate_locations, to_add)
+    return true
+}
+
+func (self *DeckState) AddPlateToNamed(plate interface{}, position string) bool {
+    return self.AddPlate(plate, self.named_positions[position])
+}
+
+//GetPlateBelow get the next plate below the position and the relative position within the plate
+func (self *DeckState) GetPlateBelow(pos wtype.Coordinates) interface{}, wtype.Coordinates {
+    var p *PlateLocation = nil
+    z := math.MAXFloat64
+    for _,pl := range self.plate_locations {
+        if pl.ContainsXY(pos) {
+            if dz := pos.Z - pl.Offset().Z; dz > 0 && dz < z {
+                p = pl
+                z = dz
+            }
+        }
+    }
+    if p == nil {
+        return nil, wtype.Coordinates{}
+    }
+    return p.GetPlate(), pos.Subtract(p.GetOffset())
+}
+
+func (self *DeckState) GetPlatesName(position string) []interface{} {
+    return self.positions[position]
+}
+
+// -------------------------------------------------------------------------------
 //                            RobotState
 // -------------------------------------------------------------------------------
 
 //RobotState Represent the physical state of a liquidhandling robot
 type RobotState struct {
-    positions       map[string]*wtype.Coordinates
-    plates          map[string]interface{}
+    deck            *DeckState
     adaptors        []*AdaptorState 
+    initialized     bool
+    finalized       bool
 }
 
 type AdaptorParams struct {
@@ -183,11 +296,11 @@ type AdaptorParams struct {
 
 func NewRobotState(positions map[string]*wtype.Coordinates,
                    adaptors []AdaptorParams) *RobotState {
-    rs := RobotState{
-        positions,
-        make(map[string]interface{},
-        make([]*AdaptorState, 0, len(adaptors)),
-    }
+    rs := RobotState{}
+    rs.deck = NewDeckState(positions)
+    rs.adaptors = make([]*AdaptorState, 0, len(adaptors))
+    rs.initialised = false
+    rs.finalised = false
     for _,ap := range adaptors {
         rs.adaptors = append(rs.adaptors, NewAdaptorState(&rs, ap.initial_position, ap.channels, ap.channel_offset))
     }
@@ -197,20 +310,47 @@ func NewRobotState(positions map[string]*wtype.Coordinates,
 //                            Accessors
 //                            ---------
 
-//GetPositionByString
-func (self *RobotState) GetPositionByString(position string) wtype.Coordinates {
-    return self.positions[position]
+//GetDeck
+func (self *RobotState) GetDeck() *DeckState {
+    return self.deck
 }
 
-//GetPlateByString
-func (self *RobotState) GetPlateByString(position string) interface{} {
-    return self.plates[position]
+//GetAdaptor
+func (self *RobotState) GetAdaptor(num int) *AdaptorState {
+    return self.adaptors[num]
 }
 
-//GetPlateBelow
-func (self *RobotState) GetPlateBelow(position wtype.Coordinates) interface{} {
+//IsInitialized
+func (self *RobotState) IsInitialized() bool {
+    return self.initialized
 }
 
-//GetWellBelow
-func (self *RobotState) GetWellBelow(position wtype.Coordinates) interface{}, *wtype.LHWell {
+//IsFinalized
+func (self *RobotState) IsFinalized() bool {
+    return self.finalized
 }
+
+//                            Actions
+//                            -------
+
+//Initialize
+func (self *RobotState) Initialize() error {
+    if self.initialized {
+        return errors.New("Called Initialize on already initialised liquid handler")
+    }
+    self.initialized = true
+    return nil
+}
+
+//Finalize
+func (self *RobotState) Finalize() error {
+    if self.finalized {
+        return errors.New("Called Finalize on already finalized liquid handler")
+    }
+    if !self.initialized {
+        return errors.New("Called Finalize on uninitialized liquidhandler")
+    }
+    self.finalized = true
+    return nil
+}
+
