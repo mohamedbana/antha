@@ -3,7 +3,7 @@ package comp
 import (
 	"fmt"
 
-	"github.com/antha-lang/antha/antha/component/lib"
+	"github.com/antha-lang/antha/component"
 )
 
 type Port struct {
@@ -22,9 +22,9 @@ type Component struct {
 	OutPorts    []Port `json:"out_ports"`
 }
 
-func New() ([]Component, error) {
+func New(lib []component.Component) ([]Component, error) {
 	var cs []Component
-	for _, v := range lib.GetComponents() {
+	for _, v := range lib {
 		c := Component{
 			Id:          v.Name,
 			Name:        v.Name,

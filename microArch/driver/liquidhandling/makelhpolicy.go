@@ -851,6 +851,15 @@ func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
 
 	*/
 
+	// remove blowout from gilson
+	rule = NewLHPolicyRule("NoBlowoutForGilson")
+	rule.AddCategoryConditionOn("PLATFORM", "GilsonPipetmax")
+
+	policy := make(LHPolicy, 6)
+	policy["RESET_OVERRIDE"] = true
+
+	lhpr.AddRule(rule, policy)
+
 	return lhpr, nil
 
 }

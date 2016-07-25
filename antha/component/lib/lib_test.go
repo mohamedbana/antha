@@ -1,7 +1,7 @@
 package lib
 
 import (
-	//"encoding/json"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	//"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
@@ -165,8 +165,8 @@ func runElements(t *testing.T, ctx context.Context, inputs []*TInput) {
 
 		select {
 		case err = <-errs:
-		case <-time.After(60 * time.Second):
-			err = fmt.Errorf("timeout after %ds", 60)
+		case <-time.After(180 * time.Second):
+			err = fmt.Errorf("timeout after %ds", 180)
 		}
 
 		if err == nil {
@@ -198,19 +198,32 @@ func makeContext() (context.Context, error) {
 	return ctx, nil
 }
 
-func getInputDir() string {
+func makeExampleInputs(t *testing.T, idx, end int) []*TInput {
 	flag.Parse()
 	args := flag.Args()
-	if len(args) != 0 {
-		return args[0]
-	}
-	return ""
-}
 
-func getExampleInputs(t *testing.T) []*TInput {
-	inputDir := getInputDir()
-	if inputDir == "" {
-		inputDir = "../../examples"
+	// Current directory of "go test foo/bar" is "foo/bar" but current
+	// directory of "go test -o xxx foo/bar" is "."
+	//
+	// No robust way to know which situation we are in, so check for all paths.
+	var candidates []string
+	if len(args) != 0 {
+		candidates = append(candidates, args[0])
+	}
+	candidates = append(candidates, "../../examples", "examples")
+
+	var err error
+	var inputDir string
+	for _, c := range candidates {
+		_, err = os.Stat(c)
+		if err == nil {
+			inputDir = c
+			break
+		}
+	}
+
+	if err != nil {
+		t.Fatalf("could not find example inputs in %v: %s", candidates, err)
 	}
 
 	inputs, err := findInputs(inputDir)
@@ -219,7 +232,8 @@ func getExampleInputs(t *testing.T) []*TInput {
 	}
 	sort.Sort(TInputs(inputs))
 
-	return inputs
+	first, last := divide(idx, end, len(inputs))
+	return inputs[first:last]
 }
 
 // Divide l into n pieces, return indices for ith piece
@@ -242,10 +256,7 @@ func TestElementsWithExampleInputs0(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	inputs := getExampleInputs(t)
-	first, last := divide(0, 5, len(inputs))
-
-	runElements(t, ctx, inputs[first:last])
+	runElements(t, ctx, makeExampleInputs(t, 0, 5))
 }
 
 func TestElementsWithExampleInputs1(t *testing.T) {
@@ -254,10 +265,7 @@ func TestElementsWithExampleInputs1(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	inputs := getExampleInputs(t)
-	first, last := divide(1, 5, len(inputs))
-
-	runElements(t, ctx, inputs[first:last])
+	runElements(t, ctx, makeExampleInputs(t, 1, 5))
 }
 
 func TestElementsWithExampleInputs2(t *testing.T) {
@@ -266,10 +274,7 @@ func TestElementsWithExampleInputs2(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	inputs := getExampleInputs(t)
-	first, last := divide(2, 5, len(inputs))
-
-	runElements(t, ctx, inputs[first:last])
+	runElements(t, ctx, makeExampleInputs(t, 2, 5))
 }
 
 func TestElementsWithExampleInputs3(t *testing.T) {
@@ -278,10 +283,7 @@ func TestElementsWithExampleInputs3(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	inputs := getExampleInputs(t)
-	first, last := divide(3, 5, len(inputs))
-
-	runElements(t, ctx, inputs[first:last])
+	runElements(t, ctx, makeExampleInputs(t, 3, 5))
 }
 
 func TestElementsWithExampleInputs4(t *testing.T) {
@@ -290,10 +292,7 @@ func TestElementsWithExampleInputs4(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	inputs := getExampleInputs(t)
-	first, last := divide(4, 5, len(inputs))
-
-	runElements(t, ctx, inputs[first:last])
+	runElements(t, ctx, makeExampleInputs(t, 4, 5))
 }
 
 var (
@@ -302,12 +301,17 @@ var (
 	defaultPlate = wtype.NewLHPlate("pcrplate_with_cooler", "Unknown", 8, 12, 25.7, "mm", defaultWell, 9, 9, 0.0, 0.0, 15.5)
 )
 
-/*
 func TestElementsWithDefaultInputs(t *testing.T) {
+	t.Skip("Not all components work with default inputs yet")
+
 	// Skip default inputs when running a particular input
-	if inputDir := getInputDir(); inputDir != "" {
+	flag.Parse()
+	args := flag.Args()
+	if len(args) != 0 {
 		return
 	}
+
+	keep := os.Getenv("TEST_DEFAULT_KEEP")
 
 	type Process struct {
 		Component string `json:"component"`
@@ -318,7 +322,7 @@ func TestElementsWithDefaultInputs(t *testing.T) {
 	var inputs []*TInput
 
 	for _, c := range GetComponents() {
-		if n := os.Getenv("TEST_DEFAULT_FILTER"); n != "" && c.Name != n {
+		if keep != "" && c.Name != keep {
 			continue
 		}
 		wf := &Workflow{
@@ -374,4 +378,3 @@ func TestElementsWithDefaultInputs(t *testing.T) {
 	}
 	runElements(t, ctx, inputs)
 }
-*/

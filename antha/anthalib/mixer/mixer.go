@@ -44,7 +44,7 @@ func Sample(l *wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
 	ret.ID = l.ID
 
-	l.AddDaughter(ret.ID)
+	l.AddDaughterComponent(ret)
 	if l.HasAnyParent() {
 		ret.ParentID = l.ParentID
 	}
@@ -70,7 +70,7 @@ func MultiSample(l []*wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent 
 		ret := wtype.NewLHComponent()
 		vi := v[i]
 		ret.ID = j.ID
-		j.AddDaughter(ret.ID)
+		j.AddDaughterComponent(ret)
 		if j.HasAnyParent() {
 			ret.ParentID = j.ParentID
 		}
@@ -93,7 +93,7 @@ func MultiSample(l []*wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent 
 func SampleForConcentration(l *wtype.LHComponent, c wunit.Concentration) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
 	ret.ID = l.ID
-	l.AddDaughter(ret.ID)
+	l.AddDaughterComponent(ret)
 	if l.HasAnyParent() {
 		ret.ParentID = l.ParentID
 	}
@@ -117,7 +117,7 @@ func SampleMass(s *wtype.LHComponent, m wunit.Mass, d wunit.Density) *wtype.LHCo
 
 	ret := wtype.NewLHComponent()
 	ret.ID = s.ID
-	s.AddDaughter(ret.ID)
+	s.AddDaughterComponent(ret)
 	if s.HasAnyParent() {
 		ret.ParentID = s.ParentID
 	}
@@ -140,7 +140,7 @@ func SampleForTotalVolume(l *wtype.LHComponent, v wunit.Volume) *wtype.LHCompone
 	ret := wtype.NewLHComponent()
 
 	ret.ID = l.ID
-	l.AddDaughter(ret.ID)
+	l.AddDaughterComponent(ret)
 	if l.HasAnyParent() {
 		ret.ParentID = l.ParentID
 	}

@@ -9,9 +9,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 //"standard_labware"
@@ -173,12 +174,12 @@ type ODSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "OD",
+	if err := addComponent(component.Component{Name: "OD",
 		Constructor: ODNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "Example OD measurement protocol.\nComputes the OD and dry cell weight estimate from absorbance reading\nTODO: implement replicates from parameters\n",
 			Path: "antha/component/an/Liquid_handling/OD/OD.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Blank_absorbance", Desc: "WellCrosssectionalArea float64// should be calculated from plate and well type automatically\n", Kind: "Parameters"},
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "Diluent_volume", Desc: "= uL(0)\n", Kind: "Parameters"},

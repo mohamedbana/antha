@@ -17,9 +17,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"strconv"
 	"strings"
 )
@@ -375,12 +376,12 @@ type Scarfree_siteremove_orfcheckSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Scarfree_siteremove_orfcheck",
+	if err := addComponent(component.Component{Name: "Scarfree_siteremove_orfcheck",
 		Constructor: Scarfree_siteremove_orfcheckNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/Scarfree_removesites_checkorfs.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Constructname", Desc: "", Kind: "Parameters"},
 				{Name: "EndsAlreadyadded", Desc: "", Kind: "Parameters"},
 				{Name: "Enzymename", Desc: "", Kind: "Parameters"},

@@ -10,9 +10,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 //"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -143,12 +144,12 @@ type InoculateSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Inoculate",
+	if err := addComponent(component.Component{Name: "Inoculate",
 		Constructor: InoculateNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "Example inoculation protocol.\nInoculates seed culture into fresh media (and logs conditions?)\nTODO: in progress from edited bradford protocol\n",
 			Path: "antha/component/an/Liquid_handling/Fermentation/Inoculate.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Antibiotic", Desc: "type buffer which could have a concentration automatically?\n", Kind: "Inputs"},
 				{Name: "Antibioticstockconc", Desc: "= mgperml (100)\n", Kind: "Parameters"},
 				{Name: "Desiredantibioticconcentration", Desc: "= mgperml  (0.1)\n", Kind: "Parameters"},

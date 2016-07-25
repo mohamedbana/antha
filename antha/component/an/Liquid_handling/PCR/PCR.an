@@ -1,4 +1,4 @@
-protocol PCR_vol
+protocol PCR
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -23,13 +23,12 @@ import (
 Parameters (
 	// PCRprep parameters:
 	ReactionVolume Volume
-	BufferConcinX int
-	FwdPrimerVol Volume
-	RevPrimerVol Volume
-	AdditiveVols []Volume
+	FwdPrimerConc Concentration
+	RevPrimerConc Concentration
+	Additiveconc Concentration
+	TargetpolymeraseConcentration Concentration
 	Templatevolume Volume
-	PolymeraseVolume Volume
-	DNTPVol Volume
+	DNTPconc Concentration
 	/*
 	// let's be ambitious and try this as part of type polymerase Polymeraseconc Volume
 	
@@ -47,8 +46,8 @@ Parameters (
 	Annealingtime Time
 	AnnealingTemp Temperature // Should be calculated from primer and template binding
 	Extensiontime Time // should be calculated from template length and polymerase rate
+	Extensiontemp Temperature
 	Finalextensiontime Time
-	Hotstart bool
 )
 
 // Data which is returned from this protocol, and data types
@@ -63,7 +62,6 @@ Inputs (
 	DNTPS *wtype.LHComponent
 	PCRPolymerase *wtype.LHComponent
 	Buffer *wtype.LHComponent
-	Water *wtype.LHComponent
 	Template *wtype.LHComponent
 	Additives []*wtype.LHComponent // e.g. DMSO
 	OutPlate *wtype.LHPlate
@@ -85,70 +83,27 @@ Setup {
 // for every input
 Steps {
 	
-	bufferVolume := (wunit.CopyVolume(ReactionVolume))
-	
-	bufferVolume.DivideBy(float64(BufferConcinX))
-	
-	// Make a mastermix
+	// Mix components
 	samples := make([]*wtype.LHComponent, 0)
-	waterSample := mixer.SampleForTotalVolume(Water, ReactionVolume)
-	bufferSample := mixer.Sample(Buffer,bufferVolume)
-	samples = append(samples, waterSample, bufferSample)
-
-	dntpSample := mixer.Sample(DNTPS, DNTPVol)
+	bufferSample := mixer.SampleForTotalVolume(Buffer, ReactionVolume)
+	samples = append(samples, bufferSample)
+	templateSample := mixer.Sample(Template, Templatevolume)
+	samples = append(samples, templateSample)
+	dntpSample := mixer.SampleForConcentration(DNTPS, DNTPconc)
 	samples = append(samples, dntpSample)
-	
-	if len(Additives)!=len(AdditiveVols){
-		panic("Bad things are going to happen if you have different numbers of additives and additivevolumes")
-	}
-	
-	for i := range Additives {
-		additiveSample := mixer.SampleForConcentration(Additives[i], AdditiveVols[i])
+	FwdPrimerSample := mixer.SampleForConcentration(FwdPrimer, FwdPrimerConc)
+	samples = append(samples, FwdPrimerSample)
+	RevPrimerSample := mixer.SampleForConcentration(RevPrimer, RevPrimerConc)
+	samples = append(samples, RevPrimerSample)
+
+	for _, additive := range Additives {
+		additiveSample := mixer.SampleForConcentration(additive, Additiveconc)
 		samples = append(samples, additiveSample)
 	}
 
-	if Hotstart == false {
-	polySample := mixer.Sample(PCRPolymerase, PolymeraseVolume)
+	polySample := mixer.SampleForConcentration(PCRPolymerase, TargetpolymeraseConcentration)
 	samples = append(samples, polySample)
-	}
-	
-	// if this is true do stuff inside {}
-	if AddPrimerstoMasterMix {
-	
-	FwdPrimerSample := mixer.Sample(FwdPrimer, FwdPrimerVol)
-	samples = append(samples, FwdPrimerSample)
-	RevPrimerSample := mixer.Sample(RevPrimer, RevPrimerVol)
-	samples = append(samples, RevPrimerSample)
-	
-	}
-	
-	// pipette out to make mastermix
-	mastermix := MixInto(OutPlate, "", samples...)
-	
-	// rest samples to zero
-	samples := make([]*wtype.LHComponent, 0)
-	
-	// if this is false do stuff inside {}
-	if !AddPrimerstoMasterMix {
-	
-	FwdPrimerSample := mixer.Sample(FwdPrimer, FwdPrimerVol)
-	samples = append(samples, FwdPrimerSample)
-	RevPrimerSample := mixer.Sample(RevPrimer, RevPrimerVol)
-	samples = append(samples, RevPrimerSample)
-	
-	}
-	
-	templateSample := mixer.Sample(Template, Templatevolume)
-	samples = append(samples, templateSample)
-
-	
-	reaction := Mix(mastermix, samples...)
-
-	if Hotstart {
-	polySample := mixer.Sample(PCRPolymerase, PolymeraseVolume)
-	
-	reaction = Mix(reaction,polySample)
-	}
+	reaction := MixInto(OutPlate, "", samples...)
 
 	// thermocycle parameters called from enzyme lookup:
 
