@@ -6,11 +6,11 @@
 			"LadderVolume":"10ul",
             "Ladder": "1kb DNA Ladder",
             "Loadingdye": "blue",
-            "Loadingdyeinsample": false,
+            "Loadingdyeinsample": true,
             "Loadingdyevolume": "1ul",
             "MixPlate": "pcrplate_skirted_riser",
             "Mixingpolicy": "load",
-            "ProjectName": "PCRAssembleandRun",
+            "ProjectName": "Test",
             "Samplenames": [
                 "lefthomologyarm1kb",
                 "lefthomologyarm3kb",

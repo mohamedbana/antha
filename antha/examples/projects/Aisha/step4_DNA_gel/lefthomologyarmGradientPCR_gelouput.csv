@@ -11,6 +11,7 @@ A9,water+lefthomologyarm1kb8,loadwater,15,ul
 A10,water+lefthomologyarm2.5kbA1,loadwater,15,ul
 A11,water+lefthomologyarm2.5kbA2,loadwater,15,ul
 A12,water+lefthomologyarm2.5kbA3,loadwater,15,ul
+A13,water+lefthomologyarm2.5kbA4,loadwater,15,ul
 B1,water+1kb DNA Ladder,load,10,ul
 B2,water+lefthomologyarm2.5kbA5,loadwater,15,ul
 B3,water+lefthomologyarm2.5kbA6,loadwater,15,ul
@@ -23,6 +24,7 @@ B9,water+lefthomologyarm2.5kbB4,loadwater,15,ul
 B10,water+lefthomologyarm2.5kbB5,loadwater,15,ul
 B11,water+lefthomologyarm2.5kbB6,loadwater,15,ul
 B12,water+lefthomologyarm2.5kbB7,loadwater,15,ul
+B13,water+lefthomologyarm2.5kbB8,loadwater,15,ul
 C1,water+1kb DNA Ladder,load,10,ul
 C2,water+lefthomologyarm3kb1,loadwater,15,ul
 C3,water+lefthomologyarm3kb2,loadwater,15,ul
@@ -35,3 +37,4 @@ C9,water+lefthomologyarm3kb8,loadwater,15,ul
 C10,water,loadwater,15,ul
 C11,water,loadwater,15,ul
 C12,water,loadwater,15,ul
+C13,water+1kb DNA Ladder,loadwater,15,ul
