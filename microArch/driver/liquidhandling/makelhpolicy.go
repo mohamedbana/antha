@@ -727,7 +727,7 @@ func MakeDefaultPolicy() LHPolicy {
 	defaultpolicy["CAN_SDD"] = true
 	defaultpolicy["TIP_REUSE_LIMIT"] = 100
 	defaultpolicy["BLOWOUTREFERENCE"] = 1
-	defaultpolicy["BLOWOUTOFFSET"] = -5.0
+	defaultpolicy["BLOWOUTOFFSET"] = 0.0 //-5.0
 	defaultpolicy["BLOWOUTVOLUME"] = 0.0
 	defaultpolicy["BLOWOUTVOLUMEUNIT"] = "ul"
 	defaultpolicy["PTZREFERENCE"] = 1
