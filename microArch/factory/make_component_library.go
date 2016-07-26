@@ -564,6 +564,17 @@ func GetComponentByType(typ string) *wtype.LHComponent {
 	}
 	return c.Dup()
 }
+func ComponentInFactory(typ string) bool {
+	components := makeComponentLibrary()
+	c, ok := components[typ]
+	if c == nil || ok == false {
+		return false
+	}
+	if ok {
+		return true
+	}
+	return false
+}
 
 func GetComponentList() []string {
 	components := makeComponentLibrary()
