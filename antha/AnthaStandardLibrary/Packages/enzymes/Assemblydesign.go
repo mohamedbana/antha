@@ -24,7 +24,7 @@
 package enzymes
 
 import (
-	//"fmt"
+	"fmt"
 	"strings"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
@@ -165,13 +165,19 @@ func AddStandardStickyEnds(part wtype.DNASequence, assemblystandard string, leve
 }
 
 // Adds sticky ends to dna part according to the class identifier (e.g. PRO, 5U, CDS)
-func AddStandardStickyEndsfromClass(part wtype.DNASequence, assemblystandard string, level string, class string) (Partwithends wtype.DNASequence) {
+func AddStandardStickyEndsfromClass(part wtype.DNASequence, assemblystandard string, level string, class string) (Partwithends wtype.DNASequence, err error) {
 
 	//vectorends := Vectorends[assemblystandard][level] // this could also look up Endlinks[assemblystandard][level][numberofparts][0]
 
 	enzyme := Enzymelookup[assemblystandard][level]
 
-	bitstoadd := EndlinksString[assemblystandard][level][class]
+	bitstoadd, found := EndlinksString[assemblystandard][level][class]
+
+	if !found {
+		err = fmt.Errorf("Class " + class + " not found in Assmbly standard map of " + assemblystandard + " level " + level)
+		return Partwithends, err
+	}
+
 	bittoadd := bitstoadd[0]
 	if strings.HasPrefix(part.Seq, bittoadd) == true {
 		bittoadd = ""
@@ -206,7 +212,7 @@ func AddStandardStickyEndsfromClass(part wtype.DNASequence, assemblystandard str
 	Partwithends.Plasmid = part.Plasmid
 	Partwithends.Seq = partwithends
 
-	return Partwithends
+	return Partwithends, err
 }
 
 // Adds ends to the part sequence based upon enzyme chosen and the desired overhangs after digestion
@@ -237,7 +243,7 @@ func AddCustomEnds(part wtype.DNASequence, enzyme wtype.TypeIIs, desiredstickyen
 }
 
 // Add compatible ends to an array of parts based on the rules of a typeIIS assembly standard
-func MakeStandardTypeIIsassemblyParts(parts []wtype.DNASequence, assemblystandard string, level string, optionalpartclasses []string) (partswithends []wtype.DNASequence) {
+func MakeStandardTypeIIsassemblyParts(parts []wtype.DNASequence, assemblystandard string, level string, optionalpartclasses []string) (partswithends []wtype.DNASequence, err error) {
 
 	partswithends = make([]wtype.DNASequence, 0)
 	var partwithends wtype.DNASequence
@@ -245,7 +251,10 @@ func MakeStandardTypeIIsassemblyParts(parts []wtype.DNASequence, assemblystandar
 	if len(optionalpartclasses) != 0 {
 		if len(optionalpartclasses) == len(parts) {
 			for i := 0; i < len(parts); i++ {
-				partwithends = AddStandardStickyEndsfromClass(parts[i], assemblystandard, level, optionalpartclasses[i])
+				partwithends, err = AddStandardStickyEndsfromClass(parts[i], assemblystandard, level, optionalpartclasses[i])
+				if err != nil {
+					return []wtype.DNASequence{}, err
+				}
 				partswithends = append(partswithends, partwithends)
 			}
 		}
@@ -256,7 +265,7 @@ func MakeStandardTypeIIsassemblyParts(parts []wtype.DNASequence, assemblystandar
 			partswithends = append(partswithends, partwithends)
 		}
 	}
-	return partswithends
+	return partswithends, err
 }
 
 // Utility function to check whether a part already has typeIIs ends added
@@ -436,6 +445,37 @@ var EndlinksString = map[string]map[string]map[string][]string{
 			"Ter":         []string{"GGTA", "CGCT"},
 			"3U + Ter":    []string{"GCTT", "CGCT"},
 		},
+		"Level1": map[string][]string{
+			"Device1": []string{"GAA", "TACT"},
+			"Device2": []string{"TACT", "CCAT"},
+			"Device3": []string{"TACT", "CCAT"},
+		},
+	},
+	"Custom": map[string]map[string][]string{
+		"Level0": map[string][]string{
+			"Pro":         []string{"GGAG", "TACT"},
+			"5U":          []string{"TACT", "CCAT"},
+			"5U(f)":       []string{"TACT", "CCAT"},
+			"Pro + 5U(f)": []string{"GGAG", "CCAT"},
+			"Pro + 5U":    []string{"GGAG", "AATG"},
+			"NT1":         []string{"CCAT", "AATG"},
+			"5U + NT1":    []string{"TACT", "AATG"},
+			"CDS1":        []string{"AATG", "GCTT"},
+			"CDS1 ns":     []string{"AATG", "TTCG"},
+			"NT2":         []string{"AATG", "AGGT"},
+			"SP":          []string{"AATG", "AGGT"},
+			"CDS2 ns":     []string{"AGGT", "TTCG"},
+			"CDS2":        []string{"AGGT", "GCTT"},
+			"CT":          []string{"TTCG", "GCTT"},
+			"3U":          []string{"GCTT", "GGTA"},
+			"Ter":         []string{"GGTA", "CGCT"},
+			"3U + Ter":    []string{"GCTT", "CGCT"},
+		},
+		"Level1": map[string][]string{
+			"Device1": []string{"GAG", "ACC"},
+			"Device2": []string{"ACC", "TGT"},
+			"Device3": []string{"TGT", "GGT"},
+		},
 	},
 	"MoClo_Raven": map[string]map[string][]string{
 		"Level0": map[string][]string{
@@ -455,7 +495,7 @@ var EndlinksString = map[string]map[string]map[string][]string{
 			"CT":          []string{"TTCG", "GCTT"},
 			"3U":          []string{"GCTT", "GGTA"},
 			"Ter":         []string{"GGTA", "CGCT"},
-			"3U + Ter":    []string{"GCTT", "GCTT"},
+			"3U + Ter":    []string{"GCTT", "GCTT"}, // both same ! look into this
 		},
 	},
 }
@@ -484,6 +524,10 @@ var Vectorends = map[string]map[string][]string{
 		"Level0": []string{"GGT", "GAA"},
 		"Level1": []string{"", ""},
 	},
+	"Custom": map[string][]string{
+		"Level0": []string{"CGCT", "GGAG"},
+		"Level1": []string{"GGT", "GAA"},
+	},
 	"Electra": map[string][]string{
 		"Level0": []string{"GGT", "ATG"},
 		"Level1": []string{"", ""},
@@ -500,6 +544,10 @@ var Enzymelookup = map[string]map[string]wtype.TypeIIs{
 	"MoClo": map[string]wtype.TypeIIs{
 		"Level0": BsaIenz,
 		"Level1": BpiIenz,
+	},
+	"Custom": map[string]wtype.TypeIIs{
+		"Level0": BsaIenz,
+		"Level1": SapIenz,
 	},
 	"Electra": map[string]wtype.TypeIIs{
 		"Level0": SapIenz,

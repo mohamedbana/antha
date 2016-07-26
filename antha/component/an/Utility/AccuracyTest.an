@@ -98,7 +98,7 @@ Steps {
 	
 	}else{
 			
-	wellpositionarray = OutPlate.AllWellPositions()
+	wellpositionarray = OutPlate.AllWellPositions(wtype.BYCOLUMN)
 	
 	}
 	reactions := make([]*wtype.LHComponent,0)

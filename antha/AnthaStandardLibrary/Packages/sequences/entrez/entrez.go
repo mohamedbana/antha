@@ -23,7 +23,7 @@
 package entrez
 
 import (
-	//"bufio"
+	"bufio"
 	"bytes"
 	"fmt"
 	"io"
@@ -67,7 +67,9 @@ func RetrieveRecords(query string, database string, Max int, ReturnType string, 
 
 	var of *os.File
 	if out == "" {
+
 		of = os.Stdout
+		//defer os.Remove(of.Name())
 	} else {
 		/*if err := os.Mkdir(filepath.Dir(out), 0777); err != nil {
 			return err
@@ -127,6 +129,7 @@ func RetrieveRecords(query string, database string, Max int, ReturnType string, 
 		_n, err := io.Copy(of, buf)
 		n += _n
 		if err != nil {
+			fmt.Println("line 133", err.Error())
 			return filename, []byte{}, err
 		}
 
@@ -134,19 +137,21 @@ func RetrieveRecords(query string, database string, Max int, ReturnType string, 
 	if bn != n {
 		fmt.Fprintf(os.Stdout, "Writethrough mismatch: %d != %d\n", bn, n)
 	}
-	/*
-		fileInfo, _ := of.Stat()
-		var size int64 = fileInfo.Size()
-		contentsinbytes := make([]byte, size)
 
-		// read file into bytes
-		buffer := bufio.NewReader(of)
-		_, err = buffer.Read(contentsinbytes)
-	*/
+	fileInfo, _ := of.Stat()
+	var size int64 = fileInfo.Size()
+	contentsinbytes = make([]byte, size)
+
+	// read file into bytes
+	buffer := bufio.NewReader(of)
+	_, err = buffer.Read(contentsinbytes)
+
 	of.Close()
-	contentsinbytes, err = ioutil.ReadAll(of)
-
-	return filename, contentsinbytes, nil
+	//contentsinbytes, err = ioutil.ReadAll(of)
+	/*if err != nil {
+		fmt.Println("line 153", err.Error())
+	}*/
+	return filename, contentsinbytes, err
 }
 
 // This retrieves sequence of any type from any NCBI sequence database
