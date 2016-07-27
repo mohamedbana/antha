@@ -8,7 +8,7 @@
 
     "Parameters": {
         "GradientPCR": {
-            "Projectname": "gradientPCRlividans",
+            "Projectname": "20160725gradientPCR",
 			"RowGradientRatherthanColumn":false,
             "Reactiontoprimerpair": {
                 "lefthomologyarm1kb": [
@@ -49,15 +49,15 @@
                 "lefthomologyarm2.5kbA": "lividans",
                 "lefthomologyarm2.5kbB": "lividans",
                 "lefthomologyarm3kb": "lividans",
-                "righthomologyarm1kb": "pQR1059",
+                "righthomologyarm1kb": "lividans",
                 "righthomologyarm2.5kbA": "lividans",
                 "righthomologyarm2.5kbB": "pQR1059",
-                "righthomologyarm3kb": "pQR1059"
+                "righthomologyarm3kb": "lividans"
             },
             "FwdPrimertype": "PrimerFw",
             "RevPrimertype": "PrimerRev",
             "Templatetype": "dna_part",
-			"Plate": "pcrplate_skirted_riser"
+			"Plate": "pcrplate_with_cooler"
         }
     }
 }

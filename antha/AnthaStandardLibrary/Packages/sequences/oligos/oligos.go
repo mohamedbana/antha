@@ -203,6 +203,68 @@ func FWDOligoSeq(seq wtype.DNASequence, maxGCcontent float64, minlength int, max
 	return
 }
 
+func REVOligoSeq(seq wtype.DNASequence, maxGCcontent float64, minlength int, maxlength int, minmeltingtemp wunit.Temperature, maxmeltingtemp wunit.Temperature, seqstoavoid []string, overlapthresholdwithseqstoavoid int) (oligoseq Primer, err error) {
+
+	//var start int
+	//var end int
+
+	// get the reverse complement of the region
+
+	region := seq.Sequence()
+	revregion := sequences.RevComp(region)
+
+	for start := 0; start < maxlength; start++ {
+
+		for end := minlength + start; end <= start+maxlength; end++ {
+
+			var overlapthresholdfail bool
+
+			tempoligoseq := revregion[start:end]
+
+			ssoligo := wtype.MakeSingleStrandedDNASequence("oligo", tempoligoseq)
+
+			temppercentage := sequences.GCcontent(tempoligoseq)
+
+			meltingtemp := BasicMeltingTemp(ssoligo)
+
+			//fmt.Println(ssoligo.Seq, temppercentage, meltingtemp.ToString())
+
+			bindingsites := CheckNonSpecificBinding(seq, ssoligo)
+
+			// fmt.Println("binding sites:", bindingsites)
+
+			if len(seqstoavoid) > 0 && overlapthresholdwithseqstoavoid > 0 {
+				for _, seq := range seqstoavoid {
+					_, overlap, _ := OverlapCheck(tempoligoseq, seq)
+
+					if overlap > overlapthresholdwithseqstoavoid {
+						overlapthresholdfail = true
+					}
+				}
+			}
+
+			if temppercentage <= maxGCcontent && minmeltingtemp.SIValue() < meltingtemp.SIValue() && maxmeltingtemp.SIValue() > meltingtemp.SIValue() && bindingsites == 1 && search.InSlice(tempoligoseq, seqstoavoid) == false && overlapthresholdfail == false {
+				// fmt.Println("found good primer!", tempoligoseq, temppercentage)
+				oligoseq.DNASequence = wtype.MakeSingleStrandedDNASequence("Primer", tempoligoseq)
+				oligoseq.GCContent = temppercentage
+				oligoseq.Length = len(tempoligoseq)
+				oligoseq.MeltingTemp = meltingtemp
+				err = nil
+				return
+
+			} else {
+				err = fmt.Errorf("No primers found matching criteria: "+" last bindingsites = "+strconv.Itoa(bindingsites)+" last gc percentage= ", temppercentage, "last melting temp:", meltingtemp.ToString())
+			}
+		}
+	}
+
+	//}else {
+	//	// fmt.Println("no oligos")
+	//	}
+
+	return
+}
+
 // directionless Positions
 func FindPositioninSequence(largeSequence wtype.DNASequence, smallSequence wtype.DNASequence) (start int, end int, err error) {
 	//positions, err := search.Findall(largeSequence.Sequence(), smallSequence.Sequence())

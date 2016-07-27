@@ -1,4 +1,12 @@
 {
+	
+	"Config": {
+        "InputPlateType": [
+            "pcrplate_skirted_riser"
+        ]
+       
+    },
+	
     "Parameters": {
         "gelof1stpcrstep": {
             "DNAgel": "EGEL96_1",
@@ -6,11 +14,11 @@
 			"LadderVolume":"10ul",
             "Ladder": "1kb DNA Ladder",
             "Loadingdye": "blue",
-            "Loadingdyeinsample": false,
+            "Loadingdyeinsample": true,
             "Loadingdyevolume": "1ul",
             "MixPlate": "pcrplate_skirted_riser",
             "Mixingpolicy": "load",
-            "ProjectName": "PCRAssembleandRun",
+            "ProjectName": "20160726",
             "Samplenames": [
                 "lefthomologyarm1kb",
                 "lefthomologyarm3kb",
