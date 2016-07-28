@@ -39,6 +39,7 @@ import (
 // Data which is returned from this protocol, and data types
 
 // parts to order
+
 // desired sequence to end up with after assembly
 
 // Input Requirement specification
@@ -121,6 +122,10 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 		partsinorder = append(partsinorder, partDNA)
 	}
 
+	// export original parts list
+
+	_output.OriginalParts = partsinorder
+
 	warnings = append(warnings, fmt.Sprintln(partsinorder))
 
 	// check parts for restriction sites first and remove if the user has chosen to
@@ -202,6 +207,9 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 			partsinorder = newparts
 		}
 	}
+
+	// export the parts list with sites removed
+	_output.PartsWithSitesRemoved = partsinorder
 
 	// make vector into an antha type DNASequence
 	if inventorydata, found := inventory.Partslist[_input.Vector]; found {
@@ -424,26 +432,30 @@ type Scarfree_siteremove_orfcheckInput struct {
 }
 
 type Scarfree_siteremove_orfcheckOutput struct {
-	Endreport          string
-	NewDNASequence     wtype.DNASequence
-	ORFmissing         bool
-	PartswithOverhangs []wtype.DNASequence
-	PositionReport     []string
-	Simulationpass     bool
-	Status             string
-	Warnings           error
+	Endreport             string
+	NewDNASequence        wtype.DNASequence
+	ORFmissing            bool
+	OriginalParts         []wtype.DNASequence
+	PartsWithSitesRemoved []wtype.DNASequence
+	PartswithOverhangs    []wtype.DNASequence
+	PositionReport        []string
+	Simulationpass        bool
+	Status                string
+	Warnings              error
 }
 
 type Scarfree_siteremove_orfcheckSOutput struct {
 	Data struct {
-		Endreport          string
-		NewDNASequence     wtype.DNASequence
-		ORFmissing         bool
-		PartswithOverhangs []wtype.DNASequence
-		PositionReport     []string
-		Simulationpass     bool
-		Status             string
-		Warnings           error
+		Endreport             string
+		NewDNASequence        wtype.DNASequence
+		ORFmissing            bool
+		OriginalParts         []wtype.DNASequence
+		PartsWithSitesRemoved []wtype.DNASequence
+		PartswithOverhangs    []wtype.DNASequence
+		PositionReport        []string
+		Simulationpass        bool
+		Status                string
+		Warnings              error
 	}
 	Outputs struct {
 	}
@@ -469,6 +481,8 @@ func init() {
 				{Name: "Endreport", Desc: "", Kind: "Data"},
 				{Name: "NewDNASequence", Desc: "desired sequence to end up with after assembly\n", Kind: "Data"},
 				{Name: "ORFmissing", Desc: "", Kind: "Data"},
+				{Name: "OriginalParts", Desc: "", Kind: "Data"},
+				{Name: "PartsWithSitesRemoved", Desc: "", Kind: "Data"},
 				{Name: "PartswithOverhangs", Desc: "parts to order\n", Kind: "Data"},
 				{Name: "PositionReport", Desc: "", Kind: "Data"},
 				{Name: "Simulationpass", Desc: "", Kind: "Data"},
