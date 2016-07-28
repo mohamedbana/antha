@@ -62,10 +62,6 @@ func (tw *LHTipwaste) GetType() string {
     return tw.Type
 }
 
-func (tw *LHTipwaste) ContainsCoords(wc *WellCoords) {
-    return wc.X == 0 && wc.Y == 0
-}
-
 func NewLHTipwaste(capacity int, typ, mfr string, height float64, w *LHWell, wellxstart, wellystart, wellzstart float64) *LHTipwaste {
 	var lht LHTipwaste
 	lht.ID = GetUUID()
@@ -92,3 +88,55 @@ func (lht *LHTipwaste) Dispose(n int) bool {
 	lht.Contents += n
 	return true
 }
+
+//@implement LHDeckObject
+
+func (self *LHTipwaste) GetSize() Coordinates {
+    //Assume that TipX/YStart is repeated the other side
+    return Coordinates{
+        2 * self.WellXStart + self.AsWell.Xdim,
+        2 * self.WellYStart + self.AsWell.Ydim,
+        self.Height,
+    }
+}
+
+func (self *LHTipwaste) HasCoords(c WellCoords) bool {
+    return c.X == 0 &&
+           c.Y == 0 
+}
+
+func (self *LHTipwaste) GetCoords(c WellCoords) (interface{}, bool) {
+    if !self.HasCoords(c) {
+        return nil, false
+    }
+    return self.AsWell, true
+}
+
+func (self *LHTipwaste) CoordsToWellCoords(r Coordinates) (WellCoords, Coordinates) {
+    wc := WellCoords{0,0}
+
+    c, _ := self.WellCoordsToCoords(wc, TopReference)
+
+    return wc, r.Subtract(c)
+}
+
+func (self *LHTipwaste) WellCoordsToCoords(wc WellCoords, r WellReference) (Coordinates, bool) {
+    if !self.HasCoords(wc) {
+        return Coordinates{}, false
+    }
+
+    var z float64
+    if r == BottomReference {
+        z = self.WellZStart
+    } else if r == TopReference {
+        z = self.Height
+    } else {
+        return Coordinates{}, false
+    }
+
+    return Coordinates{
+        self.WellXStart + 0.5 * self.AsWell.Xdim,
+        self.WellYStart + 0.5 * self.AsWell.Ydim,
+        z}, true
+}
+

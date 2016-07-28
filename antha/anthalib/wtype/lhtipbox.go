@@ -23,7 +23,10 @@
 // defines types for dealing with liquid handling requests
 package wtype
 
-import "fmt"
+import (
+    "fmt"
+    "math"
+)
 
 /* tip box */
 
@@ -135,17 +138,86 @@ func (tb *LHTipbox) N_clean_tips() int {
 	return c
 }
 
-//ContainsCoord
-func (tb *LHTipbox) ContainsCoords(c *WellCoords) bool {
+//@implement LHDeckObject
+
+func (tb *LHTipbox) GetSize() Coordinates {
+    //Assume that TipX/YStart is repeated the other side
+    return Coordinates{
+        2 * tb.TipXStart + float64(tb.Ncols) * tb.TipXOffset,
+        2 * tb.TipYStart + float64(tb.Nrows) * tb.TipYOffset,
+        tb.Height,
+    }
+}
+
+func (tb *LHTipbox) HasCoords(c WellCoords) bool {
     return c.X >= 0 &&
            c.Y >= 0 &&
            c.X < tb.Ncols &&
            c.Y < tb.Nrows
 }
 
+func (tb *LHTipbox) GetCoords(c WellCoords) (interface{}, bool) {
+    if !tb.HasCoords(c) {
+        return nil, false
+    }
+    return tb.Tips[c.X][c.Y], true
+}
+
+func (tb *LHTipbox) CoordsToWellCoords(r Coordinates) (WellCoords, Coordinates) {
+    wc := WellCoords{
+        int(math.Floor(((r.X-tb.TipXStart) / tb.TipXOffset) + 0.5)),
+        int(math.Floor(((r.Y-tb.TipYStart) / tb.TipYOffset) + 0.5)),
+    }
+    if wc.X < 0 {
+        wc.X = 0
+    } else if wc.X >= tb.Ncols {
+        wc.X = tb.Ncols - 1
+    }
+    if wc.Y < 0 {
+        wc.Y = 0
+    } else if wc.Y >= tb.Nrows {
+        wc.Y = tb.Nrows - 1
+    }
+
+    r2, _ := tb.WellCoordsToCoords(wc, TopReference)
+
+    return wc, r.Subtract(r2)
+}
+
+func (tb *LHTipbox) WellCoordsToCoords(wc WellCoords, r WellReference) (Coordinates, bool) {
+    if !tb.HasCoords(wc) {
+        return Coordinates{}, false
+    }
+
+    var z float64
+    if r == BottomReference {
+        z = tb.TipZStart
+    } else if r == TopReference {
+        z = tb.Height
+    } else {
+        return Coordinates{}, false
+    }
+
+    return Coordinates{
+        tb.TipXStart + (float64(wc.X) + 0.5) * tb.TipXOffset,
+        tb.TipYStart + (float64(wc.Y) + 0.5) * tb.TipYOffset,
+        z}, true
+}
+
+
 //HasTipAt
-func (tb *LHTipbox) HasTipAt(c *WellCoords) bool {
-    return tb.ContainsCoords(c) && tb.Tips[c.X][c.Y] != nil
+func (tb *LHTipbox) HasTipAt(c WellCoords) bool {
+    return tb.HasCoords(c) && tb.Tips[c.X][c.Y] != nil
+}
+
+//RemoveTip
+func (tb *LHTipbox) RemoveTip(c WellCoords) *LHTip {
+    if !tb.HasCoords(c) {
+        return nil
+    }
+    tip := tb.Tips[c.X][c.Y]
+    tb.Tips[c.X][c.Y] = nil
+    return tip
 }
 
 // actually useful functions

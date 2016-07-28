@@ -28,7 +28,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-
+    "math"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/microArch/logger"
@@ -65,11 +65,7 @@ func (lhp LHPlate) Name() string {
 
 func (lhp LHPlate) GetType() string {
     return lhp.Type
-}
-
-func (lhp LHPlate) ContainsCoords(wc *WellCoords) bool {
-    return wc.X >= 0 && wc.Y >= 0 && wc.X < self.WlsX && wc.Y < self.WlsY
-}    
+}  
 
 func (lhp LHPlate) String() string {
 	return fmt.Sprintf(
@@ -448,4 +444,70 @@ func (p *LHPlate) IsConstrainedOn(platform string) ([]string, bool) {
 
 	return pos, false
 
+}
+
+//@implement LHDeckObject
+
+func (self *LHPlate) GetSize() Coordinates {
+    //Assume that TipX/YStart is repeated the other side
+    return Coordinates{
+        2 * self.WellXStart + float64(self.WlsX) * self.WellXOffset,
+        2 * self.WellYStart + float64(self.WlsY) * self.WellYOffset,
+        self.Height,
+    }
+}
+
+func (self *LHPlate) HasCoords(c WellCoords) bool {
+    return c.X >= 0 &&
+           c.Y >= 0 &&
+           c.X < self.WlsX &&
+           c.Y < self.WlsY
+}
+
+func (self *LHPlate) GetCoords(c WellCoords) (interface{}, bool) {
+    if !self.HasCoords(c) {
+        return nil, false
+    }
+    return self.Cols[c.X][c.Y], true
+}
+
+func (self *LHPlate) CoordsToWellCoords(r Coordinates) (WellCoords, Coordinates) {
+    wc := WellCoords{
+        int(math.Floor(((r.X-self.WellXStart) / self.WellXOffset))),// + 0.5), Don't need to add .5 because
+        int(math.Floor(((r.Y-self.WellYStart) / self.WellYOffset))),// + 0.5), WellXStart is to edge, not center
+    }
+    if wc.X < 0 {
+        wc.X = 0
+    } else if wc.X >= self.WlsX {
+        wc.X = self.WlsX - 1
+    }
+    if wc.Y < 0 {
+        wc.Y = 0
+    } else if wc.Y >= self.WlsY {
+        wc.Y = self.WlsY - 1
+    }
+
+    r2, _ := self.WellCoordsToCoords(wc, TopReference)
+
+    return wc, r.Subtract(r2)
+}
+
+func (self *LHPlate) WellCoordsToCoords(wc WellCoords, r WellReference) (Coordinates, bool) {
+    if !self.HasCoords(wc) {
+        return Coordinates{}, false
+    }
+
+    var z float64
+    if r == BottomReference {
+        z = self.WellZStart
+    } else if r == TopReference {
+        z = self.Height
+    } else {
+        return Coordinates{}, false
+    }
+
+    return Coordinates{
+        self.WellXStart + (float64(wc.X)+0.5) * self.WellXOffset,
+        self.WellYStart + (float64(wc.Y)+0.5) * self.WellYOffset,
+        z}, true
 }
