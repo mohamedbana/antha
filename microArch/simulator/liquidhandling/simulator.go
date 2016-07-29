@@ -363,20 +363,24 @@ func (self *VirtualLiquidHandler) ResetPistons(head, channel int) driver.Command
 //AddPlateTo - used
 func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{}, name string) driver.CommandStatus {
 
+    ret := driver.CommandStatus{true, driver.OK, "ADDPLATETO ACK"}
+
     if _, ok := plate.(wtype.LHDeckObject); ok {
     
         if self.state.GetDeck().HasPosition(position) {
-            if !self.state.GetDeck().AddPlateToNamed(name, plate, position) {
-                self.AddErrorf("Couldn't add plate \"%s\" to location \"%s\"", name, position)
+            if err := self.state.GetDeck().AddPlateToNamed(name, plate, position); err != nil {
+                err.SetFunctionName("AddPlateTo")
+                self.AddSimulationError(err)
+                return ret
             }
         } else {
-            self.AddErrorf("Unknown location \"%s\"", position)
+            self.AddErrorf("AddPlateTo", "Unknown location \"%s\"", position)
         }
     } else {
-        self.AddErrorf("Couldn't add plate called \"%s\" of type %T", name, plate) 
+        self.AddErrorf("AddPlateTo", "Cannot add plate \"%s\" of type %T to location \"%s\"", name, plate, position) 
     }
 
-    return driver.CommandStatus{true, driver.OK, "ADDPLATETO ACK"}
+    return ret
 }
 
 //RemoveAllPlates - used

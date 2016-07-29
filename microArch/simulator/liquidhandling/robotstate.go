@@ -23,6 +23,7 @@
 package liquidhandling
 
 import (
+    "github.com/antha-lang/antha/microArch/simulator"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
     "errors"
@@ -388,8 +389,16 @@ func (self *PlateLocation) GetPlate() interface{} {
     return self.plate
 }
 
+func (self *PlateLocation) GetSize() wtype.Coordinates {
+    return self.size
+}
+
 func (self *PlateLocation) GetOffset() wtype.Coordinates {
     return self.offset
+}
+
+func (self *PlateLocation) GetName() string {
+    return self.plate_name
 }
 
 func (self *PlateLocation) GetLocationName() string {
@@ -443,18 +452,19 @@ func (self *DeckState) HasPosition(position_name string) bool {
     return false
 }
 
-func (self *DeckState) AddPlate(plate_name string, plate interface{}, position wtype.Coordinates, position_name string) bool {
+func (self *DeckState) AddPlate(plate_name string, plate interface{}, position wtype.Coordinates, position_name string) *simulator.SimulationError {
     to_add := NewPlateLocation(plate_name, plate.(wtype.LHDeckObject), position, position_name)
     for _,pl := range self.plate_locations {
         if pl.Intersects(to_add) {
-            return false
+            return simulator.NewErrorf("", "Cannot add \"%s\" to location \"%s\", intersects with \"%s\" at \"%s\"", 
+                             plate_name, position_name, pl.GetName(), pl.GetLocationName())
         }
     }
     self.plate_locations = append(self.plate_locations, to_add)
-    return true
+    return nil
 }
 
-func (self *DeckState) AddPlateToNamed(plate_name string, plate interface{}, position string) bool {
+func (self *DeckState) AddPlateToNamed(plate_name string, plate interface{}, position string) *simulator.SimulationError {
     return self.AddPlate(plate_name, plate, self.named_positions[position], position)
 }
 

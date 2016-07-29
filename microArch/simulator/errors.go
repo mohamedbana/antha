@@ -49,8 +49,33 @@ type SimulationError struct {
     message         string
 }
 
-func NewSimulationError(severity ErrorSeverity, message string, function_name string) *SimulationError {
-    err := SimulationError{severity, function_name, message}
+func NewError(function_name, message string) *SimulationError {
+    err := SimulationError{SeverityError, function_name, message}
+    return &err
+}
+
+func NewErrorf(function_name, message string, args ...interface{}) *SimulationError {
+    err := SimulationError{SeverityError, function_name, fmt.Sprintf(message, args...)}
+    return &err
+}
+
+func NewWarning(function_name, message string) *SimulationError {
+    err := SimulationError{SeverityWarning, function_name, message}
+    return &err
+}
+
+func NewWarningf(function_name, message string, args ...interface{}) *SimulationError {
+    err := SimulationError{SeverityWarning, function_name, fmt.Sprintf(message, args...)}
+    return &err
+}
+
+func NewInfo(function_name, message string) *SimulationError {
+    err := SimulationError{SeverityInfo, function_name, message}
+    return &err
+}
+
+func NewInfof(function_name, message string, args ...interface{}) *SimulationError {
+    err := SimulationError{SeverityInfo, function_name, fmt.Sprintf(message, args...)}
     return &err
 }
 
@@ -67,6 +92,10 @@ func (self *SimulationError) Severity() ErrorSeverity {
 
 func (self *SimulationError) FunctionName() string {
     return self.fname
+}
+
+func (self *SimulationError) SetFunctionName(fname string) {
+    self.fname = fname
 }
 
 //ErrorReporter 
@@ -114,30 +143,27 @@ func (self *ErrorReporter) AddSimulationError(se *SimulationError) {
 }
 
 func (self *ErrorReporter) AddError(fname, msg string) {
-    se := NewSimulationError(SeverityError, msg, fname)
-    self.AddSimulationError(se)
+    self.AddSimulationError(NewError(fname, msg))
 }
 
 func (self *ErrorReporter) AddWarning(fname, msg string) {
-    se := NewSimulationError(SeverityWarning, msg, fname)
-    self.AddSimulationError(se)
+    self.AddSimulationError(NewWarning(fname, msg))
 }
 
 func (self *ErrorReporter) AddInfo(fname, msg string) {
-    se := NewSimulationError(SeverityInfo, msg, fname)
-    self.AddSimulationError(se)
+    self.AddSimulationError(NewInfo(fname, msg))
 }
 
-func (self *ErrorReporter) AddErrorf(fname, format string, args ...interface{}) {
-    self.AddError(fname, fmt.Sprintf(format, args...))
+func (self *ErrorReporter) AddErrorf(fname, msg string, args ...interface{}) {
+    self.AddSimulationError(NewErrorf(fname, msg, args...))
 }
 
-func (self *ErrorReporter) AddWarningf(fname, format string, args ...interface{}) {
-    self.AddWarning(fname, fmt.Sprintf(format, args...))
+func (self *ErrorReporter) AddWarningf(fname, msg string, args ...interface{}) {
+    self.AddSimulationError(NewWarningf(fname, msg, args...))
 }
 
-func (self *ErrorReporter) AddInfof(fname, format string, args ...interface{}) {
-    self.AddInfo(fname, fmt.Sprintf(format, args...))
+func (self *ErrorReporter) AddInfof(fname, msg string, args ...interface{}) {
+    self.AddSimulationError(NewInfof(fname, msg, args...))
 }
 
 

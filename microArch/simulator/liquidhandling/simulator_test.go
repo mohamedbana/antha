@@ -120,7 +120,7 @@ func TestNewVirtualLiquidHandler_ValidProps(t *testing.T) {
     test := SimulatorTest{"Create Valid VLH", nil, nil, nil, nil, nil}
     test.run(t)
 }
-/*
+
 func TestVLH_AddPlateTo(t *testing.T) {
     tests := []SimulatorTest{
         SimulatorTest{
@@ -160,7 +160,7 @@ func TestVLH_AddPlateTo(t *testing.T) {
                 &AddPlateTo{"tipbox_1", default_lhtipbox(), "p0"},
                 &AddPlateTo{"tipbox_1", default_lhtipbox(), "p1"},
             },
-            []string{"(err) AddPlateTo: Cannot add plate \"p1\" to location \"tipbox_1\" which is already occupied by plate \"p0\""},
+            []string{"(err) AddPlateTo: Cannot add \"p1\" to location \"tipbox_1\", intersects with \"p0\" at \"tipbox_1\""},
             nil,        //no assertions
         },
 //        SimulatorTest{   -- We'll probably want a test along these lines at some point, but Preferences aren't very strict at the moment
@@ -187,7 +187,7 @@ func TestVLH_AddPlateTo(t *testing.T) {
 // ########################################################################################################################
 // ########################################################## Tip Loading/Unloading
 // ########################################################################################################################
-*/
+
 func tipTestLayout() *SetupFn {
     var ret SetupFn = func(vlh *lh.VirtualLiquidHandler) {
         vlh.Initialize()
