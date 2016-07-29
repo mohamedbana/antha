@@ -732,9 +732,9 @@ func tipboxAssertion(tipbox_loc string, missing_tips []string) *AssertionFn {
             for x:= 0; x < tipbox.Ncols; x++ {
                 wc := wtype.WellCoords{x,y}
                 wcs:= wc.FormatA1()
-                if hta, mt := tipbox.HasTipAt(wc), mmissing_tips[wcs]; hta && mt {
+                if hta, etm := tipbox.HasTipAt(wc), mmissing_tips[wcs]; !hta && !etm {
                     errors = append(errors, fmt.Sprintf("Unexpected tip missing at %s", wcs))
-                } else if !hta && !mt {
+                } else if hta && etm {
                     errors = append(errors, fmt.Sprintf("Unexpected tip present at %s", wcs))
                 }
             }

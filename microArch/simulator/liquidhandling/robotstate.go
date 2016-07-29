@@ -26,8 +26,6 @@ import (
     "github.com/antha-lang/antha/microArch/simulator"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-    "errors"
-    "fmt"
     "math"
 )
 
@@ -103,32 +101,31 @@ type GetPlateRet struct {
 }
 
 //GetPlate Get the next plate below the adaptor and check that the position, type and well match
-func (self *ChannelState) GetPlate(platetype, position, well string) (*GetPlateRet, error) {
+func (self *ChannelState) GetPlate(platetype, position, well string) (*GetPlateRet, *simulator.SimulationError) {
     //get the plate interface from the robot deck
     abs_p := self.GetAbsolutePosition()
     plate_loc := self.adaptor.GetRobot().GetDeck().GetPlateBelow(abs_p)
 
     //if there's no plate
     if plate_loc == nil {
-        return nil, errors.New("No Plate below adaptor")
+        return nil, simulator.NewErrorf("", "No Plate below channel %v, expected type \"%s\" at \"%s\"", self.number, platetype, position)
     }
 
     //check the type of the plate
     if pt := plate_loc.plate.(wtype.Typed).GetType(); pt != platetype {
-        return nil, errors.New(fmt.Sprintf("Plate below adaptor is of type \"%s\" not \"%s\"", 
-                               pt, platetype))
+        return nil, simulator.NewErrorf("", "Plate below channel %v is of type \"%s\" not \"%s\"", self.number, pt, platetype)
     }
 
     //check the position of the plate
     if plate_loc.location_name != position {
-        return nil, errors.New(fmt.Sprintf("Plate below adaptor is in location \"%s\" not \"%s\"",
-                               plate_loc.location_name, position))
+        return nil, simulator.NewErrorf("", "Plate below channel %v is in location \"%s\" not \"%s\"",
+                               self.number, plate_loc.location_name, position)
     }
 
     //check the well
     wc, offset := plate_loc.plate.(wtype.LHDeckObject).CoordsToWellCoords(abs_p.Subtract(plate_loc.GetOffset()))
     if wc.FormatA1() != well {
-        return nil, errors.New(fmt.Sprintf("Adaptor is above well %s not well %s", wc.FormatA1(), well))
+        return nil, simulator.NewErrorf("", "Channel %v is above well %s not well %s", self.number, wc.FormatA1(), well)
     }
 
     //return everything
@@ -157,10 +154,18 @@ func (self *ChannelState) Dispense(volume *wunit.Volume) error {
 }
 
 //LoadTip
-func (self *ChannelState) LoadTip(platetype, position, well string) error {
+func (self *ChannelState) LoadTip(platetype, position, well string) *simulator.SimulationError {
     if self.tip != nil {
-        return errors.New("Tip already loaded")
+        return simulator.NewErrorf("", "Tip already loaded on channel %v", self.number)
     }
+
+    //is this channel expected to remain empty
+    if platetype == "" && position == "" && well == "" {
+        //Todo: check that I'm not going to collide with anything while tip loading motion is made
+
+        return nil
+    }
+
     p, err := self.GetPlate(platetype, position, well)
     if err != nil {
         return err
@@ -169,12 +174,12 @@ func (self *ChannelState) LoadTip(platetype, position, well string) error {
     //check that we've got a tipbox
     tipbox, ok := p.Plate.(*wtype.LHTipbox)
     if !ok {
-        return errors.New("No Tipbox beneath adaptor")
+        return simulator.NewErrorf("", "No Tipbox beneath channel %v", self.number)
     }
 
     //Check that we're lined up
     if misalignment := p.Offset.AbsXY(); misalignment > 0.5 {
-        return errors.New(fmt.Sprintf("Misaligned from tip by %smm", misalignment))
+        return simulator.NewErrorf("", "Channel %v Misaligned from tip by %smm", self.number, misalignment)
     }
 
     //if there's a tip, move it to the adaptor
@@ -189,7 +194,7 @@ func (self *ChannelState) LoadTip(platetype, position, well string) error {
 }
 
 //UnloadTip
-func (self *ChannelState) UnloadTip(platetype, position, well string) error {
+func (self *ChannelState) UnloadTip(platetype, position, well string) *simulator.SimulationError {
     p, err := self.GetPlate(platetype, position, well)
     if err != nil {
         return err
@@ -198,14 +203,14 @@ func (self *ChannelState) UnloadTip(platetype, position, well string) error {
     //check that we've got a tipwaste
     tipwaste, ok := p.Plate.(*wtype.LHTipwaste)
     if !ok {
-        return errors.New("No tipwaste below adaptor")
+        return simulator.NewError("", "No tipwaste below adaptor")
     }
 
     //check that we're actually over the well
     if self.HasTip() && 
         (math.Abs(p.Offset.X) > 0.5*tipwaste.AsWell.Xdim ||
          math.Abs(p.Offset.Y) > 0.5*tipwaste.AsWell.Ydim) {
-           return errors.New("Ejecting a tip while not over TipWaste well")
+           return simulator.NewError("", "Ejecting a tip while not over TipWaste well")
     }
 
     //do it!
@@ -213,7 +218,7 @@ func (self *ChannelState) UnloadTip(platetype, position, well string) error {
     self.contents = nil
 
     if !tipwaste.Dispose(1) {
-        return errors.New("Tipbox full")
+        return simulator.NewError("", "Tipbox full")
     }
     return nil
 }
@@ -290,7 +295,7 @@ func (self *AdaptorState) GetRobot() *RobotState {
 //                            Actions
 //                            -------
 
-func (self *AdaptorState) LoadTips(platetype, position, well []string) error {
+func (self *AdaptorState) LoadTips(platetype, position, well []string) *simulator.SimulationError {
     for i := range self.channels {
         if !(self.independent && platetype[i] == "" && position[i] == "" && well[i] == "") {
             if err := self.channels[i].LoadTip(platetype[i], position[i], well[i]); err != nil {
@@ -312,52 +317,71 @@ func (self *AdaptorState) UnLoadTips(platetype, position, well []string) error {
     return nil
 }
 
-func (self *AdaptorState) Move(platetype, position, well []string, reference []wtype.WellReference, offset []wtype.Coordinates) error {
-    positions := make([]wtype.Coordinates, len(self.channels))
+func (self *AdaptorState) Move(platetype, position, well []string, 
+        reference []wtype.WellReference, offset []wtype.Coordinates) *simulator.SimulationError {
+    positions := make([]*wtype.Coordinates, len(self.channels))
 
     for i := range self.channels {
+        //leave position nil if we don't care
+        if platetype[i] == "" && position[i] == "" && well[i] == "" {
+            continue
+        }
+
         pl := self.robot.GetDeck().GetPlateByPosition(position[i], platetype[i])
         if pl == nil {
-            return errors.New(fmt.Sprintf("No plate of type \"%s\" at location \"%s\"", platetype[i], position[i]))
+            return simulator.NewErrorf("No plate of type \"%s\" at location \"%s\"", platetype[i], position[i])
         }
         do := pl.GetPlate().(wtype.LHDeckObject)
 
         wc := wtype.MakeWellCoords(well[i])
         if !do.HasCoords(wc) {
-            return errors.New(fmt.Sprintf("Plate has no coordinates %s", well[i]))
+            return simulator.NewErrorf("Plate has no coordinates %s", well[i])
         }
 
         rel_pos, ok := do.WellCoordsToCoords(wc, reference[i])
         if !ok {
-            return errors.New("Could not get location of well")
+            return simulator.NewErrorf("", "Could not get location of well %s", wc.Format1A())
         }
 
         //TODO Check for collision with plate/well
 
-        positions[i] = pl.GetOffset().Add(rel_pos).Add(offset[i])
+        pos_i := pl.GetOffset().Add(rel_pos).Add(offset[i])
+        positions[i] = &pos_i
     }
 
     //convert positions to relative
-    //I'm assuming here that the adaptor origin is always equal to the position of the
-    //first channel. This may not end up being true if we encounter robots whose
-    //channels can move independently of the adaptor
-    origin := positions[0]
+    //find the origin of the adaptor
+    var origin *wtype.Coordinates 
+    for i := range self.channels {
+        if positions[i] != nil {
+            o := positions[i].Subtract(self.channels[i].GetRelativePosition())
+            origin = &o
+        }
+    }
+    if origin == nil {
+        return simulator.NewWarning("", "Ignoring empty command")
+    }
     for i := range positions {
-        positions[i] = positions[i].Subtract(positions[0])
+        if positions[i] != nil { 
+            *positions[i] = positions[i].Subtract(*origin)
+        } else { //if position hasn't been specified, leave relative position alone
+            p := self.channels[i].GetRelativePosition()
+            positions[i] = &p
+        }
     }
 
     //if the head isn't independent, check that relative positions are the same
     if !self.independent {
         for i := range positions {
-            if positions[i] != self.channels[i].GetRelativePosition() {
-                return errors.New("Channels can't move independently")
+            if *positions[i] != self.channels[i].GetRelativePosition() {
+                return simulator.NewError("", "Channels can't move independently")
             }
         }
     }
 
-    self.position = origin
+    self.position = *origin
     for i := range self.channels {
-        self.channels[i].SetRelativePosition(positions[i])
+        self.channels[i].SetRelativePosition(*positions[i])
     }
     return nil
 }
@@ -406,7 +430,7 @@ func (self *PlateLocation) GetLocationName() string {
 }
 
 func (self *PlateLocation) ContainsXY(p wtype.Coordinates) bool {
-    d := self.offset.Subtract(p)
+    d := p.Subtract(self.offset)
     return d.X >=0 && d.Y >= 0 && d.X < self.size.X && d.Y < self.size.X
 }
 
@@ -573,9 +597,9 @@ func (self *RobotState) IsFinalized() bool {
 //                            -------
 
 //Initialize
-func (self *RobotState) Initialize() error {
+func (self *RobotState) Initialize() *simulator.SimulationError {
     if self.initialized {
-        return errors.New("Called Initialize on already initialised liquid handler")
+        return simulator.NewError("", "Called Initialize on already initialised liquid handler")
     }
     self.initialized = true
     return nil
@@ -584,10 +608,10 @@ func (self *RobotState) Initialize() error {
 //Finalize
 func (self *RobotState) Finalize() error {
     if self.finalized {
-        return errors.New("Called Finalize on already finalized liquid handler")
+        return simulator.NewError("", "Called Finalize on already finalized liquid handler")
     }
     if !self.initialized {
-        return errors.New("Called Finalize on uninitialized liquidhandler")
+        return simulator.NewError("", "Called Finalize on uninitialized liquidhandler")
     }
     self.finalized = true
     return nil

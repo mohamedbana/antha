@@ -197,7 +197,7 @@ func tipTestLayout() *SetupFn {
     }
     return &ret
 }
-/*
+
 func TestLoadTips(t *testing.T) {
     tests := []SimulatorTest{
         SimulatorTest{
@@ -207,13 +207,23 @@ func TestLoadTips(t *testing.T) {
                 tipTestLayout(),
             },
             []TestRobotInstruction{
+                &Move{
+                    []string{"tipbox_1","","","","","","","",},   //deckposition 
+                    []string{"H12","","","","","","","",},        //wellcoords   
+                    []int{1,1,1,1,1,1,1,1},                       //top reference    
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,},          //offsetX      
+                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,},          //offsetY      
+                    []float64{5.,5.,5.,5.,5.,5.,5.,5.,},          //offsetZ      
+                    []string{"tipbox","","","","","","","",},     //plate_type   
+                    0,                                            //head         
+                },
                 &LoadTips{
                     []int{0},               //channels
                     0,                      //head
-                    1,                      //multi
-                    []string{"tipbox"},     //tipbox
-                    []string{"tipbox_1"},    //location
-                    []string{"H12"},        //well
+                    8,                      //multi
+                    []string{"tipbox","","","","","","","",},     //tipbox
+                    []string{"tipbox_1","","","","","","","",},   //location
+                    []string{"H12","","","","","","","",},        //well
                 },
             },
             nil,            //errors
@@ -224,7 +234,7 @@ func TestLoadTips(t *testing.T) {
                 tipwasteAssertion("tipwaste", 0),
             },
         },
-        SimulatorTest{
+ /*       SimulatorTest{
             "OK - single tip (alt)",
             nil,
             []*SetupFn{
@@ -732,7 +742,7 @@ func TestLoadTips(t *testing.T) {
             },
             nil,            //assertions
         },
-    }
+*/    }
 
     for _,test := range tests {
         test.run(t)
@@ -740,7 +750,7 @@ func TestLoadTips(t *testing.T) {
 }
 
 
-
+/*
 
 func Test_UnloadTips(t *testing.T) {
 

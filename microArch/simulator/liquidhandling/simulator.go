@@ -234,7 +234,8 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
         }
 
         if err := adaptor.Move(platetype, deckposition, wellcoords, typed_ref, offset); err != nil {
-            self.AddError("Move", err.Error())
+            err.SetFunctionName("Move")
+            self.AddSimulationError(err)
         }
     }
 
@@ -272,7 +273,8 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
     }
 
     if err := self.state.GetAdaptor(head).LoadTips(platetype, position, well); err != nil {
-        self.AddError("LoadTips", err.Error())
+        err.SetFunctionName("LoadTips")
+        self.AddSimulationError(err)
     }
 
     //TODO: Check that tips were loaded onto the specified channels
