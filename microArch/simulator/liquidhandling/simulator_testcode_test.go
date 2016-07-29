@@ -694,11 +694,11 @@ func removeTipboxTips(tipbox_loc string, wells []string) *SetupFn {
 
 func preloadAdaptorTips(head int, tipbox_loc string, channels []int) *SetupFn {
     var ret SetupFn = func(vlh *lh.VirtualLiquidHandler) {
-        adaptor := vlh.GetHeadAdaptor(head)
+        adaptor := vlh.GetAdaptorState(head)
         tipbox := vlh.GetPlateAt(tipbox_loc).(*wtype.LHTipbox)
 
         for _,ch := range channels {
-            adaptor.AddTip(ch, tipbox.Tiptype.Dup());
+            adaptor.GetChannel(ch).SetTip(tipbox.Tiptype.Dup());
         }
     }
     return &ret
@@ -732,7 +732,7 @@ func tipboxAssertion(tipbox_loc string, missing_tips []string) *AssertionFn {
             for x:= 0; x < tipbox.Ncols; x++ {
                 wc := wtype.WellCoords{x,y}
                 wcs:= wc.FormatA1()
-                if hta, mt := tipbox.HasTipAt(&wc), mmissing_tips[wcs]; hta && mt {
+                if hta, mt := tipbox.HasTipAt(wc), mmissing_tips[wcs]; hta && mt {
                     errors = append(errors, fmt.Sprintf("Unexpected tip missing at %s", wcs))
                 } else if !hta && !mt {
                     errors = append(errors, fmt.Sprintf("Unexpected tip present at %s", wcs))
@@ -754,10 +754,10 @@ func adaptorAssertion(head int, tip_channels []int) *AssertionFn {
             mtips[tl] = true
         }
 
-        adaptor := vlh.GetHeadAdaptor(head)
+        adaptor := vlh.GetAdaptorState(head)
         errors := []string{}
-        for ch := 0; ch < adaptor.Params.Multi; ch++ {
-            if itl, et := adaptor.IsTipLoaded(ch), mtips[ch]; itl && !et {
+        for ch := 0; ch < adaptor.GetChannelCount(); ch++ {
+            if itl, et := adaptor.GetChannel(ch).HasTip(), mtips[ch]; itl && !et {
                 errors = append(errors, fmt.Sprintf("Unexpected tip on channel %v", ch))
             } else if !itl && et {
                 errors = append(errors, fmt.Sprintf("Expected tip on channel %v", ch))

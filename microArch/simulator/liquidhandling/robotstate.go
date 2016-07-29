@@ -27,6 +27,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
     "errors"
     "fmt"
+    "math"
 )
 
 // -------------------------------------------------------------------------------
@@ -64,24 +65,78 @@ func (self *ChannelState) GetTip() *wtype.LHTip {
     return self.tip
 }
 
+//SetTip set the tip, mainly for debug and testing
+func (self *ChannelState) SetTip(tip *wtype.LHTip) {
+    self.tip = tip
+}
+
 //IsEmpty returns true only if a tip is loaded and contains liquid
 func (self *ChannelState) IsEmpty() bool {
     return self.HasTip() && self.contents != nil && self.contents.IsZero()
 }
 
 //GetContents get the contents of the loaded tip, retuns nil if no contents or no tip
-func (self *ChannelState) GetContents() wtype.LHComponent {
+func (self *ChannelState) GetContents() *wtype.LHComponent {
     return self.contents
 }
 
 //GetRelativePosition get the channel's position relative to the head
-func (self *ChannelState) GetRelativePosition() wtype.Coordiantes {
+func (self *ChannelState) GetRelativePosition() wtype.Coordinates {
     return self.position
+}
+
+//SetRelativePosition get the channel's position relative to the head
+func (self *ChannelState) SetRelativePosition(v wtype.Coordinates) {
+    self.position = v
 }
 
 //GetAbsolutePosition get the channel's absolute position
 func (self *ChannelState) GetAbsolutePosition() wtype.Coordinates {
     return self.position.Add(self.adaptor.GetPosition())
+}
+
+type GetPlateRet struct {
+    Plate       interface{}
+    Position    wtype.WellCoords
+    Offset      wtype.Coordinates 
+}
+
+//GetPlate Get the next plate below the adaptor and check that the position, type and well match
+func (self *ChannelState) GetPlate(platetype, position, well string) (*GetPlateRet, error) {
+    //get the plate interface from the robot deck
+    abs_p := self.GetAbsolutePosition()
+    plate_loc := self.adaptor.GetRobot().GetDeck().GetPlateBelow(abs_p)
+
+    //if there's no plate
+    if plate_loc == nil {
+        return nil, errors.New("No Plate below adaptor")
+    }
+
+    //check the type of the plate
+    if pt := plate_loc.plate.(wtype.Typed).GetType(); pt != platetype {
+        return nil, errors.New(fmt.Sprintf("Plate below adaptor is of type \"%s\" not \"%s\"", 
+                               pt, platetype))
+    }
+
+    //check the position of the plate
+    if plate_loc.location_name != position {
+        return nil, errors.New(fmt.Sprintf("Plate below adaptor is in location \"%s\" not \"%s\"",
+                               plate_loc.location_name, position))
+    }
+
+    //check the well
+    wc, offset := plate_loc.plate.(wtype.LHDeckObject).CoordsToWellCoords(abs_p.Subtract(plate_loc.GetOffset()))
+    if wc.FormatA1() != well {
+        return nil, errors.New(fmt.Sprintf("Adaptor is above well %s not well %s", wc.FormatA1(), well))
+    }
+
+    //return everything
+    r := GetPlateRet{
+        plate_loc.plate,
+        wc,
+        offset}
+    return &r, nil
+
 }
 
 
@@ -102,13 +157,64 @@ func (self *ChannelState) Dispense(volume *wunit.Volume) error {
 
 //LoadTip
 func (self *ChannelState) LoadTip(platetype, position, well string) error {
-    p := self.GetAbsolutePosition()
-    plate, rel_p := self.adaptor.GetRobot().GetDeck().GetPlateBelow(p)
+    if self.tip != nil {
+        return errors.New("Tip already loaded")
+    }
+    p, err := self.GetPlate(platetype, position, well)
+    if err != nil {
+        return err
+    }
+
+    //check that we've got a tipbox
+    tipbox, ok := p.Plate.(*wtype.LHTipbox)
+    if !ok {
+        return errors.New("No Tipbox beneath adaptor")
+    }
+
+    //Check that we're lined up
+    if misalignment := p.Offset.AbsXY(); misalignment > 0.5 {
+        return errors.New(fmt.Sprintf("Misaligned from tip by %smm", misalignment))
+    }
+
+    //if there's a tip, move it to the adaptor
+    //at first, I thought there being no tip (tip==nil) was an error, but
+    //actually it could be deliberate in the case of a non-independent adaptor
+    //and the callee should verify afterwards that the expected tips were loaded
+    wc := wtype.MakeWellCoords(well)
+    tip, _ := tipbox.GetCoords(wc)
+    tipbox.RemoveTip(wc)
+    self.tip = tip.(*wtype.LHTip)
+    return nil
 }
 
 //UnloadTip
-func (self *ChannelState) UnloadTip(platetype, position, well string) *wtype.LHTip, error {
-    
+func (self *ChannelState) UnloadTip(platetype, position, well string) error {
+    p, err := self.GetPlate(platetype, position, well)
+    if err != nil {
+        return err
+    }
+
+    //check that we've got a tipwaste
+    tipwaste, ok := p.Plate.(*wtype.LHTipwaste)
+    if !ok {
+        return errors.New("No tipwaste below adaptor")
+    }
+
+    //check that we're actually over the well
+    if self.HasTip() && 
+        (math.Abs(p.Offset.X) > 0.5*tipwaste.AsWell.Xdim ||
+         math.Abs(p.Offset.Y) > 0.5*tipwaste.AsWell.Ydim) {
+           return errors.New("Ejecting a tip while not over TipWaste well")
+    }
+
+    //do it!
+    self.tip = nil
+    self.contents = nil
+
+    if !tipwaste.Dispose(1) {
+        return errors.New("Tipbox full")
+    }
+    return nil
 }
 
 // -------------------------------------------------------------------------------
@@ -119,20 +225,23 @@ func (self *ChannelState) UnloadTip(platetype, position, well string) *wtype.LHT
 type AdaptorState struct {
     channels        []*ChannelState
     position        wtype.Coordinates
+    independent     bool
     robot           *RobotState 
 }
 
 func NewAdaptorState(robot *RobotState, 
                      initial_position wtype.Coordinates, 
+                     independent bool,
                      channels int, 
                      channel_offset wtype.Coordinates) *AdaptorState {
     as := AdaptorState{
         make([]*ChannelState,0,channels),
         initial_position,
+        independent,
         robot}
 
     for i := 0; i < channels; i++ {
-        as.channels = append(as.channels, NewChannelState(i, &as, channel_offset.Multiply(i)))
+        as.channels = append(as.channels, NewChannelState(i, &as, channel_offset.Multiply(float64(i))))
     }
 
     return &as
@@ -148,7 +257,12 @@ func (self *AdaptorState) GetPosition() wtype.Coordinates {
 
 //GetChannelCount
 func (self *AdaptorState) GetChannelCount() int {
-    return len(channels)
+    return len(self.channels)
+}
+
+//GetChannel
+func (self *AdaptorState) GetChannel(ch int) *ChannelState {
+    return self.channels[ch]
 }
 
 //GetTipCount
@@ -162,9 +276,89 @@ func (self *AdaptorState) GetTipCount() int {
     return r
 }
 
+//IsIndependent
+func (self *AdaptorState) IsIndependent() bool {
+    return self.independent
+}
+
 //GetRobot
 func (self *AdaptorState) GetRobot() *RobotState {
     return self.robot
+}
+
+//                            Actions
+//                            -------
+
+func (self *AdaptorState) LoadTips(platetype, position, well []string) error {
+    for i := range self.channels {
+        if !(self.independent && platetype[i] == "" && position[i] == "" && well[i] == "") {
+            if err := self.channels[i].LoadTip(platetype[i], position[i], well[i]); err != nil {
+                return err
+            }            
+        }
+    }
+    return nil
+}
+
+func (self *AdaptorState) UnLoadTips(platetype, position, well []string) error {
+    for i := range self.channels {
+        if !(self.independent && platetype[i] == "" && position[i] == "" && well[i] == "") {
+            if err := self.channels[i].UnloadTip(platetype[i], position[i], well[i]); err != nil {
+                return err
+            }            
+        }
+    }
+    return nil
+}
+
+func (self *AdaptorState) Move(platetype, position, well []string, reference []wtype.WellReference, offset []wtype.Coordinates) error {
+    positions := make([]wtype.Coordinates, len(self.channels))
+
+    for i := range self.channels {
+        pl := self.robot.GetDeck().GetPlateByPosition(position[i], platetype[i])
+        if pl == nil {
+            return errors.New(fmt.Sprintf("No plate of type \"%s\" at location \"%s\"", platetype[i], position[i]))
+        }
+        do := pl.GetPlate().(wtype.LHDeckObject)
+
+        wc := wtype.MakeWellCoords(well[i])
+        if !do.HasCoords(wc) {
+            return errors.New(fmt.Sprintf("Plate has no coordinates %s", well[i]))
+        }
+
+        rel_pos, ok := do.WellCoordsToCoords(wc, reference[i])
+        if !ok {
+            return errors.New("Could not get location of well")
+        }
+
+        //TODO Check for collision with plate/well
+
+        positions[i] = pl.GetOffset().Add(rel_pos).Add(offset[i])
+    }
+
+    //convert positions to relative
+    //I'm assuming here that the adaptor origin is always equal to the position of the
+    //first channel. This may not end up being true if we encounter robots whose
+    //channels can move independently of the adaptor
+    origin := positions[0]
+    for i := range positions {
+        positions[i] = positions[i].Subtract(positions[0])
+    }
+
+    //if the head isn't independent, check that relative positions are the same
+    if !self.independent {
+        for i := range positions {
+            if positions[i] != self.channels[i].GetRelativePosition() {
+                return errors.New("Channels can't move independently")
+            }
+        }
+    }
+
+    self.position = origin
+    for i := range self.channels {
+        self.channels[i].SetRelativePosition(positions[i])
+    }
+    return nil
 }
 
 // -------------------------------------------------------------------------------
@@ -173,15 +367,19 @@ func (self *AdaptorState) GetRobot() *RobotState {
 
 //PlateLocation a wrapper for an LHObject
 type PlateLocation struct {
-    offset  wtype.Coordinates
-    size    wtype.Coordinates
-    plate   interface{}
+    plate_name      string
+    offset          wtype.Coordinates
+    size            wtype.Coordinates
+    location_name   string
+    plate           interface{}
 }
 
-func NewPlateLocation(plate wtype.LHObject, position wtype.Coordinates) *PlateLocation {
+func NewPlateLocation(plate_name string, plate wtype.LHDeckObject, position wtype.Coordinates, position_name string) *PlateLocation {
     r := PlateLocation{
+        plate_name,
         position,
         plate.GetSize(),
+        position_name,
         plate.(interface{})}
     return &r
 }
@@ -192,6 +390,10 @@ func (self *PlateLocation) GetPlate() interface{} {
 
 func (self *PlateLocation) GetOffset() wtype.Coordinates {
     return self.offset
+}
+
+func (self *PlateLocation) GetLocationName() string {
+    return self.location_name
 }
 
 func (self *PlateLocation) ContainsXY(p wtype.Coordinates) bool {
@@ -222,25 +424,27 @@ func (self *PlateLocation) Intersects(rhs *PlateLocation) bool {
 
 //DeckState Represent the physical state of an LH robot's deck
 type DeckState struct {
-    named_positions         map[string]*wtype.Coordinates
-    positions               map[string][]interface{}
+    named_positions         map[string]wtype.Coordinates
     plate_locations         []*PlateLocation
 }
 
-func NewDeckState(positions map[string]*wtype.Coordinates) *DeckState {
+func NewDeckState(positions map[string]wtype.Coordinates) *DeckState {
     r := DeckState{
         positions,
-        make(map[string][]interface{}),
-        make([]*PlateLocation, 0)
-    }
-    for k := range positions {
-        r.positions[k] = make([]interface{}, 0)
+        make([]*PlateLocation, 0),
     }
     return &r
 }
 
-func (self *DeckState) AddPlate(plate interface{}, position wtype.Coordinates) bool {
-    to_add := NewPlateLocation(plate.(wtype.LHObject), position)
+func (self *DeckState) HasPosition(position_name string) bool {
+    if _, ok := self.named_positions[position_name]; ok {
+        return true
+    }
+    return false
+}
+
+func (self *DeckState) AddPlate(plate_name string, plate interface{}, position wtype.Coordinates, position_name string) bool {
+    to_add := NewPlateLocation(plate_name, plate.(wtype.LHDeckObject), position, position_name)
     for _,pl := range self.plate_locations {
         if pl.Intersects(to_add) {
             return false
@@ -250,30 +454,49 @@ func (self *DeckState) AddPlate(plate interface{}, position wtype.Coordinates) b
     return true
 }
 
-func (self *DeckState) AddPlateToNamed(plate interface{}, position string) bool {
-    return self.AddPlate(plate, self.named_positions[position])
+func (self *DeckState) AddPlateToNamed(plate_name string, plate interface{}, position string) bool {
+    return self.AddPlate(plate_name, plate, self.named_positions[position], position)
 }
 
 //GetPlateBelow get the next plate below the position and the relative position within the plate
-func (self *DeckState) GetPlateBelow(pos wtype.Coordinates) interface{}, wtype.Coordinates {
+func (self *DeckState) GetPlateBelow(pos wtype.Coordinates) *PlateLocation {
     var p *PlateLocation = nil
-    z := math.MAXFloat64
+    z := math.MaxFloat64
     for _,pl := range self.plate_locations {
         if pl.ContainsXY(pos) {
-            if dz := pos.Z - pl.Offset().Z; dz > 0 && dz < z {
+            if dz := pos.Z - pl.GetOffset().Z; dz > 0 && dz < z {
                 p = pl
                 z = dz
             }
         }
     }
-    if p == nil {
-        return nil, wtype.Coordinates{}
-    }
-    return p.GetPlate(), pos.Subtract(p.GetOffset())
+    return p
 }
 
-func (self *DeckState) GetPlatesName(position string) []interface{} {
-    return self.positions[position]
+func (self *DeckState) GetPlateByPosition(position, platetype string) *PlateLocation {
+    ret := make([]*PlateLocation,0)
+    for _,pl := range self.plate_locations {
+        if pl.GetLocationName() == position && pl.GetPlate().(wtype.Typed).GetType() == platetype {
+            ret = append(ret, pl)
+        }
+    }
+    if len(ret) != 1 {
+        return nil
+    }
+    return ret[0]
+}
+
+func (self *DeckState) GetPlateAt(position string) interface{} {
+    ret := make([]*PlateLocation,0)
+    for _,pl := range self.plate_locations {
+        if pl.GetLocationName() == position {
+            ret = append(ret, pl)
+        }
+    }
+    if len(ret) == 0 {
+        return nil
+    }
+    return ret[0].GetPlate()
 }
 
 // -------------------------------------------------------------------------------
@@ -289,20 +512,21 @@ type RobotState struct {
 }
 
 type AdaptorParams struct {
-    initial_position    wtype.Coordinates,
-    channels            int,
-    channel_offset      wtype.Coordinates,
+    Initial_position    wtype.Coordinates
+    Independent         bool
+    Channels            int
+    Channel_offset      wtype.Coordinates
 }
 
-func NewRobotState(positions map[string]*wtype.Coordinates,
+func NewRobotState(positions map[string]wtype.Coordinates,
                    adaptors []AdaptorParams) *RobotState {
     rs := RobotState{}
     rs.deck = NewDeckState(positions)
     rs.adaptors = make([]*AdaptorState, 0, len(adaptors))
-    rs.initialised = false
-    rs.finalised = false
+    rs.initialized = false
+    rs.finalized = false
     for _,ap := range adaptors {
-        rs.adaptors = append(rs.adaptors, NewAdaptorState(&rs, ap.initial_position, ap.channels, ap.channel_offset))
+        rs.adaptors = append(rs.adaptors, NewAdaptorState(&rs, ap.Initial_position, ap.Independent, ap.Channels, ap.Channel_offset))
     }
     return &rs
 }
@@ -318,6 +542,11 @@ func (self *RobotState) GetDeck() *DeckState {
 //GetAdaptor
 func (self *RobotState) GetAdaptor(num int) *AdaptorState {
     return self.adaptors[num]
+}
+
+//GetNumberOfAdaptors
+func (self *RobotState) GetNumberOfAdaptors() int {
+    return len(self.adaptors)
 }
 
 //IsInitialized

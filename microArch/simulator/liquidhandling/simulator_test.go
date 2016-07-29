@@ -120,7 +120,7 @@ func TestNewVirtualLiquidHandler_ValidProps(t *testing.T) {
     test := SimulatorTest{"Create Valid VLH", nil, nil, nil, nil, nil}
     test.run(t)
 }
-
+/*
 func TestVLH_AddPlateTo(t *testing.T) {
     tests := []SimulatorTest{
         SimulatorTest{
@@ -187,7 +187,7 @@ func TestVLH_AddPlateTo(t *testing.T) {
 // ########################################################################################################################
 // ########################################################## Tip Loading/Unloading
 // ########################################################################################################################
-
+*/
 func tipTestLayout() *SetupFn {
     var ret SetupFn = func(vlh *lh.VirtualLiquidHandler) {
         vlh.Initialize()
@@ -197,7 +197,7 @@ func tipTestLayout() *SetupFn {
     }
     return &ret
 }
-
+/*
 func TestLoadTips(t *testing.T) {
     tests := []SimulatorTest{
         SimulatorTest{
@@ -1273,4 +1273,4 @@ func Test_Move(t *testing.T) {
     }
 }
 
-
+*/

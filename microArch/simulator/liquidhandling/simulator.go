@@ -23,7 +23,6 @@
 package liquidhandling
 
 import (
-    "io/ioutil"
     "strings"
     "fmt"
 	"github.com/antha-lang/antha/microArch/driver"
@@ -43,41 +42,50 @@ func summariseWell2Channel(well []string, channels []int) string {
 // Simulate a liquid handler Driver
 type VirtualLiquidHandler struct {
     simulator.ErrorReporter
-    properties *liquidhandling.LHProperties 
-    initialized bool
-    finalized   bool
-    log []string
+    state               *RobotState
 }
 
 //Create a new VirtualLiquidHandler which mimics an LHDriver
 func NewVirtualLiquidHandler(props *liquidhandling.LHProperties) *VirtualLiquidHandler {
     var vlh VirtualLiquidHandler
-    vlh.ErrorReporter = *simulator.NewErrorReporter()
-    vlh.initialized = false
-    vlh.finalized   = false
 
-    vlh.properties = props.Dup()
-    vlh.log = make([]string, 0)
+    vlh.validateProperties(props)
+    //if the properties are that bad, don't bother building RobotState
+    if vlh.HasError() {
+        return &vlh
+    }
 
-    vlh.validateProperties()
+    adaptors := make([]AdaptorParams, 0, len(props.Heads))
+    for _,head := range props.Heads {
+        //9mm spacing currently hardcoded. 
+        //At some point we'll either need to fetch this from the driver or
+        //infer it from the type of tipboxes/plates accepted
+        spacing := wtype.Coordinates{0,0,0}
+        if head.Adaptor.Params.Orientation == wtype.LHVChannel {
+            spacing.Y = 9.
+        } else if head.Adaptor.Params.Orientation == wtype.LHVChannel {
+            spacing.X = 9.
+        }
+        adaptors = append(adaptors, AdaptorParams{
+            wtype.Coordinates{0.,0.,0.},
+            head.Adaptor.Params.Independent,
+            head.Adaptor.Params.Multi,
+            wtype.Coordinates{0., 9., 0.}, 
+        })
+    }
+
+    vlh.state = NewRobotState(props.Layout, adaptors)
 
     return &vlh
 }
 
-//Write to the log
-func (self *VirtualLiquidHandler) LogLine(line string) {
-    self.log = append(self.log, line)
+func (self *VirtualLiquidHandler) GetPlateAt(location_name string) interface{} {
+    return self.state.GetDeck().GetPlateAt(location_name)
 }
-
-//save the log
-func (self *VirtualLiquidHandler) SaveLog(filename string) {
-    ioutil.WriteFile(filename, []byte(strings.Join(self.log, "\n")), 0644)
-}
-
 
 // ------------------------------------------------------------------------------- Useful Utilities
 
-func (self *VirtualLiquidHandler) validateProperties() {
+func (self *VirtualLiquidHandler) validateProperties(props *liquidhandling.LHProperties) {
     
     //check a property
     check_prop := func(l []string, name string) {
@@ -87,87 +95,18 @@ func (self *VirtualLiquidHandler) validateProperties() {
         }
         //all locations defined
         for _,loc := range l {
-            if !self.locationIsKnown(loc) {
+            if _, ok := props.Layout[loc]; !ok {
                 self.AddWarningf("NewVirtualLiquidHandler", "Undefined location \"%s\" referenced in %s", loc, name)
             }
         }
     }
 
-    check_prop(self.properties.Tip_preferences, "tip preferences")
-    check_prop(self.properties.Input_preferences, "input preferences")
-    check_prop(self.properties.Output_preferences, "output preferences")
-    check_prop(self.properties.Tipwaste_preferences, "tipwaste preferences")
-    check_prop(self.properties.Wash_preferences, "wash preferences")
-    check_prop(self.properties.Waste_preferences, "waste preferences")
-}
-
-func (self *VirtualLiquidHandler) locationIsKnown(location string) bool {
-    for loc := range self.properties.Layout {
-        if loc == location {
-            return true
-        }
-    }
-    return false
-}
-
-func (self *VirtualLiquidHandler) checkReady(fnName string) {
-    if !self.initialized {
-        self.AddWarning(fnName, "Instruction given before Initialize")
-    }
-    if self.finalized {
-        self.AddWarning(fnName, "Instruction given after Finalize")
-    }
-}
-
-func (self *VirtualLiquidHandler) validateTipArgs(fnname string, 
-                                        channels []int, head, multi int, 
-                                        platetype, position, well []string) bool {
-    //test length of channel, platetype, position, and well
-    wrong_length := make([]string, 0)
-    if len(channels) != multi {
-        wrong_length = append(wrong_length, "channels")
-    }
-    if len(platetype) != multi {
-        wrong_length = append(wrong_length, "platetype")
-    }
-    if len(position) != multi {
-        wrong_length = append(wrong_length, "position")
-    }
-    if len(well) != multi {
-        wrong_length = append(wrong_length, "well")
-    }
-    if len(wrong_length) > 0 {
-        self.AddErrorf(fnname, "%s should be of length multi=%v",
-                strings.Join(wrong_length, ", "),
-                multi)
-        return false
-    }
-
-    //check head exists
-    if head < 0 || head >= len(self.properties.Heads) {
-        self.AddErrorf(fnname, "Request for unknown head %v", head)
-        return false
-    }
-
-    adaptor := self.properties.Heads[head].Adaptor
-
-    //check that channel values are valid and there are no duplicates
-    encountered := map[int]bool{}
-    for _, channel := range channels {
-        if channel < 0 || channel >= adaptor.Params.Multi {
-            self.AddErrorf(fnname, "Cannot load tip to channel %v of %v-channel adaptor", 
-                            channel, adaptor.Params.Multi)
-            return false
-        }
-        if encountered[channel] {
-            self.AddErrorf(fnname, "Channel%v appears more than once", channel)
-            return false
-        } else {
-            encountered[channel] = true
-        }
-    }
-
-    return true
+    check_prop(props.Tip_preferences, "tip preferences")
+    check_prop(props.Input_preferences, "input preferences")
+    check_prop(props.Output_preferences, "output preferences")
+    check_prop(props.Tipwaste_preferences, "tipwaste preferences")
+    check_prop(props.Wash_preferences, "wash preferences")
+    check_prop(props.Waste_preferences, "waste preferences")
 }
 
 func elements_equal(slice []string) bool {
@@ -179,635 +118,377 @@ func elements_equal(slice []string) bool {
     return true
 }
 
-func (self *VirtualLiquidHandler) GetPlateAt(loc string) interface{} {
-    return self.properties.PlateLookup[self.properties.PosLookup[loc]]
+//testSliceLength test that a bunch of slices are the correct length
+func (self *VirtualLiquidHandler) testSliceLength(f_name string, slice_lengths map[string]int, exp_length int) bool {
+    
+    wrong := []string{}
+    for name, actual_length := range slice_lengths {
+        if actual_length != exp_length {
+            wrong = append(wrong, name)
+        }
+    }
+
+    if len(wrong) == 1 {
+        self.AddErrorf(f_name, "Slice %s is not of expected length %v", wrong[0], exp_length)
+        return false
+    } else if len(wrong) > 1 {
+        self.AddErrorf(f_name, "Slices %s are not of expected length %v", strings.Join(wrong, ","), exp_length)
+        return false
+    }
+    return true
 }
 
-func (self *VirtualLiquidHandler) GetHead(head int) *wtype.LHHead {
-    return self.properties.Heads[head]
+//getAdaptorState
+func (self *VirtualLiquidHandler) getAdaptorState(f_name string, h int) *AdaptorState {
+    if h < 0 || h >= self.state.GetNumberOfAdaptors() {
+        self.AddErrorf(f_name, "Unknown head %v", h)
+        return nil
+    }
+    return self.state.GetAdaptor(h)
 }
 
-func (self *VirtualLiquidHandler) GetHeadAdaptor(head int) *wtype.LHAdaptor {
-    return self.properties.Heads[head].Adaptor
+func (self *VirtualLiquidHandler) GetAdaptorState(head int) *AdaptorState {
+    return self.state.GetAdaptor(head)
 }
+
+//testTipArgs check that load/unload tip arguments are valid insofar as they won't crash in RobotState
+func (self *VirtualLiquidHandler) testTipArgs(f_name string, channels []int, head, multi int, 
+                                           platetype, position, well []string) bool {
+    //head should exist
+    adaptor := self.getAdaptorState(f_name, head)
+    if adaptor == nil {
+        return false
+    }
+
+    n_channels := adaptor.GetChannelCount()
+    ret := true
+
+    if multi != n_channels {
+        self.AddErrorf(f_name, "Argument multi does not equal the number of adaptor channels (%v != %v)", multi, n_channels)
+        ret = false
+    }
+
+    bad_channels := []string{}
+    for _,ch := range channels {
+        if ch < 0 || ch >= n_channels {
+            bad_channels = append(bad_channels, fmt.Sprintf("%v", ch))
+        }
+    }
+    if len(bad_channels) == 1 {
+        self.AddErrorf(f_name, "Unknown channel \"%v\"", bad_channels[0])
+        ret = false
+    } else if len(bad_channels) > 1 {
+        self.AddErrorf(f_name, "Unknown channels \"%v\"", strings.Join(bad_channels, "\",\""))
+        ret = false
+    }
+
+    ret = ret && self.testSliceLength(f_name, map[string]int {
+                                                            "platetype": len(platetype),
+                                                            "position": len(position),
+                                                            "well": len(well)}, 
+                                      n_channels)
+    return ret
+}
+
 
 // ------------------------------------------------------------------------ ExtendedLHDriver
 
 //Move command - used
 func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []string, reference []int, 
-                                       offsetX, offsetY, offsetZ []float64, plate_type []string, 
+                                       offsetX, offsetY, offsetZ []float64, platetype []string, 
                                        head int) driver.CommandStatus {
-    self.checkReady("Move")
-    self.LogLine(fmt.Sprintf(`Move(
-    deckposition = %v,
-    wellcoords = %v,
-    reference = %v,
-    offsetX,Y,Z = (%v, %v, %v),
-    plate_type = %v,
-    head = %v)`, deckposition, wellcoords, reference, offsetX, offsetY, offsetZ, plate_type, head))
-    
     ret := driver.CommandStatus{true, driver.OK, "MOVE ACK"}
 
-    if head < 0 || head >= len(self.properties.Heads) {
-        self.AddErrorf("Move", "Unknown head %v", head)
-        return ret
-    }
-    adaptor := self.GetHeadAdaptor(head)
-
-    multi := len(deckposition)
-    if (len(wellcoords) != multi || len(reference) != multi || len(offsetX) != multi ||
-            len(offsetY) != multi || len(offsetZ) != multi || len(plate_type) != multi) {
-        self.AddError("Move", "Deckposition, wellcoords, reference, offsetX,Y,Z, and plate_type should be the same length")
+    //get the adaptor
+    adaptor := self.getAdaptorState("Move", head)
+    if adaptor == nil {
         return ret
     }
 
-    //which items in the list are nil (this allows channels to be off the edge of the plate)
-    isNil := make(map[int]bool)
-    for i := range wellcoords {
-        isNil[i] = wellcoords[i] == nil
-    }
-    
-    plates := make(map[string]interface{})
-    for _,dp := range deckposition {
-        if dp == "" {
-            continue
+    if self.testSliceLength("Move", map[string]int{
+            "deckposition": len(deckposition),
+            "wellcoords":   len(wellcoords),
+            "reference":    len(reference),
+            "offsetX":      len(offsetX),
+            "offsetY":      len(offsetY),
+            "offsetZ":      len(offsetZ),
+            "plate_type":   len(platetype)},
+            adaptor.GetChannelCount()) {
+        offset := make([]wtype.Coordinates, adaptor.GetChannelCount())
+        typed_ref := make([]wtype.WellReference, adaptor.GetChannelCount())
+        for i := range offset {
+            offset[i].X = offsetX[i]
+            offset[i].Y = offsetY[i]
+            offset[i].Z = offsetZ[i]
+            //should already have happened...
+            switch reference[i] {
+                case 0:
+                    typed_ref[i] = wtype.BottomReference
+                case 1:
+                    typed_ref[i] = wtype.TopReference
+                case 2:
+                    typed_ref[i] = wtype.LiquidReference
+                default:
+                    panic("invalid reference")
+            }
         }
-        if !self.locationIsKnown(dp) {
-            self.AddErrorf("Move", "Unknown location \"%s\"", dp)
-            return ret
-        }
-        if plates[dp] == nil {
-            plates[dp] = self.GetPlateAt(dp)
-        }
-    }
 
-    if !adaptor.Params.Independent && len(plates) > 1 {
-        self.AddErrorf("Move", "Cannot move to multiple locations as adaptor is not independent")
-    }
-
-    //check that plate_type makes sense
-    for i := range plate_type {
-        if plate_type[i] == "" {
-            continue
-        }
-        if plates[deckposition[i]] == nil || plates[deckposition[i]].(wtype.Typed).GetType() != plate_type[i] {
-            self.AddErrorf("Move", "Location \"%s\" has no plate of type \"%s\"", deckposition[i], plate_type[i])
-            return ret
+        if err := adaptor.Move(platetype, deckposition, wellcoords, typed_ref, offset); err != nil {
+            self.AddError("Move", err.Error())
         }
     }
 
-    //check references
-    for _,r := range reference {
-        if r < 0 || r > 1 {
-            self.AddErrorf("Move", "Invalid reference %v", r)
-        }
-        if !adaptor.Params.Independent && r != reference[0] {
-            self.AddError("Move", "References must be equal as adaptor is not independent")
-        }
-    }
-
-
-    
     return ret
 }
 
 //Move raw - not yet implemented in compositerobotinstruction
 func (self *VirtualLiquidHandler) MoveRaw(head int, x, y, z float64) driver.CommandStatus {
-    self.checkReady("MoveRaw")
-    self.LogLine(fmt.Sprintf(`MoveRaw(
-    head = %v,
-    offsetX,Y,Z = (%v, %v, %v))`, head, x,y,z))
-    //Asserts:
-    //head exists
-    //x,y,x are within the machine
+    self.AddWarning("MoveRaw", "Not yet implemented")
     return driver.CommandStatus{true, driver.OK, "MOVERAW ACK"}
 }
 
 //Aspirate - used
 func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, head int, multi int, 
                                            platetype []string, what []string, llf []bool) driver.CommandStatus {
-    self.checkReady("Aspirate")
-    self.LogLine(fmt.Sprintf(`Aspirate(
-    volume = %v,
-    overstroke = %v,
-    head = %v,
-    multi = %v,
-    platetype = %v,
-    what = %v,
-    llf = %v)`, volume, overstroke, head, multi, platetype, what, llf))
-    //volumes are equal if adapter isn't independent
-    //tips are loaded in each adapter location the aspirates
-    //volume is smaller that the tips' maximum capacity
-    //the tip hasn't been used for a different liquid
-    //head exists
-    //multi matches number of tips loaded
-    //platetype matches the plate at the location we moved to
-    //what matches the expected liquid class
-    //llf is the right size, cannot vary unless independent
+    self.AddWarning("Aspirate", "Not yet implemented")
     return driver.CommandStatus{true, driver.OK, "ASPIRATE ACK"}
 }
 
 //Dispense - used
 func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, head int, multi int, 
                                            platetype []string, what []string, llf []bool) driver.CommandStatus {
-    self.checkReady("Dispense")
-    self.LogLine(fmt.Sprintf(`Dispense(
-    volume = %v,
-    blowout = %v,
-    head = %v,
-    multi = %v,
-    platetype = %v,
-    what = %v,
-    llf = %v)`, volume, blowout, head, multi, platetype, what, llf))
-    //Volumes are equal if adapter isn't indepentent
-    //Volumes are at most equal to the volume in the tip
-    //blowout is the right length
-    //head exists
-    //multi is valid
-    //platetype matches the type of plate that we're next to
-    //what matches the liquid class that was aspirated
-    //llf is the right size and follows independence constraint
+    self.AddWarning("Dispense", "Not yet implemented")
     return driver.CommandStatus{true, driver.OK, "DISPENSE ACK"}
 }
 
 //LoadTips - used
 func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int, 
                                            platetype, position, well []string) driver.CommandStatus {
-    self.checkReady("LoadTips")
-    self.LogLine(fmt.Sprintf(`LoadTips(
-    channels = %v,
-    head = %v,
-    multi = %v,
-    platetype = %v,
-    position = %v,
-    well = %v)`, channels, head, multi, platetype, position, well))
     ret := driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
-    
-    ok := self.validateTipArgs("LoadTips", channels, head, multi, platetype, position, well)
-    if !ok {
+
+    //check that RobotState won't crash
+    if !self.testTipArgs("LoadTips", channels, head, multi, platetype, position, well) {
         return ret
     }
 
-    if !elements_equal(position) {
-        self.AddError("LoadTips", "Cannot load tips from multiple locations")
-        return ret
-    }
-    if !elements_equal(platetype) {
-        self.AddError("LoadTips", "platetype should be equal")
-        return ret
+    if err := self.state.GetAdaptor(head).LoadTips(platetype, position, well); err != nil {
+        self.AddError("LoadTips", err.Error())
     }
 
-    
-    is_in_channels := map[int]bool{}
-    for _,c := range channels {
-        is_in_channels[c] = true
-    }
+    //TODO: Check that tips were loaded onto the specified channels
 
-    adaptor := self.properties.Heads[head].Adaptor
-    tipbox, ok := self.properties.PlateLookup[self.properties.PosLookup[position[0]]].(*wtype.LHTipbox)
-    if !ok {
-        self.AddErrorf("LoadTips", "No tipbox found at location \"%s\"", position[0])
-        return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
-    }
-    if platetype[0] != tipbox.Type {
-        self.AddErrorf("LoadTips", "Requested plate type \"%s\" but plate at %s is of type \"%s\"", platetype[0], position[0], tipbox.Type)
-        return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
-    }
-
-    //check that the adapter is empty
-    if adaptor.NTipsLoaded() != 0 {
-        //because not having a ternary operator is so cool.
-        stip := "tip"
-        if adaptor.NTipsLoaded() > 1 {
-            stip = "tips"
-        }
-        self.AddErrorf("LoadTips", "Cannot load tips while adaptor already contains %v %s", 
-                adaptor.NTipsLoaded(), stip)
-        return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
-    }
-
-    //check that well is valid
-    wellcoords := make([]wtype.WellCoords, multi)
-    wc_ok := true
-    for i := range well {
-        wellcoords[i] = wtype.MakeWellCoords(well[i])
-        
-        //check range
-        if wellcoords[i].IsZero() {
-            self.AddErrorf("LoadTips", "Couldn't parse well \"%s\"", well[i])
-            wc_ok = false
-            continue
-        }
-        if !tipbox.ContainsCoords(&wellcoords[i]) {
-            self.AddErrorf("LoadTips", "Request for well %s, but tipbox size is [%vx%v]", well[i], tipbox.Ncols, tipbox.Nrows)
-            wc_ok = false
-            continue
-        }
-    }
-    if !wc_ok {
-        return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
-    }
-
-    //Check that the head origin is sane
-    head_origin_ := make([]wtype.WellCoords, multi)
-    for i,wc := range wellcoords {
-        head_origin_[i] = wc
-        if adaptor.Params.Orientation == wtype.LHVChannel {
-            head_origin_[i].Y -= channels[i]
-        } else if adaptor.Params.Orientation == wtype.LHHChannel {
-            head_origin_[i].X -= channels[i]
-        }
-    }
-    head_origin := head_origin_[0]
-    origins_equal := true
-    for _,o := range head_origin_ {
-        origins_equal = origins_equal && head_origin.Equals(o)
-    }
-    if !origins_equal {
-        self.AddErrorf("LoadTips", "Cannot load %s, tip spacing doesn't match channel spacing",
-                summariseWell2Channel(well, channels))
-        return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
-    }
-   
-    //check for tip collisions on other channels
-    if !adaptor.Params.Independent {
-        collisions := []string{}
-        for i := 0; i < adaptor.Params.Multi; i++ {
-            pos := head_origin
-            if adaptor.Params.Orientation == wtype.LHVChannel {
-                pos.Y += i
-            } else if adaptor.Params.Orientation == wtype.LHHChannel {
-                pos.X += i
-            }
-            
-            //if there's a tip at this location, and we don't intend to pick it up, and the adaptor is not independent
-            if tipbox.HasTipAt(&pos) && !is_in_channels[i] {
-               collisions = append(collisions, pos.FormatA1()) 
-            }
-        }
-        if len(collisions) > 0 {
-            stip := "tip"
-            if len(collisions) > 1 {
-                stip = "tips"
-            }
-            self.AddErrorf("LoadTips", "Cannot load %s due to %s at %s (Head%v is not independent)",
-                    summariseWell2Channel(well, channels), stip, strings.Join(collisions, ","), head)
-        }
-    }
-
-
-    //if we found an error, bail on the operation
-    if self.HasError() {
-        return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
-    }
-    
-    //move the tips from the plate and add them to the adaptor
-    var tip *wtype.LHTip
-    for i := range well {
-        
-        tip = tipbox.Tips[wellcoords[i].X][wellcoords[i].Y]
-        if tip == nil {
-            self.AddErrorf("LoadTips", "Cannot load %s->channel%v as %s is empty", well[i], channels[i], well[i])
-            continue
-        }
-        tipbox.Tips[wellcoords[i].X][wellcoords[i].Y] = nil
-        adaptor.AddTip(channels[i], tip)
-    }
-
-    return driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
+    return ret
 }
 
 //UnloadTips - used
 func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int, 
                                              platetype, position, well []string) driver.CommandStatus {
-    self.checkReady("UnloadTips")
-    self.LogLine(fmt.Sprintf(`UnloadTips(
-    channels = %v,
-    head = %v,
-    multi = %v,
-    platetype = %v,
-    position = %v,
-    well = %v)`, channels, head, multi, platetype, position, well))
+    ret := driver.CommandStatus{true, driver.OK, "UNLOADTIPS ACK"}
 
-    ret := driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
-    
-    ok := self.validateTipArgs("UnloadTips", channels, head, multi, platetype, position, well)
-    if !ok {
+    //check that RobotState won't crash
+    if !self.testTipArgs("UnloadTips", channels, head, multi, platetype, position, well) {
         return ret
     }
 
-    if !elements_equal(position) {
-        self.AddError("UnloadTips", "Cannot unload tips to multiple locations")
-        return ret
-    }
-    if !elements_equal(platetype) {
-        self.AddError("UnloadTips", "platetype should be equal")
-        return ret
-    }
-    for _,w := range well {
-        wc := wtype.MakeWellCoords(w)
-        if wc.X != 0 || wc.Y != 0 {
-            self.AddErrorf("UnloadTips", "Tipwaste at \"%s\" has no well %s", position[0], w)
-        }
+    if err := self.state.GetAdaptor(head).LoadTips(platetype, position, well); err != nil {
+        self.AddError("UnloadTips", err.Error())
     }
 
-    adaptor := self.properties.Heads[head].Adaptor
-    tipwaste, ok := self.properties.PlateLookup[self.properties.PosLookup[position[0]]].(*wtype.LHTipwaste)
-    if !ok {
-        self.AddErrorf("UnloadTips", "No tipwaste found at location \"%s\"", position[0])
-        return ret
-    }
-    if platetype[0] != tipwaste.Type {
-        self.AddErrorf("UnloadTips", "Requested plate type \"%s\" but plate at %s is of type \"%s\"", platetype[0], position[0], tipwaste.Type)
-        return ret
-    }
-
-    //if not independent, check we're unloading all tips
-    if !adaptor.Params.Independent && len(channels) < adaptor.NTipsLoaded() {
-        channel_str := "channel"
-        if len(channels) > 1 {
-            channel_str = "channels"
-        }
-        channels_str := []string{}
-        for _,ch := range channels {
-            channels_str = append(channels_str, fmt.Sprintf("%v", ch))
-        }
-        self.AddErrorf("UnloadTips", "Cannot unload tips from Head%v(%s %s) due to other tips on the adaptor (independent is false)",
-            head,
-            channel_str,
-            strings.Join(channels_str, ","))
-        return ret
-    }
-
-    //check there's a tip at every channel we want to unload
-    channel_errors := []string{}
-    for _,ch :=  range channels {
-        if !adaptor.IsTipLoaded(ch) {
-            channel_errors = append(channel_errors, fmt.Sprintf("%v", ch))
-        }
-    }
-    if len(channel_errors) > 0 {
-        if len(channel_errors) > 1 {
-            self.AddErrorf("UnloadTips", "Cannot unload tips from channels %s as no tips are loaded there",
-                strings.Join(channel_errors, ","))
-
-        } else {
-            self.AddErrorf("UnloadTips", "Cannot unload tip from channel %s as no tip is loaded there",
-                channel_errors[0])
-        }
-    }
-
-    //Actually unload the adaptor
-    for _,ch := range channels {
-        adaptor.RemoveTip(ch)
-    }
-    if !tipwaste.Dispose(len(channels)) {
-        self.AddErrorf("UnloadTips", "Tipwaste at \"%s\" is overfull", position[0])
-    }
+    //TODO: check that specified channels have no tips, any other tips remain
 
     return ret
 }
 
 //SetPipetteSpeed - used
 func (self *VirtualLiquidHandler) SetPipetteSpeed(head, channel int, rate float64) driver.CommandStatus {
-    self.checkReady("SetPipetteSpeed")
-    self.LogLine(fmt.Sprintf(`SetPipetteSpeed(
-    head = %v,
-    channel = %v,
-    rate = %v)`, head, channel, rate))
-    //head exists
-    //channel exists
-    //speed is within allowable range
+    self.AddWarning("SetPipetteSpeed", "Not yet implemented")
     return driver.CommandStatus{true, driver.OK, "SETPIPETTESPEED ACK"}
 }
 
 //SetDriveSpeed - used
 func (self *VirtualLiquidHandler) SetDriveSpeed(drive string, rate float64) driver.CommandStatus {
-    self.checkReady("SetDriveSpeed")
-    self.LogLine(fmt.Sprintf(`SetDriveSpeed(
-    drive = %v,
-    rate = %v)`, drive, rate))
-    //drive string?
-    //rate is within allowable range (what is this?)
+    self.AddWarning("SetDriveSpeed", "Not yet implemented")
     return driver.CommandStatus{true, driver.OK, "SETDRIVESPEED ACK"}
 }
 
 //Stop - unused
 func (self *VirtualLiquidHandler) Stop() driver.CommandStatus {
-    panic("unimplemented")
+    self.AddWarning("Stop", "Not yet implemented")
+    return driver.CommandStatus{true, driver.OK, "STOP ACK"}
 }
 
 //Go - unused
 func (self *VirtualLiquidHandler) Go() driver.CommandStatus {
-    self.checkReady("Go")
-    panic("unimplemented")
+    self.AddWarning("Go", "Not yet implemented")
+    return driver.CommandStatus{true, driver.OK, "GO ACK"}
 }
 
 //Initialize - used
 func (self *VirtualLiquidHandler) Initialize() driver.CommandStatus {
-    self.LogLine("Initialize()")
-    if self.initialized {
-        self.AddWarningf("Initialize", "Multiple calls to Initialize")
-    } else {
-        self.initialized = true
+    err := self.state.Initialize()
+    if err != nil {
+        self.AddError("Initialize", err.Error())
     }
     return driver.CommandStatus{true, driver.OK, "INITIALIZE ACK"}
 }
 
 //Finalize - used
 func (self *VirtualLiquidHandler) Finalize() driver.CommandStatus {
-    self.LogLine("Finalize()")
-    //check that this is called last, no more calls
-    if self.finalized {
-        self.AddWarningf("Finalize", "Multiple calls to Finalize")
-    } else {
-        self.finalized = true
+    err := self.state.Finalize()
+    if err != nil {
+        self.AddError("Finalize", err.Error())
     }
     return driver.CommandStatus{true, driver.OK, "FINALIZE ACK"}
 }
 
 //Wait - used
 func (self *VirtualLiquidHandler) Wait(time float64) driver.CommandStatus {
-    self.checkReady("Wait")
-    self.LogLine(fmt.Sprintf(`Wait(time = %v)`, time))
-    //time is positive
-    //maybe a warning if it's super-long
+    self.AddWarning("Wait", "Not yet implemented")
     return driver.CommandStatus{true, driver.OK, "WAIT ACK"}
 }
 
 //Mix - used
 func (self *VirtualLiquidHandler) Mix(head int, volume []float64, platetype []string, cycles []int, 
                                       multi int, what []string, blowout []bool) driver.CommandStatus {
-    self.checkReady("Mix")
-    self.LogLine(fmt.Sprintf(`Mix(
-    head = %v,
-    volume = %v,
-    platetype = %v,
-    cycles = %v,
-    multi = %v,
-    what = %v,
-    blowout = %v)`, head, volume, platetype, cycles, multi, what, blowout))
-    //head exists
-    //volume is lte volume in wells
-    //platetype matches the plate we're over
-    //muli is correct
-    //what matches expected liquidclass
-    //volume, platetype, what, blowout match independence constraint
+    self.AddWarning("Mix", "Not yet implemented")
     return driver.CommandStatus{true, driver.OK, "MIX ACK"}
 }
 
 //ResetPistons - used
 func (self *VirtualLiquidHandler) ResetPistons(head, channel int) driver.CommandStatus {
-    self.checkReady("ResetPistons")
-    self.LogLine("ResetPistons()")
-    //head exists
-    //channel exists
-    //what does this do again? probably need to make sure it gets called appropriately
+    self.AddWarning("ResetPistons", "Not yet implemented")
     return driver.CommandStatus{true, driver.OK, "RESETPISTONS ACK"}
 }
 
 //AddPlateTo - used
 func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{}, name string) driver.CommandStatus {
-    self.checkReady("AddPlateTo")
-    self.LogLine(fmt.Sprintf(`AddPlateTo(
-    position = %v,
-    plate = %v,
-    name = %v)`, position, plate, name))
-    //check that the requested position exists
-    if !self.locationIsKnown(position) {
-        self.AddWarningf("AddPlateTo", "Adding plate \"%s\" to unknown location \"%s\"", name, position)
-    }
-    //check that the requested position is empty
-    if self.properties.PosLookup[position] != "" {
-        self.AddErrorf("AddPlateTo", "Cannot add plate \"%s\" to location \"%s\" which is already occupied by plate \"%s\"", 
-                name, 
-                position, 
-                self.properties.PlateLookup[self.properties.PosLookup[position]].(wtype.Named).GetName())
-    } else {
-        //position can accept a plate of this type
-        switch plate := plate.(type) {
-        case *wtype.LHPlate:
-            plate.PlateName = name
-            self.properties.AddPlate(position, plate)
-        case *wtype.LHTipbox:
-            plate.Boxname = name
-            self.properties.AddTipBoxTo(position, plate)
-        case *wtype.LHTipwaste:
-            plate.Type = name
-            self.properties.AddTipWasteTo(position, plate)
 
-        default:
-            self.AddErrorf("AddPlateTo", "Cannot add plate \"%s\" of type %T to location \"%s\"", name, plate, position)
+    if _, ok := plate.(wtype.LHDeckObject); ok {
+    
+        if self.state.GetDeck().HasPosition(position) {
+            if !self.state.GetDeck().AddPlateToNamed(name, plate, position) {
+                self.AddErrorf("Couldn't add plate \"%s\" to location \"%s\"", name, position)
+            }
+        } else {
+            self.AddErrorf("Unknown location \"%s\"", position)
         }
+    } else {
+        self.AddErrorf("Couldn't add plate called \"%s\" of type %T", name, plate) 
     }
+
     return driver.CommandStatus{true, driver.OK, "ADDPLATETO ACK"}
 }
 
 //RemoveAllPlates - used
 func (self *VirtualLiquidHandler) RemoveAllPlates() driver.CommandStatus {
-    self.checkReady("RemoveAllPlates")
-    self.LogLine("RemoveAllPlates()")
-    //remove plates, no checks required.
+    self.AddWarning("RemoveAllPlates", "Not yet implemented")
     return driver.CommandStatus{true, driver.OK, "REMOVEALLPLATES ACK"}
 }
 
 //RemovePlateAt - unused
 func (self *VirtualLiquidHandler) RemovePlateAt(position string) driver.CommandStatus {
-    self.LogLine(fmt.Sprintf("RemovePlateAt(position = %v)", position))
-    //plate exists at position
+    self.AddWarning("RemovePlateAt", "Not yet implemented")
     return driver.CommandStatus{true, driver.OK, "REMOVEPLATEAT ACK"}
 }
 
 //SetPositionState - unused
 func (self *VirtualLiquidHandler) SetPositionState(position string, state driver.PositionState) driver.CommandStatus {
-    panic("unimplemented")
+    self.AddWarning("SetPositionState", "Not yet implemented")
+    return driver.CommandStatus{true, driver.OK, "SETPOSITIONSTATE ACK"}
 }
 
 //GetCapabilites - used
 func (self *VirtualLiquidHandler) GetCapabilities() (liquidhandling.LHProperties, driver.CommandStatus) {
-    self.checkReady("GetCapabilities")
-    self.LogLine("GetCapabilities()")
-    //no checks required
-    return *self.properties, driver.CommandStatus{true, driver.OK, ""} 
+    self.AddWarning("SetPositionState", "Not yet implemented")
+    return liquidhandling.LHProperties{}, driver.CommandStatus{true, driver.OK, "GETCAPABILITIES ACK"}
 }
 
 //GetCurrentPosition - unused
 func (self *VirtualLiquidHandler) GetCurrentPosition(head int) (string, driver.CommandStatus) {
-    panic("unimplemented")
+    self.AddWarning("GetCurrentPosition", "Not yet implemented")
+    return "", driver.CommandStatus{true, driver.OK, "GETCURRNETPOSITION ACK"}
 }
 
 //GetPositionState - unused
 func (self *VirtualLiquidHandler) GetPositionState(position string) (string, driver.CommandStatus) {
-    panic("unimplemented")
+    self.AddWarning("GetPositionState", "Not yet implemented")
+    return "", driver.CommandStatus{true, driver.OK, "GETPOSITIONSTATE ACK"}
 }
 
 //GetHeadState - unused
 func (self *VirtualLiquidHandler) GetHeadState(head int) (string, driver.CommandStatus) {
-    panic("unimplemented")
+    self.AddWarning("GetHeadState", "Not yet implemented")
+    return "I'm fine thanks, how are you?", driver.CommandStatus{true, driver.OK, "GETHEADSTATE ACK"}
 }
 
 //GetStatus - unused
 func (self *VirtualLiquidHandler) GetStatus() (driver.Status, driver.CommandStatus) {
-    panic("unimplemented")
+    self.AddWarning("GetStatus", "Not yet implemented")
+    return driver.Status{}, driver.CommandStatus{true, driver.OK, "GETSTATUS ACK"}
 }
 
 //UpdateMetaData - used
 func (self *VirtualLiquidHandler) UpdateMetaData(props *liquidhandling.LHProperties) driver.CommandStatus {
-    self.checkReady("UpdateMetaData")
-    self.LogLine("UpdateMetaData(props *LHProperties)")
-    //check that the props and self.props are the same...
+    self.AddWarning("UpdateMetaData", "Not yet implemented")
     return driver.CommandStatus{true, driver.OK, "UPDATEMETADATA ACK"}
 }
 
 //UnloadHead - unused
 func (self *VirtualLiquidHandler) UnloadHead(param int) driver.CommandStatus {
-    panic("unimplemented")
+    self.AddWarning("UnloadHead", "Not yet implemented")
+    return driver.CommandStatus{true, driver.OK, "UNLOADHEAD ACK"}
 }
 
 //LoadHead - unused
 func (self *VirtualLiquidHandler) LoadHead(param int) driver.CommandStatus {
-    panic("unimplemented")
+    self.AddWarning("LoadHead", "Not yet implemented")
+    return driver.CommandStatus{true, driver.OK, "LOADHEAD ACK"}
 }
 
 //Lights On - not implemented in compositerobotinstruction
 func (self *VirtualLiquidHandler) LightsOn() driver.CommandStatus {
-    panic("unimplemented")
+    return driver.CommandStatus{true, driver.OK, "LIGHTSON ACK"}
 }
 
 //Lights Off - notimplemented in compositerobotinstruction
 func (self *VirtualLiquidHandler) LightsOff() driver.CommandStatus {
-    panic("unimplemented")
+    return driver.CommandStatus{true, driver.OK, "LIGHTSOFF ACK"}
 }
 
 //LoadAdaptor - notimplemented in CRI
 func (self *VirtualLiquidHandler) LoadAdaptor(param int) driver.CommandStatus {
-    panic("unimplemented")
+    self.AddWarning("LoadAdaptor", "Not yet implemented")
+    return driver.CommandStatus{true, driver.OK, "LOADADAPTOR ACK"}
 }
 
 //UnloadAdaptor - notimplemented in CRI
 func (self *VirtualLiquidHandler) UnloadAdaptor(param int) driver.CommandStatus {
-    panic("unimplemented")
+    self.AddWarning("UnloadAdaptor", "Not yet implemented")
+    return driver.CommandStatus{true, driver.OK, "UNLOADADAPTOR ACK"}
 }
 
 //Open - notimplemented in CRI
 func (self *VirtualLiquidHandler) Open() driver.CommandStatus {
-    panic("unimplemented")
+    self.AddWarning("Open", "Not yet implemented")
+    return driver.CommandStatus{true, driver.OK, "OPEN ACK"}
 }
 
 //Close - notimplement in CRI
 func (self *VirtualLiquidHandler) Close() driver.CommandStatus {
-    panic("unimplemented")
+    self.AddWarning("Close", "Not yet implemented")
+    return driver.CommandStatus{true, driver.OK, "CLOSE ACK"}
 }
 
 //Message - unused
 func (self *VirtualLiquidHandler) Message(level int, title, text string, showcancel bool) driver.CommandStatus {
-    panic("unimplemented")
+    self.AddWarning("Message", "Not yet implemented")
+    return driver.CommandStatus{true, driver.OK, "MESSAGE ACK"}
 }
 
 //GetOutputFile - used, but not in instruction stream
 func (self *VirtualLiquidHandler) GetOutputFile() (string, driver.CommandStatus) {
-    //Probably won't get called on the simulator just yet...
-    panic("unimplemented")
+    self.AddWarning("GetOutputFile", "Not yet implemented")
+    return "You forgot to say 'please'", driver.CommandStatus{true, driver.OK, "GETOUTPUTFILE ACK"}
 }
 
 
