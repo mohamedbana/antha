@@ -199,24 +199,27 @@ func tipTestLayout() *SetupFn {
 }
 
 func TestLoadTips(t *testing.T) {
+
+    mtp := moveToParams {
+        8, //Multi           int
+        0, //Head            int
+        1, //Reference       int
+        "tipbox_1", //Deckposition    string
+        "tipbox",   //Platetype       string
+        []float64{0.,0.,5.},//Offset          wtype.Coords
+        12, //Cols            int
+        8, //Rows            int
+    }
+
     tests := []SimulatorTest{
         SimulatorTest{
             "OK - single tip",
             nil,
             []*SetupFn{
                 tipTestLayout(),
+                moveTo(7,11,mtp),
             },
             []TestRobotInstruction{
-                &Move{
-                    []string{"tipbox_1","","","","","","","",},   //deckposition 
-                    []string{"H12","","","","","","","",},        //wellcoords   
-                    []int{1,1,1,1,1,1,1,1},                       //top reference    
-                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,},          //offsetX      
-                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,},          //offsetY      
-                    []float64{5.,5.,5.,5.,5.,5.,5.,5.,},          //offsetZ      
-                    []string{"tipbox","","","","","","","",},     //plate_type   
-                    0,                                            //head         
-                },
                 &LoadTips{
                     []int{0},               //channels
                     0,                      //head
@@ -239,18 +242,9 @@ func TestLoadTips(t *testing.T) {
             nil,
             []*SetupFn{
                 tipTestLayout(),
+                moveTo(-7,0,mtp),
             },
             []TestRobotInstruction{
-                &Move{
-                    []string{"","","","","","","","tipbox_1",}, //deckposition 
-                    []string{"","","","","","","","A1",},       //wellcoords   
-                    []int{1,1,1,1,1,1,1,1},                     //top reference    
-                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,},        //offsetX      
-                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,},        //offsetY      
-                    []float64{5.,5.,5.,5.,5.,5.,5.,5.,},        //offsetZ      
-                    []string{"","","","","","","","tipbox",},   //plate_type   
-                    0,                                          //head         
-                },
                 &LoadTips{
                     []int{7},                                   //channels
                     0,                                          //head
@@ -274,18 +268,9 @@ func TestLoadTips(t *testing.T) {
             []*SetupFn{
                 tipTestLayout(),
                 removeTipboxTips("tipbox_1", []string{"H12"}),
+                moveTo(6,11,mtp),
             },
             []TestRobotInstruction{
-                &Move{
-                    []string{"tipbox_1","","","","","","","",},   //deckposition 
-                    []string{"G12","","","","","","","",},        //wellcoords   
-                    []int{1,1,1,1,1,1,1,1},                       //top reference    
-                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,},          //offsetX      
-                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,},          //offsetY      
-                    []float64{5.,5.,5.,5.,5.,5.,5.,5.,},          //offsetZ      
-                    []string{"tipbox","","","","","","","",},     //plate_type   
-                    0,                                            //head         
-                },
                 &LoadTips{
                     []int{0},               //channels
                     0,                      //head
@@ -309,18 +294,9 @@ func TestLoadTips(t *testing.T) {
             []*SetupFn{
                 tipTestLayout(),
                 removeTipboxTips("tipbox_1", []string{"A1"}),
+                moveTo(-6,0,mtp),
             },
             []TestRobotInstruction{
-                &Move{
-                    []string{"","","","","","","","tipbox_1",}, //deckposition 
-                    []string{"","","","","","","","B1",},       //wellcoords   
-                    []int{1,1,1,1,1,1,1,1},                     //top reference    
-                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,},        //offsetX      
-                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,},        //offsetY      
-                    []float64{5.,5.,5.,5.,5.,5.,5.,5.,},        //offsetZ      
-                    []string{"","","","","","","","tipbox",},   //plate_type   
-                    0,                                          //head         
-                },
                 &LoadTips{
                     []int{7},                                   //channels
                     0,                                          //head
@@ -343,18 +319,9 @@ func TestLoadTips(t *testing.T) {
             nil,
             []*SetupFn{
                 tipTestLayout(),
+                moveTo(5,11,mtp),
             },
             []TestRobotInstruction{
-                &Move{
-                    []string{"tipbox_1","tipbox_1","tipbox_1","","","","","",}, //deckposition 
-                    []string{"F12","G12","H12","","","","","",},                //wellcoords   
-                    []int{1,1,1,1,1,1,1,1},                                     //top reference    
-                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,},                        //offsetX      
-                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,},                        //offsetY      
-                    []float64{5.,5.,5.,5.,5.,5.,5.,5.,},                        //offsetZ      
-                    []string{"tipbox","tipbox","tipbox","","","","","",},       //plate_type   
-                    0,                                                          //head         
-                },
                 &LoadTips{
                     []int{0,1,2},                                               //channels
                     0,                                                          //head
@@ -377,18 +344,9 @@ func TestLoadTips(t *testing.T) {
             nil,
             []*SetupFn{
                 tipTestLayout(),
+                moveTo(-5,0,mtp),
             },
             []TestRobotInstruction{
-                &Move{
-                    []string{"","","","","","tipbox_1","tipbox_1","tipbox_1",}, //deckposition 
-                    []string{"","","","","","A1","B1","C1",},                //wellcoords   
-                    []int{1,1,1,1,1,1,1,1},                                     //top reference    
-                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,},                        //offsetX      
-                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,},                        //offsetY      
-                    []float64{5.,5.,5.,5.,5.,5.,5.,5.,},                        //offsetZ      
-                    []string{"","","","","","tipbox","tipbox","tipbox",},       //plate_type   
-                    0,                                                          //head         
-                },
                 &LoadTips{
                     []int{5,6,7},                                               //channels
                     0,                                                          //head
@@ -411,18 +369,9 @@ func TestLoadTips(t *testing.T) {
             independent_lhproperties(),
             []*SetupFn{
                 tipTestLayout(),
+                moveTo(0,0,mtp),
             },
             []TestRobotInstruction{
-                &Move{
-                    []string{"tipbox_1","","","","tipbox_1","","","tipbox_1",}, //deckposition 
-                    []string{"A1","","","","E1","","","H1",},                   //wellcoords   
-                    []int{1,1,1,1,1,1,1,1},                                     //top reference    
-                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,},                        //offsetX      
-                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,},                        //offsetY      
-                    []float64{5.,5.,5.,5.,5.,5.,5.,5.,},                        //offsetZ      
-                    []string{"tipbox","","","","tipbox","","","tipbox",},       //plate_type   
-                    0,                                                          //head         
-                },
                 &LoadTips{
                     []int{0,4,7},                                               //channels
                     0,                                                          //head
@@ -445,18 +394,9 @@ func TestLoadTips(t *testing.T) {
             nil,
             []*SetupFn{
                 tipTestLayout(),
+                moveTo(0,11,mtp),
             },
             []TestRobotInstruction{
-                &Move{
-                    []string{"tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1","tipbox_1"},  //deckposition 
-                    []string{"A12","B12","C12","D12","E12","F12","G12","H12"},                                          //wellcoords   
-                    []int{1,1,1,1,1,1,1,1},                                                                             //top reference    
-                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,},                                                                //offsetX      
-                    []float64{0.,0.,0.,0.,0.,0.,0.,0.,},                                                                //offsetY      
-                    []float64{5.,5.,5.,5.,5.,5.,5.,5.,},                                                                //offsetZ      
-                    []string{"tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox","tipbox"},                  //plate_type   
-                    0,                                                                                                  //head         
-                },
                 &LoadTips{
                     []int{0,1,2,3,4,5,6,7}, //channels
                     0,                      //head

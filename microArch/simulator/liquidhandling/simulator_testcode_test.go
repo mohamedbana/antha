@@ -712,6 +712,48 @@ func fillTipwaste(tipwaste_loc string, count int) *SetupFn {
     return &ret
 }
 
+type moveToParams struct {
+    Multi           int
+    Head            int
+    Reference       int
+    Deckposition    string
+    Platetype       string
+    Offset          []float64
+    Cols            int
+    Rows            int
+}
+
+
+func moveTo(row, col int, p moveToParams) *SetupFn {
+    s_dp := make([]string, p.Multi)
+    s_wc := make([]string, p.Multi)  
+    s_rf := make([]int, p.Multi)    
+    s_ox := make([]float64, p.Multi)  
+    s_oy := make([]float64, p.Multi)  
+    s_oz := make([]float64, p.Multi)  
+    s_pt := make([]string, p.Multi)
+
+    for i:= 0; i < p.Multi; i++ {
+        if col >= 0 && col < p.Cols && row+i >= 0 && row+i < p.Rows {
+            wc := wtype.WellCoords{col, row+i}
+            s_dp[i] = p.Deckposition
+            s_wc[i] = wc.FormatA1()
+            s_rf[i] = p.Reference
+            s_ox[i] = p.Offset[0]
+            s_oy[i] = p.Offset[1]
+            s_oz[i] = p.Offset[2]
+            s_pt[i] = p.Platetype
+        }
+    }
+
+
+    var ret SetupFn = func(vlh *lh.VirtualLiquidHandler) {
+        vlh.Move(s_dp, s_wc, s_rf, s_ox, s_oy, s_oz, s_pt, p.Head)
+    }
+
+    return &ret
+}
+
 /*
  * ######################################## Assertions (about the final state)
  */
