@@ -333,13 +333,13 @@ func (self *AdaptorState) Move(platetype, position, well []string,
 
         pl := self.robot.GetDeck().GetPlateByPosition(position[i], platetype[i])
         if pl == nil {
-            return simulator.NewErrorf("No plate of type \"%s\" at location \"%s\"", platetype[i], position[i])
+            return simulator.NewErrorf("", "No plate of type \"%s\" at location \"%s\"", platetype[i], position[i])
         }
         do := pl.GetPlate().(wtype.LHDeckObject)
 
         wc := wtype.MakeWellCoords(well[i])
         if !do.HasCoords(wc) {
-            return simulator.NewErrorf("Plate has no coordinates %s", well[i])
+            return simulator.NewErrorf("", "Plate has no coordinates %s", well[i])
         }
 
         rel_pos, ok := do.WellCoordsToCoords(wc, reference[i])
