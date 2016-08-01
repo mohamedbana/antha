@@ -123,20 +123,24 @@ func (self *ChannelState) GetPlate(platetype, position, well string) (*GetPlateR
     }
 
     //check the well
-    wc, offset := plate_loc.plate.(wtype.LHDeckObject).CoordsToWellCoords(abs_p.Subtract(plate_loc.GetOffset()))
-    if wc.FormatA1() != well {
-        return nil, simulator.NewErrorf("", "Channel %v is above well %s not well %s", self.number, wc.FormatA1(), well)
+    if do, ok := plate_loc.plate.(wtype.LHDeckObject); ok {
+        rel_p := abs_p.Subtract(plate_loc.GetOffset())
+        wc, offset := do.CoordsToWellCoords(rel_p)
+
+        if wc.FormatA1() != well {
+            return nil, simulator.NewErrorf("", "Channel %v is above well %s not well %s", self.number, wc.FormatA1(), well)
+        }
+
+        //return everything
+        r := GetPlateRet{
+            plate_loc.plate,
+            wc,
+            offset}
+        return &r, nil
     }
-
-    //return everything
-    r := GetPlateRet{
-        plate_loc.plate,
-        wc,
-        offset}
-    return &r, nil
-
+    //else
+    return nil, simulator.NewErrorf("", "Object found below channel was %T, not LHDeckObject", plate_loc.plate)
 }
-
 
 //                            Actions
 //                            -------
@@ -350,12 +354,13 @@ func (self *AdaptorState) Move(platetype, position, well []string,
     }
 
     //convert positions to relative
-    //find the origin of the adaptor
+    //find the origin of the adaptor based on the first non-nil channel
     var origin *wtype.Coordinates 
     for i := range self.channels {
         if positions[i] != nil {
             o := positions[i].Subtract(self.channels[i].GetRelativePosition())
             origin = &o
+            break
         }
     }
     if origin == nil {

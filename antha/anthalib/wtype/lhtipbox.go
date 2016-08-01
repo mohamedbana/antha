@@ -165,8 +165,8 @@ func (tb *LHTipbox) GetCoords(c WellCoords) (interface{}, bool) {
 
 func (tb *LHTipbox) CoordsToWellCoords(r Coordinates) (WellCoords, Coordinates) {
     wc := WellCoords{
-        int(math.Floor(((r.X-tb.TipXStart) / tb.TipXOffset) + 0.5)),
-        int(math.Floor(((r.Y-tb.TipYStart) / tb.TipYOffset) + 0.5)),
+        int(math.Floor(((r.X-tb.TipXStart) / tb.TipXOffset))),// + 0.5)), Don't have to add .5 because
+        int(math.Floor(((r.Y-tb.TipYStart) / tb.TipYOffset))),// + 0.5)), TipX/YStart is to TL corner, not center
     }
     if wc.X < 0 {
         wc.X = 0
