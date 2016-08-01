@@ -210,6 +210,16 @@ func TestLoadTips(t *testing.T) {
         12, //Cols            int
         8, //Rows            int
     }
+    misaligned_mtp := moveToParams {
+        8, //Multi           int
+        0, //Head            int
+        1, //Reference       int
+        "tipbox_1", //Deckposition    string
+        "tipbox",   //Platetype       string
+        []float64{0.,2.,5.},//Offset          wtype.Coords
+        12, //Cols            int
+        8, //Rows            int
+    }
 
     tests := []SimulatorTest{
         SimulatorTest{
@@ -414,24 +424,25 @@ func TestLoadTips(t *testing.T) {
                 tipwasteAssertion("tipwaste", 0),
             },
         }, 
-/*        SimulatorTest{
+        SimulatorTest{
             "invalid channel 8",
             nil,
             []*SetupFn{
                 tipTestLayout(),
+                moveTo(0,0,mtp),
             },
             []TestRobotInstruction{
                 &LoadTips{
                     []int{8},               //channels
                     0,                      //head
-                    1,                      //multi
-                    []string{"tipbox"},     //tipbox
-                    []string{"tipbox_1"},    //location
-                    []string{"H12"},        //well
+                    8,                      //multi
+                    []string{"","","","","","","","tipbox"},     //tipbox
+                    []string{"","","","","","","","tipbox_1"},    //location
+                    []string{"","","","","","","","H12"},        //well
                 },
             },
             []string{       //errors
-                "(err) LoadTips: Cannot load tip to channel 8 of 8-channel adaptor",
+                "(err) LoadTips: Unknown channel \"8\"",
             },
             nil,            //assertions
         },
@@ -440,19 +451,20 @@ func TestLoadTips(t *testing.T) {
             nil,
             []*SetupFn{
                 tipTestLayout(),
+                moveTo(0,0,mtp),
             },
             []TestRobotInstruction{
                 &LoadTips{
                     []int{-1},               //channels
                     0,                      //head
-                    1,                      //multi
-                    []string{"tipbox"},     //tipbox
-                    []string{"tipbox_1"},    //location
-                    []string{"H12"},        //well
+                    8,                      //multi
+                    []string{"","","","","","","","tipbox"},     //tipbox
+                    []string{"","","","","","","","tipbox_1"},    //location
+                    []string{"","","","","","","","H12"},        //well
                 },
             },
             []string{       //errors
-                "(err) LoadTips: Cannot load tip to channel -1 of 8-channel adaptor",
+                "(err) LoadTips: Unknown channel \"-1\"",
             },
             nil,            //assertions
         },
@@ -461,6 +473,7 @@ func TestLoadTips(t *testing.T) {
             nil,
             []*SetupFn{
                 tipTestLayout(),
+                moveTo(0,11,mtp),
             },
             []TestRobotInstruction{
                 &LoadTips{
@@ -482,19 +495,20 @@ func TestLoadTips(t *testing.T) {
             nil,
             []*SetupFn{
                 tipTestLayout(),
+                moveTo(7,11,mtp),
             },
             []TestRobotInstruction{
                 &LoadTips{
                     []int{0},               //channels
                     1,                      //head
-                    1,                      //multi
-                    []string{"tipbox"},     //tipbox
-                    []string{"tipbox_1"},    //location
-                    []string{"H12"},        //well
+                    8,                      //multi
+                    []string{"tipbox","","","","","","",""},     //tipbox
+                    []string{"tipbox_1","","","","","","",""},    //location
+                    []string{"H12","","","","","","",""},        //well
                 },
             },
             []string{       //errors
-                "(err) LoadTips: Request for unknown head 1",
+                "(err) LoadTips: Unknown head 1",
             },
             nil,            //assertions
         },
@@ -503,19 +517,20 @@ func TestLoadTips(t *testing.T) {
             nil,
             []*SetupFn{
                 tipTestLayout(),
+                moveTo(7,11,mtp),
             },
             []TestRobotInstruction{
                 &LoadTips{
                     []int{0},               //channels
                     -1,                     //head
                     1,                      //multi
-                    []string{"tipbox"},     //tipbox
-                    []string{"tipbox_1"},    //location
-                    []string{"H12"},        //well
+                    []string{"tipbox","","","","","","",""},     //tipbox
+                    []string{"tipbox_1","","","","","","",""},    //location
+                    []string{"H12","","","","","","",""},        //well
                 },
             },
             []string{       //errors
-                "(err) LoadTips: Request for unknown head -1",
+                "(err) LoadTips: Unknown head -1",
             },
             nil,            //assertions
         },
@@ -524,187 +539,42 @@ func TestLoadTips(t *testing.T) {
             nil,
             []*SetupFn{
                 tipTestLayout(),
+                moveTo(7,11,mtp),
             },
             []TestRobotInstruction{
                 &LoadTips{
                     []int{0},               //channels
                     0,                     //head
-                    2,                      //multi
+                    8,                      //multi
                     []string{"tipbox"},     //tipbox
                     []string{"tipbox_1"},    //location
                     []string{"H12"},        //well
                 },
             },
             []string{       //errors
-                "(err) LoadTips: channels, platetype, position, well should be of length multi=2",
+                "(err) LoadTips: channels, platetype, position, well should be of length multi=8",
             },
             nil,            //assertions
         },
         SimulatorTest{
-            "multiple locations",
+            "mismatching multi",
             nil,
             []*SetupFn{
                 tipTestLayout(),
+                moveTo(7,11,mtp),
             },
             []TestRobotInstruction{
                 &LoadTips{
-                    []int{0,1},             //channels
-                    0,                      //head
-                    2,                      //multi
-                    []string{"tipbox","tipbox"},     //tipbox
-                    []string{"tipbox_1","tipbox_2"},    //location
-                    []string{"G12","H12"},        //well
+                    []int{0},                       //channels
+                    0,                              //head
+                    4,                              //multi
+                    []string{"tipbox","","","",},   //tipbox
+                    []string{"tipbox_1","","","",}, //location
+                    []string{"H12","","","",},      //well
                 },
             },
             []string{       //errors
-                "(err) LoadTips: Cannot load tips from multiple locations",
-            },
-            nil,            //assertions
-        },
-        SimulatorTest{
-            "multiple platetypes",
-            nil,
-            []*SetupFn{
-                tipTestLayout(),
-            },
-            []TestRobotInstruction{
-                &LoadTips{
-                    []int{0,1},             //channels
-                    0,                      //head
-                    2,                      //multi
-                    []string{"tipbox","tipwaste"},     //platetype
-                    []string{"tipbox_1","tipbox_1"},    //location
-                    []string{"G12","H12"},        //well
-                },
-            },
-            []string{       //errors
-                "(err) LoadTips: platetype should be equal",
-            },
-            nil,            //assertions
-        },
-        SimulatorTest{
-            "wrong plate type",
-            nil,
-            []*SetupFn{
-                tipTestLayout(),
-            },
-            []TestRobotInstruction{
-                &LoadTips{
-                    []int{0},               //channels
-                    0,                      //head
-                    1,                      //multi
-                    []string{"tipwaste"},     //tipbox
-                    []string{"tipwaste"},    //location
-                    []string{"H12"},        //well
-                },
-            },
-            []string{       //errors
-                "(err) LoadTips: No tipbox found at location \"tipwaste\"",
-            },
-            nil,            //assertions
-        },
-        SimulatorTest{
-            "well out of range",
-            nil,
-            []*SetupFn{
-                tipTestLayout(),
-            },
-            []TestRobotInstruction{
-                &LoadTips{
-                    []int{0},               //channels
-                    0,                      //head
-                    1,                      //multi
-                    []string{"tipbox"},     //tipbox
-                    []string{"tipbox_1"},   //location
-                    []string{"H13"},        //well
-                },
-            },
-            []string{       //errors
-                "(err) LoadTips: Request for well H13, but tipbox size is [12x8]",
-            },
-            nil,            //assertions
-        },
-        SimulatorTest{
-            "invalid well",
-            nil,
-            []*SetupFn{
-                tipTestLayout(),
-            },
-            []TestRobotInstruction{
-                &LoadTips{
-                    []int{0},               //channels
-                    0,                      //head
-                    1,                      //multi
-                    []string{"tipbox"},     //tipbox
-                    []string{"tipbox_1"},   //location
-                    []string{"not_a_well"}, //well
-                },
-            },
-            []string{       //errors
-                "(err) LoadTips: Couldn't parse well \"not_a_well\"",
-            },
-            nil,            //assertions
-        },
-        SimulatorTest{
-            "Loading collision",
-            nil,
-            []*SetupFn{
-                tipTestLayout(),
-            },
-            []TestRobotInstruction{
-                &LoadTips{
-                    []int{0},               //channels
-                    0,                      //head
-                    1,                      //multi
-                    []string{"tipbox"},     //tipbox
-                    []string{"tipbox_1"},   //location
-                    []string{"G12"},        //well
-                },
-            },
-            []string{       //errors
-                "(err) LoadTips: Cannot load G12->channel0 due to tip at H12 (Head0 is not independent)",
-            },
-            nil,            //assertions
-        },
-        SimulatorTest{
-            "multi loading collision",
-            nil,
-            []*SetupFn{
-                tipTestLayout(),
-            },
-            []TestRobotInstruction{
-                &LoadTips{
-                    []int{0,7},             //channels
-                    0,                      //head
-                    2,                      //multi
-                    []string{"tipbox","tipbox"},     //tipbox
-                    []string{"tipbox_1","tipbox_1"},   //location
-                    []string{"A12","H12"},  //well
-                },
-            },
-            []string{       //errors
-                "(err) LoadTips: Cannot load A12->channel0, H12->channel7 due to tips at B12,C12,D12,E12,F12,G12 (Head0 is not independent)",
-            },
-            nil,            //assertions
-        },
-        SimulatorTest{
-            "non-contiguous wells",
-            independent_lhproperties(),
-            []*SetupFn{
-                tipTestLayout(),
-            },
-            []TestRobotInstruction{
-                &LoadTips{
-                    []int{0,1},             //channels
-                    0,                      //head
-                    2,                      //multi
-                    []string{"tipbox","tipbox"},     //tipbox
-                    []string{"tipbox_1","tipbox_1"},   //location
-                    []string{"F12","H12"},  //well
-                },
-            },
-            []string{       //errors
-                "(err) LoadTips: Cannot load F12->channel0, H12->channel1, tip spacing doesn't match channel spacing",
+                "(err) LoadTips: Multi(=4) doesn't match number of channels on Head0(=8)",
             },
             nil,            //assertions
         },
@@ -714,15 +584,16 @@ func TestLoadTips(t *testing.T) {
             []*SetupFn{
                 tipTestLayout(),
                 removeTipboxTips("tipbox_1", []string{"H12"}),
+                moveTo(7,11,mtp),
             },
             []TestRobotInstruction{
                 &LoadTips{
                     []int{0},               //channels
                     0,                      //head
-                    1,                      //multi
-                    []string{"tipbox"},     //tipbox
-                    []string{"tipbox_1"},    //location
-                    []string{"H12"},        //well
+                    8,                      //multi
+                    []string{"tipbox","","","","","","",""},     //tipbox
+                    []string{"tipbox_1","","","","","","",""},    //location
+                    []string{"H12","","","","","","",""},        //well
                 },
             },
             []string{       //errors
@@ -736,15 +607,16 @@ func TestLoadTips(t *testing.T) {
             []*SetupFn{
                 tipTestLayout(),
                 preloadAdaptorTips(0, "tipbox_1", []int{0}),
+                moveTo(7,11,mtp),
             },
             []TestRobotInstruction{
                 &LoadTips{
                     []int{0},               //channels
                     0,                      //head
-                    1,                      //multi
-                    []string{"tipbox"},     //tipbox
-                    []string{"tipbox_1"},    //location
-                    []string{"H12"},        //well
+                    8,                      //multi
+                    []string{"tipbox","","","","","","",""},     //tipbox
+                    []string{"tipbox_1","","","","","","",""},    //location
+                    []string{"H12","","","","","","",""},        //well
                 },
             },
             []string{       //errors
@@ -752,7 +624,95 @@ func TestLoadTips(t *testing.T) {
             },
             nil,            //assertions
         },
-*/    }
+        SimulatorTest{
+            "not aligned to move",
+            nil,
+            []*SetupFn{
+                tipTestLayout(),
+                moveTo(5,11,mtp),
+            },
+            []TestRobotInstruction{
+                &LoadTips{
+                    []int{0,1,2},                                               //channels
+                    0,                                                          //head
+                    8,                                                          //multi
+                    []string{"tipbox","tipbox","tipbox","","","","","",},       //tipbox
+                    []string{"tipbox_1","tipbox_1","tipbox_1","","","","","",}, //location
+                    []string{"E12","G12","H12","","","","","",},                //well
+                },
+            },
+            []string{            //errors
+                "(err) LoadTips: Channel0 is above F12, not E12 as requested",
+            },
+            nil, //assertions
+        },
+        SimulatorTest{
+            "multiple not aligned to move",
+            nil,
+            []*SetupFn{
+                tipTestLayout(),
+                moveTo(5,11,mtp),
+            },
+            []TestRobotInstruction{
+                &LoadTips{
+                    []int{0,1,2},                                               //channels
+                    0,                                                          //head
+                    8,                                                          //multi
+                    []string{"tipbox","tipbox","tipbox","","","","","",},       //tipbox
+                    []string{"tipbox_1","tipbox_1","tipbox_1","","","","","",}, //location
+                    []string{"G12","F12","H12","","","","","",},                //well
+                },
+            },
+            []string{            //errors
+                "(err) LoadTips: Channels 0,1 are above F12,G12, not G12,F12 as requested",
+            },
+            nil, //assertions
+        },
+        SimulatorTest{
+            "misalignment single",
+            nil,
+            []*SetupFn{
+                tipTestLayout(),
+                moveTo(5,11,misaligned_mtp),
+            },
+            []TestRobotInstruction{
+                &LoadTips{
+                    []int{0,1,2},                                               //channels
+                    0,                                                          //head
+                    8,                                                          //multi
+                    []string{"tipbox","","","","","","","",},       //tipbox
+                    []string{"tipbox_1","","","","","","","",}, //location
+                    []string{"H12","","","","","","","",},                //well
+                },
+            },
+            []string{            //errors
+                "(err) LoadTips: Channel 0 is misaligned with tip H12 by 2mm",
+            },
+            nil, //assertions
+        },
+        SimulatorTest{
+            "misalignment multi",
+            nil,
+            []*SetupFn{
+                tipTestLayout(),
+                moveTo(5,11,misaligned_mtp),
+            },
+            []TestRobotInstruction{
+                &LoadTips{
+                    []int{0,1,2},                                               //channels
+                    0,                                                          //head
+                    8,                                                          //multi
+                    []string{"tipbox","tipbox","tipbox","","","","","",},       //tipbox
+                    []string{"tipbox_1","tipbox_1","tipbox_1","","","","","",}, //location
+                    []string{"F12","G12","H12","","","","","",},                //well
+                },
+            },
+            []string{            //errors
+                "(err) LoadTips: Channels {0,1,2} are misaligned with tips {F12,G12,H12} by {2,2,2}mm",
+            },
+            nil, //assertions
+        },
+    }
 
     for _,test := range tests {
         test.run(t)
