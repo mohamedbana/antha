@@ -540,14 +540,15 @@ func (lhp *LHProperties) AddWashTo(pos string, wash *wtype.LHPlate) bool {
 
 // of necessity, this must be destructive of state so we have to work on a copy
 // NB this is not properly specified yet
-func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []string, error) {
+func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent, carryvol wunit.Volume) ([]string, []string, error) {
 	r1 := make([]string, len(cmps))
 	r2 := make([]string, len(cmps))
 
-	fudgevol := wunit.NewVolume(0.5, "ul")
-
 	for i, v := range cmps {
 		foundIt := false
+
+		vdup := v.Dup()
+		vdup.Vol += carryvol.ConvertTo(wunit.ParsePrefixedUnit(vdup.Vunit))
 
 		if v.HasAnyParent() {
 			//fmt.Println("Trying to get component ", v.CName, v.ParentID)
@@ -566,7 +567,10 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []s
 			r2[i] = tx[1]
 
 			vol := v.Volume().Dup()
-			vol.Add(fudgevol)
+			vol.Add(carryvol)
+			/// XXX -- adding carry volumes is all very well but
+			// assumes we have made more of this component than we really need!
+			// -- this may just need to be removed pending a better fix
 			lhp.RemoveComponent(tx[0], tx[1], vol)
 
 			foundIt = true
@@ -581,7 +585,7 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []s
 				if ok {
 					// whaddya got?
 					// nb this won't work if we need to split a volume across several plates
-					wcarr, ok := p.GetComponent(v, false)
+					wcarr, ok := p.GetComponent(vdup, false)
 
 					if ok {
 						foundIt = true
@@ -592,7 +596,7 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []s
 						r2[i] = wcarr[0].FormatA1()
 
 						vol := v.Volume().Dup()
-						vol.Add(fudgevol)
+						vol.Add(carryvol)
 
 						lhp.RemoveComponent(r1[i], r2[i], vol)
 
@@ -602,7 +606,6 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent) ([]string, []s
 			}
 
 			if !foundIt {
-				//logger.Fatal("NOSOURCE FOR ", v.CName, " at volume ", v.Volume().ToString())
 				err := wtype.LHError(wtype.LH_ERR_DIRE, fmt.Sprint("NO SOURCE FOR ", v.CName, " at volume ", v.Volume().ToString()))
 				return r1, r2, err
 			}

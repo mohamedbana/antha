@@ -145,7 +145,7 @@ type Aliquot_SamePositionsMultipleplatesSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Aliquot_SamePositionsMultipleplates",
+	if err := addComponent(Component{Name: "Aliquot_SamePositionsMultipleplates",
 		Constructor: Aliquot_SamePositionsMultipleplatesNew,
 		Desc: ComponentDesc{
 			Desc: "example protocol showing how the MixTo command can be used to specify different plates of the same type  i.e. plate 1 ,2, 3 of type greiner384\n",
@@ -160,5 +160,7 @@ func init() {
 				{Name: "Aliquots", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

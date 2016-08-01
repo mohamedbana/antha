@@ -20,7 +20,7 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
-// Package for working with enzymes; in particular restriction enzymes are particularly well characterised at present
+// Package for working with enzymes; in particular restriction enzymes
 package enzymes
 
 import (
@@ -41,13 +41,13 @@ func LengthofPrefixOverlap(seq string, subseq string) (number int, end string) {
 
 	i:=0;i<len(subseq);i++{
 	truncated := subseq[i:]
-	fmt.Println("truncated", truncated)
+	// fmt.Println("truncated", truncated)
 	if strings.HasPrefix(part.Seq, truncated) == true {
 		number = i
 		end = "end"
 	}
 	/*start := subseq[:i]
-	fmt.Println("start", start)
+	// fmt.Println("start", start)
 	if strings.HasPrefix(part.Seq, start) == true {
 		number = i
 		end = "start"
@@ -132,19 +132,19 @@ func AddStandardStickyEnds(part wtype.DNASequence, assemblystandard string, leve
 		// This code will look for subparts of a standard overhang to add the minimum number of additional nucleotides with a partial match e.g. AATG contains ATG only so we just add A
 
 		truncated := bittoadd[1:]
-		fmt.Println("truncated", truncated)
+		// fmt.Println("truncated", truncated)
 		if strings.HasPrefix(part.Seq, truncated) == true {
 			//truncated = bittoadd[:1]
-			//fmt.Println("truncated", truncated)
+			//// fmt.Println("truncated", truncated)
 			bittoadd = bittoadd[:1]
 		}
 
 		bittoadd5prime := Makeoverhang(enzyme, "5prime", bittoadd, ChooseSpacer(enzyme.Topstrand3primedistancefromend, "", []string{}))
-		fmt.Println("bittoadd5prime", bittoadd5prime)
+		// fmt.Println("bittoadd5prime", bittoadd5prime)
 		partwith5primeend := Addoverhang(part.Seq, bittoadd5prime, "5prime")
 
 		bittoadd3 := Endlinks[assemblystandard][level][numberofparts][position+1]
-		fmt.Println("bittoadd3", bittoadd3)
+		// fmt.Println("bittoadd3", bittoadd3)
 
 		if numberofparts == position {
 			bittoadd3 = RevComp(vectorends[0])
@@ -152,9 +152,9 @@ func AddStandardStickyEnds(part wtype.DNASequence, assemblystandard string, leve
 		if strings.HasSuffix(part.Seq, bittoadd3) == true {
 			bittoadd3 = ""
 		}
-		//fmt.Println("bittoadd3", bittoadd3)
+		//// fmt.Println("bittoadd3", bittoadd3)
 		bittoadd3prime := Makeoverhang(enzyme, "3prime", bittoadd3, ChooseSpacer(enzyme.Topstrand3primedistancefromend, "", []string{}))
-		fmt.Println("bittoadd3prime", bittoadd3prime)
+		// fmt.Println("bittoadd3prime", bittoadd3prime)
 		partwithends := Addoverhang(partwith5primeend, bittoadd3prime, "3prime")
 
 		Partwithends.Nm = part.Nm
@@ -165,13 +165,19 @@ func AddStandardStickyEnds(part wtype.DNASequence, assemblystandard string, leve
 }
 
 // Adds sticky ends to dna part according to the class identifier (e.g. PRO, 5U, CDS)
-func AddStandardStickyEndsfromClass(part wtype.DNASequence, assemblystandard string, level string, class string) (Partwithends wtype.DNASequence) {
+func AddStandardStickyEndsfromClass(part wtype.DNASequence, assemblystandard string, level string, class string) (Partwithends wtype.DNASequence, err error) {
 
 	//vectorends := Vectorends[assemblystandard][level] // this could also look up Endlinks[assemblystandard][level][numberofparts][0]
 
 	enzyme := Enzymelookup[assemblystandard][level]
 
-	bitstoadd := EndlinksString[assemblystandard][level][class]
+	bitstoadd, found := EndlinksString[assemblystandard][level][class]
+
+	if !found {
+		err = fmt.Errorf("Class " + class + " not found in Assmbly standard map of " + assemblystandard + " level " + level)
+		return Partwithends, err
+	}
+
 	bittoadd := bitstoadd[0]
 	if strings.HasPrefix(part.Seq, bittoadd) == true {
 		bittoadd = ""
@@ -180,33 +186,33 @@ func AddStandardStickyEndsfromClass(part wtype.DNASequence, assemblystandard str
 	// This code will look for subparts of a standard overhang to add the minimum number of additional nucleotides with a partial match e.g. AATG contains ATG only so we just add A
 
 	truncated := bittoadd[1:]
-	fmt.Println("truncated", truncated)
+	// fmt.Println("truncated", truncated)
 	if strings.HasPrefix(part.Seq, truncated) == true {
 		//truncated = bittoadd[:1]
-		//fmt.Println("truncated", truncated)
+		//// fmt.Println("truncated", truncated)
 		bittoadd = bittoadd[:1]
 	}
 
 	bittoadd5prime := Makeoverhang(enzyme, "5prime", bittoadd, ChooseSpacer(enzyme.Topstrand3primedistancefromend, "", []string{}))
-	fmt.Println("bittoadd5prime", bittoadd5prime)
+	// fmt.Println("bittoadd5prime", bittoadd5prime)
 	partwith5primeend := Addoverhang(part.Seq, bittoadd5prime, "5prime")
 
 	bittoadd3 := bitstoadd[1]
-	fmt.Println("bittoadd3", bittoadd3)
+	// fmt.Println("bittoadd3", bittoadd3)
 
 	if strings.HasSuffix(part.Seq, bittoadd3) == true {
 		bittoadd3 = ""
 	}
-	//fmt.Println("bittoadd3", bittoadd3)
+	//// fmt.Println("bittoadd3", bittoadd3)
 	bittoadd3prime := Makeoverhang(enzyme, "3prime", bittoadd3, ChooseSpacer(enzyme.Topstrand3primedistancefromend, "", []string{}))
-	fmt.Println("bittoadd3prime", bittoadd3prime)
+	// fmt.Println("bittoadd3prime", bittoadd3prime)
 	partwithends := Addoverhang(partwith5primeend, bittoadd3prime, "3prime")
 
 	Partwithends.Nm = part.Nm
 	Partwithends.Plasmid = part.Plasmid
 	Partwithends.Seq = partwithends
 
-	return Partwithends
+	return Partwithends, err
 }
 
 // Adds ends to the part sequence based upon enzyme chosen and the desired overhangs after digestion
@@ -237,7 +243,7 @@ func AddCustomEnds(part wtype.DNASequence, enzyme wtype.TypeIIs, desiredstickyen
 }
 
 // Add compatible ends to an array of parts based on the rules of a typeIIS assembly standard
-func MakeStandardTypeIIsassemblyParts(parts []wtype.DNASequence, assemblystandard string, level string, optionalpartclasses []string) (partswithends []wtype.DNASequence) {
+func MakeStandardTypeIIsassemblyParts(parts []wtype.DNASequence, assemblystandard string, level string, optionalpartclasses []string) (partswithends []wtype.DNASequence, err error) {
 
 	partswithends = make([]wtype.DNASequence, 0)
 	var partwithends wtype.DNASequence
@@ -245,7 +251,10 @@ func MakeStandardTypeIIsassemblyParts(parts []wtype.DNASequence, assemblystandar
 	if len(optionalpartclasses) != 0 {
 		if len(optionalpartclasses) == len(parts) {
 			for i := 0; i < len(parts); i++ {
-				partwithends = AddStandardStickyEndsfromClass(parts[i], assemblystandard, level, optionalpartclasses[i])
+				partwithends, err = AddStandardStickyEndsfromClass(parts[i], assemblystandard, level, optionalpartclasses[i])
+				if err != nil {
+					return []wtype.DNASequence{}, err
+				}
 				partswithends = append(partswithends, partwithends)
 			}
 		}
@@ -256,7 +265,7 @@ func MakeStandardTypeIIsassemblyParts(parts []wtype.DNASequence, assemblystandar
 			partswithends = append(partswithends, partwithends)
 		}
 	}
-	return partswithends
+	return partswithends, err
 }
 
 // Utility function to check whether a part already has typeIIs ends added
@@ -436,6 +445,37 @@ var EndlinksString = map[string]map[string]map[string][]string{
 			"Ter":         []string{"GGTA", "CGCT"},
 			"3U + Ter":    []string{"GCTT", "CGCT"},
 		},
+		"Level1": map[string][]string{
+			"Device1": []string{"GAA", "TACT"},
+			"Device2": []string{"TACT", "CCAT"},
+			"Device3": []string{"TACT", "CCAT"},
+		},
+	},
+	"Custom": map[string]map[string][]string{
+		"Level0": map[string][]string{
+			"Pro":         []string{"GGAG", "TACT"},
+			"5U":          []string{"TACT", "CCAT"},
+			"5U(f)":       []string{"TACT", "CCAT"},
+			"Pro + 5U(f)": []string{"GGAG", "CCAT"},
+			"Pro + 5U":    []string{"GGAG", "AATG"},
+			"NT1":         []string{"CCAT", "AATG"},
+			"5U + NT1":    []string{"TACT", "AATG"},
+			"CDS1":        []string{"AATG", "GCTT"},
+			"CDS1 ns":     []string{"AATG", "TTCG"},
+			"NT2":         []string{"AATG", "AGGT"},
+			"SP":          []string{"AATG", "AGGT"},
+			"CDS2 ns":     []string{"AGGT", "TTCG"},
+			"CDS2":        []string{"AGGT", "GCTT"},
+			"CT":          []string{"TTCG", "GCTT"},
+			"3U":          []string{"GCTT", "GGTA"},
+			"Ter":         []string{"GGTA", "CGCT"},
+			"3U + Ter":    []string{"GCTT", "CGCT"},
+		},
+		"Level1": map[string][]string{
+			"Device1": []string{"GAG", "ACC"},
+			"Device2": []string{"ACC", "TGT"},
+			"Device3": []string{"TGT", "GGT"},
+		},
 	},
 	"MoClo_Raven": map[string]map[string][]string{
 		"Level0": map[string][]string{
@@ -455,7 +495,7 @@ var EndlinksString = map[string]map[string]map[string][]string{
 			"CT":          []string{"TTCG", "GCTT"},
 			"3U":          []string{"GCTT", "GGTA"},
 			"Ter":         []string{"GGTA", "CGCT"},
-			"3U + Ter":    []string{"GCTT", "GCTT"},
+			"3U + Ter":    []string{"GCTT", "GCTT"}, // both same ! look into this
 		},
 	},
 }
@@ -484,6 +524,10 @@ var Vectorends = map[string]map[string][]string{
 		"Level0": []string{"GGT", "GAA"},
 		"Level1": []string{"", ""},
 	},
+	"Custom": map[string][]string{
+		"Level0": []string{"CGCT", "GGAG"},
+		"Level1": []string{"GGT", "GAA"},
+	},
 	"Electra": map[string][]string{
 		"Level0": []string{"GGT", "ATG"},
 		"Level1": []string{"", ""},
@@ -500,6 +544,10 @@ var Enzymelookup = map[string]map[string]wtype.TypeIIs{
 	"MoClo": map[string]wtype.TypeIIs{
 		"Level0": BsaIenz,
 		"Level1": BpiIenz,
+	},
+	"Custom": map[string]wtype.TypeIIs{
+		"Level0": BsaIenz,
+		"Level1": SapIenz,
 	},
 	"Electra": map[string]wtype.TypeIIs{
 		"Level0": SapIenz,

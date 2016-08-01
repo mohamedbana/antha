@@ -23,6 +23,7 @@
 package search
 
 import (
+	"strconv"
 	"strings"
 )
 
@@ -32,28 +33,43 @@ type Thingfound struct {
 	Reverse   bool
 }
 
+func (thing Thingfound) ToString() (descriptions string) {
+	things := make([]string, 0)
+	var reverse string
+	for i := range thing.Positions {
+		if thing.Reverse {
+			reverse = " in reverse direction"
+		} else {
+			reverse = " in forward direction"
+		}
+		things = append(things, thing.Thing, " found at position ", strconv.Itoa(thing.Positions[i]), reverse, "; ")
+	}
+	descriptions = strings.Join(things, "")
+	return
+}
+
 // not perfect yet! issue with byte conversion of certain characters!
 func Findall(bigthing string, smallthing string) (positions []int) {
 
 	positions = make([]int, 0)
 	count := strings.Count(bigthing, smallthing)
-	//fmt.Println("count", count)
+	//// fmt.Println("count", count)
 	if count != 0 {
 
 		pos := (strings.Index(bigthing, smallthing))
 		restofbigthing := bigthing[(pos + 1):]
-		//fmt.Println("seq", bigthing)
-		//fmt.Println("rest,", restofbigthing)
+		//// fmt.Println("seq", bigthing)
+		//// fmt.Println("rest,", restofbigthing)
 		//pos = pos
-		//fmt.Println("pos = ", pos)
+		//// fmt.Println("pos = ", pos)
 		for i := 0; i < count; i++ {
-			//fmt.Println("pos = ", pos)
+			//// fmt.Println("pos = ", pos)
 			positions = append(positions, (pos + 1))
-			//fmt.Println("positions", positions)
+			//// fmt.Println("positions", positions)
 			pos = pos + (strings.Index(restofbigthing, smallthing) + 1)
-			//fmt.Println("pos2 = ", pos)
+			//// fmt.Println("pos2 = ", pos)
 			restofbigthing = bigthing[(pos + 1):]
-			//fmt.Println("rest2,", restofbigthing)
+			//// fmt.Println("rest2,", restofbigthing)
 		}
 	}
 	return positions
@@ -77,6 +93,7 @@ func Containsallthings(bigthing string, smallthings []string) (trueornot bool) {
 	i := 0
 	for _, thing := range smallthings {
 
+		//	if strings.Contains(strings.ToUpper(bigthing), strings.ToUpper(thing)) {
 		if strings.Contains(bigthing, thing) {
 			i = i + 1
 		}

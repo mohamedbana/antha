@@ -3,6 +3,7 @@ package lib
 import (
 	"fmt"
 	//"math"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/entrez"
@@ -12,6 +13,7 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"path/filepath"
 )
 
 // Input parameters for this protocol
@@ -35,34 +37,48 @@ func _NewDNASequence_fromLookupSetup(_ctx context.Context, _input *NewDNASequenc
 func _NewDNASequence_fromLookupSteps(_ctx context.Context, _input *NewDNASequence_fromLookupInput, _output *NewDNASequence_fromLookupOutput) {
 
 	var err error
+	var partdetails igem.Rsbpml
 
 	if _input.EntrezID {
 
 		if _input.DNAID {
 
-			_output.DNA, err = entrez.RetrieveSequence(_input.ID, "nucleotide")
+			filename := filepath.Join(anthapath.Path(), _input.ID+".gb")
+
+			_output.DNA, _, err = entrez.RetrieveSequence(_input.ID, "nucleotide", filename)
 
 		}
 	} else if _input.BiobrickID {
 
-		partdetails := igem.LookUp([]string{_input.ID})
+		partdetails = igem.LookUp([]string{_input.ID})
 
 		seq := partdetails.Sequence(_input.ID)
 
 		_output.DNA = wtype.MakeLinearDNASequence(_input.ID, seq)
 
-	} //else {Status = fmt.Sprintln("correct conditions not met")}
+	}
 
-	orfs := sequences.FindallORFs(_output.DNA.Seq)
-	features := sequences.ORFs2Features(orfs)
+	if _input.AddORFS {
+		orfs := sequences.FindallORFs(_output.DNA.Seq)
+		features := sequences.ORFs2Features(orfs)
+		_output.DNA = wtype.Annotate(_output.DNA, features)
+	}
 
-	_output.DNA = wtype.Annotate(_output.DNA, features)
-
-	_output.Status = fmt.Sprintln(
-		text.Print("DNA_Seq: ", _output.DNA),
-		text.Print("ORFs: ", _output.DNA.Features),
-	)
+	if _input.BiobrickID {
+		_output.Status = fmt.Sprintln(
+			text.Print(_input.ID+" DNA_Seq: ", _output.DNA),
+			text.Print(_input.ID+" ORFs: ", _output.DNA.Features),
+			text.Print(_input.ID+" PartDescription", partdetails.Description(_input.ID)),
+		)
+		_output.Description = partdetails.Description(_input.ID)
+	} else {
+		_output.Status = fmt.Sprintln(
+			text.Print(_input.ID+" DNA_Seq: ", _output.DNA),
+			text.Print(_input.ID+" ORFs: ", _output.DNA.Features),
+		)
+	}
 	_output.Warnings = err
+	fmt.Println(_output.Status)
 }
 
 // Actions to perform after steps block to analyze data
@@ -121,6 +137,7 @@ type NewDNASequence_fromLookupElement struct {
 }
 
 type NewDNASequence_fromLookupInput struct {
+	AddORFS    bool
 	BiobrickID bool
 	DNAID      bool
 	EntrezID   bool
@@ -128,36 +145,42 @@ type NewDNASequence_fromLookupInput struct {
 }
 
 type NewDNASequence_fromLookupOutput struct {
-	DNA      wtype.DNASequence
-	Status   string
-	Warnings error
+	DNA         wtype.DNASequence
+	Description string
+	Status      string
+	Warnings    error
 }
 
 type NewDNASequence_fromLookupSOutput struct {
 	Data struct {
-		DNA      wtype.DNASequence
-		Status   string
-		Warnings error
+		DNA         wtype.DNASequence
+		Description string
+		Status      string
+		Warnings    error
 	}
 	Outputs struct {
 	}
 }
 
 func init() {
-	addComponent(Component{Name: "NewDNASequence_fromLookup",
+	if err := addComponent(Component{Name: "NewDNASequence_fromLookup",
 		Constructor: NewDNASequence_fromLookupNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/Data/DNA/NewDNASequence/NewDNASequence_fromLookup.an",
+			Path: "antha/component/an/AnthaAcademy/Lesson4_DNA/C_NewDNASequence_fromLookup.an",
 			Params: []ParamDesc{
+				{Name: "AddORFS", Desc: "", Kind: "Parameters"},
 				{Name: "BiobrickID", Desc: "", Kind: "Parameters"},
 				{Name: "DNAID", Desc: "", Kind: "Parameters"},
 				{Name: "EntrezID", Desc: "", Kind: "Parameters"},
 				{Name: "ID", Desc: "", Kind: "Parameters"},
 				{Name: "DNA", Desc: "", Kind: "Data"},
+				{Name: "Description", Desc: "", Kind: "Data"},
 				{Name: "Status", Desc: "", Kind: "Data"},
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

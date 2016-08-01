@@ -1,0 +1,33 @@
+package workflow
+
+var condCopyEqualsJson = `
+{
+    "processes": {
+        "Equals": { "component": "Equals" },
+        "Cond": { "component": "Cond" },
+        "Copy": { "component": "Copy" }
+    },
+    "connections": [
+        {
+            "src": {
+                "process": "Equals",
+                "port": "Out"
+            },
+            "tgt": {
+                "process": "Cond",
+                "port": "Cond"
+            }
+        },
+        {
+            "src": {
+                "process": "Cond",
+                "port": "Out"
+            },
+            "tgt": {
+                "process": "Copy",
+                "port": "In"
+            }
+        }
+    ]
+}
+`

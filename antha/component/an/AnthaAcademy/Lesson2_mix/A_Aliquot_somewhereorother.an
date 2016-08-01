@@ -1,10 +1,12 @@
 // example protocol showing the highest level antha mix command which does not specify a plate type, therefore leaving it up to the scheduler to decide
 protocol Aliquot_somewhere
 
+
+// we can import code libraries and use functions and types from these libraries
 import (
-	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wtype" // the LHComponent type is imported from this library
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"github.com/antha-lang/antha/antha/anthalib/mixer"
+	"github.com/antha-lang/antha/antha/anthalib/mixer" // the Sample function is imported from mixer
 )
 
 
@@ -49,11 +51,11 @@ Steps {
 	number := SolutionVolume.SIValue()/VolumePerAliquot.SIValue()
 	possiblenumberofAliquots, _ := wutil.RoundDown(number)
 	if possiblenumberofAliquots < NumberofAliquots {
-		panic("Not enough solution for this many aliquots")
+		Errorf("Not enough solution for this many aliquots")
 	}
 	
 	
-	// make an slice of components which we'll fill with aliquots; 
+	// make a slice of components which we'll fill with aliquots; 
 	// same as we would for an array of samples but this time we won't mix together
 	aliquots := make([]*wtype.LHComponent,0)
 	
@@ -74,7 +76,10 @@ Steps {
 		// this time we append the slice of components after mixing
 		aliquots = append(aliquots,aliquot)
 	}
-	Aliquots = aliquots
+	
+	// Now we assign our temporary variable aliqouts to export as a variable as specified in Outputs
+	// In Antha the first letter of a variablename must be uppercase to allow the variable to be exported
+	Aliquots = aliquots 
 }
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results

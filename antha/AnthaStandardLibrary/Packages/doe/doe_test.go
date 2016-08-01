@@ -10,7 +10,7 @@ import (
 	"testing"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
-	//"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
+	//"github.com/tealeg/xlsx"
 )
 
 // simple reverse complement check to test testing methodology initially
@@ -131,13 +131,13 @@ type Run struct {
 
 
 func AllComboCount(pairs []DOEPair) (numberofuniquecombos int) {
-	fmt.Println("In AllComboCount", "len(pairs)", len(pairs))
+	// fmt.Println("In AllComboCount", "len(pairs)", len(pairs))
 	var movingcount int
 	movingcount = (pairs[0]).LevelCount()
-	fmt.Println("Factorcount", movingcount)
-	fmt.Println("len(levels)", len(pairs[0].Levels))
+	// fmt.Println("Factorcount", movingcount)
+	// fmt.Println("len(levels)", len(pairs[0].Levels))
 	for i := 1; i < len(pairs); i++ {
-		fmt.Println("Factorcount", movingcount)
+		// fmt.Println("Factorcount", movingcount)
 		movingcount = movingcount * (pairs[i]).LevelCount()
 	}
 	numberofuniquecombos = movingcount
@@ -151,14 +151,14 @@ func AllCombinations(factors []DOEPair) (runs []Run) {
 	runs = make([]Run, AllComboCount(factors))
 	var run Run
 	for i, factor := range factors {
-		fmt.Println("factor", i, "of", AllComboCount(factors), factor.Factor, factor.Levels)
+		// fmt.Println("factor", i, "of", AllComboCount(factors), factor.Factor, factor.Levels)
 		for j, level := range factor.Levels {
-			//fmt.Println("factor:", factor, level, i, j)
+			//// fmt.Println("factor:", factor, level, i, j)
 		descriptors = append(descriptors, factor.Factor)
 			setpoints = append(setpoints, level)
 			run.Factordescriptors = descriptors
 			run.Setpoints = setpoints
-			//	fmt.Println("factor:", factor, i, j)
+			//	// fmt.Println("factor:", factor, i, j)
 			runs[i+j] = run
 		}
 	}

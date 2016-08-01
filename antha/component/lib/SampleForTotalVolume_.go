@@ -48,8 +48,17 @@ func _SampleForTotalVolumeSteps(_ctx context.Context, _input *SampleForTotalVolu
 
 	allsamples = append(allsamples, solutionsample)
 
-	// finally use Mix to combine samples into a new component
+	// The Sample functions will not generate liquid handling instructions on their own
+	// We need to tell Antha what to do with samples
+	// For this we need to use one of the Mix functions
+	// therefore finally we use Mix to combine samples into a new component
 	_output.DilutedSample = execute.Mix(_ctx, allsamples...)
+
+	// Now we have an antha element which will generate liquid handling instructions
+	// let's see how to actually run the protocol
+	// open the terminal and type this:
+	// 'workflows && cd AnthaAcademy/Lesson1_Sample'
+	// work your way through the lessons there showing how to specify parameters and different types of workflow
 
 }
 
@@ -131,7 +140,7 @@ type SampleForTotalVolumeSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "SampleForTotalVolume",
+	if err := addComponent(Component{Name: "SampleForTotalVolume",
 		Constructor: SampleForTotalVolumeNew,
 		Desc: ComponentDesc{
 			Desc: "example protocol demonstrating the use of the SampleForTotalVolume function\n",
@@ -144,5 +153,7 @@ func init() {
 				{Name: "DilutedSample", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

@@ -38,7 +38,7 @@ func _TypeIISConstructAssemblyMMXSteps(_ctx context.Context, _input *TypeIISCons
 	for k, part := range _input.Parts {
 		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", _input.PartNames[k], " vol ", _input.PartVols[k])
 
-		part.Type = wtype.LiquidTypeFromString(_input.LHPolicyName)
+		part.Type, _ = wtype.LiquidTypeFromString(_input.LHPolicyName)
 
 		partSample := mixer.Sample(part, _input.PartVols[k])
 		partSample.CName = _input.PartNames[k]
@@ -143,7 +143,7 @@ type TypeIISConstructAssemblyMMXSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "TypeIISConstructAssemblyMMX",
+	if err := addComponent(Component{Name: "TypeIISConstructAssemblyMMX",
 		Constructor: TypeIISConstructAssemblyMMXNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -166,5 +166,7 @@ func init() {
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

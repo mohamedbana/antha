@@ -1,7 +1,7 @@
 {
   "Parameters": {
     "MakePalette1": {
-		"Imagefilename":"41_3133-sgt-peppers4.jpg",
+		"Imagefilename":"cmyk3.jpg",
 		"Rotate": false,
 		"AutoRotate": true,
 		"PosterizeImage":false,
@@ -16,7 +16,7 @@
     },
 	"Pipette1": {
        "VolumePerWell": "20ul",
-	   "Imagefilename":"41_3133-sgt-peppers4.jpg",
+	   "Imagefilename":"cmyk3.jpg",
 	   "OnlythisColour": "",
 	   "NotthisColour": "",
 	   "Rotate": false,

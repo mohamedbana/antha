@@ -8,6 +8,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/entrez"
 	"strconv"
+	"fmt"
 )
 
 Parameters (
@@ -72,8 +73,10 @@ Steps {
 	
 	// export sequence to fasta
 	if ExporttoFastaFile {
-	export.Makefastaserial2(ConstructName, PartsWithOverhangs)
+	export.Makefastaserial2(export.LOCAL,ConstructName, PartsWithOverhangs)
 	}
+	
+	fmt.Println("Parts Source: ",PartsWithOverhangs)
 }
 	
 Analysis {

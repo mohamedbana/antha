@@ -127,7 +127,7 @@ type PlateOutSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PlateOut",
+	if err := addComponent(Component{Name: "PlateOut",
 		Constructor: PlateOutNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -143,5 +143,7 @@ func init() {
 				{Name: "Platedculture", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

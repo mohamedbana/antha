@@ -29,8 +29,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/antha-lang/antha/antha/ast"
-	"github.com/antha-lang/antha/antha/token"
 	"log"
 	"path/filepath"
 	"reflect"
@@ -38,6 +36,9 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
+
+	"github.com/antha-lang/antha/antha/ast"
+	"github.com/antha-lang/antha/antha/token"
 )
 
 const (
@@ -86,6 +87,7 @@ func (p *compiler) anthaInit() {
 		"MixInto":      "execute.MixInto",
 		"Mix":          "execute.Mix",
 		"Incubate":     "execute.Incubate",
+		"Errorf":       "execute.Errorf",
 	}
 	p.types = map[string]string{
 		"Temperature":          "wunit.Temperature",
@@ -454,7 +456,7 @@ type {{.Element}}SOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "{{.Element}}",
+	if err := addComponent(Component{Name: "{{.Element}}",
 		Constructor: {{.Element}}New, 
 		Desc: ComponentDesc{
 			Desc: {{.Desc}},
@@ -464,7 +466,9 @@ func init() {
 				{{end}}
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }
 `
 

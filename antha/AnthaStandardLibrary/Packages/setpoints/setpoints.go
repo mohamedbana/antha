@@ -1,26 +1,24 @@
 // antha/AnthaStandardLibrary/Packages/setpoints/setpoints.go: Part of the Antha language
 // Copyright (C) 2015 The Antha authors. All rights reserved.
-// 
+//
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-// 
+//
 // For more information relating to the software or licensing issues please
-// contact license@antha-lang.org or write to the Antha team c/o 
+// contact license@antha-lang.org or write to the Antha team c/o
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
-
-// Functions used in calculating mass transfer in microwells
 
 /* Islam, R. S., Tisi, D., Levy, M. S. & Lye, G. J. Scale-up of Escherichia coli growth and recombinant protein expression conditions from microwell to laboratory and pilot scale based on matched kLa. Biotechnol. Bioeng. 99, 1128–1139 (2008).
 
@@ -44,10 +42,12 @@ kla = dimensionless
 	const	a = constant
 	const	b = constant
 */
+
+// Functions used in calculating mass transfer in microwells
 package setpoints //masstransfer
 
 import (
-	"fmt"
+	//"fmt"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Labware"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Liquidclasses"
@@ -81,19 +81,19 @@ func CalculateKlasquaremicrowell(Platetype string, liquid string, rpm float64, S
 	Re := eng.RE(ro, n, mu, dv)
 	//Necessaryshakerspeed := eng.Shakerspeed(TargetRE, ro, mu, dv)
 	//r, _ := stats.Round(Necessaryshakerspeed*60, 3)
-	//fmt.Println("shakerspeedrequired= ", r)
+	//// fmt.Println("shakerspeedrequired= ", r)
 	//r, _ = stats.Round(Re, 3)
-	//fmt.Println("Reynolds number = ", r)
+	//// fmt.Println("Reynolds number = ", r)
 	if Re > 5E3 {
-		fmt.Println("Turbulent flow")
+		// fmt.Println("Turbulent flow")
 	}
 
 	//r, _ = stats.Round(Fr, 3)
-	//fmt.Println("Froude number = ", r)
+	//// fmt.Println("Froude number = ", r)
 	CalculatedKla = eng.KLa_squaremicrowell(D, dv, ai, Re, a, Fr, b)
 
 	//r, _ = stats.Round(CalculatedKla, 3)
-	//fmt.Println("kla =", r)
+	//// fmt.Println("kla =", r)
 
 	// trouble shooting
 	/*

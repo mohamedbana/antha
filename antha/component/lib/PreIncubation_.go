@@ -115,7 +115,7 @@ type PreIncubationSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PreIncubation",
+	if err := addComponent(Component{Name: "PreIncubation",
 		Constructor: PreIncubationNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -129,5 +129,7 @@ func init() {
 				{Name: "ReadyCompCells", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

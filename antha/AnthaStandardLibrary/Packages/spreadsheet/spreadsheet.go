@@ -1,3 +1,26 @@
+// Part of the Antha language
+// Copyright (C) 2015 The Antha authors. All rights reserved.
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+//
+// For more information relating to the software or licensing issues please
+// contact license@antha-lang.org or write to the Antha team c/o
+// Synthace Ltd. The London Bioscience Innovation Centre
+// 2 Royal College St, London NW1 0NH UK
+
+// Package for interacting with spreadsheets
 package spreadsheet
 
 import (
@@ -5,9 +28,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
+	"github.com/tealeg/xlsx"
 )
 
 func OpenFile(filename string) (file *xlsx.File, err error) {
@@ -83,25 +105,20 @@ func HeaderandDataMap(sheet *xlsx.Sheet, headera1format string, dataminmaxcellco
 }
 
 func RowIntToCharacter(row int) (character string) {
-	alphabetarray := wutil.MakeAlphabetArray()
-	character = alphabetarray[row]
+	character = wutil.NumToAlpha(row + 1)
 	return
 }
 
 // Parses an a1 style excel cell coordinate into ints for row and column for use by plotinum library
 // note that 1 is subtracted from the column number in accordance with the go convention of counting from 0
 func A1formattorowcolumn(a1 string) (row, column int, err error) {
-
-	alphabetarray := wutil.MakeAlphabetArray()
-
 	a1 = strings.ToUpper(a1)
 
 	column, err = strconv.Atoi(a1[1:])
 	column = column - 1
 	if err == nil {
 		rowcoord := string(a1[0])
-		row := search.Position(alphabetarray, rowcoord)
-		//row := strings.Index(alphabet, string(a1[0]))
+		row := wutil.AlphaToNum(rowcoord) - 1
 		return row, column, err
 	}
 
@@ -109,9 +126,7 @@ func A1formattorowcolumn(a1 string) (row, column int, err error) {
 	column = column - 1
 	if err == nil {
 		rowcoord := a1[0:2]
-		row := search.Position(alphabetarray, rowcoord)
-
-		//row := strings.Index(alphabet, a1[0:1])
+		row := wutil.AlphaToNum(rowcoord) - 1
 		return row, column, err
 	}
 
@@ -119,8 +134,7 @@ func A1formattorowcolumn(a1 string) (row, column int, err error) {
 	column = column - 1
 	if err == nil {
 		rowcoord := a1[0:3]
-		row := search.Position(alphabetarray, rowcoord)
-		//row := strings.Index(alphabet, a1[0:2])
+		row := wutil.AlphaToNum(rowcoord) - 1
 		return row, column, err
 	}
 
@@ -132,9 +146,6 @@ func A1formattorowcolumn(a1 string) (row, column int, err error) {
 
 // from a pair of cell coordinates an aray of all entrires between the pair will be returned (e.g. a1:a12 or a1:e1)
 func ConvertMinMaxtoArray(minmax []string) (array []string, err error) {
-
-	alphabetarray := wutil.MakeAlphabetArray()
-
 	if len(minmax) != 2 {
 		err = fmt.Errorf("can only make array from a pair of values")
 		return
@@ -146,7 +157,7 @@ func ConvertMinMaxtoArray(minmax []string) (array []string, err error) {
 	}
 	maxrow, maxcol, err := A1formattorowcolumn(minmax[1])
 	if err != nil {
-		fmt.Println("minmax[1]", minmax[1], "maxrow=", maxrow, "maxcol", maxcol)
+		// fmt.Println("minmax[1]", minmax[1], "maxrow=", maxrow, "maxcol", maxcol)
 		return
 	}
 
@@ -154,11 +165,10 @@ func ConvertMinMaxtoArray(minmax []string) (array []string, err error) {
 		// fill by column
 		array = make([]string, 0)
 		for i := mincol; i < maxcol+1; i++ {
-
-			rowstring := alphabetarray[minrow]
+			rowstring := wutil.NumToAlpha(minrow + 1)
 			colstring := strconv.Itoa(i + 1)
 
-			array = append(array, string(rowstring)+colstring)
+			array = append(array, rowstring+colstring)
 		}
 
 	} else if mincol == maxcol {
@@ -166,9 +176,9 @@ func ConvertMinMaxtoArray(minmax []string) (array []string, err error) {
 		array = make([]string, 0)
 		for i := minrow; i < maxrow+1; i++ {
 			colstring := strconv.Itoa(mincol)
-			rowstring := alphabetarray[i]
+			rowstring := wutil.NumToAlpha(i + 1)
 
-			array = append(array, string(rowstring)+colstring)
+			array = append(array, rowstring+colstring)
 		}
 	} else {
 		err = fmt.Errorf("either column or row needs to be the same to make an array from two cordinates")

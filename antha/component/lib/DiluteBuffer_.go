@@ -31,8 +31,11 @@ func _DiluteBufferSetup(_ctx context.Context, _input *DiluteBufferInput) {}
 // for every input
 func _DiluteBufferSteps(_ctx context.Context, _input *DiluteBufferInput, _output *DiluteBufferOutput) {
 	//Bufferstockvolume := wunit.NewVolume((FinalVolume.SIValue() * FinalConcentration.SIValue()/Bufferstockconc.SIValue()),"l")
-
-	_output.FinalConcentration = buffers.Dilute(_input.Bufferstock.CName, _input.Bufferstockconc, _input.BufferVolumeAdded, _input.Diluent.CName, _input.DiluentVolume)
+	var err error
+	_output.FinalConcentration, err = buffers.Dilute(_input.Bufferstock.CName, _input.Bufferstockconc, _input.BufferVolumeAdded, _input.Diluent.CName, _input.DiluentVolume)
+	if err != nil {
+		panic(err)
+	}
 
 	_output.Buffer = execute.MixInto(_ctx, _input.OutPlate, "",
 		mixer.Sample(_input.Bufferstock, _input.BufferVolumeAdded),
@@ -134,7 +137,7 @@ type DiluteBufferSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "DiluteBuffer",
+	if err := addComponent(Component{Name: "DiluteBuffer",
 		Constructor: DiluteBufferNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -154,7 +157,9 @@ func init() {
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }
 
 /*

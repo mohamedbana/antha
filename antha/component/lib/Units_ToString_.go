@@ -32,6 +32,7 @@ func _Units_ToStringSteps(_ctx context.Context, _input *Units_ToStringInput, _ou
 	_output.ConcasString = _input.MyConc.ToString()
 	_output.MolesasString = _input.MyMoles.ToString()
 	_output.MassasString = _input.MyMass.ToString()
+	_output.FlowrateString = _input.MyFlowrate.ToString()
 
 	// Exercise: Add an equivalent process for a FlowRate
 }
@@ -93,6 +94,7 @@ type Units_ToStringElement struct {
 
 type Units_ToStringInput struct {
 	MyConc        wunit.Concentration
+	MyFlowrate    wunit.FlowRate
 	MyMass        wunit.Mass
 	MyMoles       wunit.Moles
 	MyTemperature wunit.Temperature
@@ -102,6 +104,7 @@ type Units_ToStringInput struct {
 
 type Units_ToStringOutput struct {
 	ConcasString   string
+	FlowrateString string
 	MassasString   string
 	MolesasString  string
 	TempasString   string
@@ -111,6 +114,7 @@ type Units_ToStringOutput struct {
 type Units_ToStringSOutput struct {
 	Data struct {
 		ConcasString   string
+		FlowrateString string
 		MassasString   string
 		MolesasString  string
 		TempasString   string
@@ -121,24 +125,28 @@ type Units_ToStringSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Units_ToString",
+	if err := addComponent(Component{Name: "Units_ToString",
 		Constructor: Units_ToStringNew,
 		Desc: ComponentDesc{
 			Desc: "demo protocol of how to convert units to string\n",
-			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/A_units_toString.an",
+			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/B_units_toString.an",
 			Params: []ParamDesc{
 				{Name: "MyConc", Desc: "", Kind: "Parameters"},
+				{Name: "MyFlowrate", Desc: "", Kind: "Parameters"},
 				{Name: "MyMass", Desc: "", Kind: "Parameters"},
 				{Name: "MyMoles", Desc: "", Kind: "Parameters"},
 				{Name: "MyTemperature", Desc: "", Kind: "Parameters"},
 				{Name: "MyTime", Desc: "", Kind: "Parameters"},
 				{Name: "MyVolume", Desc: "", Kind: "Parameters"},
 				{Name: "ConcasString", Desc: "", Kind: "Data"},
+				{Name: "FlowrateString", Desc: "", Kind: "Data"},
 				{Name: "MassasString", Desc: "", Kind: "Data"},
 				{Name: "MolesasString", Desc: "", Kind: "Data"},
 				{Name: "TempasString", Desc: "", Kind: "Data"},
 				{Name: "VolumeasString", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

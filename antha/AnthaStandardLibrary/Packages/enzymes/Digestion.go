@@ -20,16 +20,18 @@
 // Synthace Ltd. The London Bioscience Innovation Centre
 // 2 Royal College St, London NW1 0NH UK
 
+// Package for working with enzymes; in particular restriction enzymes
 package enzymes
 
 import (
+	"sort"
+	"strconv"
+	"strings"
+
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	"sort"
-	"strconv"
-	"strings"
 )
 
 //should expand to be more general, i.e. 3prime overhangs
@@ -612,7 +614,7 @@ func TypeIIDigest(sequence wtype.DNASequence, typeIIenzyme wtype.RestrictionEnzy
 	if len(Finalfragments) == 1 && sequence.Plasmid == true {
 		// TODO
 		// need to really return an uncut plasmid, maybe an error?
-		//	fmt.Println("uncut plasmid returned with no sticky ends!")
+		//	// fmt.Println("uncut plasmid returned with no sticky ends!")
 
 	}
 	if len(Finalfragments) > 1 && sequence.Plasmid == true {
@@ -744,7 +746,7 @@ func TypeIIsdigest(sequence wtype.DNASequence, typeIIsenzyme wtype.TypeIIs) (Fin
 	if len(Finalfragments) == 1 && sequence.Plasmid == true {
 		// TODO
 		// need to really return an uncut plasmid, maybe an error?
-		//	fmt.Println("uncut plasmid returned with no sticky ends!")
+		//	// fmt.Println("uncut plasmid returned with no sticky ends!")
 
 	}
 	if len(Finalfragments) > 1 && sequence.Plasmid == true {

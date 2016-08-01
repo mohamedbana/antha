@@ -52,7 +52,10 @@ func _DatacrunchSteps(_ctx context.Context, _input *DatacrunchInput, _output *Da
 	// Now working out Molarity of Substrate based on conc and looking up molecular weight in pubchem
 
 	// Look up properties
-	substrate_mw := pubchem.MakeMolecule(_input.Substrate_name)
+	substrate_mw, err := pubchem.MakeMolecule(_input.Substrate_name)
+	if err != nil {
+		panic(err)
+	}
 
 	// calculate moles
 	submoles := sequences.Moles(_input.SubstrateConc, substrate_mw.MolecularWeight, _input.SubstrateVol)
@@ -204,7 +207,7 @@ type DatacrunchSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Datacrunch",
+	if err := addComponent(Component{Name: "Datacrunch",
 		Constructor: DatacrunchNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -229,5 +232,7 @@ func init() {
 				{Name: "V", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

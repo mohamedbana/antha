@@ -53,6 +53,7 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 
 	// make sub pallete if necessary
 	var chosencolourpalette color.Palette
+	var err error
 
 	if _input.Subset {
 		chosencolourpalette = image.MakeSubPallette(_input.Palettename, _input.Subsetnames)
@@ -93,7 +94,7 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 		componentmap[componentname] = factory.GetComponentByType(componentname)
 
 	}
-	fmt.Println(componentmap)
+	//	fmt.Println(componentmap)
 
 	solutions := make([]*wtype.LHComponent, 0)
 
@@ -108,9 +109,13 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 		component := componentmap[colourtostringmap[colour]]
 
 		// make sure liquid class is appropriate for cell culture in case this is not set elsewhere
-		component.Type = wtype.LiquidTypeFromString(_input.UseLiquidClass) //wtype.LTCulture
+		component.Type, err = wtype.LiquidTypeFromString(_input.UseLiquidClass) //wtype.LTCulture
 
-		fmt.Println(image.Colourcomponentmap[colour])
+		if err != nil {
+			panic(err.Error())
+		}
+
+		//	fmt.Println(image.Colourcomponentmap[colour])
 
 		// if the option to only print a single colour is not selected then the pipetting actions for all colours (apart from if not this colour is not empty) will follow
 		if _input.OnlythisColour != "" {
@@ -120,7 +125,7 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 				_output.UniqueComponents = append(_output.UniqueComponents, component.CName)
 
 				counter = counter + 1
-				fmt.Println("wells", _input.OnlythisColour, counter)
+				//		fmt.Println("wells",OnlythisColour, counter)
 				//mediaSample := mixer.SampleForTotalVolume(Media, VolumePerWell)
 				//components = append(components,mediaSample)
 				/*antibioticSample := mixer.Sample(Antibiotic, AntibioticVolume)
@@ -142,7 +147,7 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 				_output.UniqueComponents = append(_output.UniqueComponents, component.CName)
 
 				counter = counter + 1
-				fmt.Println("wells not ", _input.Notthiscolour, counter)
+				//		fmt.Println("wells not ",Notthiscolour,counter)
 				//mediaSample := mixer.SampleForTotalVolume(Media, VolumePerWell)
 				//components = append(components,mediaSample)
 				/*antibioticSample := mixer.Sample(Antibiotic, AntibioticVolume)
@@ -152,7 +157,12 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 				inducerSample := mixer.Sample(Inducer, InducerVolume)
 				components = append(components,inducerSample)*/
 
-				component.Type = wtype.LiquidTypeFromString(_input.UseLiquidClass) //wtype.LTCulture
+				component.Type, err = wtype.LiquidTypeFromString(_input.UseLiquidClass) //wtype.LTCulture
+
+				if err != nil {
+					panic(err.Error())
+				}
+
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
 				//components = append(components,pixelSample)
 				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, pixelSample)
@@ -262,7 +272,7 @@ type PipetteImage_livingSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PipetteImage_living",
+	if err := addComponent(Component{Name: "PipetteImage_living",
 		Constructor: PipetteImage_livingNew,
 		Desc: ComponentDesc{
 			Desc: "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of coloured bacteria\n",
@@ -285,5 +295,7 @@ func init() {
 				{Name: "UniqueComponents", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

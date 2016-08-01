@@ -157,7 +157,7 @@ type Transformation_completeSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Transformation_complete",
+	if err := addComponent(Component{Name: "Transformation_complete",
 		Constructor: Transformation_completeNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -181,5 +181,7 @@ func init() {
 				{Name: "Platedculture", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

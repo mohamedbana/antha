@@ -3,10 +3,10 @@
     "PipetteImage": {
 		"OnlythisColour":"",
 		"Notthiscolour":"verywhite",
-	  	"Imagefilename": "nyancat.jpg",
+	  	"Imagefilename": "rainbow1.png",
 		"Rotate": false,
 		"AutoRotate": true,
-		"Palettename":"Neon",
+		"Palettename":"ProteinPaintboxUV",
 		"Subset": false,
 		"Subsetnames": [
 				"DreidelTeal",
@@ -19,7 +19,7 @@
 				],
 		"UseLiquidClass":"water",
       	"OutPlate": "Agarplateforpicking384_riser",
-		"UVimage":false,
+		"UVimage":true,
       	"VolumePerWell": "2ul"
     }
   }

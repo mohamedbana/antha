@@ -129,7 +129,7 @@ type AssaysetupSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Assaysetup",
+	if err := addComponent(Component{Name: "Assaysetup",
 		Constructor: AssaysetupNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -147,5 +147,7 @@ func init() {
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

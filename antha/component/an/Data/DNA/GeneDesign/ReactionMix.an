@@ -3,7 +3,7 @@ protocol ReactionMix
 import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	//"fmt"
+	"fmt"
 )
 
 // Input parameters for this protocol (data)
@@ -53,6 +53,9 @@ Setup {}
 
 
 Steps {
+	
+	fmt.Println("Components:",Components)
+	
 	samples := make([]*wtype.LHComponent, 0)
 	
 	VectorS := mixer.Sample(Vector, VectorV)

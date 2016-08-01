@@ -103,11 +103,11 @@ type DOEMediaPrepSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "DOEMediaPrep",
+	if err := addComponent(Component{Name: "DOEMediaPrep",
 		Constructor: DOEMediaPrepNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/DoE/mediaprep.an",
+			Path: "antha/component/an/GrowthAndAssay/mediaprep.an",
 			Params: []ParamDesc{
 				{Name: "BaseMedium", Desc: "", Kind: "Inputs"},
 				{Name: "Glycerol", Desc: "", Kind: "Inputs"},
@@ -121,5 +121,7 @@ func init() {
 				{Name: "GrowthMedium", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

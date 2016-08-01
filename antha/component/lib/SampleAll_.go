@@ -12,6 +12,8 @@ import (
 
 // Input parameters for this protocol (data)
 
+// the bool type is a "boolean": which essentially means true or false
+
 // Data which is returned from this protocol, and data types
 
 // Physical Inputs to this protocol with types
@@ -30,10 +32,15 @@ func _SampleAllSetup(_ctx context.Context, _input *SampleAllInput) {
 // The core process for this protocol, with the steps to be performed
 // for every input
 func _SampleAllSteps(_ctx context.Context, _input *SampleAllInput, _output *SampleAllOutput) {
+
 	// the SampleAll function samples the entire contents of the LHComponent
-	if _input.Sampleall {
+	// so there's no need to specify the volume
+	// this if statement specifies that the SampleAll action will only be performed if SampleAll is set to true
+	if _input.Sampleall == true {
 		_output.Sample = mixer.SampleAll(_input.Solution)
 	}
+
+	// now move on to C_SampleForTotalVolume.an
 
 }
 
@@ -113,16 +120,18 @@ type SampleAllSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "SampleAll",
+	if err := addComponent(Component{Name: "SampleAll",
 		Constructor: SampleAllNew,
 		Desc: ComponentDesc{
 			Desc: "example protocol demonstrating the use of the SampleAll function\n",
 			Path: "antha/component/an/AnthaAcademy/Lesson1_Sample/B_SampleAll.an",
 			Params: []ParamDesc{
-				{Name: "Sampleall", Desc: "", Kind: "Parameters"},
+				{Name: "Sampleall", Desc: "the bool type is a \"boolean\": which essentially means true or false\n", Kind: "Parameters"},
 				{Name: "Solution", Desc: "", Kind: "Inputs"},
 				{Name: "Sample", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

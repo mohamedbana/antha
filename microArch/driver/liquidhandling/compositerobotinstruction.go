@@ -727,7 +727,7 @@ func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms
 
 	for t := 0; t < len(ins.Volume); t++ {
 		newchannel, newtiptype := ChooseChannel(ins.Volume[t], prms)
-		tvs, err := TransferVolumes(ins.Volume[t], channel.Minvol, channel.Maxvol)
+		tvs, err := TransferVolumes(ins.Volume[t], newchannel.Minvol, newchannel.Maxvol)
 
 		if err != nil {
 			return ret, err
@@ -3419,6 +3419,5 @@ func DropTips(tiptype string, params *LHProperties, channel *wtype.LHChannelPara
 	ins.PltTo = tipwastepositions
 	ins.TPlateType = tipwastetypes
 	ins.Multi = multi
-	logger.Debug(InsToString(ins))
 	return ins, nil
 }

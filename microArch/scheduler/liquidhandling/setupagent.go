@@ -137,6 +137,12 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) (*
 
 	for _, pid := range input_plate_order {
 		p := input_plates[pid]
+
+		if p == nil {
+			err := wtype.LHError(wtype.LH_ERR_DIRE, fmt.Sprint("Plate with id ", pid, " in input_plate_order does not exist in input_plates"))
+			return request, err
+		}
+
 		allowed, isConstrained := p.IsConstrainedOn(params.Model)
 		if !isConstrained {
 			allowed = make([]string, 0, 1)
@@ -161,14 +167,20 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) (*
 		var waste *wtype.LHTipwaste
 		// this should be added to the automagic config setup... however it will require adding to the
 		// representation of the liquid handler
-		//TODO handle general case differently
 		if params.Model == "Pipetmax" {
 			waste = factory.GetTipwasteByType("Gilsontipwaste")
-		} else if params.Model == "GeneTheatre" {
+		} else if params.Model == "GeneTheatre" || params.Model == "Felix" {
 			waste = factory.GetTipwasteByType("CyBiotipwaste")
+		} else if params.Model == "Human" {
+			waste = factory.GetTipwasteByType("Manualtipwaste")
 		}
 
-		params.AddTipWaste(waste)
+		if waste != nil {
+			params.AddTipWaste(waste)
+		} else {
+			err := wtype.LHError(wtype.LH_ERR_OTHER, fmt.Sprint("No tip waste defined for model ", params.Model))
+			return nil, err
+		}
 	}
 	//request.Setup = setup
 	request.Plate_lookup = plate_lookup

@@ -169,7 +169,7 @@ func (a *trace) signal(lockedPool *poolCtx) error {
 func (a *trace) signalWithLock(lockedPool *poolCtx) (err error) {
 	defer func() {
 		if res := recover(); res != nil {
-			err = &goError{BaseError: res, Stack: debug.Stack()}
+			err = &Error{BaseError: res, Stack: debug.Stack()}
 		}
 	}()
 

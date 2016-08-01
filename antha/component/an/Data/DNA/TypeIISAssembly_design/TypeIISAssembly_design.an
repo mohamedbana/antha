@@ -15,7 +15,6 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/export"
 	"strings"
-	"strconv"
 )
 
 // Input parameters for this protocol (data)
@@ -105,7 +104,9 @@ Steps {
 	}
 
 	// or Look up parts from registry according to properties (this will take a couple of minutes the first time)
-	subparts := igem.FilterRegistry("REPORTER",[]string{"Fluorescent", "A "})
+	exacttypeonly := true
+	
+	subparts,_ := igem.FilterRegistry("REPORTER",[]string{"Fluorescent", "A "},exacttypeonly)
 	partdetails := igem.LookUp(subparts)
 	//fmt.Println(partdetails)
 	
@@ -173,13 +174,13 @@ Steps {
 	// Export sequences to order into a fasta file
 	
 	partswithOverhangs := make([]*wtype.DNASequence,0)
-	for i, part := range PartswithOverhangs{
-		_ = export.ExportFastaDir(Constructname,strconv.Itoa(i+1),&part)
+	for _, part := range PartswithOverhangs{
+		export.ExportFasta(Constructname,&part)
 		partswithOverhangs=append(partswithOverhangs,&part)
 		
 		
 	}
-	_ = export.Makefastaserial(Constructname,partswithOverhangs)
+	export.Makefastaserial(Constructname,partswithOverhangs)
 	
 	//partstoorder := ansi.Color(fmt.Sprintln("PartswithOverhangs", PartswithOverhangs),"red")
 	partstoorder := fmt.Sprintln("PartswithOverhangs", PartswithOverhangs)

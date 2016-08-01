@@ -5,9 +5,61 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
 )
+
+// convenience comparison operator
+
+func CompareStringWellCoordsCol(sw1, sw2 string) int {
+	w1 := MakeWellCoords(sw1)
+	w2 := MakeWellCoords(sw2)
+	return CompareWellCoordsCol(w1, w2)
+}
+
+func CompareWellCoordsCol(w1, w2 WellCoords) int {
+	dx := w1.X - w2.X
+	dy := w1.Y - w2.Y
+
+	if dx < 0 {
+		return -1
+	} else if dx > 0 {
+		return 1
+	} else {
+		if dy < 0 {
+			return -1
+		} else if dy > 0 {
+			return 1
+		} else {
+			return 0
+		}
+	}
+	return 0
+}
+func CompareStringWellCoordsRow(sw1, sw2 string) int {
+	w1 := MakeWellCoords(sw1)
+	w2 := MakeWellCoords(sw2)
+	return CompareWellCoordsRow(w1, w2)
+}
+
+func CompareWellCoordsRow(w1, w2 WellCoords) int {
+	dx := w1.X - w2.X
+	dy := w1.Y - w2.Y
+
+	if dy < 0 {
+		return -1
+	} else if dy > 0 {
+		return 1
+	} else {
+		if dx < 0 {
+			return -1
+		} else if dx > 0 {
+			return 1
+		} else {
+			return 0
+		}
+	}
+	return 0
+}
 
 // convenience structure for handling well coordinates
 type WellCoords struct {
@@ -61,32 +113,33 @@ func MakeWellCoords(wc string) WellCoords {
 	return r
 }
 
-/*
 // make well coordinates in the "A1" convention
 func MakeWellCoordsA1(a1 string) WellCoords {
-	// only handles 96 well plates
-	if !MatchString("[A-Z][0-9]{1,2}", a1) {
+	if !MatchString("[A-Z]{1,}[0-9]{1,2}", a1) {
 		return WellCoords{-1, -1}
 	}
-	return WellCoords{wutil.ParseInt(a1[1:len(a1)]) - 1, AlphaToNum(string(a1[0])) - 1}
-}
-*/
-// make well coordinates in the "A1" convention
-func MakeWellCoordsA1(a1 string) WellCoords {
+	re, _ := regexp.Compile("[A-Z]{1,}")
+	ix := re.FindIndex([]byte(a1))
+	endC := ix[1]
 
-	row, col, _ := spreadsheet.A1formattorowcolumn(a1)
-
-	return WellCoords{X: col, Y: row}
+	X := wutil.ParseInt(a1[endC:len(a1)]) - 1
+	Y := wutil.AlphaToNum(string(a1[0:endC])) - 1
+	return WellCoords{X, Y}
 }
 
 // make well coordinates in the "1A" convention
 func MakeWellCoords1A(a1 string) WellCoords {
-	// only handles 96 well plates
 
-	if !MatchString("[0-9]{1,2}[A-Z]", a1) {
+	if !MatchString("[0-9]{1,2}[A-Z]{1,}", a1) {
 		return WellCoords{-1, -1}
 	}
-	return WellCoords{AlphaToNum(string(a1[0])) - 1, wutil.ParseInt(a1[1:len(a1)]) - 1}
+	re, _ := regexp.Compile("[A-Z]{1,}")
+	ix := re.FindIndex([]byte(a1))
+	startC := ix[0]
+
+	Y := wutil.AlphaToNum(string(a1[startC:len(a1)])) - 1
+	X := wutil.ParseInt(a1[0:startC]) - 1
+	return WellCoords{X, Y}
 }
 
 // make well coordinates in a manner compatble with "X1,Y1" etc.
@@ -117,18 +170,21 @@ func (wc WellCoords) FormatXY() string {
 	}
 	return "X" + strconv.Itoa(wc.X+1) + "Y" + strconv.Itoa(wc.Y+1)
 }
+
 func (wc WellCoords) Format1A() string {
 	if wc.X < 0 || wc.Y < 0 {
 		return ""
 	}
-	return strconv.Itoa(wc.X+1) + NumToAlpha(wc.Y+1)
+	return strconv.Itoa(wc.X+1) + wutil.NumToAlpha(wc.Y+1)
 }
+
 func (wc WellCoords) FormatA1() string {
 	if wc.X < 0 || wc.Y < 0 {
 		return ""
 	}
-	return NumToAlpha(wc.Y+1) + strconv.Itoa(wc.X+1)
+	return wutil.NumToAlpha(wc.Y+1) + strconv.Itoa(wc.X+1)
 }
+
 func (wc WellCoords) WellNumber() int {
 	if wc.X < 0 || wc.Y < 0 {
 		return -1
@@ -142,11 +198,12 @@ func (wc WellCoords) ColNumString() string {
 	}
 	return strconv.Itoa(wc.X + 1)
 }
+
 func (wc WellCoords) RowLettString() string {
 	if wc.X < 0 || wc.Y < 0 {
 		return ""
 	}
-	return NumToAlpha(wc.Y + 1)
+	return wutil.NumToAlpha(wc.Y + 1)
 }
 
 // comparison operators

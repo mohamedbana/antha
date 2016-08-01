@@ -12,8 +12,8 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
-	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
 	"github.com/antha-lang/antha/microArch/factory"
+	"github.com/disintegration/imaging"
 	"image/color"
 )
 
@@ -83,7 +83,7 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 		componentmap[componentname] = factory.GetComponentByType(componentname)
 
 	}
-	fmt.Println(componentmap)
+	//fmt.Println(componentmap)
 
 	solutions := make([]*wtype.LHComponent, 0)
 
@@ -96,9 +96,9 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 		component := componentmap[colourtostringmap[colour]]
 
 		// make sure liquid class is appropriate for cell culture in case this is not set elsewhere
-		component.Type = wtype.LiquidTypeFromString(_input.UseLiquidClass) //wtype.LTCulture
+		component.Type, _ = wtype.LiquidTypeFromString(_input.UseLiquidClass) //wtype.LTCulture
 
-		fmt.Println(image.Colourcomponentmap[colour])
+		//fmt.Println(image.Colourcomponentmap[colour])
 
 		// if the option to only print a single colour is not selected then the pipetting actions for all colours (apart from if not this colour is not empty) will follow
 		if _input.OnlythisColour != "" {
@@ -108,7 +108,7 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 				_output.UniqueComponents = append(_output.UniqueComponents, component.CName)
 
 				counter = counter + 1
-				fmt.Println("wells", _input.OnlythisColour, counter)
+				//	fmt.Println("wells",OnlythisColour, counter)
 
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
 
@@ -123,9 +123,9 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 				_output.UniqueComponents = append(_output.UniqueComponents, component.CName)
 
 				counter = counter + 1
-				fmt.Println("wells not ", _input.Notthiscolour, counter)
+				//	fmt.Println("wells not ",Notthiscolour,counter)
 
-				component.Type = wtype.LiquidTypeFromString(_input.UseLiquidClass)
+				component.Type, _ = wtype.LiquidTypeFromString(_input.UseLiquidClass)
 				pixelSample := mixer.Sample(component, _input.VolumePerWell)
 
 				solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, pixelSample)
@@ -236,7 +236,7 @@ type PipetteImageSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PipetteImage",
+	if err := addComponent(Component{Name: "PipetteImage",
 		Constructor: PipetteImageNew,
 		Desc: ComponentDesc{
 			Desc: "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of coloured bacteria\n",
@@ -260,5 +260,7 @@ func init() {
 				{Name: "UniqueComponents", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

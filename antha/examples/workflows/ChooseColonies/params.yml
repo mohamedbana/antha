@@ -1,0 +1,11 @@
+{
+  "Parameters": {
+    "ChooseColonies": {
+	  "Imagefile": "Plate1.png",
+	  "Setplateperimeterfirst": true,
+	  "Rotate": false,
+	  "NumbertoPick":5
+		
+    }
+  }
+}

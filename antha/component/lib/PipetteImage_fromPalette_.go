@@ -11,7 +11,7 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
-	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
+	"github.com/disintegration/imaging"
 	"image/color"
 	"strconv"
 )
@@ -72,7 +72,7 @@ func _PipetteImage_fromPaletteSteps(_ctx context.Context, _input *PipetteImage_f
 		colourindex := strconv.Itoa(_input.Palette.Index(colour))
 
 		component, componentpresent := _input.ColourIndextoComponentMap[colourindex]
-		fmt.Println("Am I a component", component, "key:", colourindex, "from map:", _input.ColourIndextoComponentMap)
+		//	fmt.Println("Am I a component", component, "key:", colourindex, "from map:", ColourIndextoComponentMap)
 
 		if componentpresent {
 			component.Type = wtype.LTDISPENSEABOVE //"DoNotMix"
@@ -83,7 +83,7 @@ func _PipetteImage_fromPaletteSteps(_ctx context.Context, _input *PipetteImage_f
 
 				if image.Colourcomponentmap[colour] == _input.OnlythisColour {
 					counter = counter + 1
-					fmt.Println("wells", counter)
+					//		fmt.Println("wells",counter)
 					pixelSample := mixer.Sample(component, _input.VolumePerWell)
 					solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, pixelSample)
 					solutions = append(solutions, solution)
@@ -92,7 +92,7 @@ func _PipetteImage_fromPaletteSteps(_ctx context.Context, _input *PipetteImage_f
 			} else {
 				if component.CName != _input.NotthisColour {
 					counter = counter + 1
-					fmt.Println("wells", counter)
+					//		fmt.Println("wells",counter)
 					pixelSample := mixer.Sample(component, _input.VolumePerWell)
 					solution := execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, pixelSample)
 					solutions = append(solutions, solution)
@@ -196,7 +196,7 @@ type PipetteImage_fromPaletteSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PipetteImage_fromPalette",
+	if err := addComponent(Component{Name: "PipetteImage_fromPalette",
 		Constructor: PipetteImage_fromPaletteNew,
 		Desc: ComponentDesc{
 			Desc: "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours\n",
@@ -218,5 +218,7 @@ func init() {
 				{Name: "Pixels", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

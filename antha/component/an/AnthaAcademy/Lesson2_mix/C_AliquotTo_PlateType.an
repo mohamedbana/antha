@@ -48,7 +48,7 @@ Steps {
 	number := SolutionVolume.SIValue()/VolumePerAliquot.SIValue()
 	possiblenumberofAliquots, _ := wutil.RoundDown(number)
 	if possiblenumberofAliquots < NumberofAliquots {
-		panic("Not enough solution for this many aliquots")
+		Errorf("Not enough solution for this many aliquots")
 	}
 	
 	
@@ -70,7 +70,7 @@ Steps {
 		aliquot := MixTo(OutPlatetype, "", 1,aliquotSample)
 		aliquots = append(aliquots,aliquot)
 	}
-	Aliquots = aliquots
+	Aliquots = aliquots // 
 }
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results

@@ -96,11 +96,11 @@ type GrowthDOESOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "GrowthDOE",
+	if err := addComponent(Component{Name: "GrowthDOE",
 		Constructor: GrowthDOENew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/DoE/growth.an",
+			Path: "antha/component/an/GrowthAndAssay/growth.an",
 			Params: []ParamDesc{
 				{Name: "Growthtemp", Desc: "", Kind: "Parameters"},
 				{Name: "Growthtime", Desc: "", Kind: "Parameters"},
@@ -109,5 +109,7 @@ func init() {
 				{Name: "Culture", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

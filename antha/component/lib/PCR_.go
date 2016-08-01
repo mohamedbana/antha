@@ -212,7 +212,7 @@ type PCRSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PCR",
+	if err := addComponent(Component{Name: "PCR",
 		Constructor: PCRNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -244,5 +244,7 @@ func init() {
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

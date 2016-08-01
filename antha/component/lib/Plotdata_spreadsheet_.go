@@ -3,7 +3,7 @@ package lib
 import (
 	"fmt"
 	//"math/rand"
-	//"github.com/antha-lang/antha/internal/github.com/montanaflynn/stats"
+	//"github.com/montanaflynn/stats"
 	graph "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/plot"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -53,7 +53,7 @@ func _Plotdata_spreadsheetSteps(_ctx context.Context, _input *Plotdata_spreadshe
 		fmt.Println(_input.Xminmax, Xdatarange)
 		panic(err)
 	}
-	fmt.Println(Xdatarange)
+	//	fmt.Println(Xdatarange)
 
 	Ydatarangearray := make([][]string, 0)
 	for i, Yminmax := range _input.Yminmaxarray {
@@ -66,7 +66,7 @@ func _Plotdata_spreadsheetSteps(_ctx context.Context, _input *Plotdata_spreadshe
 			panic(panicmessage.Error())
 		}
 		Ydatarangearray = append(Ydatarangearray, Ydatarange)
-		fmt.Println(Ydatarange)
+		//	fmt.Println(Ydatarange)
 	}
 
 	// now plot the graph
@@ -154,7 +154,7 @@ type Plotdata_spreadsheetSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Plotdata_spreadsheet",
+	if err := addComponent(Component{Name: "Plotdata_spreadsheet",
 		Constructor: Plotdata_spreadsheetNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -167,5 +167,7 @@ func init() {
 				{Name: "Yminmaxarray", Desc: "= [][]string{[]string{\"b4\", \"b16\"}, []string{\"c4\", \"c16\"}, []string{\"d4\", \"d16\"}} // column in A1 format i.e string{1,12} would indicate all data between those points\n", Kind: "Parameters"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

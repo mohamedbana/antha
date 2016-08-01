@@ -7,7 +7,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"fmt"
-	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
+	"github.com/disintegration/imaging"
 	)
 
 
@@ -118,15 +118,15 @@ Steps {
 		
 		fullblackuint8 = uint8(MaxBlackPercentagethreshold * float64(maxuint8))
 		
-		fmt.Println("brand new minuint8 ",minuint8,"fullblackuint8 ", fullblackuint8)
+	//	fmt.Println("brand new minuint8 ",minuint8,"fullblackuint8 ", fullblackuint8)
 		
 		if gray.Y < minuint8 {
 			if SkipWhite {
 			skipped = skipped + 1
-		fmt.Println("skipping well:", skipped,locationkey)
+	//	fmt.Println("skipping well:", skipped,locationkey)
 		}else{
 			whitevol := VolumeForFullcolour
-			Diluent.Type = wtype.LiquidTypeFromString(NonMixingClass)
+			Diluent.Type,_ = wtype.LiquidTypeFromString(NonMixingClass)
 			
 			waterSample := mixer.Sample(Diluent,whitevol)
 			solution = MixTo(OutPlate.Type, locationkey,1, waterSample)
@@ -149,7 +149,7 @@ Steps {
 			
 			if gray.Y < fullblackuint8 /*&& gray.Y >= minuint8*/{
 			watervol := wunit.NewVolume((float64(maxuint8-gray.Y)/float64(maxuint8) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
-			fmt.Println("new well", locationkey, "water vol", watervol.ToString())
+//			fmt.Println("new well", locationkey, "water vol", watervol.ToString())
 			// force hv tip choice
 			if  OnlyHighVolumetips && watervol.RawValue() < 21	 && watervol.Unit().PrefixedSymbol() == "ul"{
 				watervol.SetValue(21)
@@ -160,22 +160,22 @@ Steps {
 		} 
 		if gray.Y >= fullblackuint8{
 			fullblack = fullblack + 1
-			fmt.Println("full colours:", fullblack)
+	//		fmt.Println("full colours:", fullblack)
 			blackvol = VolumeForFullcolour
 		}else {
 		blackvol = wunit.NewVolume((float64(gray.Y)/float64(maxuint8) * VolumeForFullcolour.RawValue()), VolumeForFullcolour.Unit().PrefixedSymbol())
 		}
 		
-		fmt.Println("new well", locationkey, "black vol", blackvol.ToString())
+	//	fmt.Println("new well", locationkey, "black vol", blackvol.ToString())
 		
 		//Black.Type = wtype.LiquidTypeFromString("NeedToMix")
 		
 		if DontMix {
 		Black.Type = wtype.LTDISPENSEABOVE
 		}else if gray.Y >= fullblackuint8 {
-		Black.Type = wtype.LiquidTypeFromString(NonMixingClass)
+		Black.Type,_ = wtype.LiquidTypeFromString(NonMixingClass)
 		}else{
-			Black.Type = wtype.LiquidTypeFromString(MixingLiquidClass)
+			Black.Type,_ = wtype.LiquidTypeFromString(MixingLiquidClass)
 		}
 		
 		//fmt.Println("blackvol2",blackvol.ToString())

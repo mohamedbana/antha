@@ -7,7 +7,7 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
-	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
+	"github.com/disintegration/imaging"
 )
 
 // Input parameters for this protocol (data)
@@ -132,7 +132,7 @@ type PreProcessImageSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PreProcessImage",
+	if err := addComponent(Component{Name: "PreProcessImage",
 		Constructor: PreProcessImageNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -150,5 +150,7 @@ func init() {
 				{Name: "ProcessedImageFilename", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

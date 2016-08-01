@@ -1,3 +1,25 @@
+// Part of the Antha language
+// Copyright (C) 2015 The Antha authors. All rights reserved.
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+//
+// For more information relating to the software or licensing issues please
+// contact license@antha-lang.org or write to the Antha team c/o
+// Synthace Ltd. The London Bioscience Innovation Centre
+// 2 Royal College St, London NW1 0NH UK
+
 // Package for facilitating DOE methodology in antha
 package doe
 
@@ -10,7 +32,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
+	"github.com/tealeg/xlsx"
 )
 
 type DOEPair struct {
@@ -48,6 +70,16 @@ func (run Run) AddResponseValue(responsedescriptor string, responsevalue interfa
 		}
 	}
 
+}
+
+func (run Run) GetResponseValue(responsedescriptor string) (responsevalue interface{}) {
+
+	for i, descriptor := range run.Responsedescriptors {
+		if strings.ToUpper(descriptor) == strings.ToUpper(responsedescriptor) {
+			responsevalue = run.ResponseValues[i]
+		}
+	}
+	return
 }
 
 func AddNewResponseFieldandValue(run Run, responsedescriptor string, responsevalue interface{}) (newrun Run) {
@@ -227,7 +259,7 @@ func AddAdditionalHeaders(run Run, additionalheader string, additionalsubheader 
 	newrun.AdditionalHeaders = headers
 	newrun.AdditionalSubheaders = subheaders
 
-	fmt.Println("newrun: ", newrun)
+	// fmt.Println("newrun: ", newrun)
 	return
 
 }
@@ -238,7 +270,7 @@ func AddAdditionalHeaderandValue(run Run, additionalheader string, additionalsub
 	if search.InSlice(additionalsubheader, run.AdditionalSubheaders) == false {
 
 		midrun := AddAdditionalHeaders(run, additionalheader, additionalsubheader)
-		fmt.Println("midrun: ", midrun)
+		// fmt.Println("midrun: ", midrun)
 		newrun = AddAdditionalValue(midrun, additionalsubheader, additionalvalue)
 	} else {
 		newrun = ReplaceAdditionalValue(run, additionalsubheader, additionalvalue)
@@ -265,7 +297,7 @@ func (run Run) GetAdditionalInfo(subheader string) (value interface{}, err error
 
 		}
 	}
-	fmt.Println("Header: ", subheader)
+	// fmt.Println("Header: ", subheader)
 	return value, fmt.Errorf("header, ", subheader, " not found in ", run.AdditionalSubheaders)
 }
 
@@ -329,13 +361,13 @@ func RunsFromFixedFactors(fixedfactors []DOEPair) (runswithfixedfactors []Run) {
 }
 
 func AllComboCount(pairs []DOEPair) (numberofuniquecombos int) {
-	fmt.Println("In AllComboCount", "len(pairs)", len(pairs))
+	// fmt.Println("In AllComboCount", "len(pairs)", len(pairs))
 	var movingcount int
 	movingcount = (pairs[0]).LevelCount()
-	fmt.Println("levelcount", movingcount)
-	fmt.Println("len(levels)", len(pairs[0].Levels))
+	// fmt.Println("levelcount", movingcount)
+	// fmt.Println("len(levels)", len(pairs[0].Levels))
 	for i := 1; i < len(pairs); i++ {
-		fmt.Println("levelcount", movingcount)
+		// fmt.Println("levelcount", movingcount)
 		movingcount = movingcount * (pairs[i]).LevelCount()
 	}
 	numberofuniquecombos = movingcount
@@ -430,14 +462,14 @@ func AddWelllocations(DXORJMP string, xlsxfile string, oldsheet int, runnumberto
 
 	_ = file.AddSheet("hello")
 
-	extracolumn := sheet.MaxCol + 1
+	//extracolumn := sheet.MaxCol + 1
 
 	// add extra column headers first
 	for _, extracolumnheader := range extracolumnheaders {
 		xlsxcell = sheet.Rows[0].AddCell()
 
 		xlsxcell.Value = "Extra column added"
-		fmt.Println("CEllll added succesfully", sheet.Cell(0, extracolumn).String())
+		// fmt.Println("CEllll added succesfully", sheet.Cell(0, extracolumn).String())
 		xlsxcell = sheet.Rows[1].AddCell()
 		xlsxcell.Value = extracolumnheader
 	}
@@ -446,7 +478,7 @@ func AddWelllocations(DXORJMP string, xlsxfile string, oldsheet int, runnumberto
 	xlsxcell = sheet.Rows[0].AddCell()
 
 	xlsxcell.Value = "Location"
-	fmt.Println("CEllll added succesfully", sheet.Cell(0, extracolumn).String())
+	// fmt.Println("CEllll added succesfully", sheet.Cell(0, extracolumn).String())
 	xlsxcell = sheet.Rows[1].AddCell()
 	xlsxcell.Value = "Well ID"
 
@@ -523,7 +555,13 @@ func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) 
 
 				_, err := cell.Float()
 
-				if err == nil || celltype == 1 {
+				if strings.ToUpper(cell.Value) == "TRUE" {
+					setpoint = true //cell.SetBool(true)
+				} else if strings.ToUpper(cell.Value) == "FALSE" {
+					setpoint = false //cell.SetBool(false)
+				} else if celltype == 3 {
+					setpoint = cell.Bool()
+				} else if err == nil || celltype == 1 {
 					setpoint, _ = cell.Float()
 					if search.InSlice(descriptor, intfactors) {
 						setpoint, err = cell.Int()
@@ -531,12 +569,6 @@ func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) 
 							return runs, err
 						}
 					}
-				} else if strings.ToUpper(cell.Value) == "TRUE" {
-					setpoint = true //cell.SetBool(true)
-				} else if strings.ToUpper(cell.Value) == "FALSE" {
-					setpoint = false //cell.SetBool(false)
-				} else if celltype == 3 {
-					setpoint = cell.Bool()
 				} else {
 					setpoint = cell.String()
 				}
@@ -547,7 +579,7 @@ func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) 
 			} else if strings.Contains(factororresponse, "Response") {
 				descriptor = sheet.Cell(1, j).String()
 				responsedescriptor := descriptor
-				//fmt.Println("response", i, j, descriptor)
+				//// fmt.Println("response", i, j, descriptor)
 				responsedescriptors = append(responsedescriptors, responsedescriptor)
 
 				cell := sheet.Cell(i, j)
@@ -667,9 +699,7 @@ func DXXLSXFilefromRuns(runs []Run, outputfilename string) (xlsxfile *xlsx.File)
 
 	// then add subheadings and descriptors
 	for i, descriptor := range runs[0].Factordescriptors {
-
-		letter := strings.ToUpper(wutil.Alphabet[i])
-
+		letter := wutil.NumToAlpha(i + 1)
 		cell = row.AddCell()
 		cell.Value = letter + ":" + descriptor
 
@@ -736,7 +766,7 @@ func DXXLSXFilefromRuns(runs []Run, outputfilename string) (xlsxfile *xlsx.File)
 
 // jmp
 
-func RunsFromJMPDesign(xlsx string, patterncolumn int, factorcolumns []int, responsecolumns []int, intfactors []string) (runs []Run, err error) {
+func RunsFromJMPDesign(xlsx string, factorcolumns []int, responsecolumns []int, intfactors []string) (runs []Run, err error) {
 	file, err := spreadsheet.OpenFile(xlsx)
 	if err != nil {
 		return runs, err
@@ -768,7 +798,7 @@ func RunsFromJMPDesign(xlsx string, patterncolumn int, factorcolumns []int, resp
 
 			if search.Contains(factorcolumns, j) {
 				factororresponse = "Factor"
-			} else if search.Contains(responsecolumns, j) && j != patterncolumn {
+			} else if search.Contains(responsecolumns, j) {
 				factororresponse = "Response"
 			}
 
@@ -784,7 +814,13 @@ func RunsFromJMPDesign(xlsx string, patterncolumn int, factorcolumns []int, resp
 
 				_, err := cell.Float()
 
-				if err == nil || celltype == 1 {
+				if strings.ToUpper(cell.Value) == "TRUE" {
+					setpoint = true //cell.SetBool(true)
+				} else if strings.ToUpper(cell.Value) == "FALSE" {
+					setpoint = false //cell.SetBool(false)
+				} else if celltype == 3 {
+					setpoint = cell.Bool()
+				} else if err == nil || celltype == 1 {
 					setpoint, _ = cell.Float()
 					if search.InSlice(descriptor, intfactors) {
 						setpoint, err = cell.Int()
@@ -792,12 +828,6 @@ func RunsFromJMPDesign(xlsx string, patterncolumn int, factorcolumns []int, resp
 							return runs, err
 						}
 					}
-				} else if cell.Value == "TRUE" {
-					setpoint = true //cell.SetBool(true)
-				} else if cell.Value == "FALSE" {
-					setpoint = false //cell.SetBool(false)
-				} else if celltype == 3 {
-					setpoint = cell.Bool()
 				} else {
 					setpoint = cell.String()
 				}
@@ -946,6 +976,16 @@ func JMPXLSXFilefromRuns(runs []Run, outputfilename string) (xlsxfile *xlsx.File
 	err = xlsxfile.Save(outputfilename)
 	if err != nil {
 		fmt.Printf(err.Error())
+	}
+	return
+}
+
+func XLSXFileFromRuns(runs []Run, outputfilename string, dxorjmp string) (xlsxfile *xlsx.File) {
+	if dxorjmp == "DX" {
+		xlsxfile = DXXLSXFilefromRuns(runs, outputfilename)
+	}
+	if dxorjmp == "JMP" {
+		xlsxfile = JMPXLSXFilefromRuns(runs, outputfilename)
 	}
 	return
 }

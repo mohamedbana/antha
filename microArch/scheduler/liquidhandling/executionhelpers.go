@@ -124,7 +124,7 @@ func (bg ByGeneration) Len() int      { return len(bg) }
 func (bg ByGeneration) Swap(i, j int) { bg[i], bg[j] = bg[j], bg[i] }
 func (bg ByGeneration) Less(i, j int) bool {
 	if bg[i].Generation() == bg[j].Generation() {
-		strings.Compare(bg[i].Welladdress, bg[j].Welladdress)
+		return wtype.CompareStringWellCoordsCol(bg[i].Welladdress, bg[j].Welladdress) < 0
 	}
 
 	return bg[i].Generation() < bg[j].Generation()
@@ -149,9 +149,6 @@ func set_output_order(rq *LHRequest) error {
 	}
 
 	rq.Output_order = it.Flatten()
-
-	// wha
-	it.Print()
 
 	rq.InstructionChain = it
 
@@ -204,7 +201,7 @@ func merge_transfers(insIn []driver.RobotInstruction, aggregates [][]int) []driv
 	return ret
 }
 
-func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) (insOut *driver.TransferInstruction, err error) {
+func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties, carryvol wunit.Volume) (insOut *driver.TransferInstruction, err error) {
 	cmps := insIn.Components
 
 	lenToMake := len(insIn.Components)
@@ -219,7 +216,7 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties) 
 
 	// six parameters applying to the source
 
-	fromPlateID, fromWells, err := robot.GetComponents(cmps)
+	fromPlateID, fromWells, err := robot.GetComponents(cmps, carryvol)
 
 	if err != nil {
 		return nil, err

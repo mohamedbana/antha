@@ -2,6 +2,7 @@ package lib
 
 import (
 	"fmt"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -27,7 +28,28 @@ func _TypeIISConstructAssemblyMMX_forscreenSetup(_ctx context.Context, _input *T
 // The core process for this protocol, with the steps to be performed
 // for every input
 func _TypeIISConstructAssemblyMMX_forscreenSteps(_ctx context.Context, _input *TypeIISConstructAssemblyMMX_forscreenInput, _output *TypeIISConstructAssemblyMMX_forscreenOutput) {
+	var err error
+
 	samples := make([]*wtype.LHComponent, 0)
+	_output.ConstructName = _input.OutputConstructName
+
+	last := len(_input.PartSeqs) - 1
+	output, count, _, seq, err := enzymes.Assemblysimulator(enzymes.Assemblyparameters{
+		Constructname: _output.ConstructName,
+		Enzymename:    _input.EnzymeName,
+		Vector:        _input.PartSeqs[last],
+		Partsinorder:  _input.PartSeqs[:last],
+	})
+	if err != nil {
+		_output.Errors = append(_output.Errors, fmt.Sprintf("%s: %s", output, err))
+		return
+	}
+	if count != 1 {
+		_output.Errors = append(_output.Errors, fmt.Sprintf("no successful assembly"))
+		return
+	}
+
+	_output.Sequence = seq
 
 	waterSample := mixer.SampleForTotalVolume(_input.Water, _input.ReactionVolume)
 	samples = append(samples, waterSample)
@@ -36,18 +58,24 @@ func _TypeIISConstructAssemblyMMX_forscreenSteps(_ctx context.Context, _input *T
 	samples = append(samples, mmxSample)
 
 	for k, part := range _input.Parts {
-		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", _input.PartNames[k], " vol ", _input.PartVols[k])
+		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", _input.PartSeqs[k].Nm, " vol ", _input.PartVols[k])
 
-		part.Type = wtype.LiquidTypeFromString(_input.LHPolicyName)
+		part.Type, err = wtype.LiquidTypeFromString(_input.LHPolicyName)
+
+		if err != nil {
+			_output.Errors = append(_output.Errors, fmt.Sprintf("cannot find liquid type: %s", err))
+			return
+		}
 
 		partSample := mixer.Sample(part, _input.PartVols[k])
-		partSample.CName = _input.PartNames[k]
+		partSample.CName = _input.PartSeqs[k].Nm
 		samples = append(samples, partSample)
 	}
 
 	// ensure the last step is mixed
 	samples[len(samples)-1].Type = wtype.LTDNAMIX
 	_output.Reaction = execute.MixTo(_ctx, _input.OutPlate.Type, _input.OutputLocation, _input.OutputPlateNum, samples...)
+	_output.Reaction.Extra["label"] = _output.ConstructName
 
 	// incubate the reaction mixture
 	// commented out pending changes to incubate
@@ -114,30 +142,38 @@ type TypeIISConstructAssemblyMMX_forscreenElement struct {
 }
 
 type TypeIISConstructAssemblyMMX_forscreenInput struct {
-	InactivationTemp   wunit.Temperature
-	InactivationTime   wunit.Time
-	LHPolicyName       string
-	MasterMix          *wtype.LHComponent
-	MasterMixVolume    wunit.Volume
-	OutPlate           *wtype.LHPlate
-	OutputLocation     string
-	OutputPlateNum     int
-	OutputReactionName string
-	PartNames          []string
-	PartVols           []wunit.Volume
-	Parts              []*wtype.LHComponent
-	ReactionTemp       wunit.Temperature
-	ReactionTime       wunit.Time
-	ReactionVolume     wunit.Volume
-	Water              *wtype.LHComponent
+	EnzymeName          string
+	InactivationTemp    wunit.Temperature
+	InactivationTime    wunit.Time
+	LHPolicyName        string
+	MasterMix           *wtype.LHComponent
+	MasterMixVolume     wunit.Volume
+	OutPlate            *wtype.LHPlate
+	OutputConstructName string
+	OutputLocation      string
+	OutputPlateNum      int
+	OutputReactionName  string
+	PartSeqs            []wtype.DNASequence
+	PartVols            []wunit.Volume
+	Parts               []*wtype.LHComponent
+	ReactionTemp        wunit.Temperature
+	ReactionTime        wunit.Time
+	ReactionVolume      wunit.Volume
+	Water               *wtype.LHComponent
 }
 
 type TypeIISConstructAssemblyMMX_forscreenOutput struct {
-	Reaction *wtype.LHComponent
+	ConstructName string
+	Errors        []string
+	Reaction      *wtype.LHComponent
+	Sequence      wtype.DNASequence
 }
 
 type TypeIISConstructAssemblyMMX_forscreenSOutput struct {
 	Data struct {
+		ConstructName string
+		Errors        []string
+		Sequence      wtype.DNASequence
 	}
 	Outputs struct {
 		Reaction *wtype.LHComponent
@@ -145,30 +181,37 @@ type TypeIISConstructAssemblyMMX_forscreenSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "TypeIISConstructAssemblyMMX_forscreen",
+	if err := addComponent(Component{Name: "TypeIISConstructAssemblyMMX_forscreen",
 		Constructor: TypeIISConstructAssemblyMMX_forscreenNew,
 		Desc: ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/TypeIIsAssembly/TypeIISConstructAssemblyMMX_forscreen/TypeIISConstructAssemblyMMX.an",
 			Params: []ParamDesc{
+				{Name: "EnzymeName", Desc: "", Kind: "Parameters"},
 				{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
 				{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
 				{Name: "LHPolicyName", Desc: "", Kind: "Parameters"},
 				{Name: "MasterMix", Desc: "", Kind: "Inputs"},
 				{Name: "MasterMixVolume", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
+				{Name: "OutputConstructName", Desc: "", Kind: "Parameters"},
 				{Name: "OutputLocation", Desc: "", Kind: "Parameters"},
 				{Name: "OutputPlateNum", Desc: "", Kind: "Parameters"},
 				{Name: "OutputReactionName", Desc: "", Kind: "Parameters"},
-				{Name: "PartNames", Desc: "", Kind: "Parameters"},
+				{Name: "PartSeqs", Desc: "", Kind: "Parameters"},
 				{Name: "PartVols", Desc: "", Kind: "Parameters"},
 				{Name: "Parts", Desc: "", Kind: "Inputs"},
 				{Name: "ReactionTemp", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionTime", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionVolume", Desc: "", Kind: "Parameters"},
 				{Name: "Water", Desc: "", Kind: "Inputs"},
+				{Name: "ConstructName", Desc: "", Kind: "Data"},
+				{Name: "Errors", Desc: "", Kind: "Data"},
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
+				{Name: "Sequence", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

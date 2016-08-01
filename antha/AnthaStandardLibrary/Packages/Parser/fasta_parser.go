@@ -27,7 +27,7 @@ import (
 	"bytes"
 	"encoding/csv"
 	"errors"
-	"fmt"
+	//"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -49,7 +49,7 @@ func RetrieveSeqFromFASTA(id string, filename string) (seq wtype.DNASequence, er
 
 	allparts, err := ioutil.ReadFile(filename)
 	if err != nil {
-		fmt.Println("error:", err)
+		// fmt.Println("error:", err)
 		return
 	}
 
@@ -82,7 +82,7 @@ func FASTAtoLinearDNASeqs(filename string) (seqs []wtype.DNASequence, err error)
 
 	allparts, err := ioutil.ReadFile(filename)
 	if err != nil {
-		fmt.Println("error:", err)
+		// fmt.Println("error:", err)
 		return
 	}
 
@@ -111,7 +111,7 @@ func FASTAtoPlasmidDNASeqs(filename string) (seqs []wtype.DNASequence, err error
 
 	allparts, err := ioutil.ReadFile(filename)
 	if err != nil {
-		fmt.Println("error:", err)
+		// fmt.Println("error:", err)
 		return
 	}
 
@@ -227,7 +227,7 @@ func FastaParse(fastaFh io.Reader) chan Fasta {
 
 					// Standard FASTA identifiers look like: ">id desc"
 					header = line[1:]
-					//fmt.Println(" header: ", header)
+					//// fmt.Println(" header: ", header)
 					//header = strings.Join(line[1:], " ")
 
 				} else {

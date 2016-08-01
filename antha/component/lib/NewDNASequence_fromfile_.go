@@ -58,7 +58,7 @@ func _NewDNASequence_fromfileSteps(_ctx context.Context, _input *NewDNASequence_
 
 	_output.Warnings = err
 
-} //else {Status = fmt.Sprintln("correct conditions not met")}
+}
 
 // Actions to perform after steps block to analyze data
 func _NewDNASequence_fromfileAnalysis(_ctx context.Context, _input *NewDNASequence_fromfileInput, _output *NewDNASequence_fromfileOutput) {
@@ -140,11 +140,11 @@ type NewDNASequence_fromfileSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "NewDNASequence_fromfile",
+	if err := addComponent(Component{Name: "NewDNASequence_fromfile",
 		Constructor: NewDNASequence_fromfileNew,
 		Desc: ComponentDesc{
 			Desc: "Protocol for creating a DNASequence from a sequence file format. // Supported formats: .gdx .fasta .gb\n",
-			Path: "antha/component/an/Data/DNA/NewDNASequence/NewDNASequence_fromfile.an",
+			Path: "antha/component/an/AnthaAcademy/Lesson4_DNA/B_NewDNASequence_fromfile.an",
 			Params: []ParamDesc{
 				{Name: "Filename", Desc: "", Kind: "Parameters"},
 				{Name: "Gene_name", Desc: "", Kind: "Parameters"},
@@ -156,5 +156,7 @@ func init() {
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

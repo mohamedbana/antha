@@ -153,7 +153,7 @@ type Transformation_lowlevelSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Transformation_lowlevel",
+	if err := addComponent(Component{Name: "Transformation_lowlevel",
 		Constructor: Transformation_lowlevelNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -170,5 +170,7 @@ func init() {
 				{Name: "Transformedcells", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

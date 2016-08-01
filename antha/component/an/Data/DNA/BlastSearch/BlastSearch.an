@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/blast"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
-	biogo "github.com/antha-lang/antha/internal/github.com/biogo/ncbi/blast"
+	biogo "github.com/biogo/ncbi/blast"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	
 )
@@ -18,8 +18,14 @@ Parameters (
 
 // Data which is returned from this protocol; output data
 Data (
-	Hits string
-	//AnthaSeq wtype.DNASequence
+	Hitssummary string
+	//AllHits []biogo.Hit
+	ExactHits []biogo.Hit
+	BestHit biogo.Hit
+	Identity float64
+	Coverage float64
+	AnthaSeq wtype.DNASequence
+	Warning error
 )
 
 // Physical inputs to this protocol
@@ -46,29 +52,14 @@ Steps {
 	
 	var err error
 	var hits []biogo.Hit
-	/*
-	if Querytype == "PROTEIN" {
-	hits, err = blast.MegaBlastP(Query)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	
-	Hits = fmt.Sprintln(blast.HitSummary(hits))
-
-	
-	} else if Querytype == "DNA" {
-	hits, err = blast.MegaBlastN(Query)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	
-	Hits = fmt.Sprintln(blast.HitSummary(hits))
-	} 
-	*/
+	var hitsummary string	
+	var identity float64
+	var coverage float64
+	var besthitsummary string
 	
 	
 	// Convert the sequence to an anthatype
-	AnthaSeq := wtype.MakeLinearDNASequence(Name, DNA)
+	AnthaSeq = wtype.MakeLinearDNASequence(Name, DNA)
 	
 	// look for orfs
 	orf, orftrue := sequences.FindORF(AnthaSeq.Seq)
@@ -84,14 +75,27 @@ Steps {
 	if err !=nil {
 		fmt.Println(err.Error())
 	
-	} //else {
+	} 
 	
-		//Hits = fmt.Sprintln(blast.HitSummary(hits))
-		
+		ExactHits, hitsummary, err =  blast.AllExactMatches(hits)
+	
+		if len(ExactHits)== 0 {
+		hitsummary,err = blast.HitSummary(hits,10,10)
+		}
+		BestHit,identity, coverage, besthitsummary, err = blast.FindBestHit(hits)
+	
+	//	AllHits = hits 
+		Hitssummary = hitsummary
+		fmt.Println(hitsummary)
+		fmt.Println(besthitsummary)
 		// Rename Sequence with ID of top blast hit
-		AnthaSeq.Nm = hits[0].Id
-	//}
-	
+		
+		if coverage == 100 && identity == 100 { 
+		AnthaSeq.Nm = BestHit.Id
+		}
+	Warning = err
+	Identity = identity
+	Coverage = coverage
 	
 }
 

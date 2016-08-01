@@ -107,7 +107,7 @@ type Units_ConcentrationSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Units_Concentration",
+	if err := addComponent(Component{Name: "Units_Concentration",
 		Constructor: Units_ConcentrationNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -119,5 +119,7 @@ func init() {
 				{Name: "ConcinMperL", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

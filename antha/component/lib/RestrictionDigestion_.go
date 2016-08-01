@@ -159,7 +159,7 @@ type RestrictionDigestionSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "RestrictionDigestion",
+	if err := addComponent(Component{Name: "RestrictionDigestion",
 		Constructor: RestrictionDigestionNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -186,5 +186,7 @@ func init() {
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

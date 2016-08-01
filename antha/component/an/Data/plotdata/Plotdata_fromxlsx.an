@@ -4,7 +4,7 @@ protocol Plotdata_spreadsheet
 import (
 	"fmt"
 	//"math/rand"
-	//"github.com/antha-lang/antha/internal/github.com/montanaflynn/stats"
+	//"github.com/montanaflynn/stats"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
 	graph "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/plot"
 )
@@ -60,7 +60,7 @@ Steps {
 		fmt.Println(Xminmax, Xdatarange)
 		panic(err)
 	}
-	fmt.Println(Xdatarange)
+//	fmt.Println(Xdatarange)
 
 	Ydatarangearray := make([][]string, 0)
 	for i, Yminmax := range Yminmaxarray {
@@ -73,7 +73,7 @@ Steps {
 			panic(panicmessage.Error())
 		}
 		Ydatarangearray = append(Ydatarangearray, Ydatarange)
-		fmt.Println(Ydatarange)
+	//	fmt.Println(Ydatarange)
 	}
 
 	// now plot the graph

@@ -9,9 +9,11 @@ package lib
 
 import (
 	"fmt"
+	inventory "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Inventory"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes/lookup"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/export"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/igem"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
@@ -67,6 +69,7 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 
 	_output.Status = "all parts available"
 	for i, part := range _input.Seqsinorder {
+		// check if genbank feature
 		if strings.Contains(part, ".gb") && strings.Contains(part, "Feature:") {
 
 			split := strings.SplitAfter(part, ".gb")
@@ -76,20 +79,60 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 			feature := split2[1]
 
 			partDNA, _ = parser.GenbankFeaturetoDNASequence(file, feature)
+
+			// check if genbank file
 		} else if strings.Contains(part, ".gb") {
 
 			partDNA, _ = parser.GenbanktoAnnotatedSeq(part)
-		} else {
+			//check if biobrick
+		} else if strings.Contains(part, "BBa_") {
+			nm := "Part " + strconv.Itoa(i) + "_" + part
+			part = igem.GetSequence(part)
 
-			if strings.Contains(part, "BBa_") {
-				part = igem.GetSequence(part)
-			}
+			partDNA = wtype.MakeLinearDNASequence(nm, part)
+
+			// check if in inventory
+		} else if inventoryDNA, found := inventory.Partslist[part]; found {
+			partDNA = inventoryDNA
+
+			// else treat as DNA sequence and check
+		} else {
 			partDNA = wtype.MakeLinearDNASequence("Part "+strconv.Itoa(i), part)
+
+			// test for illegal nucleotides
+			pass, illegals, _ := sequences.Illegalnucleotides(partDNA)
+
+			if !pass {
+				var newstatus = make([]string, 0)
+				for _, illegal := range illegals {
+
+					newstatus = append(newstatus, "part: "+partDNA.Nm+" "+partDNA.Seq+": contains illegalnucleotides:"+illegal.ToString())
+				}
+				warnings = append(warnings, strings.Join(newstatus, ""))
+				execute.Errorf(_ctx, strings.Join(newstatus, ""))
+			}
+			if pass && _input.BlastSeqswithNoName {
+				// run a blast search on the sequence to get the name
+				blastsearch := BlastSearch_wtypeRunSteps(_ctx, &BlastSearch_wtypeInput{DNA: partDNA})
+				partDNA.Nm = blastsearch.Data.AnthaSeq.Nm
+			}
+
 		}
 		partsinorder = append(partsinorder, partDNA)
 	}
+
+	warnings = append(warnings, fmt.Sprintln(partsinorder))
+
 	// check parts for restriction sites first and remove if the user has chosen to
 	enz := lookup.EnzymeLookup(_input.Enzymename)
+
+	// get properties of other enzyme sites to remove
+	removetheseenzymes := make([]wtype.RestrictionEnzyme, 0)
+	removetheseenzymes = append(removetheseenzymes, enz)
+
+	for _, enzyme := range _input.OtherEnzymeSitesToRemove {
+		removetheseenzymes = append(removetheseenzymes, lookup.EnzymeLookup(enzyme))
+	}
 
 	warning = text.Print("RemoveproblemRestrictionSites =", _input.RemoveproblemRestrictionSites)
 	warnings = append(warnings, warning)
@@ -100,14 +143,14 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 
 		for _, part := range partsinorder {
 
-			info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
+			info := enzymes.Restrictionsitefinder(part, removetheseenzymes)
 
 			for _, anysites := range info {
 				if anysites.Sitefound {
-					warning = "problem site found in " + part.Nm
+					warning = "problem " + anysites.Enzyme.Name + " site found in " + part.Nm
 					warnings = append(warnings, warning)
 					orf, orftrue := sequences.FindBiggestORF(part.Seq)
-					warning = fmt.Sprintln("site found in orf ", part.Nm, " ", orftrue, " site positions ", anysites.Positions("ALL"), "orf between", orf.StartPosition, " and ", orf.EndPosition /*orf.DNASeq[orf.StartPosition:orf.EndPosition]*/)
+					warning = fmt.Sprintln(anysites.Enzyme.Name+" site found in orf ", part.Nm, " ", orftrue, " site positions ", anysites.Positions("ALL"), "orf between", orf.StartPosition, " and ", orf.EndPosition /*orf.DNASeq[orf.StartPosition:orf.EndPosition]*/)
 					warnings = append(warnings, warning)
 					if orftrue /* && len(orf.ProtSeq) > 20 */ {
 						allsitestoavoid := make([]string, 0)
@@ -122,7 +165,7 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 								warnings = append(warnings, warning)
 								warnings = append(warnings, "Paaaaerrttseq: "+part.Seq+"position: "+strconv.Itoa(position)+" original: "+originalcodon+" replacementcodon: "+codonoption)
 								if err != nil {
-									warning := text.Print("removal of site from orf "+orf.DNASeq, " failed! improve your algorithm! "+err.Error())
+									warning := text.Print("removal of "+anysites.Enzyme.Name+" site from orf "+orf.DNASeq, " failed! improve your algorithm! "+err.Error())
 									warnings = append(warnings, warning)
 								}
 							} else {
@@ -130,7 +173,7 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 								part, err = sequences.RemoveSite(part, anysites.Enzyme, allsitestoavoid)
 								if err != nil {
 
-									warning = text.Print("position found to be outside of orf: "+orf.DNASeq, " failed! improve your algorithm! "+err.Error())
+									warning = text.Print(anysites.Enzyme.Name+" position found to be outside of orf: "+orf.DNASeq, " failed! improve your algorithm! "+err.Error())
 									warnings = append(warnings, warning)
 								}
 							}
@@ -138,14 +181,14 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 					} else {
 						allsitestoavoid := make([]string, 0)
 						temppart, err := sequences.RemoveSite(part, anysites.Enzyme, allsitestoavoid)
-						fmt.Println("part= ", part)
-						fmt.Println("temppart= ", temppart)
+						//		fmt.Println("part= ", part)
+						//		fmt.Println("temppart= ", temppart)
 						if err != nil {
 							warning := text.Print("removal of site failed! improve your algorithm!", err.Error())
 							warnings = append(warnings, warning)
 
 						}
-						warning = fmt.Sprintln("modified "+temppart.Nm+"new seq: ", temppart.Seq)
+						warning = fmt.Sprintln("modified "+temppart.Nm+"new seq: ", temppart.Seq, "original seq: ", part.Seq)
 						warnings = append(warnings, warning)
 						part = temppart
 
@@ -153,26 +196,28 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 					}
 				}
 
-				newparts = append(newparts, part)
-
-				partsinorder = newparts
 			}
+			newparts = append(newparts, part)
+
+			partsinorder = newparts
 		}
 	}
 
 	// make vector into an antha type DNASequence
-
-	if strings.Contains(_input.Vector, ".gb") {
+	if inventorydata, found := inventory.Partslist[_input.Vector]; found {
+		vectordata = inventorydata
+	} else if strings.Contains(_input.Vector, ".gb") {
 
 		vectordata, _ = parser.GenbanktoAnnotatedSeq(_input.Vector)
 		vectordata.Plasmid = true
 	} else {
-
-		if strings.Contains(_input.Vector, "BBa_") {
+		vectornm := "Vector"
+		if strings.Contains(_input.Vector, "BBa_") || strings.Contains(_input.Vector, "pSB") {
+			vectornm = _input.Vector
 			_input.Vector = igem.GetSequence(_input.Vector)
 
 		}
-		vectordata = wtype.MakePlasmidDNASequence("Vector", _input.Vector)
+		vectordata = wtype.MakePlasmidDNASequence(vectornm, _input.Vector)
 	}
 
 	//lookup restriction enzyme
@@ -196,34 +241,37 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 
 	endreport := "Endreport only run in the event of assembly simulation failure"
 	//sites := "Restriction mapper only run in the event of assembly simulation failure"
+	newDNASequence.Nm = _input.Constructname
 	_output.NewDNASequence = newDNASequence
 	if err == nil && numberofassemblies == 1 {
 
 		_output.Simulationpass = true
-	} else {
+	} // else {
 
-		warnings = append(warnings, status)
-		// perform mock digest to test fragement overhangs (fragments are hidden by using _, )
-		_, stickyends5, stickyends3 := enzymes.TypeIIsdigest(vectordata, restrictionenzyme)
+	warnings = append(warnings, status)
+	// perform mock digest to test fragement overhangs (fragments are hidden by using _, )
+	_, stickyends5, stickyends3 := enzymes.TypeIIsdigest(vectordata, restrictionenzyme)
 
-		allends := make([]string, 0)
-		ends := ""
+	allends := make([]string, 0)
+	ends := ""
 
-		ends = text.Print(vectordata.Nm+" 5 Prime end: ", stickyends5)
+	ends = text.Print(vectordata.Nm+" 5 Prime end: ", stickyends5)
+	allends = append(allends, ends)
+	ends = text.Print(vectordata.Nm+" 3 Prime end: ", stickyends3)
+	allends = append(allends, ends)
+
+	for _, part := range _output.PartswithOverhangs {
+		_, stickyends5, stickyends3 := enzymes.TypeIIsdigest(part, restrictionenzyme)
+		ends = text.Print(part.Nm+" 5 Prime end: ", stickyends5)
 		allends = append(allends, ends)
-		ends = text.Print(vectordata.Nm+" 3 Prime end: ", stickyends3)
+		ends = text.Print(part.Nm+" 3 Prime end: ", stickyends3)
 		allends = append(allends, ends)
-
-		for _, part := range _output.PartswithOverhangs {
-			_, stickyends5, stickyends3 := enzymes.TypeIIsdigest(part, restrictionenzyme)
-			ends = text.Print(part.Nm+" 5 Prime end: ", stickyends5)
-			allends = append(allends, ends)
-			ends = text.Print(part.Nm+" 3 Prime end: ", stickyends3)
-			allends = append(allends, ends)
-		}
-		endreport = strings.Join(allends, " ")
+	}
+	endreport = strings.Join(allends, " ")
+	if !_output.Simulationpass {
 		warnings = append(warnings, endreport)
 	}
+	//	}
 
 	// check number of sites per part !
 
@@ -231,13 +279,15 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 	multiple := make([]string, 0)
 	for _, part := range _output.PartswithOverhangs {
 
-		info := enzymes.Restrictionsitefinder(part, []wtype.RestrictionEnzyme{enz})
+		info := enzymes.Restrictionsitefinder(part, removetheseenzymes)
 
-		sitepositions := enzymes.SitepositionString(info[0])
+		for i := range info {
+			sitepositions := enzymes.SitepositionString(info[i])
 
-		sites = append(sites, info[0].Numberofsites)
-		sitepositions = text.Print(part.Nm+" "+_input.Enzymename+" positions:", sitepositions)
-		multiple = append(multiple, sitepositions)
+			sites = append(sites, info[i].Numberofsites)
+			sitepositions = text.Print(part.Nm+" "+info[i].Enzyme.Name+" positions:", sitepositions)
+			multiple = append(multiple, sitepositions)
+		}
 	}
 
 	for _, orf := range _input.ORFstoConfirm {
@@ -252,12 +302,14 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 		warnings = append(warnings, "none")
 	}
 	_output.Warnings = fmt.Errorf(strings.Join(warnings, ";"))
+	_output.Endreport = endreport
+	_output.PositionReport = multiple
 
 	partsummary := make([]string, 0)
 	for _, part := range _output.PartswithOverhangs {
 		partsummary = append(partsummary, text.Print(part.Nm, part.Seq))
 	}
-
+	partsummary = append(partsummary, text.Print("Vector:"+vectordata.Nm, vectordata.Seq))
 	partstoorder := text.Print("PartswithOverhangs: ", partsummary)
 
 	// Print status
@@ -279,6 +331,24 @@ func _Scarfree_siteremove_orfcheckSteps(_ctx context.Context, _input *Scarfree_s
 		//anthapath.ExporttoFile("Report"+"_"+Constructname+".txt",[]byte(Status))
 		//anthapath.ExportTextFile("Report"+"_"+Constructname+".txt",Status)
 		fmt.Println(_output.Status)
+	}
+
+	// export sequence to fasta
+	if _input.ExporttoFastaFile && _output.Simulationpass {
+		exportedsequences := make([]wtype.DNASequence, 0)
+		// add dna sequence produced
+		exportedsequences = append(exportedsequences, _output.NewDNASequence)
+
+		// export to file
+		export.Makefastaserial2(export.LOCAL, _input.Constructname+"_AssemblyProduct", exportedsequences)
+
+		// reset
+		exportedsequences = make([]wtype.DNASequence, 0)
+		// add all parts with overhangs
+		for _, part := range _output.PartswithOverhangs {
+			exportedsequences = append(exportedsequences, part)
+		}
+		export.Makefastaserial2(export.LOCAL, _input.Constructname+"_Parts", exportedsequences)
 	}
 
 }
@@ -341,19 +411,24 @@ type Scarfree_siteremove_orfcheckElement struct {
 }
 
 type Scarfree_siteremove_orfcheckInput struct {
+	BlastSeqswithNoName           bool
 	Constructname                 string
 	EndsAlreadyadded              bool
 	Enzymename                    string
+	ExporttoFastaFile             bool
 	ORFstoConfirm                 []string
+	OtherEnzymeSitesToRemove      []string
 	RemoveproblemRestrictionSites bool
 	Seqsinorder                   []string
 	Vector                        string
 }
 
 type Scarfree_siteremove_orfcheckOutput struct {
+	Endreport          string
 	NewDNASequence     wtype.DNASequence
 	ORFmissing         bool
 	PartswithOverhangs []wtype.DNASequence
+	PositionReport     []string
 	Simulationpass     bool
 	Status             string
 	Warnings           error
@@ -361,9 +436,11 @@ type Scarfree_siteremove_orfcheckOutput struct {
 
 type Scarfree_siteremove_orfcheckSOutput struct {
 	Data struct {
+		Endreport          string
 		NewDNASequence     wtype.DNASequence
 		ORFmissing         bool
 		PartswithOverhangs []wtype.DNASequence
+		PositionReport     []string
 		Simulationpass     bool
 		Status             string
 		Warnings           error
@@ -373,26 +450,33 @@ type Scarfree_siteremove_orfcheckSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Scarfree_siteremove_orfcheck",
+	if err := addComponent(Component{Name: "Scarfree_siteremove_orfcheck",
 		Constructor: Scarfree_siteremove_orfcheckNew,
 		Desc: ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/Scarfree_removesites_checkorfs.an",
 			Params: []ParamDesc{
+				{Name: "BlastSeqswithNoName", Desc: "", Kind: "Parameters"},
 				{Name: "Constructname", Desc: "", Kind: "Parameters"},
 				{Name: "EndsAlreadyadded", Desc: "", Kind: "Parameters"},
 				{Name: "Enzymename", Desc: "", Kind: "Parameters"},
+				{Name: "ExporttoFastaFile", Desc: "", Kind: "Parameters"},
 				{Name: "ORFstoConfirm", Desc: "enter each as amino acid sequence\n", Kind: "Parameters"},
+				{Name: "OtherEnzymeSitesToRemove", Desc: "", Kind: "Parameters"},
 				{Name: "RemoveproblemRestrictionSites", Desc: "", Kind: "Parameters"},
 				{Name: "Seqsinorder", Desc: "", Kind: "Parameters"},
 				{Name: "Vector", Desc: "", Kind: "Parameters"},
+				{Name: "Endreport", Desc: "", Kind: "Data"},
 				{Name: "NewDNASequence", Desc: "desired sequence to end up with after assembly\n", Kind: "Data"},
 				{Name: "ORFmissing", Desc: "", Kind: "Data"},
 				{Name: "PartswithOverhangs", Desc: "parts to order\n", Kind: "Data"},
+				{Name: "PositionReport", Desc: "", Kind: "Data"},
 				{Name: "Simulationpass", Desc: "", Kind: "Data"},
 				{Name: "Status", Desc: "", Kind: "Data"},
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

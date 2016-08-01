@@ -17,7 +17,7 @@ import (
 
 // Physical Inputs to this protocol with types
 
-// this time we're specifying the plate
+// this time we're specifying what plate we're using
 
 // Physical outputs from this protocol with types
 
@@ -37,7 +37,7 @@ func _Aliquot_SpecificPlateSteps(_ctx context.Context, _input *Aliquot_SpecificP
 	number := _input.SolutionVolume.SIValue() / _input.VolumePerAliquot.SIValue()
 	possiblenumberofAliquots, _ := wutil.RoundDown(number)
 	if possiblenumberofAliquots < _input.NumberofAliquots {
-		panic("Not enough solution for this many aliquots")
+		execute.Errorf(_ctx, "Not enough solution for this many aliquots")
 	}
 
 	aliquots := make([]*wtype.LHComponent, 0)
@@ -51,7 +51,7 @@ func _Aliquot_SpecificPlateSteps(_ctx context.Context, _input *Aliquot_SpecificP
 		// the MixInto command is used instead of Mix to specify the plate
 		// MixInto allows you to specify the exact plate to MixInto (i.e. rather than just a plate type. e.g. barcode 123214234)
 		// the three input fields to the MixInto command represent
-		// 1. the plate,
+		// 1. the plate
 		// 2. well location as a  string e.g. "A1" (in this case leaving it blank "" will leave the well location up to the scheduler),
 		// 3. the sample or array of samples to be mixed
 		aliquot := execute.MixInto(_ctx, _input.OutPlate, "", aliquotSample)
@@ -139,19 +139,21 @@ type Aliquot_SpecificPlateSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Aliquot_SpecificPlate",
+	if err := addComponent(Component{Name: "Aliquot_SpecificPlate",
 		Constructor: Aliquot_SpecificPlateNew,
 		Desc: ComponentDesc{
 			Desc: "example protocol showing The MixInto command which allows a specifc plate to be specified. i.e. plate with ID blahblahblah\n",
 			Path: "antha/component/an/AnthaAcademy/Lesson2_mix/B_AliquotIntoSpecificPlate.an",
 			Params: []ParamDesc{
 				{Name: "NumberofAliquots", Desc: "", Kind: "Parameters"},
-				{Name: "OutPlate", Desc: "this time we're specifying the plate\n", Kind: "Inputs"},
+				{Name: "OutPlate", Desc: "this time we're specifying what plate we're using\n", Kind: "Inputs"},
 				{Name: "Solution", Desc: "", Kind: "Inputs"},
 				{Name: "SolutionVolume", Desc: "", Kind: "Parameters"},
 				{Name: "VolumePerAliquot", Desc: "", Kind: "Parameters"},
 				{Name: "Aliquots", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

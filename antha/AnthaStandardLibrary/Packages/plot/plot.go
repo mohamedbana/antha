@@ -1,13 +1,37 @@
+// Part of the Antha language
+// Copyright (C) 2015 The Antha authors. All rights reserved.
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+//
+// For more information relating to the software or licensing issues please
+// contact license@antha-lang.org or write to the Antha team c/o
+// Synthace Ltd. The London Bioscience Innovation Centre
+// 2 Royal College St, London NW1 0NH UK
+
+// Package for plotting data
 package plot
 
 import (
 	"fmt"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
-	"github.com/antha-lang/antha/internal/code.google.com/p/plotinum/plot"
-	"github.com/antha-lang/antha/internal/code.google.com/p/plotinum/plotter"
-	"github.com/antha-lang/antha/internal/code.google.com/p/plotinum/plotutil"
-	"github.com/antha-lang/antha/internal/github.com/tealeg/xlsx"
+	"github.com/gonum/plot"
+	"github.com/gonum/plot/plotter"
+	"github.com/gonum/plot/plotutil"
+	"github.com/gonum/plot/vg"
+	"github.com/tealeg/xlsx"
 )
 
 var (
@@ -15,7 +39,9 @@ var (
 )
 
 func Export(plt *plot.Plot, filename string) {
-	plt.Save(4, 4, filename)
+	length, _ := vg.ParseLength("10cm")
+
+	plt.Save(length, length, filename)
 }
 
 func Plot(Xvalues []float64, Yvaluearray [][]float64) (plt *plot.Plot) {
@@ -60,7 +86,7 @@ func Plot(Xvalues []float64, Yvaluearray [][]float64) (plt *plot.Plot) {
 	// second, each point is the median x and y value with the
 	// error bars showing the minimum and maximum values.
 	/*
-	   	fmt.Println("pts", pts)
+	   	// fmt.Println("pts", pts)
 	   	mean95, err := plotutil.NewErrorPoints(plotutil.MeanAndConf95, pts...)
 	   	if err != nil {
 	   		panic(err)
@@ -80,7 +106,14 @@ func Plot(Xvalues []float64, Yvaluearray [][]float64) (plt *plot.Plot) {
 	*/
 
 	fmt.Println(len(pts))
-	plotutil.AddScattersXYer(plt, pts)
+
+	ptsinterface := make([]interface{}, 0)
+
+	for _, pt := range pts {
+		ptsinterface = append(ptsinterface, pt)
+	}
+
+	plotutil.AddScatters(plt, ptsinterface...) //AddScattersXYer(plt, pts)
 	return
 }
 
@@ -124,27 +157,27 @@ func Plotfromspreadsheet(sheet *xlsx.Sheet, Xdatarange []string, Ydatarangearray
 
 			xys := make(plotter.XYs, len(Ydatarangearray))
 
-			fmt.Println("going here3")
-			fmt.Println("Xdatapoint= ", Xdatapoint)
+			// fmt.Println("going here3")
+			// fmt.Println("Xdatapoint= ", Xdatapoint)
 
 			xrow, xcol, err := spreadsheet.A1formattorowcolumn(Xdatapoint)
 			if err != nil {
 				panic(err)
 			}
-			fmt.Println("row, col line 155:", xrow, xcol)
+			// fmt.Println("row, col line 155:", xrow, xcol)
 			xpoint := sheet.Rows[xcol].Cells[xrow]
-			fmt.Println("datapoint", Xdatarangeindex, Xdatapoint, "xpoint = ", xpoint)
+			// fmt.Println("datapoint", Xdatarangeindex, Xdatapoint, "xpoint = ", xpoint)
 
 			// get each y point and work out average
 
 			//yvalues := make([]xlsx.Cell, 0)
 			yfloats := make([]float64, 0)
-			for ydatarangearrayindex, Ydatarange := range Ydatarangearray {
+			for _, Ydatarange := range Ydatarangearray {
 				yrow, ycol, err := spreadsheet.A1formattorowcolumn(Ydatarange[Xdatarangeindex])
 				if err != nil {
 					panic(err)
 				}
-				fmt.Println("row, col line 148:", yrow, ycol)
+				// fmt.Println("row, col line 148:", yrow, ycol)
 				//ypoint := sheet.Cell(yrow, ycol)
 				ypoint := sheet.Rows[ycol].Cells[yrow]
 				//yvalues = append(yvalues, ypoint)
@@ -153,7 +186,7 @@ func Plotfromspreadsheet(sheet *xlsx.Sheet, Xdatarange []string, Ydatarangearray
 					panic(err)
 				}
 				yfloats = append(yfloats, yfloat)
-				fmt.Println("datapoint", Xdatarangeindex, ydatarangearrayindex, Ydatarange[ydatarangearrayindex], "Ycol", ycol, "yrow", yrow, "ypoint = ", ypoint)
+				// fmt.Println("datapoint", Xdatarangeindex, ydatarangearrayindex, Ydatarange[ydatarangearrayindex], "Ycol", ycol, "yrow", yrow, "ypoint = ", ypoint)
 
 				//n, m := 5, 10
 				//pts := make([]plotter.XYer, len(Xdatarange))
@@ -179,30 +212,30 @@ func Plotfromspreadsheet(sheet *xlsx.Sheet, Xdatarange []string, Ydatarangearray
 				panic(err)
 			}
 
-			fmt.Println("datapoint", Xdatarangeindex, Xdatapoint, "xpoint = ", xpoint)
+			// fmt.Println("datapoint", Xdatarangeindex, Xdatapoint, "xpoint = ", xpoint)
 			if err != nil {
 				panic(err)
 			}
-			fmt.Println("going here2")
+			// fmt.Println("going here2")
 			//center := float64(i)
 			for j := range xys {
-				fmt.Println("going here")
+				// fmt.Println("going here")
 				fmt.Println(ptsindex)
 				//x, _ := pts[l].XY(j)
 				xys[j].X = xfloat
-				fmt.Println("xfloat", j, xfloat)
+				// fmt.Println("xfloat", j, xfloat)
 				xys[j].Y = yfloats[j]
-				fmt.Println("yfloats[j]", j, yfloats[j])
-				fmt.Println("xysssssssssx", Xdatarangeindex, j, xys)
+				// fmt.Println("yfloats[j]", j, yfloats[j])
+				// fmt.Println("xysssssssssx", Xdatarangeindex, j, xys)
 			}
 			fmt.Println(xys)
 			pts = append(pts, xys) //
 			//pts[Xdatarangeindex] = xys
-			fmt.Println("hello:", pts[Xdatarangeindex])
-			fmt.Println("hello again", pts)
+			// fmt.Println("hello:", pts[Xdatarangeindex])
+			// fmt.Println("hello again", pts)
 		}
 
-		fmt.Println("len(pts)", len(pts))
+		// fmt.Println("len(pts)", len(pts))
 	}
 	plt, err := plot.New()
 
@@ -216,24 +249,33 @@ func Plotfromspreadsheet(sheet *xlsx.Sheet, Xdatarange []string, Ydatarangearray
 	// second, each point is the median x and y value with the
 	// error bars showing the minimum and maximum values.
 
-	fmt.Println("pts", pts)
-	mean95, err := plotutil.NewErrorPoints(plotutil.MeanAndConf95, pts...)
-	if err != nil {
-		panic(err)
-	}
+	//	// fmt.Println("pts", pts)
+	//	mean95, err := plotutil.NewErrorPoints(plotutil.MeanAndConf95, pts...)
+	//	if err != nil {
+	//		panic(err)
+	//	}
 	/*medMinMax, err := plotutil.NewErrorPoints(plotutil.MedianAndMinMax, pts...)
 	if err != nil {
 		panic(err)
 	}*/
-	plotutil.AddLinePoints(plt,
-		"mean and 95% confidence", mean95,
-	) //	"median and minimum and maximum", medMinMax)
+	//	plotutil.AddLinePoints(plt,
+	//		"mean and 95% confidence", mean95,
+	//	) //	"median and minimum and maximum", medMinMax)
 	//plotutil.AddErrorBars(plt, mean95, medMinMax)
 
 	// Add the points that are summarized by the error points.
 	fmt.Println(len(pts))
-	plotutil.AddScatters(plt, pts[0], pts[1], pts[2], pts[3], pts[4])
 
-	plt.Save(4, 4, Exportedfilename)
+	ptsinterface := make([]interface{}, 0)
+
+	for _, pt := range pts {
+		ptsinterface = append(ptsinterface, pt)
+	}
+
+	plotutil.AddScatters(plt, ptsinterface...) //pts[0], pts[1], pts[2], pts[3], pts[4])
+
+	length, _ := vg.ParseLength("10cm")
+
+	plt.Save(length, length, Exportedfilename)
 
 }

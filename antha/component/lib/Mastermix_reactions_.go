@@ -165,7 +165,7 @@ type Mastermix_reactionsSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Mastermix_reactions",
+	if err := addComponent(Component{Name: "Mastermix_reactions",
 		Constructor: Mastermix_reactionsNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -185,5 +185,7 @@ func init() {
 				{Name: "Status", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

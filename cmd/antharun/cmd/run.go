@@ -37,12 +37,12 @@ import (
 	"github.com/antha-lang/antha/cmd/antharun/spawn"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
-	"github.com/antha-lang/antha/internal/github.com/spf13/cobra"
-	"github.com/antha-lang/antha/internal/github.com/spf13/viper"
 	"github.com/antha-lang/antha/target"
 	"github.com/antha-lang/antha/target/auto"
 	"github.com/antha-lang/antha/target/human"
 	"github.com/antha-lang/antha/target/mixer"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 const (

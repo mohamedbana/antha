@@ -24,7 +24,7 @@ package wutil
 
 import (
 	"fmt"
-	"github.com/antha-lang/antha/internal/github.com/montanaflynn/stats"
+	"github.com/montanaflynn/stats"
 	"math"
 )
 

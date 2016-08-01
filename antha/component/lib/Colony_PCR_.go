@@ -200,7 +200,7 @@ type Colony_PCRSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Colony_PCR",
+	if err := addComponent(Component{Name: "Colony_PCR",
 		Constructor: Colony_PCRNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -232,5 +232,7 @@ func init() {
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

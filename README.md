@@ -4,17 +4,63 @@
 
 Antha v0.0.2
 
+Contents:
+- Installation Instructions
+  - Docker
+  - OSX (Native)
+  - Linux (Native)
+  - Windows (Native)
+- Checking Your Installation
+- Making and Running Antha Components
+- Adding Custom Equipment Drivers
+  - List of Supported Interfaces
+  - Connecting the Driver to Antha
+- Demo
+
 ## Installation Instructions
 
-### OSX
+### Docker
 
-First step is to install or upgrade to go 1.5. Follow the instructions at the
+Docker is a virtualization technology that allows you to easily download and run
+pre-build operating system images on your own machine. 
+
+  1. Install [docker](https://www.docker.com) by following the instructions for
+     your operating system.
+  2. Follow the docker instructions to start the docker server on your machine
+  3. Run the antha docker image
+```bash
+docker run -it antha/antha
+```
+  4. Inside the antha docker image, you can follow the instructions below
+     for making and running antha elements
+
+By default, when you run the antha image again, you will get a new machine
+instance and any changes you made in previously will not be available. If you want
+to persist changes you make to antha elements, you can mount directories on your
+host machine inside docker instances.
+
+For example,
+  1. Download the antha github repo on your (host) machine.
+```bash
+git clone https://github.com/antha-lang/antha
+```
+  2. Run the antha docker image and mount your host directory to a directory
+     inside the docker instance.
+```bash
+docker run -it -v `pwd`/antha:/go/src/github.com/antha-lang/antha antha/antha
+```
+Now, any changes you make to antha on your host machine will be available
+within the docker instance.
+
+### OSX (Native)
+
+First step is to install or upgrade to go 1.6. Follow the instructions at the
 [Golang](http://golang.org/doc/install) site. 
 
 After you install go, if you don't have [Homebrew](http://brew.sh/), please
 install it. Then, follow these steps to setup a working antha development
 environment:
-```sh
+```bash
 # Setup environment variables
 cat<<EOF>>$HOME/.bash_profile
 export GOPATH=$HOME/go
@@ -29,13 +75,13 @@ xcode-select --install
 
 # Install some external dependencies
 brew update
-brew install homebrew/science/glpk sqlite3
+brew install pkg-config homebrew/science/glpk sqlite3 opencv
 
 # Install antha
 go get github.com/antha-lang/antha/cmd/...
 ```
 
-### Linux
+### Linux (Native)
 
 Depending on your Linux distribution, you may not have the most recent version
 of go available from your distribution's package repository. We recommend you
@@ -46,10 +92,10 @@ instructions follow.  If you do not use a Debian based system or if you are not
 using an x86_64 machine, you will have to modify these instructions by
 replacing the go binary with one that corresponds to your platform and
 replacing ``apt-get`` with your package manager.
-```sh
+```bash
 # Install go
-curl -O https://storage.googleapis.com/golang/go1.5.3.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.5.3.linux-amd64.tar.gz
+curl -O https://storage.googleapis.com/golang/go1.6.2.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.6.2.linux-amd64.tar.gz
 
 # Setup environment variables
 cat<<EOF>>$HOME/.bash_profile
@@ -61,13 +107,13 @@ EOF
 . $HOME/.bash_profile
 
 # Install antha external dependencies
-sudo apt-get install -y libglpk-dev libsqlite3-dev git
+sudo apt-get install -y libglpk-dev libopencv-dev libsqlite3-dev git
 
 # Now, we are ready to get antha
 go get github.com/antha-lang/antha/cmd/...
 ```
 
-### Windows
+### Windows (Native)
 
 Installing antha on Windows is significantly more involved than for OSX or
 Linux. The basic steps are:
@@ -92,7 +138,7 @@ procedure with the default options. Caveat emptor.
 
 After following the installation instructions for your machine. You can check
 if Antha is working properly by running a test protocol
-```sh
+```bash
 cd $GOPATH/src/github.com/antha-lang/antha/antha/examples/workflows/constructassembly
 antharun --workflow workflow.json --parameters parameters.yml
 ```
@@ -103,12 +149,42 @@ The easiest way to start developing your own antha components is to place them
 in the ``antha/component/an`` directory and follow the structure of the
 existing components there. Afterwards, you can compile and use your components
 with the following commands:
-```sh
+```bash
 cd $GOPATH/src/github.com/antha-lang/antha
 make
 go get github.com/antha-lang/antha/cmd/...
 antharun --workflow myworkflowdefinition.json --parameters myparameters.yml
 ```
+
+## Adding Custom Equipment Drivers
+
+In order to write a custom driver for a piece of equipment and use it with Antha, you would need:
+
+1. Find out what device interfaces does Antha currently support (see the list below)
+2. Implementing the driver against that gRPC interface
+3. Connect the driver to Antha.
+
+### List of Supported Interfaces
+
+This list could be interpreted as a list of device functions that this version of Antha can automate.
+
+- **LIQUID HANDLING**
+
+  - Interface: https://github.com/antha-lang/manualLiquidHandler#implementation
+  - Dummy Driver (example code): https://github.com/antha-lang/manualLiquidHandler
+
+### Connecting the Driver to Antha
+
+Connecting the driver is as simple as running antharun with a flag --driver [driver_tcp_port]. It could look like this:
+
+```
+antharun --workflow wf.json --parameters params.json --driver localhost:50051
+```
+
+More instructions can be found here:
+
+- https://github.com/antha-lang/antha/blob/master/antha/examples/workflows/AnthaAcademy/Lesson1_Sample/B_parallelruns/readme_drivers.txt
+- https://github.com/antha-lang/manualLiquidHandler#antharun-as-client
 
 ## Demo 
 

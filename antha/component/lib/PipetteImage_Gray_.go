@@ -11,7 +11,7 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
-	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
+	"github.com/disintegration/imaging"
 )
 
 // Input parameters for this protocol (data)
@@ -89,15 +89,15 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 
 		fullblackuint8 = uint8(_input.MaxBlackPercentagethreshold * float64(maxuint8))
 
-		fmt.Println("brand new minuint8 ", minuint8, "fullblackuint8 ", fullblackuint8)
+		//	fmt.Println("brand new minuint8 ",minuint8,"fullblackuint8 ", fullblackuint8)
 
 		if gray.Y < minuint8 {
 			if _input.SkipWhite {
 				skipped = skipped + 1
-				fmt.Println("skipping well:", skipped, locationkey)
+				//	fmt.Println("skipping well:", skipped,locationkey)
 			} else {
 				whitevol := _input.VolumeForFullcolour
-				_input.Diluent.Type = wtype.LiquidTypeFromString(_input.NonMixingClass)
+				_input.Diluent.Type, _ = wtype.LiquidTypeFromString(_input.NonMixingClass)
 
 				waterSample := mixer.Sample(_input.Diluent, whitevol)
 				solution = execute.MixTo(_ctx, _input.OutPlate.Type, locationkey, 1, waterSample)
@@ -120,7 +120,7 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 
 			if gray.Y < fullblackuint8 /*&& gray.Y >= minuint8*/ {
 				watervol := wunit.NewVolume((float64(maxuint8-gray.Y) / float64(maxuint8) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
-				fmt.Println("new well", locationkey, "water vol", watervol.ToString())
+				//			fmt.Println("new well", locationkey, "water vol", watervol.ToString())
 				// force hv tip choice
 				if _input.OnlyHighVolumetips && watervol.RawValue() < 21 && watervol.Unit().PrefixedSymbol() == "ul" {
 					watervol.SetValue(21)
@@ -131,22 +131,22 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 			}
 			if gray.Y >= fullblackuint8 {
 				fullblack = fullblack + 1
-				fmt.Println("full colours:", fullblack)
+				//		fmt.Println("full colours:", fullblack)
 				blackvol = _input.VolumeForFullcolour
 			} else {
 				blackvol = wunit.NewVolume((float64(gray.Y) / float64(maxuint8) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
 			}
 
-			fmt.Println("new well", locationkey, "black vol", blackvol.ToString())
+			//	fmt.Println("new well", locationkey, "black vol", blackvol.ToString())
 
 			//Black.Type = wtype.LiquidTypeFromString("NeedToMix")
 
 			if _input.DontMix {
 				_input.Black.Type = wtype.LTDISPENSEABOVE
 			} else if gray.Y >= fullblackuint8 {
-				_input.Black.Type = wtype.LiquidTypeFromString(_input.NonMixingClass)
+				_input.Black.Type, _ = wtype.LiquidTypeFromString(_input.NonMixingClass)
 			} else {
-				_input.Black.Type = wtype.LiquidTypeFromString(_input.MixingLiquidClass)
+				_input.Black.Type, _ = wtype.LiquidTypeFromString(_input.MixingLiquidClass)
 			}
 
 			//fmt.Println("blackvol2",blackvol.ToString())
@@ -278,7 +278,7 @@ type PipetteImage_GraySOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PipetteImage_Gray",
+	if err := addComponent(Component{Name: "PipetteImage_Gray",
 		Constructor: PipetteImage_GrayNew,
 		Desc: ComponentDesc{
 			Desc: "Generates instructions to pipette out a defined image onto a defined plate by blending cyan magenta yellow and black dyes\n",
@@ -310,5 +310,7 @@ func init() {
 				{Name: "Skipped", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

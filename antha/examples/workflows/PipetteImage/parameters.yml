@@ -1,7 +1,7 @@
 {
   "Parameters": {
     "PipetteImage": {
-      "Imagefilename": "windows.png",
+      "Imagefilename": "apple.jpg",
 	  "UVimage": false,
 	  "Rotate":false,
 	  "AutoRotate":false,
@@ -21,9 +21,9 @@
 		"pink"
 		],
 		"OnlythisColour":"",
-		"Notthiscolour":"black",
-      "OutPlate": "greiner384_riser",
-      "VolumePerWell": "100ul"
+		"Notthiscolour":"white",
+      "OutPlate": "nunc1536_riser",
+      "VolumePerWell": "0.5ul"
     }
   }
 }

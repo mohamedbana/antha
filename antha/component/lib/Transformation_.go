@@ -122,7 +122,7 @@ type TransformationSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Transformation",
+	if err := addComponent(Component{Name: "Transformation",
 		Constructor: TransformationNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -138,5 +138,7 @@ func init() {
 				{Name: "Transformedcells", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

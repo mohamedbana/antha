@@ -1,4 +1,4 @@
-// antha/AnthaStandardLibrary/Packages/igem/igem.go: Part of the Antha language
+//Part of the Antha language
 // Copyright (C) 2015 The Antha authors. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
@@ -21,7 +21,6 @@
 // 2 Royal College St, London NW1 0NH UK
 
 // Package for interacting with the iGem registry
-
 package igem
 
 import (
@@ -29,19 +28,16 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
-	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
-	//"/data"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
-	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
-	//"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"strings"
-	//"time"
 	"path/filepath"
+	"strings"
+
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 )
 
 // http://parts.igem.org/Registry_API
@@ -71,6 +67,61 @@ Groups (not enabled now)
 If you enter 'recursive' as the first part name, the returned XML will include details about all the subparts of this part.
 
 */
+
+const (
+	registryFile = "iGem_registry.txt"
+)
+
+// Part Name classifications
+/*
+BBa_B... = Generic basic parts such as Terminators, DNA, and Ribosome Binding Site
+BBa_C... = Protein coding parts
+BBa_E... = Reporter parts
+BBa_F... = Signalling parts
+BBa_G... = Primer parts
+BBa_I... = IAP 2003, 2004 project parts
+BBa_J... = iGEM project parts
+BBa_M... = Tag parts
+BBa_P... = Protein Generator parts
+BBa_Q... = Inverter parts
+BBa_R... = Regulatory parts
+BBa_S... = Intermediate parts
+BBa_V... = Cell strain parts
+*/
+
+const (
+	GENERIC          = "BBa_B"
+	PROTEINCODING    = "BBa_C"
+	REPORTER         = "BBa_E"
+	SIGNALLING       = "BBa_F"
+	PRIMER           = "BBa_G"
+	IAPPROJECT       = "BBa_I"
+	IGEMPROJECT      = "BBa_J"
+	TAG              = "BBa_M"
+	PROTEINGENERATOR = "BBa_P"
+	INVERTER         = "BBa_Q"
+	REGULATORY       = "BBa_R"
+	INTERMEDIATE     = "BBa_S"
+	CELLSTRAIN       = "BBa_V"
+)
+
+var (
+	IgemTypeCodes = map[string]string{
+		"GENERIC":          "BBa_B",
+		"PROTEINCODING":    "BBa_C",
+		"REPORTER":         "BBa_E",
+		"SIGNALLING":       "BBa_F",
+		"PRIMER":           "BBa_G",
+		"IAPPROJECT":       "BBa_I",
+		"IGEMPROJECT":      "BBa_J",
+		"TAG":              "BBa_M",
+		"PROTEINGENERATOR": "BBa_P",
+		"INVERTER":         "BBa_Q",
+		"REGULATORY":       "BBa_R",
+		"INTERMEDIATE":     "BBa_S",
+		"CELLSTRAIN":       "BBa_V",
+	}
+)
 
 func MakeFastaURL(partname string) (Urlstring string) {
 	// see comment above for structure
@@ -120,28 +171,38 @@ func SlurpOutput(Urlstring string) (output []byte) {
 	return output
 }
 
-func UpdateRegistryfile() (err error) {
-	fmt.Println("Getting latest registry database file from ...", "http://parts.igem.org/fasta/parts/All_Parts")
-	res, err := http.Get("http://parts.igem.org/fasta/parts/All_Parts")
-	if err != nil {
-		log.Fatal(err)
+func makeRegistryfile() ([]byte, error) {
+	file := filepath.Join(anthapath.Path(), registryFile)
+
+	if _, err := os.Stat(file); os.IsNotExist(err) {
+		if err := os.MkdirAll(filepath.Dir(file), 0777); err != nil {
+			return nil, err
+		}
+		// FYI: >34MB file
+		res, err := http.Get("http://parts.igem.org/fasta/parts/All_Parts")
+		if err != nil {
+			return nil, err
+		}
+		defer res.Body.Close()
+
+		f, err := os.Create(file)
+		if err != nil {
+			return nil, err
+		}
+		defer f.Close()
+
+		var buf bytes.Buffer
+		if _, err := io.Copy(&buf, res.Body); err != nil {
+			return nil, err
+		}
+
+		if err := ioutil.WriteFile(file, buf.Bytes(), 0666); err != nil {
+			return nil, err
+		}
+		return buf.Bytes(), nil
 	}
-	fmt.Println("step 1: creating registry file")
 
-	anthapath.CreatedotAnthafolder()
-	f, _ := os.Create(filepath.Join(anthapath.Dirpath(), "iGem_registry.txt"))
-	fmt.Println("step 2: copying registry... This could take a few minutes, don't go anywhere")
-	_, err = io.Copy(f, res.Body) // takes just as long as ioutil.Readall()
-	fmt.Println("step 3")
-
-	fmt.Println("step 4")
-
-	res.Body.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
-	//fmt.Println(Urlstring, "=", string(output))
-	return err
+	return ioutil.ReadFile(file)
 }
 
 //[Part name] [First character of status] [Part Id Number] [Part type] [Short description]
@@ -243,17 +304,9 @@ func FastaParse(fastaFh io.Reader) chan FastaPart {
 }
 
 func CountPartsinRegistryContaining(keystrings []string) (numberofparts int) {
-
-	if anthapath.Anthafileexists("iGem_registry.txt") == false {
-		err := UpdateRegistryfile()
-		if err != nil {
-			fmt.Println("error:", err)
-		}
-		//allparts := SlurpOutput("http://parts.igem.org/fasta/parts/All_Parts")
-	}
-	allparts, err := ioutil.ReadFile(filepath.Join(anthapath.Dirpath(), "iGem_registry.txt"))
+	allparts, err := makeRegistryfile()
 	if err != nil {
-		fmt.Println("error:", err)
+		return
 	}
 	/*allparts, err := ioutil.ReadFile("iGem_registry.txt")
 	if err != nil {
@@ -289,29 +342,15 @@ func CountPartsinRegistryContaining(keystrings []string) (numberofparts int) {
 	return numberofparts
 }
 
-func Exists(filename string) bool {
-	if _, err := os.Stat(filename); err != nil {
-		if os.IsNotExist(err) {
-			return false
-		}
-	}
-	return true
-}
+func FilterRegistry(partype string, keystrings []string, exacttypecodeonly bool) (listofpartIDs []string, idtodescriptionmap map[string]string) {
 
-func FilterRegistry(partype string, keystrings []string) (listofpartIDs []string) {
-	if anthapath.Anthafileexists("iGem_registry.txt") == false {
-		err := UpdateRegistryfile()
-		if err != nil {
-			fmt.Println("error:", err)
-		}
-		//allparts := SlurpOutput("http://parts.igem.org/fasta/parts/All_Parts")
-	}
-	allparts, err := ioutil.ReadFile(filepath.Join(anthapath.Dirpath(), "iGem_registry.txt"))
+	idtodescriptionmap = make(map[string]string)
+
+	allparts, err := makeRegistryfile()
 	if err != nil {
-		fmt.Println("error:", err)
+		return
 	}
 
-	fmt.Println("slurped registry")
 	fastaFh := bytes.NewReader(allparts)
 
 	//fasta := parser.FastaParse(allparts)
@@ -327,10 +366,20 @@ func FilterRegistry(partype string, keystrings []string) (listofpartIDs []string
 		seqtype := "DNA"
 		class := "not specified"*/
 
-		if search.Containsallthings(record.Desc, keystrings) && strings.Contains(strings.ToUpper(record.Part_type), strings.ToUpper(partype)) && record.Seq_data != "" {
-			fmt.Println(record.Part_name)
+		if !exacttypecodeonly && search.Containsallthings(record.Desc, keystrings) && strings.Contains(strings.ToUpper(record.Part_type), strings.ToUpper(partype)) && record.Seq_data != "" {
 			listofpartIDs = append(listofpartIDs, record.Part_name)
+			idtodescriptionmap[record.Part_name] = record.Desc
 		}
+
+		bba_code, ok := IgemTypeCodes[strings.ToUpper(partype)]
+		i := 0
+		if ok && search.Containsallthings(record.Desc, keystrings) && record.Seq_data != "" && strings.Contains(record.Part_name, bba_code) {
+
+			listofpartIDs = append(listofpartIDs, record.Part_name)
+			idtodescriptionmap[record.Part_name] = record.Desc
+			i++
+		}
+
 		/*	if strings.Contains(record.Desc, "Amino acid") || strings.Contains(record.Id, "aa") {
 				seqtype = "AA"
 			}
@@ -343,7 +392,7 @@ func FilterRegistry(partype string, keystrings []string) (listofpartIDs []string
 			seq = []string{record.Id, record.Seq, plasmidstatus, seqtype, class}*/
 		/*records = append(records, seq)*/
 	}
-	return listofpartIDs
+	return listofpartIDs, idtodescriptionmap
 }
 
 /*
@@ -483,13 +532,13 @@ func LookUp(parts []string) (parsedxml Rsbpml) {
 	if len(parts) > 14 {
 
 		partslice := parts[0:14]
-		fmt.Println("len(partslice) =", len(partslice))
+		//fmt.Println("len(partslice) =", len(partslice))
 
 		parsedxml = Partpropertiesmini(partslice)
 
 		//var parts []Part
 		newparsedxml := make([]Part, 0)
-		fmt.Println("len(parsedxml.Partlist[0].Parts) =", len(parsedxml.Partlist[0].Parts))
+		//	fmt.Println("len(parsedxml.Partlist[0].Parts) =", len(parsedxml.Partlist[0].Parts))
 		for _, part := range parsedxml.Partlist[0].Parts {
 			newparsedxml = append(newparsedxml, part)
 		}
@@ -506,10 +555,10 @@ func LookUp(parts []string) (parsedxml Rsbpml) {
 		for i := 10; i < len(parts); i = i + 14 {
 			partslice = parts[i : i+14]
 			parsedxml = Partpropertiesmini(partslice)
-			fmt.Println("len(parsedxml.Partlist[0].Parts) =", len(parsedxml.Partlist[0].Parts))
+			//	fmt.Println("len(parsedxml.Partlist[0].Parts) =", len(parsedxml.Partlist[0].Parts))
 			for _, part := range parsedxml.Partlist[0].Parts {
 				newparsedxml = append(newparsedxml, part)
-				fmt.Println("len(newparsedxml)", len(newparsedxml))
+				//			fmt.Println("len(newparsedxml)", len(newparsedxml))
 			}
 			var parsedxml Rsbpml
 			partsleft = partsleft - len(partslice)
@@ -521,9 +570,9 @@ func LookUp(parts []string) (parsedxml Rsbpml) {
 
 				for _, part := range parsedxml.Partlist[0].Parts {
 					newparsedxml = append(newparsedxml, part)
-					fmt.Println("len(newparsedxml)", len(newparsedxml))
+					//				fmt.Println("len(newparsedxml)", len(newparsedxml))
 					parsedxml.Partlist[0].Parts = newparsedxml
-					fmt.Println("newparsedxml", newparsedxml)
+					//				fmt.Println("newparsedxml", newparsedxml)
 
 				}
 				{

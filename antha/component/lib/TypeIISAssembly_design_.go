@@ -18,7 +18,6 @@ import (
 	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
-	"strconv"
 	"strings"
 )
 
@@ -88,7 +87,9 @@ func _TypeIISAssembly_designSteps(_ctx context.Context, _input *TypeIISAssembly_
 	}
 
 	// or Look up parts from registry according to properties (this will take a couple of minutes the first time)
-	subparts := igem.FilterRegistry("REPORTER", []string{"Fluorescent", "A "})
+	exacttypeonly := true
+
+	subparts, _ := igem.FilterRegistry("REPORTER", []string{"Fluorescent", "A "}, exacttypeonly)
 	partdetails := igem.LookUp(subparts)
 	//fmt.Println(partdetails)
 
@@ -152,12 +153,12 @@ func _TypeIISAssembly_designSteps(_ctx context.Context, _input *TypeIISAssembly_
 	// Export sequences to order into a fasta file
 
 	partswithOverhangs := make([]*wtype.DNASequence, 0)
-	for i, part := range _output.PartswithOverhangs {
-		_ = export.ExportFastaDir(_input.Constructname, strconv.Itoa(i+1), &part)
+	for _, part := range _output.PartswithOverhangs {
+		export.ExportFasta(_input.Constructname, &part)
 		partswithOverhangs = append(partswithOverhangs, &part)
 
 	}
-	_ = export.Makefastaserial(_input.Constructname, partswithOverhangs)
+	export.Makefastaserial(_input.Constructname, partswithOverhangs)
 
 	//partstoorder := ansi.Color(fmt.Sprintln("PartswithOverhangs", PartswithOverhangs),"red")
 	partstoorder := fmt.Sprintln("PartswithOverhangs", _output.PartswithOverhangs)
@@ -276,7 +277,7 @@ type TypeIISAssembly_designSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "TypeIISAssembly_design",
+	if err := addComponent(Component{Name: "TypeIISAssembly_design",
 		Constructor: TypeIISAssembly_designNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -298,5 +299,7 @@ func init() {
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

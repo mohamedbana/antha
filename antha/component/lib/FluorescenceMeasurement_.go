@@ -96,11 +96,11 @@ type FluorescenceMeasurementSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "FluorescenceMeasurement",
+	if err := addComponent(Component{Name: "FluorescenceMeasurement",
 		Constructor: FluorescenceMeasurementNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/DoE/fluorescenceassay.an",
+			Path: "antha/component/an/GrowthAndAssay/fluorescenceassay.an",
 			Params: []ParamDesc{
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "DilutionVolume", Desc: "", Kind: "Parameters"},
@@ -110,5 +110,7 @@ func init() {
 				{Name: "FluorescenceMeasurement", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

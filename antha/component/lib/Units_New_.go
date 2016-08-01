@@ -105,16 +105,18 @@ type Units_NewSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "Units_New",
+	if err := addComponent(Component{Name: "Units_New",
 		Constructor: Units_NewNew,
 		Desc: ComponentDesc{
 			Desc: "demo of how to create units from raw values and unit strings\n",
-			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/B_units_new.an",
+			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/A_units_new.an",
 			Params: []ParamDesc{
 				{Name: "MyUnit", Desc: "", Kind: "Parameters"},
 				{Name: "MyValue", Desc: "", Kind: "Parameters"},
 				{Name: "MyVolume", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

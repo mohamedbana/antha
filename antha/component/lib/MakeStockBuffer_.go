@@ -41,8 +41,11 @@ func _MakeStockBufferSetup(_ctx context.Context, _input *MakeStockBufferInput) {
 // for every input
 func _MakeStockBufferSteps(_ctx context.Context, _input *MakeStockBufferInput, _output *MakeStockBufferOutput) {
 	//Bufferstockvolume := wunit.NewVolume((FinalVolume.SIValue() * FinalConcentration.SIValue()/Bufferstockconc.SIValue()),"l")
-
-	_output.StockConc = buffers.StockConcentration(_input.Moleculename, _input.MassAddedinG, _input.Diluent.CName, _input.TotalVolume)
+	var err error
+	_output.StockConc, err = buffers.StockConcentration(_input.Moleculename, _input.MassAddedinG, _input.Diluent.CName, _input.TotalVolume)
+	if err != nil {
+		panic(err)
+	}
 
 	/*
 		Buffer = MixInto(OutPlate,"",
@@ -136,7 +139,7 @@ type MakeStockBufferSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "MakeStockBuffer",
+	if err := addComponent(Component{Name: "MakeStockBuffer",
 		Constructor: MakeStockBufferNew,
 		Desc: ComponentDesc{
 			Desc: "",
@@ -149,7 +152,9 @@ func init() {
 				{Name: "StockConc", Desc: "Status string\n", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }
 
 /*

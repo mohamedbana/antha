@@ -6,7 +6,7 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
-	"github.com/antha-lang/antha/internal/github.com/disintegration/imaging"
+	"github.com/disintegration/imaging"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/microArch/factory"
 	"fmt"
@@ -108,7 +108,7 @@ Steps {
 		componentmap[componentname] = factory.GetComponentByType(componentname)
 
 	}
-	fmt.Println(componentmap)
+	//fmt.Println(componentmap)
 
 	solutions := make([]*wtype.LHComponent, 0)
 
@@ -122,9 +122,9 @@ Steps {
 		component := componentmap[colourtostringmap[colour]]
 
 		// make sure liquid class is appropriate for cell culture in case this is not set elsewhere
-		component.Type = wtype.LiquidTypeFromString(UseLiquidClass)//wtype.LTCulture
+		component.Type,_ = wtype.LiquidTypeFromString(UseLiquidClass)//wtype.LTCulture
 		
-		fmt.Println(image.Colourcomponentmap[colour])
+		//fmt.Println(image.Colourcomponentmap[colour])
 		
 		// if the option to only print a single colour is not selected then the pipetting actions for all colours (apart from if not this colour is not empty) will follow
 		if OnlythisColour !="" {
@@ -134,7 +134,7 @@ Steps {
 			UniqueComponents = append(UniqueComponents,component.CName)
 			
 			counter = counter + 1
-			fmt.Println("wells",OnlythisColour, counter)
+		//	fmt.Println("wells",OnlythisColour, counter)
 	
 		pixelSample := mixer.Sample(component, VolumePerWell)
 	
@@ -149,9 +149,9 @@ Steps {
 			UniqueComponents = append(UniqueComponents,component.CName)
 			
 			counter = counter + 1
-			fmt.Println("wells not ",Notthiscolour,counter)
+		//	fmt.Println("wells not ",Notthiscolour,counter)
 	
-		component.Type = wtype.LiquidTypeFromString(UseLiquidClass)
+		component.Type,_ = wtype.LiquidTypeFromString(UseLiquidClass)
 		pixelSample := mixer.Sample(component, VolumePerWell)
 	
 		solution := MixTo(OutPlate.Type, locationkey, 1, pixelSample)

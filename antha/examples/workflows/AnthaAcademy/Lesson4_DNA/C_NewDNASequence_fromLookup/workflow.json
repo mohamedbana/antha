@@ -6,6 +6,9 @@
         },
         "BiobrickSequence": {
             "component": "NewDNASequence_fromLookup"
+        },
+        "BiobrickSequenceRecursive": {
+            "component": "NewDNASequence_fromLookup"
         }
 	}
        
