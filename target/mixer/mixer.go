@@ -23,7 +23,7 @@ var (
 
 type Mixer struct {
 	driver     driver.ExtendedLiquidhandlingDriver
-	properties driver.LHProperties
+	properties *driver.LHProperties // Prototype to create fresh properties
 	opt        Opt
 }
 
@@ -55,6 +55,7 @@ func (a *Mixer) MoveCost(from target.Device) int {
 
 type lhreq struct {
 	*planner.LHRequest     // A request
+	*driver.LHProperties   // ... its state
 	*planner.Liquidhandler // ... and its associated planner
 }
 
@@ -69,17 +70,9 @@ func (a *Mixer) makeLhreq() (*lhreq, error) {
 	}
 
 	req := planner.NewLHRequest()
-	/*
-		-- moved to NewLHRequest, which is a better place for it
-		pols, err := driver.GetLHPolicyForTest()
-
-		if err != nil {
-			return nil, err
-		}
-		req.Policies = pols
-	*/
-
-	plan := planner.Init(&a.properties)
+	prop := a.properties.Dup()
+	prop.Driver = a.properties.Driver
+	plan := planner.Init(prop)
 
 	if p := a.opt.MaxPlates; p != nil {
 		req.Input_setup_weights["MAX_N_PLATES"] = *p
@@ -153,6 +146,7 @@ func (a *Mixer) makeLhreq() (*lhreq, error) {
 
 	return &lhreq{
 		LHRequest:     req,
+		LHProperties:  prop,
 		Liquidhandler: plan,
 	}, nil
 }
@@ -263,13 +257,15 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 	}
 
 	var ftype string
-	if a.properties.Mnfr != "" {
-		ftype = fmt.Sprintf("application/%s", strings.ToLower(a.properties.Mnfr))
+	if r.LHProperties.Mnfr != "" {
+		ftype = fmt.Sprintf("application/%s", strings.ToLower(r.LHProperties.Mnfr))
 	}
 	return &target.Mix{
-		Dev:        a,
-		Request:    r.LHRequest,
-		Properties: a.properties,
+		Dev:             a,
+		Request:         r.LHRequest,
+		Properties:      r.LHProperties,
+		FinalProperties: r.Liquidhandler.FinalProperties,
+		Final:           r.Liquidhandler.PlateIDMap(),
 		Files: target.Files{
 			Tarball: tarball,
 			Type:    ftype,
@@ -282,9 +278,9 @@ func New(opt Opt, d driver.ExtendedLiquidhandlingDriver) (*Mixer, error) {
 	if !status.OK {
 		return nil, fmt.Errorf("cannot get capabilities: %s", status.Msg)
 	}
-	if len(opt.DriverSpecificTipPreferences) != 0 {
+	if len(opt.DriverSpecificTipPreferences) != 0 && p.CheckTipPrefCompatibility(opt.DriverSpecificTipPreferences) {
 		p.Tip_preferences = opt.DriverSpecificTipPreferences
 	}
 	p.Driver = d
-	return &Mixer{driver: d, properties: p, opt: opt}, nil
+	return &Mixer{driver: d, properties: &p, opt: opt}, nil
 }

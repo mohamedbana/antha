@@ -547,7 +547,7 @@ func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) 
 
 				descriptor = strings.Split(sheet.Cell(1, j).String(), ":")[1]
 				factrodescriptor := descriptor
-				fmt.Println(i, j, descriptor)
+				//fmt.Println(i, j, descriptor)
 
 				cell := sheet.Cell(i, j)
 
@@ -986,6 +986,108 @@ func XLSXFileFromRuns(runs []Run, outputfilename string, dxorjmp string) (xlsxfi
 	}
 	if dxorjmp == "JMP" {
 		xlsxfile = JMPXLSXFilefromRuns(runs, outputfilename)
+	}
+	return
+}
+
+func RunsFromDesign(designfile string, intfactors []string, responsecolumns []int, dxorjmp string) (runs []Run, err error) {
+
+	if dxorjmp == "DX" {
+
+		runs, err = RunsFromDXDesign(designfile, intfactors)
+		if err != nil {
+			return runs, err
+		}
+
+	} else if dxorjmp == "JMP" {
+
+		factorcolumns := findFactorColumns(designfile, responsecolumns)
+
+		runs, err = RunsFromJMPDesign(designfile, factorcolumns, responsecolumns, intfactors)
+		if err != nil {
+			return runs, err
+		}
+	}
+	return
+}
+
+func RunsFromDesignPreResponses(designfile string, intfactors []string, dxorjmp string) (runs []Run, err error) {
+
+	if dxorjmp == "DX" {
+
+		runs, err = RunsFromDXDesign(designfile, intfactors)
+		if err != nil {
+			return runs, err
+		}
+
+	} else if dxorjmp == "JMP" {
+
+		factorcolumns, responsecolumns, _ := findJMPFactorandResponseColumnsinEmptyDesign(designfile)
+
+		runs, err = RunsFromJMPDesign(designfile, factorcolumns, responsecolumns, intfactors)
+		if err != nil {
+			return runs, err
+		}
+	}
+	return
+
+}
+
+func findFactorColumns(xlsx string, responsefactors []int) (factorcolumns []int) {
+
+	factorcolumns = make([]int, 0)
+
+	file, err := spreadsheet.OpenFile(xlsx)
+	if err != nil {
+		return factorcolumns
+	}
+	sheet := spreadsheet.Sheet(file, 0)
+
+	for i := 0; i < sheet.MaxCol; i++ {
+		if search.BinarySearch(responsefactors, i) == false && strings.ToUpper(sheet.Cell(0, i).String()) != "PATTERN" {
+			factorcolumns = append(factorcolumns, i)
+		}
+	}
+
+	return
+}
+
+// add func to auto check for Response and factor status based on empty entries implying Response column
+func findJMPFactorandResponseColumnsinEmptyDesign(xlsx string) (factorcolumns []int, responsecolumns []int, PatternColumn int) {
+
+	factorcolumns = make([]int, 0)
+	responsecolumns = make([]int, 0)
+
+	file, err := spreadsheet.OpenFile(xlsx)
+	if err != nil {
+		return
+	}
+	sheet := spreadsheet.Sheet(file, 0)
+
+	//descriptors := make([]string, 0)
+
+	for j := 0; j < sheet.MaxCol; j++ {
+
+		descriptor := sheet.Cell(0, j).String()
+		//	descriptors = append(descriptors,descriptor)
+		if strings.ToUpper(descriptor) == "PATTERN" {
+			PatternColumn = j
+		}
+	}
+	// iterate through every run of the design sheet (row) and if all values for that row == "", the column is interpreted as a response
+	for i := 1; i < sheet.MaxRow; i++ {
+		//maxfactorcol := 2
+		for j := 0; j < sheet.MaxCol; j++ {
+
+			if j != PatternColumn && sheet.Cell(i, j).String() != "" {
+				factorcolumns = append(factorcolumns, j)
+			} else if sheet.Cell(i, j).String() == "" {
+
+				responsecolumns = append(responsecolumns, j)
+			}
+
+		}
+
 	}
 	return
 }

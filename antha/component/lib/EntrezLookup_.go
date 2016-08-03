@@ -3,9 +3,10 @@ package lib
 import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/entrez"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Valid Database list: http://www.ncbi.nlm.nih.gov/books/NBK25497/table/chapter2.T._entrez_unique_identifiers_ui/?report=objectonly
@@ -126,12 +127,12 @@ type EntrezLookupSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "EntrezLookup",
+	if err := addComponent(component.Component{Name: "EntrezLookup",
 		Constructor: EntrezLookupNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/EntrezLookup/EntrezLookup.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Database", Desc: "e.g. \"nucleotide\", \"Protein\", \"Gene\"\n", Kind: "Parameters"},
 				{Name: "Filename", Desc: "e.g myproject/GFPReporter.gb. if Filename == \"\" no file will be generated\n", Kind: "Parameters"},
 				{Name: "ID", Desc: "e.g. \"EF208560\"\n", Kind: "Parameters"},

@@ -1,8 +1,9 @@
 package inject
 
 import (
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"testing"
+
+	"golang.org/x/net/context"
 )
 
 func TestFuncRunner(t *testing.T) {

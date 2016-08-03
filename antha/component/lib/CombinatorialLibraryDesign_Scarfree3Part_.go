@@ -12,9 +12,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"strconv"
 )
 
@@ -195,12 +196,12 @@ type CombinatorialLibraryDesign_Scarfree3PartSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "CombinatorialLibraryDesign_Scarfree3Part",
+	if err := addComponent(component.Component{Name: "CombinatorialLibraryDesign_Scarfree3Part",
 		Constructor: CombinatorialLibraryDesign_Scarfree3PartNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/CombinatorialLibraryDesign_Scarfree.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "BlastSearchSeqs", Desc: "", Kind: "Parameters"},
 				{Name: "EnzymeName", Desc: "", Kind: "Parameters"},
 				{Name: "ORFStoconfirm", Desc: "", Kind: "Parameters"},

@@ -6,9 +6,10 @@ import (
 
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 //"strconv"
@@ -141,12 +142,12 @@ type PickColoniesSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "PickColonies",
+	if err := addComponent(component.Component{Name: "PickColonies",
 		Constructor: PickColoniesNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "row\n",
 			Path: "antha/component/an/Liquid_handling/PickColonies/PickColonies.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "ColonyLocations", Desc: "MediaVolume  Volume\n", Kind: "Parameters"},
 				{Name: "ColonyVolume", Desc: "", Kind: "Parameters"},
 				{Name: "Colonytype", Desc: "", Kind: "Inputs"},

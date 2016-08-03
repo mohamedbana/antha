@@ -154,7 +154,7 @@ func (lhr *LHRequest) NewComponentsAdded() bool {
 	// run this after Plan to determine if anything
 	// new was added to the inputs
 
-	return len(lhr.Input_assignments) == 0
+	return len(lhr.Input_vols_wanting) != 0
 }
 
 type LHPolicyManager struct {

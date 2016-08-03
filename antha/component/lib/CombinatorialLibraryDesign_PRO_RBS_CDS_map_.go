@@ -12,15 +12,17 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"strconv"
 )
 
 // Input parameters for this protocol (data)
 
 //Seqsinorder					map[string][]string // constructname to sequence combination
+
 //MoClo
 // of assembly standard
 
@@ -62,7 +64,7 @@ func _CombinatorialLibraryDesign_PRO_RBS_CDS_mapSteps(_ctx context.Context, _inp
 			for l := range _input.RBSs {
 				for m := range _input.CDSs {
 					for n := range _input.TERs {
-						key := "Contruct" + strconv.Itoa(counter)
+						key := _input.ProjectName + strconv.Itoa(counter)
 						assembly := AssemblyStandard_siteremove_orfcheckRunSteps(_ctx, &AssemblyStandard_siteremove_orfcheckInput{Constructname: key,
 							Seqsinorder:                   []string{_input.PROs[k], _input.RBSs[l], _input.CDSs[m], _input.TERs[n]},
 							AssemblyStandard:              _input.Standard,
@@ -168,6 +170,7 @@ type CombinatorialLibraryDesign_PRO_RBS_CDS_mapInput struct {
 	BlastSearchSeqs bool
 	CDSs            []string
 	PROs            []string
+	ProjectName     string
 	RBSs            []string
 	SitesToRemove   []string
 	Standard        string
@@ -201,18 +204,19 @@ type CombinatorialLibraryDesign_PRO_RBS_CDS_mapSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "CombinatorialLibraryDesign_PRO_RBS_CDS_map",
+	if err := addComponent(component.Component{Name: "CombinatorialLibraryDesign_PRO_RBS_CDS_map",
 		Constructor: CombinatorialLibraryDesign_PRO_RBS_CDS_mapNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/CombinatorialLibraryDesign4part.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "BlastSearchSeqs", Desc: "", Kind: "Parameters"},
 				{Name: "CDSs", Desc: "", Kind: "Parameters"},
 				{Name: "PROs", Desc: "", Kind: "Parameters"},
+				{Name: "ProjectName", Desc: "Seqsinorder\t\t\t\t\tmap[string][]string // constructname to sequence combination\n", Kind: "Parameters"},
 				{Name: "RBSs", Desc: "", Kind: "Parameters"},
 				{Name: "SitesToRemove", Desc: "", Kind: "Parameters"},
-				{Name: "Standard", Desc: "Seqsinorder\t\t\t\t\tmap[string][]string // constructname to sequence combination\n\nMoClo\n", Kind: "Parameters"},
+				{Name: "Standard", Desc: "MoClo\n", Kind: "Parameters"},
 				{Name: "StandardLevel", Desc: "of assembly standard\n", Kind: "Parameters"},
 				{Name: "TERs", Desc: "", Kind: "Parameters"},
 				{Name: "Vectors", Desc: "", Kind: "Parameters"},

@@ -3,10 +3,11 @@ package lib
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/microArch/factory"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -171,12 +172,12 @@ type AutoPCRSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "AutoPCR",
+	if err := addComponent(component.Component{Name: "AutoPCR",
 		Constructor: AutoPCRNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/PCR/AutoPCR.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "FwdPrimertype", Desc: "", Kind: "Inputs"},
 				{Name: "Plate", Desc: "", Kind: "Inputs"},
 				{Name: "Projectname", Desc: "PCRprep parameters\n", Kind: "Parameters"},

@@ -35,9 +35,10 @@ import (
 	//"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 //"github.com/antha-lang/antha/microArch/factory"
@@ -196,12 +197,12 @@ type EvaporationrateSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Evaporationrate",
+	if err := addComponent(component.Component{Name: "Evaporationrate",
 		Constructor: EvaporationrateNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/eng/Evaporationrate/Evaporationrate.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Airvelocity", Desc: "// velocity of air above water in m/s ; could be calculated or measured by an anemometer\n", Kind: "Parameters"},
 				{Name: "Executiontime", Desc: "time\n", Kind: "Parameters"},
 				{Name: "Liquid", Desc: "", Kind: "Inputs"},

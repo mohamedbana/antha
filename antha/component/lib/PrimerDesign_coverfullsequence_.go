@@ -8,9 +8,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/oligos"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol
@@ -135,12 +136,12 @@ type PrimerDesign_coverfullsequenceSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "PrimerDesign_coverfullsequence",
+	if err := addComponent(component.Component{Name: "PrimerDesign_coverfullsequence",
 		Constructor: PrimerDesign_coverfullsequenceNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "This element will design primers to cover the full length of a sequence at the interval specified by the user (e.g. every 800 bp).\nDesign criteria such as maximum gc content, acceptable ranges of melting temperatures and primer length may be specified by the user.\n",
 			Path: "antha/component/an/Data/DNA/PrimerDesign/PrimerDesign_coverfullsequence.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "DNASeqfile", Desc: "", Kind: "Parameters"},
 				{Name: "Maxgc", Desc: "as a proportion of 1, i.e. 1 == 100%\n", Kind: "Parameters"},
 				{Name: "Maxlength", Desc: "", Kind: "Parameters"},

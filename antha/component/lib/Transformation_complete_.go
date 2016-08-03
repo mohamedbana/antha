@@ -4,9 +4,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -157,12 +158,12 @@ type Transformation_completeSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Transformation_complete",
+	if err := addComponent(component.Component{Name: "Transformation_complete",
 		Constructor: Transformation_completeNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/Transformation/Transformation_complete.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "AgarPlate", Desc: "", Kind: "Inputs"},
 				{Name: "CompetentCells", Desc: "", Kind: "Inputs"},
 				{Name: "CompetentCellvolumeperassembly", Desc: "= 50.(uL)\n", Kind: "Parameters"},

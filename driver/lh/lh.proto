@@ -509,14 +509,15 @@ message ArrayOfPtrToLHHeadMessage{
 message LHChannelParameterMessage {
 	string Arg_1 = 1;
 	string Arg_2 = 2;
-	VolumeMessage Arg_3 = 3;
+	string Arg_3 = 3;
 	VolumeMessage Arg_4 = 4;
-	FlowRateMessage Arg_5 = 5;
+	VolumeMessage Arg_5 = 5;
 	FlowRateMessage Arg_6 = 6;
-	int64 Arg_7 = 7;
-	bool Arg_8 = 8;
-	int64 Arg_9 = 9;
+	FlowRateMessage Arg_7 = 7;
+	int64 Arg_8 = 8;
+	bool Arg_9 = 9;
 	int64 Arg_10 = 10;
+	int64 Arg_11 = 11;
 }
 message MapstringPtrToLHTipwasteMessageMessageFieldEntry{
 string key = 1;

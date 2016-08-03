@@ -6,9 +6,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -173,12 +174,12 @@ type SequentialMixingSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "SequentialMixing",
+	if err := addComponent(component.Component{Name: "SequentialMixing",
 		Constructor: SequentialMixingNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "Protocol to Demonstrate how to perform sequential mixing using the example of\nmaking a serial dilution series from a solution and diluent\n",
 			Path: "antha/component/an/AnthaAcademy/Lesson3_MixPart2/C_SequentialMixing.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "DilutionFactor", Desc: "e.g. 10 would take 1 part solution to 9 parts diluent for each dilution\n", Kind: "Parameters"},
 				{Name: "NumberOfDilutions", Desc: "", Kind: "Parameters"},

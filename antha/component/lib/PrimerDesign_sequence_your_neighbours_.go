@@ -11,9 +11,10 @@ import (
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"os"
 	"path/filepath"
 	"strings"
@@ -296,12 +297,12 @@ type PrimerDesign_sequence_your_neighboursSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "PrimerDesign_sequence_your_neighbours",
+	if err := addComponent(component.Component{Name: "PrimerDesign_sequence_your_neighbours",
 		Constructor: PrimerDesign_sequence_your_neighboursNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "This element will design outward facing primers for all .gb file sequences in a specified folder.\nDesign criteria such as maximum gc content, acceptable ranges of melting temperatures and primer length may be specified by the user.\n",
 			Path: "antha/component/an/Data/DNA/PrimerDesign/PrimerDesign_sequence_your_neighbours.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Dirname", Desc: "files     []string = []string{\"STAR_0023_VECTOR_BBSI.gb\", \"STAR_0023_VECTOR_BBSI+Grp7+Grp14+Grp3.gb\"}\n\n= \"current\" // this will check for all .gb files in the folder you select here\n", Kind: "Parameters"},
 				{Name: "ExportToFile", Desc: "", Kind: "Parameters"},
 				{Name: "Maxgc", Desc: "     = 0.6\n", Kind: "Parameters"},

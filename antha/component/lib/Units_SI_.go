@@ -2,9 +2,10 @@ package lib
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol
@@ -113,12 +114,12 @@ type Units_SISOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Units_SI",
+	if err := addComponent(component.Component{Name: "Units_SI",
 		Constructor: Units_SINew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/C_units_SI.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "MyMass", Desc: "", Kind: "Parameters"},
 				{Name: "RawMass", Desc: "", Kind: "Data"},
 				{Name: "RawMassUnit", Desc: "", Kind: "Data"},

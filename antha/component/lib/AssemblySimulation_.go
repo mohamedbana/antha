@@ -4,9 +4,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/enzymes"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 func _AssemblySimulationRequirements() {
@@ -111,12 +112,12 @@ type AssemblySimulationSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "AssemblySimulation",
+	if err := addComponent(component.Component{Name: "AssemblySimulation",
 		Constructor: AssemblySimulationNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/GeneDesign/AssemblySimulation.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "PartsWithOverhangs", Desc: "", Kind: "Parameters"},
 				{Name: "RE", Desc: "", Kind: "Parameters"},
 				{Name: "SynthesisProvider", Desc: "", Kind: "Parameters"},

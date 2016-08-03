@@ -53,6 +53,8 @@ Data (
 	Status string
 	Simulationpass bool
 	PartswithOverhangs []wtype.DNASequence // parts to order
+	PartsWithSitesRemoved []wtype.DNASequence
+	OriginalParts []wtype.DNASequence 
 	NewDNASequence wtype.DNASequence // desired sequence to end up with after assembly
 	ORFmissing bool
 	Endreport string
@@ -143,6 +145,10 @@ Steps {
 		partsinorder = append(partsinorder,partDNA)
 	}
 	
+	// export original parts list
+	
+	OriginalParts = partsinorder
+	
 	warnings = append(warnings,fmt.Sprintln(partsinorder))
 			
 	
@@ -227,6 +233,10 @@ Steps {
 				partsinorder = newparts
 		}
 	}
+	
+	
+	// export the parts list with sites removed
+	PartsWithSitesRemoved = partsinorder
 	
 	// make vector into an antha type DNASequence
 	if inventorydata, found := inventory.Partslist[Vector]; found{

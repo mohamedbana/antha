@@ -10,9 +10,10 @@ package lib
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -167,12 +168,12 @@ type CombinatorialLibraryDesign_PRO_RBS_CDSSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "CombinatorialLibraryDesign_PRO_RBS_CDS",
+	if err := addComponent(component.Component{Name: "CombinatorialLibraryDesign_PRO_RBS_CDS",
 		Constructor: CombinatorialLibraryDesign_PRO_RBS_CDSNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/CombinatorialLibraryDesign.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "PartTypesinOrder", Desc: "labels e.g. pro = promoter\n", Kind: "Parameters"},
 				{Name: "Seqsinorder", Desc: "constructname to sequence combination\n", Kind: "Parameters"},
 				{Name: "SitesToRemove", Desc: "", Kind: "Parameters"},

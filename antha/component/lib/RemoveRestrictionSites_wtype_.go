@@ -11,9 +11,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"strconv"
 	"strings"
 )
@@ -260,12 +261,12 @@ type RemoveRestrictionSites_wtypeSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "RemoveRestrictionSites_wtype",
+	if err := addComponent(component.Component{Name: "RemoveRestrictionSites_wtype",
 		Constructor: RemoveRestrictionSites_wtypeNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/RestrictionSiteRemover/RemoveRestrictionSites_wtype.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "EnzymeforRestrictionmapping", Desc: "", Kind: "Parameters"},
 				{Name: "PreserveTranslatedseq", Desc: "", Kind: "Parameters"},
 				{Name: "RemoveifnotinORF", Desc: "", Kind: "Parameters"},

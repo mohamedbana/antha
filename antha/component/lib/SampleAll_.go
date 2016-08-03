@@ -5,9 +5,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -120,12 +121,12 @@ type SampleAllSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "SampleAll",
+	if err := addComponent(component.Component{Name: "SampleAll",
 		Constructor: SampleAllNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "example protocol demonstrating the use of the SampleAll function\n",
 			Path: "antha/component/an/AnthaAcademy/Lesson1_Sample/B_SampleAll.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Sampleall", Desc: "the bool type is a \"boolean\": which essentially means true or false\n", Kind: "Parameters"},
 				{Name: "Solution", Desc: "", Kind: "Inputs"},
 				{Name: "Sample", Desc: "", Kind: "Outputs"},

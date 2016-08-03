@@ -3,9 +3,10 @@ package lib
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol
@@ -27,6 +28,7 @@ func _Units_NewSetup(_ctx context.Context, _input *Units_NewInput) {
 
 // Core process of the protocol: steps to be performed for each input
 func _Units_NewSteps(_ctx context.Context, _input *Units_NewInput, _output *Units_NewOutput) {
+	// this is importing the NewVolume function from the wunit package
 	_output.MyVolume = wunit.NewVolume(_input.MyValue, _input.MyUnit)
 
 	// Exercise: adjust the protocol to make a concentration instead
@@ -105,12 +107,12 @@ type Units_NewSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Units_New",
+	if err := addComponent(component.Component{Name: "Units_New",
 		Constructor: Units_NewNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "demo of how to create units from raw values and unit strings\n",
 			Path: "antha/component/an/AnthaAcademy/Lesson0_Units/A_units_new.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "MyUnit", Desc: "", Kind: "Parameters"},
 				{Name: "MyValue", Desc: "", Kind: "Parameters"},
 				{Name: "MyVolume", Desc: "", Kind: "Data"},

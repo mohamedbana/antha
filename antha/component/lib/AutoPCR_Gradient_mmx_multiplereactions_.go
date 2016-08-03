@@ -3,10 +3,11 @@ package lib
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/microArch/factory"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -243,12 +244,12 @@ type AutoPCR_Gradient_mmx_multiplereactionsSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "AutoPCR_Gradient_mmx_multiplereactions",
+	if err := addComponent(component.Component{Name: "AutoPCR_Gradient_mmx_multiplereactions",
 		Constructor: AutoPCR_Gradient_mmx_multiplereactionsNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/PCR/AutoGradientPCRmmx_multiplereactions.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "FwdPrimertype", Desc: "", Kind: "Inputs"},
 				{Name: "Plate", Desc: "", Kind: "Inputs"},
 				{Name: "Projectname", Desc: "PCRprep parameters\n", Kind: "Parameters"},

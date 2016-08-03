@@ -8,10 +8,11 @@ import (
 	//"github.com/antha-lang/antha/microArch/factory"
 	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"github.com/disintegration/imaging"
+	"golang.org/x/net/context"
 	"image/color"
 	"strconv"
 )
@@ -196,12 +197,12 @@ type PipetteImage_fromPaletteSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "PipetteImage_fromPalette",
+	if err := addComponent(component.Component{Name: "PipetteImage_fromPalette",
 		Constructor: PipetteImage_fromPaletteNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of colours\n",
 			Path: "antha/component/an/Liquid_handling/PipetteImage/PipetteImage_fromPalette.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "AutoRotate", Desc: "", Kind: "Parameters"},
 				{Name: "ColourIndextoComponentMap", Desc: "", Kind: "Parameters"},
 				{Name: "Colourcomponents", Desc: "", Kind: "Inputs"},

@@ -540,6 +540,12 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 
 	A = wtype.NewLHComponent()
 	//A.GenericMatter = matter[wtype.LTWater]
+	A.CName = "colony"
+	A.Type = wtype.LTCOLONY
+	A.Smax = 1.0 //still not sure....
+	cmap[A.CName] = A
+	A = wtype.NewLHComponent()
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "LB_autoinduction_Amp"
 	A.Type = wtype.LTWater
 	A.Smax = 1.0 //still not sure....
@@ -577,6 +583,17 @@ func GetComponentByType(typ string) *wtype.LHComponent {
 		panic(fmt.Errorf("Component %s not found", typ)) //TODO refactor to errors
 	}
 	return c.Dup()
+}
+func ComponentInFactory(typ string) bool {
+	components := makeComponentLibrary()
+	c, ok := components[typ]
+	if c == nil || ok == false {
+		return false
+	}
+	if ok {
+		return true
+	}
+	return false
 }
 
 func GetComponentList() []string {

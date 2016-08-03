@@ -4,9 +4,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -130,12 +131,12 @@ type Assay_quenchSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Assay_quench",
+	if err := addComponent(component.Component{Name: "Assay_quench",
 		Constructor: Assay_quenchNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/AssaySetUp/QuenchedReaction.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Enzyme", Desc: "", Kind: "Inputs"},
 				{Name: "EnzymeVolume", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Parameters"},
