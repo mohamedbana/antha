@@ -5,9 +5,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 /*type Polymerase struct {
@@ -251,12 +252,12 @@ type ColonyPCR_vol_mmxSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "ColonyPCR_vol_mmx",
+	if err := addComponent(component.Component{Name: "ColonyPCR_vol_mmx",
 		Constructor: ColonyPCR_vol_mmxNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/PCR/ColonyPCR_vol_mmx.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "AnnealingTemp", Desc: "Should be calculated from primer and template binding\n", Kind: "Parameters"},
 				{Name: "Annealingtime", Desc: "Denaturationtemp Temperature\n", Kind: "Parameters"},
 				{Name: "Denaturationtime", Desc: "", Kind: "Parameters"},

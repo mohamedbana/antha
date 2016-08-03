@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol
@@ -153,12 +154,12 @@ type JoinDNASequences_mapSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "JoinDNASequences_map",
+	if err := addComponent(component.Component{Name: "JoinDNASequences_map",
 		Constructor: JoinDNASequences_mapNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/AnthaAcademy/Lesson4_DNA/G_JoinSequencePairs.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "BlastSeqswithNoName", Desc: "", Kind: "Parameters"},
 				{Name: "Pairs", Desc: "", Kind: "Parameters"},
 				{Name: "Vectors", Desc: "", Kind: "Parameters"},

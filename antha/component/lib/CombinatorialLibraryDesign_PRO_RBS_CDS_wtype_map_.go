@@ -10,9 +10,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences/oligos"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 //"strconv"
@@ -201,12 +202,12 @@ type CombinatorialLibraryDesign_PRO_RBS_CDS_wtype_mapSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "CombinatorialLibraryDesign_PRO_RBS_CDS_wtype_map",
+	if err := addComponent(component.Component{Name: "CombinatorialLibraryDesign_PRO_RBS_CDS_wtype_map",
 		Constructor: CombinatorialLibraryDesign_PRO_RBS_CDS_wtype_mapNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "This protocol is intended to design assembly parts using a specified enzyme.\noverhangs are added to complement the adjacent parts and leave no scar.\nparts can be entered as genbank (.gb) files, sequences or biobrick IDs\nIf assembly simulation fails after overhangs are added. In order to help the user\ndiagnose the reason, a report of the part overhangs\nis returned to the user along with a list of cut sites in each part.\n",
 			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/CombinatorialLibraryDesign4part_wtype.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "BlastSearchSeqs", Desc: "", Kind: "Parameters"},
 				{Name: "CDSs", Desc: "", Kind: "Parameters"},
 				{Name: "PROs", Desc: "", Kind: "Parameters"},

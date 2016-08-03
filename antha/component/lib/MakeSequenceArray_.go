@@ -4,9 +4,10 @@ package lib
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol
@@ -138,12 +139,12 @@ type MakeSequenceArraySOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "MakeSequenceArray",
+	if err := addComponent(component.Component{Name: "MakeSequenceArray",
 		Constructor: MakeSequenceArrayNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "combine up to 8 sequences into array; for convenience in using workflow editor\n",
 			Path: "antha/component/an/AnthaAcademy/Lesson4_DNA/F_MakeDNASequenceArray.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Seq1", Desc: "", Kind: "Parameters"},
 				{Name: "Seq2", Desc: "", Kind: "Parameters"},
 				{Name: "Seq3", Desc: "", Kind: "Parameters"},

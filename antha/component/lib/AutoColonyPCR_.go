@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/microArch/factory"
 	inplate "github.com/antha-lang/antha/target/mixer"
+	"golang.org/x/net/context"
 	"strconv"
 )
 
@@ -223,12 +224,12 @@ type AutoColonyPCRSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "AutoColonyPCR",
+	if err := addComponent(component.Component{Name: "AutoColonyPCR",
 		Constructor: AutoColonyPCRNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/PCR/AutoColonyPCR.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "FwdPrimertype", Desc: "", Kind: "Inputs"},
 				{Name: "Plate", Desc: "", Kind: "Inputs"},
 				{Name: "Projectname", Desc: "PCRprep parameters\n", Kind: "Parameters"},

@@ -13,9 +13,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"strconv"
 	"strings"
 )
@@ -194,12 +195,12 @@ type NewDNASequencesSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "NewDNASequences",
+	if err := addComponent(component.Component{Name: "NewDNASequences",
 		Constructor: NewDNASequencesNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "Demo protocol of how to create an array of dna types from parsing user inputs of various types\nscenarios handled:\nBiobrick IDS\ngenbank files\nraw sequence\ninventory lookup\n",
 			Path: "antha/component/an/AnthaAcademy/Lesson4_DNA/D_NewDNASequences.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "BlastSeqswithNoName", Desc: "", Kind: "Parameters"},
 				{Name: "Seqsinorder", Desc: "", Kind: "Parameters"},
 				{Name: "Vectors", Desc: "", Kind: "Parameters"},
