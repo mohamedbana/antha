@@ -77,6 +77,9 @@ func (gpu *GenericPrefixedUnit) PrefixedSymbol() string {
 	if gpu == nil {
 		return ""
 	}
+	if gpu.SPrefix.Name == "" || gpu.SPrefix.Name == " " {
+		return fmt.Sprintf("%s", gpu.GenericUnit.Symbol())
+	}
 	return fmt.Sprintf("%s%s", gpu.SPrefix.Name, gpu.GenericUnit.Symbol())
 }
 

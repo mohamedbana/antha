@@ -3,9 +3,10 @@ package lib
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol
@@ -103,12 +104,12 @@ type VolumeFromMassandConcSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "VolumeFromMassandConc",
+	if err := addComponent(component.Component{Name: "VolumeFromMassandConc",
 		Constructor: VolumeFromMassandConcNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "example of how to convert a concentration and mass to a volume\n",
 			Path: "antha/component/an/AnthaAcademy/Lesson5_Units2/C_VolumefromMassandConc.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "DNAConc", Desc: "", Kind: "Parameters"},
 				{Name: "DNAMassperReaction", Desc: "", Kind: "Parameters"},
 				{Name: "DNAVol", Desc: "", Kind: "Data"},

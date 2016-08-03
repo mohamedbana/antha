@@ -8,9 +8,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 //"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
@@ -152,12 +153,12 @@ type PrimerDesign_FWD_wtypeSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "PrimerDesign_FWD_wtype",
+	if err := addComponent(component.Component{Name: "PrimerDesign_FWD_wtype",
 		Constructor: PrimerDesign_FWD_wtypeNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "This element will design a sequencing primer to target amplification of a target region within a sequence file\nDesign criteria such as maximum gc content, acceptable ranges of melting temperatures and primer length may be specified by the user.\n",
 			Path: "antha/component/an/Data/DNA/PrimerDesign/PrimerDesign_FWD_wtype.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "FlankTargetSequence", Desc: "", Kind: "Parameters"},
 				{Name: "FullDNASeq", Desc: "string // genbank file (.gb)\n", Kind: "Parameters"},
 				{Name: "Maxgc", Desc: "as a proportion of 1, i.e. 1 == 100%\n", Kind: "Parameters"},

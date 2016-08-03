@@ -14,9 +14,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"strings"
 )
 
@@ -220,12 +221,12 @@ type MoCloLevel1_3Devices_VECTORSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "MoCloLevel1_3Devices_VECTOR",
+	if err := addComponent(component.Component{Name: "MoCloLevel1_3Devices_VECTOR",
 		Constructor: MoCloLevel1_3Devices_VECTORNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/MoClo_level1.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "AssemblyStandard", Desc: "MoClo\n", Kind: "Parameters"},
 				{Name: "Constructname", Desc: "", Kind: "Parameters"},
 				{Name: "Device1", Desc: "Level\t\t\t\t\t\tstring // of assembly standard\nPartMoClotypesinorder\t\t[]string // labels e.g. pro = promoter\n", Kind: "Parameters"},

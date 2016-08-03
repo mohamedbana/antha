@@ -12,9 +12,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"strconv"
 )
 
@@ -203,12 +204,12 @@ type CombinatorialLibraryDesign_PRO_RBS_CDS_mapSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "CombinatorialLibraryDesign_PRO_RBS_CDS_map",
+	if err := addComponent(component.Component{Name: "CombinatorialLibraryDesign_PRO_RBS_CDS_map",
 		Constructor: CombinatorialLibraryDesign_PRO_RBS_CDS_mapNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/CombinatorialLibraryDesign4part.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "BlastSearchSeqs", Desc: "", Kind: "Parameters"},
 				{Name: "CDSs", Desc: "", Kind: "Parameters"},
 				{Name: "PROs", Desc: "", Kind: "Parameters"},

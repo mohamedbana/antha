@@ -4,10 +4,11 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"github.com/disintegration/imaging"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -132,12 +133,12 @@ type PreProcessImageSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "PreProcessImage",
+	if err := addComponent(component.Component{Name: "PreProcessImage",
 		Constructor: PreProcessImageNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/PipetteImage/PreProcessImage.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "AutoRotate", Desc: "", Kind: "Parameters"},
 				{Name: "CheckAllResizeAlgorithms", Desc: "", Kind: "Parameters"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},

@@ -22,9 +22,10 @@ import (
 	"strings"
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"path/filepath"
 )
 
@@ -468,12 +469,12 @@ type AssemblyStandard_siteremove_orfcheckSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "AssemblyStandard_siteremove_orfcheck",
+	if err := addComponent(component.Component{Name: "AssemblyStandard_siteremove_orfcheck",
 		Constructor: AssemblyStandard_siteremove_orfcheckNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/AssemblyStandard_removesites_checkorfs.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "AssemblyStandard", Desc: "MoClo\n", Kind: "Parameters"},
 				{Name: "BlastSeqswithNoName", Desc: "", Kind: "Parameters"},
 				{Name: "Constructname", Desc: "", Kind: "Parameters"},

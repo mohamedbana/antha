@@ -4,9 +4,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image/pick"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -116,12 +117,12 @@ type ChooseColoniesMapSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "ChooseColoniesMap",
+	if err := addComponent(component.Component{Name: "ChooseColoniesMap",
 		Constructor: ChooseColoniesMapNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/choosecolonies/ChooseColoniesMap.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "ExportFileName", Desc: "", Kind: "Parameters"},
 				{Name: "Imagefile", Desc: "", Kind: "Parameters"},
 				{Name: "PlateForCoordinates", Desc: "", Kind: "Inputs"},

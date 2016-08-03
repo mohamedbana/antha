@@ -259,6 +259,7 @@ func (lhvc LHVariableCondition) IsEqualTo(other LHVariableCondition) bool {
 
 func (lhvc LHVariableCondition) Check(ins RobotInstruction) bool {
 	v := ins.GetParameter(lhvc.TestVariable)
+
 	return lhvc.Condition.Match(v)
 }
 
@@ -331,7 +332,6 @@ func (s sortableRules) Swap(i, j int) {
 func (lhpr LHPolicyRuleSet) GetPolicyFor(ins RobotInstruction) LHPolicy {
 	// find the set of matching rules
 	rules := make([]LHPolicyRule, 0, len(lhpr.Rules))
-
 	for _, rule := range lhpr.Rules {
 		if rule.Check(ins) {
 			rules = append(rules, rule)
@@ -373,7 +373,6 @@ type LHCategoryCondition struct {
 }
 
 func (lhcc LHCategoryCondition) Match(v interface{}) bool {
-
 	////logger.Debug(fmt.Sprintln("CATEGORY MATCH ON ", lhcc.Category))
 
 	switch v.(type) {

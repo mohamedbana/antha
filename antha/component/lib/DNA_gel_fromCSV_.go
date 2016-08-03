@@ -7,10 +7,11 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	inplate "github.com/antha-lang/antha/target/mixer"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -348,12 +349,12 @@ type DNA_gel_fromCSVSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "DNA_gel_fromCSV",
+	if err := addComponent(component.Component{Name: "DNA_gel_fromCSV",
 		Constructor: DNA_gel_fromCSVNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/DNA_gel/DNA_gel_fromCSV.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "DNAgel", Desc: "gel\n", Kind: "Inputs"},
 				{Name: "DNAgelrunvolume", Desc: "", Kind: "Parameters"},
 				{Name: "InputCSVfile", Desc: "", Kind: "Parameters"},

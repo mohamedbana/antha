@@ -16,9 +16,10 @@ import (
 	// antha "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	// "fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"strconv"
 	"strings"
 )
@@ -395,12 +396,12 @@ type AddPlateReaderresults_2SOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "AddPlateReaderresults_2",
+	if err := addComponent(component.Component{Name: "AddPlateReaderresults_2",
 		Constructor: AddPlateReaderresults_2New,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Utility/AddPlateReaderResults_2.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Blanks", Desc: "= []string{\"P24\"}\n", Kind: "Parameters"},
 				{Name: "DesignFile", Desc: "= \"250516CCFbubbles/240516DXCFFDoeoutputgilsonright_TEST.xlsx\"\n", Kind: "Parameters"},
 				{Name: "DesignFiletype", Desc: "= \"JMP\"\n", Kind: "Parameters"},
