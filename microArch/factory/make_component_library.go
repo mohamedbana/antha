@@ -540,6 +540,12 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 
 	A = wtype.NewLHComponent()
 	//A.GenericMatter = matter[wtype.LTWater]
+	A.CName = "colony"
+	A.Type = wtype.LTCOLONY
+	A.Smax = 1.0 //still not sure....
+	cmap[A.CName] = A
+	A = wtype.NewLHComponent()
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "LB_autoinduction_Amp"
 	A.Type = wtype.LTWater
 	A.Smax = 1.0 //still not sure....

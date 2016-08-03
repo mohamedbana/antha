@@ -17,46 +17,46 @@ import (
 
 // Physical outputs from this protocol with types
 
-func _ChooseColoniesRequirements() {
+func _ChooseColoniesMapRequirements() {
 
 }
 
 // Conditions to run on startup
-func _ChooseColoniesSetup(_ctx context.Context, _input *ChooseColoniesInput) {
+func _ChooseColoniesMapSetup(_ctx context.Context, _input *ChooseColoniesMapInput) {
 
 }
 
 // The core process for this protocol, with the steps to be performed
 // for every input
-func _ChooseColoniesSteps(_ctx context.Context, _input *ChooseColoniesInput, _output *ChooseColoniesOutput) {
+func _ChooseColoniesMapSteps(_ctx context.Context, _input *ChooseColoniesMapInput, _output *ChooseColoniesMapOutput) {
 
-	_output.Wellstopick, _output.Error = pick.PickAndExportCSV(_input.Imagefile, _input.ExportFileName, _input.PlateForCoordinates, _input.NumbertoPick, _input.Setplateperimeterfirst, _input.Rotate)
+	_output.Wellstopick, _output.Error = pick.PickAndExportCSVMap(_input.Imagefile, _input.ExportFileName, _input.PlateForCoordinates, _input.ReactiontoNumberMap, _input.Setplateperimeterfirst, _input.Rotate)
 
 }
 
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
-func _ChooseColoniesAnalysis(_ctx context.Context, _input *ChooseColoniesInput, _output *ChooseColoniesOutput) {
+func _ChooseColoniesMapAnalysis(_ctx context.Context, _input *ChooseColoniesMapInput, _output *ChooseColoniesMapOutput) {
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
-func _ChooseColoniesValidation(_ctx context.Context, _input *ChooseColoniesInput, _output *ChooseColoniesOutput) {
+func _ChooseColoniesMapValidation(_ctx context.Context, _input *ChooseColoniesMapInput, _output *ChooseColoniesMapOutput) {
 
 }
-func _ChooseColoniesRun(_ctx context.Context, input *ChooseColoniesInput) *ChooseColoniesOutput {
-	output := &ChooseColoniesOutput{}
-	_ChooseColoniesSetup(_ctx, input)
-	_ChooseColoniesSteps(_ctx, input, output)
-	_ChooseColoniesAnalysis(_ctx, input, output)
-	_ChooseColoniesValidation(_ctx, input, output)
+func _ChooseColoniesMapRun(_ctx context.Context, input *ChooseColoniesMapInput) *ChooseColoniesMapOutput {
+	output := &ChooseColoniesMapOutput{}
+	_ChooseColoniesMapSetup(_ctx, input)
+	_ChooseColoniesMapSteps(_ctx, input, output)
+	_ChooseColoniesMapAnalysis(_ctx, input, output)
+	_ChooseColoniesMapValidation(_ctx, input, output)
 	return output
 }
 
-func ChooseColoniesRunSteps(_ctx context.Context, input *ChooseColoniesInput) *ChooseColoniesSOutput {
-	soutput := &ChooseColoniesSOutput{}
-	output := _ChooseColoniesRun(_ctx, input)
+func ChooseColoniesMapRunSteps(_ctx context.Context, input *ChooseColoniesMapInput) *ChooseColoniesMapSOutput {
+	soutput := &ChooseColoniesMapSOutput{}
+	output := _ChooseColoniesMapRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
 		panic(err)
 	}
@@ -66,19 +66,19 @@ func ChooseColoniesRunSteps(_ctx context.Context, input *ChooseColoniesInput) *C
 	return soutput
 }
 
-func ChooseColoniesNew() interface{} {
-	return &ChooseColoniesElement{
+func ChooseColoniesMapNew() interface{} {
+	return &ChooseColoniesMapElement{
 		inject.CheckedRunner{
 			RunFunc: func(_ctx context.Context, value inject.Value) (inject.Value, error) {
-				input := &ChooseColoniesInput{}
+				input := &ChooseColoniesMapInput{}
 				if err := inject.Assign(value, input); err != nil {
 					return nil, err
 				}
-				output := _ChooseColoniesRun(_ctx, input)
+				output := _ChooseColoniesMapRun(_ctx, input)
 				return inject.MakeValue(output), nil
 			},
-			In:  &ChooseColoniesInput{},
-			Out: &ChooseColoniesOutput{},
+			In:  &ChooseColoniesMapInput{},
+			Out: &ChooseColoniesMapOutput{},
 		},
 	}
 }
@@ -88,25 +88,25 @@ var (
 	_ = wunit.Make_units
 )
 
-type ChooseColoniesElement struct {
+type ChooseColoniesMapElement struct {
 	inject.CheckedRunner
 }
 
-type ChooseColoniesInput struct {
+type ChooseColoniesMapInput struct {
 	ExportFileName         string
 	Imagefile              string
-	NumbertoPick           int
 	PlateForCoordinates    *wtype.LHPlate
+	ReactiontoNumberMap    map[string]int
 	Rotate                 bool
 	Setplateperimeterfirst bool
 }
 
-type ChooseColoniesOutput struct {
+type ChooseColoniesMapOutput struct {
 	Error       error
 	Wellstopick []string
 }
 
-type ChooseColoniesSOutput struct {
+type ChooseColoniesMapSOutput struct {
 	Data struct {
 		Error       error
 		Wellstopick []string
@@ -116,16 +116,16 @@ type ChooseColoniesSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "ChooseColonies",
-		Constructor: ChooseColoniesNew,
+	if err := addComponent(Component{Name: "ChooseColoniesMap",
+		Constructor: ChooseColoniesMapNew,
 		Desc: ComponentDesc{
 			Desc: "",
-			Path: "antha/component/an/Data/choosecolonies/ChooseColonies.an",
+			Path: "antha/component/an/Data/choosecolonies/ChooseColoniesMap.an",
 			Params: []ParamDesc{
 				{Name: "ExportFileName", Desc: "", Kind: "Parameters"},
 				{Name: "Imagefile", Desc: "", Kind: "Parameters"},
-				{Name: "NumbertoPick", Desc: "", Kind: "Parameters"},
 				{Name: "PlateForCoordinates", Desc: "", Kind: "Inputs"},
+				{Name: "ReactiontoNumberMap", Desc: "", Kind: "Parameters"},
 				{Name: "Rotate", Desc: "", Kind: "Parameters"},
 				{Name: "Setplateperimeterfirst", Desc: "", Kind: "Parameters"},
 				{Name: "Error", Desc: "", Kind: "Data"},
