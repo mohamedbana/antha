@@ -371,12 +371,6 @@ func (self *RobotState) Finalize() *simulator.SimulationError {
 
 //AddObject
 func (self *RobotState) AddObject(slot_name string, o wtype.LHObject) *simulator.SimulationError {
-    //try and get the object's name
-    oname := "unnamed"
-    if n, ok := o.(wtype.Named); ok {
-        oname = n.GetName()
-    }
-
     if sl, ok := self.slots[slot_name]; ok {
         //check that the slot is empty and can hold a child of this type
         if sl.HasChild() {
@@ -386,12 +380,8 @@ func (self *RobotState) AddObject(slot_name string, o wtype.LHObject) *simulator
             } else {
                 return simulator.NewErrorf("", "Location \"%s\" already contains an unnamed object", slot_name)
             }
-        } else if !sl.Accepts(o) {
-            if sl, ok := sl.(wtype.Typed); ok {
-                return simulator.NewErrorf("", "Slot type \"%s\" at location \"%s\" can't accept object \"%s\"", sl.GetType(), slot_name, oname)
-            } else {
-                return simulator.NewErrorf("", "Slot at location \"%s\" can't accept object \"%s\"", slot_name, oname)
-            }
+        } else if err := sl.Accepts(o); err != nil {
+            return simulator.NewError("", err.Error())
         }
 
         //check for intersections with other objects

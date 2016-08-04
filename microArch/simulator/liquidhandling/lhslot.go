@@ -24,6 +24,7 @@ package liquidhandling
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+    "errors"
     "fmt"
 )
 
@@ -31,8 +32,8 @@ import (
 type LHSlot interface {
     HasChild() bool
     GetChild() wtype.LHObject
-    SetChild(wtype.LHObject) bool
-    Accepts(wtype.LHObject) bool
+    SetChild(wtype.LHObject) error
+    Accepts(wtype.LHObject) error
     GetChildPosition() wtype.Coordinates
 }
 
@@ -42,14 +43,13 @@ type LHSlot interface {
 
 //GeneralSlot this slot will accept anything that fits
 type GeneralSlot struct {
+    wtype.BBox
     name            string
-    position        wtype.Coordinates
-    size            wtype.Coordinates
     child           wtype.LHObject
 }
 
 func NewGeneralSlot(name string, position, size wtype.Coordinates) *GeneralSlot {
-    r := GeneralSlot{name, position, size, nil}
+    r := GeneralSlot{*wtype.NewBBox(position, size), name, nil}
     return &r
 }
 
@@ -65,17 +65,6 @@ func (self *GeneralSlot) GetType() string {
     return "general_slot"
 }
 
-//@implements LHObject
-func (self *GeneralSlot) GetSize() wtype.Coordinates {
-    return self.size
-}
-func (self *GeneralSlot) GetPosition() wtype.Coordinates {
-    return self.position
-}
-func (self *GeneralSlot) SetPosition(p wtype.Coordinates) {
-    self.position = p
-}
-
 //@implements LHSlot
 func (self *GeneralSlot) HasChild() bool {
     return self.child != nil
@@ -88,20 +77,28 @@ func (self *GeneralSlot) GetChild() wtype.LHObject {
     return self.child
 }
 
-func (self *GeneralSlot) SetChild(o wtype.LHObject) bool {
-    if self.Accepts(o) {
-        self.child = o
-        return true
+func (self *GeneralSlot) SetChild(o wtype.LHObject) error {
+    if err := self.Accepts(o); err != nil {
+        return err
     }
-    return false
+    self.child = o
+    return nil
 }
 
-func (self *GeneralSlot) Accepts(o wtype.LHObject) bool {
-    return self.size.X >= o.GetSize().X && self.size.Y >= o.GetSize().Y
+func (self *GeneralSlot) Accepts(o wtype.LHObject) error {
+    if self.GetSize().X >= o.GetSize().X && self.GetSize().Y >= o.GetSize().Y {
+        return nil
+    }
+    if n, ok := o.(wtype.Named); ok {
+        return errors.New(fmt.Sprintf("Slot \"%s\"(%s) cannot fit object \"%s\"(%s)", 
+                            self.GetName(), self.GetSize(), n.GetName(), o.GetSize()))
+    }
+    return errors.New(fmt.Sprintf("Slot \"%s\"(%s) cannot fit unnamed object %s", 
+                        self.GetName(), self.GetSize(), o.GetSize()))
 }
 
 func (self *GeneralSlot) GetChildPosition() wtype.Coordinates {
-    return self.position
+    return self.GetPosition()
 }
 
 // -------------------------------------------------------------------------------
@@ -114,7 +111,8 @@ type TipwasteSlot struct {
 }
 
 func NewTipwasteSlot(name string, position, size wtype.Coordinates) *TipwasteSlot {
-    r := TipwasteSlot{GeneralSlot{name, position, size, nil}}
+    r := TipwasteSlot{}
+    r.GeneralSlot = *NewGeneralSlot(name, position, size)
     return &r
 }
 
@@ -123,15 +121,27 @@ func (self *TipwasteSlot) GetType() string {
     return "tipwaste_slot"
 }
 
-func (self *TipwasteSlot) Accepts(o wtype.LHObject) bool {
-    if self.GeneralSlot.Accepts(o) {
-        //check that this is a tipwaste
-        _, ok := o.(*wtype.LHTipwaste)
-        return ok
+func (self *TipwasteSlot) Accepts(o wtype.LHObject) error {
+    if err := self.GeneralSlot.Accepts(o); err != nil {
+        return err
+    } else if _, ok := o.(*wtype.LHTipwaste); !ok {
+        if n, ok := o.(wtype.Named); ok {
+            return errors.New(fmt.Sprintf("Slot \"%s\" cannot accept non-tipwaste object \"%s\"",
+            self.GetName(), n.GetName()))
+        } else {
+            return errors.New(fmt.Sprintf("Slot \"%s\" cannot accept unnamed object as it is not a TipWaste",
+            self.GetName()))
+        }
     }
-    fmt.Println("GeneralFail")
-    fmt.Println("object size: ", o.GetSize())
-    return false
+    return nil
+}
+
+func (self *TipwasteSlot) SetChild(o wtype.LHObject) error {
+    if err := self.Accepts(o); err != nil {
+        return err
+    }
+    self.child = o
+    return nil
 }
 
 // -------------------------------------------------------------------------------
@@ -144,7 +154,8 @@ type NonTipwasteSlot struct {
 }
 
 func NewNonTipwasteSlot(name string, position, size wtype.Coordinates) *NonTipwasteSlot {
-    r := NonTipwasteSlot{GeneralSlot{name, position, size, nil}}
+    r := NonTipwasteSlot{}
+    r.GeneralSlot = *NewGeneralSlot(name, position, size)
     return &r
 }
 
@@ -153,11 +164,25 @@ func (self *NonTipwasteSlot) GetType() string {
     return "nontipwaste_slot"
 }
 
-func (self *NonTipwasteSlot) Accepts(o wtype.LHObject) bool {
-    if self.GeneralSlot.Accepts(o) {
-        //check that this isn't a tipwaste
-        _, ok := o.(*wtype.LHTipwaste)
-        return !ok
+func (self *NonTipwasteSlot) Accepts(o wtype.LHObject) error {
+    if err := self.GeneralSlot.Accepts(o); err != nil {
+        return err
+    } else if _, ok := o.(*wtype.LHTipwaste); ok {
+        if n, ok := o.(wtype.Named); ok {
+            return errors.New(fmt.Sprintf("Slot \"%s\" cannot accept tipwaste object \"%s\"",
+            self.GetName(), n.GetName()))
+        } else {
+            return errors.New(fmt.Sprintf("Slot \"%s\" cannot accept unnamed tipwaste object",
+            self.GetName()))
+        }
     }
-    return false
+    return nil
+}
+
+func (self *NonTipwasteSlot) SetChild(o wtype.LHObject) error {
+    if err := self.Accepts(o); err != nil {
+        return err
+    }
+    self.child = o
+    return nil
 }
