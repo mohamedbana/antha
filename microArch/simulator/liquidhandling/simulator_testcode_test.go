@@ -361,7 +361,7 @@ func compare_errors(t *testing.T, desc string, expected []string, actual []*simu
 
 func default_lhplate() *wtype.LHPlate {
     params := LHPlateParams {
-        "test_plate_type",  // platetype       string 
+        "test_plate",  // platetype       string 
         "test_plate_mfr",   // mfr             string 
         8,                  // nrows           int 
         12,                 // ncols           int 

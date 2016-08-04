@@ -58,15 +58,7 @@ type LHPlate struct {
 	WellXStart  float64            // offset (mm) to first well in X direction
 	WellYStart  float64            // offset (mm) to first well in Y direction
 	WellZStart  float64            // offset (mm) to bottom of well in Z direction
-}
-
-func (lhp LHPlate) Name() string {
-	return lhp.PlateName
-}
-
-func (lhp LHPlate) GetType() string {
-    return lhp.Type
-}  
+} 
 
 func (lhp LHPlate) String() string {
 	return fmt.Sprintf(
@@ -192,6 +184,11 @@ func (lhp *LHPlate) GetName() string {
 	return lhp.PlateName
 }
 
+// @implement Typed
+func (lhp *LHPlate) GetType() string {
+    return lhp.Type
+} 
+
 func (lhp *LHPlate) WellAt(wc WellCoords) *LHWell {
 	return lhp.Wellcoords[wc.FormatA1()]
 }
@@ -231,6 +228,7 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit s
 	var lhp LHPlate
 	lhp.Type = platetype
 	lhp.ID = GetUUID()
+    lhp.PlateName = fmt.Sprintf("%s_%s", platetype, lhp.ID[1:len(lhp.ID)-2])
 	lhp.Mnfr = mfr
 	lhp.WlsX = ncols
 	lhp.WlsY = nrows

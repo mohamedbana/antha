@@ -7,6 +7,7 @@ import "fmt"
 
 type LHTipwaste struct {
     BBox
+    Name       string
 	ID         string
 	Type       string
 	Mnfr       string
@@ -28,6 +29,7 @@ func (te LHTipwaste) String() string {
 		`LHTipwaste {
 	ID: %s,
 	Type: %s,
+    Name: %s,
 	Mnfr: %s,
 	Capacity: %d,
 	Contents: %d,
@@ -40,6 +42,7 @@ func (te LHTipwaste) String() string {
 `,
 		te.ID,
 		te.Type,
+        te.Name,
 		te.Mnfr,
 		te.Capacity,
 		te.Contents,
@@ -56,7 +59,7 @@ func (tw *LHTipwaste) Dup() *LHTipwaste {
 }
 
 func (tw *LHTipwaste) GetName() string {
-	return tw.Type
+	return tw.Name
 }
 
 func (tw *LHTipwaste) GetType() string {
@@ -67,6 +70,7 @@ func NewLHTipwaste(capacity int, typ, mfr string, height float64, w *LHWell, wel
 	var lht LHTipwaste
 	lht.ID = GetUUID()
 	lht.Type = typ
+    lht.Name = fmt.Sprintf("%s_%s", typ, lht.ID[1:len(lht.ID)-2])
 	lht.Mnfr = mfr
 	lht.Capacity = capacity
 	lht.Height = height
