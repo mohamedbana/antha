@@ -38,7 +38,7 @@ type ChannelState struct {
     number          int
     tip             *wtype.LHTip        //Nil if no tip loaded, otherwise the tip that's loaded
     contents        *wtype.LHComponent  //What's in the tip?
-    position        wtype.Coordinates  //position relative to the adaptor
+    position        wtype.Coordinates   //position relative to the adaptor
     adaptor         *AdaptorState       //the channel's adaptor
 }
 
@@ -62,11 +62,6 @@ func (self *ChannelState) HasTip() bool {
 //GetTip get the loaded tip, returns nil if none loaded
 func (self *ChannelState) GetTip() *wtype.LHTip {
     return self.tip
-}
-
-//SetTip set the tip, mainly for debug and testing
-func (self *ChannelState) SetTip(tip *wtype.LHTip) {
-    self.tip = tip
 }
 
 //IsEmpty returns true only if a tip is loaded and contains liquid
@@ -94,52 +89,28 @@ func (self *ChannelState) GetAbsolutePosition() wtype.Coordinates {
     return self.position.Add(self.adaptor.GetPosition())
 }
 
-type GetPlateRet struct {
-    Plate       interface{}
-    Position    wtype.WellCoords
-    Offset      wtype.Coordinates 
-}
+//GetTarget get the LHObject below the adaptor
+func (self *ChannelState) GetTarget() wtype.LHObject {
+    pos := self.GetAbsolutePosition()
+    zbox := wtype.NewZBox4f(pos.X, pos.Y, 0, 0,)
 
-//GetPlate Get the next plate below the adaptor and check that the position, type and well match
-func (self *ChannelState) GetPlate(platetype, position, well string) (*GetPlateRet, *simulator.SimulationError) {
-    //get the plate interface from the robot deck
-    abs_p := self.GetAbsolutePosition()
-    plate_loc := self.adaptor.GetRobot().GetDeck().GetPlateBelow(abs_p)
-
-    //if there's no plate
-    if plate_loc == nil {
-        return nil, simulator.NewErrorf("", "No Plate below channel %v, expected type \"%s\" at \"%s\"", self.number, platetype, position)
+    objs := self.adaptor.GetRobot().GetObjectsIn(zbox)
+    if len(objs) == 0 {
+        return nil
     }
 
-    //check the type of the plate
-    if pt := plate_loc.plate.(wtype.Typed).GetType(); pt != platetype {
-        return nil, simulator.NewErrorf("", "Plate below channel %v is of type \"%s\" not \"%s\"", self.number, pt, platetype)
-    }
-
-    //check the position of the plate
-    if plate_loc.location_name != position {
-        return nil, simulator.NewErrorf("", "Plate below channel %v is in location \"%s\" not \"%s\"",
-                               self.number, plate_loc.location_name, position)
-    }
-
-    //check the well
-    if do, ok := plate_loc.plate.(wtype.LHDeckObject); ok {
-        rel_p := abs_p.Subtract(plate_loc.GetOffset())
-        wc, offset := do.CoordsToWellCoords(rel_p)
-
-        if wc.FormatA1() != well {
-            return nil, simulator.NewErrorf("", "Channel %v is above well %s not well %s", self.number, wc.FormatA1(), well)
+    z_min := math.MaxFloat64
+    i_min := -1
+    for i := range objs {
+        if gap := pos.Z - objs[i].GetMax(wtype.ZDim); gap > 0 && gap < z_min {
+            z_min = gap
+            i_min = i
         }
-
-        //return everything
-        r := GetPlateRet{
-            plate_loc.plate,
-            wc,
-            offset}
-        return &r, nil
     }
-    //else
-    return nil, simulator.NewErrorf("", "Object found below channel was %T, not LHDeckObject", plate_loc.plate)
+    if i_min < 0 {
+        return nil
+    }
+    return objs[i_min]
 }
 
 //                            Actions
@@ -158,73 +129,15 @@ func (self *ChannelState) Dispense(volume *wunit.Volume) error {
 }
 
 //LoadTip
-func (self *ChannelState) LoadTip(platetype, position, well string) *simulator.SimulationError {
-    if self.tip != nil {
-        return simulator.NewErrorf("", "Tip already loaded on channel %v", self.number)
-    }
-
-    //is this channel expected to remain empty
-    if platetype == "" && position == "" && well == "" {
-        //Todo: check that I'm not going to collide with anything while tip loading motion is made
-
-        return nil
-    }
-
-    p, err := self.GetPlate(platetype, position, well)
-    if err != nil {
-        return err
-    }
-
-    //check that we've got a tipbox
-    tipbox, ok := p.Plate.(*wtype.LHTipbox)
-    if !ok {
-        return simulator.NewErrorf("", "No Tipbox beneath channel %v", self.number)
-    }
-
-    //Check that we're lined up
-    if misalignment := p.Offset.AbsXY(); misalignment > 0.5 {
-        return simulator.NewErrorf("", "Channel %v Misaligned from tip by %smm", self.number, misalignment)
-    }
-
-    //if there's a tip, move it to the adaptor
-    //at first, I thought there being no tip (tip==nil) was an error, but
-    //actually it could be deliberate in the case of a non-independent adaptor
-    //and the callee should verify afterwards that the expected tips were loaded
-    wc := wtype.MakeWellCoords(well)
-    tip, _ := tipbox.GetCoords(wc)
-    tipbox.RemoveTip(wc)
-    self.tip = tip.(*wtype.LHTip)
-    return nil
+func (self *ChannelState) LoadTip(tip *wtype.LHTip) {
+    self.tip = tip
 }
 
 //UnloadTip
-func (self *ChannelState) UnloadTip(platetype, position, well string) *simulator.SimulationError {
-    p, err := self.GetPlate(platetype, position, well)
-    if err != nil {
-        return err
-    }
-
-    //check that we've got a tipwaste
-    tipwaste, ok := p.Plate.(*wtype.LHTipwaste)
-    if !ok {
-        return simulator.NewError("", "No tipwaste below adaptor")
-    }
-
-    //check that we're actually over the well
-    if self.HasTip() && 
-        (math.Abs(p.Offset.X) > 0.5*tipwaste.AsWell.Xdim ||
-         math.Abs(p.Offset.Y) > 0.5*tipwaste.AsWell.Ydim) {
-           return simulator.NewError("", "Ejecting a tip while not over TipWaste well")
-    }
-
-    //do it!
+func (self *ChannelState) UnloadTip() *wtype.LHTip {
+    tip := self.tip
     self.tip = nil
-    self.contents = nil
-
-    if !tipwaste.Dispose(1) {
-        return simulator.NewError("", "Tipbox full")
-    }
-    return nil
+    return tip
 }
 
 // -------------------------------------------------------------------------------
@@ -239,16 +152,15 @@ type AdaptorState struct {
     robot           *RobotState 
 }
 
-func NewAdaptorState(robot *RobotState, 
-                     initial_position wtype.Coordinates, 
-                     independent bool,
+func NewAdaptorState(independent bool,
                      channels int, 
                      channel_offset wtype.Coordinates) *AdaptorState {
     as := AdaptorState{
         make([]*ChannelState,0,channels),
-        initial_position,
+        wtype.Coordinates{},
         independent,
-        robot}
+        nil,
+    }
 
     for i := 0; i < channels; i++ {
         as.channels = append(as.channels, NewChannelState(i, &as, channel_offset.Multiply(float64(i))))
@@ -296,247 +208,71 @@ func (self *AdaptorState) GetRobot() *RobotState {
     return self.robot
 }
 
+//SetRobot
+func (self *AdaptorState) SetRobot(r *RobotState) {
+    self.robot = r
+}
+
+func (self *AdaptorState) SetPosition(p wtype.Coordinates) {
+    self.position = p    
+}
+
 //                            Actions
 //                            -------
 
-func (self *AdaptorState) LoadTips(platetype, position, well []string) *simulator.SimulationError {
-    for i := range self.channels {
-        if !(self.independent && platetype[i] == "" && position[i] == "" && well[i] == "") {
-            if err := self.channels[i].LoadTip(platetype[i], position[i], well[i]); err != nil {
-                return err
-            }            
+func (self *AdaptorState) Move(target wtype.LHObject, wc []wtype.WellCoords, ref []wtype.WellReference, off []wtype.Coordinates) *simulator.SimulationError {
+    addr, ok := target.(wtype.Addressable)
+    if !ok {
+        if n, nok := target.(wtype.Named); nok {
+            return simulator.NewErrorf("", "Target object \"%s\" is not addressable", n.GetName())
+        } else {
+            return simulator.NewErrorf("", "Target object is not addressable")
         }
     }
-    return nil
-}
-
-func (self *AdaptorState) UnLoadTips(platetype, position, well []string) error {
-    for i := range self.channels {
-        if !(self.independent && platetype[i] == "" && position[i] == "" && well[i] == "") {
-            if err := self.channels[i].UnloadTip(platetype[i], position[i], well[i]); err != nil {
-                return err
-            }            
-        }
-    }
-    return nil
-}
-
-func (self *AdaptorState) Move(platetype, position, well []string, 
-        reference []wtype.WellReference, offset []wtype.Coordinates) *simulator.SimulationError {
-    positions := make([]*wtype.Coordinates, len(self.channels))
-
-    for i := range self.channels {
-        //leave position nil if we don't care
-        if platetype[i] == "" && position[i] == "" && well[i] == "" {
-            continue
-        }
-
-        pl := self.robot.GetDeck().GetPlateByPosition(position[i], platetype[i])
-        if pl == nil {
-            return simulator.NewErrorf("", "No plate of type \"%s\" at location \"%s\"", platetype[i], position[i])
-        }
-        do := pl.GetPlate().(wtype.LHDeckObject)
-
-        wc := wtype.MakeWellCoords(well[i])
-        if !do.HasCoords(wc) {
-            return simulator.NewErrorf("", "Plate has no coordinates %s", well[i])
-        }
-
-        rel_pos, ok := do.WellCoordsToCoords(wc, reference[i])
-        if !ok {
-            return simulator.NewErrorf("", "Could not get location of well %s", wc.Format1A())
-        }
-
-        //TODO Check for collision with plate/well
-
-        pos_i := pl.GetOffset().Add(rel_pos).Add(offset[i])
-        positions[i] = &pos_i
-    }
-
-    //convert positions to relative
-    //find the origin of the adaptor based on the first non-nil channel
-    var origin *wtype.Coordinates 
-    for i := range self.channels {
-        if positions[i] != nil {
-            o := positions[i].Subtract(self.channels[i].GetRelativePosition())
-            origin = &o
+    
+    //find the origin
+    origin := wtype.Coordinates{}
+    for i := range wc {
+        if addr.HasCoords(wc[i]) {
+            origin, _ = addr.WellCoordsToCoords(wc[i], ref[i])
+            origin = origin.Add(off[i]).Subtract(self.channels[i].GetRelativePosition())
             break
         }
     }
-    if origin == nil {
-        return simulator.NewWarning("", "Ignoring empty command")
-    }
-    for i := range positions {
-        if positions[i] != nil { 
-            *positions[i] = positions[i].Subtract(*origin)
-        } else { //if position hasn't been specified, leave relative position alone
-            p := self.channels[i].GetRelativePosition()
-            positions[i] = &p
+
+    //find the relative positions
+    positions := make([]wtype.Coordinates, len(self.channels))
+    for i := range self.channels {
+        if wc[i].IsZero() {
+            positions[i] = self.GetChannel(i).GetRelativePosition()
+        } else {
+            if pos, ok := addr.WellCoordsToCoords(wc[i], ref[i]); ok {
+                positions[i] = pos.Add(off[i]).Subtract(origin)
+            } else {
+                return simulator.NewErrorf("", "No well \"%s\" in target", wc[i].FormatA1())
+            }
         }
     }
 
-    //if the head isn't independent, check that relative positions are the same
+    //if not independent, relative positions should not change
     if !self.independent {
         for i := range positions {
-            if *positions[i] != self.channels[i].GetRelativePosition() {
-                return simulator.NewError("", "Channels can't move independently")
+            if positions[i] != self.channels[i].GetRelativePosition() {
+                return simulator.NewError("", "Failed to adjust channel offset in non-independent adaptor")
             }
         }
     }
 
-    self.position = *origin
+    //do it
+    self.position = origin
     for i := range self.channels {
-        self.channels[i].SetRelativePosition(*positions[i])
+        self.channels[i].SetRelativePosition(positions[i])
     }
     return nil
 }
 
-// -------------------------------------------------------------------------------
-//                            PlateLocation
-// -------------------------------------------------------------------------------
 
-//PlateLocation a wrapper for an LHObject
-type PlateLocation struct {
-    plate_name      string
-    offset          wtype.Coordinates
-    size            wtype.Coordinates
-    location_name   string
-    plate           interface{}
-}
 
-func NewPlateLocation(plate_name string, plate wtype.LHDeckObject, position wtype.Coordinates, position_name string) *PlateLocation {
-    r := PlateLocation{
-        plate_name,
-        position,
-        plate.GetSize(),
-        position_name,
-        plate.(interface{})}
-    return &r
-}
-
-func (self *PlateLocation) GetPlate() interface{} {
-    return self.plate
-}
-
-func (self *PlateLocation) GetSize() wtype.Coordinates {
-    return self.size
-}
-
-func (self *PlateLocation) GetOffset() wtype.Coordinates {
-    return self.offset
-}
-
-func (self *PlateLocation) GetName() string {
-    return self.plate_name
-}
-
-func (self *PlateLocation) GetLocationName() string {
-    return self.location_name
-}
-
-func (self *PlateLocation) ContainsXY(p wtype.Coordinates) bool {
-    d := p.Subtract(self.offset)
-    return d.X >=0 && d.Y >= 0 && d.X < self.size.X && d.Y < self.size.X
-}
-
-func (self *PlateLocation) Intersects(rhs *PlateLocation) bool {
-    //test a single dimension. 
-    //(a,b) are the start and end of the first position
-    //(c,d) are the start and end of the second pos
-    // assert(a > b  and  d > c)
-    f := func(a,b,c,d float64) bool {
-        return !(c >= b || d <= a)
-    }
-
-    return (f(self.offset.X, self.offset.X + self.size.X,
-               rhs.offset.X,  rhs.offset.X +  rhs.size.X) &&
-            f(self.offset.Y, self.offset.Y + self.size.Y,
-               rhs.offset.Y,  rhs.offset.Y +  rhs.size.Y) &&
-            f(self.offset.Z, self.offset.Z + self.size.Z,
-               rhs.offset.Z,  rhs.offset.Z +  rhs.size.Z))
-}
-
-// -------------------------------------------------------------------------------
-//                            DeckState
-// -------------------------------------------------------------------------------
-
-//DeckState Represent the physical state of an LH robot's deck
-type DeckState struct {
-    named_positions         map[string]wtype.Coordinates
-    plate_locations         []*PlateLocation
-}
-
-func NewDeckState(positions map[string]wtype.Coordinates) *DeckState {
-    r := DeckState{
-        positions,
-        make([]*PlateLocation, 0),
-    }
-    return &r
-}
-
-func (self *DeckState) HasPosition(position_name string) bool {
-    if _, ok := self.named_positions[position_name]; ok {
-        return true
-    }
-    return false
-}
-
-func (self *DeckState) AddPlate(plate_name string, plate interface{}, position wtype.Coordinates, position_name string) *simulator.SimulationError {
-    to_add := NewPlateLocation(plate_name, plate.(wtype.LHDeckObject), position, position_name)
-    for _,pl := range self.plate_locations {
-        if pl.Intersects(to_add) {
-            return simulator.NewErrorf("", "Cannot add \"%s\" to location \"%s\", intersects with \"%s\" at \"%s\"", 
-                             plate_name, position_name, pl.GetName(), pl.GetLocationName())
-        }
-    }
-    self.plate_locations = append(self.plate_locations, to_add)
-    return nil
-}
-
-func (self *DeckState) AddPlateToNamed(plate_name string, plate interface{}, position string) *simulator.SimulationError {
-    return self.AddPlate(plate_name, plate, self.named_positions[position], position)
-}
-
-//GetPlateBelow get the next plate below the position and the relative position within the plate
-func (self *DeckState) GetPlateBelow(pos wtype.Coordinates) *PlateLocation {
-    var p *PlateLocation = nil
-    z := math.MaxFloat64
-    for _,pl := range self.plate_locations {
-        if pl.ContainsXY(pos) {
-            if dz := pos.Z - pl.GetOffset().Z; dz > 0 && dz < z {
-                p = pl
-                z = dz
-            }
-        }
-    }
-    return p
-}
-
-func (self *DeckState) GetPlateByPosition(position, platetype string) *PlateLocation {
-    ret := make([]*PlateLocation,0)
-    for _,pl := range self.plate_locations {
-        if pl.GetLocationName() == position && pl.GetPlate().(wtype.Typed).GetType() == platetype {
-            ret = append(ret, pl)
-        }
-    }
-    if len(ret) != 1 {
-        return nil
-    }
-    return ret[0]
-}
-
-func (self *DeckState) GetPlateAt(position string) interface{} {
-    ret := make([]*PlateLocation,0)
-    for _,pl := range self.plate_locations {
-        if pl.GetLocationName() == position {
-            ret = append(ret, pl)
-        }
-    }
-    if len(ret) == 0 {
-        return nil
-    }
-    return ret[0].GetPlate()
-}
 
 // -------------------------------------------------------------------------------
 //                            RobotState
@@ -544,39 +280,23 @@ func (self *DeckState) GetPlateAt(position string) interface{} {
 
 //RobotState Represent the physical state of a liquidhandling robot
 type RobotState struct {
-    deck            *DeckState
+    slots           map[string]LHSlot
     adaptors        []*AdaptorState 
     initialized     bool
     finalized       bool
 }
 
-type AdaptorParams struct {
-    Initial_position    wtype.Coordinates
-    Independent         bool
-    Channels            int
-    Channel_offset      wtype.Coordinates
-}
-
-func NewRobotState(positions map[string]wtype.Coordinates,
-                   adaptors []AdaptorParams) *RobotState {
+func NewRobotState() *RobotState {
     rs := RobotState{}
-    rs.deck = NewDeckState(positions)
-    rs.adaptors = make([]*AdaptorState, 0, len(adaptors))
+    rs.slots = make(map[string]LHSlot)
+    rs.adaptors = make([]*AdaptorState, 0)
     rs.initialized = false
     rs.finalized = false
-    for _,ap := range adaptors {
-        rs.adaptors = append(rs.adaptors, NewAdaptorState(&rs, ap.Initial_position, ap.Independent, ap.Channels, ap.Channel_offset))
-    }
     return &rs
 }
 
 //                            Accessors
 //                            ---------
-
-//GetDeck
-func (self *RobotState) GetDeck() *DeckState {
-    return self.deck
-}
 
 //GetAdaptor
 func (self *RobotState) GetAdaptor(num int) *AdaptorState {
@@ -588,6 +308,22 @@ func (self *RobotState) GetNumberOfAdaptors() int {
     return len(self.adaptors)
 }
 
+//AddAdaptor
+func (self *RobotState) AddAdaptor(a *AdaptorState) {
+    a.SetRobot(self)
+    self.adaptors = append(self.adaptors, a)
+}
+
+//AddSlot
+func (self *RobotState) AddSlot(s LHSlot) {
+    self.slots[s.(wtype.Named).GetName()] = s
+}
+
+//GetSlot
+func (self *RobotState) GetSlot(name string) LHSlot {
+    return self.slots[name]
+}
+
 //IsInitialized
 func (self *RobotState) IsInitialized() bool {
     return self.initialized
@@ -596,6 +332,17 @@ func (self *RobotState) IsInitialized() bool {
 //IsFinalized
 func (self *RobotState) IsFinalized() bool {
     return self.finalized
+}
+
+//GetObjectsIn Return all slots that intersect with the bounding box
+func (self *RobotState) GetObjectsIn(o wtype.LHObject) []wtype.LHObject {
+    ret := make([]wtype.LHObject, 0)
+    for _, slot := range self.slots {
+        if slot.HasChild() && wtype.Intersects(o, slot.GetChild()) {
+            ret = append(ret, slot.GetChild())
+        }
+    }
+    return ret
 }
 
 //                            Actions
@@ -611,7 +358,7 @@ func (self *RobotState) Initialize() *simulator.SimulationError {
 }
 
 //Finalize
-func (self *RobotState) Finalize() error {
+func (self *RobotState) Finalize() *simulator.SimulationError {
     if self.finalized {
         return simulator.NewError("", "Called Finalize on already finalized liquid handler")
     }
@@ -619,6 +366,47 @@ func (self *RobotState) Finalize() error {
         return simulator.NewError("", "Called Finalize on uninitialized liquidhandler")
     }
     self.finalized = true
+    return nil
+}
+
+//AddObject
+func (self *RobotState) AddObject(slot_name string, o wtype.LHObject) *simulator.SimulationError {
+    //try and get the object's name
+    oname := "unnamed"
+    if n, ok := o.(wtype.Named); ok {
+        oname = n.GetName()
+    }
+
+    if sl, ok := self.slots[slot_name]; ok {
+        //check that the slot is empty and can hold a child of this type
+        if sl.HasChild() {
+            //In the future, we'll check if the child can accept another LHObject, for now barf
+            if n, ok := sl.GetChild().(wtype.Named); ok {
+                return simulator.NewErrorf("", "Location \"%s\" already contains an object \"%s\"", slot_name, n.GetName())
+            } else {
+                return simulator.NewErrorf("", "Location \"%s\" already contains an unnamed object", slot_name)
+            }
+        } else if !sl.Accepts(o) {
+            if sl, ok := sl.(wtype.Typed); ok {
+                return simulator.NewErrorf("", "Slot type \"%s\" at location \"%s\" can't accept object \"%s\"", sl.GetType(), slot_name, oname)
+            } else {
+                return simulator.NewErrorf("", "Slot at location \"%s\" can't accept object \"%s\"", slot_name, oname)
+            }
+        }
+
+        //check for intersections with other objects
+        old_pos := o.GetPosition()
+        o.SetPosition(sl.GetChildPosition())
+        for name, slot := range self.slots {
+            if wtype.Intersects(o, slot.GetChild()) {
+                o.SetPosition(old_pos)
+                return simulator.NewErrorf("", "Object intersects with object at position \"%s\"", name)
+            }
+        }
+        sl.SetChild(o)
+    } else {
+        return simulator.NewErrorf("", "Robot contains no locations named \"%s\"", slot_name)
+    }
     return nil
 }
 

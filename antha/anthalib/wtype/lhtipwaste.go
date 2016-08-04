@@ -6,6 +6,7 @@ import "fmt"
 // tip waste
 
 type LHTipwaste struct {
+    BBox
 	ID         string
 	Type       string
 	Mnfr       string
@@ -73,6 +74,13 @@ func NewLHTipwaste(capacity int, typ, mfr string, height float64, w *LHWell, wel
 	lht.WellXStart = wellxstart
 	lht.WellYStart = wellystart
 	lht.WellZStart = wellzstart
+
+    lht.BBox = BBox{Coordinates{}, Coordinates{
+        2 * wellxstart + w.Xdim,
+        2 * wellystart + w.Ydim,
+        height,
+    }}
+
 	return &lht
 }
 
@@ -89,20 +97,10 @@ func (lht *LHTipwaste) Dispose(n int) bool {
 	return true
 }
 
-//@implement LHDeckObject
-
-func (self *LHTipwaste) GetSize() Coordinates {
-    //Assume that TipX/YStart is repeated the other side
-    return Coordinates{
-        2 * self.WellXStart + self.AsWell.Xdim,
-        2 * self.WellYStart + self.AsWell.Ydim,
-        self.Height,
-    }
-}
+//@implement Addressable
 
 func (self *LHTipwaste) HasCoords(c WellCoords) bool {
-    return c.X == 0 &&
-           c.Y == 0 
+    return c.X == 0 && c.Y == 0 
 }
 
 func (self *LHTipwaste) GetCoords(c WellCoords) (interface{}, bool) {

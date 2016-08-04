@@ -544,15 +544,15 @@ func TestLoadTips(t *testing.T) {
             []TestRobotInstruction{
                 &LoadTips{
                     []int{0},               //channels
-                    0,                     //head
+                    0,                      //head
                     8,                      //multi
                     []string{"tipbox"},     //tipbox
-                    []string{"tipbox_1"},    //location
+                    []string{"tipbox_1"},   //location
                     []string{"H12"},        //well
                 },
             },
             []string{       //errors
-                "(err) LoadTips: channels, platetype, position, well should be of length multi=8",
+                "(err) LoadTips: Slices platetype,position,well are not of expected length 8",
             },
             nil,            //assertions
         },
@@ -597,7 +597,8 @@ func TestLoadTips(t *testing.T) {
                 },
             },
             []string{       //errors
-                "(err) LoadTips: Cannot load H12->channel0 as H12 is empty",
+                "(warn) LoadTips: Cannot load tip to channel 0 as no tip at H12 in tipbox_1",
+                "(err) LoadTips: Failed to load tip to channel 0",
             },
             nil,            //assertions
         },
@@ -620,7 +621,7 @@ func TestLoadTips(t *testing.T) {
                 },
             },
             []string{       //errors
-                "(err) LoadTips: Cannot load tips while adaptor already contains 1 tip",
+                "(err) LoadTips: Tip already loaded on channel 0",
             },
             nil,            //assertions
         },

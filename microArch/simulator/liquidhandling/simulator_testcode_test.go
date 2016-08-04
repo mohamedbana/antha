@@ -683,7 +683,7 @@ type SetupFn func(*lh.VirtualLiquidHandler)
 
 func removeTipboxTips(tipbox_loc string, wells []string) *SetupFn {
     var ret SetupFn = func(vlh *lh.VirtualLiquidHandler) {
-        tipbox := vlh.GetPlateAt(tipbox_loc).(*wtype.LHTipbox)
+        tipbox := vlh.GetObjectAt(tipbox_loc).(*wtype.LHTipbox)
         for _,well := range wells {
             wc := wtype.MakeWellCoords(well)
             tipbox.Tips[wc.X][wc.Y] = nil
@@ -695,10 +695,10 @@ func removeTipboxTips(tipbox_loc string, wells []string) *SetupFn {
 func preloadAdaptorTips(head int, tipbox_loc string, channels []int) *SetupFn {
     var ret SetupFn = func(vlh *lh.VirtualLiquidHandler) {
         adaptor := vlh.GetAdaptorState(head)
-        tipbox := vlh.GetPlateAt(tipbox_loc).(*wtype.LHTipbox)
+        tipbox := vlh.GetObjectAt(tipbox_loc).(*wtype.LHTipbox)
 
         for _,ch := range channels {
-            adaptor.GetChannel(ch).SetTip(tipbox.Tiptype.Dup());
+            adaptor.GetChannel(ch).LoadTip(tipbox.Tiptype.Dup());
         }
     }
     return &ret
@@ -706,7 +706,7 @@ func preloadAdaptorTips(head int, tipbox_loc string, channels []int) *SetupFn {
 
 func fillTipwaste(tipwaste_loc string, count int) *SetupFn {
     var ret SetupFn = func(vlh *lh.VirtualLiquidHandler) {
-        tipwaste := vlh.GetPlateAt(tipwaste_loc).(*wtype.LHTipwaste)
+        tipwaste := vlh.GetObjectAt(tipwaste_loc).(*wtype.LHTipwaste)
         tipwaste.Contents += count
     }
     return &ret
@@ -768,21 +768,24 @@ func tipboxAssertion(tipbox_loc string, missing_tips []string) *AssertionFn {
             mmissing_tips[tl] = true
         }
 
-        tipbox := vlh.GetPlateAt(tipbox_loc).(*wtype.LHTipbox)
-        errors := []string{}
-        for y := 0; y < tipbox.Nrows; y++ {
-            for x:= 0; x < tipbox.Ncols; x++ {
-                wc := wtype.WellCoords{x,y}
-                wcs:= wc.FormatA1()
-                if hta, etm := tipbox.HasTipAt(wc), mmissing_tips[wcs]; !hta && !etm {
-                    errors = append(errors, fmt.Sprintf("Unexpected tip missing at %s", wcs))
-                } else if hta && etm {
-                    errors = append(errors, fmt.Sprintf("Unexpected tip present at %s", wcs))
+        if tipbox, ok := vlh.GetObjectAt(tipbox_loc).(*wtype.LHTipbox); !ok {
+            t.Errorf("TipboxAssertion failed in \"%s\", no Tipbox found at \"%s\"", name, tipbox_loc)
+        } else {
+            errors := []string{}
+            for y := 0; y < tipbox.Nrows; y++ {
+                for x:= 0; x < tipbox.Ncols; x++ {
+                    wc := wtype.WellCoords{x,y}
+                    wcs:= wc.FormatA1()
+                    if hta, etm := tipbox.HasTipAt(wc), mmissing_tips[wcs]; !hta && !etm {
+                        errors = append(errors, fmt.Sprintf("Unexpected tip missing at %s", wcs))
+                    } else if hta && etm {
+                        errors = append(errors, fmt.Sprintf("Unexpected tip present at %s", wcs))
+                    }
                 }
             }
-        }
-        if len(errors) > 0 {
-            t.Errorf("TipboxAssertion failed in test \"%s\", tipbox at \"%s\":\n%s", name, tipbox_loc, strings.Join(errors, "\n"))
+            if len(errors) > 0 {
+                t.Errorf("TipboxAssertion failed in test \"%s\", tipbox at \"%s\":\n%s", name, tipbox_loc, strings.Join(errors, "\n"))
+            }
         }
     }
     return &ret
@@ -815,11 +818,13 @@ func adaptorAssertion(head int, tip_channels []int) *AssertionFn {
 //tipwasteAssertion assert the number of tips which should be in the tipwaste
 func tipwasteAssertion(tipwaste_loc string, expected_contents int) *AssertionFn {
     var ret AssertionFn = func(name string, t *testing.T, vlh *lh.VirtualLiquidHandler) {
-        tipwaste := vlh.GetPlateAt(tipwaste_loc).(*wtype.LHTipwaste)
-        
-        if tipwaste.Contents != expected_contents {
-            t.Errorf("TipwasteAssertion failed in test \"%s\" at location %s: expected %v tips, got %v", 
-                name, tipwaste_loc, expected_contents, tipwaste.Contents)
+        if tipwaste, ok := vlh.GetObjectAt(tipwaste_loc).(*wtype.LHTipwaste); !ok {
+            t.Errorf("TipWasteAssertion failed in \"%s\", no Tipwaste found at %s", name, tipwaste_loc)
+        } else {
+            if tipwaste.Contents != expected_contents {
+                t.Errorf("TipwasteAssertion failed in test \"%s\" at location %s: expected %v tips, got %v", 
+                    name, tipwaste_loc, expected_contents, tipwaste.Contents)
+            }
         }
     }
     return &ret

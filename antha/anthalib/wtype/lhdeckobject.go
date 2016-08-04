@@ -23,6 +23,10 @@
 // defines types for dealing with liquid handling requests
 package wtype
 
+import (
+    "math"
+)
+
 //WellReference used for specifying position within a well
 type WellReference int
 
@@ -32,12 +36,34 @@ const (
     LiquidReference                      //2
 )
 
-//LHDeckObject Provides a unified interface to physical properties
-//of items that can be placed on a liquid handler's deck, 
-//currently LHPlate, LHTipbox, and LHTipWaste
-type LHDeckObject interface {
-    //GetSize Return the physical size of the object in mm
+type Dimension int
+const (
+    XDim Dimension = iota
+    YDim
+    ZDim
+)
+
+//LHObject Provides a unified interface to physical size
+//of items that can be placed on a liquid handler's deck
+type LHObject interface {
+    //GetSize Return the physical size of the object's bounding box in mm
     GetSize() Coordinates
+    //GetPosition Return the absolute offset of the object
+    GetPosition() Coordinates
+    //SetOffset Store the offset of the object
+    SetPosition(Coordinates)
+    //GetTop maximum x-position
+    GetMax(Dimension) float64
+    //GetTop minimum x-position
+    GetMin(Dimension) float64
+}
+
+//Addressable unifies the interface to objects which have
+//sub-components that can be adressed by WellCoords (e.g. "A1")
+//for example tip-boxes, plates, etc
+type Addressable interface {
+    //GetSize return the number of rows and columns
+    GetSize() WellCoords
     //HasCoords Do the given coordinates exist in the object?
     HasCoords(WellCoords) bool
     //GetCoords Return the object at the given well coords
@@ -63,3 +89,142 @@ type LHDeckObject interface {
     WellCoordsToCoords(WellCoords, WellReference) (Coordinates, bool)
 }
 
+//Intersects just checks for bounding box intersection
+func Intersects(lhs LHObject, rhs LHObject) bool {
+    if lhs == nil || rhs == nil {
+        return false
+    }
+    //test a single dimension. 
+    //(a,b) are the start and end of the first position
+    //(c,d) are the start and end of the second pos
+    // assert(a > b  and  d > c)
+    f := func(a,b,c,d float64) bool {
+        return !(c >= b || d <= a)
+    }
+
+    lo := lhs.GetPosition()
+    ls := lhs.GetSize()
+    ro := rhs.GetPosition()
+    rs := rhs.GetSize()
+
+    return (f(lo.X, lo.X + ls.X, ro.X,  ro.X +  rs.X) &&
+            f(lo.Y, lo.Y + ls.Y, ro.Y,  ro.Y +  rs.Y) &&
+            f(lo.Z, lo.Z + ls.Z, ro.Z,  ro.Z +  rs.Z))
+}
+
+//BBox is a simple LHObject representing a bounding box, 
+//useful for checking if there's stuff in the way 
+type BBox struct {
+    position    Coordinates
+    size        Coordinates
+}
+
+func NewBBox(position, size Coordinates) *BBox {
+    r := BBox{position, size}
+    return &r
+}
+
+func NewBBox6f(pos_x, pos_y, pos_z, size_x, size_y, size_z float64) *BBox {
+    return NewBBox(Coordinates{ pos_x,  pos_y,  pos_z}, 
+                   Coordinates{size_x, size_y, size_z})
+}
+
+func (self *BBox) GetSize() Coordinates {
+    return self.size
+}
+
+func (self *BBox) GetPosition() Coordinates {
+    return self.position
+}
+
+func (self *BBox) SetPosition(c Coordinates) {
+    self.position = c
+}
+
+func (self *BBox) GetMax(d Dimension) float64 {
+    switch d {
+    case XDim:
+        return math.Max(self.position.X, self.position.X + self.size.X)
+    case YDim:
+        return math.Max(self.position.Y, self.position.Y + self.size.Y)
+    }
+    //case ZDim:
+    return math.Max(self.position.Z, self.position.Z + self.size.Z)
+}
+
+func (self *BBox) GetMin(d Dimension) float64 {
+    switch d {
+    case XDim:
+        return math.Min(self.position.X, self.position.X + self.size.X)
+    case YDim:
+        return math.Min(self.position.Y, self.position.Y + self.size.Y)
+    }
+    //case ZDim:
+    return math.Min(self.position.Z, self.position.Z + self.size.Z)
+}
+
+//XBox is a BBox which extends infinitely in the X direction
+type XBox struct {
+    BBox
+}
+
+func NewXBox(position, size Coordinates) *XBox {
+    size.X = math.MaxFloat64
+    position.X = -0.5 * math.MaxFloat64
+    r := XBox{BBox{position, size}}
+    return &r
+}
+
+func NewXBox4f(pos_y, pos_z, size_y, size_z float64) *XBox {
+    return NewXBox(Coordinates{0.,  pos_y,  pos_z}, 
+                   Coordinates{0., size_y, size_z})
+}
+
+func (self *XBox) SetPosition(c Coordinates) {
+    c.X = -0.5 * math.MaxFloat64
+    self.position = c
+}
+
+//YBox is a BBox which extends infinitely in the Y direction
+type YBox struct {
+    BBox
+}
+
+func NewYBox(position, size Coordinates) *YBox {
+    size.Y = math.MaxFloat64
+    position.Y = -0.5 * math.MaxFloat64
+    r := YBox{BBox{position, size}}
+    return &r
+}
+
+func NewYBox4f(pos_x, pos_z, size_x, size_z float64) *YBox {
+    return NewYBox(Coordinates{ pos_x, 0.,  pos_z}, 
+                   Coordinates{size_x, 0., size_z})
+}
+
+func (self *YBox) SetPosition(c Coordinates) {
+    c.Y = -0.5 * math.MaxFloat64
+    self.position = c
+}
+
+//ZBox is a BBox which extends infinitely in the Z direction
+type ZBox struct {
+    BBox
+}
+
+func NewZBox(position, size Coordinates) *ZBox {
+    size.Z = math.MaxFloat64
+    position.Z = -0.5 * math.MaxFloat64
+    r := ZBox{BBox{position, size}}
+    return &r
+}
+
+func NewZBox4f(pos_x, pos_y, size_x, size_y float64) *ZBox {
+    return NewZBox(Coordinates{ pos_x,  pos_y, 0.}, 
+                   Coordinates{size_x, size_y, 0.})
+}
+
+func (self *ZBox) SetPosition(c Coordinates) {
+    c.Z = -0.5 * math.MaxFloat64
+    self.position = c
+}

@@ -24,6 +24,7 @@ package liquidhandling
 
 import (
     "strings"
+    "sort"
     "fmt"
 	"github.com/antha-lang/antha/microArch/driver"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
@@ -54,33 +55,44 @@ func NewVirtualLiquidHandler(props *liquidhandling.LHProperties) *VirtualLiquidH
     if vlh.HasError() {
         return &vlh
     }
+    vlh.state = NewRobotState()
 
-    adaptors := make([]AdaptorParams, 0, len(props.Heads))
+    //add the adaptors
     for _,head := range props.Heads {
+        p := head.Adaptor.Params
         //9mm spacing currently hardcoded. 
         //At some point we'll either need to fetch this from the driver or
         //infer it from the type of tipboxes/plates accepted
         spacing := wtype.Coordinates{0,0,0}
-        if head.Adaptor.Params.Orientation == wtype.LHVChannel {
+        if p.Orientation == wtype.LHVChannel {
             spacing.Y = 9.
-        } else if head.Adaptor.Params.Orientation == wtype.LHVChannel {
+        } else if p.Orientation == wtype.LHVChannel {
             spacing.X = 9.
         }
-        adaptors = append(adaptors, AdaptorParams{
-            wtype.Coordinates{0.,0.,0.},
-            head.Adaptor.Params.Independent,
-            head.Adaptor.Params.Multi,
-            wtype.Coordinates{0., 9., 0.}, 
-        })
+        vlh.state.AddAdaptor(NewAdaptorState(p.Independent, p.Multi, spacing))
     }
 
-    vlh.state = NewRobotState(props.Layout, adaptors)
+    is_in := func(s string, l []string) bool {
+        for _,k := range l {
+            if s == k {
+                return true
+            }
+        }
+        return false
+    }
+    //add the slots
+    for name, coords := range props.Layout {
+        //assuming default size for now
+        var sl LHSlot
+        if is_in(name, props.Tipwaste_preferences) {
+            sl = NewTipwasteSlot(name, coords, wtype.Coordinates{127.76, 85.48, 0.})
+        } else {
+            sl = NewNonTipwasteSlot(name, coords, wtype.Coordinates{127.76, 85.48, 0.})
+        }
+        vlh.state.AddSlot(sl)            
+    }
 
     return &vlh
-}
-
-func (self *VirtualLiquidHandler) GetPlateAt(location_name string) interface{} {
-    return self.state.GetDeck().GetPlateAt(location_name)
 }
 
 // ------------------------------------------------------------------------------- Useful Utilities
@@ -132,6 +144,8 @@ func (self *VirtualLiquidHandler) testSliceLength(f_name string, slice_lengths m
         self.AddErrorf(f_name, "Slice %s is not of expected length %v", wrong[0], exp_length)
         return false
     } else if len(wrong) > 1 {
+        //for unit testing, names need to always be in the same order
+        sort.Strings(wrong)
         self.AddErrorf(f_name, "Slices %s are not of expected length %v", strings.Join(wrong, ","), exp_length)
         return false
     }
@@ -164,14 +178,22 @@ func (self *VirtualLiquidHandler) testTipArgs(f_name string, channels []int, hea
     ret := true
 
     if multi != n_channels {
-        self.AddErrorf(f_name, "Argument multi does not equal the number of adaptor channels (%v != %v)", multi, n_channels)
+        self.AddErrorf(f_name, "Multi(=%v) doesn't match number of channels on Head%v(=%v)", multi, head, n_channels)
         ret = false
     }
 
     bad_channels := []string{}
+    mchannels := map[int]bool{}
+    dup_channels := []string{}
     for _,ch := range channels {
         if ch < 0 || ch >= n_channels {
             bad_channels = append(bad_channels, fmt.Sprintf("%v", ch))
+        } else {
+            if mchannels[ch] {
+                dup_channels = append(dup_channels, fmt.Sprintf("%v",ch))
+            } else {
+                mchannels[ch] = true
+            }
         }
     }
     if len(bad_channels) == 1 {
@@ -179,6 +201,13 @@ func (self *VirtualLiquidHandler) testTipArgs(f_name string, channels []int, hea
         ret = false
     } else if len(bad_channels) > 1 {
         self.AddErrorf(f_name, "Unknown channels \"%v\"", strings.Join(bad_channels, "\",\""))
+        ret = false
+    }
+    if len(dup_channels) == 1 {
+        self.AddErrorf(f_name, "Channel%v appears more than once", dup_channels[0])
+        ret = false
+    } else if len(dup_channels) == 1 {
+        self.AddErrorf(f_name, "Channels {%s} appear more than once", strings.Join(dup_channels, "\",\""))
         ret = false
     }
 
@@ -190,6 +219,9 @@ func (self *VirtualLiquidHandler) testTipArgs(f_name string, channels []int, hea
     return ret
 }
 
+func (self *VirtualLiquidHandler) GetObjectAt(slot_name string) wtype.LHObject {
+    return self.state.GetSlot(slot_name).GetChild()
+}
 
 // ------------------------------------------------------------------------ ExtendedLHDriver
 
@@ -214,8 +246,42 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
             "offsetZ":      len(offsetZ),
             "plate_type":   len(platetype)},
             adaptor.GetChannelCount()) {
+        //at this point, deckposition and platetype have to be equal
+        dp := "" 
+        pt := ""
+        for i := range deckposition {
+            if deckposition[i] != "" {
+                if dp != "" {
+                    if dp != deckposition[i] {
+                        self.AddWarning("Move", "Deckpositions are not equal, ignoring further values")
+                    }
+                } else {
+                    dp = deckposition[i]
+                }
+            }
+            if platetype[i] != "" {
+                if dp != "" {
+                    if dp != platetype[i] {
+                        self.AddWarning("Move", "Platetypes are not equal, ignoring further values")
+                    }
+                } else {
+                    dp = platetype[i]
+                }
+            }
+        }
+
+        target := self.state.GetSlot(dp).GetChild()
+        if target == nil {
+            self.AddErrorf("Move", "No object found at slot %s", dp)
+            return ret
+        }
+        if t, ok := target.(wtype.Typed); ok && t.GetType() != pt {
+            self.AddWarningf("Move", "Object found at %s was type %s not type %s as expected", dp, t.GetType(), pt)
+        }
+        
         offset := make([]wtype.Coordinates, adaptor.GetChannelCount())
         typed_ref := make([]wtype.WellReference, adaptor.GetChannelCount())
+        wc := make([]wtype.WellCoords, adaptor.GetChannelCount())
         for i := range offset {
             offset[i].X = offsetX[i]
             offset[i].Y = offsetY[i]
@@ -231,9 +297,10 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
                 default:
                     panic("invalid reference")
             }
+            wc[i] = wtype.MakeWellCoords(wellcoords[i])
         }
 
-        if err := adaptor.Move(platetype, deckposition, wellcoords, typed_ref, offset); err != nil {
+        if err := adaptor.Move(target, wc, typed_ref, offset); err != nil {
             err.SetFunctionName("Move")
             self.AddSimulationError(err)
         }
@@ -272,12 +339,36 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
         return ret
     }
 
-    if err := self.state.GetAdaptor(head).LoadTips(platetype, position, well); err != nil {
-        err.SetFunctionName("LoadTips")
-        self.AddSimulationError(err)
-    }
+    adaptor := self.state.GetAdaptor(head)
+    //if err := adaptor.LoadTips(platetype, position, well); err != nil {
+    //    err.SetFunctionName("LoadTips")
+    //    self.AddSimulationError(err)
+    //}
 
-    //TODO: Check that tips were loaded onto the specified channels
+    //Check that tips were loaded onto the specified channels
+    mchannels := map[int]bool{}
+    for _,ch := range channels {
+        mchannels[ch] = true
+    }
+    extra := []string{}
+    missing := []string{}
+    for ch := 0; ch < adaptor.GetChannelCount(); ch++ {
+        if ht,et := adaptor.GetChannel(ch).HasTip(), mchannels[ch]; ht && !et {
+            extra = append(extra, fmt.Sprintf("%v", ch))
+        } else if !ht && et {
+            missing = append(missing, fmt.Sprintf("%v", ch))
+        }
+    }
+    if len(extra) == 1 {
+        self.AddErrorf("LoadTips", "Unexpected tip loaded to channel %s", extra[0])
+    } else if len(extra) > 1 {
+        self.AddErrorf("LoadTips", "Unexpected tips loaded to channels {%s}", strings.Join(extra, ","))
+    }
+    if len(missing) == 1 {
+        self.AddErrorf("LoadTips", "Failed to load tip to channel %s", missing[0])
+    } else if len(missing) > 1 {
+        self.AddErrorf("LoadTips", "Failed to load tips to channels {%s}", strings.Join(missing, ","))
+    }
 
     return ret
 }
@@ -292,9 +383,9 @@ func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
         return ret
     }
 
-    if err := self.state.GetAdaptor(head).LoadTips(platetype, position, well); err != nil {
-        self.AddError("UnloadTips", err.Error())
-    }
+    //if err := self.state.GetAdaptor(head).UnloadTips(platetype, position, well); err != nil {
+    //    self.AddError("UnloadTips", err.Error())
+    //}
 
     //TODO: check that specified channels have no tips, any other tips remain
 
@@ -367,19 +458,18 @@ func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{},
 
     ret := driver.CommandStatus{true, driver.OK, "ADDPLATETO ACK"}
 
-    if _, ok := plate.(wtype.LHDeckObject); ok {
-    
-        if self.state.GetDeck().HasPosition(position) {
-            if err := self.state.GetDeck().AddPlateToNamed(name, plate, position); err != nil {
-                err.SetFunctionName("AddPlateTo")
-                self.AddSimulationError(err)
-                return ret
-            }
-        } else {
-            self.AddErrorf("AddPlateTo", "Unknown location \"%s\"", position)
+    if obj, ok := plate.(wtype.LHObject); ok {
+        if n, nok := obj.(wtype.Named); nok && n.GetName() != name {
+            self.AddWarningf("AddPlateTo", "Object name(=%s) doesn't match argument name(=%s)", n.GetName(), name)
         }
+
+        if err := self.state.AddObject(position, obj); err != nil {
+            err.SetFunctionName("AddPlateTo")
+            self.AddSimulationError(err)
+        }
+
     } else {
-        self.AddErrorf("AddPlateTo", "Cannot add plate \"%s\" of type %T to location \"%s\"", name, plate, position) 
+        self.AddErrorf("AddPlateTo", "Couldn't add object of type %T to %s", plate, position)
     }
 
     return ret

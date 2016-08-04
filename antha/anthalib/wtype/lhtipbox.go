@@ -31,6 +31,7 @@ import (
 /* tip box */
 
 type LHTipbox struct {
+    BBox
 	ID         string
 	Boxname    string
 	Type       string
@@ -47,6 +48,9 @@ type LHTipbox struct {
 	TipXStart  float64
 	TipYStart  float64
 	TipZStart  float64
+
+    size        Coordinates
+    position    Coordinates
 }
 
 func NewLHTipbox(nrows, ncols int, height float64, manufacturer, boxtype string, tiptype *LHTip, well *LHWell, tipxoffset, tipyoffset, tipxstart, tipystart, tipzstart float64) *LHTipbox {
@@ -70,6 +74,12 @@ func NewLHTipbox(nrows, ncols int, height float64, manufacturer, boxtype string,
 	tipbox.TipXStart = tipxstart
 	tipbox.TipYStart = tipystart
 	tipbox.TipZStart = tipzstart
+
+    tipbox.BBox = BBox{Coordinates{}, Coordinates{
+        2 * tipxstart + float64(ncols) * tipxoffset,
+        2 * tipystart + float64(nrows) * tipyoffset,
+        height,
+    }}
 	return initialize_tips(&tipbox, tiptype)
 }
 
@@ -138,23 +148,15 @@ func (tb *LHTipbox) N_clean_tips() int {
 	return c
 }
 
-//@implement LHDeckObject
 
-func (tb *LHTipbox) GetSize() Coordinates {
-    //Assume that TipX/YStart is repeated the other side
-    return Coordinates{
-        2 * tb.TipXStart + float64(tb.Ncols) * tb.TipXOffset,
-        2 * tb.TipYStart + float64(tb.Nrows) * tb.TipYOffset,
-        tb.Height,
-    }
-}
-
+//@implement Addressable
 func (tb *LHTipbox) HasCoords(c WellCoords) bool {
     return c.X >= 0 &&
            c.Y >= 0 &&
            c.X < tb.Ncols &&
            c.Y < tb.Nrows
 }
+
 
 func (tb *LHTipbox) GetCoords(c WellCoords) (interface{}, bool) {
     if !tb.HasCoords(c) {

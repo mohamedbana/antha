@@ -36,6 +36,7 @@ import (
 
 // structure describing a microplate
 type LHPlate struct {
+    BBox
 	ID          string
 	Inst        string
 	Loc         string             // location of plate
@@ -243,6 +244,15 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit s
 	lhp.WellYStart = wellYStart
 	lhp.WellZStart = wellZStart
 
+    //HJK 3/8/16: Guessing plate size from other parameters, 
+    //maybe we want to set this explicitly at some point as it assumes
+    //wells are centered
+    lhp.BBox = BBox{Coordinates{}, Coordinates{
+            2 * wellXStart + float64(ncols) * wellXOffset,
+            2 * wellYStart + float64(nrows) * wellYOffset,
+            height, //assuming units of mm
+        }}
+
 	wellcoords := make(map[string]*LHWell, ncols*nrows)
 
 	// make wells
@@ -446,16 +456,9 @@ func (p *LHPlate) IsConstrainedOn(platform string) ([]string, bool) {
 
 }
 
-//@implement LHDeckObject
-
-func (self *LHPlate) GetSize() Coordinates {
-    //Assume that TipX/YStart is repeated the other side
-    return Coordinates{
-        2 * self.WellXStart + float64(self.WlsX) * self.WellXOffset,
-        2 * self.WellYStart + float64(self.WlsY) * self.WellYOffset,
-        self.Height,
-    }
-}
+//##############################################
+//@implement Addressable
+//##############################################
 
 func (self *LHPlate) HasCoords(c WellCoords) bool {
     return c.X >= 0 &&
