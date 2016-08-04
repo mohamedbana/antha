@@ -90,11 +90,11 @@ func (self *GeneralSlot) Accepts(o wtype.LHObject) error {
         return nil
     }
     if n, ok := o.(wtype.Named); ok {
-        return errors.New(fmt.Sprintf("Slot \"%s\"(%s) cannot fit object \"%s\"(%s)", 
-                            self.GetName(), self.GetSize(), n.GetName(), o.GetSize()))
+        return fmt.Errorf("Footprint of object \"%s\"[%s] too large for slot \"%s\"[%s]", 
+                            n.GetName(), o.GetSize(), self.GetName(), self.GetSize())
     }
-    return errors.New(fmt.Sprintf("Slot \"%s\"(%s) cannot fit unnamed object %s", 
-                        self.GetName(), self.GetSize(), o.GetSize()))
+    return fmt.Errorf("Footprint of unnamed object[%s] too large for slot \"%s\"[%s]", 
+                            o.GetSize(), self.GetName(), self.GetSize())
 }
 
 func (self *GeneralSlot) GetChildPosition() wtype.Coordinates {

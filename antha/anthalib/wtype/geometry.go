@@ -25,12 +25,18 @@ package wtype
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
     "math"
+    "fmt"
 )
 
 type Coordinates struct {
 	X float64
 	Y float64
 	Z float64
+}
+
+//implement Stringer
+func (self Coordinates) String() string {
+    return fmt.Sprintf("%vx%vx%vmm", self.X, self.Y, self.Z)
 }
 
 // Value for dimension
