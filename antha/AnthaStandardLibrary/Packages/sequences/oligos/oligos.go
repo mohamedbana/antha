@@ -125,15 +125,19 @@ func BasicMeltingTemp(primersequence wtype.DNASequence) (meltingtemp wunit.Tempe
 	return
 }
 
-//define region in DNA sequence
+// define region in DNA sequence
+// this is directionless and does not check for reverse complement
+// if endposition < startposition and sequence is a plasmid then the end of sequence will be used
 func DNAregion(sequence wtype.DNASequence, startposition int, endposition int) (region wtype.DNASequence) {
 
 	dnaseq := sequence.Sequence()
 
 	//define region in sequence to create primer. NB: Sequence position will start from 0 not 1.
-
-	region = wtype.MakeLinearDNASequence("region"+strconv.Itoa(startposition)+":"+strconv.Itoa(endposition), dnaseq[startposition-1:endposition])
-
+	if endposition > startposition {
+		region = wtype.MakeLinearDNASequence("region"+strconv.Itoa(startposition)+":"+strconv.Itoa(endposition), dnaseq[startposition-1:endposition])
+	} else if endposition < startposition && sequence.Plasmid {
+		region = wtype.MakeLinearDNASequence("region"+strconv.Itoa(startposition)+":"+strconv.Itoa(endposition), dnaseq[startposition-1:]+dnaseq[:endposition])
+	}
 	return
 
 }
@@ -149,7 +153,7 @@ func FWDOligoSeq(seq wtype.DNASequence, maxGCcontent float64, minlength int, max
 	//var start int
 	//var end int
 
-	region := seq.Sequence()
+	region := strings.ToUpper(seq.Sequence())
 
 	for start := 0; start < maxlength; start++ {
 
@@ -207,12 +211,14 @@ func FWDOligoSeq(seq wtype.DNASequence, maxGCcontent float64, minlength int, max
 func FindPositioninSequence(largeSequence wtype.DNASequence, smallSequence wtype.DNASequence) (start int, end int, err error) {
 	//positions, err := search.Findall(largeSequence.Sequence(), smallSequence.Sequence())
 
-	seqsfound := sequences.FindSeqsinSeqs(largeSequence.Sequence(), []string{smallSequence.Sequence()})
+	seqsfound := sequences.FindSeqsinSeqs(strings.ToUpper(largeSequence.Sequence()), []string{strings.ToUpper(smallSequence.Sequence())})
 
 	/*if err != nil {
 		return
 	} else */if len(seqsfound) != 1 {
-		err = fmt.Errorf(strconv.Itoa(len(seqsfound)), " seqs found of ", smallSequence.Nm, " in ", largeSequence.Nm)
+
+		errstr := fmt.Sprint(strconv.Itoa(len(seqsfound)), " sequences of ", smallSequence.Nm, " ", smallSequence.Seq, " found in ", largeSequence.Nm, " ", largeSequence.Seq)
+		err = fmt.Errorf(errstr)
 		return
 	}
 	//if !seqsfound[0].Reverse {
