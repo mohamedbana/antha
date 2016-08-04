@@ -43,10 +43,10 @@
                 "lefthomologyarm2.5kbA": "lividans",
                 "lefthomologyarm2.5kbB": "lividans",
                 "lefthomologyarm3kb": "lividans",
-                "righthomologyarm1kb": "pQR1059",
+                "righthomologyarm1kb": "lividans",
                 "righthomologyarm2.5kbA": "lividans",
                 "righthomologyarm2.5kbB": "pQR1059",
-                "righthomologyarm3kb": "pQR1059"
+                "righthomologyarm3kb": "lividans"
             },
             "FwdPrimertype": "PrimerFw",
             "RevPrimertype": "PrimerRev",

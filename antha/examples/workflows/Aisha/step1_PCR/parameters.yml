@@ -2,8 +2,8 @@
     "Parameters": {
         "PCR": {
             "FwdPrimertype": "PrimerFw",
-            "Plate": "pcrplate_skirted_riser",
-            "Projectname": "idontknow",
+            "Plate": "pcrplate_with_cooler",
+            "Projectname": "20160725",
             "Reactiontoprimerpair": {
                 "lefthomologyarm1kb": [
                     "LHA1kbF",
@@ -43,10 +43,10 @@
                 "lefthomologyarm2.5kbA": "lividans",
                 "lefthomologyarm2.5kbB": "lividans",
                 "lefthomologyarm3kb": "lividans",
-                "righthomologyarm1kb": "pQR1059",
+                "righthomologyarm1kb": "lividans",
                 "righthomologyarm2.5kbA": "lividans",
                 "righthomologyarm2.5kbB": "pQR1059",
-                "righthomologyarm3kb": "pQR1059"
+                "righthomologyarm3kb": "lividans"
             },
             "RevPrimertype": "PrimerRev",
             "Templatetype": "dna_part"

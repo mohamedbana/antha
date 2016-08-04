@@ -1,7 +1,4 @@
-// This element will design a pair of primers to cover a specified region of a sequence for colonyPCR.
-// But it's not finished yet!, please finish it off by designing the reverse primer
-// go to cd $GOPATH/src/github.com/antha-lang/antha/antha/examples/workflows/AnthaAcademy/Exercises/PrimerDesignExercise
-// make antharun return correct primerpairs for the three cases shown
+// This element will design a sequencing primer to target amplification of a target region within a sequence file
 // Design criteria such as maximum gc content, acceptable ranges of melting temperatures and primer length may be specified by the user.
 package lib
 
@@ -13,10 +10,9 @@ import (
 	//"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Parser"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/component"
+	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
-	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol
@@ -29,23 +25,21 @@ import (
 
 // Data which is returned from this protocol
 
-// this needs to be changed to PrimerPair [2]oligo.Primer
-
 // Physical inputs to this protocol
 
 // Physical outputs from this protocol
 
-func _PrimerDesign_ColonyPCRRequirements() {
+func _PrimerDesign_REVRequirements() {
 
 }
 
 // Actions to perform before protocol itself
-func _PrimerDesign_ColonyPCRSetup(_ctx context.Context, _input *PrimerDesign_ColonyPCRInput) {
+func _PrimerDesign_REVSetup(_ctx context.Context, _input *PrimerDesign_REVInput) {
 
 }
 
 // Core process of the protocol: steps to be performed for each input
-func _PrimerDesign_ColonyPCRSteps(_ctx context.Context, _input *PrimerDesign_ColonyPCRInput, _output *PrimerDesign_ColonyPCROutput) {
+func _PrimerDesign_REVSteps(_ctx context.Context, _input *PrimerDesign_REVInput, _output *PrimerDesign_REVOutput) {
 
 	var region wtype.DNASequence
 
@@ -74,31 +68,13 @@ func _PrimerDesign_ColonyPCRSteps(_ctx context.Context, _input *PrimerDesign_Col
 		execute.Errorf(_ctx, _output.Warnings.Error())
 	}
 	fmt.Println("5")
-	// if true then the start oint ot design primers is moved back 150bp to ensure full region is covered
-	if _input.FlankTargetSequence {
-		region = oligos.DNAregion(fulldnaseqs[0], regionstart-150, regionend)
-	} else {
-		region = oligos.DNAregion(fulldnaseqs[0], regionstart, regionend)
-	}
-	fmt.Println("6")
-
-	_output.FWDPrimer, _output.Warnings = oligos.FWDOligoSeq(region, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, _input.Seqstoavoid, _input.PermittednucleotideOverlapBetweenPrimers)
-
-	if _output.Warnings != nil {
-		fmt.Println("FWDOligoSeqFail")
-		execute.Errorf(_ctx, _output.Warnings.Error())
-	}
-
-	fmt.Println(text.Print("FWDPrimer:", _output.FWDPrimer))
-
+	// if true then the end point to design primers is moved back 150bp to ensure full region is covered
 	if _input.FlankTargetSequence {
 		region = oligos.DNAregion(fulldnaseqs[0], regionstart, regionend+150)
 	} else {
 		region = oligos.DNAregion(fulldnaseqs[0], regionstart, regionend)
 	}
 	fmt.Println("6")
-
-	_input.Seqstoavoid = append(_input.Seqstoavoid, _output.FWDPrimer.Seq)
 
 	_output.REVPrimer, _output.Warnings = oligos.REVOligoSeq(region, _input.Maxgc, _input.Minlength, _input.Maxlength, _input.Mintemp, _input.Maxtemp, _input.Seqstoavoid, _input.PermittednucleotideOverlapBetweenPrimers)
 
@@ -108,29 +84,28 @@ func _PrimerDesign_ColonyPCRSteps(_ctx context.Context, _input *PrimerDesign_Col
 	}
 
 	fmt.Println(text.Print("REVPrimer:", _output.REVPrimer))
-
 }
 
 // Actions to perform after steps block to analyze data
-func _PrimerDesign_ColonyPCRAnalysis(_ctx context.Context, _input *PrimerDesign_ColonyPCRInput, _output *PrimerDesign_ColonyPCROutput) {
+func _PrimerDesign_REVAnalysis(_ctx context.Context, _input *PrimerDesign_REVInput, _output *PrimerDesign_REVOutput) {
 
 }
 
-func _PrimerDesign_ColonyPCRValidation(_ctx context.Context, _input *PrimerDesign_ColonyPCRInput, _output *PrimerDesign_ColonyPCROutput) {
+func _PrimerDesign_REVValidation(_ctx context.Context, _input *PrimerDesign_REVInput, _output *PrimerDesign_REVOutput) {
 
 }
-func _PrimerDesign_ColonyPCRRun(_ctx context.Context, input *PrimerDesign_ColonyPCRInput) *PrimerDesign_ColonyPCROutput {
-	output := &PrimerDesign_ColonyPCROutput{}
-	_PrimerDesign_ColonyPCRSetup(_ctx, input)
-	_PrimerDesign_ColonyPCRSteps(_ctx, input, output)
-	_PrimerDesign_ColonyPCRAnalysis(_ctx, input, output)
-	_PrimerDesign_ColonyPCRValidation(_ctx, input, output)
+func _PrimerDesign_REVRun(_ctx context.Context, input *PrimerDesign_REVInput) *PrimerDesign_REVOutput {
+	output := &PrimerDesign_REVOutput{}
+	_PrimerDesign_REVSetup(_ctx, input)
+	_PrimerDesign_REVSteps(_ctx, input, output)
+	_PrimerDesign_REVAnalysis(_ctx, input, output)
+	_PrimerDesign_REVValidation(_ctx, input, output)
 	return output
 }
 
-func PrimerDesign_ColonyPCRRunSteps(_ctx context.Context, input *PrimerDesign_ColonyPCRInput) *PrimerDesign_ColonyPCRSOutput {
-	soutput := &PrimerDesign_ColonyPCRSOutput{}
-	output := _PrimerDesign_ColonyPCRRun(_ctx, input)
+func PrimerDesign_REVRunSteps(_ctx context.Context, input *PrimerDesign_REVInput) *PrimerDesign_REVSOutput {
+	soutput := &PrimerDesign_REVSOutput{}
+	output := _PrimerDesign_REVRun(_ctx, input)
 	if err := inject.AssignSome(output, &soutput.Data); err != nil {
 		panic(err)
 	}
@@ -140,19 +115,19 @@ func PrimerDesign_ColonyPCRRunSteps(_ctx context.Context, input *PrimerDesign_Co
 	return soutput
 }
 
-func PrimerDesign_ColonyPCRNew() interface{} {
-	return &PrimerDesign_ColonyPCRElement{
+func PrimerDesign_REVNew() interface{} {
+	return &PrimerDesign_REVElement{
 		inject.CheckedRunner{
 			RunFunc: func(_ctx context.Context, value inject.Value) (inject.Value, error) {
-				input := &PrimerDesign_ColonyPCRInput{}
+				input := &PrimerDesign_REVInput{}
 				if err := inject.Assign(value, input); err != nil {
 					return nil, err
 				}
-				output := _PrimerDesign_ColonyPCRRun(_ctx, input)
+				output := _PrimerDesign_REVRun(_ctx, input)
 				return inject.MakeValue(output), nil
 			},
-			In:  &PrimerDesign_ColonyPCRInput{},
-			Out: &PrimerDesign_ColonyPCROutput{},
+			In:  &PrimerDesign_REVInput{},
+			Out: &PrimerDesign_REVOutput{},
 		},
 	}
 }
@@ -162,11 +137,11 @@ var (
 	_ = wunit.Make_units
 )
 
-type PrimerDesign_ColonyPCRElement struct {
+type PrimerDesign_REVElement struct {
 	inject.CheckedRunner
 }
 
-type PrimerDesign_ColonyPCRInput struct {
+type PrimerDesign_REVInput struct {
 	DNASeqfile                               string
 	FlankTargetSequence                      bool
 	Maxgc                                    float64
@@ -180,15 +155,13 @@ type PrimerDesign_ColonyPCRInput struct {
 	Seqstoavoid                              []string
 }
 
-type PrimerDesign_ColonyPCROutput struct {
-	FWDPrimer oligos.Primer
+type PrimerDesign_REVOutput struct {
 	REVPrimer oligos.Primer
 	Warnings  error
 }
 
-type PrimerDesign_ColonyPCRSOutput struct {
+type PrimerDesign_REVSOutput struct {
 	Data struct {
-		FWDPrimer oligos.Primer
 		REVPrimer oligos.Primer
 		Warnings  error
 	}
@@ -197,12 +170,12 @@ type PrimerDesign_ColonyPCRSOutput struct {
 }
 
 func init() {
-	if err := addComponent(component.Component{Name: "PrimerDesign_ColonyPCR",
-		Constructor: PrimerDesign_ColonyPCRNew,
-		Desc: component.ComponentDesc{
-			Desc: "This element will design a pair of primers to cover a specified region of a sequence for colonyPCR.\nBut it's not finished yet!, please finish it off by designing the reverse primer\ngo to cd $GOPATH/src/github.com/antha-lang/antha/antha/examples/workflows/AnthaAcademy/Exercises/PrimerDesignExercise\nmake antharun return correct primerpairs for the three cases shown\nDesign criteria such as maximum gc content, acceptable ranges of melting temperatures and primer length may be specified by the user.\n",
-			Path: "antha/component/an/Data/DNA/PrimerDesign/PrimerDesign_ColonyPCR.an",
-			Params: []component.ParamDesc{
+	if err := addComponent(Component{Name: "PrimerDesign_REV",
+		Constructor: PrimerDesign_REVNew,
+		Desc: ComponentDesc{
+			Desc: "This element will design a sequencing primer to target amplification of a target region within a sequence file\nDesign criteria such as maximum gc content, acceptable ranges of melting temperatures and primer length may be specified by the user.\n",
+			Path: "antha/component/an/Data/DNA/PrimerDesign/PrimerDesign_Rev.an",
+			Params: []ParamDesc{
 				{Name: "DNASeqfile", Desc: "genbank file (.gb)\n", Kind: "Parameters"},
 				{Name: "FlankTargetSequence", Desc: "", Kind: "Parameters"},
 				{Name: "Maxgc", Desc: "as a proportion of 1, i.e. 1 == 100%\n", Kind: "Parameters"},
@@ -214,7 +187,6 @@ func init() {
 				{Name: "Plasmid", Desc: "", Kind: "Parameters"},
 				{Name: "RegionSequenceString", Desc: "", Kind: "Parameters"},
 				{Name: "Seqstoavoid", Desc: "", Kind: "Parameters"},
-				{Name: "FWDPrimer", Desc: "this needs to be changed to PrimerPair [2]oligo.Primer\n", Kind: "Data"},
 				{Name: "REVPrimer", Desc: "", Kind: "Data"},
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},

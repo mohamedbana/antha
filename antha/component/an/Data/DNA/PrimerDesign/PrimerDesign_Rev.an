@@ -1,9 +1,6 @@
-// This element will design a pair of primers to cover a specified region of a sequence for colonyPCR. 
-// But it's not finished yet!, please finish it off by designing the reverse primer
-// go to cd $GOPATH/src/github.com/antha-lang/antha/antha/examples/workflows/AnthaAcademy/Exercises/PrimerDesignExercise
-// make antharun return correct primerpairs for the three cases shown
+// This element will design a sequencing primer to target amplification of a target region within a sequence file
 // Design criteria such as maximum gc content, acceptable ranges of melting temperatures and primer length may be specified by the user.
-protocol PrimerDesign_ColonyPCR
+protocol PrimerDesign_REV
 
 import (
 	"fmt"
@@ -32,7 +29,6 @@ Parameters (
 
 // Data which is returned from this protocol
 Data (
-	FWDPrimer oligos.Primer // this needs to be changed to PrimerPair [2]oligo.Primer
 	REVPrimer oligos.Primer
 	Warnings error
 )
@@ -85,31 +81,13 @@ Steps {
 		Errorf(Warnings.Error())
 	}
 	fmt.Println("5")
-	// if true then the start oint ot design primers is moved back 150bp to ensure full region is covered
-	if FlankTargetSequence {
-		region = oligos.DNAregion(fulldnaseqs[0], regionstart-150, regionend)
-	}else {
-		region = oligos.DNAregion(fulldnaseqs[0], regionstart, regionend)
-	}
-	fmt.Println("6")
-	
-	FWDPrimer, Warnings = oligos.FWDOligoSeq(region, Maxgc, Minlength, Maxlength, Mintemp, Maxtemp, Seqstoavoid, PermittednucleotideOverlapBetweenPrimers) 
-	
-	if Warnings != nil {
-		fmt.Println("FWDOligoSeqFail")
-		Errorf(Warnings.Error())
-	}
-	
-	fmt.Println(text.Print("FWDPrimer:",FWDPrimer))
-
+	// if true then the end point to design primers is moved back 150bp to ensure full region is covered
 	if FlankTargetSequence {
 		region = oligos.DNAregion(fulldnaseqs[0], regionstart, regionend+150)
 	}else {
 		region = oligos.DNAregion(fulldnaseqs[0], regionstart, regionend)
 	}
 	fmt.Println("6")
-	
-	Seqstoavoid = append(Seqstoavoid,FWDPrimer.Seq)
 	
 	REVPrimer, Warnings = oligos.REVOligoSeq(region, Maxgc, Minlength, Maxlength, Mintemp, Maxtemp, Seqstoavoid, PermittednucleotideOverlapBetweenPrimers) 
 	
@@ -119,12 +97,7 @@ Steps {
 	}
 	
 	fmt.Println(text.Print("REVPrimer:",REVPrimer))
-	
-	
-
 }
-
-
 
 // Actions to perform after steps block to analyze data
 Analysis {
