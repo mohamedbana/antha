@@ -39,7 +39,7 @@ func makeTipLibrary() map[string]*wtype.LHTipbox {
 	w.Extra["InnerL"] = 5.6
 	w.Extra["InnerW"] = 5.6
 	tip := wtype.NewLHTip("cybio", "CyBio250", 10.0, 250.0, "ul")
-	tb := wtype.NewLHTipbox(8, 12, 60.13, "CyBio", "CyBio250Tipbox", tip, w, 9.0, 9.0, 0.0, 0.0, 0.0)
+	tb := wtype.NewLHTipbox(8, 12, wtype.Coordinates{127.76, 85.48, 60.13}, "CyBio", "CyBio250Tipbox", tip, w, 9.0, 9.0, 0.0, 0.0, 0.0)
 	tips[tip.Type] = tb
 	tips[tb.Type] = tb
 
@@ -48,7 +48,7 @@ func makeTipLibrary() map[string]*wtype.LHTipbox {
 	w.Extra["InnerW"] = 5.6
 
 	tip = wtype.NewLHTip("cybio", "CyBio50", 0.5, 50.0, "ul")
-	tb = wtype.NewLHTipbox(8, 12, 60.13, "CyBio", "CyBio50Tipbox", tip, w, 9.0, 9.0, 0.0, 0.0, 0.0)
+	tb = wtype.NewLHTipbox(8, 12, wtype.Coordinates{127.76, 85.48, 60.13}, "CyBio", "CyBio50Tipbox", tip, w, 9.0, 9.0, 0.0, 0.0, 0.0)
 	tips[tip.Type] = tb
 	tips[tb.Type] = tb
 
@@ -57,7 +57,7 @@ func makeTipLibrary() map[string]*wtype.LHTipbox {
 	w.Extra["InnerL"] = 5.6
 	w.Extra["InnerW"] = 5.6
 	tip = wtype.NewLHTip("cybio", "CyBio1000", 100.0, 1000.0, "ul")
-	tb = wtype.NewLHTipbox(8, 12, 60.13, "CyBio", "CyBio1000Tipbox", tip, w, 9.0, 9.0, 0.0, 0.0, 0.0)
+	tb = wtype.NewLHTipbox(8, 12, wtype.Coordinates{127.76, 85.48, 60.13}, "CyBio", "CyBio1000Tipbox", tip, w, 9.0, 9.0, 0.0, 0.0, 0.0)
 	tips[tip.Type] = tb
 	tips[tb.Type] = tb
 
@@ -66,7 +66,7 @@ func makeTipLibrary() map[string]*wtype.LHTipbox {
 	w.Extra["InnerW"] = 5.6
 	w.Extra["Tipeffectiveheight"] = 44.7
 	tip = wtype.NewLHTip("gilson", "Gilson200", 10.0, 200.0, "ul")
-	tb = wtype.NewLHTipbox(8, 12, 60.13, "Gilson", "DF200 Tip Rack (PIPETMAX 8x200)", tip, w, 9.0, 9.0, 0.0, 0.0, 24.78)
+	tb = wtype.NewLHTipbox(8, 12, wtype.Coordinates{127.76, 85.48, 60.13}, "Gilson", "DF200 Tip Rack (PIPETMAX 8x200)", tip, w, 9.0, 9.0, 0.0, 0.0, 24.78)
 	tips[tip.Type] = tb
 	tips[tb.Type] = tb
 
@@ -75,7 +75,7 @@ func makeTipLibrary() map[string]*wtype.LHTipbox {
 	w.Extra["InnerW"] = 5.5
 	w.Extra["Tipeffectiveheight"] = 34.6
 	tip = wtype.NewLHTip("gilson", "Gilson20", 0.5, 20.0, "ul")
-	tb = wtype.NewLHTipbox(8, 12, 60.13, "Gilson", "DL10 Tip Rack (PIPETMAX 8x20)", tip, w, 9.0, 9.0, 0.0, 0.0, 28.93)
+	tb = wtype.NewLHTipbox(8, 12, wtype.Coordinates{127.76, 85.48, 60.13}, "Gilson", "DL10 Tip Rack (PIPETMAX 8x20)", tip, w, 9.0, 9.0, 0.0, 0.0, 28.93)
 	tips[tip.Type] = tb
 	tips[tb.Type] = tb
 
