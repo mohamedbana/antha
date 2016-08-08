@@ -25,11 +25,10 @@ package wtype
 
 //An LHObject that can hold other LHObjects
 type LHSlot interface {
-    IsEmpty() bool
-    GetContents() wtype.LHObject
-    SetContents(wtype.LHObject) error
-    Accepts(wtype.LHObject) error
-    ClearContents()
+    SlotName() string
+    GetContents() LHObject
+    SetContents(LHObject) error
+    Accepts(LHObject) error
 }
 
 //WellReference used for specifying position within a well
@@ -49,6 +48,10 @@ type LHObject interface {
     GetBounds() *BBox
     //GetOffset Return the absolute offset of the object
     GetOffset() Coordinates
+    //SetOffset
+    SetOffset(Coordinates)
+    //GetSize Return the size of the object
+    GetSize() Coordinates
     //SetParent Store the offset of the object
     SetParent(LHObject)
     //GetParent

@@ -23,10 +23,6 @@
 // defines types for dealing with liquid handling requests
 package wtype
 
-import (
-    "math"
-)
-
 //BBox is a simple LHObject representing a bounding box, 
 //useful for checking if there's stuff in the way 
 type BBox struct {
@@ -72,7 +68,7 @@ func (self *BBox) Contains(rhs Coordinates) bool {
 
 //Intersects just checks for bounding box intersection
 func (self *BBox) Intersects(rhs *BBox) bool {
-    if lhs == nil || rhs == nil {
+    if self == nil || rhs == nil {
         return false
     }
     //test a single dimension. 
@@ -83,9 +79,9 @@ func (self *BBox) Intersects(rhs *BBox) bool {
         return !(c >= b || d <= a)
     }
 
-    s := self.Position.Add(self.Size)
-    r :=  rhs.Position.Add( rhs.Size)
-    return (f(self.Position.X, s.X, rhs.Position.X, r.X) &&
-            f(self.Position.Y, s.Y, rhs.Position.Y, r.Y) &&
-            f(self.Position.Z, s.Z, rhs.Position.Z, r.Z))
+    s := self.position.Add(self.size)
+    r :=  rhs.GetPosition().Add(rhs.GetSize())
+    return (f(self.position.X, s.X, rhs.GetPosition().X, r.X) &&
+            f(self.position.Y, s.Y, rhs.GetPosition().Y, r.Y) &&
+            f(self.position.Z, s.Z, rhs.GetPosition().Z, r.Z))
 }

@@ -31,7 +31,6 @@ import (
 /* tip box */
 
 type LHTipbox struct {
-    BBox
 	ID         string
 	Boxname    string
 	Type       string
@@ -50,10 +49,11 @@ type LHTipbox struct {
 	TipZStart  float64
 
     size        Coordinates
-    position    Coordinates
+    offset      Coordinates
+    parent      LHObject
 }
 
-func NewLHTipbox(nrows, ncols int, height float64, manufacturer, boxtype string, tiptype *LHTip, well *LHWell, tipxoffset, tipyoffset, tipxstart, tipystart, tipzstart float64) *LHTipbox {
+func NewLHTipbox(nrows, ncols int, size Coordinates, manufacturer, boxtype string, tiptype *LHTip, well *LHWell, tipxoffset, tipyoffset, tipxstart, tipystart, tipzstart float64) *LHTipbox {
 	var tipbox LHTipbox
 	tipbox.ID = GetUUID()
 	tipbox.Type = boxtype
@@ -63,7 +63,7 @@ func NewLHTipbox(nrows, ncols int, height float64, manufacturer, boxtype string,
 	tipbox.Ncols = ncols
 	tipbox.Tips = make([][]*LHTip, ncols)
 	tipbox.NTips = tipbox.Nrows * tipbox.Ncols
-	tipbox.Height = height
+	tipbox.size = size
 	tipbox.Tiptype = tiptype
 	tipbox.AsWell = well
 	for i := 0; i < ncols; i++ {
@@ -75,11 +75,7 @@ func NewLHTipbox(nrows, ncols int, height float64, manufacturer, boxtype string,
 	tipbox.TipYStart = tipystart
 	tipbox.TipZStart = tipzstart
 
-    tipbox.BBox = BBox{Coordinates{}, Coordinates{
-        2 * tipxstart + float64(ncols) * tipxoffset,
-        2 * tipystart + float64(nrows) * tipyoffset,
-        height,
-    }}
+    
 	return initialize_tips(&tipbox, tiptype)
 }
 
@@ -92,6 +88,8 @@ Type      : %s,
 Mnfr      : %s,
 Nrows     : %d,
 Ncols     : %d,
+Width     : %f,
+Length    : %f,
 Height    : %f,
 Tiptype   : %p,
 AsWell    : %v,
@@ -109,7 +107,9 @@ TipZStart : %f,
 		tb.Mnfr,
 		tb.Nrows,
 		tb.Ncols,
-		tb.Height,
+		tb.size.X,
+		tb.size.Y,
+		tb.size.Z,
 		tb.Tiptype,
 		tb.AsWell,
 		tb.NTips,
@@ -123,7 +123,7 @@ TipZStart : %f,
 }
 
 func (tb *LHTipbox) Dup() *LHTipbox {
-	return NewLHTipbox(tb.Nrows, tb.Ncols, tb.Height, tb.Mnfr, tb.Type, tb.Tiptype, tb.AsWell, tb.TipXOffset, tb.TipYOffset, tb.TipXStart, tb.TipYStart, tb.TipZStart)
+	return NewLHTipbox(tb.Nrows, tb.Ncols, tb.GetSize(), tb.Mnfr, tb.Type, tb.Tiptype, tb.AsWell, tb.TipXOffset, tb.TipYOffset, tb.TipXStart, tb.TipYStart, tb.TipZStart)
 }
 
 // @implement named
@@ -148,8 +148,39 @@ func (tb *LHTipbox) N_clean_tips() int {
 	return c
 }
 
+//##############################################
+//@implement LHObject
+//##############################################
 
+func (self *LHTipbox) GetOffset() Coordinates {
+    if self.parent != nil {
+        return self.offset.Add(self.parent.GetOffset())
+    }
+    return self.offset
+}
+
+func (self *LHTipbox) GetSize() Coordinates {
+    return self.size
+}
+
+func (self *LHTipbox) GetBounds() *BBox {
+    r := BBox{self.GetOffset(), self.GetSize()}
+    return &r
+}
+
+func (self *LHTipbox) SetParent(p LHObject) {
+    self.parent = p
+}
+
+func (self *LHTipbox) GetParent() LHObject {
+    return self.parent
+}
+
+
+//##############################################
 //@implement Addressable
+//##############################################
+
 func (tb *LHTipbox) HasCoords(c WellCoords) bool {
     return c.X >= 0 &&
            c.Y >= 0 &&

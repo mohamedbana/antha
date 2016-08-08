@@ -6,18 +6,20 @@ import "fmt"
 // tip waste
 
 type LHTipwaste struct {
-    BBox
-    Name       string
-	ID         string
-	Type       string
-	Mnfr       string
-	Capacity   int
-	Contents   int
-	Height     float64
-	WellXStart float64
-	WellYStart float64
-	WellZStart float64
-	AsWell     *LHWell
+    Name        string
+	ID          string
+	Type        string
+	Mnfr        string
+	Capacity    int
+	Contents    int
+	Height      float64
+	WellXStart  float64
+	WellYStart  float64
+	WellZStart  float64
+	AsWell      *LHWell
+    size        Coordinates
+    offset      Coordinates
+    parent      LHObject
 }
 
 func (tw LHTipwaste) SpaceLeft() int {
@@ -33,6 +35,8 @@ func (te LHTipwaste) String() string {
 	Mnfr: %s,
 	Capacity: %d,
 	Contents: %d,
+    Length: %f,
+    Width: %f,
 	Height: %f,
 	WellXStart: %f,
 	WellYStart: %f,
@@ -46,16 +50,18 @@ func (te LHTipwaste) String() string {
 		te.Mnfr,
 		te.Capacity,
 		te.Contents,
-		te.Height,
+		te.size.X,
+		te.size.Y,
+		te.size.Z,
 		te.WellXStart,
 		te.WellYStart,
 		te.WellZStart,
-		te.AsWell, //AsWell is printed as pointer to kepp things short
+		te.AsWell, //AsWell is printed as pointer to keep things short
 	)
 }
 
 func (tw *LHTipwaste) Dup() *LHTipwaste {
-	return NewLHTipwaste(tw.Capacity, tw.Type, tw.Mnfr, tw.Height, tw.AsWell, tw.WellXStart, tw.WellYStart, tw.WellZStart)
+	return NewLHTipwaste(tw.Capacity, tw.Type, tw.Mnfr, tw.GetSize(), tw.AsWell, tw.WellXStart, tw.WellYStart, tw.WellZStart)
 }
 
 func (tw *LHTipwaste) GetName() string {
@@ -66,24 +72,18 @@ func (tw *LHTipwaste) GetType() string {
     return tw.Type
 }
 
-func NewLHTipwaste(capacity int, typ, mfr string, height float64, w *LHWell, wellxstart, wellystart, wellzstart float64) *LHTipwaste {
+func NewLHTipwaste(capacity int, typ, mfr string, size Coordinates, w *LHWell, wellxstart, wellystart, wellzstart float64) *LHTipwaste {
 	var lht LHTipwaste
 	lht.ID = GetUUID()
 	lht.Type = typ
     lht.Name = fmt.Sprintf("%s_%s", typ, lht.ID[1:len(lht.ID)-2])
 	lht.Mnfr = mfr
 	lht.Capacity = capacity
-	lht.Height = height
+	lht.size = size
 	lht.AsWell = w
 	lht.WellXStart = wellxstart
 	lht.WellYStart = wellystart
 	lht.WellZStart = wellzstart
-
-    lht.BBox = BBox{Coordinates{}, Coordinates{
-        2 * wellxstart + w.Xdim,
-        2 * wellystart + w.Ydim,
-        height,
-    }}
 
 	return &lht
 }
@@ -101,7 +101,37 @@ func (lht *LHTipwaste) Dispose(n int) bool {
 	return true
 }
 
+//##############################################
+//@implement LHObject
+//##############################################
+
+func (self *LHTipwaste) GetOffset() Coordinates {
+    if self.parent != nil {
+        return self.offset.Add(self.parent.GetOffset())
+    }
+    return self.offset
+}
+
+func (self *LHTipwaste) GetSize() Coordinates {
+    return self.size
+}
+
+func (self *LHTipwaste) GetBounds() *BBox {
+    r := BBox{self.GetOffset(), self.GetSize()}
+    return &r
+}
+
+func (self *LHTipwaste) SetParent(p LHObject) {
+    self.parent = p
+}
+
+func (self *LHTipwaste) GetParent() LHObject {
+    return self.parent
+}
+
+//##############################################
 //@implement Addressable
+//##############################################
 
 func (self *LHTipwaste) HasCoords(c WellCoords) bool {
     return c.X == 0 && c.Y == 0 

@@ -37,6 +37,8 @@ type SLHPlate struct {
 	WellsX         int
 	WellsY         int
 	Nwells         int
+    Width          float64
+    Length         float64
 	Height         float64
 	Hunit          string
 	Welltype       *LHWell
@@ -54,8 +56,10 @@ func (slhp SLHPlate) FillPlate(plate *LHPlate) {
 	plate.WlsX = slhp.WellsX
 	plate.WlsY = slhp.WellsY
 	plate.Nwells = slhp.Nwells
-	plate.Height = slhp.Height
-	plate.Hunit = slhp.Hunit
+//	plate.Width = slhp.Width
+//	plate.Length = slhp.Length
+//	plate.Height = slhp.Height
+//  plate.Hunit = slhp.Hunit
 	plate.Welltype = slhp.Welltype
 	plate.Wellcoords = slhp.Wellcoords
 }

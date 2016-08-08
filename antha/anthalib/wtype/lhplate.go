@@ -36,7 +36,6 @@ import (
 
 // structure describing a microplate
 type LHPlate struct {
-    BBox
 	ID          string
 	Inst        string
 	Loc         string             // location of plate
@@ -47,8 +46,6 @@ type LHPlate struct {
 	WlsY        int                // wells along short axis
 	Nwells      int                // total number of wells
 	HWells      map[string]*LHWell // map of well IDs to well
-	Height      float64            // plate height (unit below)
-	Hunit       string             // unit of plate height
 	Rows        [][]*LHWell
 	Cols        [][]*LHWell
 	Welltype    *LHWell
@@ -58,6 +55,9 @@ type LHPlate struct {
 	WellXStart  float64            // offset (mm) to first well in X direction
 	WellYStart  float64            // offset (mm) to first well in Y direction
 	WellZStart  float64            // offset (mm) to bottom of well in Z direction
+    size        Coordinates        // size of the plate (mm)
+    offset      Coordinates        // (relative) position of the plate (mm), set by parent
+    parent      LHObject
 } 
 
 func (lhp LHPlate) String() string {
@@ -73,8 +73,6 @@ func (lhp LHPlate) String() string {
 	WlsY        : %d,
 	Nwells      : %d,
 	HWells      : %p,
-	Height      : %f,
-	Hunit       : %s,
 	Rows        : %p,
 	Cols        : %p,
 	Welltype    : %p,
@@ -84,6 +82,7 @@ func (lhp LHPlate) String() string {
 	WellXStart  : %f,
 	WellYStart  : %f,
 	WellZStart  : %f,
+	Size  : %f x %f x %f,
 }`,
 		lhp.ID,
 		lhp.Inst,
@@ -95,8 +94,6 @@ func (lhp LHPlate) String() string {
 		lhp.WlsY,
 		lhp.Nwells,
 		lhp.HWells,
-		lhp.Height,
-		lhp.Hunit,
 		lhp.Rows,
 		lhp.Cols,
 		lhp.Welltype,
@@ -106,6 +103,9 @@ func (lhp LHPlate) String() string {
 		lhp.WellXStart,
 		lhp.WellYStart,
 		lhp.WellZStart,
+        lhp.size.X,
+        lhp.size.Y,
+        lhp.size.Z,
 	)
 }
 
@@ -224,7 +224,7 @@ func (lhp *LHPlate) NextEmptyWell(it PlateIterator) WellCoords {
 	return ZeroWellCoords()
 }
 
-func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
+func NewLHPlate(platetype, mfr string, nrows, ncols int, size Coordinates, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
 	var lhp LHPlate
 	lhp.Type = platetype
 	lhp.ID = GetUUID()
@@ -233,23 +233,13 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit s
 	lhp.WlsX = ncols
 	lhp.WlsY = nrows
 	lhp.Nwells = ncols * nrows
-	lhp.Height = height
-	lhp.Hunit = hunit
 	lhp.Welltype = welltype
 	lhp.WellXOffset = wellXOffset
 	lhp.WellYOffset = wellYOffset
 	lhp.WellXStart = wellXStart
 	lhp.WellYStart = wellYStart
 	lhp.WellZStart = wellZStart
-
-    //HJK 3/8/16: Guessing plate size from other parameters, 
-    //maybe we want to set this explicitly at some point as it assumes
-    //wells are centered
-    lhp.BBox = BBox{Coordinates{}, Coordinates{
-            2 * wellXStart + float64(ncols) * wellXOffset,
-            2 * wellYStart + float64(nrows) * wellYOffset,
-            height, //assuming units of mm
-        }}
+    lhp.size = size
 
 	wellcoords := make(map[string]*LHWell, ncols*nrows)
 
@@ -292,8 +282,8 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit s
 }
 
 func (lhp *LHPlate) Dup() *LHPlate {
-	ret := NewLHPlate(lhp.Type, lhp.Mnfr, lhp.WlsY, lhp.WlsX, lhp.Height, lhp.Hunit, lhp.Welltype, lhp.WellXOffset, lhp.WellYOffset, lhp.WellXStart, lhp.WellYStart, lhp.WellZStart)
-
+	ret := NewLHPlate(lhp.Type, lhp.Mnfr, lhp.WlsY, lhp.WlsX, lhp.GetSize(), lhp.Welltype, lhp.WellXOffset, lhp.WellYOffset, lhp.WellXStart, lhp.WellYStart, lhp.WellZStart)
+    
 	ret.PlateName = lhp.PlateName
 
 	ret.HWells = make(map[string]*LHWell, len(ret.HWells))
@@ -321,12 +311,6 @@ func (p *LHPlate) UnProtectAllWells() {
 	for _, v := range p.Wellcoords {
 		v.UnProtect()
 	}
-}
-
-func New_Plate(platetype *LHPlate) *LHPlate {
-	new_plate := NewLHPlate(platetype.Type, platetype.Mnfr, platetype.WlsY, platetype.WlsX, platetype.Height, platetype.Hunit, platetype.Welltype, platetype.WellXOffset, platetype.WellYOffset, platetype.WellXStart, platetype.WellYStart, platetype.WellZStart)
-	//	Initialize_Wells(new_plate)
-	return new_plate
 }
 
 func Initialize_Wells(plate *LHPlate) {
@@ -455,6 +439,34 @@ func (p *LHPlate) IsConstrainedOn(platform string) ([]string, bool) {
 }
 
 //##############################################
+//@implement LHObject
+//##############################################
+
+func (self *LHPlate) GetOffset() Coordinates {
+    if self.parent != nil {
+        return self.offset.Add(self.parent.GetOffset())
+    }
+    return self.offset
+}
+
+func (self *LHPlate) GetSize() Coordinates {
+    return self.size
+}
+
+func (self *LHPlate) GetBounds() *BBox {
+    r := BBox{self.GetOffset(), self.GetSize()}
+    return &r
+}
+
+func (self *LHPlate) SetParent(p LHObject) {
+    self.parent = p
+}
+
+func (self *LHPlate) GetParent() LHObject {
+    return self.parent
+}
+
+//##############################################
 //@implement Addressable
 //##############################################
 
@@ -502,9 +514,9 @@ func (self *LHPlate) WellCoordsToCoords(wc WellCoords, r WellReference) (Coordin
     if r == BottomReference {
         z = self.WellZStart
     } else if r == TopReference {
-        z = self.Height
-    } else {
-        return Coordinates{}, false
+        z = self.size.Z
+    } else if r == LiquidReference {
+        panic("Haven't implemented liquid level yet")
     }
 
     return Coordinates{
