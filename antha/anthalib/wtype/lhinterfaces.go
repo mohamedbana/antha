@@ -25,10 +25,10 @@ package wtype
 
 //An LHObject that can hold other LHObjects
 type LHSlot interface {
-    SlotName() string
     GetContents() LHObject
     SetContents(LHObject) error
     Accepts(LHObject) error
+    GetContentsPosition() Coordinates
 }
 
 //WellReference used for specifying position within a well
@@ -45,13 +45,9 @@ const (
 //of items that can be placed on a liquid handler's deck
 type LHObject interface {
     //GetBounds Return the absolute coordinates of the bounding box of the object
-    GetBounds() *BBox
-    //GetOffset Return the absolute offset of the object
-    GetOffset() Coordinates
-    //SetOffset
+    GetBounds() BBox
+    //SetOffset set the offset of the object relative to its parent (global if parent is nil)
     SetOffset(Coordinates)
-    //GetSize Return the size of the object
-    GetSize() Coordinates
     //SetParent Store the offset of the object
     SetParent(LHObject)
     //GetParent

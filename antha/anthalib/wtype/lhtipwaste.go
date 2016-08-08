@@ -17,8 +17,7 @@ type LHTipwaste struct {
 	WellYStart  float64
 	WellZStart  float64
 	AsWell      *LHWell
-    size        Coordinates
-    offset      Coordinates
+    bounds      BBox
     parent      LHObject
 }
 
@@ -50,9 +49,9 @@ func (te LHTipwaste) String() string {
 		te.Mnfr,
 		te.Capacity,
 		te.Contents,
-		te.size.X,
-		te.size.Y,
-		te.size.Z,
+		te.bounds.GetSize().X,
+		te.bounds.GetSize().Y,
+		te.bounds.GetSize().Z,
 		te.WellXStart,
 		te.WellYStart,
 		te.WellZStart,
@@ -61,7 +60,7 @@ func (te LHTipwaste) String() string {
 }
 
 func (tw *LHTipwaste) Dup() *LHTipwaste {
-	return NewLHTipwaste(tw.Capacity, tw.Type, tw.Mnfr, tw.GetSize(), tw.AsWell, tw.WellXStart, tw.WellYStart, tw.WellZStart)
+	return NewLHTipwaste(tw.Capacity, tw.Type, tw.Mnfr, tw.bounds.GetSize(), tw.AsWell, tw.WellXStart, tw.WellYStart, tw.WellZStart)
 }
 
 func (tw *LHTipwaste) GetName() string {
@@ -79,7 +78,7 @@ func NewLHTipwaste(capacity int, typ, mfr string, size Coordinates, w *LHWell, w
     lht.Name = fmt.Sprintf("%s_%s", typ, lht.ID[1:len(lht.ID)-2])
 	lht.Mnfr = mfr
 	lht.Capacity = capacity
-	lht.size = size
+	lht.bounds.SetSize(size)
 	lht.AsWell = w
 	lht.WellXStart = wellxstart
 	lht.WellYStart = wellystart
@@ -105,24 +104,15 @@ func (lht *LHTipwaste) Dispose(n int) bool {
 //@implement LHObject
 //##############################################
 
-func (self *LHTipwaste) GetOffset() Coordinates {
-    if self.parent != nil {
-        return self.offset.Add(self.parent.GetOffset())
-    }
-    return self.offset
-}
-
 func (self *LHTipwaste) SetOffset(o Coordinates) {
-    self.offset = o
+    if self.parent != nil {
+        o = o.Add(self.parent.GetBounds().GetSize())
+    }
+    self.bounds.SetPosition(o)
 }
 
-func (self *LHTipwaste) GetSize() Coordinates {
-    return self.size
-}
-
-func (self *LHTipwaste) GetBounds() *BBox {
-    r := BBox{self.GetOffset(), self.GetSize()}
-    return &r
+func (self *LHTipwaste) GetBounds() BBox {
+    return self.bounds
 }
 
 func (self *LHTipwaste) SetParent(p LHObject) {

@@ -23,6 +23,8 @@
 // defines types for dealing with liquid handling requests
 package wtype
 
+import "math"
+
 //BBox is a simple LHObject representing a bounding box, 
 //useful for checking if there's stuff in the way 
 type BBox struct {
@@ -52,25 +54,48 @@ func NewBBox6f(pos_x, pos_y, pos_z, size_x, size_y, size_z float64) *BBox {
                    Coordinates{size_x, size_y, size_z})
 }
 
-func (self *BBox) GetPosition() Coordinates {
-    return self.position
+func NewXBox4f(pos_y, pos_z, size_y, size_z float64) *BBox {
+    return NewBBox(Coordinates{-math.MaxFloat64 / 2.,  pos_y,  pos_z}, 
+                   Coordinates{math.MaxFloat64, size_y, size_z})
 }
 
-func (self *BBox) GetSize() Coordinates {
+func NewYBox4f(pos_x, pos_z, size_x, size_z float64) *BBox {
+    return NewBBox(Coordinates{ pos_x,  -math.MaxFloat64 / 2.,  pos_z}, 
+                   Coordinates{size_x, math.MaxFloat64, size_z})
+}
+
+func NewZBox4f(pos_x, pos_y, size_x, size_y float64) *BBox {
+    return NewBBox(Coordinates{ pos_x,  pos_y,  -math.MaxFloat64 / 2.}, 
+                   Coordinates{size_x, size_y, math.MaxFloat64})
+}
+
+func (self BBox) GetPosition() Coordinates {
+    return self.position
+}
+func (self BBox) ZMax() float64 {
+    return self.position.Z + self.size.Z
+}
+
+func (self BBox) GetSize() Coordinates {
     return self.size
 }
 
-func (self *BBox) Contains(rhs Coordinates) bool {
+func (self *BBox) SetPosition(c Coordinates) {
+    self.position = c
+}
+
+func (self *BBox) SetSize(c Coordinates) {
+    self.size = c
+}
+
+func (self BBox) Contains(rhs Coordinates) bool {
     return (rhs.X >= self.position.X && rhs.X < self.position.X + self.size.X &&
             rhs.Y >= self.position.Y && rhs.Y < self.position.Y + self.size.Y &&
             rhs.Z >= self.position.Z && rhs.Z < self.position.Z + self.size.Z)
 }
 
 //Intersects just checks for bounding box intersection
-func (self *BBox) Intersects(rhs *BBox) bool {
-    if self == nil || rhs == nil {
-        return false
-    }
+func (self BBox) Intersects(rhs BBox) bool {
     //test a single dimension. 
     //(a,b) are the start and end of the first position
     //(c,d) are the start and end of the second pos

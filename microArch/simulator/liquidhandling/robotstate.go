@@ -102,7 +102,8 @@ func (self *ChannelState) GetTarget() wtype.LHObject {
     z_min := math.MaxFloat64
     i_min := -1
     for i := range objs {
-        if gap := pos.Z - objs[i].GetMax(wtype.ZDim); gap > 0 && gap < z_min {
+        bb := objs[i].GetBounds()
+        if gap := pos.Z - (bb.GetPosition().Z + bb.GetSize().Z); gap > 0 && gap < z_min {
             z_min = gap
             i_min = i
         }
@@ -233,7 +234,7 @@ func (self *AdaptorState) Move(target wtype.LHObject, wc []wtype.WellCoords, ref
     //find the origin
     origin := wtype.Coordinates{}
     for i := range wc {
-        if addr.HasCoords(wc[i]) {
+        if addr.HasLocation(wc[i]) {
             origin, _ = addr.WellCoordsToCoords(wc[i], ref[i])
             origin = origin.Add(off[i]).Subtract(self.channels[i].GetRelativePosition())
             break
@@ -280,7 +281,7 @@ func (self *AdaptorState) Move(target wtype.LHObject, wc []wtype.WellCoords, ref
 
 //RobotState Represent the physical state of a liquidhandling robot
 type RobotState struct {
-    slots           map[string]LHSlot
+    slots           map[string]wtype.LHSlot
     adaptors        []*AdaptorState 
     initialized     bool
     finalized       bool
@@ -288,7 +289,7 @@ type RobotState struct {
 
 func NewRobotState() *RobotState {
     rs := RobotState{}
-    rs.slots = make(map[string]LHSlot)
+    rs.slots = make(map[string]wtype.LHSlot)
     rs.adaptors = make([]*AdaptorState, 0)
     rs.initialized = false
     rs.finalized = false
@@ -315,12 +316,12 @@ func (self *RobotState) AddAdaptor(a *AdaptorState) {
 }
 
 //AddSlot
-func (self *RobotState) AddSlot(s LHSlot) {
+func (self *RobotState) AddSlot(s wtype.LHSlot) {
     self.slots[s.(wtype.Named).GetName()] = s
 }
 
 //GetSlot
-func (self *RobotState) GetSlot(name string) LHSlot {
+func (self *RobotState) GetSlot(name string) wtype.LHSlot {
     return self.slots[name]
 }
 
@@ -335,11 +336,11 @@ func (self *RobotState) IsFinalized() bool {
 }
 
 //GetObjectsIn Return all slots that intersect with the bounding box
-func (self *RobotState) GetObjectsIn(o wtype.LHObject) []wtype.LHObject {
+func (self *RobotState) GetObjectsIn(bb *wtype.BBox) []wtype.LHObject {
     ret := make([]wtype.LHObject, 0)
     for _, slot := range self.slots {
-        if slot.HasChild() && wtype.Intersects(o, slot.GetChild()) {
-            ret = append(ret, slot.GetChild())
+        if slot.GetContents() != nil && bb.Intersects(slot.GetContents().GetBounds()) {
+            ret = append(ret, slot.GetContents())
         }
     }
     return ret
@@ -373,11 +374,11 @@ func (self *RobotState) Finalize() *simulator.SimulationError {
 func (self *RobotState) AddObject(slot_name string, o wtype.LHObject) *simulator.SimulationError {
     if sl, ok := self.slots[slot_name]; ok {
         //check that the slot is empty and can hold a child of this type
-        if sl.HasChild() {
+        if child := sl.GetContents(); child != nil {
             //In the future, we'll check if the child can accept another LHObject, for now barf
             cname := "unknown"
             oname := "unknown"
-            if n, ok := sl.GetChild().(wtype.Named); ok {
+            if n, ok := child.(wtype.Named); ok {
                 cname = n.GetName()
             }
             if n, ok := o.(wtype.Named); ok {
@@ -391,15 +392,14 @@ func (self *RobotState) AddObject(slot_name string, o wtype.LHObject) *simulator
         }
 
         //check for intersections with other objects
-        old_pos := o.GetPosition()
-        o.SetPosition(sl.GetChildPosition())
+        bb := o.GetBounds()
+        bb.SetPosition(sl.GetContentsPosition())
         for name, slot := range self.slots {
-            if wtype.Intersects(o, slot.GetChild()) {
-                o.SetPosition(old_pos)
+            if c := slot.GetContents(); c != nil && bb.Intersects(c.GetBounds()) {
                 return simulator.NewErrorf("", "Object intersects with object at position \"%s\"", name)
             }
         }
-        sl.SetChild(o)
+        sl.SetContents(o)
     } else {
         return simulator.NewErrorf("", "Robot contains no locations named \"%s\"", slot_name)
     }

@@ -55,8 +55,7 @@ type LHPlate struct {
 	WellXStart  float64            // offset (mm) to first well in X direction
 	WellYStart  float64            // offset (mm) to first well in Y direction
 	WellZStart  float64            // offset (mm) to bottom of well in Z direction
-    size        Coordinates        // size of the plate (mm)
-    offset      Coordinates        // (relative) position of the plate (mm), set by parent
+    bounds      BBox               // (relative) position of the plate (mm), set by parent
     parent      LHObject
 } 
 
@@ -103,9 +102,9 @@ func (lhp LHPlate) String() string {
 		lhp.WellXStart,
 		lhp.WellYStart,
 		lhp.WellZStart,
-        lhp.size.X,
-        lhp.size.Y,
-        lhp.size.Z,
+        lhp.bounds.GetSize().X,
+        lhp.bounds.GetSize().Y,
+        lhp.bounds.GetSize().Z,
 	)
 }
 
@@ -239,7 +238,7 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, size Coordinates, wellt
 	lhp.WellXStart = wellXStart
 	lhp.WellYStart = wellYStart
 	lhp.WellZStart = wellZStart
-    lhp.size = size
+    lhp.bounds.SetSize(size)
 
 	wellcoords := make(map[string]*LHWell, ncols*nrows)
 
@@ -282,7 +281,7 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, size Coordinates, wellt
 }
 
 func (lhp *LHPlate) Dup() *LHPlate {
-	ret := NewLHPlate(lhp.Type, lhp.Mnfr, lhp.WlsY, lhp.WlsX, lhp.GetSize(), lhp.Welltype, lhp.WellXOffset, lhp.WellYOffset, lhp.WellXStart, lhp.WellYStart, lhp.WellZStart)
+	ret := NewLHPlate(lhp.Type, lhp.Mnfr, lhp.WlsY, lhp.WlsX, lhp.bounds.GetSize(), lhp.Welltype, lhp.WellXOffset, lhp.WellYOffset, lhp.WellXStart, lhp.WellYStart, lhp.WellZStart)
     
 	ret.PlateName = lhp.PlateName
 
@@ -442,24 +441,15 @@ func (p *LHPlate) IsConstrainedOn(platform string) ([]string, bool) {
 //@implement LHObject
 //##############################################
 
-func (self *LHPlate) GetOffset() Coordinates {
-    if self.parent != nil {
-        return self.offset.Add(self.parent.GetOffset())
-    }
-    return self.offset
-}
-
 func (self *LHPlate) SetOffset(o Coordinates) {
-    self.offset = o
+    if self.parent != nil {
+        o = o.Add(self.parent.GetBounds().GetPosition())
+    }
+    self.bounds.SetPosition(o)
 }
 
-func (self *LHPlate) GetSize() Coordinates {
-    return self.size
-}
-
-func (self *LHPlate) GetBounds() *BBox {
-    r := BBox{self.GetOffset(), self.GetSize()}
-    return &r
+func (self *LHPlate) GetBounds() BBox {
+    return self.bounds
 }
 
 func (self *LHPlate) SetParent(p LHObject) {
@@ -518,7 +508,7 @@ func (self *LHPlate) WellCoordsToCoords(wc WellCoords, r WellReference) (Coordin
     if r == BottomReference {
         z = self.WellZStart
     } else if r == TopReference {
-        z = self.size.Z
+        z = self.bounds.ZMax()
     } else if r == LiquidReference {
         panic("Haven't implemented liquid level yet")
     }
