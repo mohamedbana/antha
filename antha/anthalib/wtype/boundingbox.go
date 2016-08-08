@@ -30,13 +30,44 @@ import (
 //BBox is a simple LHObject representing a bounding box, 
 //useful for checking if there's stuff in the way 
 type BBox struct {
-    Position    Coordinates
-    Size        Coordinates
+    position    Coordinates
+    size        Coordinates
+}
+
+func NewBBox(pos, size Coordinates) *BBox {
+    if size.X < 0. {
+        pos.X = pos.X + size.X
+        size.X = -size.X
+    }
+    if size.Y < 0. {
+        pos.Y = pos.Y + size.Y
+        size.Y = -size.Y
+    }
+    if size.Z < 0. {
+        pos.Z = pos.Z + size.Z
+        size.Z = -size.Z
+    }
+    r := BBox{pos, size}
+    return &r
 }
 
 func NewBBox6f(pos_x, pos_y, pos_z, size_x, size_y, size_z float64) *BBox {
     return NewBBox(Coordinates{ pos_x,  pos_y,  pos_z}, 
                    Coordinates{size_x, size_y, size_z})
+}
+
+func (self *BBox) GetPosition() Coordinates {
+    return self.position
+}
+
+func (self *BBox) GetSize() Coordinates {
+    return self.size
+}
+
+func (self *BBox) Contains(rhs Coordinates) bool {
+    return (rhs.X >= self.position.X && rhs.X < self.position.X + self.size.X &&
+            rhs.Y >= self.position.Y && rhs.Y < self.position.Y + self.size.Y &&
+            rhs.Z >= self.position.Z && rhs.Z < self.position.Z + self.size.Z)
 }
 
 //Intersects just checks for bounding box intersection
