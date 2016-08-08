@@ -90,8 +90,9 @@ func (self *GeneralSlot) Accepts(o wtype.LHObject) error {
         return nil
     }
     if n, ok := o.(wtype.Named); ok {
-        return fmt.Errorf("Footprint of object \"%s\"[%s] too large for slot \"%s\"[%s]", 
-                            n.GetName(), o.GetSize(), self.GetName(), self.GetSize())
+        return fmt.Errorf("Footprint of object \"%s\"[%vmm x %vmm] too large for slot \"%s\"[%vmm x %vmm]", 
+                            n.GetName(), o.GetSize().X, o.GetSize().Y, 
+                            self.GetName(), self.GetSize().X, self.GetSize().Y)
     }
     return fmt.Errorf("Footprint of unnamed object[%s] too large for slot \"%s\"[%s]", 
                             o.GetSize(), self.GetName(), self.GetSize())
@@ -125,13 +126,12 @@ func (self *TipwasteSlot) Accepts(o wtype.LHObject) error {
     if err := self.GeneralSlot.Accepts(o); err != nil {
         return err
     } else if _, ok := o.(*wtype.LHTipwaste); !ok {
+        name := "unnamed"
         if n, ok := o.(wtype.Named); ok {
-            return errors.New(fmt.Sprintf("Slot \"%s\" cannot accept non-tipwaste object \"%s\"",
-            self.GetName(), n.GetName()))
-        } else {
-            return errors.New(fmt.Sprintf("Slot \"%s\" cannot accept unnamed object as it is not a TipWaste",
-            self.GetName()))
+            name = n.GetName()
         }
+        return fmt.Errorf("Position \"%s\" cannot accept non-tipwaste object \"%s\"",
+                            self.GetName(), name)
     }
     return nil
 }

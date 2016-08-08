@@ -276,7 +276,7 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
             return ret
         }
         if t, ok := target.(wtype.Typed); ok && t.GetType() != pt {
-            self.AddWarningf("Move", "Object found at %s was type %s not type %s as expected", dp, t.GetType(), pt)
+            self.AddWarningf("Move", "Object found at %s was type \"%s\" not type \"%s\" as expected", dp, t.GetType(), pt)
         }
         
         offset := make([]wtype.Coordinates, adaptor.GetChannelCount())

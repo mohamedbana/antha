@@ -375,11 +375,17 @@ func (self *RobotState) AddObject(slot_name string, o wtype.LHObject) *simulator
         //check that the slot is empty and can hold a child of this type
         if sl.HasChild() {
             //In the future, we'll check if the child can accept another LHObject, for now barf
+            cname := "unknown"
+            oname := "unknown"
             if n, ok := sl.GetChild().(wtype.Named); ok {
-                return simulator.NewErrorf("", "Location \"%s\" already contains an object \"%s\"", slot_name, n.GetName())
-            } else {
-                return simulator.NewErrorf("", "Location \"%s\" already contains an unnamed object", slot_name)
+                cname = n.GetName()
             }
+            if n, ok := o.(wtype.Named); ok {
+                oname = n.GetName()
+            }
+            return simulator.NewErrorf("", 
+                "Couldn't add \"%s\" to location \"%s\" which already contains \"%s\"", 
+                oname, slot_name, cname)
         } else if err := sl.Accepts(o); err != nil {
             return simulator.NewError("", err.Error())
         }

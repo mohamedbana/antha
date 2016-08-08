@@ -129,13 +129,13 @@ func TestVLH_AddPlateTo(t *testing.T) {
             nil,        //no setup
             []TestRobotInstruction{
                 &Initialize{},
-                &AddPlateTo{"tipbox_1", default_lhtipbox(), "tipbox1"},
-                &AddPlateTo{"tipbox_2", default_lhtipbox(), "tipbox2"},
-                &AddPlateTo{"input_1", default_lhplate(), "input1"},
-                &AddPlateTo{"input_2", default_lhplate(), "input2"},
-                &AddPlateTo{"output_1", default_lhplate(), "output1"},
-                &AddPlateTo{"output_2", default_lhplate(), "output2"},
-                &AddPlateTo{"tipwaste", default_lhtipwaste(), "tipwaste"},
+                &AddPlateTo{"tipbox_1",    default_lhtipbox("tipbox1"), "tipbox1"},
+                &AddPlateTo{"tipbox_2",    default_lhtipbox("tipbox2"), "tipbox2"},
+                &AddPlateTo{ "input_1",      default_lhplate("input1"), "input1"},
+                &AddPlateTo{ "input_2",      default_lhplate("input2"), "input2"},
+                &AddPlateTo{"output_1",     default_lhplate("output1"), "output1"},
+                &AddPlateTo{"output_2",     default_lhplate("output2"), "output2"},
+                &AddPlateTo{"tipwaste", default_lhtipwaste("tipwaste"), "tipwaste"},
             },
             nil,        //no errors
             nil,        //no assertions
@@ -148,7 +148,7 @@ func TestVLH_AddPlateTo(t *testing.T) {
                 &Initialize{},
                 &AddPlateTo{"tipbox_1", "my plate's gone stringy", "not_a_plate"},
             },
-            []string{"(err) AddPlateTo: Cannot add plate \"not_a_plate\" of type string to location \"tipbox_1\""},
+            []string{"(err) AddPlateTo: Couldn't add object of type string to tipbox_1"},
             nil,        //no assertions
         },
         SimulatorTest{
@@ -157,23 +157,34 @@ func TestVLH_AddPlateTo(t *testing.T) {
             nil,                    //no setup
             []TestRobotInstruction{
                 &Initialize{},
-                &AddPlateTo{"tipbox_1", default_lhtipbox(), "p0"},
-                &AddPlateTo{"tipbox_1", default_lhtipbox(), "p1"},
+                &AddPlateTo{"tipbox_1", default_lhtipbox("p0"), "p0"},
+                &AddPlateTo{"tipbox_1", default_lhtipbox("p1"), "p1"},
             },
-            []string{"(err) AddPlateTo: Cannot add \"p1\" to location \"tipbox_1\", intersects with \"p0\" at \"tipbox_1\""},
+            []string{"(err) AddPlateTo: Couldn't add \"p1\" to location \"tipbox_1\" which already contains \"p0\""},
             nil,        //no assertions
         },
-//        SimulatorTest{   -- We'll probably want a test along these lines at some point, but Preferences aren't very strict at the moment
-//            "wrong plate type",     //name
-//            nil,                    //default params
-//            nil,                    //no setup
-//            []TestRobotInstruction{
-//                &Initialize{},
-//                &AddPlateTo{"tipbox_1", default_lhplate(), "tipbox"},
-//            },
-//            []string{"(warn) AddPlateTo: Added type Plate to location \"tipbox_1\", when preferences requested Tipbox"},
-//            nil,        //no assertions
-//        },
+        SimulatorTest{
+            "wrong plate type",     //name
+            nil,                    //default params
+            nil,                    //no setup
+            []TestRobotInstruction{
+                &Initialize{},
+                &AddPlateTo{"tipwaste", default_lhplate("tipbox"), "tipbox"},
+            },
+            []string{"(err) AddPlateTo: Position \"tipwaste\" cannot accept non-tipwaste object \"tipbox\""},
+            nil,        //no assertions
+        },
+        SimulatorTest{
+            "unknown location",     //name
+            nil,                    //default params
+            nil,                    //no setup
+            []TestRobotInstruction{
+                &Initialize{},
+                &AddPlateTo{"ruritania", default_lhplate("tipbox"), "tipbox"},
+            },
+            []string{"(err) AddPlateTo: Robot contains no locations named \"ruritania\""},
+            nil,        //no assertions
+        },
     }
 
     for _,test := range tests {
@@ -191,9 +202,9 @@ func TestVLH_AddPlateTo(t *testing.T) {
 func tipTestLayout() *SetupFn {
     var ret SetupFn = func(vlh *lh.VirtualLiquidHandler) {
         vlh.Initialize()
-        vlh.AddPlateTo("tipbox_1",  default_lhtipbox(), "tipbox1")
-        vlh.AddPlateTo("tipbox_2",  default_lhtipbox(), "tipbox2")
-        vlh.AddPlateTo("tipwaste", default_lhtipwaste(), "tipwaste")
+        vlh.AddPlateTo("tipbox_1",    default_lhtipbox("tipbox1"), "tipbox1")
+        vlh.AddPlateTo("tipbox_2",    default_lhtipbox("tipbox2"), "tipbox2")
+        vlh.AddPlateTo("tipwaste", default_lhtipwaste("tipwaste"), "tipwaste")
     }
     return &ret
 }

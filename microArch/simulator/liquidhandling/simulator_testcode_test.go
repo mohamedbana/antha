@@ -210,19 +210,21 @@ type LHPlateParams struct {
     wellZStart      float64
 }
 
-func makeLHPlate(p *LHPlateParams) *wtype.LHPlate {
-    return wtype.NewLHPlate(p.platetype,
-                            p.mfr,
-                            p.nrows,
-                            p.ncols,
-                            p.height,
-                            p.hunit,
-                            makeLHWell(&p.welltype),
-                            p.wellXOffset,
-                            p.wellYOffset,
-                            p.wellXStart,
-                            p.wellYStart,
-                            p.wellZStart)
+func makeLHPlate(p *LHPlateParams, name string) *wtype.LHPlate {
+    r := wtype.NewLHPlate(p.platetype,
+                          p.mfr,
+                          p.nrows,
+                          p.ncols,
+                          p.height,
+                          p.hunit,
+                          makeLHWell(&p.welltype),
+                          p.wellXOffset,
+                          p.wellYOffset,
+                          p.wellXStart,
+                          p.wellYStart,
+                          p.wellZStart)
+    r.PlateName = name
+    return r
 }
 
 type LHTipParams struct {
@@ -256,19 +258,21 @@ type LHTipboxParams struct {
     tipzstart       float64
 }
 
-func makeLHTipbox(p *LHTipboxParams) *wtype.LHTipbox {
-    return wtype.NewLHTipbox(p.nrows,
-                             p.ncols,
-                             p.height,
-                             p.manufacturer,
-                             p.boxtype,
-                             makeLHTip(&p.tiptype),
-                             makeLHWell(&p.well),
-                             p.tipxoffset,
-                             p.tipyoffset,
-                             p.tipystart,
-                             p.tipxstart,
-                             p.tipzstart)
+func makeLHTipbox(p *LHTipboxParams, name string) *wtype.LHTipbox {
+    r := wtype.NewLHTipbox(p.nrows,
+                           p.ncols,
+                           p.height,
+                           p.manufacturer,
+                           p.boxtype,
+                           makeLHTip(&p.tiptype),
+                           makeLHWell(&p.well),
+                           p.tipxoffset,
+                           p.tipyoffset,
+                           p.tipystart,
+                           p.tipxstart,
+                           p.tipzstart)
+    r.Boxname = name
+    return r
 }
 
 type LHTipwasteParams struct {
@@ -282,15 +286,17 @@ type LHTipwasteParams struct {
     wellzstart      float64
 }
 
-func makeLHTipWaste(p *LHTipwasteParams) *wtype.LHTipwaste {
-    return wtype.NewLHTipwaste(p.capacity,
-                               p.typ,
-                               p.mfr,
-                               p.height,
-                               makeLHWell(&p.w),
-                               p.wellxstart,
-                               p.wellystart,
-                               p.wellzstart)
+func makeLHTipWaste(p *LHTipwasteParams, name string) *wtype.LHTipwaste {
+    r := wtype.NewLHTipwaste(p.capacity,
+                             p.typ,
+                             p.mfr,
+                             p.height,
+                             makeLHWell(&p.w),
+                             p.wellxstart,
+                             p.wellystart,
+                             p.wellzstart)
+    r.Name = name
+    return r
 }
 
 /*
@@ -359,7 +365,7 @@ func compare_errors(t *testing.T, desc string, expected []string, actual []*simu
  * ####################################### Default Types
  */
 
-func default_lhplate() *wtype.LHPlate {
+func default_lhplate(name string) *wtype.LHPlate {
     params := LHPlateParams {
         "test_plate",  // platetype       string 
         "test_plate_mfr",   // mfr             string 
@@ -395,10 +401,10 @@ func default_lhplate() *wtype.LHPlate {
         18.5,      // wellZStart      float64
     }
 
-    return makeLHPlate(&params)
+    return makeLHPlate(&params, name)
 }
 
-func default_lhtipbox() *wtype.LHTipbox {
+func default_lhtipbox(name string) *wtype.LHTipbox {
     params := LHTipboxParams{
         8,                      //nrows           int 
         12,                     //ncols           int 
@@ -440,10 +446,10 @@ func default_lhtipbox() *wtype.LHTipbox {
         0.,                     //tipzstart       float64
     }
 
-    return makeLHTipbox(&params)
+    return makeLHTipbox(&params, name)
 }
 
-func default_lhtipwaste() *wtype.LHTipwaste {
+func default_lhtipwaste(name string) *wtype.LHTipwaste {
     params := LHTipwasteParams {
         700,                    //capacity        int 
         "tipwaste",             //typ             string
@@ -474,7 +480,7 @@ func default_lhtipwaste() *wtype.LHTipwaste {
         45.5,               //wellystart      float64
         0.0,                //wellzstart      float64
     }
-    return makeLHTipWaste(&params)
+    return makeLHTipWaste(&params, name)
 }
 
 func default_lhproperties() *liquidhandling.LHProperties {
