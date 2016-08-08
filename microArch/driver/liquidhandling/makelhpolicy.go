@@ -542,7 +542,7 @@ func MakeSolventPolicy() LHPolicy {
 func MakeDNAPolicy() LHPolicy {
 	dnapolicy := make(LHPolicy, 10)
 	dnapolicy["ASPSPEED"] = 2.0
-	dnapolicy["DSPSPEED"] = 2.0
+	dnapolicy["DSPSPEED"] = 3.0
 	dnapolicy["CAN_MULTI"] = false
 	dnapolicy["CAN_MSA"] = false
 	dnapolicy["CAN_SDD"] = false
