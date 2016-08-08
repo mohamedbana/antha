@@ -112,6 +112,10 @@ func (self *LHTipwaste) GetOffset() Coordinates {
     return self.offset
 }
 
+func (self *LHTipwaste) SetOffset(o Coordinates) {
+    self.offset = o
+}
+
 func (self *LHTipwaste) GetSize() Coordinates {
     return self.size
 }

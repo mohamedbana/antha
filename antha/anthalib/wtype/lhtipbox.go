@@ -159,6 +159,10 @@ func (self *LHTipbox) GetOffset() Coordinates {
     return self.offset
 }
 
+func (self *LHTipbox) SetOffset(o Coordinates) {
+    self.offset = o
+}
+
 func (self *LHTipbox) GetSize() Coordinates {
     return self.size
 }

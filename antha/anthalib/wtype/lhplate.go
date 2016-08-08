@@ -449,6 +449,10 @@ func (self *LHPlate) GetOffset() Coordinates {
     return self.offset
 }
 
+func (self *LHPlate) SetOffset(o Coordinates) {
+    self.offset = o
+}
+
 func (self *LHPlate) GetSize() Coordinates {
     return self.size
 }
