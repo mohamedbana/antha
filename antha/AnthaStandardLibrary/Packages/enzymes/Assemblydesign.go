@@ -449,33 +449,34 @@ var EndlinksString = map[string]map[string]map[string][]string{
 	"Custom": map[string]map[string][]string{
 		"Level0": map[string][]string{
 			"L1Uadaptor":       []string{"GTCG", "GGAG"}, // adaptor to add SapI sites to clone into level 1 vector
-			"L1Uadaptor + Pro": []string{"GTCG", "TACT"}, // adaptor to add SapI sites to clone into level 1 vector
+			"L1Uadaptor + Pro": []string{"GTCG", "TTTT"}, // adaptor to add SapI sites to clone into level 1 vector
 			//	"TF":               []string{"GTCG", "GGAG"}, // transcription factor e.g. laci (same as L1Uadaptor prefix currently)
-			//	"TF + Pro":         []string{"GTCG", "TACT"},
-			"Pro":              []string{"GGAG", "TACT"},
-			"5U":               []string{"TACT", "CCAT"}, // 5' untranslated, e.g. rbs
-			"5U(f)":            []string{"TACT", "CCAT"},
-			"Pro + 5U(f)":      []string{"GGAG", "CCAT"},
-			"Pro + 5U":         []string{"GGAG", "AATG"},
-			"NT1":              []string{"CCAT", "AATG"},
-			"5U + NT1":         []string{"TACT", "AATG"},
-			"CDS1":             []string{"AATG", "GCTT"},
-			"CDS1 ns":          []string{"AATG", "TTCG"},
-			"NT2":              []string{"AATG", "AGGT"},
-			"SP":               []string{"AATG", "AGGT"},
-			"CDS2 ns":          []string{"AGGT", "TTCG"},
-			"CDS2":             []string{"AGGT", "GCTT"},
-			"CT":               []string{"TTCG", "GCTT"},
-			"3U":               []string{"GCTT", "GGTA"},
-			"Ter":              []string{"GGTA", "CGCT"},
-			"3U + Ter":         []string{"GCTT", "CGCT"},
-			"L1Dadaptor":       []string{"CGCT", "TAAT"},
-			"Ter + L1Dadaptor": []string{"GGTA", "TAAT"},
+			//	"TF + Pro":         []string{"GTCG", "TTTT"},
+			"Pro":                   []string{"GGAG", "TTTT"},
+			"5U":                    []string{"TTTT", "CCAT"}, // 5' untranslated, e.g. rbs // changed from MoClo TACT to TTTT to conform with Protein Paintbox??
+			"5U(f)":                 []string{"TTTT", "CCAT"},
+			"Pro + 5U(f)":           []string{"GGAG", "CCAT"},
+			"Pro + 5U":              []string{"GGAG", "TATG"}, //changed AATG to TATG to work with Kosuri paper RBSs
+			"NT1":                   []string{"CCAT", "TATG"}, //changed AATG to TATG to work with Kosuri paper RBSs
+			"5U + NT1":              []string{"TTTT", "TATG"}, //changed AATG to TATG to work with Kosuri paper RBSs
+			"CDS1":                  []string{"TATG", "GCTT"}, //changed AATG to TATG to work with Kosuri paper RBSs
+			"CDS1 ns":               []string{"TATG", "TTCG"}, //changed AATG to TATG to work with Kosuri paper RBSs
+			"NT2":                   []string{"TATG", "AGGT"}, //changed AATG to TATG to work with Kosuri paper RBSs
+			"SP":                    []string{"TATG", "AGGT"}, //changed AATG to TATG to work with Kosuri paper RBSs
+			"CDS2 ns":               []string{"AGGT", "TTCG"},
+			"CDS2":                  []string{"AGGT", "GCTT"},
+			"CT":                    []string{"TTCG", "GCTT"},
+			"3U":                    []string{"GCTT", "CCCC"}, // should we cahnge this from GGTA to CCCC to conform with Protein Paintbox??
+			"Ter":                   []string{"CCCC", "CGCT"},
+			"3U + Ter":              []string{"GCTT", "CGCT"},
+			"3U + Ter + L1Dadaptor": []string{"GCTT", "TAAT"},
+			"L1Dadaptor":            []string{"CGCT", "TAAT"},
+			"Ter + L1Dadaptor":      []string{"CCCC", "TAAT"},
 		},
 		"Level1": map[string][]string{
-			"Device1": []string{"GAG", "ACC"},
-			"Device2": []string{"ACC", "TGT"},
-			"Device3": []string{"TGT", "GGT"},
+			"Device1": []string{"GAA", "ACC"},
+			"Device2": []string{"ACC", "CTG"},
+			"Device3": []string{"CTG", "GGT"},
 		},
 	},
 	"Antibody": map[string]map[string][]string{
@@ -574,6 +575,19 @@ var Enzymelookup = map[string]map[string]wtype.TypeIIs{
 		"Level0": SapIenz,
 	},
 }
+
+/*
+func AdaptPartsForNextLevel(parts []wtype.DNASequence, assemblystandard string, level string, class string) (newparts []wtype.DNASequence) {
+	newparts = make([]wtype.DNASequence, 0)
+
+	enzyme := Enzymelookup[assemblystandard][level]
+
+	enzyme.RestrictionEnzyme
+
+	UpstreamAdaptor := AddStandardStickyEndsfromClass(parts[0], assemblystandard, level, class)
+
+	return
+}*/
 
 /*
 var MoClo AssemblyStandard{
