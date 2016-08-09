@@ -25,64 +25,80 @@ package wtype
 
 //An LHObject that can hold other LHObjects
 type LHSlot interface {
-    //GetChild get the contained object, nil if none
-    GetChild() LHObject
-    //SetChild set the contained object, error if it cannot
-    SetChild(LHObject) error
-    //Accepts can the slot accept the given object? (Can return true even if the slot is full)
-    Accepts(LHObject) bool
-    //GetChildPosition get the (absolute) position of the child object
-    GetChildPosition() Coordinates
+	//GetChild get the contained object, nil if none
+	GetChild() LHObject
+	//SetChild set the contained object, error if it cannot
+	SetChild(LHObject) error
+	//Accepts can the slot accept the given object? (Can return true even if the slot is full)
+	Accepts(LHObject) bool
+	//GetChildPosition get the (absolute) position of the child object
+	GetChildPosition() Coordinates
 }
 
 //WellReference used for specifying position within a well
 type WellReference int
 
 const (
-    BottomReference WellReference = iota //0
-    TopReference                         //1
-    LiquidReference                      //2
+	BottomReference WellReference = iota //0
+	TopReference                         //1
+	LiquidReference                      //2
 )
-
 
 //LHObject Provides a unified interface to physical size
 //of items that can be placed on a liquid handler's deck
 type LHObject interface {
-    //GetBounds Return the absolute coordinates of the bounding box of the object
-    GetBounds() BBox
-    //SetOffset set the offset of the object relative to its parent (global if parent is nil)
-    SetOffset(Coordinates)
-    //SetParent Store the offset of the object
-    SetParent(LHObject)
-    //GetParent
-    GetParent() LHObject
+	//GetBounds Return the absolute coordinates of the bounding box of the object
+	GetBounds() BBox
+	//SetOffset set the offset of the object relative to its parent (global if parent is nil)
+	SetOffset(Coordinates)
+	//SetParent Store the offset of the object
+	SetParent(LHObject)
+	//GetParent
+	GetParent() LHObject
+}
+
+//Helper functions for objects as most are named and typed
+
+//GetObjectName
+func GetObjectName(o LHObject) string {
+	if on, ok := o.(Named); ok {
+		return on.GetName()
+	}
+	return "<unnamed>"
+}
+
+//GetObjectType
+func GetObjectType(o LHObject) string {
+	if ot, ok := o.(Typed); ok {
+		return ot.GetType()
+	}
+	return "<untyped>"
 }
 
 //Addressable unifies the interface to objects which have
 //sub-components that can be addressed by WellCoords (e.g. "A1")
 //for example tip-boxes, plates, etc
 type Addressable interface {
-    //HasLocation Do the given coordinates exist in the object?
-    HasLocation(WellCoords) bool
-    //GetCoords Returns the object at the given well coords
-    //nil if empty or position doesn't exist
-    GetLocation(WellCoords) LHObject
-    //CoordsToWellCoords Convert Real world coordinates 
-    //(relative to the object origin) to WellCoords. 
-    //The returned WellCoords should be the closest 
-    //addressable location to the coorinates, and shold only be 
-    //invalid if the object has no adressable locations (e.g. wells
-    //or tips). The second return value gives the offset from the top
-    //of the center of the well/tip to the given coordinate
-    //(this leaves the caller to ascertain whether any mis-alignment
-    //is acceptable)
-    CoordsToWellCoords(Coordinates) (WellCoords, Coordinates)
-    //WellCoordsToCoords Get the physical location of an addressable
-    //position relative to the object origin.
-    //WellCoords should be valid in the object, or the bool will 
-    //return false and Coordinates are undefined.
-    //WellReference is the position within a well.
-    //Requesting LiquidReference on a LHTipbox will return false
-    WellCoordsToCoords(WellCoords, WellReference) (Coordinates, bool)
+	//HasLocation Do the given coordinates exist in the object?
+	HasLocation(WellCoords) bool
+	//GetCoords Returns the object at the given well coords
+	//nil if empty or position doesn't exist
+	GetLocation(WellCoords) LHObject
+	//CoordsToWellCoords Convert Real world coordinates
+	//(relative to the object origin) to WellCoords.
+	//The returned WellCoords should be the closest
+	//addressable location to the coorinates, and shold only be
+	//invalid if the object has no adressable locations (e.g. wells
+	//or tips). The second return value gives the offset from the top
+	//of the center of the well/tip to the given coordinate
+	//(this leaves the caller to ascertain whether any mis-alignment
+	//is acceptable)
+	CoordsToWellCoords(Coordinates) (WellCoords, Coordinates)
+	//WellCoordsToCoords Get the physical location of an addressable
+	//position relative to the object origin.
+	//WellCoords should be valid in the object, or the bool will
+	//return false and Coordinates are undefined.
+	//WellReference is the position within a well.
+	//Requesting LiquidReference on a LHTipbox will return false
+	WellCoordsToCoords(WellCoords, WellReference) (Coordinates, bool)
 }
-

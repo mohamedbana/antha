@@ -384,8 +384,6 @@ func (self *RobotState) AddObject(slot_name string, o wtype.LHObject) *simulator
 			return simulator.NewErrorf("",
 				"Couldn't add \"%s\" to location \"%s\" which already contains \"%s\"",
 				oname, slot_name, cname)
-		} else if !sl.Accepts(o) {
-			return simulator.NewError("", sl.SetChild(o).Error())
 		}
 
 		//check for intersections with other objects
@@ -396,7 +394,9 @@ func (self *RobotState) AddObject(slot_name string, o wtype.LHObject) *simulator
 				return simulator.NewErrorf("", "Object intersects with object at position \"%s\"", name)
 			}
 		}
-		sl.SetChild(o)
+		if err := sl.SetChild(o); err != nil {
+			return simulator.NewError("", err.Error())
+		}
 	} else {
 		return simulator.NewErrorf("", "Robot contains no locations named \"%s\"", slot_name)
 	}

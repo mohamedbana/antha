@@ -357,13 +357,13 @@ func compare_errors(t *testing.T, desc string, expected []string, actual []*simu
  * ####################################### Default Types
  */
 
-func default_lhplate(name string) *wtype.LHPlate {
+func default_lhplate_props() *LHPlateParams {
 	params := LHPlateParams{
-		"test_plate",     // platetype       string
+		"plate",          // platetype       string
 		"test_plate_mfr", // mfr             string
 		8,                // nrows           int
 		12,               // ncols           int
-		wtype.Coordinates{127.76, 85.48, 25.7}, // height          float64
+		wtype.Coordinates{127.76, 85.48, 25.7}, // size          float64
 		LHWellParams{ // welltype
 			"test_welltype", // platetype       string
 			"test_wellid",   // plateid         string
@@ -392,7 +392,19 @@ func default_lhplate(name string) *wtype.LHPlate {
 		18.5, // wellZStart      float64
 	}
 
-	return makeLHPlate(&params, name)
+	return &params
+}
+
+func default_lhplate(name string) *wtype.LHPlate {
+	params := default_lhplate_props()
+	return makeLHPlate(params, name)
+}
+
+//This plate will fill into the next door position on the robot
+func wide_lhplate(name string) *wtype.LHPlate {
+	params := default_lhplate_props()
+	params.size.X = 300.
+	return makeLHPlate(params, name)
 }
 
 func default_lhtipbox(name string) *wtype.LHTipbox {

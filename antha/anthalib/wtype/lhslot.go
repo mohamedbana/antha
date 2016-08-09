@@ -24,6 +24,7 @@ package wtype
 
 import (
 	"fmt"
+	"strings"
 )
 
 // -------------------------------------------------------------------------------
@@ -105,16 +106,8 @@ func (self *DeckSlot) SetChild(o LHObject) error {
 		return err
 	}
 	if self.child != nil {
-		o_name := "unnamed"
-		c_name := "unnamed"
-		if on, ok := o.(Named); ok {
-			o_name = on.GetName()
-		}
-		if cn, ok := self.child.(Named); ok {
-			c_name = cn.GetName()
-		}
 		return fmt.Errorf("Cannot add object \"%s\" to slot \"%s\" which already contains \"%s\"",
-			o_name, self.GetName(), c_name)
+			GetObjectName(o), self.GetName(), GetObjectName(self.child))
 	}
 	o.SetParent(self)
 	o.SetOffset(Coordinates{})
@@ -143,14 +136,21 @@ func (self *DeckSlot) accepts(o LHObject) error {
 		if b {
 			return nil
 		} else {
-			return fmt.Errorf("Cannot accept object type %T to slot \"%s\"", o, self.GetName())
+			prefs := []string{}
+			if self.acceptsPlate {
+				prefs = append(prefs, "Plates")
+			}
+			if self.acceptsTip {
+				prefs = append(prefs, "Tipboxes")
+			}
+			if self.acceptsTipwaste {
+				prefs = append(prefs, "Tipwaste")
+			}
+			return fmt.Errorf("%s \"%s\" added to slot \"%s\" which prefers %s",
+				GetObjectType(o), GetObjectName(o), self.GetName(), strings.Join(prefs, " or "))
 		}
 	}
-	if n, ok := o.(Named); ok {
-		return fmt.Errorf("Footprint of object \"%s\"[%vmm x %vmm] does not fit slot \"%s\"[%vmm x %vmm]",
-			n.GetName(), os.X, os.Y,
-			self.GetName(), ss.X, ss.Y)
-	}
-	return fmt.Errorf("Footprint of unnamed object[%s] does not fit slot \"%s\"[%s]",
-		os, self.GetName(), ss)
+	return fmt.Errorf("Footprint of \"%s\"[%vmm x %vmm] doesn't fit slot \"%s\"[%vmm x %vmm]",
+		GetObjectName(o), os.X, os.Y,
+		self.GetName(), ss.X, ss.Y)
 }
