@@ -25,10 +25,14 @@ package wtype
 
 //An LHObject that can hold other LHObjects
 type LHSlot interface {
-    GetContents() LHObject
-    SetContents(LHObject) error
-    Accepts(LHObject) error
-    GetContentsPosition() Coordinates
+    //GetChild get the contained object, nil if none
+    GetChild() LHObject
+    //SetChild set the contained object, error if it cannot
+    SetChild(LHObject) error
+    //Accepts can the slot accept the given object? (Can return true even if the slot is full)
+    Accepts(LHObject) bool
+    //GetChildPosition get the (absolute) position of the child object
+    GetChildPosition() Coordinates
 }
 
 //WellReference used for specifying position within a well
