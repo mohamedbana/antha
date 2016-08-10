@@ -31,8 +31,8 @@ import (
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
-	simulator_lh "github.com/antha-lang/antha/microArch/simulator/liquidhandling"
-	"github.com/antha-lang/antha/microArch/simulator"
+	//"github.com/antha-lang/antha/microArch/simulator"
+	//simulator_lh "github.com/antha-lang/antha/microArch/simulator/liquidhandling"
 )
 
 // the liquid handler structure defines the interface to a particular liquid handling
@@ -91,10 +91,10 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) error {
 		return err
 	}
 
-    err = this.AddSetupInstructions(request)
-    if err != nil {
-        return err
-    }
+	err = this.AddSetupInstructions(request)
+	if err != nil {
+		return err
+	}
 
 	err = this.Simulate(request)
 	if err != nil {
@@ -121,16 +121,16 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) error {
 //AddSetupInstructions add instructions to the instruction stream to setup
 //the plate layout of the machine
 func (this *Liquidhandler) AddSetupInstructions(request *LHRequest) error {
-    if request.Instructions == nil {
+	if request.Instructions == nil {
 		return wtype.LHError(wtype.LH_ERR_OTHER, "Cannot execute request: no instructions")
-    }
-    setup_insts := this.get_setup_instructions(request)
-    if request.Instructions[0].InstructionType() == liquidhandling.INI {
-        request.Instructions = append(request.Instructions[:1], append(setup_insts, request.Instructions[1:]...)...)
-    } else {
-        request.Instructions = append(setup_insts, request.Instructions...)
-    }
-    return nil
+	}
+	setup_insts := this.get_setup_instructions(request)
+	if request.Instructions[0].InstructionType() == liquidhandling.INI {
+		request.Instructions = append(request.Instructions[:1], append(setup_insts, request.Instructions[1:]...)...)
+	} else {
+		request.Instructions = append(setup_insts, request.Instructions...)
+	}
+	return nil
 }
 
 // run the request via the simulator
@@ -141,18 +141,18 @@ func (this *Liquidhandler) Simulate(request *LHRequest) error {
 		return wtype.LHError(wtype.LH_ERR_OTHER, "Cannot execute request: no instructions")
 	}
 
+	//Simulator disabled for now - HJK 10/08/16
+
 	// set up the simulator
-    vlh := simulator_lh.NewVirtualLiquidHandler(this.Properties)
-    //check we didn't hit a catastrophic error
-    if vlh.GetErrorSeverity() == simulator.SeverityError {
-        return vlh.GetWorstError()
-    }
+	//vlh := simulator_lh.NewVirtualLiquidHandler(this.Properties)
+	//check we didn't hit a catastrophic error
+	//if vlh.GetErrorSeverity() == simulator.SeverityError {
+	//	return vlh.GetWorstError()
+	//}
 
-	for _, ins := range instructions {
-		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(vlh)
-	}
-
-    vlh.SaveLog("instructions_log")
+	//for _, ins := range instructions {
+	//	ins.(liquidhandling.TerminalRobotInstruction).OutputTo(vlh)
+	//}
 
 	return nil
 }
@@ -160,7 +160,7 @@ func (this *Liquidhandler) Simulate(request *LHRequest) error {
 // run the request via the driver
 func (this *Liquidhandler) Execute(request *LHRequest) error {
 	// set up the robot
-    driver := this.Properties.Driver.(liquidhandling.ExtendedLiquidhandlingDriver)
+	driver := this.Properties.Driver.(liquidhandling.ExtendedLiquidhandlingDriver)
 
 	instructions := (*request).Instructions
 
@@ -267,22 +267,22 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 
 func (this *Liquidhandler) get_setup_instructions(rq *LHRequest) []liquidhandling.TerminalRobotInstruction {
 
-    instructions := make([]liquidhandling.TerminalRobotInstruction, 1+len(this.Properties.PosLookup))
+	instructions := make([]liquidhandling.TerminalRobotInstruction, 1+len(this.Properties.PosLookup))
 
-    //first instruction is always to remove all plates
-    instructions = append(instructions, liquidhandling.NewRemoveAllPlatesInstruction())
+	//first instruction is always to remove all plates
+	instructions = append(instructions, liquidhandling.NewRemoveAllPlatesInstruction())
 
 	for position, plateid := range this.Properties.PosLookup {
 		if plateid == "" {
 			continue
 		}
-        ins := liquidhandling.NewAddPlateToInstruction()
+		ins := liquidhandling.NewAddPlateToInstruction()
 		ins.Plate = this.Properties.PlateLookup[plateid]
-        ins.PlateType = ins.Plate.(wtype.LHPlate).Type
+		ins.PlateType = ins.Plate.(wtype.LHPlate).Type
 		ins.Name = ins.Plate.(wtype.Named).GetName()
-        ins.Position = position
+		ins.Position = position
 
-        instructions = append(instructions, ins)
+		instructions = append(instructions, ins)
 	}
 
 	return nil
