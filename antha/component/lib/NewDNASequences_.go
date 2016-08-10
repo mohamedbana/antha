@@ -48,6 +48,7 @@ func _NewDNASequencesSteps(_ctx context.Context, _input *NewDNASequencesInput, _
 	partsinorder := make([]wtype.DNASequence, 0)
 
 	var partDNA wtype.DNASequence
+	var err error
 
 	_output.Status = "all parts available"
 	for i, part := range _input.Seqsinorder {
@@ -57,10 +58,14 @@ func _NewDNASequencesSteps(_ctx context.Context, _input *NewDNASequencesInput, _
 			split := strings.SplitAfter(part, ".gb")
 			file := split[0]
 
-			split2 := strings.Split(split[1], ":")
+			split2 := strings.Split(split[1], "Feature:")
 			feature := split2[1]
 
-			partDNA, _ = parser.GenbankFeaturetoDNASequence(file, feature)
+			partDNA, err = parser.GenbankFeaturetoDNASequence(file, feature)
+
+			if err != nil {
+				execute.Errorf(_ctx, err.Error())
+			}
 
 			// check if genbank file
 		} else if strings.Contains(part, ".gb") {

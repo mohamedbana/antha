@@ -119,7 +119,7 @@ func _AssemblyStandard_siteremove_orfcheck_wtypeSteps(_ctx context.Context, _inp
 									warning := text.Print("removal of "+anysites.Enzyme.Name+" site from orf "+orf.DNASeq, " failed! improve your algorithm! "+err.Error())
 									warnings = append(warnings, warning)
 								}
-							} else {
+							} else if !_input.OnlyRemovesitesinORFs {
 								allsitestoavoid := make([]string, 0)
 								part, err = sequences.RemoveSite(part, anysites.Enzyme, allsitestoavoid)
 								if err != nil {
@@ -129,7 +129,7 @@ func _AssemblyStandard_siteremove_orfcheck_wtypeSteps(_ctx context.Context, _inp
 								}
 							}
 						}
-					} else {
+					} else if !_input.OnlyRemovesitesinORFs {
 						allsitestoavoid := make([]string, 0)
 						temppart, err := sequences.RemoveSite(part, anysites.Enzyme, allsitestoavoid)
 						//		fmt.Println("part= ", part)
@@ -182,6 +182,10 @@ func _AssemblyStandard_siteremove_orfcheck_wtypeSteps(_ctx context.Context, _inp
 	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
 	assembly := enzymes.Assemblyparameters{_input.Constructname, restrictionenzyme.Name, vectordata, _output.PartswithOverhangs}
 	status, numberofassemblies, _, newDNASequence, err := enzymes.Assemblysimulator(assembly)
+
+	if err != nil {
+		execute.Errorf(_ctx, err.Error())
+	}
 
 	endreport := "Endreport only run in the event of assembly simulation failure"
 	//sites := "Restriction mapper only run in the event of assembly simulation failure"
@@ -362,6 +366,7 @@ type AssemblyStandard_siteremove_orfcheck_wtypeInput struct {
 	ExporttoFastaFile             bool
 	Level                         string
 	ORFstoConfirm                 []string
+	OnlyRemovesitesinORFs         bool
 	OtherEnzymeSitesToRemove      []string
 	PartMoClotypesinorder         []string
 	RemoveproblemRestrictionSites bool
@@ -413,6 +418,7 @@ func init() {
 				{Name: "ExporttoFastaFile", Desc: "", Kind: "Parameters"},
 				{Name: "Level", Desc: "of assembly standard\n", Kind: "Parameters"},
 				{Name: "ORFstoConfirm", Desc: "enter each as amino acid sequence\n", Kind: "Parameters"},
+				{Name: "OnlyRemovesitesinORFs", Desc: "", Kind: "Parameters"},
 				{Name: "OtherEnzymeSitesToRemove", Desc: "", Kind: "Parameters"},
 				{Name: "PartMoClotypesinorder", Desc: "labels e.g. pro = promoter\n", Kind: "Parameters"},
 				{Name: "RemoveproblemRestrictionSites", Desc: "", Kind: "Parameters"},

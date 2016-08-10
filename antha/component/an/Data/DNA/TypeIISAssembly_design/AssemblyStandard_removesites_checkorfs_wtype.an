@@ -34,9 +34,10 @@ Parameters (
 	OtherEnzymeSitesToRemove	[]string
 	ORFstoConfirm				[]string // enter each as amino acid sequence
 	RemoveproblemRestrictionSites bool
+	OnlyRemovesitesinORFs		bool
 	EndsAlreadyadded 			bool
 	ExporttoFastaFile 			bool
-	BlastSeqswithNoName			bool
+	BlastSeqswithNoName		bool
 )
 
 // Physical Inputs to this protocol with types
@@ -135,7 +136,7 @@ Steps {
 									warning := text.Print("removal of "+anysites.Enzyme.Name+" site from orf "+orf.DNASeq, " failed! improve your algorithm! "+err.Error())
 									warnings = append(warnings, warning)
 								}
-							} else {
+							} else if !OnlyRemovesitesinORFs{
 								allsitestoavoid := make([]string, 0)
 								part, err = sequences.RemoveSite(part, anysites.Enzyme, allsitestoavoid)
 								if err != nil {
@@ -145,7 +146,7 @@ Steps {
 								}
 							}
 						}
-					} else {
+					} else if !OnlyRemovesitesinORFs{
 						allsitestoavoid := make([]string, 0)
 						temppart, err := sequences.RemoveSite(part, anysites.Enzyme, allsitestoavoid)
 				//		fmt.Println("part= ", part)
@@ -199,6 +200,10 @@ Steps {
 	// Check that assembly is feasible with designed parts by simulating assembly of the sequences with the chosen enzyme
 	assembly := enzymes.Assemblyparameters{Constructname, restrictionenzyme.Name, vectordata, PartswithOverhangs}
 	status, numberofassemblies, _, newDNASequence, err := enzymes.Assemblysimulator(assembly)
+	
+	if err != nil {
+		Errorf(err.Error())
+	}
 
 	endreport := "Endreport only run in the event of assembly simulation failure"
 	//sites := "Restriction mapper only run in the event of assembly simulation failure"
