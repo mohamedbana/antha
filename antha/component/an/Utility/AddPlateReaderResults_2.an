@@ -53,7 +53,11 @@ Data (
 	BlankValues []float64
 	ResponsetoManualValuesmap map[string][]float64
 	MeasuredOptimalWavelength int
-	Runs []doe.Run	
+	Runs []doe.Run
+	R2 float64
+	R2Pass bool
+	CV float64
+	CVpass bool
 )
 
 
@@ -305,7 +309,7 @@ Steps {
 			meanManCF := stats.Mean(manualCorrectnessFactorValues)
 			run = doe.AddNewResponseFieldandValue(run, response+"_Average_ManualCorrectnessFactor", meanManCF)
 			}
-*/
+		*/
 		
 		}
 
@@ -318,8 +322,8 @@ Steps {
 
 		runswithresponses = append(runswithresponses, run)
 	}
-
-	_ = doe.XLSXFileFromRuns(runswithresponses,OutputFilename,DesignFiletype)
+	
+	doe.XLSXFileFromRuns(runswithresponses,OutputFilename,DesignFiletype)
 	
 	Runs = runswithresponses
 
@@ -328,7 +332,14 @@ Steps {
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 Analysis {
+	
+	/*// now calculate mean, CV, r2 and plot results
+	for _,runwithresponses := range Runs {
+		
+	}*/
+		
 }
+
 
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a

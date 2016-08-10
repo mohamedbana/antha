@@ -292,7 +292,7 @@ func _AddPlateReaderresults_2Steps(_ctx context.Context, _input *AddPlateReaderr
 		runswithresponses = append(runswithresponses, run)
 	}
 
-	_ = doe.XLSXFileFromRuns(runswithresponses, _input.OutputFilename, _input.DesignFiletype)
+	doe.XLSXFileFromRuns(runswithresponses, _input.OutputFilename, _input.DesignFiletype)
 
 	_output.Runs = runswithresponses
 
@@ -301,6 +301,12 @@ func _AddPlateReaderresults_2Steps(_ctx context.Context, _input *AddPlateReaderr
 // Run after controls and a steps block are completed to
 // post process any data and provide downstream results
 func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateReaderresults_2Input, _output *AddPlateReaderresults_2Output) {
+
+	/*// now calculate mean, CV, r2 and plot results
+	for _,runwithresponses := range Runs {
+
+	}*/
+
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
@@ -379,7 +385,11 @@ type AddPlateReaderresults_2Input struct {
 
 type AddPlateReaderresults_2Output struct {
 	BlankValues               []float64
+	CV                        float64
+	CVpass                    bool
 	MeasuredOptimalWavelength int
+	R2                        float64
+	R2Pass                    bool
 	ResponsetoManualValuesmap map[string][]float64
 	Runs                      []doe.Run
 }
@@ -387,7 +397,11 @@ type AddPlateReaderresults_2Output struct {
 type AddPlateReaderresults_2SOutput struct {
 	Data struct {
 		BlankValues               []float64
+		CV                        float64
+		CVpass                    bool
 		MeasuredOptimalWavelength int
+		R2                        float64
+		R2Pass                    bool
 		ResponsetoManualValuesmap map[string][]float64
 		Runs                      []doe.Run
 	}
@@ -422,7 +436,11 @@ func init() {
 				{Name: "Wavelength", Desc: "= 472\n", Kind: "Parameters"},
 				{Name: "WellForScanAnalysis", Desc: "= []string{\"J5\"}\n", Kind: "Parameters"},
 				{Name: "BlankValues", Desc: "", Kind: "Data"},
+				{Name: "CV", Desc: "", Kind: "Data"},
+				{Name: "CVpass", Desc: "", Kind: "Data"},
 				{Name: "MeasuredOptimalWavelength", Desc: "", Kind: "Data"},
+				{Name: "R2", Desc: "", Kind: "Data"},
+				{Name: "R2Pass", Desc: "", Kind: "Data"},
 				{Name: "ResponsetoManualValuesmap", Desc: "", Kind: "Data"},
 				{Name: "Runs", Desc: "", Kind: "Data"},
 			},
