@@ -86,7 +86,7 @@ func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain 
 
 	for _, v := range request.Output_plates {
 		// we need to ensure this has a name
-		if v.Name() == "" {
+		if v.GetName() == "" {
 			v.PlateName = fmt.Sprintf("Output_plate_%s", v.ID[0:6])
 		}
 	}

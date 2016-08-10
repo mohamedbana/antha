@@ -125,7 +125,7 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) (*
 
 		if position == "" {
 			//RaiseError("No positions left for output")
-			err := wtype.LHError(wtype.LH_ERR_NO_DECK_SPACE, fmt.Sprint("No position left for output ", p.Name(), " Type: ", p.Type, " Constrained: ", isConstrained, " allowed positions: ", allowed))
+			err := wtype.LHError(wtype.LH_ERR_NO_DECK_SPACE, fmt.Sprint("No position left for output ", p.GetName(), " Type: ", p.Type, " Constrained: ", isConstrained, " allowed positions: ", allowed))
 			return request, err
 		}
 
@@ -150,7 +150,7 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) (*
 		position := get_first_available_preference(input_preferences, setup, allowed)
 		if position == "" {
 			//RaiseError("No positions left for input")
-			err := wtype.LHError(wtype.LH_ERR_NO_DECK_SPACE, fmt.Sprint("No position left for input ", p.Name(), " Type: ", p.Type, " Constrained: ", isConstrained, " allowed positions: ", allowed))
+			err := wtype.LHError(wtype.LH_ERR_NO_DECK_SPACE, fmt.Sprint("No position left for input ", p.GetName(), " Type: ", p.Type, " Constrained: ", isConstrained, " allowed positions: ", allowed))
 			return request, err
 		}
 		//fmt.Println("PLAATE: ", position)
