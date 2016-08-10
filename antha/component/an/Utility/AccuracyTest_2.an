@@ -265,7 +265,7 @@ Steps {
 	}
 	
 	// export overall DOE design file showing all well locations for all conditions
-	_ = doe.XLSXFileFromRuns(newruns,string(Filename),DXORJMP)
+	_ = doe.XLSXFileFromRuns(newruns,string(OutputFilename),DXORJMP)
 	
 	// add blanks after
 	

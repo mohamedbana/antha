@@ -210,7 +210,7 @@ func _AccuracyTestSteps(_ctx context.Context, _input *AccuracyTestInput, _output
 	}
 
 	// export overall DOE design file showing all well locations for all conditions
-	_ = doe.XLSXFileFromRuns(runs, string(Filename), _input.DXORJMP)
+	_ = doe.XLSXFileFromRuns(runs, string(_input.OutputFilename), _input.DXORJMP)
 
 	// add blanks after
 
