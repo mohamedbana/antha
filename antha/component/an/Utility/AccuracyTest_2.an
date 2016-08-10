@@ -24,7 +24,7 @@ Parameters (
 	UseLiquidPolicyForTestSolutions bool
 	LHPolicy string
 	DXORJMP string
-	Filename wtype.Filename
+	OutputFilename wtype.Filename
 	PipetteOnebyOne bool
 	UseLHPolicyDoeforDiluent bool
 
