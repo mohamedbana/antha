@@ -35,18 +35,19 @@ func _PreProcessImageSteps(_ctx context.Context, _input *PreProcessImageInput, _
 	chosencolourpalette := image.AvailablePalettes[_input.Palette]
 
 	if _input.CheckAllResizeAlgorithms {
-		image.CheckAllResizealgorithms(_input.Imagefilename, _input.OutPlate, _input.Rotate, imaging.AllResampleFilters)
+		image.CheckAllResizealgorithms(string(_input.Imagefilename), _input.OutPlate, _input.Rotate, imaging.AllResampleFilters)
 	}
-	_, _, newimagename := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
+	_, _, newimagename := image.ImagetoPlatelayout(string(_input.Imagefilename), _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
 
 	// if posterize rerun
 	if _input.PosterizeImage {
-		_, _input.Imagefilename = image.Posterize(newimagename, _input.PosterizeLevels)
+		_, tmpfn := image.Posterize(newimagename, _input.PosterizeLevels)
+		_input.Imagefilename = wtype.InputFilename(tmpfn)
 
-		_, _, newimagename = image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
+		_, _, newimagename = image.ImagetoPlatelayout(string(_input.Imagefilename), _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
 	}
 
-	_output.ProcessedImageFilename = newimagename
+	_output.ProcessedImageFilename = string(newimagename)
 
 }
 

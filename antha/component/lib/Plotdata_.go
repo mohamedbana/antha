@@ -44,7 +44,7 @@ func _PlotdataSteps(_ctx context.Context, _input *PlotdataInput, _output *Plotda
 
 	plot := graph.Plot(_input.Xvalues, _input.Yvaluearray)
 
-	graph.Export(plot, _input.Exportedfilename)
+	graph.Export(plot, string(_input.Exportedfilename))
 
 }
 

@@ -61,13 +61,14 @@ Steps {
 	
 	
 	if PosterizeImage{
-		_, Imagefilename = image.Posterize(Imagefilename, PosterizeLevels)
+		_, tmpfn:= image.Posterize(string(Imagefilename), PosterizeLevels)
+		Imagefilename=wtype.InputFilename(tmpfn)
 	}
 	
-	positiontocolourmap, _,_ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &Palette, Rotate,AutoRotate) 
+	positiontocolourmap, _,_ := image.ImagetoPlatelayout(string(Imagefilename), OutPlate, &Palette, Rotate,AutoRotate) 
 	
 	
-	image.CheckAllResizealgorithms(Imagefilename,OutPlate,Rotate,imaging.AllResampleFilters)
+	image.CheckAllResizealgorithms(string(Imagefilename),OutPlate,Rotate,imaging.AllResampleFilters)
 
 	
 	/*	

@@ -50,7 +50,7 @@ Steps {
 	
 	plot := graph.Plot(Xvalues, Yvaluearray)
 	
-	graph.Export(plot,Exportedfilename)
+	graph.Export(plot,string(Exportedfilename))
 	
 
 }

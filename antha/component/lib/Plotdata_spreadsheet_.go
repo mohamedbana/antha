@@ -46,7 +46,7 @@ func _Plotdata_spreadsheetSteps(_ctx context.Context, _input *Plotdata_spreadshe
 
 	// Get some data.
 
-	file, err := spreadsheet.OpenFile(_input.Filename)
+	file, err := spreadsheet.OpenFile(string(_input.Filename))
 
 	sheet := file.Sheets[_input.Sheet]
 
@@ -75,7 +75,7 @@ func _Plotdata_spreadsheetSteps(_ctx context.Context, _input *Plotdata_spreadshe
 
 	// the data points
 
-	graph.PlotfromMinMaxpairs(sheet, _input.Xminmax, _input.Yminmaxarray, _input.Exportedfilename)
+	graph.PlotfromMinMaxpairs(sheet, _input.Xminmax, _input.Yminmaxarray, string(_input.Exportedfilename))
 
 }
 

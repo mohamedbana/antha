@@ -47,14 +47,15 @@ func _MakePalette_OneByOneSteps(_ctx context.Context, _input *MakePalette_OneByO
 	//positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate)
 
 	if _input.PosterizeImage {
-		_, _input.Imagefilename = image.Posterize(_input.Imagefilename, _input.PosterizeLevels)
+		_, fn := image.Posterize(string(_input.Imagefilename), _input.PosterizeLevels)
+		_input.Imagefilename = wtype.InputFilename(fn)
 	}
 
 	// make palette of colours from image
-	chosencolourpalette := image.MakeSmallPalleteFromImage(_input.Imagefilename, _input.OutPlate, _input.Rotate)
+	chosencolourpalette := image.MakeSmallPalleteFromImage(string(_input.Imagefilename), _input.OutPlate, _input.Rotate)
 
 	// make a map of colour to well coordinates
-	positiontocolourmap, _, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
+	positiontocolourmap, _, _ := image.ImagetoPlatelayout(string(_input.Imagefilename), _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
 
 	// remove duplicates
 	positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)

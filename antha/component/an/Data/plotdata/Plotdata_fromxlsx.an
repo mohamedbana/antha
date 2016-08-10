@@ -52,7 +52,7 @@ Steps {
 
 	// Get some data.
 
-	file, err := spreadsheet.OpenFile(Filename)
+	file, err := spreadsheet.OpenFile(string(Filename))
 
 	sheet := file.Sheets[Sheet]
 	
@@ -82,7 +82,7 @@ Steps {
 	// the data points
 	
 	
-	graph.PlotfromMinMaxpairs(sheet, Xminmax, Yminmaxarray, Exportedfilename)
+	graph.PlotfromMinMaxpairs(sheet, Xminmax, Yminmaxarray, string(Exportedfilename))
 	
 
 }

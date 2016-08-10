@@ -65,9 +65,9 @@ Steps {
 	//positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate) 
 	
 	// make pallette of colours from image
-	chosencolourpalette := image.MakeSmallPalleteFromImage(Imagefilename, OutPlate,Rotate) 
+	chosencolourpalette := image.MakeSmallPalleteFromImage(string(Imagefilename), OutPlate,Rotate) 
 	
-	positiontocolourmap, _,_ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate, AutoRotate) 
+	positiontocolourmap, _,_ := image.ImagetoPlatelayout(string(Imagefilename), OutPlate, &chosencolourpalette, Rotate, AutoRotate) 
 	
 	// remove duplicates
 	positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)

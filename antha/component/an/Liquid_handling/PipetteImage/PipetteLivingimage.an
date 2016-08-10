@@ -81,7 +81,7 @@ Steps {
 	
 	// resize image to fit dimensions of plate and change each pixel to match closest colour from chosen palette
 	// the output of this is a map of well positions to colours needed
-	positiontocolourmap, _,_ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette,Rotate,AutoRotate) 
+	positiontocolourmap, _,_ := image.ImagetoPlatelayout(string(Imagefilename), OutPlate, &chosencolourpalette,Rotate,AutoRotate) 
 	
 	colourtostringmap := image.AvailableComponentmaps[Palettename]
 	
@@ -95,7 +95,7 @@ Steps {
 		uvmap = image.MakeSubMapfromMap(colourtostringmap, Subsetnames)
 		visiblemap = image.MakeSubMapfromMap(colourtostringmap, Subsetnames)
 		}
-		image.PrintFPImagePreview(Imagefilename,OutPlate, Rotate, visiblemap, uvmap)
+		image.PrintFPImagePreview(string(Imagefilename),OutPlate, Rotate, visiblemap, uvmap)
 	}
 
 	// get components from factory

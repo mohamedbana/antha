@@ -48,9 +48,9 @@ func _MakePaletteSteps(_ctx context.Context, _input *MakePaletteInput, _output *
 	//positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate)
 
 	// make pallette of colours from image
-	chosencolourpalette := image.MakeSmallPalleteFromImage(_input.Imagefilename, _input.OutPlate, _input.Rotate)
+	chosencolourpalette := image.MakeSmallPalleteFromImage(string(_input.Imagefilename), _input.OutPlate, _input.Rotate)
 
-	positiontocolourmap, _, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
+	positiontocolourmap, _, _ := image.ImagetoPlatelayout(string(_input.Imagefilename), _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
 
 	// remove duplicates
 	positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)

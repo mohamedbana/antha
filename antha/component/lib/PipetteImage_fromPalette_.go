@@ -41,12 +41,13 @@ func _PipetteImage_fromPaletteSetup(_ctx context.Context, _input *PipetteImage_f
 func _PipetteImage_fromPaletteSteps(_ctx context.Context, _input *PipetteImage_fromPaletteInput, _output *PipetteImage_fromPaletteOutput) {
 
 	if _input.PosterizeImage {
-		_, _input.Imagefilename = image.Posterize(_input.Imagefilename, _input.PosterizeLevels)
+		_, tmpfn := image.Posterize(string(_input.Imagefilename), _input.PosterizeLevels)
+		_input.Imagefilename = wtype.InputFilename(tmpfn)
 	}
 
-	positiontocolourmap, _, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &_input.Palette, _input.Rotate, _input.AutoRotate)
+	positiontocolourmap, _, _ := image.ImagetoPlatelayout(string(_input.Imagefilename), _input.OutPlate, &_input.Palette, _input.Rotate, _input.AutoRotate)
 
-	image.CheckAllResizealgorithms(_input.Imagefilename, _input.OutPlate, _input.Rotate, imaging.AllResampleFilters)
+	image.CheckAllResizealgorithms(string(_input.Imagefilename), _input.OutPlate, _input.Rotate, imaging.AllResampleFilters)
 
 	/*
 		// get components from factory

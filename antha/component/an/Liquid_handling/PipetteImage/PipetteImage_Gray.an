@@ -79,17 +79,18 @@ Steps {
 	chosencolourpalette := image.AvailablePalettes["Gray"]
 	
 	if CheckResizeAlgorithms {
-	image.CheckAllResizealgorithms(Imagefilename,OutPlate,Rotate,imaging.AllResampleFilters)
+	image.CheckAllResizealgorithms(string(Imagefilename),OutPlate,Rotate,imaging.AllResampleFilters)
 	}
 	
 	
-	positiontocolourmap, _, newimagename := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate,AutoRotate) 
+	positiontocolourmap, _, newimagename := image.ImagetoPlatelayout(string(Imagefilename), OutPlate, &chosencolourpalette, Rotate,AutoRotate) 
 	
 	// if posterize rerun 
 	if PosterizeImage{
-		_, Imagefilename = image.Posterize(newimagename, PosterizeLevels)
+		_, tmpfn:= image.Posterize(newimagename, PosterizeLevels)
 		
-		positiontocolourmap, _, _ = image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate,AutoRotate)
+		Imagefilename=wtype.InputFilename(tmpfn)
+		positiontocolourmap, _, _ = image.ImagetoPlatelayout(string(Imagefilename), OutPlate, &chosencolourpalette, Rotate,AutoRotate)
 	}
 	
 	

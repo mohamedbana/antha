@@ -64,17 +64,18 @@ Steps {
 	//chosencolourpalette := image.AvailablePalettes["Plan9"] 
 	
 	//positiontocolourmap, _ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate) 
-	
+
 	if PosterizeImage{
-		_, Imagefilename = image.Posterize(Imagefilename, PosterizeLevels)
+		_, fn:= image.Posterize(string(Imagefilename), PosterizeLevels)
+		Imagefilename = wtype.InputFilename(fn)
 	}
 	
 	
 	// make palette of colours from image
-	chosencolourpalette := image.MakeSmallPalleteFromImage(Imagefilename, OutPlate,Rotate) 
+	chosencolourpalette := image.MakeSmallPalleteFromImage(string(Imagefilename), OutPlate,Rotate) 
 	
 	// make a map of colour to well coordinates
-	positiontocolourmap, _,_ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate, AutoRotate) 
+	positiontocolourmap, _,_ := image.ImagetoPlatelayout(string(Imagefilename), OutPlate, &chosencolourpalette, Rotate, AutoRotate) 
 	
 	// remove duplicates
 	positiontocolourmap = image.RemoveDuplicatesValuesfromMap(positiontocolourmap)

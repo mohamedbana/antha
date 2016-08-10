@@ -49,11 +49,11 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 	}
 
 	if _input.CheckResizeAlgorithms {
-		image.CheckAllResizealgorithms(_input.Imagefilename, _input.OutPlate, _input.Rotate, imaging.AllResampleFilters)
+		image.CheckAllResizealgorithms(string(_input.Imagefilename), _input.OutPlate, _input.Rotate, imaging.AllResampleFilters)
 	}
 	// resize image to fit dimensions of plate and change each pixel to match closest colour from chosen palette
 	// the output of this is a map of well positions to colours needed
-	positiontocolourmap, _, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
+	positiontocolourmap, _, _ := image.ImagetoPlatelayout(string(_input.Imagefilename), _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
 
 	colourtostringmap := image.AvailableComponentmaps[_input.Palettename]
 
@@ -67,7 +67,7 @@ func _PipetteImageSteps(_ctx context.Context, _input *PipetteImageInput, _output
 			uvmap = image.MakeSubMapfromMap(colourtostringmap, _input.Subsetnames)
 			visiblemap = image.MakeSubMapfromMap(colourtostringmap, _input.Subsetnames)
 		}
-		image.PrintFPImagePreview(_input.Imagefilename, _input.OutPlate, _input.Rotate, visiblemap, uvmap)
+		image.PrintFPImagePreview(string(_input.Imagefilename), _input.OutPlate, _input.Rotate, visiblemap, uvmap)
 	}
 
 	// get components from factory

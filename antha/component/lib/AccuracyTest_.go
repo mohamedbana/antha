@@ -57,7 +57,7 @@ func _AccuracyTestSteps(_ctx context.Context, _input *AccuracyTestInput, _output
 
 	if _input.Printasimage {
 		chosencolourpalette := image.AvailablePalettes["Palette1"]
-		positiontocolourmap, _, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, rotate, autorotate)
+		positiontocolourmap, _, _ := image.ImagetoPlatelayout(string(_input.Imagefilename), _input.OutPlate, &chosencolourpalette, rotate, autorotate)
 
 		//Runtowelllocationmap = make([]string,0)
 
@@ -310,7 +310,7 @@ type AccuracyTestInput struct {
 	NumberofBlanks                  int
 	NumberofReplicates              int
 	OutPlate                        *wtype.LHPlate
-	OutputFilename                  string
+	OutputFilename                  wtype.OutputFilename
 	PipetteOnebyOne                 bool
 	Printasimage                    bool
 	TestSolVolumes                  []wunit.Volume

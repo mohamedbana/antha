@@ -83,7 +83,7 @@ Steps {
 	
 	if Printasimage {
 	chosencolourpalette := image.AvailablePalettes["Palette1"]
-	positiontocolourmap, _,_ := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, rotate,autorotate) 
+	positiontocolourmap, _,_ := image.ImagetoPlatelayout(string(Imagefilename), OutPlate, &chosencolourpalette, rotate,autorotate) 
 	
 	//Runtowelllocationmap = make([]string,0)
 	

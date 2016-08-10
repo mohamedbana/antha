@@ -56,7 +56,7 @@ func _AccuracyTest_2Steps(_ctx context.Context, _input *AccuracyTest_2Input, _ou
 
 	if _input.Printasimage {
 		chosencolourpalette := image.AvailablePalettes["Palette1"]
-		positiontocolourmap, _, _ := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, rotate, autorotate)
+		positiontocolourmap, _, _ := image.ImagetoPlatelayout(string(_input.Imagefilename), _input.OutPlate, &chosencolourpalette, rotate, autorotate)
 
 		//Runtowelllocationmap = make([]string,0)
 

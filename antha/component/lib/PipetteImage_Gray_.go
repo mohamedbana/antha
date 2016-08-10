@@ -54,16 +54,17 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 	chosencolourpalette := image.AvailablePalettes["Gray"]
 
 	if _input.CheckResizeAlgorithms {
-		image.CheckAllResizealgorithms(_input.Imagefilename, _input.OutPlate, _input.Rotate, imaging.AllResampleFilters)
+		image.CheckAllResizealgorithms(string(_input.Imagefilename), _input.OutPlate, _input.Rotate, imaging.AllResampleFilters)
 	}
 
-	positiontocolourmap, _, newimagename := image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
+	positiontocolourmap, _, newimagename := image.ImagetoPlatelayout(string(_input.Imagefilename), _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
 
 	// if posterize rerun
 	if _input.PosterizeImage {
-		_, _input.Imagefilename = image.Posterize(newimagename, _input.PosterizeLevels)
+		_, tmpfn := image.Posterize(newimagename, _input.PosterizeLevels)
 
-		positiontocolourmap, _, _ = image.ImagetoPlatelayout(_input.Imagefilename, _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
+		_input.Imagefilename = wtype.InputFilename(tmpfn)
+		positiontocolourmap, _, _ = image.ImagetoPlatelayout(string(_input.Imagefilename), _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
 	}
 
 	solutions := make([]*wtype.LHComponent, 0)

@@ -339,7 +339,7 @@ var ProteinPaintboxSubsetmap = map[color.Color]string{
 	color.RGBA{R: uint8(242), G: uint8(243), B: uint8(242), A: uint8(255)}: "verywhite",
 }
 
-func MakeGoimageNRGBA(imagefilename wtype.InputFilename) (nrgba *goimage.NRGBA) {
+func MakeGoimageNRGBA(imagefilename string) (nrgba *goimage.NRGBA) {
 	img, err := imaging.Open(string(imagefilename))
 	if err != nil {
 		panic(err)
@@ -349,7 +349,7 @@ func MakeGoimageNRGBA(imagefilename wtype.InputFilename) (nrgba *goimage.NRGBA) 
 	return
 }
 
-func Posterize(imagefilename wtype.InputFilename, levels int) (posterized *goimage.NRGBA, newfilename string) {
+func Posterize(imagefilename string, levels int) (posterized *goimage.NRGBA, newfilename string) {
 
 	var newcolor color.NRGBA
 	numberofAreas := 256 / (levels)
@@ -440,7 +440,7 @@ func Posterize(imagefilename wtype.InputFilename, levels int) (posterized *goima
 	return
 }
 
-func ResizeImagetoPlate(imagefilename wtype.InputFilename, plate *wtype.LHPlate, algorithm imaging.ResampleFilter, rotate bool) (plateimage *goimage.NRGBA) {
+func ResizeImagetoPlate(imagefilename string, plate *wtype.LHPlate, algorithm imaging.ResampleFilter, rotate bool) (plateimage *goimage.NRGBA) {
 
 	// input files (just 1 in this case)
 	files := []string{string(imagefilename)}
@@ -472,7 +472,7 @@ func ResizeImagetoPlate(imagefilename wtype.InputFilename, plate *wtype.LHPlate,
 
 }
 
-func ResizeImagetoPlateAutoRotate(imagefilename wtype.InputFilename, plate *wtype.LHPlate, algorithm imaging.ResampleFilter) (plateimage *goimage.NRGBA) {
+func ResizeImagetoPlateAutoRotate(imagefilename string, plate *wtype.LHPlate, algorithm imaging.ResampleFilter) (plateimage *goimage.NRGBA) {
 
 	// input files (just 1 in this case)
 	files := []string{string(imagefilename)}
@@ -505,7 +505,7 @@ func ResizeImagetoPlateAutoRotate(imagefilename wtype.InputFilename, plate *wtyp
 
 }
 
-func CheckAllResizealgorithms(imagefilename wtype.InputFilename, plate *wtype.LHPlate, rotate bool, algorithms map[string]imaging.ResampleFilter) {
+func CheckAllResizealgorithms(imagefilename string, plate *wtype.LHPlate, rotate bool, algorithms map[string]imaging.ResampleFilter) {
 	// input files (just 1 in this case)
 	files := []string{string(imagefilename)}
 	var dir string
@@ -557,7 +557,7 @@ func CheckAllResizealgorithms(imagefilename wtype.InputFilename, plate *wtype.LH
 	}
 }
 
-func MakePalleteFromImage(imagefilename wtype.InputFilename, plate *wtype.LHPlate, rotate bool) (newpallette color.Palette) {
+func MakePalleteFromImage(imagefilename string, plate *wtype.LHPlate, rotate bool) (newpallette color.Palette) {
 
 	plateimage := ResizeImagetoPlate(imagefilename, plate, imaging.CatmullRom, rotate)
 
@@ -578,7 +578,7 @@ func MakePalleteFromImage(imagefilename wtype.InputFilename, plate *wtype.LHPlat
 	return
 }
 
-func MakeSmallPalleteFromImage(imagefilename wtype.InputFilename, plate *wtype.LHPlate, rotate bool) (newpallette color.Palette) {
+func MakeSmallPalleteFromImage(imagefilename string, plate *wtype.LHPlate, rotate bool) (newpallette color.Palette) {
 
 	plateimage := ResizeImagetoPlate(imagefilename, plate, imaging.CatmullRom, rotate)
 	//image, _ := imaging.Open(imagefilename)
@@ -624,7 +624,7 @@ func MakeSmallPalleteFromImage(imagefilename wtype.InputFilename, plate *wtype.L
 // create a map of pixel to plate position from processing a given image with a chosen colour palette.
 // It's recommended to use at least 384 well plate
 // if autorotate == true, rotate is overridden
-func ImagetoPlatelayout(imagefilename wtype.InputFilename, plate *wtype.LHPlate, chosencolourpalette *color.Palette, rotate bool, autorotate bool) (wellpositiontocolourmap map[string]color.Color, numberofpixels int, newname string) {
+func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolourpalette *color.Palette, rotate bool, autorotate bool) (wellpositiontocolourmap map[string]color.Color, numberofpixels int, newname string) {
 
 	var plateimage *goimage.NRGBA
 
@@ -700,7 +700,7 @@ func ImagetoPlatelayout(imagefilename wtype.InputFilename, plate *wtype.LHPlate,
 	return
 }
 
-func PrintFPImagePreview(imagefile wtype.InputFilename, plate *wtype.LHPlate, rotate bool, visiblemap, uvmap map[color.Color]string) {
+func PrintFPImagePreview(imagefile string, plate *wtype.LHPlate, rotate bool, visiblemap, uvmap map[color.Color]string) {
 
 	plateimage := ResizeImagetoPlate(imagefile, plate, imaging.CatmullRom, rotate)
 

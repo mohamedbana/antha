@@ -54,18 +54,19 @@ Steps {
 	chosencolourpalette := image.AvailablePalettes[Palette]
 	
 	if CheckAllResizeAlgorithms {
-			image.CheckAllResizealgorithms(Imagefilename,OutPlate,Rotate,imaging.AllResampleFilters)
+			image.CheckAllResizealgorithms(string(Imagefilename),OutPlate,Rotate,imaging.AllResampleFilters)
 	}
-	_, _, newimagename := image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate,AutoRotate) 
+	_, _, newimagename := image.ImagetoPlatelayout(string(Imagefilename), OutPlate, &chosencolourpalette, Rotate,AutoRotate) 
 	
 	// if posterize rerun 
 	if PosterizeImage{
-		_, Imagefilename = image.Posterize(newimagename, PosterizeLevels)
+		_, tmpfn:= image.Posterize(newimagename, PosterizeLevels)
+		Imagefilename=wtype.InputFilename(tmpfn)
 		
-		_, _, newimagename = image.ImagetoPlatelayout(Imagefilename, OutPlate, &chosencolourpalette, Rotate,AutoRotate)
+		_, _, newimagename = image.ImagetoPlatelayout(string(Imagefilename), OutPlate, &chosencolourpalette, Rotate,AutoRotate)
 	}
 	
-	ProcessedImageFilename = newimagename
+	ProcessedImageFilename = string(newimagename)
 	
 
 }
