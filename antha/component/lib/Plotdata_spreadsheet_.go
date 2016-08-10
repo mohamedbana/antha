@@ -6,6 +6,7 @@ import (
 	//"github.com/montanaflynn/stats"
 	graph "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/plot"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/spreadsheet"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
@@ -137,8 +138,8 @@ type Plotdata_spreadsheetElement struct {
 }
 
 type Plotdata_spreadsheetInput struct {
-	Exportedfilename string
-	Filename         string
+	Exportedfilename wtype.OutputFilename
+	Filename         wtype.InputFilename
 	Sheet            int
 	Xminmax          []string
 	Yminmaxarray     [][]string

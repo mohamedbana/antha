@@ -17,7 +17,7 @@ import (
 // Input parameters for this protocol (data)
 Parameters (
 	VolumePerWell  Volume
-	Imagefilename string
+	Imagefilename wtype.InputFilename
 	Palette color.Palette
 	ColourIndextoComponentMap map[string]*wtype.LHComponent
 	//AvailableColours []string

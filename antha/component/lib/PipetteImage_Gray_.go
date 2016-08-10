@@ -241,7 +241,7 @@ type PipetteImage_GrayInput struct {
 	CheckResizeAlgorithms           bool
 	Diluent                         *wtype.LHComponent
 	DontMix                         bool
-	Imagefilename                   string
+	Imagefilename                   wtype.InputFilename
 	MaxBlackPercentagethreshold     float64
 	MinimumBlackpercentagethreshold float64
 	MixingLiquidClass               string

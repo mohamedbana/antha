@@ -17,13 +17,13 @@ Parameters (
 	TestSolVolumes []Volume
 	NumberofReplicates int
 	Printasimage bool
-	Imagefilename string
+	Imagefilename wtype.InputFilename
 
 	NumberofBlanks int
 	UseLiquidPolicyForTestSolutions bool
 	LHPolicy string
 	DXORJMP string
-	OutputFilename string
+	OutputFilename wtype.OutputFilename
 	PipetteOnebyOne bool
 	UseLHPolicyDoeforDiluent bool
 

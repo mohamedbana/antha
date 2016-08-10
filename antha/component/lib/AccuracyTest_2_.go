@@ -327,12 +327,12 @@ type AccuracyTest_2Element struct {
 type AccuracyTest_2Input struct {
 	DXORJMP                         string
 	Diluent                         *wtype.LHComponent
-	Imagefilename                   string
+	Imagefilename                   wtype.InputFilename
 	LHPolicy                        string
 	NumberofBlanks                  int
 	NumberofReplicates              int
 	OutPlate                        *wtype.LHPlate
-	OutputFilename                  string
+	OutputFilename                  wtype.OutputFilename
 	PipetteOnebyOne                 bool
 	Printasimage                    bool
 	TestSolVolumes                  []wunit.Volume

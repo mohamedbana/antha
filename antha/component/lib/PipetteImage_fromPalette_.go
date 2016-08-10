@@ -171,7 +171,7 @@ type PipetteImage_fromPaletteInput struct {
 	AutoRotate                bool
 	ColourIndextoComponentMap map[string]*wtype.LHComponent
 	Colourcomponents          []*wtype.LHComponent
-	Imagefilename             string
+	Imagefilename             wtype.InputFilename
 	NotthisColour             string
 	OnlythisColour            string
 	OutPlate                  *wtype.LHPlate

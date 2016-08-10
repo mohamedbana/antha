@@ -2,6 +2,7 @@ package lib
 
 import (
 	graph "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/plot"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
@@ -106,7 +107,7 @@ type PlotdataElement struct {
 }
 
 type PlotdataInput struct {
-	Exportedfilename string
+	Exportedfilename wtype.OutputFilename
 	Xvalues          []float64
 	Yvaluearray      [][]float64
 }

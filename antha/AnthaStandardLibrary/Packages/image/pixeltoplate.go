@@ -339,8 +339,8 @@ var ProteinPaintboxSubsetmap = map[color.Color]string{
 	color.RGBA{R: uint8(242), G: uint8(243), B: uint8(242), A: uint8(255)}: "verywhite",
 }
 
-func MakeGoimageNRGBA(imagefilename string) (nrgba *goimage.NRGBA) {
-	img, err := imaging.Open(imagefilename)
+func MakeGoimageNRGBA(imagefilename wtype.InputFilename) (nrgba *goimage.NRGBA) {
+	img, err := imaging.Open(string(imagefilename))
 	if err != nil {
 		panic(err)
 	}
@@ -349,13 +349,13 @@ func MakeGoimageNRGBA(imagefilename string) (nrgba *goimage.NRGBA) {
 	return
 }
 
-func Posterize(imagefilename string, levels int) (posterized *goimage.NRGBA, newfilename string) {
+func Posterize(imagefilename wtype.InputFilename, levels int) (posterized *goimage.NRGBA, newfilename string) {
 
 	var newcolor color.NRGBA
 	numberofAreas := 256 / (levels)
 	numberofValues := 255 / (levels - 1)
 
-	img, err := imaging.Open(imagefilename)
+	img, err := imaging.Open(string(imagefilename))
 	if err != nil {
 		panic(err)
 	}
@@ -431,7 +431,7 @@ func Posterize(imagefilename string, levels int) (posterized *goimage.NRGBA, new
 	}
 
 	// rename file
-	splitfilename := strings.Split(imagefilename, `.`)
+	splitfilename := strings.Split(string(imagefilename), `.`)
 
 	newfilename = filepath.Join(fmt.Sprint(splitfilename[0], "_posterized", `.`, splitfilename[1]))
 	// save
@@ -440,10 +440,10 @@ func Posterize(imagefilename string, levels int) (posterized *goimage.NRGBA, new
 	return
 }
 
-func ResizeImagetoPlate(imagefilename string, plate *wtype.LHPlate, algorithm imaging.ResampleFilter, rotate bool) (plateimage *goimage.NRGBA) {
+func ResizeImagetoPlate(imagefilename wtype.InputFilename, plate *wtype.LHPlate, algorithm imaging.ResampleFilter, rotate bool) (plateimage *goimage.NRGBA) {
 
 	// input files (just 1 in this case)
-	files := []string{imagefilename}
+	files := []string{string(imagefilename)}
 
 	// Colour palette to use // this would relate to a map of components of these available colours in factory
 	//availablecolours := chosencolourpalette //palette.WebSafe
@@ -472,10 +472,10 @@ func ResizeImagetoPlate(imagefilename string, plate *wtype.LHPlate, algorithm im
 
 }
 
-func ResizeImagetoPlateAutoRotate(imagefilename string, plate *wtype.LHPlate, algorithm imaging.ResampleFilter) (plateimage *goimage.NRGBA) {
+func ResizeImagetoPlateAutoRotate(imagefilename wtype.InputFilename, plate *wtype.LHPlate, algorithm imaging.ResampleFilter) (plateimage *goimage.NRGBA) {
 
 	// input files (just 1 in this case)
-	files := []string{imagefilename}
+	files := []string{string(imagefilename)}
 
 	// Colour palette to use // this would relate to a map of components of these available colours in factory
 	//availablecolours := chosencolourpalette //palette.WebSafe
@@ -505,9 +505,9 @@ func ResizeImagetoPlateAutoRotate(imagefilename string, plate *wtype.LHPlate, al
 
 }
 
-func CheckAllResizealgorithms(imagefilename string, plate *wtype.LHPlate, rotate bool, algorithms map[string]imaging.ResampleFilter) {
+func CheckAllResizealgorithms(imagefilename wtype.InputFilename, plate *wtype.LHPlate, rotate bool, algorithms map[string]imaging.ResampleFilter) {
 	// input files (just 1 in this case)
-	files := []string{imagefilename}
+	files := []string{string(imagefilename)}
 	var dir string
 
 	var plateimage *goimage.NRGBA
@@ -539,7 +539,7 @@ func CheckAllResizealgorithms(imagefilename string, plate *wtype.LHPlate, rotate
 		}
 
 		// rename file
-		splitfilename := strings.Split(imagefilename, `.`)
+		splitfilename := strings.Split(string(imagefilename), `.`)
 
 		dir = splitfilename[0]
 
@@ -557,7 +557,7 @@ func CheckAllResizealgorithms(imagefilename string, plate *wtype.LHPlate, rotate
 	}
 }
 
-func MakePalleteFromImage(imagefilename string, plate *wtype.LHPlate, rotate bool) (newpallette color.Palette) {
+func MakePalleteFromImage(imagefilename wtype.InputFilename, plate *wtype.LHPlate, rotate bool) (newpallette color.Palette) {
 
 	plateimage := ResizeImagetoPlate(imagefilename, plate, imaging.CatmullRom, rotate)
 
@@ -578,7 +578,7 @@ func MakePalleteFromImage(imagefilename string, plate *wtype.LHPlate, rotate boo
 	return
 }
 
-func MakeSmallPalleteFromImage(imagefilename string, plate *wtype.LHPlate, rotate bool) (newpallette color.Palette) {
+func MakeSmallPalleteFromImage(imagefilename wtype.InputFilename, plate *wtype.LHPlate, rotate bool) (newpallette color.Palette) {
 
 	plateimage := ResizeImagetoPlate(imagefilename, plate, imaging.CatmullRom, rotate)
 	//image, _ := imaging.Open(imagefilename)
@@ -624,7 +624,7 @@ func MakeSmallPalleteFromImage(imagefilename string, plate *wtype.LHPlate, rotat
 // create a map of pixel to plate position from processing a given image with a chosen colour palette.
 // It's recommended to use at least 384 well plate
 // if autorotate == true, rotate is overridden
-func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolourpalette *color.Palette, rotate bool, autorotate bool) (wellpositiontocolourmap map[string]color.Color, numberofpixels int, newname string) {
+func ImagetoPlatelayout(imagefilename wtype.InputFilename, plate *wtype.LHPlate, chosencolourpalette *color.Palette, rotate bool, autorotate bool) (wellpositiontocolourmap map[string]color.Color, numberofpixels int, newname string) {
 
 	var plateimage *goimage.NRGBA
 
@@ -670,7 +670,7 @@ func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolour
 	}
 
 	// rename file
-	splitfilename := strings.Split(imagefilename, `.`)
+	splitfilename := strings.Split(string(imagefilename), `.`)
 
 	newname = splitfilename[0] + "_plateformat" + `.` + splitfilename[1]
 	// save
@@ -700,7 +700,7 @@ func ImagetoPlatelayout(imagefilename string, plate *wtype.LHPlate, chosencolour
 	return
 }
 
-func PrintFPImagePreview(imagefile string, plate *wtype.LHPlate, rotate bool, visiblemap, uvmap map[color.Color]string) {
+func PrintFPImagePreview(imagefile wtype.InputFilename, plate *wtype.LHPlate, rotate bool, visiblemap, uvmap map[color.Color]string) {
 
 	plateimage := ResizeImagetoPlate(imagefile, plate, imaging.CatmullRom, rotate)
 
@@ -721,7 +721,7 @@ func PrintFPImagePreview(imagefile string, plate *wtype.LHPlate, rotate bool, vi
 	}
 
 	// rename file
-	splitfilename := strings.Split(imagefile, `.`)
+	splitfilename := strings.Split(string(imagefile), `.`)
 
 	newname := splitfilename[0] + "_plateformat_UV" + `.` + splitfilename[1]
 	// save
@@ -763,7 +763,7 @@ func PrintFPImagePreview(imagefile string, plate *wtype.LHPlate, rotate bool, vi
 	}
 
 	// rename file
-	splitfilename = strings.Split(imagefile, `.`)
+	splitfilename = strings.Split(string(imagefile), `.`)
 
 	newname = splitfilename[0] + "_plateformat_vis" + `.` + splitfilename[1]
 	// save

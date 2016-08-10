@@ -2,7 +2,7 @@ protocol Plotdata
 
 	
 import (
-
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	graph "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/plot"
 )
 
@@ -10,7 +10,7 @@ import (
 Parameters  (                                      
 	Xvalues/*datarange*/ []float64                                                             
 	Yvaluearray/*datarange*/ [][]float64 
-	Exportedfilename string 
+	Exportedfilename wtype.OutputFilename
 //	HeaderRange []string 
 )
 

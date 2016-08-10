@@ -305,7 +305,7 @@ type AccuracyTestElement struct {
 type AccuracyTestInput struct {
 	DXORJMP                         string
 	Diluent                         *wtype.LHComponent
-	Imagefilename                   string
+	Imagefilename                   wtype.InputFilename
 	LHPolicy                        string
 	NumberofBlanks                  int
 	NumberofReplicates              int

@@ -111,7 +111,7 @@ type PreProcessImageElement struct {
 type PreProcessImageInput struct {
 	AutoRotate               bool
 	CheckAllResizeAlgorithms bool
-	Imagefilename            string
+	Imagefilename            wtype.InputFilename
 	Negative                 bool
 	OutPlate                 *wtype.LHPlate
 	Palette                  string

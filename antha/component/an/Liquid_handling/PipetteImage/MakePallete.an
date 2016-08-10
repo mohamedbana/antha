@@ -15,7 +15,7 @@ import (
 // Input parameters for this protocol (data)
 Parameters (
 	VolumeForFullcolour  Volume
-	Imagefilename string
+	Imagefilename wtype.InputFilename
 	Rotate bool
 	AutoRotate bool
 )

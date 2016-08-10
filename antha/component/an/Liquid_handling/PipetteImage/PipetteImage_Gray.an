@@ -14,7 +14,7 @@ import (
 // Input parameters for this protocol (data)
 Parameters (
 	VolumeForFullcolour  Volume
-	Imagefilename string
+	Imagefilename wtype.InputFilename
 	MinimumBlackpercentagethreshold float64 // as a proportion of 1 i.e. 0.5 == 50%. Below this it will be considered white
 	MaxBlackPercentagethreshold float64 // above this value pure black will be dispensed
 	OnlyHighVolumetips bool

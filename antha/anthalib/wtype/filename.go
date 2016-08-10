@@ -1,3 +1,4 @@
 package wtype
 
-type Filename string
+type InputFilename string
+type OutputFilename string

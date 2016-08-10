@@ -10,7 +10,7 @@ import (
 // Input parameters for this protocol (data)
 Parameters (
 	
-	Imagefilename string
+	Imagefilename wtype.InputFilename
 	Negative bool
 	Rotate bool
 	AutoRotate bool

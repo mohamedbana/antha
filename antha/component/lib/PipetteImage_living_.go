@@ -243,7 +243,7 @@ type PipetteImage_livingElement struct {
 
 type PipetteImage_livingInput struct {
 	AutoRotate     bool
-	Imagefilename  string
+	Imagefilename  wtype.InputFilename
 	Notthiscolour  string
 	OnlythisColour string
 	OutPlate       *wtype.LHPlate
