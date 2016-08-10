@@ -70,6 +70,8 @@ var AvailablePolicyfiles []PolicyFile = []PolicyFile{
 	MakePolicyFile("newdesign2factorsonly.xlsx", "JMP", &[]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}, 2000),
 	MakePolicyFile("190516OnePolicy.xlsx", "JMP", &[]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}, 3000),
 	MakePolicyFile("AssemblycategoricScreen.xlsx", "JMP", &[]int{1, 2, 3, 4, 5}, 4000),
+	MakePolicyFile("090816dispenseerrordiagnosis.xlsx", "JMP", &[]int{2}, 5000),
+	MakePolicyFile("090816combineddesign.xlsx", "JMP", &[]int{1}, 6000),
 }
 
 // change to range through several files
@@ -863,15 +865,17 @@ func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
 
 	*/
 
-	// remove blowout from gilson
-	rule = NewLHPolicyRule("NoBlowoutForGilson")
-	rule.AddCategoryConditionOn("PLATFORM", "GilsonPipetmax")
+	// this is commented out to diagnose the dispense error
+	/*
+			// remove blowout from gilson
+			rule = NewLHPolicyRule("NoBlowoutForGilson")
+			rule.AddCategoryConditionOn("PLATFORM", "GilsonPipetmax")
 
-	policy := make(LHPolicy, 6)
-	policy["RESET_OVERRIDE"] = true
+			policy := make(LHPolicy, 6)
+			policy["RESET_OVERRIDE"] = true
 
-	lhpr.AddRule(rule, policy)
-
+		lhpr.AddRule(rule, policy)
+	*/
 	return lhpr, nil
 
 }
