@@ -23,6 +23,14 @@
 // defines types for dealing with liquid handling requests
 package wtype
 
+type Named interface {
+	GetName() string
+}
+
+type Typed interface {
+	GetType() string
+}
+
 //An LHObject that can hold other LHObjects
 type LHSlot interface {
 	//GetChild get the contained object, nil if none
