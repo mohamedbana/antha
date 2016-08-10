@@ -48,7 +48,7 @@ func _MakePalette_OneByOneSteps(_ctx context.Context, _input *MakePalette_OneByO
 
 	if _input.PosterizeImage {
 		_, fn := image.Posterize(string(_input.Imagefilename), _input.PosterizeLevels)
-		_input.Imagefilename = wtype.InputFilename(fn)
+		_input.Imagefilename = wtype.Filename(fn)
 	}
 
 	// make palette of colours from image
@@ -218,7 +218,7 @@ type MakePalette_OneByOneInput struct {
 	AutoRotate          bool
 	Black               *wtype.LHComponent
 	Cyan                *wtype.LHComponent
-	Imagefilename       wtype.InputFilename
+	Imagefilename       wtype.Filename
 	Magenta             *wtype.LHComponent
 	OutPlate            *wtype.LHPlate
 	PalettePlate        *wtype.LHPlate

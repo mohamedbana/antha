@@ -138,8 +138,8 @@ type Plotdata_spreadsheetElement struct {
 }
 
 type Plotdata_spreadsheetInput struct {
-	Exportedfilename wtype.OutputFilename
-	Filename         wtype.InputFilename
+	Exportedfilename wtype.Filename
+	Filename         wtype.Filename
 	Sheet            int
 	Xminmax          []string
 	Yminmaxarray     [][]string

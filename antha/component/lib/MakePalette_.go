@@ -254,7 +254,7 @@ type MakePaletteInput struct {
 	AutoRotate          bool
 	Black               *wtype.LHComponent
 	Cyan                *wtype.LHComponent
-	Imagefilename       wtype.InputFilename
+	Imagefilename       wtype.Filename
 	Magenta             *wtype.LHComponent
 	OutPlate            *wtype.LHPlate
 	PalettePlate        *wtype.LHPlate

@@ -20,7 +20,7 @@ Parameters (
 	/*AntibioticVolume Volume
 	InducerVolume Volume
 	RepressorVolume Volume*/
-	Imagefilename wtype.InputFilename
+	Imagefilename wtype.Filename
 	Palettename string
 	OnlythisColour string
 	Notthiscolour string

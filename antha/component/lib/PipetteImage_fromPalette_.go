@@ -42,7 +42,7 @@ func _PipetteImage_fromPaletteSteps(_ctx context.Context, _input *PipetteImage_f
 
 	if _input.PosterizeImage {
 		_, tmpfn := image.Posterize(string(_input.Imagefilename), _input.PosterizeLevels)
-		_input.Imagefilename = wtype.InputFilename(tmpfn)
+		_input.Imagefilename = wtype.Filename(tmpfn)
 	}
 
 	positiontocolourmap, _, _ := image.ImagetoPlatelayout(string(_input.Imagefilename), _input.OutPlate, &_input.Palette, _input.Rotate, _input.AutoRotate)
@@ -172,7 +172,7 @@ type PipetteImage_fromPaletteInput struct {
 	AutoRotate                bool
 	ColourIndextoComponentMap map[string]*wtype.LHComponent
 	Colourcomponents          []*wtype.LHComponent
-	Imagefilename             wtype.InputFilename
+	Imagefilename             wtype.Filename
 	NotthisColour             string
 	OnlythisColour            string
 	OutPlate                  *wtype.LHPlate

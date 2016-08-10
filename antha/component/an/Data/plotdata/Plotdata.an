@@ -10,7 +10,7 @@ import (
 Parameters  (                                      
 	Xvalues/*datarange*/ []float64                                                             
 	Yvaluearray/*datarange*/ [][]float64 
-	Exportedfilename wtype.OutputFilename
+	Exportedfilename wtype.Filename
 //	HeaderRange []string 
 )
 

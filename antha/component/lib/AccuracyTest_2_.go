@@ -232,7 +232,7 @@ func _AccuracyTest_2Steps(_ctx context.Context, _input *AccuracyTest_2Input, _ou
 	}
 
 	// export overall DOE design file showing all well locations for all conditions
-	_ = doe.XLSXFileFromRuns(newruns, _input.OutputFilename, _input.DXORJMP)
+	_ = doe.XLSXFileFromRuns(newruns, string(_input.Filename), _input.DXORJMP)
 
 	// add blanks after
 
@@ -327,12 +327,12 @@ type AccuracyTest_2Element struct {
 type AccuracyTest_2Input struct {
 	DXORJMP                         string
 	Diluent                         *wtype.LHComponent
-	Imagefilename                   wtype.InputFilename
+	Filename                        wtype.Filename
+	Imagefilename                   wtype.Filename
 	LHPolicy                        string
 	NumberofBlanks                  int
 	NumberofReplicates              int
 	OutPlate                        *wtype.LHPlate
-	OutputFilename                  wtype.OutputFilename
 	PipetteOnebyOne                 bool
 	Printasimage                    bool
 	TestSolVolumes                  []wunit.Volume
@@ -377,12 +377,12 @@ func init() {
 			Params: []component.ParamDesc{
 				{Name: "DXORJMP", Desc: "", Kind: "Parameters"},
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
+				{Name: "Filename", Desc: "", Kind: "Parameters"},
 				{Name: "Imagefilename", Desc: "", Kind: "Parameters"},
 				{Name: "LHPolicy", Desc: "", Kind: "Parameters"},
 				{Name: "NumberofBlanks", Desc: "", Kind: "Parameters"},
 				{Name: "NumberofReplicates", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlate", Desc: "", Kind: "Inputs"},
-				{Name: "OutputFilename", Desc: "", Kind: "Parameters"},
 				{Name: "PipetteOnebyOne", Desc: "", Kind: "Parameters"},
 				{Name: "Printasimage", Desc: "", Kind: "Parameters"},
 				{Name: "TestSolVolumes", Desc: "", Kind: "Parameters"},

@@ -207,7 +207,7 @@ type PipetteImageElement struct {
 type PipetteImageInput struct {
 	AutoRotate            bool
 	CheckResizeAlgorithms bool
-	Imagefilename         wtype.InputFilename
+	Imagefilename         wtype.Filename
 	Notthiscolour         string
 	OnlythisColour        string
 	OutPlate              *wtype.LHPlate

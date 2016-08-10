@@ -42,7 +42,7 @@ func _PreProcessImageSteps(_ctx context.Context, _input *PreProcessImageInput, _
 	// if posterize rerun
 	if _input.PosterizeImage {
 		_, tmpfn := image.Posterize(newimagename, _input.PosterizeLevels)
-		_input.Imagefilename = wtype.InputFilename(tmpfn)
+		_input.Imagefilename = wtype.Filename(tmpfn)
 
 		_, _, newimagename = image.ImagetoPlatelayout(string(_input.Imagefilename), _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
 	}
@@ -112,7 +112,7 @@ type PreProcessImageElement struct {
 type PreProcessImageInput struct {
 	AutoRotate               bool
 	CheckAllResizeAlgorithms bool
-	Imagefilename            wtype.InputFilename
+	Imagefilename            wtype.Filename
 	Negative                 bool
 	OutPlate                 *wtype.LHPlate
 	Palette                  string

@@ -19,12 +19,12 @@ Parameters (
 	TestSolVolumes []Volume
 	NumberofReplicates int
 	Printasimage bool
-	Imagefilename wtype.InputFilename
+	Imagefilename wtype.Filename
 	NumberofBlanks int
 	UseLiquidPolicyForTestSolutions bool
 	LHPolicy string
 	DXORJMP string
-	OutputFilename wtype.OutputFilename
+	Filename wtype.Filename
 	PipetteOnebyOne bool
 	UseLHPolicyDoeforDiluent bool
 
@@ -265,7 +265,7 @@ Steps {
 	}
 	
 	// export overall DOE design file showing all well locations for all conditions
-	_ = doe.XLSXFileFromRuns(newruns,OutputFilename,DXORJMP)
+	_ = doe.XLSXFileFromRuns(newruns,string(Filename),DXORJMP)
 	
 	// add blanks after
 	

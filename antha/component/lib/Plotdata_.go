@@ -107,7 +107,7 @@ type PlotdataElement struct {
 }
 
 type PlotdataInput struct {
-	Exportedfilename wtype.OutputFilename
+	Exportedfilename wtype.Filename
 	Xvalues          []float64
 	Yvaluearray      [][]float64
 }

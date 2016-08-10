@@ -221,7 +221,7 @@ type PipetteImage_CMYKInput struct {
 	AutoRotate          bool
 	Black               *wtype.LHComponent
 	Cyan                *wtype.LHComponent
-	Imagefilename       wtype.InputFilename
+	Imagefilename       wtype.Filename
 	Magenta             *wtype.LHComponent
 	OutPlate            *wtype.LHPlate
 	Rotate              bool

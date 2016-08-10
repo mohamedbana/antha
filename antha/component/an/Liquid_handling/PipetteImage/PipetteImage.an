@@ -17,7 +17,7 @@ import (
 // Input parameters for this protocol (data)
 Parameters (
 	VolumePerWell  Volume
-	Imagefilename wtype.InputFilename
+	Imagefilename wtype.Filename
 	Palettename string
 	OnlythisColour string
 	Notthiscolour string

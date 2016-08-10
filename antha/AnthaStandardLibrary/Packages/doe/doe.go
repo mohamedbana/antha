@@ -651,7 +651,7 @@ func RunsFromDXDesign(xlsx string, intfactors []string) (runs []Run, err error) 
 	return
 }
 
-func DXXLSXFilefromRuns(runs []Run, outputfilename wtype.OutputFilename) (xlsxfile *xlsx.File) {
+func DXXLSXFilefromRuns(runs []Run, outputfilename string) (xlsxfile *xlsx.File) {
 
 	// if output is a struct look for a sensible field to print
 
@@ -909,7 +909,7 @@ func RunsFromJMPDesign(xlsx string, factorcolumns []int, responsecolumns []int, 
 	return
 }
 
-func JMPXLSXFilefromRuns(runs []Run, outputfilename wtype.OutputFilename) (xlsxfile *xlsx.File) {
+func JMPXLSXFilefromRuns(runs []Run, outputfilename string) (xlsxfile *xlsx.File) {
 
 	// if output is a struct look for a sensible field to print
 
@@ -980,7 +980,7 @@ func JMPXLSXFilefromRuns(runs []Run, outputfilename wtype.OutputFilename) (xlsxf
 	return
 }
 
-func XLSXFileFromRuns(runs []Run, outputfilename wtype.OutputFilename, dxorjmp string) (xlsxfile *xlsx.File) {
+func XLSXFileFromRuns(runs []Run, outputfilename string, dxorjmp string) (xlsxfile *xlsx.File) {
 	if dxorjmp == "DX" {
 		xlsxfile = DXXLSXFilefromRuns(runs, outputfilename)
 	}

@@ -63,7 +63,7 @@ func _PipetteImage_GraySteps(_ctx context.Context, _input *PipetteImage_GrayInpu
 	if _input.PosterizeImage {
 		_, tmpfn := image.Posterize(newimagename, _input.PosterizeLevels)
 
-		_input.Imagefilename = wtype.InputFilename(tmpfn)
+		_input.Imagefilename = wtype.Filename(tmpfn)
 		positiontocolourmap, _, _ = image.ImagetoPlatelayout(string(_input.Imagefilename), _input.OutPlate, &chosencolourpalette, _input.Rotate, _input.AutoRotate)
 	}
 
@@ -242,7 +242,7 @@ type PipetteImage_GrayInput struct {
 	CheckResizeAlgorithms           bool
 	Diluent                         *wtype.LHComponent
 	DontMix                         bool
-	Imagefilename                   wtype.InputFilename
+	Imagefilename                   wtype.Filename
 	MaxBlackPercentagethreshold     float64
 	MinimumBlackpercentagethreshold float64
 	MixingLiquidClass               string

@@ -12,11 +12,11 @@ import (
 
 // Input parameters for this protocol (data)
 Parameters  (
-	Filename             wtype.InputFilename  //                                                                         = "plotinumdata.xlsx"
+	Filename             wtype.Filename  //                                                                         = "plotinumdata.xlsx"
 	Sheet                int       //                                                                        = 0
 	Xminmax/*datarange*/ []string      //  = []string{"a4", "a16"}                                                           // row in A1 format i.e string{A,E} would indicate all data between those points
 	Yminmaxarray/*datarange*/ [][]string //= [][]string{[]string{"b4", "b16"}, []string{"c4", "c16"}, []string{"d4", "d16"}} // column in A1 format i.e string{1,12} would indicate all data between those points
-	Exportedfilename wtype.OutputFilename //= "Excelfile.jpg"
+	Exportedfilename wtype.Filename //= "Excelfile.jpg"
 //	HeaderRange []string // if Bycolumn == true, format would be e.g. string{A1,E1} else e.g. string{A1,A12}
 )
 
