@@ -72,13 +72,30 @@ func (run Run) AddResponseValue(responsedescriptor string, responsevalue interfa
 
 }
 
-func (run Run) GetResponseValue(responsedescriptor string) (responsevalue interface{}) {
+func (run Run) GetResponseValue(responsedescriptor string) (responsevalue interface{}, err error) {
 
+	var tempresponsevalue interface{}
+
+	errstr := fmt.Sprint("response descriptor", responsedescriptor, "not found in ", run)
+	err = fmt.Errorf(errstr)
 	for i, descriptor := range run.Responsedescriptors {
-		if strings.ToUpper(descriptor) == strings.ToUpper(responsedescriptor) {
+		if strings.TrimSpace(strings.ToUpper(descriptor)) == strings.TrimSpace(strings.ToUpper(responsedescriptor)) {
 			responsevalue = run.ResponseValues[i]
+			return responsevalue, nil
+		} else if strings.Contains(strings.TrimSpace(strings.ToUpper(descriptor)), strings.TrimSpace(strings.ToUpper(responsedescriptor))) {
+			errstr := fmt.Sprint("response descriptor", responsedescriptor, "found within ", run, "but no exact match")
+			err = fmt.Errorf(errstr)
+			tempresponsevalue = run.ResponseValues[i]
+			return tempresponsevalue, err
+		} else if strings.Contains(strings.TrimSpace(strings.ToUpper(responsedescriptor)), strings.TrimSpace(strings.ToUpper(descriptor))) {
+			errstr := fmt.Sprint("response descriptor of ", run, "found within ", responsedescriptor, "but no exact match")
+			err = fmt.Errorf(errstr)
+			tempresponsevalue = run.ResponseValues[i]
+			return tempresponsevalue, err
 		}
 	}
+
+	responsevalue = tempresponsevalue
 	return
 }
 

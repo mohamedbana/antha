@@ -303,6 +303,8 @@ func _AddPlateReaderresults_2Steps(_ctx context.Context, _input *AddPlateReaderr
 // post process any data and provide downstream results
 func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateReaderresults_2Input, _output *AddPlateReaderresults_2Output) {
 
+	_output.Errors = make([]error, 0)
+
 	xvalues := make([]float64, 0)
 	yvalues := make([]float64, 0)
 
@@ -312,22 +314,43 @@ func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateRead
 
 	fmt.Println("in analysis")
 
+	if len(_output.Runs) == 0 {
+		execute.Errorf(_ctx, "no runs")
+	}
 	// now calculate mean, CV, r2 and plot results
-	for _, runwithresponses := range _output.Runs {
+	for i, runwithresponses := range _output.Runs {
 		// values for r2 to reset each run
 
 		// get response value and check if it's a float64 type
-		expectedconcfloat, floattrue := runwithresponses.GetResponseValue(" ExpectedConc " + strconv.Itoa(_input.Wavelength)).(float64)
+		expectedconc, err := runwithresponses.GetResponseValue(" ExpectedConc " + strconv.Itoa(_input.Wavelength))
 
+		if err != nil {
+			_output.Errors = append(_output.Errors, err)
+		}
+
+		expectedconcfloat, floattrue := expectedconc.(float64)
 		// if float64 is true
 		if floattrue {
 			xvalues = append(xvalues, expectedconcfloat)
+		} else {
+			execute.Errorf(_ctx, "Run"+fmt.Sprint(i, runwithresponses)+" ExpectedConc:"+fmt.Sprint(expectedconcfloat))
 		}
 
 		// get response value and check if it's a float64 type
-		actualconcfloat, floattrue := runwithresponses.GetResponseValue(" ActualConc " + strconv.Itoa(_input.Wavelength)).(float64)
+		actualconc, err := runwithresponses.GetResponseValue("AbsorbanceActualConc")
+
+		if err != nil {
+			fmt.Println(err.Error())
+			_output.Errors = append(_output.Errors, err)
+		}
+
+		actualconcfloat, floattrue := actualconc.(float64)
+
 		if floattrue {
 			yvalues = append(yvalues, actualconcfloat)
+		} else {
+			fmt.Println(err.Error())
+			execute.Errorf(_ctx, " ActualConc:"+fmt.Sprint(actualconcfloat))
 		}
 
 	}
@@ -418,6 +441,7 @@ type AddPlateReaderresults_2Output struct {
 	BlankValues               []float64
 	CV                        float64
 	CVpass                    bool
+	Errors                    []error
 	MeasuredOptimalWavelength int
 	R2                        float64
 	R2Pass                    bool
@@ -430,6 +454,7 @@ type AddPlateReaderresults_2SOutput struct {
 		BlankValues               []float64
 		CV                        float64
 		CVpass                    bool
+		Errors                    []error
 		MeasuredOptimalWavelength int
 		R2                        float64
 		R2Pass                    bool
@@ -469,6 +494,7 @@ func init() {
 				{Name: "BlankValues", Desc: "", Kind: "Data"},
 				{Name: "CV", Desc: "", Kind: "Data"},
 				{Name: "CVpass", Desc: "", Kind: "Data"},
+				{Name: "Errors", Desc: "", Kind: "Data"},
 				{Name: "MeasuredOptimalWavelength", Desc: "", Kind: "Data"},
 				{Name: "R2", Desc: "", Kind: "Data"},
 				{Name: "R2Pass", Desc: "", Kind: "Data"},

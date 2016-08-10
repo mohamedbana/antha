@@ -59,6 +59,7 @@ Data (
 	R2Pass bool
 	CV float64
 	CVpass bool
+	Errors []error
 )
 
 
@@ -334,6 +335,8 @@ Steps {
 // post process any data and provide downstream results
 Analysis {
 	
+	Errors = make([]error,0)
+	
 		xvalues := make([]float64, 0)
 		yvalues := make([]float64, 0)
 
@@ -343,22 +346,43 @@ Analysis {
 	
 	fmt.Println("in analysis")
 	
+	if len(Runs)==0{
+		Errorf("no runs")
+	}
 	// now calculate mean, CV, r2 and plot results
-	for _,runwithresponses := range Runs {
+	for i,runwithresponses := range Runs {
 		// values for r2 to reset each run
 
 	// get response value and check if it's a float64 type
-	expectedconcfloat, floattrue := runwithresponses.GetResponseValue(" ExpectedConc "+strconv.Itoa(Wavelength)).(float64)
+	expectedconc, err := runwithresponses.GetResponseValue(" ExpectedConc "+strconv.Itoa(Wavelength))
 	
+	if err != nil{
+		Errors = append(Errors,err)
+	}
+	
+	expectedconcfloat,floattrue := expectedconc.(float64)
 	// if float64 is true 
 	if floattrue {
 		xvalues = append(xvalues, expectedconcfloat)
+	}else {
+		Errorf("Run"+fmt.Sprint(i,runwithresponses)+" ExpectedConc:"+fmt.Sprint(expectedconcfloat))
 	}
 
 	// get response value and check if it's a float64 type
-	actualconcfloat, floattrue := runwithresponses.GetResponseValue(" ActualConc "+strconv.Itoa(Wavelength)).(float64)
+	actualconc, err := runwithresponses.GetResponseValue("AbsorbanceActualConc")
+	
+	if err != nil{
+		fmt.Println(err.Error())
+		Errors = append(Errors,err)
+	}
+	
+	actualconcfloat,floattrue := actualconc.(float64)
+	
 	if floattrue {
 		yvalues = append(yvalues,actualconcfloat )
+	}else {
+		fmt.Println(err.Error())
+		Errorf(" ActualConc:"+fmt.Sprint(actualconcfloat))
 	}
 		
 	}
