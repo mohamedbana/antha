@@ -12,9 +12,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/buffers"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/platereader"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/plot"
 	// "path/filepath"
 	// antha "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
-	// "fmt"
+	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
@@ -302,11 +303,41 @@ func _AddPlateReaderresults_2Steps(_ctx context.Context, _input *AddPlateReaderr
 // post process any data and provide downstream results
 func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateReaderresults_2Input, _output *AddPlateReaderresults_2Output) {
 
-	/*// now calculate mean, CV, r2 and plot results
-	for _,runwithresponses := range Runs {
+	xvalues := make([]float64, 0)
+	yvalues := make([]float64, 0)
 
-	}*/
+	// add origin
+	xvalues = append(xvalues, 0.0)
+	yvalues = append(yvalues, 0.0)
 
+	fmt.Println("in analysis")
+
+	// now calculate mean, CV, r2 and plot results
+	for _, runwithresponses := range _output.Runs {
+		// values for r2 to reset each run
+
+		// get response value and check if it's a float64 type
+		expectedconcfloat, floattrue := runwithresponses.GetResponseValue(" ExpectedConc " + strconv.Itoa(_input.Wavelength)).(float64)
+
+		// if float64 is true
+		if floattrue {
+			xvalues = append(xvalues, expectedconcfloat)
+		}
+
+		// get response value and check if it's a float64 type
+		actualconcfloat, floattrue := runwithresponses.GetResponseValue(" ActualConc " + strconv.Itoa(_input.Wavelength)).(float64)
+		if floattrue {
+			yvalues = append(yvalues, actualconcfloat)
+		}
+
+	}
+
+	_output.R2 = plot.Rsquared("Expected Conc", xvalues, "Actual Conc", yvalues)
+	//run.AddResponseValue("R2", rsquared)
+
+	xygraph := plot.Plot(xvalues, [][]float64{yvalues})
+	filenameandextension := strings.Split(_input.OutputFilename, ".")
+	plot.Export(xygraph, filenameandextension[0]+".png")
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
