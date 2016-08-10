@@ -23,7 +23,7 @@
 package liquidhandling_test
 
 import (
-	lh "github.com/antha-lang/antha/microArch/simulator/liquidhandling"
+	//lh "github.com/antha-lang/antha/microArch/simulator/liquidhandling"
 	"testing"
 )
 
@@ -218,7 +218,7 @@ func TestVLH_AddPlateTo(t *testing.T) {
 // ########################################################################################################################
 // ########################################################## Tip Loading/Unloading
 // ########################################################################################################################
-
+/*
 func tipTestLayout() *SetupFn {
 	var ret SetupFn = func(vlh *lh.VirtualLiquidHandler) {
 		vlh.Initialize()
