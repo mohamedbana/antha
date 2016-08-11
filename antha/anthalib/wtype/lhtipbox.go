@@ -24,8 +24,8 @@
 package wtype
 
 import (
-    "fmt"
-    "math"
+	"fmt"
+	"math"
 )
 
 /* tip box */
@@ -48,8 +48,8 @@ type LHTipbox struct {
 	TipYStart  float64
 	TipZStart  float64
 
-    bounds      BBox
-    parent      LHObject
+	bounds BBox
+	parent LHObject
 }
 
 func NewLHTipbox(nrows, ncols int, size Coordinates, manufacturer, boxtype string, tiptype *LHTip, well *LHWell, tipxoffset, tipyoffset, tipxstart, tipystart, tipzstart float64) *LHTipbox {
@@ -74,7 +74,6 @@ func NewLHTipbox(nrows, ncols int, size Coordinates, manufacturer, boxtype strin
 	tipbox.TipYStart = tipystart
 	tipbox.TipZStart = tipzstart
 
-    
 	return initialize_tips(&tipbox, tiptype)
 }
 
@@ -132,7 +131,7 @@ func (tb *LHTipbox) GetName() string {
 }
 
 func (tb *LHTipbox) GetType() string {
-    return tb.Type
+	return tb.Type
 }
 
 func (tb *LHTipbox) N_clean_tips() int {
@@ -152,99 +151,106 @@ func (tb *LHTipbox) N_clean_tips() int {
 //##############################################
 
 func (self *LHTipbox) SetOffset(o Coordinates) {
-    if self.parent != nil {
-        o = o.Add(self.parent.GetBounds().GetPosition())
-    }
-    self.bounds.SetPosition(o)
+	if self.parent != nil {
+		o = o.Add(self.parent.GetBounds().GetPosition())
+	}
+	self.bounds.SetPosition(o)
 }
 
 func (self *LHTipbox) GetBounds() BBox {
-    return self.bounds
+	return self.bounds
 }
 
 func (self *LHTipbox) SetParent(p LHObject) {
-    self.parent = p
+	self.parent = p
 }
 
 func (self *LHTipbox) GetParent() LHObject {
-    return self.parent
+	return self.parent
 }
-
 
 //##############################################
 //@implement Addressable
 //##############################################
 
-func (tb *LHTipbox) HasCoords(c WellCoords) bool {
-    return c.X >= 0 &&
-           c.Y >= 0 &&
-           c.X < tb.Ncols &&
-           c.Y < tb.Nrows
+func (tb *LHTipbox) HasLocation(c WellCoords) bool {
+	return c.X >= 0 &&
+		c.Y >= 0 &&
+		c.X < tb.Ncols &&
+		c.Y < tb.Nrows
 }
 
+func (self *LHTipbox) NRows() int {
+	return self.Nrows
+}
 
-func (tb *LHTipbox) GetCoords(c WellCoords) (interface{}, bool) {
-    if !tb.HasCoords(c) {
-        return nil, false
-    }
-    return tb.Tips[c.X][c.Y], true
+func (self *LHTipbox) NCols() int {
+	return self.Ncols
+}
+
+func (tb *LHTipbox) GetLocation(c WellCoords) LHObject {
+	if !tb.HasLocation(c) {
+		return nil
+	}
+	//Tips aren't yet an LHObject...
+	//return tb.Tips[c.X][c.Y]
+	return nil
 }
 
 func (tb *LHTipbox) CoordsToWellCoords(r Coordinates) (WellCoords, Coordinates) {
-    wc := WellCoords{
-        int(math.Floor(((r.X-tb.TipXStart) / tb.TipXOffset))),// + 0.5)), Don't have to add .5 because
-        int(math.Floor(((r.Y-tb.TipYStart) / tb.TipYOffset))),// + 0.5)), TipX/YStart is to TL corner, not center
-    }
-    if wc.X < 0 {
-        wc.X = 0
-    } else if wc.X >= tb.Ncols {
-        wc.X = tb.Ncols - 1
-    }
-    if wc.Y < 0 {
-        wc.Y = 0
-    } else if wc.Y >= tb.Nrows {
-        wc.Y = tb.Nrows - 1
-    }
+	wc := WellCoords{
+		int(math.Floor(((r.X - tb.TipXStart) / tb.TipXOffset))), // + 0.5)), Don't have to add .5 because
+		int(math.Floor(((r.Y - tb.TipYStart) / tb.TipYOffset))), // + 0.5)), TipX/YStart is to TL corner, not center
+	}
+	if wc.X < 0 {
+		wc.X = 0
+	} else if wc.X >= tb.Ncols {
+		wc.X = tb.Ncols - 1
+	}
+	if wc.Y < 0 {
+		wc.Y = 0
+	} else if wc.Y >= tb.Nrows {
+		wc.Y = tb.Nrows - 1
+	}
 
-    r2, _ := tb.WellCoordsToCoords(wc, TopReference)
+	r2, _ := tb.WellCoordsToCoords(wc, TopReference)
 
-    return wc, r.Subtract(r2)
+	return wc, r.Subtract(r2)
 }
 
 func (tb *LHTipbox) WellCoordsToCoords(wc WellCoords, r WellReference) (Coordinates, bool) {
-    if !tb.HasCoords(wc) {
-        return Coordinates{}, false
-    }
+	if !tb.HasLocation(wc) {
+		return Coordinates{}, false
+	}
 
-    var z float64
-    if r == BottomReference {
-        z = tb.TipZStart
-    } else if r == TopReference {
-        z = tb.Height
-    } else {
-        return Coordinates{}, false
-    }
+	var z float64
+	if r == BottomReference {
+		z = tb.TipZStart
+	} else if r == TopReference {
+		z = tb.Height
+	} else {
+		return Coordinates{}, false
+	}
 
-    return Coordinates{
-        tb.TipXStart + (float64(wc.X) + 0.5) * tb.TipXOffset,
-        tb.TipYStart + (float64(wc.Y) + 0.5) * tb.TipYOffset,
-        z}, true
+	return Coordinates{
+		tb.TipXStart + (float64(wc.X)+0.5)*tb.TipXOffset,
+		tb.TipYStart + (float64(wc.Y)+0.5)*tb.TipYOffset,
+		z}, true
 }
-
 
 //HasTipAt
 func (tb *LHTipbox) HasTipAt(c WellCoords) bool {
-    return tb.HasCoords(c) && tb.Tips[c.X][c.Y] != nil
+	return tb.HasLocation(c) && tb.Tips[c.X][c.Y] != nil
 }
 
 //RemoveTip
 func (tb *LHTipbox) RemoveTip(c WellCoords) *LHTip {
-    if !tb.HasCoords(c) {
-        return nil
-    }
-    tip := tb.Tips[c.X][c.Y]
-    tb.Tips[c.X][c.Y] = nil
-    return tip
+	if !tb.HasLocation(c) {
+		return nil
+	}
+	tip := tb.Tips[c.X][c.Y]
+	tb.Tips[c.X][c.Y] = nil
+	return tip
 }
 
 // actually useful functions

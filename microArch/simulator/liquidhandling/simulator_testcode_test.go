@@ -52,6 +52,7 @@ type UnitParams struct {
 
 type ChannelParams struct {
 	Name        string
+	Platform    string
 	Minvol      UnitParams
 	Maxvol      UnitParams
 	Minrate     UnitParams
@@ -64,6 +65,7 @@ type ChannelParams struct {
 
 func makeLHChannelParameter(cp ChannelParams) *wtype.LHChannelParameter {
 	return wtype.NewLHChannelParameter(cp.Name,
+		cp.Platform,
 		wunit.NewVolume(cp.Minvol.Value, cp.Minvol.Unit),
 		wunit.NewVolume(cp.Maxvol.Value, cp.Maxvol.Unit),
 		wunit.NewFlowRate(cp.Minrate.Value, cp.Minrate.Unit),
@@ -507,6 +509,7 @@ func default_lhproperties() *liquidhandling.LHProperties {
 				"Head0 Manufacturer",
 				ChannelParams{
 					"Head0 ChannelParams",     //Name
+					"Head0 Platform",          //Platform
 					UnitParams{0.1, "ul"},     //min volume
 					UnitParams{1., "ml"},      //max volume
 					UnitParams{0.1, "ml/min"}, //min flowrate
@@ -521,6 +524,7 @@ func default_lhproperties() *liquidhandling.LHProperties {
 					"Head0 Adaptor Manufacturer",
 					ChannelParams{
 						"Head0 Adaptor ChannelParams", //Name
+						"Head0 Adaptor Platform",      //Platform
 						UnitParams{0.1, "ul"},         //min volume
 						UnitParams{1., "ml"},          //max volume
 						UnitParams{0.1, "ml/min"},     //min flowrate
@@ -565,6 +569,7 @@ func independent_lhproperties() *liquidhandling.LHProperties {
 				"Head0 Manufacturer",
 				ChannelParams{
 					"Head0 ChannelParams",     //Name
+					"Head0 Platform",          //Platform
 					UnitParams{0.1, "ul"},     //min volume
 					UnitParams{1., "ml"},      //max volume
 					UnitParams{0.1, "ml/min"}, //min flowrate
@@ -579,6 +584,7 @@ func independent_lhproperties() *liquidhandling.LHProperties {
 					"Head0 Adaptor Manufacturer",
 					ChannelParams{
 						"Head0 Adaptor ChannelParams", //Name
+						"Head0 Adaptor Platform",      //Platform
 						UnitParams{0.1, "ul"},         //min volume
 						UnitParams{1., "ml"},          //max volume
 						UnitParams{0.1, "ml/min"},     //min flowrate

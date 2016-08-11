@@ -6,19 +6,19 @@ import "fmt"
 // tip waste
 
 type LHTipwaste struct {
-    Name        string
-	ID          string
-	Type        string
-	Mnfr        string
-	Capacity    int
-	Contents    int
-	Height      float64
-	WellXStart  float64
-	WellYStart  float64
-	WellZStart  float64
-	AsWell      *LHWell
-    bounds      BBox
-    parent      LHObject
+	Name       string
+	ID         string
+	Type       string
+	Mnfr       string
+	Capacity   int
+	Contents   int
+	Height     float64
+	WellXStart float64
+	WellYStart float64
+	WellZStart float64
+	AsWell     *LHWell
+	bounds     BBox
+	parent     LHObject
 }
 
 func (tw LHTipwaste) SpaceLeft() int {
@@ -45,7 +45,7 @@ func (te LHTipwaste) String() string {
 `,
 		te.ID,
 		te.Type,
-        te.Name,
+		te.Name,
 		te.Mnfr,
 		te.Capacity,
 		te.Contents,
@@ -68,14 +68,14 @@ func (tw *LHTipwaste) GetName() string {
 }
 
 func (tw *LHTipwaste) GetType() string {
-    return tw.Type
+	return tw.Type
 }
 
 func NewLHTipwaste(capacity int, typ, mfr string, size Coordinates, w *LHWell, wellxstart, wellystart, wellzstart float64) *LHTipwaste {
 	var lht LHTipwaste
 	lht.ID = GetUUID()
 	lht.Type = typ
-    lht.Name = fmt.Sprintf("%s_%s", typ, lht.ID[1:len(lht.ID)-2])
+	lht.Name = fmt.Sprintf("%s_%s", typ, lht.ID[1:len(lht.ID)-2])
 	lht.Mnfr = mfr
 	lht.Capacity = capacity
 	lht.bounds.SetSize(size)
@@ -105,64 +105,73 @@ func (lht *LHTipwaste) Dispose(n int) bool {
 //##############################################
 
 func (self *LHTipwaste) SetOffset(o Coordinates) {
-    if self.parent != nil {
-        o = o.Add(self.parent.GetBounds().GetSize())
-    }
-    self.bounds.SetPosition(o)
+	if self.parent != nil {
+		o = o.Add(self.parent.GetBounds().GetSize())
+	}
+	self.bounds.SetPosition(o)
 }
 
 func (self *LHTipwaste) GetBounds() BBox {
-    return self.bounds
+	return self.bounds
 }
 
 func (self *LHTipwaste) SetParent(p LHObject) {
-    self.parent = p
+	self.parent = p
 }
 
 func (self *LHTipwaste) GetParent() LHObject {
-    return self.parent
+	return self.parent
 }
 
 //##############################################
 //@implement Addressable
 //##############################################
 
-func (self *LHTipwaste) HasCoords(c WellCoords) bool {
-    return c.X == 0 && c.Y == 0 
+func (self *LHTipwaste) HasLocation(c WellCoords) bool {
+	return c.X == 0 && c.Y == 0
 }
 
-func (self *LHTipwaste) GetCoords(c WellCoords) (interface{}, bool) {
-    if !self.HasCoords(c) {
-        return nil, false
-    }
-    return self.AsWell, true
+func (self *LHTipwaste) NRows() int {
+	return 1
+}
+
+func (self *LHTipwaste) NCols() int {
+	return 1
+}
+
+func (self *LHTipwaste) GetLocation(c WellCoords) LHObject {
+	if !self.HasLocation(c) {
+		return nil
+	}
+	//LHWells arent LHObjects yet
+	//return self.AsWell
+	return nil
 }
 
 func (self *LHTipwaste) CoordsToWellCoords(r Coordinates) (WellCoords, Coordinates) {
-    wc := WellCoords{0,0}
+	wc := WellCoords{0, 0}
 
-    c, _ := self.WellCoordsToCoords(wc, TopReference)
+	c, _ := self.WellCoordsToCoords(wc, TopReference)
 
-    return wc, r.Subtract(c)
+	return wc, r.Subtract(c)
 }
 
 func (self *LHTipwaste) WellCoordsToCoords(wc WellCoords, r WellReference) (Coordinates, bool) {
-    if !self.HasCoords(wc) {
-        return Coordinates{}, false
-    }
+	if !self.HasLocation(wc) {
+		return Coordinates{}, false
+	}
 
-    var z float64
-    if r == BottomReference {
-        z = self.WellZStart
-    } else if r == TopReference {
-        z = self.Height
-    } else {
-        return Coordinates{}, false
-    }
+	var z float64
+	if r == BottomReference {
+		z = self.WellZStart
+	} else if r == TopReference {
+		z = self.Height
+	} else {
+		return Coordinates{}, false
+	}
 
-    return Coordinates{
-        self.WellXStart + 0.5 * self.AsWell.Xdim,
-        self.WellYStart + 0.5 * self.AsWell.Ydim,
-        z}, true
+	return Coordinates{
+		self.WellXStart + 0.5*self.AsWell.Xdim,
+		self.WellYStart + 0.5*self.AsWell.Ydim,
+		z}, true
 }
-

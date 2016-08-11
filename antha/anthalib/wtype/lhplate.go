@@ -26,12 +26,12 @@ package wtype
 import (
 	"encoding/csv"
 	"fmt"
-	"os"
-	"strconv"
-    "math"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/microArch/logger"
+	"math"
+	"os"
+	"strconv"
 )
 
 // structure describing a microplate
@@ -55,9 +55,9 @@ type LHPlate struct {
 	WellXStart  float64            // offset (mm) to first well in X direction
 	WellYStart  float64            // offset (mm) to first well in Y direction
 	WellZStart  float64            // offset (mm) to bottom of well in Z direction
-    bounds      BBox               // (relative) position of the plate (mm), set by parent
-    parent      LHObject
-} 
+	bounds      BBox               // (relative) position of the plate (mm), set by parent
+	parent      LHObject
+}
 
 func (lhp LHPlate) String() string {
 	return fmt.Sprintf(
@@ -102,9 +102,9 @@ func (lhp LHPlate) String() string {
 		lhp.WellXStart,
 		lhp.WellYStart,
 		lhp.WellZStart,
-        lhp.bounds.GetSize().X,
-        lhp.bounds.GetSize().Y,
-        lhp.bounds.GetSize().Z,
+		lhp.bounds.GetSize().X,
+		lhp.bounds.GetSize().Y,
+		lhp.bounds.GetSize().Z,
 	)
 }
 
@@ -185,8 +185,8 @@ func (lhp *LHPlate) GetName() string {
 
 // @implement Typed
 func (lhp *LHPlate) GetType() string {
-    return lhp.Type
-} 
+	return lhp.Type
+}
 
 func (lhp *LHPlate) WellAt(wc WellCoords) *LHWell {
 	return lhp.Wellcoords[wc.FormatA1()]
@@ -227,7 +227,7 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, size Coordinates, wellt
 	var lhp LHPlate
 	lhp.Type = platetype
 	lhp.ID = GetUUID()
-    lhp.PlateName = fmt.Sprintf("%s_%s", platetype, lhp.ID[1:len(lhp.ID)-2])
+	lhp.PlateName = fmt.Sprintf("%s_%s", platetype, lhp.ID[1:len(lhp.ID)-2])
 	lhp.Mnfr = mfr
 	lhp.WlsX = ncols
 	lhp.WlsY = nrows
@@ -238,7 +238,7 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, size Coordinates, wellt
 	lhp.WellXStart = wellXStart
 	lhp.WellYStart = wellYStart
 	lhp.WellZStart = wellZStart
-    lhp.bounds.SetSize(size)
+	lhp.bounds.SetSize(size)
 
 	wellcoords := make(map[string]*LHWell, ncols*nrows)
 
@@ -283,7 +283,7 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, size Coordinates, wellt
 
 func (lhp *LHPlate) Dup() *LHPlate {
 	ret := NewLHPlate(lhp.Type, lhp.Mnfr, lhp.WlsY, lhp.WlsX, lhp.bounds.GetSize(), lhp.Welltype, lhp.WellXOffset, lhp.WellYOffset, lhp.WellXStart, lhp.WellYStart, lhp.WellZStart)
-    
+
 	ret.PlateName = lhp.PlateName
 
 	ret.HWells = make(map[string]*LHWell, len(ret.HWells))
@@ -447,79 +447,89 @@ func (p *LHPlate) IsConstrainedOn(platform string) ([]string, bool) {
 //##############################################
 
 func (self *LHPlate) SetOffset(o Coordinates) {
-    if self.parent != nil {
-        o = o.Add(self.parent.GetBounds().GetPosition())
-    }
-    self.bounds.SetPosition(o)
+	if self.parent != nil {
+		o = o.Add(self.parent.GetBounds().GetPosition())
+	}
+	self.bounds.SetPosition(o)
 }
 
 func (self *LHPlate) GetBounds() BBox {
-    return self.bounds
+	return self.bounds
 }
 
 func (self *LHPlate) SetParent(p LHObject) {
-    self.parent = p
+	self.parent = p
 }
 
 func (self *LHPlate) GetParent() LHObject {
-    return self.parent
+	return self.parent
 }
 
 //##############################################
 //@implement Addressable
 //##############################################
 
-func (self *LHPlate) HasCoords(c WellCoords) bool {
-    return c.X >= 0 &&
-           c.Y >= 0 &&
-           c.X < self.WlsX &&
-           c.Y < self.WlsY
+func (self *LHPlate) HasLocation(c WellCoords) bool {
+	return c.X >= 0 &&
+		c.Y >= 0 &&
+		c.X < self.WlsX &&
+		c.Y < self.WlsY
 }
 
-func (self *LHPlate) GetCoords(c WellCoords) (interface{}, bool) {
-    if !self.HasCoords(c) {
-        return nil, false
-    }
-    return self.Cols[c.X][c.Y], true
+func (lhp *LHPlate) NCols() int {
+	return lhp.WlsX
+}
+
+func (lhp *LHPlate) NRows() int {
+	return lhp.WlsY
+}
+
+func (self *LHPlate) GetLocation(c WellCoords) LHObject {
+	if !self.HasLocation(c) {
+		return nil
+	}
+	//LHWells aren't LHObjects yet
+	//return self.Cols[c.X][c.Y]
+	return nil
 }
 
 func (self *LHPlate) CoordsToWellCoords(r Coordinates) (WellCoords, Coordinates) {
-    wc := WellCoords{
-        int(math.Floor(((r.X-self.WellXStart) / self.WellXOffset))),// + 0.5), Don't need to add .5 because
-        int(math.Floor(((r.Y-self.WellYStart) / self.WellYOffset))),// + 0.5), WellXStart is to edge, not center
-    }
-    if wc.X < 0 {
-        wc.X = 0
-    } else if wc.X >= self.WlsX {
-        wc.X = self.WlsX - 1
-    }
-    if wc.Y < 0 {
-        wc.Y = 0
-    } else if wc.Y >= self.WlsY {
-        wc.Y = self.WlsY - 1
-    }
+	wc := WellCoords{
+		int(math.Floor(((r.X - self.WellXStart) / self.WellXOffset))), // + 0.5), Don't need to add .5 because
+		int(math.Floor(((r.Y - self.WellYStart) / self.WellYOffset))), // + 0.5), WellXStart is to edge, not center
+	}
+	if wc.X < 0 {
+		wc.X = 0
+	} else if wc.X >= self.WlsX {
+		wc.X = self.WlsX - 1
+	}
+	if wc.Y < 0 {
+		wc.Y = 0
+	} else if wc.Y >= self.WlsY {
+		wc.Y = self.WlsY - 1
+	}
 
-    r2, _ := self.WellCoordsToCoords(wc, TopReference)
+	r2, _ := self.WellCoordsToCoords(wc, TopReference)
 
-    return wc, r.Subtract(r2)
+	return wc, r.Subtract(r2)
 }
 
 func (self *LHPlate) WellCoordsToCoords(wc WellCoords, r WellReference) (Coordinates, bool) {
-    if !self.HasCoords(wc) {
-        return Coordinates{}, false
-    }
+	if !self.HasLocation(wc) {
+		return Coordinates{}, false
+	}
 
-    var z float64
-    if r == BottomReference {
-        z = self.WellZStart
-    } else if r == TopReference {
-        z = self.bounds.ZMax()
-    } else if r == LiquidReference {
-        panic("Haven't implemented liquid level yet")
-    }
+	var z float64
+	if r == BottomReference {
+		z = self.WellZStart
+	} else if r == TopReference {
+		z = self.bounds.ZMax()
+	} else if r == LiquidReference {
+		panic("Haven't implemented liquid level yet")
+	}
 
-    return Coordinates{
-        self.WellXStart + (float64(wc.X)+0.5) * self.WellXOffset,
-        self.WellYStart + (float64(wc.Y)+0.5) * self.WellYOffset,
-        z}, true
+	return Coordinates{
+		self.WellXStart + (float64(wc.X)+0.5)*self.WellXOffset,
+		self.WellYStart + (float64(wc.Y)+0.5)*self.WellYOffset,
+		z}, true
 }

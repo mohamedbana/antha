@@ -52,6 +52,8 @@ const (
 	LiquidReference                      //2
 )
 
+var WellReferenceNames []string = []string{"bottom", "top", "liquid"}
+
 //LHObject Provides a unified interface to physical size
 //of items that can be placed on a liquid handler's deck
 type LHObject interface {
@@ -89,6 +91,8 @@ func GetObjectType(o LHObject) string {
 type Addressable interface {
 	//HasLocation Do the given coordinates exist in the object?
 	HasLocation(WellCoords) bool
+	NRows() int
+	NCols() int
 	//GetCoords Returns the object at the given well coords
 	//nil if empty or position doesn't exist
 	GetLocation(WellCoords) LHObject

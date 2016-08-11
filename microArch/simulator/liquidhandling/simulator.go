@@ -227,6 +227,78 @@ func (self *VirtualLiquidHandler) GetObjectAt(slot_name string) wtype.LHObject {
 	return self.state.GetSlot(slot_name).GetChild()
 }
 
+//getAbsolutePosition get a position within the liquidhandler, adding any errors as neccessary
+//bool is false if the instruction shouldn't continue (e.g. missing deckposition e.t.c)
+func (self *VirtualLiquidHandler) getAbsolutePosition(fname, deckposition, well string, reference int, platetype string) (wtype.Coordinates, bool) {
+	ret := wtype.Coordinates{}
+
+	var ref wtype.WellReference
+	switch reference {
+	case 0:
+		ref = wtype.BottomReference
+	case 1:
+		ref = wtype.TopReference
+	case 2:
+		ref = wtype.LiquidReference
+	default:
+		self.AddErrorf(fname, "Invalid reference %d", reference)
+		return ret, false
+	}
+
+	slot := self.state.GetSlot(deckposition)
+	if slot == nil {
+		self.AddErrorf(fname, "Unknown location \"%s\"", deckposition)
+		return ret, false
+	}
+
+	target := slot.GetChild()
+	if target == nil {
+		self.AddErrorf(fname, "No object found at position %s", deckposition)
+		return ret, false
+	}
+	if platetype != wtype.GetObjectType(target) {
+		self.AddWarningf(fname, "Object found at %s was type \"%s\" not type \"%s\" as expected",
+			deckposition, wtype.GetObjectType(target), platetype)
+	}
+
+	addr, ok := target.(wtype.Addressable)
+	if !ok {
+		self.AddErrorf(fname, "Object \"%s\" at \"%s\" is not addressable", wtype.GetObjectName(target), deckposition)
+		return ret, false
+	}
+
+	wc := wtype.MakeWellCoords(well)
+	if wc.IsZero() {
+		self.AddErrorf(fname, "Couldn't parse well \"%s\"", well)
+		return ret, false
+	}
+
+	if !addr.HasLocation(wc) {
+		self.AddErrorf(fname, "Request for well %s in object \"%s\" at \"%s\" which is of size [%dx%d]",
+			wc.FormatA1(), wtype.GetObjectName(target), deckposition, addr.NRows(), addr.NCols())
+		return ret, false
+	}
+
+	ret, ok = addr.WellCoordsToCoords(wc, ref)
+	if !ok {
+		//since we already checked that the address exists, this must be a bad reference
+		self.AddErrorf(fname, "Object type %s at %s doesn't support reference \"%s\"",
+			wtype.GetObjectType(target), deckposition, wtype.WellReferenceNames[ref])
+		return ret, false
+	}
+	return ret, true
+}
+
+func makeOffsets(Xs, Ys, Zs []float64) []wtype.Coordinates {
+	ret := make([]wtype.Coordinates, len(Xs))
+	for i := range Xs {
+		ret[i].X = Xs[i]
+		ret[i].Y = Ys[i]
+		ret[i].Z = Zs[i]
+	}
+	return ret
+}
+
 // ------------------------------------------------------------------------ ExtendedLHDriver
 
 //Move command - used
@@ -241,7 +313,8 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
 		return ret
 	}
 
-	if self.testSliceLength("Move", map[string]int{
+	//check slice length
+	ok := self.testSliceLength("Move", map[string]int{
 		"deckposition": len(deckposition),
 		"wellcoords":   len(wellcoords),
 		"reference":    len(reference),
@@ -249,65 +322,84 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
 		"offsetY":      len(offsetY),
 		"offsetZ":      len(offsetZ),
 		"plate_type":   len(platetype)},
-		adaptor.GetChannelCount()) {
-		//at this point, deckposition and platetype have to be equal
-		dp := ""
-		pt := ""
-		for i := range deckposition {
-			if deckposition[i] != "" {
-				if dp != "" {
-					if dp != deckposition[i] {
-						self.AddWarning("Move", "Deckpositions are not equal, ignoring further values")
-					}
-				} else {
-					dp = deckposition[i]
-				}
+		adaptor.GetChannelCount())
+	if !ok {
+		return ret
+	}
+
+	//find the coordinates of each explicitly requested position
+	coords := make([]wtype.Coordinates, adaptor.GetChannelCount())
+	offsets := makeOffsets(offsetX, offsetY, offsetZ)
+	explicit := make([]bool, adaptor.GetChannelCount())
+	exp_count := 0
+	for i := range deckposition {
+		if deckposition[i] == "" {
+			if wellcoords[i] != "" {
+				self.AddWarningf("Move", "deckposition was blank, but well was \"%s\"", wellcoords[i])
 			}
 			if platetype[i] != "" {
-				if dp != "" {
-					if dp != platetype[i] {
-						self.AddWarning("Move", "Platetypes are not equal, ignoring further values")
-					}
-				} else {
-					dp = platetype[i]
-				}
+				self.AddWarningf("Move", "deckposition was blank, but platetype was \"%s\"", platetype[i])
+			}
+			explicit[i] = false
+		} else {
+			coords[i], ok = self.getAbsolutePosition("Move", deckposition[i], wellcoords[i], reference[i], platetype[i])
+			if !ok {
+				return ret
+			}
+			coords[i] = coords[i].Add(offsets[i])
+			explicit[i] = true
+			exp_count++
+		}
+	}
+	if exp_count == 0 {
+		self.AddWarning("Move", "Ignoring blank move command")
+	}
+
+	//find the head location, origin
+	origin := wtype.Coordinates{}
+	//for now, assuming that the relative position of the first explicitly provided channel and the head stay
+	//the same. This seems sensible for the Glison, but might turn out not to be how other robots with independent channels work
+	for i, c := range coords {
+		if explicit[i] {
+			origin = c.Subtract(adaptor.GetChannel(i).GetRelativePosition())
+			break
+		}
+	}
+
+	//fill in implicit locations
+	for i := range coords {
+		if !explicit[i] {
+			coords[i] = origin.Add(adaptor.GetChannel(i).GetRelativePosition())
+		}
+	}
+
+	//Get relative locations
+	rel_coords := make([]wtype.Coordinates, adaptor.GetChannelCount())
+	for i := range coords {
+		rel_coords[i] = coords[i].Subtract(origin)
+	}
+
+	//check that the requested position is possible given the head/adaptor capabilities
+	if !adaptor.IsIndependent() {
+		//i.e. the channels can't move relative to each other or the head, so relative locations must remain the same
+		moved := []string{}
+		for i, rc := range rel_coords {
+			if rc != adaptor.GetChannel(i).GetRelativePosition() {
+				moved = append(moved, fmt.Sprintf("%d", i))
 			}
 		}
-
-		target := self.state.GetSlot(dp).GetChild()
-		if target == nil {
-			self.AddErrorf("Move", "No object found at slot %s", dp)
+		if len(moved) > 0 {
+			self.AddErrorf("Move", "Head %d Channels %s cannot move independently", head, strings.Join(moved, ","))
 			return ret
 		}
-		if t, ok := target.(wtype.Typed); ok && t.GetType() != pt {
-			self.AddWarningf("Move", "Object found at %s was type \"%s\" not type \"%s\" as expected", dp, t.GetType(), pt)
-		}
+	}
 
-		offset := make([]wtype.Coordinates, adaptor.GetChannelCount())
-		typed_ref := make([]wtype.WellReference, adaptor.GetChannelCount())
-		wc := make([]wtype.WellCoords, adaptor.GetChannelCount())
-		for i := range offset {
-			offset[i].X = offsetX[i]
-			offset[i].Y = offsetY[i]
-			offset[i].Z = offsetZ[i]
-			//should already have happened...
-			switch reference[i] {
-			case 0:
-				typed_ref[i] = wtype.BottomReference
-			case 1:
-				typed_ref[i] = wtype.TopReference
-			case 2:
-				typed_ref[i] = wtype.LiquidReference
-			default:
-				panic("invalid reference")
-			}
-			wc[i] = wtype.MakeWellCoords(wellcoords[i])
-		}
+	//check for collisions in the new location
 
-		if err := adaptor.Move(target, wc, typed_ref, offset); err != nil {
-			err.SetFunctionName("Move")
-			self.AddSimulationError(err)
-		}
+	//update the head position accordingly
+	adaptor.SetPosition(origin)
+	for i, rc := range rel_coords {
+		adaptor.GetChannel(i).SetRelativePosition(rc)
 	}
 
 	return ret

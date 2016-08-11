@@ -218,60 +218,6 @@ func (self *AdaptorState) SetPosition(p wtype.Coordinates) {
 	self.position = p
 }
 
-//                            Actions
-//                            -------
-
-func (self *AdaptorState) Move(target wtype.LHObject, wc []wtype.WellCoords, ref []wtype.WellReference, off []wtype.Coordinates) *simulator.SimulationError {
-	addr, ok := target.(wtype.Addressable)
-	if !ok {
-		if n, nok := target.(wtype.Named); nok {
-			return simulator.NewErrorf("", "Target object \"%s\" is not addressable", n.GetName())
-		} else {
-			return simulator.NewErrorf("", "Target object is not addressable")
-		}
-	}
-
-	//find the origin
-	origin := wtype.Coordinates{}
-	for i := range wc {
-		if addr.HasLocation(wc[i]) {
-			origin, _ = addr.WellCoordsToCoords(wc[i], ref[i])
-			origin = origin.Add(off[i]).Subtract(self.channels[i].GetRelativePosition())
-			break
-		}
-	}
-
-	//find the relative positions
-	positions := make([]wtype.Coordinates, len(self.channels))
-	for i := range self.channels {
-		if wc[i].IsZero() {
-			positions[i] = self.GetChannel(i).GetRelativePosition()
-		} else {
-			if pos, ok := addr.WellCoordsToCoords(wc[i], ref[i]); ok {
-				positions[i] = pos.Add(off[i]).Subtract(origin)
-			} else {
-				return simulator.NewErrorf("", "No well \"%s\" in target", wc[i].FormatA1())
-			}
-		}
-	}
-
-	//if not independent, relative positions should not change
-	if !self.independent {
-		for i := range positions {
-			if positions[i] != self.channels[i].GetRelativePosition() {
-				return simulator.NewError("", "Failed to adjust channel offset in non-independent adaptor")
-			}
-		}
-	}
-
-	//do it
-	self.position = origin
-	for i := range self.channels {
-		self.channels[i].SetRelativePosition(positions[i])
-	}
-	return nil
-}
-
 // -------------------------------------------------------------------------------
 //                            RobotState
 // -------------------------------------------------------------------------------
