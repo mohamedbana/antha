@@ -368,7 +368,7 @@ message LHTipboxMessage {
 	string Arg_4 = 4;
 	int64 Arg_5 = 5;
 	int64 Arg_6 = 6;
-	double Arg_7 = 7;
+	CoordinatesMessage Arg_7 = 7;
 	PtrToLHTipMessage Arg_8 = 8;
 	PtrToLHWellMessage Arg_9 = 9;
 	int64 Arg_10 = 10;
@@ -440,7 +440,7 @@ message LHTipwasteMessage {
 	string Arg_3 = 3;
 	int64 Arg_4 = 4;
 	int64 Arg_5 = 5;
-	double Arg_6 = 6;
+	CoordinatesMessage Arg_6 = 6;
 	double Arg_7 = 7;
 	double Arg_8 = 8;
 	double Arg_9 = 9;
@@ -490,8 +490,7 @@ message LHPlateMessage {
 	int64 Arg_8 = 8;
 	int64 Arg_9 = 9;
 	MapstringPtrToLHWellMessageMessage Arg_10 = 10;
-	double Arg_11 = 11;
-	string Arg_12 = 12;
+	CoordinatesMessage Arg_11 = 11;
 	ArrayOfArrayOfPtrToLHWellMessage Arg_13 = 13;
 	ArrayOfArrayOfPtrToLHWellMessage Arg_14 = 14;
 	PtrToLHWellMessage Arg_15 = 15;

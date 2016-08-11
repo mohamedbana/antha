@@ -208,11 +208,11 @@ func DecodeLHTip(arg *pb.LHTipMessage) wtype.LHTip {
 	return ret
 }
 func EncodeLHPlate(arg wtype.LHPlate) *pb.LHPlateMessage {
-	ret := pb.LHPlateMessage{(string)(arg.ID), (string)(arg.Inst), (string)(arg.Loc), (string)(arg.PlateName), (string)(arg.Type), (string)(arg.Mnfr), int64(arg.WlsX), int64(arg.WlsY), int64(arg.Nwells), EncodeMapstringPtrToLHWellMessage(arg.HWells), (float64)(arg.Height), (string)(arg.Hunit), EncodeArrayOfArrayOfPtrToLHWell(arg.Rows), EncodeArrayOfArrayOfPtrToLHWell(arg.Cols), EncodePtrToLHWell(arg.Welltype), EncodeMapstringPtrToLHWellMessage(arg.Wellcoords), (float64)(arg.WellXOffset), (float64)(arg.WellYOffset), (float64)(arg.WellXStart), (float64)(arg.WellYStart), (float64)(arg.WellZStart)}
+	ret := pb.LHPlateMessage{(string)(arg.ID), (string)(arg.Inst), (string)(arg.Loc), (string)(arg.PlateName), (string)(arg.Type), (string)(arg.Mnfr), int64(arg.WlsX), int64(arg.WlsY), int64(arg.Nwells), EncodeMapstringPtrToLHWellMessage(arg.HWells), EncodeCoordinates(arg.GetBounds().GetSize()), EncodeArrayOfArrayOfPtrToLHWell(arg.Rows), EncodeArrayOfArrayOfPtrToLHWell(arg.Cols), EncodePtrToLHWell(arg.Welltype), EncodeMapstringPtrToLHWellMessage(arg.Wellcoords), (float64)(arg.WellXOffset), (float64)(arg.WellYOffset), (float64)(arg.WellXStart), (float64)(arg.WellYStart), (float64)(arg.WellZStart)}
 	return &ret
 }
 func DecodeLHPlate(arg *pb.LHPlateMessage) wtype.LHPlate {
-	ret := wtype.LHPlate{(string)(arg.Arg_1), (string)(arg.Arg_2), (string)(arg.Arg_3), (string)(arg.Arg_4), (string)(arg.Arg_5), (string)(arg.Arg_6), (int)(arg.Arg_7), (int)(arg.Arg_8), (int)(arg.Arg_9), (map[string]*wtype.LHWell)(DecodeMapstringPtrToLHWellMessage(arg.Arg_10)), (float64)(arg.Arg_11), (string)(arg.Arg_12), ([][]*wtype.LHWell)(DecodeArrayOfArrayOfPtrToLHWell(arg.Arg_13)), ([][]*wtype.LHWell)(DecodeArrayOfArrayOfPtrToLHWell(arg.Arg_14)), (*wtype.LHWell)(DecodePtrToLHWell(arg.Arg_15)), (map[string]*wtype.LHWell)(DecodeMapstringPtrToLHWellMessage(arg.Arg_16)), (float64)(arg.Arg_17), (float64)(arg.Arg_18), (float64)(arg.Arg_19), (float64)(arg.Arg_20), (float64)(arg.Arg_21)}
+	ret := wtype.LHPlate{(string)(arg.Arg_1), (string)(arg.Arg_2), (string)(arg.Arg_3), (string)(arg.Arg_4), (string)(arg.Arg_5), (string)(arg.Arg_6), (int)(arg.Arg_7), (int)(arg.Arg_8), (int)(arg.Arg_9), (map[string]*wtype.LHWell)(DecodeMapstringPtrToLHWellMessage(arg.Arg_10)), (string)(arg.Arg_12), ([][]*wtype.LHWell)(DecodeArrayOfArrayOfPtrToLHWell(arg.Arg_13)), ([][]*wtype.LHWell)(DecodeArrayOfArrayOfPtrToLHWell(arg.Arg_14)), (*wtype.LHWell)(DecodePtrToLHWell(arg.Arg_15)), (map[string]*wtype.LHWell)(DecodeMapstringPtrToLHWellMessage(arg.Arg_16)), (float64)(arg.Arg_17), (float64)(arg.Arg_18), (float64)(arg.Arg_19), (float64)(arg.Arg_20), (float64)(arg.Arg_21), wtype.BBox{wtype.Coordinates{}, DecodeCoordinates(arg.Arg_11)}, nil}
 	return ret
 }
 func EncodeLHHead(arg wtype.LHHead) *pb.LHHeadMessage {
@@ -355,11 +355,11 @@ func DecodePtrToLHPosition(arg *pb.PtrToLHPositionMessage) *wtype.LHPosition {
 	return &ret
 }
 func EncodeLHTipbox(arg wtype.LHTipbox) *pb.LHTipboxMessage {
-	ret := pb.LHTipboxMessage{(string)(arg.ID), (string)(arg.Boxname), (string)(arg.Type), (string)(arg.Mnfr), int64(arg.Nrows), int64(arg.Ncols), (float64)(arg.Height), EncodePtrToLHTip(arg.Tiptype), EncodePtrToLHWell(arg.AsWell), int64(arg.NTips), EncodeArrayOfArrayOfPtrToLHTip(arg.Tips), (float64)(arg.TipXOffset), (float64)(arg.TipYOffset), (float64)(arg.TipXStart), (float64)(arg.TipYStart), (float64)(arg.TipZStart)}
+	ret := pb.LHTipboxMessage{(string)(arg.ID), (string)(arg.Boxname), (string)(arg.Type), (string)(arg.Mnfr), int64(arg.Nrows), int64(arg.Ncols), EncodeCoordinates(arg.GetBounds().GetSize()), EncodePtrToLHTip(arg.Tiptype), EncodePtrToLHWell(arg.AsWell), int64(arg.NTips), EncodeArrayOfArrayOfPtrToLHTip(arg.Tips), (float64)(arg.TipXOffset), (float64)(arg.TipYOffset), (float64)(arg.TipXStart), (float64)(arg.TipYStart), (float64)(arg.TipZStart)}
 	return &ret
 }
 func DecodeLHTipbox(arg *pb.LHTipboxMessage) wtype.LHTipbox {
-	ret := wtype.LHTipbox{(string)(arg.Arg_1), (string)(arg.Arg_2), (string)(arg.Arg_3), (string)(arg.Arg_4), (int)(arg.Arg_5), (int)(arg.Arg_6), (float64)(arg.Arg_7), (*wtype.LHTip)(DecodePtrToLHTip(arg.Arg_8)), (*wtype.LHWell)(DecodePtrToLHWell(arg.Arg_9)), (int)(arg.Arg_10), ([][]*wtype.LHTip)(DecodeArrayOfArrayOfPtrToLHTip(arg.Arg_11)), (float64)(arg.Arg_12), (float64)(arg.Arg_13), (float64)(arg.Arg_14), (float64)(arg.Arg_15), (float64)(arg.Arg_16)}
+	ret := wtype.LHTipbox{(string)(arg.Arg_1), (string)(arg.Arg_2), (string)(arg.Arg_3), (string)(arg.Arg_4), (int)(arg.Arg_5), (int)(arg.Arg_6), (*wtype.LHTip)(DecodePtrToLHTip(arg.Arg_8)), (*wtype.LHWell)(DecodePtrToLHWell(arg.Arg_9)), (int)(arg.Arg_10), ([][]*wtype.LHTip)(DecodeArrayOfArrayOfPtrToLHTip(arg.Arg_11)), (float64)(arg.Arg_12), (float64)(arg.Arg_13), (float64)(arg.Arg_14), (float64)(arg.Arg_15), (float64)(arg.Arg_16), wtype.BBox{wtype.Coordinates{}, DecodeCoordinates(arg.Arg_7)}}
 	return ret
 }
 func EncodePtrToLHAdaptor(arg *wtype.LHAdaptor) *pb.PtrToLHAdaptorMessage {
@@ -557,19 +557,19 @@ func DecodeMapstringPtrToLHTipboxMessageFieldEntry(arg *pb.MapstringPtrToLHTipbo
 	return k, v
 }
 func EncodeLHAdaptor(arg wtype.LHAdaptor) *pb.LHAdaptorMessage {
-	ret := pb.LHAdaptorMessage{(string)(arg.Name), 
-                               (string)(arg.ID), 
-                               (string)(arg.Manufacturer), 
-                               EncodePtrToLHChannelParameter(arg.Params), 
-                               EncodeArrayOfPtrToLHTip(arg.Tips)}
+	ret := pb.LHAdaptorMessage{(string)(arg.Name),
+		(string)(arg.ID),
+		(string)(arg.Manufacturer),
+		EncodePtrToLHChannelParameter(arg.Params),
+		EncodeArrayOfPtrToLHTip(arg.Tips)}
 	return &ret
 }
 func DecodeLHAdaptor(arg *pb.LHAdaptorMessage) wtype.LHAdaptor {
-	ret := wtype.LHAdaptor{(string)(arg.Arg_1), 
-                           (string)(arg.Arg_2), 
-                           (string)(arg.Arg_3), 
-                           (*wtype.LHChannelParameter)(DecodePtrToLHChannelParameter(arg.Arg_4)), 
-                           ([]*wtype.LHTip)(DecodeArrayOfPtrToLHTip(arg.Arg_5))}
+	ret := wtype.LHAdaptor{(string)(arg.Arg_1),
+		(string)(arg.Arg_2),
+		(string)(arg.Arg_3),
+		(*wtype.LHChannelParameter)(DecodePtrToLHChannelParameter(arg.Arg_4)),
+		([]*wtype.LHTip)(DecodeArrayOfPtrToLHTip(arg.Arg_5))}
 	return ret
 }
 func EncodePtrToLHPlate(arg *wtype.LHPlate) *pb.PtrToLHPlateMessage {
@@ -595,11 +595,11 @@ func DecodePtrToLHPlate(arg *pb.PtrToLHPlateMessage) *wtype.LHPlate {
 	return &ret
 }
 func EncodeLHTipwaste(arg wtype.LHTipwaste) *pb.LHTipwasteMessage {
-	ret := pb.LHTipwasteMessage{(string)(arg.ID), (string)(arg.Type), (string)(arg.Mnfr), int64(arg.Capacity), int64(arg.Contents), (float64)(arg.Height), (float64)(arg.WellXStart), (float64)(arg.WellYStart), (float64)(arg.WellZStart), EncodePtrToLHWell(arg.AsWell)}
+	ret := pb.LHTipwasteMessage{(string)(arg.ID), (string)(arg.Type), (string)(arg.Mnfr), int64(arg.Capacity), int64(arg.Contents), EncodeCoordinates(arg.GetBounds().GetSize()), (float64)(arg.WellXStart), (float64)(arg.WellYStart), (float64)(arg.WellZStart), EncodePtrToLHWell(arg.AsWell)}
 	return &ret
 }
 func DecodeLHTipwaste(arg *pb.LHTipwasteMessage) wtype.LHTipwaste {
-	ret := wtype.LHTipwaste{(string)(arg.Arg_1), (string)(arg.Arg_2), (string)(arg.Arg_3), (int)(arg.Arg_4), (int)(arg.Arg_5), (float64)(arg.Arg_6), (float64)(arg.Arg_7), (float64)(arg.Arg_8), (float64)(arg.Arg_9), (*wtype.LHWell)(DecodePtrToLHWell(arg.Arg_10))}
+	ret := wtype.LHTipwaste{(string)(arg.Arg_1), (string)(arg.Arg_2), (string)(arg.Arg_3), (int)(arg.Arg_4), (int)(arg.Arg_5), (float64)(arg.Arg_7), (float64)(arg.Arg_8), (float64)(arg.Arg_9), (*wtype.LHWell)(DecodePtrToLHWell(arg.Arg_10)), wtype.BBox{wtype.Coordinates{}, DecodeCoordinates(arg.Arg_6)}}
 	return ret
 }
 func EncodeLHChannelParameter(arg wtype.LHChannelParameter) *pb.LHChannelParameterMessage {
