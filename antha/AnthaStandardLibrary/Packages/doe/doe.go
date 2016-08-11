@@ -72,23 +72,39 @@ func (run Run) AddResponseValue(responsedescriptor string, responsevalue interfa
 
 }
 
+func (run Run) AllResponses() (headers []string, values []interface{}) {
+	headers = make([]string, 0)
+	values = make([]interface{}, 0)
+
+	for _, header := range run.Responsedescriptors {
+		headers = append(headers, header)
+	}
+	for _, value := range run.ResponseValues {
+		values = append(values, value)
+	}
+	return
+}
+
 func (run Run) GetResponseValue(responsedescriptor string) (responsevalue interface{}, err error) {
 
 	var tempresponsevalue interface{}
+	headers, _ := run.AllResponses()
 
-	errstr := fmt.Sprint("response descriptor", responsedescriptor, "not found in ", run)
+	errstr := fmt.Sprint("response descriptor", responsedescriptor, "not found in ", headers)
 	err = fmt.Errorf(errstr)
 	for i, descriptor := range run.Responsedescriptors {
 		if strings.TrimSpace(strings.ToUpper(descriptor)) == strings.TrimSpace(strings.ToUpper(responsedescriptor)) {
 			responsevalue = run.ResponseValues[i]
 			return responsevalue, nil
 		} else if strings.Contains(strings.TrimSpace(strings.ToUpper(descriptor)), strings.TrimSpace(strings.ToUpper(responsedescriptor))) {
-			errstr := fmt.Sprint("response descriptor", responsedescriptor, "found within ", run, "but no exact match")
+
+			errstr := fmt.Sprint("response descriptor", responsedescriptor, "found within ", descriptor, "but no exact match")
 			err = fmt.Errorf(errstr)
 			tempresponsevalue = run.ResponseValues[i]
 			return tempresponsevalue, err
 		} else if strings.Contains(strings.TrimSpace(strings.ToUpper(responsedescriptor)), strings.TrimSpace(strings.ToUpper(descriptor))) {
-			errstr := fmt.Sprint("response descriptor of ", run, "found within ", responsedescriptor, "but no exact match")
+
+			errstr := fmt.Sprint("response descriptors of ", descriptor, "found within ", responsedescriptor, "but not exact match")
 			err = fmt.Errorf(errstr)
 			tempresponsevalue = run.ResponseValues[i]
 			return tempresponsevalue, err

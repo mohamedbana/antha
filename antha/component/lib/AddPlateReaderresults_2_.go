@@ -303,7 +303,7 @@ func _AddPlateReaderresults_2Steps(_ctx context.Context, _input *AddPlateReaderr
 // post process any data and provide downstream results
 func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateReaderresults_2Input, _output *AddPlateReaderresults_2Output) {
 
-	_output.Errors = make([]error, 0)
+	_output.Errors = make([]string, 0)
 
 	xvalues := make([]float64, 0)
 	yvalues := make([]float64, 0)
@@ -317,15 +317,15 @@ func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateRead
 	if len(_output.Runs) == 0 {
 		execute.Errorf(_ctx, "no runs")
 	}
-	// now calculate mean, CV, r2 and plot results
+	// now calculate r2 and plot results
 	for i, runwithresponses := range _output.Runs {
 		// values for r2 to reset each run
 
 		// get response value and check if it's a float64 type
-		expectedconc, err := runwithresponses.GetResponseValue(" ExpectedConc " + strconv.Itoa(_input.Wavelength))
+		expectedconc, err := runwithresponses.GetResponseValue("Absorbance ExpectedConc " + strconv.Itoa(_input.Wavelength))
 
 		if err != nil {
-			_output.Errors = append(_output.Errors, err)
+			_output.Errors = append(_output.Errors, err.Error())
 		}
 
 		expectedconcfloat, floattrue := expectedconc.(float64)
@@ -341,7 +341,7 @@ func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateRead
 
 		if err != nil {
 			fmt.Println(err.Error())
-			_output.Errors = append(_output.Errors, err)
+			_output.Errors = append(_output.Errors, err.Error())
 		}
 
 		actualconcfloat, floattrue := actualconc.(float64)
@@ -355,12 +355,65 @@ func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateRead
 
 	}
 
-	_output.R2 = plot.Rsquared("Expected Conc", xvalues, "Actual Conc", yvalues)
+	_output.R2, _output.Variance, _output.Formula = plot.Rsquared("Expected Conc", xvalues, "Actual Conc", yvalues)
 	//run.AddResponseValue("R2", rsquared)
 
 	xygraph := plot.Plot(xvalues, [][]float64{yvalues})
 	filenameandextension := strings.Split(_input.OutputFilename, ".")
-	plot.Export(xygraph, filenameandextension[0]+".png")
+	plot.Export(xygraph, filenameandextension[0]+"_plot"+".png")
+
+	// reset
+	xvalues = make([]float64, 0)
+	yvalues = make([]float64, 0)
+
+	// add origin
+	xvalues = append(xvalues, 0.0)
+	yvalues = append(yvalues, 0.0)
+
+	// now plot correctnessfactor
+	for i, runwithresponses := range _output.Runs {
+		// values for r2 to reset each run
+
+		// get response value and check if it's a float64 type
+		expectedconc, err := runwithresponses.GetResponseValue("Absorbance ExpectedConc " + strconv.Itoa(_input.Wavelength))
+
+		if err != nil {
+			_output.Errors = append(_output.Errors, err.Error())
+		}
+
+		expectedconcfloat, floattrue := expectedconc.(float64)
+		// if float64 is true
+		if floattrue {
+			xvalues = append(xvalues, expectedconcfloat)
+		} else {
+			execute.Errorf(_ctx, "Run"+fmt.Sprint(i, runwithresponses)+" ExpectedConc:"+fmt.Sprint(expectedconcfloat))
+		}
+
+		// get response value and check if it's a float64 type
+		correctness, err := runwithresponses.GetResponseValue("Absorbance CorrectnessFactor " + strconv.Itoa(_input.Wavelength))
+
+		if err != nil {
+			fmt.Println(err.Error())
+			_output.Errors = append(_output.Errors, err.Error())
+		}
+
+		correctnessfloat, floattrue := correctness.(float64)
+
+		if floattrue {
+			yvalues = append(yvalues, correctnessfloat)
+		} else {
+			fmt.Println(err.Error())
+			execute.Errorf(_ctx, " Absorbance CorrectnessFactor:"+fmt.Sprint(correctnessfloat))
+		}
+
+	}
+
+	_output.R2_CorrectnessFactor, _, _ = plot.Rsquared("Expected Conc", xvalues, "Correctness Factor", yvalues)
+	//run.AddResponseValue("R2", rsquared)
+
+	correctnessgraph := plot.Plot(xvalues, [][]float64{yvalues})
+
+	plot.Export(correctnessgraph, filenameandextension[0]+"_correctnessfactor"+".png")
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
@@ -441,12 +494,15 @@ type AddPlateReaderresults_2Output struct {
 	BlankValues               []float64
 	CV                        float64
 	CVpass                    bool
-	Errors                    []error
+	Errors                    []string
+	Formula                   string
 	MeasuredOptimalWavelength int
 	R2                        float64
 	R2Pass                    bool
+	R2_CorrectnessFactor      float64
 	ResponsetoManualValuesmap map[string][]float64
 	Runs                      []doe.Run
+	Variance                  float64
 }
 
 type AddPlateReaderresults_2SOutput struct {
@@ -454,12 +510,15 @@ type AddPlateReaderresults_2SOutput struct {
 		BlankValues               []float64
 		CV                        float64
 		CVpass                    bool
-		Errors                    []error
+		Errors                    []string
+		Formula                   string
 		MeasuredOptimalWavelength int
 		R2                        float64
 		R2Pass                    bool
+		R2_CorrectnessFactor      float64
 		ResponsetoManualValuesmap map[string][]float64
 		Runs                      []doe.Run
+		Variance                  float64
 	}
 	Outputs struct {
 	}
@@ -495,11 +554,14 @@ func init() {
 				{Name: "CV", Desc: "", Kind: "Data"},
 				{Name: "CVpass", Desc: "", Kind: "Data"},
 				{Name: "Errors", Desc: "", Kind: "Data"},
+				{Name: "Formula", Desc: "", Kind: "Data"},
 				{Name: "MeasuredOptimalWavelength", Desc: "", Kind: "Data"},
 				{Name: "R2", Desc: "", Kind: "Data"},
 				{Name: "R2Pass", Desc: "", Kind: "Data"},
+				{Name: "R2_CorrectnessFactor", Desc: "", Kind: "Data"},
 				{Name: "ResponsetoManualValuesmap", Desc: "", Kind: "Data"},
 				{Name: "Runs", Desc: "", Kind: "Data"},
+				{Name: "Variance", Desc: "", Kind: "Data"},
 			},
 		},
 	}); err != nil {
