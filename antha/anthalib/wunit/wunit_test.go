@@ -141,9 +141,9 @@ func ExampleEight() {
 	// 50.000MHz  is  0.05   GHz
 	// 50.000MHz  is  50   MHz
 	// 10.000GHz  is  10000   MHz
-	// 10.000 l
+	// 10.000l
 	// Name: litre Symbol: l Conversion: 1    BaseUnit: l
-	//  l
+	// l
 }
 
 func ExampleNine() {

@@ -48,7 +48,7 @@ var listCmd = &cobra.Command{
 func listComponents(cmd *cobra.Command, args []string) error {
 	viper.BindPFlags(cmd.Flags())
 
-	cs, err := comp.New()
+	cs, err := comp.New(library)
 	if err != nil {
 		return err
 	}

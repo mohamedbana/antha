@@ -74,6 +74,7 @@ func (lhmcc LHMultiChannelConstraint) Equals(lhmcc2 LHMultiChannelConstraint) bo
 // describes sets of parameters which can be used to create a configuration
 type LHChannelParameter struct {
 	ID          string
+	Platform    string
 	Name        string
 	Minvol      wunit.Volume
 	Maxvol      wunit.Volume
@@ -86,7 +87,7 @@ type LHChannelParameter struct {
 }
 
 func (lhcp LHChannelParameter) String() string {
-	return fmt.Sprintf("%s Minvol %s Maxvol %s Minspd %s Maxspd %s Multi %d Independent %t Ori %d Head %d", lhcp.Name, lhcp.Minvol.ToString(), lhcp.Maxvol.ToString(), lhcp.Minspd.ToString(), lhcp.Maxspd.ToString(), lhcp.Multi, lhcp.Independent, lhcp.Orientation, lhcp.Head)
+	return fmt.Sprintf("%s %s Minvol %s Maxvol %s Minspd %s Maxspd %s Multi %d Independent %t Ori %d Head %d", lhcp.Platform, lhcp.Name, lhcp.Minvol.ToString(), lhcp.Maxvol.ToString(), lhcp.Minspd.ToString(), lhcp.Maxspd.ToString(), lhcp.Multi, lhcp.Independent, lhcp.Orientation, lhcp.Head)
 }
 
 // given the dimension of the plate, what is the constraint
@@ -142,15 +143,16 @@ func (lhcp LHChannelParameter) MarshalJSON() ([]byte, error) {
 }
 
 func (lhcp *LHChannelParameter) Dup() *LHChannelParameter {
-	r := NewLHChannelParameter(lhcp.Name, lhcp.Minvol, lhcp.Maxvol, lhcp.Minspd, lhcp.Maxspd, lhcp.Multi, lhcp.Independent, lhcp.Orientation, lhcp.Head)
+	r := NewLHChannelParameter(lhcp.Name, lhcp.Platform, lhcp.Minvol, lhcp.Maxvol, lhcp.Minspd, lhcp.Maxspd, lhcp.Multi, lhcp.Independent, lhcp.Orientation, lhcp.Head)
 
 	return r
 }
 
-func NewLHChannelParameter(name string, minvol, maxvol wunit.Volume, minspd, maxspd wunit.FlowRate, multi int, independent bool, orientation int, head int) *LHChannelParameter {
+func NewLHChannelParameter(name, platform string, minvol, maxvol wunit.Volume, minspd, maxspd wunit.FlowRate, multi int, independent bool, orientation int, head int) *LHChannelParameter {
 	var lhp LHChannelParameter
 	lhp.ID = GetUUID()
 	lhp.Name = name
+	lhp.Platform = platform
 	lhp.Minvol = minvol
 	lhp.Maxvol = maxvol
 	lhp.Minspd = minspd

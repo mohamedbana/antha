@@ -9,10 +9,11 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/search"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"github.com/antha-lang/antha/microArch/factory"
+	"golang.org/x/net/context"
 	"image/color"
 )
 
@@ -94,7 +95,7 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 		componentmap[componentname] = factory.GetComponentByType(componentname)
 
 	}
-	fmt.Println(componentmap)
+	//	fmt.Println(componentmap)
 
 	solutions := make([]*wtype.LHComponent, 0)
 
@@ -115,7 +116,7 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 			panic(err.Error())
 		}
 
-		fmt.Println(image.Colourcomponentmap[colour])
+		//	fmt.Println(image.Colourcomponentmap[colour])
 
 		// if the option to only print a single colour is not selected then the pipetting actions for all colours (apart from if not this colour is not empty) will follow
 		if _input.OnlythisColour != "" {
@@ -125,7 +126,7 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 				_output.UniqueComponents = append(_output.UniqueComponents, component.CName)
 
 				counter = counter + 1
-				fmt.Println("wells", _input.OnlythisColour, counter)
+				//		fmt.Println("wells",OnlythisColour, counter)
 				//mediaSample := mixer.SampleForTotalVolume(Media, VolumePerWell)
 				//components = append(components,mediaSample)
 				/*antibioticSample := mixer.Sample(Antibiotic, AntibioticVolume)
@@ -147,7 +148,7 @@ func _PipetteImage_livingSteps(_ctx context.Context, _input *PipetteImage_living
 				_output.UniqueComponents = append(_output.UniqueComponents, component.CName)
 
 				counter = counter + 1
-				fmt.Println("wells not ", _input.Notthiscolour, counter)
+				//		fmt.Println("wells not ",Notthiscolour,counter)
 				//mediaSample := mixer.SampleForTotalVolume(Media, VolumePerWell)
 				//components = append(components,mediaSample)
 				/*antibioticSample := mixer.Sample(Antibiotic, AntibioticVolume)
@@ -272,12 +273,12 @@ type PipetteImage_livingSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "PipetteImage_living",
+	if err := addComponent(component.Component{Name: "PipetteImage_living",
 		Constructor: PipetteImage_livingNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "Generates instructions to pipette out a defined image onto a defined plate using a defined palette of coloured bacteria\n",
 			Path: "antha/component/an/Liquid_handling/PipetteImage/PipetteLivingimage.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "AutoRotate", Desc: "", Kind: "Parameters"},
 				{Name: "Imagefilename", Desc: "InoculationVolume Volume\nAntibioticVolume Volume\n\tInducerVolume Volume\n\tRepressorVolume Volume\n", Kind: "Parameters"},
 				{Name: "Notthiscolour", Desc: "", Kind: "Parameters"},

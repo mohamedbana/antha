@@ -255,7 +255,7 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, size Coordinates, wellt
 			if colarr[j] == nil {
 				colarr[j] = make([]*LHWell, nrows)
 			}
-			arr[i][j] = welltype.Dup()
+			arr[i][j] = welltype.CDup()
 
 			//crds := wutil.NumToAlpha(i+1) + ":" + strconv.Itoa(j+1)
 			crds := WellCoords{j, i}.FormatA1()
@@ -269,6 +269,7 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, size Coordinates, wellt
 			arr[i][j].Plateid = lhp.ID
 			arr[i][j].Platetype = lhp.Type
 			arr[i][j].Crds = crds
+			arr[i][j].WContents.Loc = lhp.ID + ":" + crds
 		}
 	}
 
@@ -294,6 +295,10 @@ func (lhp *LHPlate) Dup() *LHPlate {
 			ret.Cols[j][i] = d
 			ret.Wellcoords[d.Crds] = d
 			ret.HWells[d.ID] = d
+			d.WContents.Loc = ret.ID + ":" + d.Crds
+			d.Plate = ret
+			d.Plateinst = ret.Inst
+			d.Plateid = ret.ID
 		}
 	}
 

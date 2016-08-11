@@ -47,7 +47,7 @@ func KLa_squaremicrowell(D float64, dv float64, ai float64, RE float64, a float6
 
 	log := math.Log((3.94E-4)) + math.Log((D / dv)) + math.Log(math.Pow(RE, 1.91)) + (a * (math.Pow(froude, b)))
 
-	fmt.Println("e ^", log)
+	// fmt.Println("e ^", log)
 
 	kla := math.Exp(log)
 

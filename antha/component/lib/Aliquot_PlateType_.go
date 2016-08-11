@@ -6,9 +6,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -35,7 +36,7 @@ func _Aliquot_PlateTypeSteps(_ctx context.Context, _input *Aliquot_PlateTypeInpu
 	number := _input.SolutionVolume.SIValue() / _input.VolumePerAliquot.SIValue()
 	possiblenumberofAliquots, _ := wutil.RoundDown(number)
 	if possiblenumberofAliquots < _input.NumberofAliquots {
-		panic("Not enough solution for this many aliquots")
+		execute.Errorf(_ctx, "Not enough solution for this many aliquots")
 	}
 
 	aliquots := make([]*wtype.LHComponent, 0)
@@ -137,12 +138,12 @@ type Aliquot_PlateTypeSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Aliquot_PlateType",
+	if err := addComponent(component.Component{Name: "Aliquot_PlateType",
 		Constructor: Aliquot_PlateTypeNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "example protocol showing The MixTo command which allows a specifc plate type to be specified. i.e. platetype pcrplate_skirted\n",
 			Path: "antha/component/an/AnthaAcademy/Lesson2_mix/C_AliquotTo_PlateType.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "NumberofAliquots", Desc: "", Kind: "Parameters"},
 				{Name: "OutPlatetype", Desc: "", Kind: "Parameters"},
 				{Name: "Solution", Desc: "", Kind: "Inputs"},

@@ -61,10 +61,12 @@ import (
 
 type Liquidhandler struct {
 	Properties       *liquidhandling.LHProperties
+	FinalProperties  *liquidhandling.LHProperties
 	SetupAgent       func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
 	LayoutAgent      func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
 	ExecutionPlanner func(*LHRequest, *liquidhandling.LHProperties) (*LHRequest, error)
 	PolicyManager    *LHPolicyManager
+	plateIDMap       map[string]string // which plates are before / after versions
 }
 
 // initialize the liquid handling structure
@@ -74,7 +76,19 @@ func Init(properties *liquidhandling.LHProperties) *Liquidhandler {
 	lh.LayoutAgent = ImprovedLayoutAgent
 	lh.ExecutionPlanner = ImprovedExecutionPlanner
 	lh.Properties = properties
+	lh.FinalProperties = properties
+	lh.plateIDMap = make(map[string]string)
 	return &lh
+}
+
+func (this *Liquidhandler) PlateIDMap() map[string]string {
+	ret := make(map[string]string, len(this.plateIDMap))
+
+	for k, v := range this.plateIDMap {
+		ret[k] = v
+	}
+
+	return ret
 }
 
 // high-level function which requests planning and execution for an incoming set of
@@ -160,7 +174,6 @@ func (this *Liquidhandler) Simulate(request *LHRequest) error {
 // run the request via the driver
 func (this *Liquidhandler) Execute(request *LHRequest) error {
 	// set up the robot
-	driver := this.Properties.Driver.(liquidhandling.ExtendedLiquidhandlingDriver)
 
 	instructions := (*request).Instructions
 
@@ -174,8 +187,9 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 	var d time.Duration
 
 	for _, ins := range instructions {
-		logger.Debug(fmt.Sprintln(liquidhandling.InsToString(ins)))
-		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(driver)
+		//logger.Debug(fmt.Sprintln(liquidhandling.InsToString(ins)))
+		fmt.Println(liquidhandling.InsToString(ins))
+		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(this.Properties.Driver)
 
 		if timer != nil {
 			d += timer.TimeFor(ins)
@@ -189,8 +203,6 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 }
 
 func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
-	// just count up the volumes... add a fudge for additional volume perhaps
-
 	// XXX -- HARD CODE 8 here
 	lastPlate := make([]string, 8)
 	lastWell := make([]string, 8)
@@ -203,7 +215,7 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 			lastPos := ins.GetParameter("POSTO").([]string)
 
 			for i, p := range lastPos {
-				lastPlate[i] = this.Properties.PosLookup[p]
+				lastPlate[i] = this.FinalProperties.PosLookup[p]
 			}
 
 			lastWell = ins.GetParameter("WELLTO").([]string)
@@ -239,7 +251,8 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 	// now go through and set the plates up appropriately
 
 	for plateID, wellmap := range vols {
-		plate, ok := this.Properties.Plates[this.Properties.PlateIDLookup[plateID]]
+		plate, ok := this.FinalProperties.Plates[this.FinalProperties.PlateIDLookup[plateID]]
+		plate2, _ := this.Properties.Plates[this.FinalProperties.PlateIDLookup[plateID]]
 
 		if !ok {
 			err := wtype.LHError(wtype.LH_ERR_DIRE, fmt.Sprint("NO SUCH PLATE: ", plateID))
@@ -248,10 +261,13 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 
 		for crd, vol := range wellmap {
 			well := plate.Wellcoords[crd]
+			well2 := plate2.Wellcoords[crd]
 			if well.IsAutoallocated() {
 				vol.Add(well.ResidualVolume())
-				well.WContents.SetVolume(vol)
+				well2.WContents.SetVolume(vol)
+				well.WContents.SetVolume(well.ResidualVolume())
 				well.DeclareNotTemporary()
+				well2.DeclareNotTemporary()
 			}
 		}
 	}
@@ -259,6 +275,24 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 	// finally get rid of any temporary stuff
 
 	this.Properties.RemoveTemporaryComponents()
+	this.FinalProperties.RemoveTemporaryComponents()
+
+	// now ensure the mapping, excluding any temp plates added above, is recorded
+
+	for plateID, _ := range vols {
+		plate, ok := this.FinalProperties.Plates[this.FinalProperties.PlateIDLookup[plateID]]
+
+		if !ok {
+			// plate deleted
+			continue
+		}
+
+		pos := this.FinalProperties.PlateIDLookup[plateID]
+
+		plate2 := this.Properties.Plates[pos]
+
+		this.plateIDMap[plate2.ID] = plate.ID
+	}
 
 	// all done
 
@@ -367,7 +401,6 @@ func (this *Liquidhandler) Plan(request *LHRequest) error {
 		return err
 	}
 	// fix the deck setup
-
 	request, err = this.Tip_box_setup(request)
 	if err != nil {
 		return err
@@ -465,6 +498,7 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) (*LHRequest, error) {
 	(*request).Input_order = component_order
 
 	// work out how much we have and how much we need
+	// need to consider what to do with IDs
 
 	var requestinputs map[string][]*wtype.LHComponent
 	requestinputs = request.Input_solutions
@@ -492,8 +526,8 @@ func (this *Liquidhandler) GetInputs(request *LHRequest) (*LHRequest, error) {
 		if volb.GreaterThanFloat(0.0001) {
 			vmap3[k] = volb
 		}
-		volc := vmap[k]
-		logger.Debug(fmt.Sprint("COMPONENT ", k, " HAVE : ", vola.ToString(), " WANT: ", volc.ToString(), " DIFF: ", volb.ToString()))
+		//	volc := vmap[k]
+		//logger.Debug(fmt.Sprint("COMPONENT ", k, " HAVE : ", vola.ToString(), " WANT: ", volc.ToString(), " DIFF: ", volb.ToString()))
 	}
 
 	(*request).Input_vols_required = vmap
@@ -625,11 +659,23 @@ func (this *Liquidhandler) Layout(request *LHRequest) (*LHRequest, error) {
 
 // make the instructions for executing this request
 func (this *Liquidhandler) ExecutionPlan(request *LHRequest) (*LHRequest, error) {
-	rbtcpy := this.Properties.Dup()
+	//rbtcpy := this.Properties.Dup()
+	this.FinalProperties = this.Properties.Dup()
 
-	rq, err := this.ExecutionPlanner(request, rbtcpy)
+	rq, err := this.ExecutionPlanner(request, this.FinalProperties)
 
 	// ensure any relevant state changes are noted
+
+	/*
+		for _, v := range rbtcpy.Plates {
+			fmt.Println("PLATE NAME: ", v.Name())
+			for _, w := range v.Wellcoords {
+				if !w.Empty() {
+					fmt.Println("WELL: ", w.Crds, " HAS: ", w.WContents.Volume().ToString(), " of ", w.WContents.CName)
+				}
+			}
+		}
+	*/
 
 	return rq, err
 }

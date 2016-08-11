@@ -603,14 +603,14 @@ func DecodeLHTipwaste(arg *pb.LHTipwasteMessage) wtype.LHTipwaste {
 	return ret
 }
 func EncodeLHChannelParameter(arg wtype.LHChannelParameter) *pb.LHChannelParameterMessage {
-	ret := pb.LHChannelParameterMessage{(string)(arg.ID), (string)(arg.Name), EncodeVolume(arg.Minvol), EncodeVolume(arg.Maxvol), EncodeFlowRate(arg.Minspd), EncodeFlowRate(arg.Maxspd), int64(arg.Multi), (bool)(arg.Independent), int64(arg.Orientation), int64(arg.Head)}
+	ret := pb.LHChannelParameterMessage{(string)(arg.ID), (string)(arg.Platform), (string)(arg.Name), EncodeVolume(arg.Minvol), EncodeVolume(arg.Maxvol), EncodeFlowRate(arg.Minspd), EncodeFlowRate(arg.Maxspd), int64(arg.Multi), (bool)(arg.Independent), int64(arg.Orientation), int64(arg.Head)}
 	return &ret
 }
 func DecodeLHChannelParameter(arg *pb.LHChannelParameterMessage) wtype.LHChannelParameter {
 	if arg == nil {
 		return wtype.LHChannelParameter{}
 	}
-	ret := wtype.LHChannelParameter{(string)(arg.Arg_1), (string)(arg.Arg_2), (wunit.Volume)(DecodeVolume(arg.Arg_3)), (wunit.Volume)(DecodeVolume(arg.Arg_4)), (wunit.FlowRate)(DecodeFlowRate(arg.Arg_5)), (wunit.FlowRate)(DecodeFlowRate(arg.Arg_6)), (int)(arg.Arg_7), (bool)(arg.Arg_8), (int)(arg.Arg_9), (int)(arg.Arg_10)}
+	ret := wtype.LHChannelParameter{(string)(arg.Arg_1), (string)(arg.Arg_2), (string)(arg.Arg_3), (wunit.Volume)(DecodeVolume(arg.Arg_4)), (wunit.Volume)(DecodeVolume(arg.Arg_5)), (wunit.FlowRate)(DecodeFlowRate(arg.Arg_6)), (wunit.FlowRate)(DecodeFlowRate(arg.Arg_7)), (int)(arg.Arg_8), (bool)(arg.Arg_9), (int)(arg.Arg_10), (int)(arg.Arg_11)}
 	return ret
 }
 func EncodeCoordinates(arg wtype.Coordinates) *pb.CoordinatesMessage {

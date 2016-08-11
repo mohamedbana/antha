@@ -143,7 +143,7 @@ func LayoutStage(request *LHRequest, params *liquidhandling.LHProperties, chain 
 					//fmt.Println("SETTING LOCATION...A")
 					x.Loc = remap[tx[0]] + ":" + tx[1]
 					sampletracker.SetLocationOf(x.ID, x.Loc)
-					logger.Track(fmt.Sprintf("OUTPUT ASSIGNMENT I=%s R=%s A=%s", id, x.ID, x.Loc))
+					//logger.Track(fmt.Sprintf("OUTPUT ASSIGNMENT I=%s R=%s A=%s", id, x.ID, x.Loc))
 				} else {
 					//fmt.Println("SETTING LOCATION...B")
 					x.Loc = tx[0] + ":" + tx[1]

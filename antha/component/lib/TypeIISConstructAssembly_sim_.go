@@ -11,9 +11,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -238,12 +239,12 @@ type TypeIISConstructAssembly_simSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "TypeIISConstructAssembly_sim",
+	if err := addComponent(component.Component{Name: "TypeIISConstructAssembly_sim",
 		Constructor: TypeIISConstructAssembly_simNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/TypeIIsAssembly/TypeIIsConstructAssembly_sim/TypeIIsConstructAssembly_sim.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Atp", Desc: "", Kind: "Inputs"},
 				{Name: "AtpVol", Desc: "", Kind: "Parameters"},
 				{Name: "Buffer", Desc: "", Kind: "Inputs"},

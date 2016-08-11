@@ -1,7 +1,7 @@
 {
     "Parameters": {
         "DiluteBuffer": {
-            "Bufferstock": "tartrazine",
+            "Bufferstock": "Acid yellow 23",
             "Bufferstockconc": "0.006M/l",
             "BufferVolumeAdded": "1ul",
             "Diluent": "water",

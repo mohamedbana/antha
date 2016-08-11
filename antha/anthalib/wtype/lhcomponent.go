@@ -24,12 +24,12 @@
 package wtype
 
 import (
-	"encoding/json"
 	"fmt"
-	"strings"
-
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/microArch/logger"
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
+	"strings"
+	//"github.com/antha-lang/antha/microArch/logger"
+	"github.com/antha-lang/antha/graph"
 )
 
 // structure describing a liquid component and its desired properties
@@ -129,6 +129,8 @@ func (lhc *LHComponent) Dup() *LHComponent {
 	}
 	c.Loc = lhc.Loc
 	c.Destination = lhc.Destination
+	c.ParentID = lhc.ParentID
+	c.DaughterID = lhc.DaughterID
 	return c
 }
 
@@ -168,25 +170,26 @@ func (cmp *LHComponent) HasAnyParent() bool {
 	return false
 }
 
-func (cmp *LHComponent) AddParent(parentID string) {
-	cmp.ParentID += parentID + "_"
+func (cmp *LHComponent) AddParentComponent(cmp2 *LHComponent) {
+	if cmp.ParentID != "" {
+		cmp.ParentID += "_"
+	}
+	cmp.ParentID += cmp2.String() + "(" + cmp2.ParentID + ")"
+	//cmp.ParentID += cmp2.ID + "(" + cmp2.ParentID + ")"
 }
 
-func (cmp *LHComponent) AddDaughter(daughterID string) {
-	cmp.DaughterID += daughterID + "_"
+func (cmp *LHComponent) AddDaughterComponent(cmp2 *LHComponent) {
+	if cmp.DaughterID != "" {
+		cmp.DaughterID += "_"
+	}
+
+	//cmp.DaughterID += cmp2.String()
+
+	cmp.DaughterID += cmp2.ID
 }
 
 func (cmp *LHComponent) Mix(cmp2 *LHComponent) {
-	// if this component is zero we inherit the id of the other one
-	// unless the other component is a sample: in this case it retains
-	// the parent ID so this would not be safe
-	// do I want to do this at all?
-	/*
-		if cmp.IsZero() && !cmp2.IsSample() {
-			fmt.Println("CMP IS ZERO: REDEFINING ID")
-			cmp.ID = cmp2.ID
-		}
-	*/
+	//wasEmpty := cmp.IsZero()
 	cmp.Smax = mergeSolubilities(cmp, cmp2)
 	// determine type of final
 	cmp.Type = mergeTypes(cmp, cmp2)
@@ -197,7 +200,18 @@ func (cmp *LHComponent) Mix(cmp2 *LHComponent) {
 	cmp.Vol = vcmp.RawValue() // same units
 	cmp.CName = mergeNames(cmp.CName, cmp2.CName)
 	// allow trace back
-	logger.Track(fmt.Sprintf("MIX %s %s %s", cmp.ID, cmp2.ID, vcmp.ToString()))
+	//logger.Track(fmt.Sprintf("MIX %s %s %s", cmp.ID, cmp2.ID, vcmp.ToString()))
+
+	// add parent IDs... this is recursive
+
+	/*
+		if !wasEmpty {
+			cmp.AddParentComponent(cmp)
+		}
+	*/
+	cmp.AddParentComponent(cmp2)
+	cmp.ID = GetUUID()
+	cmp2.AddDaughterComponent(cmp)
 }
 
 // @implement Liquid
@@ -245,15 +259,93 @@ func NewLHComponent() *LHComponent {
 	return &lhc
 }
 
-// XXX -- why is this different from Dup?
-func CopyLHComponent(lhc *LHComponent) *LHComponent {
-	tmp, _ := json.Marshal(lhc)
-	var lhc2 LHComponent
-	json.Unmarshal(tmp, &lhc2)
-	lhc2.ID = GetUUID()
-	if lhc2.Inst != "" {
-		lhc2.Inst = GetUUID()
-		// this needs some thought
+func (cmp *LHComponent) String() string {
+	id := cmp.ID
+
+	l := cmp.Loc
+
+	v := fmt.Sprintf("%-6.3f:%s", cmp.Vol, cmp.Vunit)
+
+	if l == "" {
+		l = "NOPLATE:NOWELL"
 	}
-	return &lhc2
+
+	return id + ":" + l + ":" + v
+}
+
+func (cmp *LHComponent) ParentTree() graph.StringGraph {
+	g := graph.StringGraph{Nodes: make([]string, 0, 3), Outs: make(map[string][]string)}
+	parseTree(cmp.ID+"("+cmp.ParentID+")", &g)
+	return g
+}
+
+// graphviz format
+func (cmp *LHComponent) ParentTreeString() string {
+	g := cmp.ParentTree()
+	s := graph.Print(graph.PrintOpt{Graph: &g})
+	return s
+}
+
+//   a(b_c_d)_e()_f(g_h)
+//   nodes: [abcdefgh]
+//   outs : a:[] b[a] c[a] d[a] e[] f[] g[f] h[f]
+//
+
+func parseTree(p string, g *graph.StringGraph) []string {
+	newnodes := make([]string, 0, 3)
+	if p[0] == '(' {
+		// strip brackets
+		p = p[1 : len(p)-1]
+	}
+
+	if len(p) == 0 {
+		// empty bracket pair
+		return newnodes
+	}
+
+	bc := 0
+
+	splits := make([]int, 0, len(p))
+
+	for i, c := range p {
+		if c == '(' {
+			bc += 1
+			continue
+		} else if c == ')' {
+			bc -= 1
+			continue
+		}
+
+		if bc == 0 && c == '_' {
+			splits = append(splits, i)
+		}
+		//   a(b()_c()_d())_e()_f(g()_h())
+		//                 s   s
+	}
+
+	splits = append(splits, len(p))
+
+	// carve up
+
+	b := 0
+
+	for _, e := range splits {
+		tok := p[b:e]
+		lb := strings.Index(tok, "(")
+		node := tok[:lb]
+		if !wutil.StrInStrArray(node, g.Nodes) {
+			g.Nodes = append(g.Nodes, node)
+			g.Outs[node] = make([]string, 0, 3)
+			newnodes = append(newnodes, node)
+		}
+
+		childnodes := parseTree(tok[lb:], g)
+
+		for _, child := range childnodes {
+			g.Outs[child] = append(g.Outs[child], node)
+		}
+		b = e + 1
+	}
+
+	return newnodes
 }

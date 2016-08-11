@@ -6,9 +6,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -41,12 +42,10 @@ func _TypeIISConstructAssemblyMMX_forscreenSteps(_ctx context.Context, _input *T
 		Partsinorder:  _input.PartSeqs[:last],
 	})
 	if err != nil {
-		_output.Errors = append(_output.Errors, fmt.Sprintf("%s: %s", output, err))
-		return
+		execute.Errorf(_ctx, "%s: %s", output, err)
 	}
 	if count != 1 {
-		_output.Errors = append(_output.Errors, fmt.Sprintf("no successful assembly"))
-		return
+		execute.Errorf(_ctx, "no successful assembly")
 	}
 
 	_output.Sequence = seq
@@ -54,23 +53,22 @@ func _TypeIISConstructAssemblyMMX_forscreenSteps(_ctx context.Context, _input *T
 	waterSample := mixer.SampleForTotalVolume(_input.Water, _input.ReactionVolume)
 	samples = append(samples, waterSample)
 
-	mmxSample := mixer.Sample(_input.MasterMix, _input.MasterMixVolume)
-	samples = append(samples, mmxSample)
-
 	for k, part := range _input.Parts {
 		fmt.Println("creating dna part num ", k, " comp ", part.CName, " renamed to ", _input.PartSeqs[k].Nm, " vol ", _input.PartVols[k])
 
 		part.Type, err = wtype.LiquidTypeFromString(_input.LHPolicyName)
 
 		if err != nil {
-			_output.Errors = append(_output.Errors, fmt.Sprintf("cannot find liquid type: %s", err))
-			return
+			execute.Errorf(_ctx, "cannot find liquid type: %s", err)
 		}
 
 		partSample := mixer.Sample(part, _input.PartVols[k])
 		partSample.CName = _input.PartSeqs[k].Nm
 		samples = append(samples, partSample)
 	}
+
+	mmxSample := mixer.Sample(_input.MasterMix, _input.MasterMixVolume)
+	samples = append(samples, mmxSample)
 
 	// ensure the last step is mixed
 	samples[len(samples)-1].Type = wtype.LTDNAMIX
@@ -164,7 +162,6 @@ type TypeIISConstructAssemblyMMX_forscreenInput struct {
 
 type TypeIISConstructAssemblyMMX_forscreenOutput struct {
 	ConstructName string
-	Errors        []string
 	Reaction      *wtype.LHComponent
 	Sequence      wtype.DNASequence
 }
@@ -172,7 +169,6 @@ type TypeIISConstructAssemblyMMX_forscreenOutput struct {
 type TypeIISConstructAssemblyMMX_forscreenSOutput struct {
 	Data struct {
 		ConstructName string
-		Errors        []string
 		Sequence      wtype.DNASequence
 	}
 	Outputs struct {
@@ -181,12 +177,12 @@ type TypeIISConstructAssemblyMMX_forscreenSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "TypeIISConstructAssemblyMMX_forscreen",
+	if err := addComponent(component.Component{Name: "TypeIISConstructAssemblyMMX_forscreen",
 		Constructor: TypeIISConstructAssemblyMMX_forscreenNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/TypeIIsAssembly/TypeIISConstructAssemblyMMX_forscreen/TypeIISConstructAssemblyMMX.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "EnzymeName", Desc: "", Kind: "Parameters"},
 				{Name: "InactivationTemp", Desc: "", Kind: "Parameters"},
 				{Name: "InactivationTime", Desc: "", Kind: "Parameters"},
@@ -206,7 +202,6 @@ func init() {
 				{Name: "ReactionVolume", Desc: "", Kind: "Parameters"},
 				{Name: "Water", Desc: "", Kind: "Inputs"},
 				{Name: "ConstructName", Desc: "", Kind: "Data"},
-				{Name: "Errors", Desc: "", Kind: "Data"},
 				{Name: "Reaction", Desc: "", Kind: "Outputs"},
 				{Name: "Sequence", Desc: "", Kind: "Data"},
 			},

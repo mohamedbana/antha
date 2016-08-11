@@ -49,7 +49,7 @@ Steps {
 	number := SolutionVolume.SIValue()/VolumePerAliquot.SIValue()
 	possiblenumberofAliquots, _ := wutil.RoundDown(number)
 	if possiblenumberofAliquots < NumberofAliquots {
-		panic("Not enough solution for this many aliquots")
+		Errorf("Not enough solution for this many aliquots")
 	}
 	
 	

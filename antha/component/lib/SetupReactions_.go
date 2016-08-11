@@ -14,9 +14,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -147,12 +148,12 @@ type SetupReactionsSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "SetupReactions",
+	if err := addComponent(component.Component{Name: "SetupReactions",
 		Constructor: SetupReactionsNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "this protocol will set up a specified number of reactions one component at a time, i.e. in the following format:\nadd component 1 into reaction 1 location,\nadd component 1 into reaction 2 location,\nadd component 1 into reaction n location,\nadd component 2 into reaction 1 location,\nadd component 2 into reaction 2 location,\nadd component 2 into reaction n location,\nadd component x into reaction 1 location,\nadd component x into reaction 2 location,\nadd component x into reaction n location,\n",
 			Path: "antha/component/an/AnthaAcademy/Lesson3_MixPart2/A_Assaysetup_componentbycomponent.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Buffer", Desc: "", Kind: "Inputs"},
 				{Name: "Enzyme", Desc: "", Kind: "Inputs"},
 				{Name: "EnzymeVolume", Desc: "", Kind: "Parameters"},

@@ -5,9 +5,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -162,12 +163,12 @@ type SerialDilutionSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "SerialDilution",
+	if err := addComponent(component.Component{Name: "SerialDilution",
 		Constructor: SerialDilutionNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "Protocol to make a serial dilution series from a solution and diluent\n",
 			Path: "antha/component/an/Liquid_handling/SerialDilution/SerialDilution.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "DilutionFactor", Desc: "", Kind: "Parameters"},
 				{Name: "NumberOfDilutions", Desc: "", Kind: "Parameters"},
@@ -177,5 +178,7 @@ func init() {
 				{Name: "Dilutions", Desc: "", Kind: "Outputs"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

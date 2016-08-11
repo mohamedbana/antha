@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Reaction volume
@@ -158,12 +159,12 @@ type MakeAssembliesSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "MakeAssemblies",
+	if err := addComponent(component.Component{Name: "MakeAssemblies",
 		Constructor: MakeAssembliesNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "Assemble multiple assemblies using TypeIIs construct assembly\n",
 			Path: "antha/component/an/Liquid_handling/TypeIIsAssembly/MakeAssemblies/MakeAssemblies.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Atp", Desc: "ATP to use\n", Kind: "Inputs"},
 				{Name: "AtpVol", Desc: "ATP volume\n", Kind: "Parameters"},
 				{Name: "Buffer", Desc: "Buffer to use\n", Kind: "Inputs"},

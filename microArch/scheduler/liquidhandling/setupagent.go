@@ -132,7 +132,7 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) (*
 		setup[position] = p
 		plate_lookup[p.ID] = position
 		params.AddPlate(position, p)
-		logger.Info(fmt.Sprintf("Output plate of type %s in position %s", p.Type, position))
+		//logger.Info(fmt.Sprintf("Output plate of type %s in position %s", p.Type, position))
 	}
 
 	for _, pid := range input_plate_order {
@@ -148,6 +148,7 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) (*
 			allowed = make([]string, 0, 1)
 		}
 		position := get_first_available_preference(input_preferences, setup, allowed)
+
 		if position == "" {
 			//RaiseError("No positions left for input")
 			err := wtype.LHError(wtype.LH_ERR_NO_DECK_SPACE, fmt.Sprint("No position left for input ", p.GetName(), " Type: ", p.Type, " Constrained: ", isConstrained, " allowed positions: ", allowed))

@@ -29,16 +29,18 @@ import (
 	//"github.com/antha-lang/antha/antha/anthalib/wtype"
 )
 
-func StockConcentration(nameofmolecule string, massofmoleculeactuallyaddedinG wunit.Mass, diluent string, totalvolumeinL wunit.Volume) (actualconc wunit.Concentration) {
-
-	molecule := pubchem.MakeMolecule(nameofmolecule)
+func StockConcentration(nameofmolecule string, massofmoleculeactuallyaddedinG wunit.Mass, diluent string, totalvolumeinL wunit.Volume) (actualconc wunit.Concentration, err error) {
+	molecule, err := pubchem.MakeMolecule(nameofmolecule)
+	if err != nil {
+		return
+	}
 
 	// in particular, the molecular weight
 	molecularweight := molecule.MolecularWeight
 
 	//diluentmolecule := pubchem.MakeMolecule(diluent)
 
-	//fmt.Println("SI value of mass:", massofmoleculeactuallyaddedinG.SIValue())
+	//// fmt.Println("SI value of mass:", massofmoleculeactuallyaddedinG.SIValue())
 
 	actualconcfloat := (massofmoleculeactuallyaddedinG.SIValue() * 1000) / (molecularweight * totalvolumeinL.SIValue())
 
@@ -47,9 +49,11 @@ func StockConcentration(nameofmolecule string, massofmoleculeactuallyaddedinG wu
 	return
 }
 
-func Dilute(moleculename string, stockconc wunit.Concentration, stockvolume wunit.Volume, diluentname string, diluentvoladded wunit.Volume) (dilutedconc wunit.Concentration) {
-
-	molecule := pubchem.MakeMolecule(moleculename)
+func Dilute(moleculename string, stockconc wunit.Concentration, stockvolume wunit.Volume, diluentname string, diluentvoladded wunit.Volume) (dilutedconc wunit.Concentration, err error) {
+	molecule, err := pubchem.MakeMolecule(moleculename)
+	if err != nil {
+		return
+	}
 
 	stockMperL := stockconc.MolPerL(molecule.MolecularWeight)
 

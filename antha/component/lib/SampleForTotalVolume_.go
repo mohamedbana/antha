@@ -5,9 +5,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 // Input parameters for this protocol (data)
@@ -140,12 +141,12 @@ type SampleForTotalVolumeSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "SampleForTotalVolume",
+	if err := addComponent(component.Component{Name: "SampleForTotalVolume",
 		Constructor: SampleForTotalVolumeNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "example protocol demonstrating the use of the SampleForTotalVolume function\n",
 			Path: "antha/component/an/AnthaAcademy/Lesson1_Sample/C_SampleForTotalVolume.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
 				{Name: "Solution", Desc: "", Kind: "Inputs"},
 				{Name: "SolutionVolume", Desc: "e.g. 2ul\n", Kind: "Parameters"},

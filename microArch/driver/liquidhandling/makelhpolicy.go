@@ -555,8 +555,8 @@ func MakeDNAPolicy() LHPolicy {
 
 func MakeDNAMixPolicy() LHPolicy {
 	dnapolicy := MakeDNAPolicy()
-	dnapolicy["POST_MIX_VOLUME"] = 50
-	dnapolicy["POST_MIX"] = 3
+	dnapolicy["POST_MIX_VOLUME"] = 10.0
+	dnapolicy["POST_MIX"] = 5
 	dnapolicy["POST_MIX_Z"] = 0.5
 	dnapolicy["POST_MIX_RATE"] = 3.0
 	return dnapolicy
@@ -850,6 +850,15 @@ func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
 	lhpr.AddRule(rule, pol)
 
 	*/
+
+	// remove blowout from gilson
+	rule = NewLHPolicyRule("NoBlowoutForGilson")
+	rule.AddCategoryConditionOn("PLATFORM", "GilsonPipetmax")
+
+	policy := make(LHPolicy, 6)
+	policy["RESET_OVERRIDE"] = true
+
+	lhpr.AddRule(rule, policy)
 
 	return lhpr, nil
 

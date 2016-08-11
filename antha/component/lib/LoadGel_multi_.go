@@ -5,9 +5,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"strconv"
 )
 
@@ -142,12 +143,12 @@ type LoadGel_multiSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "LoadGel_multi",
+	if err := addComponent(component.Component{Name: "LoadGel_multi",
 		Constructor: LoadGel_multiNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/LoadGel/LoadGel_multi.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "GelPlate", Desc: "Gel to load ie OutPlate\n", Kind: "Inputs"},
 				{Name: "InPlate", Desc: "96 well plate with water, marker and samples\n", Kind: "Inputs"},
 				{Name: "LoadVolume", Desc: "", Kind: "Parameters"},

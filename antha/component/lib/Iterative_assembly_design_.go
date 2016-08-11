@@ -14,9 +14,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"strconv"
 	"strings"
 )
@@ -298,12 +299,12 @@ type Iterative_assembly_designSOutput struct {
 }
 
 func init() {
-	if err := addComponent(Component{Name: "Iterative_assembly_design",
+	if err := addComponent(component.Component{Name: "Iterative_assembly_design",
 		Constructor: Iterative_assembly_designNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/Iterative_assembly_design.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "ApprovedEnzymes", Desc: "", Kind: "Parameters"},
 				{Name: "Constructname", Desc: "", Kind: "Parameters"},
 				{Name: "Seqsinorder", Desc: "", Kind: "Parameters"},
