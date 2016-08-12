@@ -319,7 +319,7 @@ func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateRead
 	if len(_output.Runs) == 0 {
 		execute.Errorf(_ctx, "no runs")
 	}
-	// now calculate r2 and plot results
+	// 1. now calculate r2 and plot results
 	for i, runwithresponses := range _output.Runs {
 		// values for r2 to reset each run
 
@@ -372,7 +372,7 @@ func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateRead
 	xvalues = append(xvalues, 0.0)
 	yvalues = append(yvalues, 0.0)
 
-	// now plot correctnessfactor
+	// 2. now plot correctnessfactor
 	for i, runwithresponses := range _output.Runs {
 		// values for r2 to reset each run
 
@@ -417,7 +417,64 @@ func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateRead
 
 	plot.Export(correctnessgraph, filenameandextension[0]+"_correctnessfactor"+".png")
 
-	// now look for systematic errors
+	// reset
+	xvalues = make([]float64, 0)
+	yvalues = make([]float64, 0)
+
+	// add origin
+	xvalues = append(xvalues, 0.0)
+	yvalues = append(yvalues, 0.0)
+
+	// 3. now look for systematic errors
+	for i, runwithresponses := range _output.Runs {
+		// values for r2 to reset each run
+
+		// get response value and check if it's a float64 type
+		runorder, err := runwithresponses.GetResponseValue("Runorder")
+
+		if err != nil {
+			_output.Errors = append(_output.Errors, err.Error())
+		}
+
+		runorderint, inttrue := runorder.(int)
+		// if int is true
+		if inttrue {
+			xvalues = append(xvalues, float64(runorderint))
+		} else {
+			execute.Errorf(_ctx, "Run"+fmt.Sprint(i, runwithresponses)+" Run Order:"+fmt.Sprint(runorderint), " not an int")
+		}
+
+		// get response value and check if it's a float64 type
+		actualconc, err := runwithresponses.GetResponseValue("AbsorbanceActualConc")
+
+		if err != nil {
+			fmt.Println(err.Error())
+			_output.Errors = append(_output.Errors, err.Error())
+		}
+
+		actualconcfloat, floattrue := actualconc.(float64)
+
+		if floattrue {
+			yvalues = append(yvalues, actualconcfloat)
+		} else {
+			fmt.Println(err.Error())
+			execute.Errorf(_ctx, " ActualConc:"+fmt.Sprint(actualconcfloat))
+		}
+	}
+
+	runorderconcgraph := plot.Plot(xvalues, [][]float64{yvalues})
+
+	plot.Export(runorderconcgraph, filenameandextension[0]+"_runorder"+".png")
+
+	// reset
+	xvalues = make([]float64, 0)
+	yvalues = make([]float64, 0)
+
+	// add origin
+	xvalues = append(xvalues, 0.0)
+	yvalues = append(yvalues, 0.0)
+
+	// 4.  now look for systematic errors with correctness factor
 	for i, runwithresponses := range _output.Runs {
 		// values for r2 to reset each run
 
@@ -455,12 +512,10 @@ func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateRead
 
 	}
 
-	_output.R2_CorrectnessFactor, _, _ = plot.Rsquared("Run Order", xvalues, "Correctness Factor", yvalues)
-	//run.AddResponseValue("R2", rsquared)
-
 	runordercorrectnessgraph := plot.Plot(xvalues, [][]float64{yvalues})
 
 	plot.Export(runordercorrectnessgraph, filenameandextension[0]+"_runorder_correctnessfactor"+".png")
+
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
