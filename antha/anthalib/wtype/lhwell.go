@@ -342,7 +342,8 @@ func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape 
 	var well LHWell
 
 	well.WContents = NewLHComponent()
-	well.ID = "well-" + GetUUID()
+	//well.ID = "well-" + GetUUID()
+	well.ID = GetUUID()
 	well.Platetype = platetype
 	well.Plateid = plateid
 	well.Crds = crds

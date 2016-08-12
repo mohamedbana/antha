@@ -210,7 +210,8 @@ func (cmp *LHComponent) Mix(cmp2 *LHComponent) {
 		}
 	*/
 	cmp.AddParentComponent(cmp2)
-	cmp.ID = "component-" + GetUUID()
+	//	cmp.ID = "component-" + GetUUID()
+	cmp.ID = GetUUID()
 	cmp2.AddDaughterComponent(cmp)
 }
 
@@ -253,7 +254,8 @@ func (lhc *LHComponent) GetType() string {
 
 func NewLHComponent() *LHComponent {
 	var lhc LHComponent
-	lhc.ID = "component-" + GetUUID()
+	//lhc.ID = "component-" + GetUUID()
+	lhc.ID = GetUUID()
 	lhc.Vunit = "ul"
 	lhc.Extra = make(map[string]interface{})
 	return &lhc

@@ -289,7 +289,7 @@ func (lhp *LHProperties) Dup() *LHProperties {
 func NewLHProperties(num_positions int, model, manufacturer, lhtype, tiptype string, layout map[string]wtype.Coordinates) *LHProperties {
 	var lhp LHProperties
 
-	lhp.ID = "robot-" + wtype.GetUUID()
+	lhp.ID = wtype.GetUUID()
 
 	lhp.Nposns = num_positions
 
