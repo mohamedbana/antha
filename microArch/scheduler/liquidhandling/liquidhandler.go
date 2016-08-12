@@ -258,19 +258,40 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 
 	// now ensure the mapping, excluding any temp plates added above, is recorded
 
-	for plateID, _ := range vols {
-		plate, ok := this.FinalProperties.Plates[this.FinalProperties.PlateIDLookup[plateID]]
+	/*
+		for plateID, _ := range vols {
+			plate, ok := this.FinalProperties.Plates[this.FinalProperties.PlateIDLookup[plateID]]
 
-		if !ok {
-			// plate deleted
+			if !ok {
+				// plate deleted
+				continue
+			}
+
+			pos := this.FinalProperties.PlateIDLookup[plateID]
+
+			plate2 := this.Properties.Plates[pos]
+
+			fmt.Println("Plate ID Map: ", plate2.ID, " --> ", plate.ID)
+
+			this.plateIDMap[plate2.ID] = plate.ID
+		}
+
+	*/
+	for pos, _ := range this.Properties.Plates {
+		p1, ok1 := this.Properties.Plates[pos]
+		p2, ok2 := this.FinalProperties.Plates[pos]
+
+		if (!ok1 && ok2) || (ok1 && !ok2) {
+			return (wtype.LHError(6, fmt.Sprintf("Plate disappeared from position %s", pos)))
+		}
+
+		if !(ok1 && ok2) {
 			continue
 		}
 
-		pos := this.FinalProperties.PlateIDLookup[plateID]
+		fmt.Println("POOSS::", pos, " ", p1.ID, " ", p2.ID)
 
-		plate2 := this.Properties.Plates[pos]
-
-		this.plateIDMap[plate2.ID] = plate.ID
+		this.plateIDMap[p1.ID] = p2.ID
 	}
 
 	// all done

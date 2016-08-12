@@ -225,7 +225,7 @@ func (lhp *LHPlate) NextEmptyWell(it PlateIterator) WellCoords {
 func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
 	var lhp LHPlate
 	lhp.Type = platetype
-	lhp.ID = GetUUID()
+	lhp.ID = "plate-" + GetUUID()
 	lhp.Mnfr = mfr
 	lhp.WlsX = ncols
 	lhp.WlsY = nrows

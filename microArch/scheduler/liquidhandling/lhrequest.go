@@ -115,7 +115,7 @@ func ValidateLHRequest(rq *LHRequest) (bool, string) {
 
 func NewLHRequest() *LHRequest {
 	var lhr LHRequest
-	lhr.ID = wtype.GetUUID()
+	lhr.ID = "request:" + wtype.GetUUID()
 	lhr.LHInstructions = make(map[string]*wtype.LHInstruction)
 	lhr.Input_solutions = make(map[string][]*wtype.LHComponent)
 	lhr.Plates = make(map[string]*wtype.LHPlate)

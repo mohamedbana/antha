@@ -295,7 +295,7 @@ func choose_plates(request *LHRequest, pc []PlateChoice, order []string) []Plate
 			if ass == -1 {
 				// make a new plate
 				ass = len(pc)
-				pc = append(pc, PlateChoice{chooseAPlate(request, v), []string{v.ID}, wtype.GetUUID(), []string{""}})
+				pc = append(pc, PlateChoice{chooseAPlate(request, v), []string{v.ID}, "plate:" + wtype.GetUUID(), []string{""}})
 			}
 
 			pc[ass].Assigned = append(pc[ass].Assigned, v.ID)
@@ -339,7 +339,7 @@ func modpc(choice PlateChoice, nwell int) []PlateChoice {
 		ID := choice.ID
 		if s != 0 {
 			// new ID
-			ID = wtype.GetUUID()
+			ID = "plate:" + wtype.GetUUID()
 		}
 		/*
 			fmt.Println("S: ", s, " E: ", e)

@@ -48,7 +48,7 @@ type LHTipbox struct {
 
 func NewLHTipbox(nrows, ncols int, height float64, manufacturer, boxtype string, tiptype *LHTip, well *LHWell, tipxoffset, tipyoffset, tipxstart, tipystart, tipzstart float64) *LHTipbox {
 	var tipbox LHTipbox
-	tipbox.ID = GetUUID()
+	tipbox.ID = "tipbox-" + GetUUID()
 	tipbox.Type = boxtype
 	tipbox.Boxname = fmt.Sprintf("%s_%s", boxtype, tipbox.ID[1:len(tipbox.ID)-2])
 	tipbox.Mnfr = manufacturer
