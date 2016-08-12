@@ -491,7 +491,7 @@ func (self *LHPlate) GetParent() LHObject {
 //@implement Addressable
 //##############################################
 
-func (self *LHPlate) HasLocation(c WellCoords) bool {
+func (self *LHPlate) AddressExists(c WellCoords) bool {
 	return c.X >= 0 &&
 		c.Y >= 0 &&
 		c.X < self.WlsX &&
@@ -506,8 +506,8 @@ func (lhp *LHPlate) NRows() int {
 	return lhp.WlsY
 }
 
-func (self *LHPlate) GetLocation(c WellCoords) LHObject {
-	if !self.HasLocation(c) {
+func (self *LHPlate) GetChildByAddress(c WellCoords) LHObject {
+	if !self.AddressExists(c) {
 		return nil
 	}
 	//LHWells aren't LHObjects yet
@@ -537,7 +537,7 @@ func (self *LHPlate) CoordsToWellCoords(r Coordinates) (WellCoords, Coordinates)
 }
 
 func (self *LHPlate) WellCoordsToCoords(wc WellCoords, r WellReference) (Coordinates, bool) {
-	if !self.HasLocation(wc) {
+	if !self.AddressExists(wc) {
 		return Coordinates{}, false
 	}
 

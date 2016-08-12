@@ -149,7 +149,7 @@ func (self *LHTipwaste) GetParent() LHObject {
 //@implement Addressable
 //##############################################
 
-func (self *LHTipwaste) HasLocation(c WellCoords) bool {
+func (self *LHTipwaste) AddressExists(c WellCoords) bool {
 	return c.X == 0 && c.Y == 0
 }
 
@@ -161,8 +161,8 @@ func (self *LHTipwaste) NCols() int {
 	return 1
 }
 
-func (self *LHTipwaste) GetLocation(c WellCoords) LHObject {
-	if !self.HasLocation(c) {
+func (self *LHTipwaste) GetChildByAddress(c WellCoords) LHObject {
+	if !self.AddressExists(c) {
 		return nil
 	}
 	//LHWells arent LHObjects yet
@@ -179,7 +179,7 @@ func (self *LHTipwaste) CoordsToWellCoords(r Coordinates) (WellCoords, Coordinat
 }
 
 func (self *LHTipwaste) WellCoordsToCoords(wc WellCoords, r WellReference) (Coordinates, bool) {
-	if !self.HasLocation(wc) {
+	if !self.AddressExists(wc) {
 		return Coordinates{}, false
 	}
 

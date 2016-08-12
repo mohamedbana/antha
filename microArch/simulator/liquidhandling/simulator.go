@@ -273,7 +273,7 @@ func (self *VirtualLiquidHandler) getAbsolutePosition(fname, deckposition, well 
 		return ret, false
 	}
 
-	if !addr.HasLocation(wc) {
+	if !addr.AddressExists(wc) {
 		self.AddErrorf(fname, "Request for well %s in object \"%s\" at \"%s\" which is of size [%dx%d]",
 			wc.FormatA1(), wtype.GetObjectName(target), deckposition, addr.NRows(), addr.NCols())
 		return ret, false

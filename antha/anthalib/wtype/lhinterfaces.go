@@ -95,13 +95,13 @@ func GetObjectType(o LHObject) string {
 //sub-components that can be addressed by WellCoords (e.g. "A1")
 //for example tip-boxes, plates, etc
 type Addressable interface {
-	//HasLocation Do the given coordinates exist in the object?
-	HasLocation(WellCoords) bool
+	//AddressExists Do the given coordinates exist in the object?
+	AddressExists(WellCoords) bool
 	NRows() int
 	NCols() int
-	//GetCoords Returns the object at the given well coords
+	//GetChildByAddress Returns the object at the given well coords
 	//nil if empty or position doesn't exist
-	GetLocation(WellCoords) LHObject
+	GetChildByAddress(WellCoords) LHObject
 	//CoordsToWellCoords Convert Real world coordinates
 	//(relative to the object origin) to WellCoords.
 	//The returned WellCoords should be the closest

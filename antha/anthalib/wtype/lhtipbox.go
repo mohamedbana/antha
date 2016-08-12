@@ -195,7 +195,7 @@ func (self *LHTipbox) GetParent() LHObject {
 //@implement Addressable
 //##############################################
 
-func (tb *LHTipbox) HasLocation(c WellCoords) bool {
+func (tb *LHTipbox) AddressExists(c WellCoords) bool {
 	return c.X >= 0 &&
 		c.Y >= 0 &&
 		c.X < tb.Ncols &&
@@ -210,8 +210,8 @@ func (self *LHTipbox) NCols() int {
 	return self.Ncols
 }
 
-func (tb *LHTipbox) GetLocation(c WellCoords) LHObject {
-	if !tb.HasLocation(c) {
+func (tb *LHTipbox) GetChildByAddress(c WellCoords) LHObject {
+	if !tb.AddressExists(c) {
 		return nil
 	}
 	//Tips aren't yet an LHObject...
@@ -241,7 +241,7 @@ func (tb *LHTipbox) CoordsToWellCoords(r Coordinates) (WellCoords, Coordinates) 
 }
 
 func (tb *LHTipbox) WellCoordsToCoords(wc WellCoords, r WellReference) (Coordinates, bool) {
-	if !tb.HasLocation(wc) {
+	if !tb.AddressExists(wc) {
 		return Coordinates{}, false
 	}
 
@@ -262,12 +262,12 @@ func (tb *LHTipbox) WellCoordsToCoords(wc WellCoords, r WellReference) (Coordina
 
 //HasTipAt
 func (tb *LHTipbox) HasTipAt(c WellCoords) bool {
-	return tb.HasLocation(c) && tb.Tips[c.X][c.Y] != nil
+	return tb.AddressExists(c) && tb.Tips[c.X][c.Y] != nil
 }
 
 //RemoveTip
 func (tb *LHTipbox) RemoveTip(c WellCoords) *LHTip {
-	if !tb.HasLocation(c) {
+	if !tb.AddressExists(c) {
 		return nil
 	}
 	tip := tb.Tips[c.X][c.Y]
