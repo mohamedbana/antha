@@ -318,6 +318,8 @@ Steps {
 		
 		}
 
+		run = doe.AddNewResponseFieldandValue(run, "Runorder", k)
+		
 		//rsquared := plot.Rsquared("Expected Conc", xvalues, "Actual Conc", yvalues)
 		//run.AddResponseValue("R2", rsquared)
 
@@ -451,6 +453,54 @@ Analysis {
 	correctnessgraph := plot.Plot(xvalues, [][]float64{yvalues})
 	
 	plot.Export(correctnessgraph, filenameandextension[0]+"_correctnessfactor"+".png")
+	
+	
+	
+	// now look for systematic errors
+	for i,runwithresponses := range Runs {
+		// values for r2 to reset each run
+
+	// get response value and check if it's a float64 type
+	runorder, err := runwithresponses.GetResponseValue("Runorder")
+	
+	if err != nil{
+		Errors = append(Errors,err.Error())
+	}
+	
+	runorderint,inttrue := runorder.(int)
+	// if int is true 
+	if inttrue {
+		xvalues = append(xvalues, float64(runorderint))
+	}else {
+		Errorf("Run"+fmt.Sprint(i,runwithresponses)+" Run Order:"+fmt.Sprint(runorderint), " not an int")
+	}
+
+	// get response value and check if it's a float64 type
+	correctness, err := runwithresponses.GetResponseValue("Absorbance CorrectnessFactor "+strconv.Itoa(Wavelength))
+	
+	if err != nil{
+		fmt.Println(err.Error())
+		Errors = append(Errors,err.Error())
+	}
+	
+	correctnessfloat,floattrue := correctness.(float64)
+	
+	if floattrue {
+		yvalues = append(yvalues,correctnessfloat )
+	}else {
+		fmt.Println(err.Error())
+		Errorf(" Absorbance CorrectnessFactor:"+fmt.Sprint(correctnessfloat))
+	}
+		
+	}
+		
+		
+	R2_CorrectnessFactor,_,_ = plot.Rsquared("Run Order", xvalues, "Correctness Factor", yvalues)
+	//run.AddResponseValue("R2", rsquared)
+
+	runordercorrectnessgraph := plot.Plot(xvalues, [][]float64{yvalues})
+	
+	plot.Export(runordercorrectnessgraph, filenameandextension[0]+"_runorder_correctnessfactor"+".png")
 }
 
 
@@ -458,4 +508,9 @@ Analysis {
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 Validation {
+	
+	if R2 > 0.9 {
+		R2Pass = true
+	}
+	
 }

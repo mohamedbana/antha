@@ -283,6 +283,8 @@ func _AddPlateReaderresults_2Steps(_ctx context.Context, _input *AddPlateReaderr
 
 		}
 
+		run = doe.AddNewResponseFieldandValue(run, "Runorder", k)
+
 		//rsquared := plot.Rsquared("Expected Conc", xvalues, "Actual Conc", yvalues)
 		//run.AddResponseValue("R2", rsquared)
 
@@ -414,12 +416,62 @@ func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateRead
 	correctnessgraph := plot.Plot(xvalues, [][]float64{yvalues})
 
 	plot.Export(correctnessgraph, filenameandextension[0]+"_correctnessfactor"+".png")
+
+	// now look for systematic errors
+	for i, runwithresponses := range _output.Runs {
+		// values for r2 to reset each run
+
+		// get response value and check if it's a float64 type
+		runorder, err := runwithresponses.GetResponseValue("Runorder")
+
+		if err != nil {
+			_output.Errors = append(_output.Errors, err.Error())
+		}
+
+		runorderint, inttrue := runorder.(int)
+		// if int is true
+		if inttrue {
+			xvalues = append(xvalues, float64(runorderint))
+		} else {
+			execute.Errorf(_ctx, "Run"+fmt.Sprint(i, runwithresponses)+" Run Order:"+fmt.Sprint(runorderint), " not an int")
+		}
+
+		// get response value and check if it's a float64 type
+		correctness, err := runwithresponses.GetResponseValue("Absorbance CorrectnessFactor " + strconv.Itoa(_input.Wavelength))
+
+		if err != nil {
+			fmt.Println(err.Error())
+			_output.Errors = append(_output.Errors, err.Error())
+		}
+
+		correctnessfloat, floattrue := correctness.(float64)
+
+		if floattrue {
+			yvalues = append(yvalues, correctnessfloat)
+		} else {
+			fmt.Println(err.Error())
+			execute.Errorf(_ctx, " Absorbance CorrectnessFactor:"+fmt.Sprint(correctnessfloat))
+		}
+
+	}
+
+	_output.R2_CorrectnessFactor, _, _ = plot.Rsquared("Run Order", xvalues, "Correctness Factor", yvalues)
+	//run.AddResponseValue("R2", rsquared)
+
+	runordercorrectnessgraph := plot.Plot(xvalues, [][]float64{yvalues})
+
+	plot.Export(runordercorrectnessgraph, filenameandextension[0]+"_runorder_correctnessfactor"+".png")
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
 // Optionally, destructive tests can be performed to validate results on a
 // dipstick basis
 func _AddPlateReaderresults_2Validation(_ctx context.Context, _input *AddPlateReaderresults_2Input, _output *AddPlateReaderresults_2Output) {
+
+	if _output.R2 > 0.9 {
+		_output.R2Pass = true
+	}
+
 }
 func _AddPlateReaderresults_2Run(_ctx context.Context, input *AddPlateReaderresults_2Input) *AddPlateReaderresults_2Output {
 	output := &AddPlateReaderresults_2Output{}

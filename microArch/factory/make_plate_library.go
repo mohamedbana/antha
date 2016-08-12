@@ -496,7 +496,6 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
 	plate = wtype.NewLHPlate("Nuncon12wellAgar", "Unknown", wellspercolumn, wellsperrow, heightinmm, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
-
 	//	WellXOffset float64
 	//	WellYOffset float64
 	//	WellXStart  float64
