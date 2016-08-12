@@ -54,11 +54,17 @@ const (
 
 var WellReferenceNames []string = []string{"bottom", "top", "liquid"}
 
-//LHObject Provides a unified interface to physical size
-//of items that can be placed on a liquid handler's deck
+//LHObject Provides a unified interface to physical size and location
+//of objects that exist within a liquid handler
 type LHObject interface {
-	//GetBounds Return the absolute coordinates of the bounding box of the object
-	GetBounds() BBox
+	//GetPosition get the absolute position of the object (mm)
+	GetPosition() Coordinates
+	//GetSize get the size of the object (mm)
+	GetSize() Coordinates
+	//GetBoxIntersections get a list of LHObjects (can be this object or children) which intersect with the BBox
+	GetBoxIntersections(BBox) []LHObject
+	//GetPointIntersections get a list of LHObjects (can be this object or children) which intersect with the given point
+	GetPointIntersections(Coordinates) []LHObject
 	//SetOffset set the offset of the object relative to its parent (global if parent is nil)
 	SetOffset(Coordinates)
 	//SetParent Store the offset of the object

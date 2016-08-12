@@ -25,88 +25,95 @@ package wtype
 
 import "math"
 
-//BBox is a simple LHObject representing a bounding box, 
-//useful for checking if there's stuff in the way 
+//BBox is a simple LHObject representing a bounding box,
+//useful for checking if there's stuff in the way
 type BBox struct {
-    position    Coordinates
-    size        Coordinates
+	position Coordinates
+	size     Coordinates
 }
 
 func NewBBox(pos, size Coordinates) *BBox {
-    if size.X < 0. {
-        pos.X = pos.X + size.X
-        size.X = -size.X
-    }
-    if size.Y < 0. {
-        pos.Y = pos.Y + size.Y
-        size.Y = -size.Y
-    }
-    if size.Z < 0. {
-        pos.Z = pos.Z + size.Z
-        size.Z = -size.Z
-    }
-    r := BBox{pos, size}
-    return &r
+	if size.X < 0. {
+		pos.X = pos.X + size.X
+		size.X = -size.X
+	}
+	if size.Y < 0. {
+		pos.Y = pos.Y + size.Y
+		size.Y = -size.Y
+	}
+	if size.Z < 0. {
+		pos.Z = pos.Z + size.Z
+		size.Z = -size.Z
+	}
+	r := BBox{pos, size}
+	return &r
 }
 
 func NewBBox6f(pos_x, pos_y, pos_z, size_x, size_y, size_z float64) *BBox {
-    return NewBBox(Coordinates{ pos_x,  pos_y,  pos_z}, 
-                   Coordinates{size_x, size_y, size_z})
+	return NewBBox(Coordinates{pos_x, pos_y, pos_z},
+		Coordinates{size_x, size_y, size_z})
 }
 
 func NewXBox4f(pos_y, pos_z, size_y, size_z float64) *BBox {
-    return NewBBox(Coordinates{-math.MaxFloat64 / 2.,  pos_y,  pos_z}, 
-                   Coordinates{math.MaxFloat64, size_y, size_z})
+	return NewBBox(Coordinates{-math.MaxFloat64 / 2., pos_y, pos_z},
+		Coordinates{math.MaxFloat64, size_y, size_z})
 }
 
 func NewYBox4f(pos_x, pos_z, size_x, size_z float64) *BBox {
-    return NewBBox(Coordinates{ pos_x,  -math.MaxFloat64 / 2.,  pos_z}, 
-                   Coordinates{size_x, math.MaxFloat64, size_z})
+	return NewBBox(Coordinates{pos_x, -math.MaxFloat64 / 2., pos_z},
+		Coordinates{size_x, math.MaxFloat64, size_z})
 }
 
 func NewZBox4f(pos_x, pos_y, size_x, size_y float64) *BBox {
-    return NewBBox(Coordinates{ pos_x,  pos_y,  -math.MaxFloat64 / 2.}, 
-                   Coordinates{size_x, size_y, math.MaxFloat64})
+	return NewBBox(Coordinates{pos_x, pos_y, -math.MaxFloat64 / 2.},
+		Coordinates{size_x, size_y, math.MaxFloat64})
 }
 
 func (self BBox) GetPosition() Coordinates {
-    return self.position
+	return self.position
 }
 func (self BBox) ZMax() float64 {
-    return self.position.Z + self.size.Z
+	return self.position.Z + self.size.Z
 }
 
 func (self BBox) GetSize() Coordinates {
-    return self.size
+	return self.size
 }
 
 func (self *BBox) SetPosition(c Coordinates) {
-    self.position = c
+	self.position = c
 }
 
 func (self *BBox) SetSize(c Coordinates) {
-    self.size = c
+	self.size = c
 }
 
 func (self BBox) Contains(rhs Coordinates) bool {
-    return (rhs.X >= self.position.X && rhs.X < self.position.X + self.size.X &&
-            rhs.Y >= self.position.Y && rhs.Y < self.position.Y + self.size.Y &&
-            rhs.Z >= self.position.Z && rhs.Z < self.position.Z + self.size.Z)
+	return (rhs.X >= self.position.X && rhs.X < self.position.X+self.size.X &&
+		rhs.Y >= self.position.Y && rhs.Y < self.position.Y+self.size.Y &&
+		rhs.Z >= self.position.Z && rhs.Z < self.position.Z+self.size.Z)
 }
 
-//Intersects just checks for bounding box intersection
-func (self BBox) Intersects(rhs BBox) bool {
-    //test a single dimension. 
-    //(a,b) are the start and end of the first position
-    //(c,d) are the start and end of the second pos
-    // assert(a > b  and  d > c)
-    f := func(a,b,c,d float64) bool {
-        return !(c >= b || d <= a)
-    }
+//IntersectsBox checks for bounding box intersection
+func (self BBox) IntersectsBox(rhs BBox) bool {
+	//test a single dimension.
+	//(a,b) are the start and end of the first position
+	//(c,d) are the start and end of the second pos
+	// assert(a > b  and  d > c)
+	f := func(a, b, c, d float64) bool {
+		return !(c >= b || d <= a)
+	}
 
-    s := self.position.Add(self.size)
-    r :=  rhs.GetPosition().Add(rhs.GetSize())
-    return (f(self.position.X, s.X, rhs.GetPosition().X, r.X) &&
-            f(self.position.Y, s.Y, rhs.GetPosition().Y, r.Y) &&
-            f(self.position.Z, s.Z, rhs.GetPosition().Z, r.Z))
+	s := self.position.Add(self.size)
+	r := rhs.GetPosition().Add(rhs.GetSize())
+	return (f(self.position.X, s.X, rhs.GetPosition().X, r.X) &&
+		f(self.position.Y, s.Y, rhs.GetPosition().Y, r.Y) &&
+		f(self.position.Z, s.Z, rhs.GetPosition().Z, r.Z))
+}
+
+//IntersectsPoint
+func (self BBox) IntersectsPoint(rhs Coordinates) bool {
+	return (rhs.X >= self.position.X && rhs.X < self.position.X+self.size.X &&
+		rhs.Y >= self.position.Y && rhs.Y < self.position.Y+self.size.Y &&
+		rhs.Z >= self.position.Z && rhs.Z < self.position.Z+self.size.Z)
 }

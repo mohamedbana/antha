@@ -446,15 +446,37 @@ func (p *LHPlate) IsConstrainedOn(platform string) ([]string, bool) {
 //@implement LHObject
 //##############################################
 
-func (self *LHPlate) SetOffset(o Coordinates) {
-	if self.parent != nil {
-		o = o.Add(self.parent.GetBounds().GetPosition())
-	}
-	self.bounds.SetPosition(o)
+func (self *LHPlate) GetPosition() Coordinates {
+	return self.bounds.GetPosition()
 }
 
-func (self *LHPlate) GetBounds() BBox {
-	return self.bounds
+func (self *LHPlate) GetSize() Coordinates {
+	return self.bounds.GetSize()
+}
+
+func (self *LHPlate) GetBoxIntersections(box BBox) []LHObject {
+	ret := []LHObject{}
+	if self.bounds.IntersectsBox(box) {
+		ret = append(ret, self)
+	}
+	//todo, scan through wells
+	return ret
+}
+
+func (self *LHPlate) GetPointIntersections(point Coordinates) []LHObject {
+	ret := []LHObject{}
+	//todo, scan through wells
+	if self.bounds.IntersectsPoint(point) {
+		ret = append(ret, self)
+	}
+	return ret
+}
+
+func (self *LHPlate) SetOffset(o Coordinates) {
+	if self.parent != nil {
+		o = o.Add(self.parent.GetPosition())
+	}
+	self.bounds.SetPosition(o)
 }
 
 func (self *LHPlate) SetParent(p LHObject) {
