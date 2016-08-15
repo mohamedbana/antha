@@ -1,0 +1,217 @@
+// liquidhandling/lhdeck.Go: Part of the Antha language
+// Copyright (C) 2014 the Antha authors. All rights reserved.
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+//
+// For more information relating to the software or licensing issues please
+// contact license@antha-lang.Org or write to the Antha team c/o
+// Synthace Ltd. The London Bioscience Innovation Centre
+// 2 Royal College St, London NW1 0NH UK
+
+// defines types for dealing with liquid handling requests
+package wtype
+
+import (
+	"fmt"
+	"math"
+	"reflect"
+)
+
+type deckSlot struct {
+	contents LHObject
+	position Coordinates
+	size     Coordinates
+	accepts  []reflect.Type
+}
+
+func newDeckSlot(position, size Coordinates) *deckSlot {
+	r := deckSlot{nil, position, size, make([]reflect.Type, 0)}
+	return &r
+}
+
+func (self *deckSlot) Fits(size Coordinates) bool {
+	//.1mm tolerance for potential numerical error
+	return math.Abs(self.size.X-size.X) < 0.1 &&
+		math.Abs(self.size.Y-size.Y) < 0.1
+}
+
+func (self *deckSlot) AcceptsType(o LHObject) bool {
+	ot := reflect.TypeOf(o)
+	for _, t := range self.accepts {
+		if t == ot {
+			return true
+		}
+	}
+	return false
+}
+
+func (self *deckSlot) SetAccepts(o LHObject) {
+	self.accepts = append(self.accepts, reflect.TypeOf(o))
+}
+
+//Represents a robot deck
+type LHDeck struct {
+	name     string
+	mfg      string
+	decktype string
+	id       string
+	size     Coordinates
+	slots    map[string]*deckSlot
+}
+
+func NewLHDeck(name, mfg, decktype string, size Coordinates) *LHDeck {
+	r := LHDeck{name, mfg, decktype, GetUUID(), size, make(map[string]*deckSlot)}
+	return &r
+}
+
+//@implements Named
+
+func (self *LHDeck) GetName() string {
+	return self.name
+}
+
+//@implements Typed
+
+func (self *LHDeck) GetType() string {
+	return self.decktype
+}
+
+func (self *LHDeck) GetManufacturer() string {
+	return self.mfg
+}
+
+func (self *LHDeck) GetID() string {
+	return self.id
+}
+
+//@implements LHObject
+
+func (self *LHDeck) GetPosition() Coordinates {
+	return Coordinates{}
+}
+
+func (self *LHDeck) GetSize() Coordinates {
+	return self.size
+}
+
+func (self *LHDeck) GetBoxIntersections(box BBox) []LHObject {
+	ret := []LHObject{}
+	for _, ds := range self.slots {
+		if ds.contents != nil {
+			ret = append(ret, ds.contents.GetBoxIntersections(box)...)
+		}
+	}
+	return ret
+}
+
+func (self *LHDeck) GetPointIntersections(point Coordinates) []LHObject {
+	ret := []LHObject{}
+	for _, ds := range self.slots {
+		if ds.contents != nil {
+			ret = append(ret, ds.contents.GetPointIntersections(point)...)
+		}
+	}
+	return ret
+}
+
+func (self *LHDeck) SetOffset(o Coordinates) {
+	panic("Can't set offset for LHRobot")
+}
+
+func (self *LHDeck) SetParent(o LHObject) {
+	panic("Can't set a parent for an LHDeck")
+}
+
+func (self *LHDeck) GetParent() LHObject {
+	return nil
+}
+
+//@implements LHParent
+func (self *LHDeck) GetChild(name string) (LHObject, bool) {
+	if ds, ok := self.slots[name]; ok {
+		return ds.contents, true
+	}
+	return nil, false
+}
+
+func (self *LHDeck) GetSlotNames() []string {
+	ret := make([]string, 0, len(self.slots))
+	for key := range self.slots {
+		ret = append(ret, key)
+	}
+	return ret
+}
+
+func (self *LHDeck) SetChild(name string, child LHObject) error {
+	if ds, ok := self.slots[name]; !ok {
+		return fmt.Errorf("Cannot put \"%s\" at unknown slot \"%s\"", GetObjectName(child), name)
+	} else if !ds.Fits(child.GetSize()) {
+		return fmt.Errorf("Object \"%s\" [%dmm x %dmm] doesn't fit in slot \"%s\" [%dmm x %dmm]",
+			GetObjectName(child), child.GetSize().X, child.GetSize().Y,
+			name, ds.size.X, ds.size.Y)
+	} else if !ds.AcceptsType(child) {
+		return fmt.Errorf("Slot \"%s\" can't accept object \"%s\" of type \"%s\"",
+			name, GetObjectName(child), GetObjectType(child))
+	} else {
+		ds.contents = child
+	}
+	return nil
+}
+
+func (self *LHDeck) Accepts(name string, child LHObject) bool {
+	if ds, ok := self.slots[name]; ok {
+		return ds.Fits(child.GetSize()) && ds.AcceptsType(child)
+	}
+	return false
+}
+
+func (self *LHDeck) GetSlotSize(name string) Coordinates {
+	return self.slots[name].size
+}
+
+//LHDeck specific methods
+
+func (self *LHDeck) AddSlot(name string, position, size Coordinates) {
+	self.slots[name] = newDeckSlot(position, size)
+}
+
+func (self *LHDeck) SetSlotAccepts(name string, o LHObject) {
+	self.slots[name].SetAccepts(o)
+}
+
+//Return the nearest object below the point, nil if none.
+//The base of the object is used as reference, so e.g. a point within a well
+//will return the plate
+func (self *LHDeck) GetChildBelow(point Coordinates) LHObject {
+	//get all children in the same vertical plane
+	box := NewBBox6f(point.X, point.Y, math.MaxFloat64, 0, 0, math.MaxFloat64)
+	candidates := self.GetBoxIntersections(*box)
+
+	//find the closest that's below
+	z_off_min := math.MaxFloat64
+	z_off_i := -1
+	for i, c := range candidates {
+		if z_off := point.Z - c.GetPosition().Z; z_off > 0 && z_off < z_off_min {
+			z_off_min = z_off
+			z_off_i = i
+		}
+	}
+
+	//len(candidates) == 0
+	if z_off_i < 0 {
+		return nil
+	}
+	return candidates[z_off_i]
+}

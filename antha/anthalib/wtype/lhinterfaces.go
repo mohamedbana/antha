@@ -31,29 +31,6 @@ type Typed interface {
 	GetType() string
 }
 
-//An LHObject that can hold other LHObjects
-type LHSlot interface {
-	//GetChild get the contained object, nil if none
-	GetChild() LHObject
-	//SetChild set the contained object, error if it cannot
-	SetChild(LHObject) error
-	//Accepts can the slot accept the given object? (Can return true even if the slot is full)
-	Accepts(LHObject) bool
-	//GetChildPosition get the (absolute) position of the child object
-	GetChildPosition() Coordinates
-}
-
-//WellReference used for specifying position within a well
-type WellReference int
-
-const (
-	BottomReference WellReference = iota //0
-	TopReference                         //1
-	LiquidReference                      //2
-)
-
-var WellReferenceNames []string = []string{"bottom", "top", "liquid"}
-
 //LHObject Provides a unified interface to physical size and location
 //of objects that exist within a liquid handler
 type LHObject interface {
@@ -90,6 +67,43 @@ func GetObjectType(o LHObject) string {
 	}
 	return "<untyped>"
 }
+
+//GetObjectRoot get the highest parent
+func GetObjectRoot(o LHObject) LHObject {
+	start := o
+	for o.GetParent() != nil {
+		o = o.GetParent()
+		if o == start {
+			panic("Infinite loop of LHObjects")
+		}
+	}
+	return o
+}
+
+//LHParent An LHObject that can hold other LHObjects
+type LHParent interface {
+	//GetChild get the child in the specified slot, nil if none. bool is false if the slot doesn't exists
+	GetChild(string) (LHObject, bool)
+	//GetSlotNames get a list of the slots
+	GetSlotNames() []string
+	//SetChild put the object in the slot
+	SetChild(string, LHObject) error
+	//Accepts test whether the object can be placed in the slot
+	Accepts(string, LHObject) bool
+	//GetSlotSize
+	GetSlotSize(string) Coordinates
+}
+
+//WellReference used for specifying position within a well
+type WellReference int
+
+const (
+	BottomReference WellReference = iota //0
+	TopReference                         //1
+	LiquidReference                      //2
+)
+
+var WellReferenceNames []string = []string{"bottom", "top", "liquid"}
 
 //Addressable unifies the interface to objects which have
 //sub-components that can be addressed by WellCoords (e.g. "A1")
