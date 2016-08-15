@@ -217,10 +217,6 @@ func TestPlateReuse(t *testing.T) {
 
 	// this time we should have added some components again
 	if len(rq.Input_assignments) != 3 {
-
-		for k, v := range rq.Input_assignments {
-			fmt.Println(k, " ", v)
-		}
 		t.Fatal(fmt.Sprintf("Error resimulating, should have added 3 components, instead added %d", len(rq.Input_assignments)))
 	}
 
