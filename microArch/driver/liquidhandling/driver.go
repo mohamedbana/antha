@@ -98,7 +98,7 @@ type LiquidhandlingDriver interface {
 	//AddPlateTo add an LHObject to a particular position in the liquid handler
 	//position: the name of the position defined in LHProperties struct
 	//plate: the LHObject to add
-	//name: the name of the plate, should match wtype.GetObjectName(plate)
+	//name: the name of the plate, should match wtype.NameOf(plate)
 	AddPlateTo(position string, plate interface{}, name string) driver.CommandStatus
 	//RemoveAllPlates remove every object in the machine
 	RemoveAllPlates() driver.CommandStatus

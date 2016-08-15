@@ -156,14 +156,14 @@ func (self *LHDeck) GetSlotNames() []string {
 
 func (self *LHDeck) SetChild(name string, child LHObject) error {
 	if ds, ok := self.slots[name]; !ok {
-		return fmt.Errorf("Cannot put \"%s\" at unknown slot \"%s\"", GetObjectName(child), name)
+		return fmt.Errorf("Cannot put \"%s\" at unknown slot \"%s\"", NameOf(child), name)
 	} else if !ds.Fits(child.GetSize()) {
 		return fmt.Errorf("Object \"%s\" [%dmm x %dmm] doesn't fit in slot \"%s\" [%dmm x %dmm]",
-			GetObjectName(child), child.GetSize().X, child.GetSize().Y,
+			NameOf(child), child.GetSize().X, child.GetSize().Y,
 			name, ds.size.X, ds.size.Y)
 	} else if !ds.AcceptsType(child) {
 		return fmt.Errorf("Slot \"%s\" can't accept object \"%s\" of type \"%s\"",
-			name, GetObjectName(child), GetObjectType(child))
+			name, NameOf(child), TypeOf(child))
 	} else {
 		ds.contents = child
 		child.SetParent(self)

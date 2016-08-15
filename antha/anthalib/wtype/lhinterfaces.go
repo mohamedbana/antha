@@ -27,8 +27,37 @@ type Named interface {
 	GetName() string
 }
 
+//NameOf
+func NameOf(o interface{}) string {
+	if on, ok := o.(Named); ok {
+		return on.GetName()
+	}
+	return "<unnamed>"
+}
+
 type Typed interface {
 	GetType() string
+}
+
+//TypeOf
+func TypeOf(o interface{}) string {
+	if ot, ok := o.(Typed); ok {
+		return ot.GetType()
+	}
+	return "<unknown>"
+}
+
+//the class of thing it is, mainly for more helpful errors
+type Classy interface {
+	GetClass() string
+}
+
+//ClassOf
+func ClassOf(o interface{}) string {
+	if ot, ok := o.(Typed); ok {
+		return ot.GetClass()
+	}
+	return "<unknown>"
 }
 
 //LHObject Provides a unified interface to physical size and location
@@ -48,24 +77,6 @@ type LHObject interface {
 	SetParent(LHObject)
 	//GetParent
 	GetParent() LHObject
-}
-
-//Helper functions for objects as most are named and typed
-
-//GetObjectName
-func GetObjectName(o LHObject) string {
-	if on, ok := o.(Named); ok {
-		return on.GetName()
-	}
-	return "<unnamed>"
-}
-
-//GetObjectType
-func GetObjectType(o LHObject) string {
-	if ot, ok := o.(Typed); ok {
-		return ot.GetType()
-	}
-	return "<untyped>"
 }
 
 //GetObjectRoot get the highest parent

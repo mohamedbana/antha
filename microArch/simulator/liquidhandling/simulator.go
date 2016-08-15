@@ -256,14 +256,14 @@ func (self *VirtualLiquidHandler) getAbsolutePosition(fname, deckposition, well 
 		self.AddErrorf(fname, "No object found at position %s", deckposition)
 		return ret, false
 	}
-	if platetype != wtype.GetObjectType(target) {
+	if platetype != wtype.TypeOf(target) {
 		self.AddWarningf(fname, "Object found at %s was type \"%s\" not type \"%s\" as expected",
-			deckposition, wtype.GetObjectType(target), platetype)
+			deckposition, wtype.TypeOf(target), platetype)
 	}
 
 	addr, ok := target.(wtype.Addressable)
 	if !ok {
-		self.AddErrorf(fname, "Object \"%s\" at \"%s\" is not addressable", wtype.GetObjectName(target), deckposition)
+		self.AddErrorf(fname, "Object \"%s\" at \"%s\" is not addressable", wtype.NameOf(target), deckposition)
 		return ret, false
 	}
 
@@ -275,7 +275,7 @@ func (self *VirtualLiquidHandler) getAbsolutePosition(fname, deckposition, well 
 
 	if !addr.AddressExists(wc) {
 		self.AddErrorf(fname, "Request for well %s in object \"%s\" at \"%s\" which is of size [%dx%d]",
-			wc.FormatA1(), wtype.GetObjectName(target), deckposition, addr.NRows(), addr.NCols())
+			wc.FormatA1(), wtype.NameOf(target), deckposition, addr.NRows(), addr.NCols())
 		return ret, false
 	}
 
@@ -283,7 +283,7 @@ func (self *VirtualLiquidHandler) getAbsolutePosition(fname, deckposition, well 
 	if !ok {
 		//since we already checked that the address exists, this must be a bad reference
 		self.AddErrorf(fname, "Object type %s at %s doesn't support reference \"%s\"",
-			wtype.GetObjectType(target), deckposition, wtype.WellReferenceNames[ref])
+			wtype.TypeOf(target), deckposition, wtype.WellReferenceNames[ref])
 		return ret, false
 	}
 	return ret, true
