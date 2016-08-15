@@ -166,6 +166,8 @@ func (self *LHDeck) SetChild(name string, child LHObject) error {
 			name, GetObjectName(child), GetObjectType(child))
 	} else {
 		ds.contents = child
+		child.SetParent(self)
+		child.SetOffset(ds.position)
 	}
 	return nil
 }
