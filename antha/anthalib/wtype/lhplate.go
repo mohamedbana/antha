@@ -188,6 +188,10 @@ func (lhp *LHPlate) GetType() string {
 	return lhp.Type
 }
 
+func (self *LHPlate) GetClass() string {
+	return "plate"
+}
+
 func (lhp *LHPlate) WellAt(wc WellCoords) *LHWell {
 	return lhp.Wellcoords[wc.FormatA1()]
 }

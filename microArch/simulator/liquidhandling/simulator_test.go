@@ -159,7 +159,7 @@ func TestVLH_AddPlateTo(t *testing.T) {
 				&AddPlateTo{"tipbox_1", default_lhtipbox("p0"), "p0"},
 				&AddPlateTo{"tipbox_1", default_lhtipbox("p1"), "p1"},
 			},
-			[]string{"(err) AddPlateTo: Couldn't add \"p1\" to location \"tipbox_1\" which already contains \"p0\""},
+			[]string{"(err) AddPlateTo: Couldn't add tipbox \"p1\" to location \"tipbox_1\" which already contains tipbox \"p0\""},
 			nil, //no assertions
 		},
 		SimulatorTest{
@@ -170,7 +170,7 @@ func TestVLH_AddPlateTo(t *testing.T) {
 				&Initialize{},
 				&AddPlateTo{"tipwaste", default_lhtipbox("tipbox"), "tipbox"},
 			},
-			[]string{"(err) AddPlateTo: tipbox \"tipbox\" added to slot \"tipwaste\" which prefers Tipwaste"},
+			[]string{"(err) AddPlateTo: Slot \"tipwaste\" can't accept tipbox \"tipbox\", only tipwaste allowed"},
 			nil, //no assertions
 		},
 		SimulatorTest{
@@ -181,7 +181,7 @@ func TestVLH_AddPlateTo(t *testing.T) {
 				&Initialize{},
 				&AddPlateTo{"tipbox_1", default_lhtipwaste("tipwaste"), "tipwaste"},
 			},
-			[]string{"(err) AddPlateTo: tipwaste \"tipwaste\" added to slot \"tipbox_1\" which prefers Tipboxes"},
+			[]string{"(err) AddPlateTo: Slot \"tipbox_1\" can't accept tipwaste \"tipwaste\", only tipbox allowed"},
 			nil, //no assertions
 		},
 		SimulatorTest{
@@ -190,9 +190,9 @@ func TestVLH_AddPlateTo(t *testing.T) {
 			nil,                //no setup
 			[]TestRobotInstruction{
 				&Initialize{},
-				&AddPlateTo{"ruritania", default_lhtipbox("tipbox"), "tipbox"},
+				&AddPlateTo{"ruritania", default_lhtipbox("aTipbox"), "aTipbox"},
 			},
-			[]string{"(err) AddPlateTo: Robot contains no locations named \"ruritania\""},
+			[]string{"(err) AddPlateTo: Cannot put tipbox \"aTipbox\" at unknown slot \"ruritania\""},
 			nil, //no assertions
 		},
 		SimulatorTest{
@@ -204,7 +204,7 @@ func TestVLH_AddPlateTo(t *testing.T) {
 				&AddPlateTo{"output_1", wide_lhplate("plate1"), "plate1"},
 			},
 			[]string{ //errors
-				"(err) AddPlateTo: Footprint of \"plate1\"[300mm x 85.48mm] doesn't fit slot \"output_1\"[127.76mm x 85.48mm]",
+				"(err) AddPlateTo: Footprint of plate \"plate1\"[300mm x 85.48mm] doesn't fit slot \"output_1\"[127.76mm x 85.48mm]",
 			},
 			nil, //no assertions
 		},

@@ -54,7 +54,7 @@ type Classy interface {
 
 //ClassOf
 func ClassOf(o interface{}) string {
-	if ot, ok := o.(Typed); ok {
+	if ot, ok := o.(Classy); ok {
 		return ot.GetClass()
 	}
 	return "<unknown>"
@@ -99,7 +99,7 @@ type LHParent interface {
 	GetSlotNames() []string
 	//SetChild put the object in the slot
 	SetChild(string, LHObject) error
-	//Accepts test whether the object can be placed in the slot
+	//Accepts test if slot can accept a certain class
 	Accepts(string, LHObject) bool
 	//GetSlotSize
 	GetSlotSize(string) Coordinates

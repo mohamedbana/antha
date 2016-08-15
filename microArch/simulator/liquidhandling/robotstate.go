@@ -25,8 +25,6 @@ package liquidhandling
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/microArch/simulator"
-	"math"
 )
 
 // -------------------------------------------------------------------------------
@@ -91,27 +89,7 @@ func (self *ChannelState) GetAbsolutePosition() wtype.Coordinates {
 
 //GetTarget get the LHObject below the adaptor
 func (self *ChannelState) GetTarget() wtype.LHObject {
-	pos := self.GetAbsolutePosition()
-	zbox := wtype.NewZBox4f(pos.X, pos.Y, 0, 0)
-
-	objs := self.adaptor.GetRobot().GetObjectsIn(zbox)
-	if len(objs) == 0 {
-		return nil
-	}
-
-	z_min := math.MaxFloat64
-	i_min := -1
-	for i := range objs {
-		bb := objs[i].GetBounds()
-		if gap := pos.Z - (bb.GetPosition().Z + bb.GetSize().Z); gap > 0 && gap < z_min {
-			z_min = gap
-			i_min = i
-		}
-	}
-	if i_min < 0 {
-		return nil
-	}
-	return objs[i_min]
+	return self.adaptor.GetRobot().GetDeck().GetChildBelow(self.GetAbsolutePosition())
 }
 
 //                            Actions
@@ -224,18 +202,19 @@ func (self *AdaptorState) SetPosition(p wtype.Coordinates) {
 
 //RobotState Represent the physical state of a liquidhandling robot
 type RobotState struct {
-	slots       map[string]wtype.LHSlot
+	deck        *wtype.LHDeck
 	adaptors    []*AdaptorState
 	initialized bool
 	finalized   bool
 }
 
 func NewRobotState() *RobotState {
-	rs := RobotState{}
-	rs.slots = make(map[string]wtype.LHSlot)
-	rs.adaptors = make([]*AdaptorState, 0)
-	rs.initialized = false
-	rs.finalized = false
+	rs := RobotState{
+		nil,
+		make([]*AdaptorState, 0),
+		false,
+		false,
+	}
 	return &rs
 }
 
@@ -258,14 +237,14 @@ func (self *RobotState) AddAdaptor(a *AdaptorState) {
 	self.adaptors = append(self.adaptors, a)
 }
 
-//AddSlot
-func (self *RobotState) AddSlot(s wtype.LHSlot) {
-	self.slots[s.(wtype.Named).GetName()] = s
+//GetDeck
+func (self *RobotState) GetDeck() *wtype.LHDeck {
+	return self.deck
 }
 
-//GetSlot
-func (self *RobotState) GetSlot(name string) wtype.LHSlot {
-	return self.slots[name]
+//SetDeck
+func (self *RobotState) SetDeck(deck *wtype.LHDeck) {
+	self.deck = deck
 }
 
 //IsInitialized
@@ -278,73 +257,15 @@ func (self *RobotState) IsFinalized() bool {
 	return self.finalized
 }
 
-//GetObjectsIn Return all slots that intersect with the bounding box
-func (self *RobotState) GetObjectsIn(bb *wtype.BBox) []wtype.LHObject {
-	ret := make([]wtype.LHObject, 0)
-	for _, slot := range self.slots {
-		if slot.GetChild() != nil && bb.Intersects(slot.GetChild().GetBounds()) {
-			ret = append(ret, slot.GetChild())
-		}
-	}
-	return ret
-}
-
 //                            Actions
 //                            -------
 
 //Initialize
-func (self *RobotState) Initialize() *simulator.SimulationError {
-	if self.initialized {
-		return simulator.NewError("", "Called Initialize on already initialised liquid handler")
-	}
+func (self *RobotState) Initialize() {
 	self.initialized = true
-	return nil
 }
 
 //Finalize
-func (self *RobotState) Finalize() *simulator.SimulationError {
-	if self.finalized {
-		return simulator.NewError("", "Called Finalize on already finalized liquid handler")
-	}
-	if !self.initialized {
-		return simulator.NewError("", "Called Finalize on uninitialized liquidhandler")
-	}
+func (self *RobotState) Finalize() {
 	self.finalized = true
-	return nil
-}
-
-//AddObject
-func (self *RobotState) AddObject(slot_name string, o wtype.LHObject) *simulator.SimulationError {
-	if sl, ok := self.slots[slot_name]; ok {
-		//check that the slot is empty and can hold a child of this type
-		if child := sl.GetChild(); child != nil {
-			//In the future, we'll check if the child can accept another LHObject, for now barf
-			cname := "unknown"
-			oname := "unknown"
-			if n, ok := child.(wtype.Named); ok {
-				cname = n.GetName()
-			}
-			if n, ok := o.(wtype.Named); ok {
-				oname = n.GetName()
-			}
-			return simulator.NewErrorf("",
-				"Couldn't add \"%s\" to location \"%s\" which already contains \"%s\"",
-				oname, slot_name, cname)
-		}
-
-		//check for intersections with other objects
-		bb := o.GetBounds()
-		bb.SetPosition(sl.GetChildPosition())
-		for name, slot := range self.slots {
-			if c := slot.GetChild(); c != nil && bb.Intersects(c.GetBounds()) {
-				return simulator.NewErrorf("", "Object intersects with object at position \"%s\"", name)
-			}
-		}
-		if err := sl.SetChild(o); err != nil {
-			return simulator.NewError("", err.Error())
-		}
-	} else {
-		return simulator.NewErrorf("", "Robot contains no locations named \"%s\"", slot_name)
-	}
-	return nil
 }

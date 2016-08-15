@@ -134,6 +134,10 @@ func (tb *LHTipbox) GetType() string {
 	return tb.Type
 }
 
+func (self *LHTipbox) GetClass() string {
+	return "tipbox"
+}
+
 func (tb *LHTipbox) N_clean_tips() int {
 	c := 0
 	for j := 0; j < tb.Nrows; j++ {

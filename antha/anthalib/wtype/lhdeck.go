@@ -26,18 +26,18 @@ package wtype
 import (
 	"fmt"
 	"math"
-	"reflect"
+	"strings"
 )
 
 type deckSlot struct {
 	contents LHObject
 	position Coordinates
 	size     Coordinates
-	accepts  []reflect.Type
+	accepts  []string
 }
 
 func newDeckSlot(position, size Coordinates) *deckSlot {
-	r := deckSlot{nil, position, size, make([]reflect.Type, 0)}
+	r := deckSlot{nil, position, size, make([]string, 0)}
 	return &r
 }
 
@@ -47,18 +47,21 @@ func (self *deckSlot) Fits(size Coordinates) bool {
 		math.Abs(self.size.Y-size.Y) < 0.1
 }
 
-func (self *deckSlot) AcceptsType(o LHObject) bool {
-	ot := reflect.TypeOf(o)
+func (self *deckSlot) AcceptsClass(class string) bool {
 	for _, t := range self.accepts {
-		if t == ot {
+		if t == class {
 			return true
 		}
 	}
 	return false
 }
 
-func (self *deckSlot) SetAccepts(o LHObject) {
-	self.accepts = append(self.accepts, reflect.TypeOf(o))
+func (self *deckSlot) SetAccepts(class string) {
+	self.accepts = append(self.accepts, class)
+}
+
+func (self *deckSlot) GetAccepted() []string {
+	return self.accepts
 }
 
 //Represents a robot deck
@@ -67,12 +70,11 @@ type LHDeck struct {
 	mfg      string
 	decktype string
 	id       string
-	size     Coordinates
 	slots    map[string]*deckSlot
 }
 
-func NewLHDeck(name, mfg, decktype string, size Coordinates) *LHDeck {
-	r := LHDeck{name, mfg, decktype, GetUUID(), size, make(map[string]*deckSlot)}
+func NewLHDeck(name, mfg, decktype string) *LHDeck {
+	r := LHDeck{name, mfg, decktype, GetUUID(), make(map[string]*deckSlot)}
 	return &r
 }
 
@@ -86,6 +88,10 @@ func (self *LHDeck) GetName() string {
 
 func (self *LHDeck) GetType() string {
 	return self.decktype
+}
+
+func (self *LHDeck) GetClass() string {
+	return "deck"
 }
 
 func (self *LHDeck) GetManufacturer() string {
@@ -102,8 +108,9 @@ func (self *LHDeck) GetPosition() Coordinates {
 	return Coordinates{}
 }
 
+//zero size
 func (self *LHDeck) GetSize() Coordinates {
-	return self.size
+	return Coordinates{}
 }
 
 func (self *LHDeck) GetBoxIntersections(box BBox) []LHObject {
@@ -156,14 +163,17 @@ func (self *LHDeck) GetSlotNames() []string {
 
 func (self *LHDeck) SetChild(name string, child LHObject) error {
 	if ds, ok := self.slots[name]; !ok {
-		return fmt.Errorf("Cannot put \"%s\" at unknown slot \"%s\"", NameOf(child), name)
+		return fmt.Errorf("Cannot put %s \"%s\" at unknown slot \"%s\"", ClassOf(child), NameOf(child), name)
 	} else if !ds.Fits(child.GetSize()) {
-		return fmt.Errorf("Object \"%s\" [%dmm x %dmm] doesn't fit in slot \"%s\" [%dmm x %dmm]",
-			NameOf(child), child.GetSize().X, child.GetSize().Y,
+		return fmt.Errorf("Footprint of %s \"%s\"[%vmm x %vmm] doesn't fit slot \"%s\"[%vmm x %vmm]",
+			ClassOf(child), NameOf(child), child.GetSize().X, child.GetSize().Y,
 			name, ds.size.X, ds.size.Y)
-	} else if !ds.AcceptsType(child) {
-		return fmt.Errorf("Slot \"%s\" can't accept object \"%s\" of type \"%s\"",
-			name, NameOf(child), TypeOf(child))
+	} else if !ds.AcceptsClass(ClassOf(child)) {
+		return fmt.Errorf("Slot \"%s\" can't accept %s \"%s\", only %s allowed",
+			name, ClassOf(child), NameOf(child), strings.Join(ds.GetAccepted(), ","))
+	} else if ds.contents != nil {
+		return fmt.Errorf("Couldn't add %s \"%s\" to location \"%s\" which already contains %s \"%s\"",
+			ClassOf(child), NameOf(child), name, ClassOf(ds.contents), NameOf(ds.contents))
 	} else {
 		ds.contents = child
 		child.SetParent(self)
@@ -174,7 +184,7 @@ func (self *LHDeck) SetChild(name string, child LHObject) error {
 
 func (self *LHDeck) Accepts(name string, child LHObject) bool {
 	if ds, ok := self.slots[name]; ok {
-		return ds.Fits(child.GetSize()) && ds.AcceptsType(child)
+		return ds.Fits(child.GetSize()) && ds.AcceptsClass(ClassOf(child))
 	}
 	return false
 }
@@ -189,8 +199,10 @@ func (self *LHDeck) AddSlot(name string, position, size Coordinates) {
 	self.slots[name] = newDeckSlot(position, size)
 }
 
-func (self *LHDeck) SetSlotAccepts(name string, o LHObject) {
-	self.slots[name].SetAccepts(o)
+func (self *LHDeck) SetSlotAccepts(name string, class string) {
+	if sl, ok := self.slots[name]; ok {
+		sl.SetAccepts(class)
+	}
 }
 
 //Return the nearest object below the point, nil if none.

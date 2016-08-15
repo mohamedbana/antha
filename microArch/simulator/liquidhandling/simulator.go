@@ -72,29 +72,28 @@ func NewVirtualLiquidHandler(props *liquidhandling.LHProperties) *VirtualLiquidH
 		vlh.state.AddAdaptor(NewAdaptorState(p.Independent, p.Multi, spacing))
 	}
 
-	is_in := func(s string, l []string) bool {
-		for _, k := range l {
-			if s == k {
-				return true
-			}
-		}
-		return false
+	//Make the deck
+	deck := wtype.NewLHDeck("simulated deck", props.Mnfr, props.Model)
+	for name, pos := range props.Layout {
+		//size not given un LHProperties, assuming standard 96well size
+		deck.AddSlot(name, pos, wtype.Coordinates{127.76, 85.48, 0})
+		//deck.SetSlotAccepts(name, "riser")
 	}
-	//add the slots
-	for name, coords := range props.Layout {
-		//assuming default size for now
-		sl := wtype.NewDeckSlot(name, coords, wtype.Coordinates{127.76, 85.48, 0.})
-		if is_in(name, props.Tipwaste_preferences) {
-			sl.SetAcceptsTipwaste(true)
-		}
-		if is_in(name, props.Tip_preferences) {
-			sl.SetAcceptsTip(true)
-		}
-		if is_in(name, props.Input_preferences) || is_in(name, props.Output_preferences) {
-			sl.SetAcceptsPlate(true)
-		}
-		vlh.state.AddSlot(sl)
+
+	for _, name := range props.Tip_preferences {
+		deck.SetSlotAccepts(name, "tipbox")
 	}
+	for _, name := range props.Input_preferences {
+		deck.SetSlotAccepts(name, "plate")
+	}
+	for _, name := range props.Output_preferences {
+		deck.SetSlotAccepts(name, "plate")
+	}
+	for _, name := range props.Tipwaste_preferences {
+		deck.SetSlotAccepts(name, "tipwaste")
+	}
+
+	vlh.state.SetDeck(deck)
 
 	return &vlh
 }
@@ -169,6 +168,11 @@ func (self *VirtualLiquidHandler) GetAdaptorState(head int) *AdaptorState {
 	return self.state.GetAdaptor(head)
 }
 
+func (self *VirtualLiquidHandler) GetObjectAt(slot string) wtype.LHObject {
+	ret, _ := self.state.GetDeck().GetChild(slot)
+	return ret
+}
+
 //testTipArgs check that load/unload tip arguments are valid insofar as they won't crash in RobotState
 func (self *VirtualLiquidHandler) testTipArgs(f_name string, channels []int, head, multi int,
 	platetype, position, well []string) bool {
@@ -223,10 +227,6 @@ func (self *VirtualLiquidHandler) testTipArgs(f_name string, channels []int, hea
 	return ret
 }
 
-func (self *VirtualLiquidHandler) GetObjectAt(slot_name string) wtype.LHObject {
-	return self.state.GetSlot(slot_name).GetChild()
-}
-
 //getAbsolutePosition get a position within the liquidhandler, adding any errors as neccessary
 //bool is false if the instruction shouldn't continue (e.g. missing deckposition e.t.c)
 func (self *VirtualLiquidHandler) getAbsolutePosition(fname, deckposition, well string, reference int, platetype string) (wtype.Coordinates, bool) {
@@ -245,17 +245,16 @@ func (self *VirtualLiquidHandler) getAbsolutePosition(fname, deckposition, well 
 		return ret, false
 	}
 
-	slot := self.state.GetSlot(deckposition)
-	if slot == nil {
+	target, ok := self.state.GetDeck().GetChild(deckposition)
+	if !ok {
 		self.AddErrorf(fname, "Unknown location \"%s\"", deckposition)
 		return ret, false
 	}
-
-	target := slot.GetChild()
 	if target == nil {
 		self.AddErrorf(fname, "No object found at position %s", deckposition)
 		return ret, false
 	}
+
 	if platetype != wtype.TypeOf(target) {
 		self.AddWarningf(fname, "Object found at %s was type \"%s\" not type \"%s\" as expected",
 			deckposition, wtype.TypeOf(target), platetype)
@@ -514,19 +513,22 @@ func (self *VirtualLiquidHandler) Go() driver.CommandStatus {
 
 //Initialize - used
 func (self *VirtualLiquidHandler) Initialize() driver.CommandStatus {
-	err := self.state.Initialize()
-	if err != nil {
-		self.AddError("Initialize", err.Error())
+	if self.state.IsInitialized() {
+		self.AddWarning("Initialize", "Call to initialize when robot is already initialized")
 	}
+	self.state.Initialize()
 	return driver.CommandStatus{true, driver.OK, "INITIALIZE ACK"}
 }
 
 //Finalize - used
 func (self *VirtualLiquidHandler) Finalize() driver.CommandStatus {
-	err := self.state.Finalize()
-	if err != nil {
-		self.AddError("Finalize", err.Error())
+	if !self.state.IsInitialized() {
+		self.AddWarning("Finalize", "Call to finalize when robot is not inisialized")
 	}
+	if self.state.IsFinalized() {
+		self.AddWarning("Finalize", "Call to finalize when robot is already finalized")
+	}
+	self.state.Finalize()
 	return driver.CommandStatus{true, driver.OK, "FINALIZE ACK"}
 }
 
@@ -559,9 +561,8 @@ func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{},
 			self.AddWarningf("AddPlateTo", "Object name(=%s) doesn't match argument name(=%s)", n.GetName(), name)
 		}
 
-		if err := self.state.AddObject(position, obj); err != nil {
-			err.SetFunctionName("AddPlateTo")
-			self.AddSimulationError(err)
+		if err := self.state.GetDeck().SetChild(position, obj); err != nil {
+			self.AddError("AddPlateTo", err.Error())
 		}
 
 	} else {

@@ -71,6 +71,10 @@ func (tw *LHTipwaste) GetType() string {
 	return tw.Type
 }
 
+func (self *LHTipwaste) GetClass() string {
+	return "tipwaste"
+}
+
 func NewLHTipwaste(capacity int, typ, mfr string, size Coordinates, w *LHWell, wellxstart, wellystart, wellzstart float64) *LHTipwaste {
 	var lht LHTipwaste
 	lht.ID = GetUUID()
