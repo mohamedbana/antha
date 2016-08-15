@@ -116,11 +116,6 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) error {
 
 	OutputSetup(this.Properties)
 
-	//}
-
-	// this is protective, should not be needed
-	//err := this.Once.Do(f)
-
 	return nil
 }
 
@@ -277,6 +272,7 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 		}
 
 	*/
+	pidm := make(map[string]string, len(this.Properties.Plates))
 	for pos, _ := range this.Properties.Plates {
 		p1, ok1 := this.Properties.Plates[pos]
 		p2, ok2 := this.FinalProperties.Plates[pos]
@@ -290,6 +286,37 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 		}
 
 		this.plateIDMap[p1.ID] = p2.ID
+		pidm[p2.ID] = p1.ID
+	}
+
+	for _, inst := range rq.LHInstructions {
+		inst.SetPlateID(pidm[inst.PlateID()])
+	}
+
+	// this is many shades of wrong but likely to save us a lot of time
+	for _, pos := range this.Properties.Output_preferences {
+		p1, ok1 := this.Properties.Plates[pos]
+		p2, ok2 := this.FinalProperties.Plates[pos]
+
+		if ok1 && ok2 {
+			for _, wa := range p2.Cols {
+				for _, w := range wa {
+					// the initial state needs to look like the final one... pro tem
+					/// XXX don't like it
+					if !w.Empty() {
+						//		fmt.Println("BBB: ", w.Crds, " ", w.WContents.CName)
+						w2, ok := p1.Wellcoords[w.Crds]
+						if ok && w2.Empty() {
+							w2.Add(w.WContents)
+							w2.WContents.SetVolume(wunit.NewVolume(0.000002, "ul"))
+						}
+					}
+				}
+
+			}
+
+		}
+
 	}
 
 	// all done
