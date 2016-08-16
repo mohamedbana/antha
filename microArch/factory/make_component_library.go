@@ -156,6 +156,30 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 	cmap[A.CName] = A
 
 	A = wtype.NewLHComponent()
+	A.CName = "tartrazinePostMix"
+	A.Type = wtype.LTPostMix
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.CName = "tartrazineNeedtoMix"
+	A.Type = wtype.LTNeedToMix
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.CName = "tartrazine_DNA"
+	A.Type = wtype.LTDNA
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	A.CName = "tartrazine_Glycerol"
+	A.Type = wtype.LTGlycerol
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
 	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "Yellow_ink"
 	A.Type = wtype.LTPAINT
