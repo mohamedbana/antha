@@ -476,15 +476,17 @@ func (self *LHPlate) GetPointIntersections(point Coordinates) []LHObject {
 	return ret
 }
 
-func (self *LHPlate) SetOffset(o Coordinates) {
+func (self *LHPlate) SetOffset(o Coordinates) error {
 	if self.parent != nil {
 		o = o.Add(self.parent.GetPosition())
 	}
 	self.bounds.SetPosition(o)
+	return nil
 }
 
-func (self *LHPlate) SetParent(p LHObject) {
+func (self *LHPlate) SetParent(p LHObject) error {
 	self.parent = p
+	return nil
 }
 
 func (self *LHPlate) GetParent() LHObject {

@@ -180,15 +180,17 @@ func (self *LHTipbox) GetPointIntersections(point Coordinates) []LHObject {
 	return ret
 }
 
-func (self *LHTipbox) SetOffset(o Coordinates) {
+func (self *LHTipbox) SetOffset(o Coordinates) error {
 	if self.parent != nil {
 		o = o.Add(self.parent.GetPosition())
 	}
 	self.bounds.SetPosition(o)
+	return nil
 }
 
-func (self *LHTipbox) SetParent(p LHObject) {
+func (self *LHTipbox) SetParent(p LHObject) error {
 	self.parent = p
+	return nil
 }
 
 func (self *LHTipbox) GetParent() LHObject {

@@ -72,9 +72,9 @@ type LHObject interface {
 	//GetPointIntersections get a list of LHObjects (can be this object or children) which intersect with the given point
 	GetPointIntersections(Coordinates) []LHObject
 	//SetOffset set the offset of the object relative to its parent (global if parent is nil)
-	SetOffset(Coordinates)
+	SetOffset(Coordinates) error
 	//SetParent Store the offset of the object
-	SetParent(LHObject)
+	SetParent(LHObject) error
 	//GetParent
 	GetParent() LHObject
 }

@@ -133,12 +133,13 @@ func (self *LHDeck) GetPointIntersections(point Coordinates) []LHObject {
 	return ret
 }
 
-func (self *LHDeck) SetOffset(o Coordinates) {
-	panic("Can't set offset for LHRobot")
+func (self *LHDeck) SetOffset(o Coordinates) error {
+	return fmt.Errorf("Can't set offset for deck \"%s\"", self.GetName())
 }
 
-func (self *LHDeck) SetParent(o LHObject) {
-	panic("Can't set a parent for an LHDeck")
+func (self *LHDeck) SetParent(o LHObject) error {
+	return fmt.Errorf("Can't set deck \"%s\"'s parent, tried to set to %s \"%s\"",
+		self.GetName(), ClassOf(o), NameOf(o))
 }
 
 func (self *LHDeck) GetParent() LHObject {

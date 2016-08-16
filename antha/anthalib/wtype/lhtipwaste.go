@@ -134,15 +134,17 @@ func (self *LHTipwaste) GetPointIntersections(point Coordinates) []LHObject {
 	return ret
 }
 
-func (self *LHTipwaste) SetOffset(o Coordinates) {
+func (self *LHTipwaste) SetOffset(o Coordinates) error {
 	if self.parent != nil {
 		o = o.Add(self.parent.GetSize())
 	}
 	self.bounds.SetPosition(o)
+	return nil
 }
 
-func (self *LHTipwaste) SetParent(p LHObject) {
+func (self *LHTipwaste) SetParent(p LHObject) error {
 	self.parent = p
+	return nil
 }
 
 func (self *LHTipwaste) GetParent() LHObject {
