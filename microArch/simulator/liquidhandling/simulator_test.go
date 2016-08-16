@@ -469,18 +469,18 @@ func Test_Move(t *testing.T) {
 			},
 			[]TestRobotInstruction{
 				&Move{
-					[]string{"tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1"}, //deckposition
-					[]string{"A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"},                                                 //wellcoords
-					[]int{0, 0, 0, 0, 1, 1, 1, 1},                                                                            //reference
-					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                                //offsetX
-					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                                //offsetY
-					[]float64{-5., -5., -5., -5., -5., -5., -5., -5.},                                                        //offsetZ
-					[]string{"tipbox", "tipbox", "tipbox", "tipbox", "tipbox", "tipbox", "tipbox", "tipbox"},                 //plate_type
+					[]string{"input_1", "input_1", "input_1", "input_1", "input_1", "input_1", "input_1", "input_1"}, //deckposition
+					[]string{"A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"},                                         //wellcoords
+					[]int{0, 0, 0, 0, 1, 1, 1, 1},                                                                    //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                        //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                        //offsetY
+					[]float64{-5., -5., -5., -5., -5., -5., -5., -5.},                                                //offsetZ
+					[]string{"plate", "plate", "plate", "plate", "plate", "plate", "plate", "plate"},                 //plate_type
 					0, //head
 				},
 			},
 			[]string{ //errors
-				"(err) Move: References must be equal as adaptor is not independent",
+				"(err) Move: Non-independent head '0' can't move adaptors to \"plate\" positions [A-H]0, layout mismatch",
 			},
 			nil, //assertions
 		},
@@ -503,7 +503,7 @@ func Test_Move(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Move: Head 0 Channels 3,4,5 cannot move independently",
+				"(err) Move: Non-independent head '0' can't move adaptors to \"tipbox\" positions [A-H]0, layout mismatch",
 			},
 			nil, //assertions
 		},
@@ -526,7 +526,7 @@ func Test_Move(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Move: Head 0 Channels 1,3,5,7 cannot move independently",
+				"(err) Move: Non-independent head '0' can't move adaptors to \"tipbox\" positions A1,B2,C1,D2,E1,F2,G1,H2, layout mismatch",
 			},
 			nil, //assertions
 		},

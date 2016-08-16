@@ -1,11 +1,11 @@
 package wtype
 
 import (
+	"fmt"
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"regexp"
 	"strconv"
 	"strings"
-
-	"github.com/antha-lang/antha/antha/anthalib/wutil"
 )
 
 // convenience comparison operator
@@ -235,3 +235,48 @@ func (wca WellCoordArrayRow) Len() int           { return len(wca) }
 func (wca WellCoordArrayRow) Swap(i, j int)      { t := wca[i]; wca[i] = wca[j]; wca[j] = t }
 func (wca WellCoordArrayRow) Less(i, j int) bool { return wca[i].ColLessThan(wca[j]) }
 
+//HumanizeWellCoords convenience function to make displaying a slice of WellCoords more human readable
+func HumanizeWellCoords(coords []WellCoords) string {
+	show_range := func(first, last WellCoords) string {
+		if first == last {
+			return first.FormatA1()
+		} else if first.X == last.X {
+			return fmt.Sprintf("[%s-%s]%d", string(int('A')+first.Y), string(int('A')+last.Y), first.X)
+		} else if first.Y == last.Y {
+			return fmt.Sprintf("%s[%d-%d]", string(int('A')+first.Y), first.X, last.X)
+		}
+		return ""
+	}
+
+	ret := []string{}
+	start := coords[0]
+	dx := 0
+	dy := 0
+	for i, wc := range coords {
+		if i == 0 {
+			continue
+		}
+		if dx == 0 && dy == 0 {
+			dx = wc.X - coords[i-1].X
+			dy = wc.Y - coords[i-1].Y
+			if !(dx == 0 && dy == 1) && !(dx == 1 && dy == 0) {
+				ret = append(ret, show_range(start, coords[i-1]))
+				start = wc
+				dx = 0
+				dy = 0
+				continue
+			}
+		}
+		ddx := wc.X - coords[i-1].X
+		ddy := wc.Y - coords[i-1].Y
+		if ddx != dx || ddy != dy {
+			ret = append(ret, show_range(start, coords[i-1]))
+			start = wc
+			dx = 0
+			dy = 0
+		}
+	}
+	ret = append(ret, show_range(start, coords[len(coords)-1]))
+
+	return strings.Join(ret, ",")
+}

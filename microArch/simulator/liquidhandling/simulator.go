@@ -298,6 +298,26 @@ func makeOffsets(Xs, Ys, Zs []float64) []wtype.Coordinates {
 	return ret
 }
 
+//return the unique elements of a string slice
+func getUnique(ss []string) []string {
+	r := []string{}
+	is_in := func(s string) bool {
+		for _, v := range r {
+			if v == s {
+				return true
+			}
+		}
+		return false
+	}
+
+	for _, s := range ss {
+		if !is_in(s) {
+			r = append(r, s)
+		}
+	}
+	return r
+}
+
 // ------------------------------------------------------------------------ ExtendedLHDriver
 
 //Move command - used
@@ -388,7 +408,13 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
 			}
 		}
 		if len(moved) > 0 {
-			self.AddErrorf("Move", "Head %d Channels %s cannot move independently", head, strings.Join(moved, ","))
+			//get slice of well coords
+			wc := make([]wtype.WellCoords, len(wellcoords))
+			for i := range wellcoords {
+				wc[i] = wtype.MakeWellCoords(wellcoords[i])
+			}
+			self.AddErrorf("Move", "Non-independent head '%d' can't move adaptors to \"%s\" positions %s, layout mismatch",
+				head, strings.Join(getUnique(platetype), "\",\""), wtype.HumanizeWellCoords(wc))
 			return ret
 		}
 	}
