@@ -55,6 +55,8 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	welltype = wtype.NewLHWell("DSW96", "", "", "ul", 1000, 100, swshp, wtype.LHWBV, 8.2, 8.2, 41.3, 4.7, "mm")
 	plate = wtype.NewLHPlate("DSW96_riser", "Unknown", 8, 12, 44.1, "mm", welltype, 9, 9, 0.0, 0.0, riserheightinmm)
 	plates[plate.Type] = plate
+	plate = wtype.NewLHPlate("DSW96_riser40", "Unknown", 8, 12, 44.1, "mm", welltype, 9, 9, 0.0, 0.0, riserheightinmm)
+	plates[plate.Type] = plate
 
 	// deep square well 96 on q instruments incubator
 	swshp = wtype.NewShape("box", "mm", 8.2, 8.2, 41.3)
@@ -99,6 +101,8 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
 	plate = wtype.NewLHPlate("DSW24_riser", "Unknown", wellspercolumn, wellsperrow, heightinmm, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
+	plate = wtype.NewLHPlate("DSW24_riser40", "Unknown", wellspercolumn, wellsperrow, heightinmm, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+	plates[plate.Type] = plate
 
 	// shallow round well flat bottom 96
 	rwshp := wtype.NewShape("cylinder", "mm", 8.2, 8.2, 11)
@@ -111,6 +115,8 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	welltype = wtype.NewLHWell("SRWFB96", "", "", "ul", 500, 10, rwshp, 0, 8.2, 8.2, 11, 1.0, "mm")
 	plate = wtype.NewLHPlate("SRWFB96_riser", "Unknown", 8, 12, 15, "mm", welltype, 9, 9, 0.0, 0.0, 40.0)
 	plates[plate.Type] = plate
+	plate = wtype.NewLHPlate("SRWFB96_riser40", "Unknown", 8, 12, 15, "mm", welltype, 9, 9, 0.0, 0.0, 40.0)
+	plates[plate.Type] = plate
 
 	// deep well strip trough 12
 	stshp := wtype.NewShape("box", "mm", 8.2, 72, 41.3)
@@ -122,6 +128,8 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	stshp = wtype.NewShape("box", "mm", 8.2, 72, 41.3)
 	welltype = wtype.NewLHWell("DWST12", "", "", "ul", 15000, 1000, stshp, wtype.LHWBV, 8.2, 72, 41.3, 4.7, "mm")
 	plate = wtype.NewLHPlate("DWST12_riser", "Unknown", 1, 12, 44.1, "mm", welltype, 9, 9, 0, 30.0, riserheightinmm+valueformaxheadtonotintoDSWplatewithp20tips)
+	plates[plate.Type] = plate
+	plate = wtype.NewLHPlate("DWST12_riser40", "Unknown", 1, 12, 44.1, "mm", welltype, 9, 9, 0, 30.0, riserheightinmm+valueformaxheadtonotintoDSWplatewithp20tips)
 	plates[plate.Type] = plate
 
 	// deep well strip trough 8
@@ -166,12 +174,18 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 
 	plates[plate.Type] = plate
 
+	plate = wtype.NewLHPlate("pcrplate_skirted_riser40", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, riserheightinmm-1.25)
+
+	plates[plate.Type] = plate
+
 	// pcr plate skirted (on riser)
 	cone = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
 	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 200, 5, cone, wtype.LHWBU, 5.5, 5.5, 20.4, 1.4, "mm")
 
 	plate = wtype.NewLHPlate("pcrplate_skirted_shallowriser", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, shallowriserheightinmm-1.25)
+	plates[plate.Type] = plate
 
+	plate = wtype.NewLHPlate("pcrplate_skirted_riser20", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, shallowriserheightinmm-1.25)
 	plates[plate.Type] = plate
 
 	// pcr plate skirted
@@ -264,6 +278,9 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	plate = wtype.NewLHPlate("greiner384_riser", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
 
+	plate = wtype.NewLHPlate("greiner384_riser40", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+	plates[plate.Type] = plate
+
 	// greiner 384 well plate flat bottom on shallow riser
 
 	bottomtype = wtype.LHWBFLAT
@@ -286,6 +303,9 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	plate = wtype.NewLHPlate("greiner384_shallowriser", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
 
+	plate = wtype.NewLHPlate("greiner384_riser20", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+	plates[plate.Type] = plate
+
 	// NUNC 1536 well plate flat bottom on riser
 
 	bottomtype = wtype.LHWBFLAT
@@ -304,8 +324,9 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	//func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
 	welltype = wtype.NewLHWell("1536flat", "", "", "ul", 13, 2, square, bottomtype, xdim, ydim, zdim, bottomh, "mm")
 
-	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
 	plate = wtype.NewLHPlate("nunc1536_riser", "Unknown", 32, 48, 7, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+	plates[plate.Type] = plate
+	plate = wtype.NewLHPlate("nunc1536_riser40", "Unknown", 32, 48, 7, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
 
 	// 250ml box reservoir (working vol estimated to be 100ml to prevent spillage on moving decks)
@@ -335,6 +356,9 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
 	// greiner one well with 50ml of agar in
 	plate = wtype.NewLHPlate("Agarplateforpicking1536_riser", "Unknown", 32, 48, 7, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+	plate = wtype.NewLHPlate("Agarplateforpicking1536_riser40", "Unknown", 32, 48, 7, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+	plates[plate.Type] = plate
+
 	plates[plate.Type] = plate
 
 	// Onewell SBS format Agarplate with colonies on riser (50ml agar) low res
@@ -358,6 +382,8 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
 	// greiner one well with 50ml of agar in
 	plate = wtype.NewLHPlate("Agarplateforpicking384_riser", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+	plates[plate.Type] = plate
+	plate = wtype.NewLHPlate("Agarplateforpicking384_riser40", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
 
 	// Onewell SBS format Agarplate with colonies on shallowriser (50ml agar) low res
@@ -383,6 +409,8 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	plate = wtype.NewLHPlate("Agarplateforpicking384_shallowriser", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
 
+	plate = wtype.NewLHPlate("Agarplateforpicking384_riser20", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+	plates[plate.Type] = plate
 	// Onewell SBS format Agarplate with colonies on riser (30ml agar) low res
 
 	zstart = 41 // offset of bottom of deck to bottom of well
@@ -390,6 +418,8 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	//func NewLHPlate(platetype, mfr string, nrows, ncols int, height float64, hunit string, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
 	// greiner one well with 50ml of agar in
 	plate = wtype.NewLHPlate("30mlAgarplateforpicking384_riser", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+	plates[plate.Type] = plate
+	plate = wtype.NewLHPlate("30mlAgarplateforpicking384_riser40", "Unknown", 16, 24, 14, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
 
 	/*
@@ -532,6 +562,10 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	plates[plate.Type] = plate
 
 	plate = MakeGreinerVBottomPlateWithRiser()
+	plates[plate.Type] = plate
+
+	plate = plate.Dup()
+	plate.Type += "40"
 	plates[plate.Type] = plate
 
 	return plates
