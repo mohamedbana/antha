@@ -27,6 +27,8 @@ import (
 	"math"
 )
 
+//Shape a more detailed representation of an object's shape
+//Shapes should also implement LHObject
 type Shape interface {
 	Volume() wunit.Volume
 	MaxCrossSectionalArea() wunit.Area

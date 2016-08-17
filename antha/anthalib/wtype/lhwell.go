@@ -25,16 +25,55 @@ package wtype
 
 import (
 	"fmt"
-
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/logger"
 )
 
+type WellBottomType int
+
 const (
-	LHWBFLAT = iota
-	LHWBU
-	LHWBV
+	FlatWellBottom WellBottomType = iota
+	UWellBottom
+	VWellBottom
 )
+
+type WellShape int
+
+const (
+	RoundWell WellShape = iota
+	SquareWell
+)
+
+func MakeWellShape(ws WellShape, size_x, size_y, height, bottomh float64, units string, wb WellBottomType) Shape {
+	var body, bottom Shape
+	switch ws {
+	case RoundWell:
+		body = NewCylinderShape(size_x, size_y, height-bottomh, units)
+	case SquareWell:
+		body = NewBoxShape(size_x, size_y, height-bottomh, units)
+	}
+
+	if wb == FlatWellBottom {
+		return body
+	}
+
+	if wb == UWellBottom {
+		//this probably only makes sense for ws == RoundWell
+		bottom = NewHSphereShape(size_x, size_y, bottomh, units, Upwards)
+	} else if wb == VWellBottom {
+		switch ws {
+		case RoundWell:
+			bottom = NewConeShape(size_x, size_y, bottomh, units, Upwards)
+		case SquareWell:
+			bottom = NewSqPyrShape(size_x, size_y, bottomh, units, Upwards)
+		}
+	}
+
+	//stack on top of each other
+	body.(LHObject).SetOffset(Coordinates{0, 0, bottomh})
+
+	return NewCompositeShape([]Shape{body, bottom})
+}
 
 // structure representing a well on a microplate - description of a destination
 type LHWell struct {
@@ -50,13 +89,73 @@ type LHWell struct {
 	Rvol      float64
 	WShape    *Shape
 	Bottom    int
-	Xdim      float64
-	Ydim      float64
-	Zdim      float64
+	bounds    BBox
 	Bottomh   float64
 	Dunit     string
 	Extra     map[string]interface{}
 	Plate     *LHPlate `gotopb:"-" json:"-"`
+}
+
+//@implement Named
+func (self *LHWell) GetName() string {
+	return self.Plate.GetName() + "_well@" + self.Crds
+}
+
+//@implement Typed
+func (self *LHWell) GetType() string {
+	return self.Plate.GetType() + "_well"
+}
+
+//@implement Classy
+func (self *LHWell) GetClass() string {
+	return "well"
+}
+
+//@implement LHObject
+func (self *LHWell) GetPosition() Coordinates {
+	return self.Plate.GetPosition().Add(self.bounds.GetPosition())
+}
+
+//@implement LHObject
+func (self *LHWell) GetSize() Coordinates {
+	return self.bounds.GetSize()
+}
+
+//@implement LHObject
+func (self *LHWell) GetBoxIntersections(box BBox) []LHObject {
+	//get a relative box
+	box = box.SetPosition(box.GetPosition().Subtract(self.Plate.GetPosition()))
+	if box.IntersectsBox(self.bounds) {
+		return []LHObject{self}
+	}
+	return nil
+}
+
+//@implement LHObject
+func (self *LHWell) GetPointIntersections(point Coordinates) []LHObject {
+}
+
+//@implement LHObject
+func (self *LHWell) SetOffset(c Coordinates) error {
+	self.bounds.SetPosition(c)
+	return nil
+}
+
+//@implement LHObject
+//Doesn't seem likely that this will be used anytime soon, but maybe moving
+//wells from one plate is possible with some funky labware?
+func (self *LHWell) SetParent(o LHObject) error {
+	if p, ok := o.(*LHPlate); ok {
+		self.Plate = p
+		return nil
+	}
+	return fmt.Errorf("Cannot set well \"%s\"'s parent to %s \"%s\" - only plates can parent wells",
+		self.GetName(), ClassOf(o), NameOf(o))
+}
+
+//@implement LHObject
+func (self *LHWell) GetParent() LHObject {
+	return self.Plate
 }
 
 func (w LHWell) String() string {
