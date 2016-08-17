@@ -84,6 +84,10 @@ func (self *BBox) SetPosition(c Coordinates) {
 	self.position = c
 }
 
+func (self *BBox) SetRelativeTo(c Coordinates) {
+	self.position = self.position.Subtract(c)
+}
+
 func (self *BBox) SetSize(c Coordinates) {
 	self.size = c
 }
@@ -116,4 +120,20 @@ func (self BBox) IntersectsPoint(rhs Coordinates) bool {
 	return (rhs.X >= self.position.X && rhs.X < self.position.X+self.size.X &&
 		rhs.Y >= self.position.Y && rhs.Y < self.position.Y+self.size.Y &&
 		rhs.Z >= self.position.Z && rhs.Z < self.position.Z+self.size.Z)
+}
+
+//Merge get the bounding box of both bounding boxes
+func (self BBox) Merge(rhs BBox) BBox {
+	tl := Coordinates{
+		math.Min(self.position.X, rhs.GetPosition().X),
+		math.Min(self.position.Y, rhs.GetPosition().Y),
+		math.Min(self.position.Z, rhs.GetPosition().Z),
+	}
+	br := Coordinates{
+		math.Max(self.position.X+self.size.X, rhs.GetPosition().X+rhs.GetPosition().X),
+		math.Max(self.position.Y+self.size.Y, rhs.GetPosition().Y+rhs.GetPosition().Y),
+		math.Max(self.position.Z+self.size.Z, rhs.GetPosition().Z+rhs.GetPosition().Z),
+	}
+
+	return BBox{tl, br.Subtract(tl)}
 }
