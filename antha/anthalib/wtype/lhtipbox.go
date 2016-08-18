@@ -167,7 +167,7 @@ func (self *LHTipbox) GetSize() Coordinates {
 
 func (self *LHTipbox) GetBoxIntersections(box BBox) []LHObject {
 	//relative box
-	box.SetPosition(box.GetPosition().Subtract(self.GetPosition()))
+	box.SetPosition(box.GetPosition().Subtract(OriginOf(self)))
 	ret := []LHObject{}
 	if self.bounds.IntersectsBox(box) {
 		ret = append(ret, self)
@@ -178,7 +178,7 @@ func (self *LHTipbox) GetBoxIntersections(box BBox) []LHObject {
 
 func (self *LHTipbox) GetPointIntersections(point Coordinates) []LHObject {
 	//relative point
-	point = point.Subtract(self.GetPosition())
+	point = point.Subtract(OriginOf(self))
 	ret := []LHObject{}
 	if self.bounds.IntersectsPoint(point) {
 		ret = append(ret, self)

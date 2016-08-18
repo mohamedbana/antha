@@ -91,6 +91,14 @@ func GetObjectRoot(o LHObject) LHObject {
 	return o
 }
 
+//get the origin for the objects coordinate system
+func OriginOf(o LHObject) Coordinates {
+	if p := o.GetParent(); p != nil {
+		return p.GetPosition()
+	}
+	return Coordinates{}
+}
+
 //LHParent An LHObject that can hold other LHObjects
 type LHParent interface {
 	//GetChild get the child in the specified slot, nil if none. bool is false if the slot doesn't exists
