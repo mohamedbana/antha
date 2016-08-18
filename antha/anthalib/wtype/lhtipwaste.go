@@ -109,6 +109,9 @@ func (lht *LHTipwaste) Dispose(n int) bool {
 //##############################################
 
 func (self *LHTipwaste) GetPosition() Coordinates {
+	if self.parent != nil {
+		return self.parent.GetPosition().Add(self.bounds.GetPosition())
+	}
 	return self.bounds.GetPosition()
 }
 
@@ -117,6 +120,9 @@ func (self *LHTipwaste) GetSize() Coordinates {
 }
 
 func (self *LHTipwaste) GetBoxIntersections(box BBox) []LHObject {
+	//relative box
+	box.SetPosition(box.GetPosition().Subtract(self.GetPosition()))
+
 	ret := []LHObject{}
 	//todo, test well
 	if self.bounds.IntersectsBox(box) {
@@ -126,6 +132,9 @@ func (self *LHTipwaste) GetBoxIntersections(box BBox) []LHObject {
 }
 
 func (self *LHTipwaste) GetPointIntersections(point Coordinates) []LHObject {
+	//relative point
+	point = point.Subtract(self.GetPosition())
+
 	ret := []LHObject{}
 	//Todo, test well
 	if self.bounds.IntersectsPoint(point) {
@@ -135,9 +144,6 @@ func (self *LHTipwaste) GetPointIntersections(point Coordinates) []LHObject {
 }
 
 func (self *LHTipwaste) SetOffset(o Coordinates) error {
-	if self.parent != nil {
-		o = o.Add(self.parent.GetSize())
-	}
 	self.bounds.SetPosition(o)
 	return nil
 }
