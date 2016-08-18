@@ -37,8 +37,8 @@ type SLHPlate struct {
 	WellsX         int
 	WellsY         int
 	Nwells         int
-    Width          float64
-    Length         float64
+	Width          float64
+	Length         float64
 	Height         float64
 	Hunit          string
 	Welltype       *LHWell
@@ -56,10 +56,10 @@ func (slhp SLHPlate) FillPlate(plate *LHPlate) {
 	plate.WlsX = slhp.WellsX
 	plate.WlsY = slhp.WellsY
 	plate.Nwells = slhp.Nwells
-//	plate.Width = slhp.Width
-//	plate.Length = slhp.Length
-//	plate.Height = slhp.Height
-//  plate.Hunit = slhp.Hunit
+	//	plate.Width = slhp.Width
+	//	plate.Length = slhp.Length
+	//	plate.Height = slhp.Height
+	//  plate.Hunit = slhp.Hunit
 	plate.Welltype = slhp.Welltype
 	plate.Wellcoords = slhp.Wellcoords
 }
@@ -70,7 +70,7 @@ type LHWellType struct {
 	Vol       float64
 	Vunit     string
 	Rvol      float64
-	ShapeName string
+	ShapeType WellShape
 	Bottom    int
 	Xdim      float64
 	Ydim      float64
@@ -85,16 +85,13 @@ func (w *LHWell) AddDimensions(lhwt *LHWellType) {
 	w.Rvol = lhwt.Rvol
 	w.WShape = NewShape(lhwt.ShapeName, lhwt.Dunit, lhwt.Xdim, lhwt.Ydim, lhwt.Zdim)
 	w.Bottom = lhwt.Bottom
-	w.Xdim = lhwt.Xdim
-	w.Ydim = lhwt.Ydim
-	w.Zdim = lhwt.Zdim
 	w.Bottomh = lhwt.Bottomh
 	w.Dunit = lhwt.Dunit
 }
 
 func (plate *LHPlate) Welldimensions() *LHWellType {
 	t := plate.Welltype
-	lhwt := LHWellType{t.MaxVol, t.Vunit, t.Rvol, t.WShape.ShapeName, t.Bottom, t.Xdim, t.Ydim, t.Zdim, t.Bottomh, t.Dunit}
+	lhwt := LHWellType{t.MaxVol, t.Vunit, t.Rvol, t.WShape.ShapeName, t.Bottom, t.GetSize().X, t.GetSize().Y, t.GetSize().Z, t.Bottomh, t.Dunit}
 	return &lhwt
 }
 

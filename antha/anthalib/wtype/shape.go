@@ -32,6 +32,7 @@ import (
 type Shape interface {
 	Volume() wunit.Volume
 	MaxCrossSectionalArea() wunit.Area
+	Dup() Shape
 }
 
 type Direction int
@@ -70,8 +71,18 @@ func NewBoxShape(top_x, top_y, base_x, base_y, height float64, units string) *Bo
 		lengthInMM(math.Max(top_y, base_y), units),
 		lengthInMM(height, units),
 	}
-	r := BoxShape{BBox{Coordinates{}, top_x, top_y, base_x, base_y, size}, nil}
+	r := BoxShape{BBox{Coordinates{}, size},
+		lengthInMM(top_x, units),
+		lengthInMM(top_y, units),
+		lengthInMM(base_x, units),
+		lengthInMM(base_y, units),
+		nil}
 	return &r
+}
+
+//Duplicate
+func (self *BoxShape) Dup() Shape {
+	return NewBoxShape(self.top_x, self.top_y, self.base_x, self.base_y, self.GetSize().Z, "mm")
 }
 
 //@implement LHObject
@@ -108,7 +119,7 @@ func (self *BoxShape) GetPointIntersections(point Coordinates) []LHObject {
 	}
 
 	//get x/y size at height
-	a := point.Z / self.bounds.Z
+	a := point.Z / self.bounds.GetSize().Z
 	rx := 0.5 * (a*self.top_x + (1-a)*self.base_x)
 	ry := 0.5 * (a*self.top_y + (1-a)*self.base_y)
 
@@ -140,7 +151,7 @@ func (self *BoxShape) GetParent() LHObject {
 
 //@implement Shape
 func (self *BoxShape) Volume() wunit.Volume {
-	return wunit.NewVolume(0.5*(self.top_x+self.base_x)*0.5*(self.top_y+self.base_y)*self.bounds.Size().Z, "mm^3")
+	return wunit.NewVolume(0.5*(self.top_x+self.base_x)*0.5*(self.top_y+self.base_y)*self.bounds.GetSize().Z, "mm^3")
 }
 
 //@implement Shape
@@ -166,10 +177,20 @@ func NewCylinderShape(top_x, top_y, base_x, base_y, height float64, units string
 	size := Coordinates{
 		lengthInMM(math.Max(top_x, base_x), units),
 		lengthInMM(math.Max(top_y, base_y), units),
-		lengthInMM(size_z, units),
+		lengthInMM(height, units),
 	}
-	r := CylinderShape{BBox{Coordinates{}, size}, top_x / 2, top_y / 2, base_x / 2, base_y / 2, nil}
+	r := CylinderShape{BBox{Coordinates{}, size},
+		lengthInMM(top_x/2, units),
+		lengthInMM(top_y/2, units),
+		lengthInMM(base_x/2, units),
+		lengthInMM(base_y/2, units),
+		nil}
 	return &r
+}
+
+//Duplicate
+func (self *CylinderShape) Dup() Shape {
+	return NewCylinderShape(2*self.rx_t, 2*self.ry_t, 2*self.rx_b, 2*self.ry_b, self.GetSize().Z, "mm")
 }
 
 //@implement LHObject
@@ -206,14 +227,14 @@ func (self *CylinderShape) GetPointIntersections(point Coordinates) []LHObject {
 	}
 
 	//get x/y size at height
-	a := point.Z / self.bounds.Z
+	a := point.Z / self.GetSize().Z
 	rx := 0.5 * (a*self.rx_t + (1-a)*self.rx_b)
 	ry := 0.5 * (a*self.ry_t + (1-a)*self.ry_b)
 
 	//point relative to center
 	point = point.Subtract(self.bounds.GetSize().Multiply(0.5))
 
-	if (point.X/rx)*(point.X/rx)+(point.Y/ry)(point.Y/ry) < 1 {
+	if (point.X/rx)*(point.X/rx)+(point.Y/ry)*(point.Y/ry) < 1 {
 		return []LHObject{self}
 	}
 	return nil
@@ -243,12 +264,12 @@ func (self *CylinderShape) Volume() wunit.Volume {
 		self.rx_b*self.ry_t +
 		2*self.rx_b*self.ry_b
 	return wunit.NewVolume(
-		(math.Pi*self.bounds.Size().Z/6)*p, "mm^3")
+		(math.Pi*self.GetSize().Z/6)*p, "mm^3")
 }
 
 //@implement Shape
 func (self *CylinderShape) MaxCrossSectionalArea() wunit.Area {
-	return wunit.NewArea(0.25*math.Pi*math.Max(self.top_x*self.top_y, self.base_x*self.base_y), "mm^2")
+	return wunit.NewArea(0.25*math.Pi*math.Max(self.rx_t*self.ry_t, self.rx_b*self.ry_b), "mm^2")
 }
 
 //###########################################################
@@ -271,6 +292,11 @@ func NewSphereShape(size_x, size_y, size_z float64, units string) *SphereShape {
 	return &r
 }
 
+//Duplicate
+func (self *SphereShape) Dup() Shape {
+	return NewSphereShape(self.GetSize().X, self.GetSize().Y, self.GetSize().Z, "mm")
+}
+
 //@implement LHObject
 func (self *SphereShape) GetPosition() Coordinates {
 	if self.parent != nil {
@@ -287,9 +313,7 @@ func (self *SphereShape) GetSize() Coordinates {
 //@implement LHObject
 func (self *SphereShape) GetBoxIntersections(box BBox) []LHObject {
 	//relative box
-	if self.parent {
-		box.SetRelativeTo(self.parent.GetPosition())
-	}
+	box.SetRelativeTo(OriginOf(self))
 	if box.IntersectsBox(self.bounds) {
 		return []LHObject{self}
 	}
@@ -341,7 +365,7 @@ func (self *SphereShape) Volume() wunit.Volume {
 
 //@implement Shape
 func (self *SphereShape) MaxCrossSectionalArea() wunit.Area {
-	return wunit.NewArea(0.25*math.Pi*self.bounds.Size().X*self.bounds.Size().Y, "mm^2")
+	return wunit.NewArea(0.25*math.Pi*self.GetSize().X*self.GetSize().Y, "mm^2")
 }
 
 //###########################################################
@@ -365,6 +389,11 @@ func NewHSphereShape(size_x, size_y, size_z float64, units string, face Directio
 	return &r
 }
 
+//Duplicate
+func (self *HSphereShape) Dup() Shape {
+	return NewHSphereShape(self.GetSize().X, self.GetSize().Y, self.GetSize().Z, "mm", self.face)
+}
+
 //@implement LHObject
 func (self *HSphereShape) GetPosition() Coordinates {
 	if self.parent != nil {
@@ -381,9 +410,7 @@ func (self *HSphereShape) GetSize() Coordinates {
 //@implement LHObject
 func (self *HSphereShape) GetBoxIntersections(box BBox) []LHObject {
 	//relative box
-	if self.parent {
-		box.SetRelativeTo(self.parent.GetPosition())
-	}
+	box.SetRelativeTo(OriginOf(self))
 	if box.IntersectsBox(self.bounds) {
 		return []LHObject{self}
 	}
@@ -455,17 +482,17 @@ func (self *HSphereShape) MaxCrossSectionalArea() wunit.Area {
 	var a float64
 	switch self.face {
 	case Upwards:
-		a = 0.25 * math.Pi * self.bounds.Size().X * self.bounds.Size().Y
+		a = 0.25 * math.Pi * self.GetSize().X * self.GetSize().Y
 	case Downwards:
-		a = 0.25 * math.Pi * self.bounds.Size().X * self.bounds.Size().Y
+		a = 0.25 * math.Pi * self.GetSize().X * self.GetSize().Y
 	case Leftwards:
-		a = 0.25 * math.Pi * self.bounds.Size().Z * self.bounds.Size().Y
+		a = 0.25 * math.Pi * self.GetSize().Z * self.GetSize().Y
 	case Rightwards:
-		a = 0.25 * math.Pi * self.bounds.Size().Z * self.bounds.Size().Y
+		a = 0.25 * math.Pi * self.GetSize().Z * self.GetSize().Y
 	case Forwards:
-		a = 0.25 * math.Pi * self.bounds.Size().X * self.bounds.Size().Z
+		a = 0.25 * math.Pi * self.GetSize().X * self.GetSize().Z
 	case Backwards:
-		a = 0.25 * math.Pi * self.bounds.Size().X * self.bounds.Size().Z
+		a = 0.25 * math.Pi * self.GetSize().X * self.GetSize().Z
 	}
 	return wunit.NewArea(a, "mm^2")
 }
@@ -491,6 +518,11 @@ func NewConeShape(size_x, size_y, size_z float64, units string, face Direction) 
 	return &r
 }
 
+//Duplicate
+func (self *ConeShape) Dup() Shape {
+	return NewConeShape(self.GetSize().X, self.GetSize().Y, self.GetSize().Z, "mm", self.face)
+}
+
 //@implement LHObject
 func (self *ConeShape) GetPosition() Coordinates {
 	if self.parent != nil {
@@ -507,9 +539,7 @@ func (self *ConeShape) GetSize() Coordinates {
 //@implement LHObject
 func (self *ConeShape) GetBoxIntersections(box BBox) []LHObject {
 	//relative box
-	if self.parent {
-		box.SetRelativeTo(self.parent.GetPosition())
-	}
+	box.SetRelativeTo(OriginOf(self))
 	if box.IntersectsBox(self.bounds) {
 		return []LHObject{self}
 	}
@@ -657,6 +687,11 @@ func NewSqPyrShape(size_x, size_y, size_z float64, units string, face Direction)
 	return &r
 }
 
+//Duplicate
+func (self *SqPyrShape) Dup() Shape {
+	return NewSqPyrShape(self.GetSize().X, self.GetSize().Y, self.GetSize().Z, "mm", self.face)
+}
+
 //@implement LHObject
 func (self *SqPyrShape) GetPosition() Coordinates {
 	if self.parent != nil {
@@ -673,9 +708,7 @@ func (self *SqPyrShape) GetSize() Coordinates {
 //@implement LHObject
 func (self *SqPyrShape) GetBoxIntersections(box BBox) []LHObject {
 	//relative box
-	if self.parent {
-		box.SetRelativeTo(self.parent.GetPosition())
-	}
+	box.SetRelativeTo(OriginOf(self))
 	if box.IntersectsBox(self.bounds) {
 		return []LHObject{self}
 	}
@@ -816,11 +849,20 @@ type CompositeShape struct {
 func NewCompositeShape(children []Shape) *CompositeShape {
 	bounds := BBox{}
 	for _, child := range children {
-		ch := child.(*LHObject)
+		ch := child.(LHObject)
 		bounds = bounds.Merge(BBox{ch.GetPosition(), ch.GetSize()})
 	}
 	r := CompositeShape{children, bounds, nil}
 	return &r
+}
+
+//Duplicate
+func (self *CompositeShape) Dup() Shape {
+	dch := make([]Shape, len(self.children))
+	for _, ch := range self.children {
+		dch = append(dch, ch.Dup())
+	}
+	return NewCompositeShape(dch)
 }
 
 //@implement LHObject
@@ -839,9 +881,7 @@ func (self *CompositeShape) GetSize() Coordinates {
 //@implement LHObject
 func (self *CompositeShape) GetBoxIntersections(box BBox) []LHObject {
 	//relative box
-	if self.parent {
-		box.SetRelativeTo(self.parent.GetPosition())
-	}
+	box.SetRelativeTo(OriginOf(self))
 	if box.IntersectsBox(self.bounds) {
 		return []LHObject{self}
 	}
@@ -856,7 +896,7 @@ func (self *CompositeShape) GetPointIntersections(point Coordinates) []LHObject 
 	}
 
 	for _, ch := range self.children {
-		if len(ch.GetPointIntersections(point)) > 0 {
+		if len(ch.(LHObject).GetPointIntersections(point)) > 0 {
 			return []LHObject{self}
 		}
 	}
@@ -882,7 +922,7 @@ func (self *CompositeShape) GetParent() LHObject {
 
 //@implement Shape
 func (self *CompositeShape) Volume() wunit.Volume {
-	v = wunit.NewVolume(0, "mm^3")
+	r := wunit.NewVolume(0, "mm^3")
 	for _, ch := range self.children {
 		r.Add(ch.Volume())
 	}
@@ -891,7 +931,7 @@ func (self *CompositeShape) Volume() wunit.Volume {
 
 //@implement Shape
 func (self *CompositeShape) MaxCrossSectionalArea() wunit.Area {
-	a = wunit.NewArea(0, "mm^2")
+	a := wunit.NewArea(0, "mm^2")
 	for _, ch := range self.children {
 		if na := ch.MaxCrossSectionalArea(); na.GreaterThan(a) {
 			a = na

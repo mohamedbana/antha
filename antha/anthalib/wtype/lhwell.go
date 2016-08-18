@@ -376,7 +376,7 @@ func (lhw *LHWell) CalculateMaxVolume() wunit.Volume {
 }
 
 // make a new well structure
-func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
+func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
 	var well LHWell
 
 	well.WContents = NewLHComponent()
