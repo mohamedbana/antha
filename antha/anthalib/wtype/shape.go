@@ -56,17 +56,21 @@ func lengthInMM(length float64, units string) float64 {
 
 type BoxShape struct {
 	bounds BBox
+	top_x  float64
+	top_y  float64
+	base_x float64
+	base_y float64
 	parent LHObject
 }
 
 //Constructor
-func NewBoxShape(size_x, size_y, size_z float64, units string) *BoxShape {
+func NewBoxShape(top_x, top_y, base_x, base_y, height float64, units string) *BoxShape {
 	size := Coordinates{
-		lengthInMM(size_x, units),
-		lengthInMM(size_y, units),
-		lengthInMM(size_z, units),
+		lengthInMM(math.Max(top_x, base_x), units),
+		lengthInMM(math.Max(top_y, base_y), units),
+		lengthInMM(height, units),
 	}
-	r := BoxShape{BBox{Coordinates{}, size}, nil}
+	r := BoxShape{BBox{Coordinates{}, top_x, top_y, base_x, base_y, size}, nil}
 	return &r
 }
 
@@ -86,9 +90,7 @@ func (self *BoxShape) GetSize() Coordinates {
 //@implement LHObject
 func (self *BoxShape) GetBoxIntersections(box BBox) []LHObject {
 	//relative box
-	if self.parent {
-		box.SetRelativeTo(self.parent.GetPosition())
-	}
+	box.SetRelativeTo(OriginOf(self))
 	if box.IntersectsBox(self.bounds) {
 		return []LHObject{self}
 	}
@@ -97,8 +99,23 @@ func (self *BoxShape) GetBoxIntersections(box BBox) []LHObject {
 
 //@implement LHObject
 func (self *BoxShape) GetPointIntersections(point Coordinates) []LHObject {
-	//conveniently this shape is a bounding box :)
-	if self.bounds.IntersectsPoint(point) {
+	//find relative point
+	point = point.Subtract(OriginOf(self))
+
+	//check bounding box intersection
+	if !self.bounds.IntersectsPoint(point) {
+		return nil
+	}
+
+	//get x/y size at height
+	a := point.Z / self.bounds.Z
+	rx := 0.5 * (a*self.top_x + (1-a)*self.base_x)
+	ry := 0.5 * (a*self.top_y + (1-a)*self.base_y)
+
+	//point relative to center
+	point = point.Subtract(self.bounds.GetSize().Multiply(0.5))
+
+	if math.Abs(point.X) < rx && math.Abs(point.Y) < ry {
 		return []LHObject{self}
 	}
 	return nil
@@ -123,12 +140,12 @@ func (self *BoxShape) GetParent() LHObject {
 
 //@implement Shape
 func (self *BoxShape) Volume() wunit.Volume {
-	return wunit.NewVolume(self.bounds.Size().X*self.bounds.Size().Y*self.bounds.Size().Z, "mm^3")
+	return wunit.NewVolume(0.5*(self.top_x+self.base_x)*0.5*(self.top_y+self.base_y)*self.bounds.Size().Z, "mm^3")
 }
 
 //@implement Shape
 func (self *BoxShape) MaxCrossSectionalArea() wunit.Area {
-	return wunit.NewArea(self.bounds.Size().X*self.bounds.Size().Y, "mm^3")
+	return wunit.NewArea(math.Max(self.top_x*self.top_y, self.base_x*self.base_y), "mm^3")
 }
 
 //###########################################################
@@ -137,17 +154,21 @@ func (self *BoxShape) MaxCrossSectionalArea() wunit.Area {
 
 type CylinderShape struct {
 	bounds BBox
+	rx_t   float64
+	ry_t   float64
+	rx_b   float64
+	ry_b   float64
 	parent LHObject
 }
 
-//Constructor
-func NewCylinderShape(size_x, size_y, size_z float64, units string) *CylinderShape {
+//Constructor diameters at top and bottom, height, and units
+func NewCylinderShape(top_x, top_y, base_x, base_y, height float64, units string) *CylinderShape {
 	size := Coordinates{
-		lengthInMM(size_x, units),
-		lengthInMM(size_y, units),
+		lengthInMM(math.Max(top_x, base_x), units),
+		lengthInMM(math.Max(top_y, base_y), units),
 		lengthInMM(size_z, units),
 	}
-	r := CylinderShape{BBox{Coordinates{}, size}, nil}
+	r := CylinderShape{BBox{Coordinates{}, size}, top_x / 2, top_y / 2, base_x / 2, base_y / 2, nil}
 	return &r
 }
 
@@ -167,9 +188,7 @@ func (self *CylinderShape) GetSize() Coordinates {
 //@implement LHObject
 func (self *CylinderShape) GetBoxIntersections(box BBox) []LHObject {
 	//relative box
-	if self.parent {
-		box.SetRelativeTo(self.parent.GetPosition())
-	}
+	box.SetRelativeTo(OriginOf(self))
 	if box.IntersectsBox(self.bounds) {
 		return []LHObject{self}
 	}
@@ -178,18 +197,23 @@ func (self *CylinderShape) GetBoxIntersections(box BBox) []LHObject {
 
 //@implement LHObject
 func (self *CylinderShape) GetPointIntersections(point Coordinates) []LHObject {
-	//coarse intersection check
+	//find relative point
+	point = point.Subtract(OriginOf(self))
+
+	//check bounding box intersection
 	if !self.bounds.IntersectsPoint(point) {
 		return nil
 	}
 
-	rx := self.GetSize().X / 2.
-	ry := self.GetSize().Y / 2
-	//point relative to centeral X-axis
-	point = point.Subtract(self.GetPosition().Add(Coordinates{rx, ry, 0}))
+	//get x/y size at height
+	a := point.Z / self.bounds.Z
+	rx := 0.5 * (a*self.rx_t + (1-a)*self.rx_b)
+	ry := 0.5 * (a*self.ry_t + (1-a)*self.ry_b)
 
-	//general case for any ellipse
-	if (point.X/rx)*(point.X/rx)+(point.Y/ry)*(point.Y/ry) < 1 {
+	//point relative to center
+	point = point.Subtract(self.bounds.GetSize().Multiply(0.5))
+
+	if (point.X/rx)*(point.X/rx)+(point.Y/ry)(point.Y/ry) < 1 {
 		return []LHObject{self}
 	}
 	return nil
@@ -214,12 +238,17 @@ func (self *CylinderShape) GetParent() LHObject {
 
 //@implement Shape
 func (self *CylinderShape) Volume() wunit.Volume {
-	return wunit.NewVolume(0.25*math.Pi*self.bounds.Size().X*self.bounds.Size().Y*self.bounds.Size().Z, "mm^3")
+	p := 2*self.rx_t*self.ry_t +
+		self.rx_t*self.ry_b +
+		self.rx_b*self.ry_t +
+		2*self.rx_b*self.ry_b
+	return wunit.NewVolume(
+		(math.Pi*self.bounds.Size().Z/6)*p, "mm^3")
 }
 
 //@implement Shape
 func (self *CylinderShape) MaxCrossSectionalArea() wunit.Area {
-	return wunit.NewArea(0.25*math.Pi*self.bounds.Size().X*self.bounds.Size().Y, "mm^2")
+	return wunit.NewArea(0.25*math.Pi*math.Max(self.top_x*self.top_y, self.base_x*self.base_y), "mm^2")
 }
 
 //###########################################################

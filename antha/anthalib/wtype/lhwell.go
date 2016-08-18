@@ -44,13 +44,13 @@ const (
 	SquareWell
 )
 
-func MakeWellShape(ws WellShape, size_x, size_y, height, bottomh float64, units string, wb WellBottomType) Shape {
+func MakeWellShape(ws WellShape, top_x, top_y, base_x, base_y, height, bottomh float64, units string, wb WellBottomType) Shape {
 	var body, bottom Shape
 	switch ws {
 	case RoundWell:
-		body = NewCylinderShape(size_x, size_y, height-bottomh, units)
+		body = NewCylinderShape(top_x, top_y, base_x, base_y, height-bottomh, units)
 	case SquareWell:
-		body = NewBoxShape(size_x, size_y, height-bottomh, units)
+		body = NewBoxShape(top_x, top_y, base_x, base_y, height-bottomh, units)
 	}
 
 	if wb == FlatWellBottom {
@@ -59,13 +59,13 @@ func MakeWellShape(ws WellShape, size_x, size_y, height, bottomh float64, units 
 
 	if wb == UWellBottom {
 		//this probably only makes sense for ws == RoundWell
-		bottom = NewHSphereShape(size_x, size_y, bottomh, units, Upwards)
+		bottom = NewHSphereShape(base_x, base_y, bottomh, units, Upwards)
 	} else if wb == VWellBottom {
 		switch ws {
 		case RoundWell:
-			bottom = NewConeShape(size_x, size_y, bottomh, units, Upwards)
+			bottom = NewConeShape(base_x, base_y, bottomh, units, Upwards)
 		case SquareWell:
-			bottom = NewSqPyrShape(size_x, size_y, bottomh, units, Upwards)
+			bottom = NewSqPyrShape(base_x, base_y, bottomh, units, Upwards)
 		}
 	}
 
@@ -87,7 +87,7 @@ type LHWell struct {
 	Vunit     string
 	WContents *LHComponent
 	Rvol      float64
-	WShape    *Shape
+	WShape    Shape
 	Bottom    int
 	bounds    BBox
 	Bottomh   float64
@@ -123,9 +123,7 @@ func (self *LHWell) GetSize() Coordinates {
 
 //@implement LHObject
 func (self *LHWell) GetBoxIntersections(box BBox) []LHObject {
-	//get a relative box
-	box = box.SetPosition(box.GetPosition().Subtract(self.Plate.GetPosition()))
-	if box.IntersectsBox(self.bounds) {
+	if len(self.WShape.(LHObject).GetBoxIntersections(box)) > 0 {
 		return []LHObject{self}
 	}
 	return nil
@@ -133,6 +131,10 @@ func (self *LHWell) GetBoxIntersections(box BBox) []LHObject {
 
 //@implement LHObject
 func (self *LHWell) GetPointIntersections(point Coordinates) []LHObject {
+	if len(self.WShape.(LHObject).GetPointIntersections(point)) > 0 {
+		return []LHObject{self}
+	}
+	return nil
 }
 
 //@implement LHObject
@@ -193,9 +195,9 @@ Plate     : %v,
 		w.Rvol,
 		w.WShape,
 		w.Bottom,
-		w.Xdim,
-		w.Ydim,
-		w.Zdim,
+		w.WShape.(LHObject).GetSize().X,
+		w.WShape.(LHObject).GetSize().Y,
+		w.WShape.(LHObject).GetSize().Z,
 		w.Bottomh,
 		w.Dunit,
 		w.Extra,
@@ -318,11 +320,7 @@ func (lhw *LHWell) Location_Name() string {
 	return lhw.Platetype
 }
 
-func (lhw *LHWell) Shape() *Shape {
-	if lhw.WShape == nil {
-		// return the non-shape
-		return NewNilShape()
-	}
+func (lhw *LHWell) Shape() Shape {
 	return lhw.WShape
 }
 
@@ -347,7 +345,7 @@ func (w *LHWell) Empty() bool {
 
 // copy of instance
 func (lhw *LHWell) Dup() *LHWell {
-	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, lhw.Dunit)
+	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.WShape.(LHObject).GetSize().X, lhw.WShape.(LHObject).GetSize().Y, lhw.WShape.(LHObject).GetSize().Z, lhw.Bottomh, lhw.Dunit)
 
 	for k, v := range lhw.Extra {
 		cp.Extra[k] = v
@@ -360,7 +358,7 @@ func (lhw *LHWell) Dup() *LHWell {
 
 // copy of type
 func (lhw *LHWell) CDup() *LHWell {
-	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, lhw.Dunit)
+	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.WShape.(LHObject).GetSize().X, lhw.WShape.(LHObject).GetSize().Y, lhw.WShape.(LHObject).GetSize().Z, lhw.Bottomh, lhw.Dunit)
 	for k, v := range lhw.Extra {
 		cp.Extra[k] = v
 	}
@@ -368,26 +366,13 @@ func (lhw *LHWell) CDup() *LHWell {
 	return cp
 }
 
-func (lhw *LHWell) CalculateMaxCrossSectionArea() (ca wunit.Area, err error) {
-
-	ca, err = lhw.Shape().MaxCrossSectionalArea()
-
-	return
+func (lhw *LHWell) CalculateMaxCrossSectionArea() wunit.Area {
+	return lhw.Shape().MaxCrossSectionalArea()
 }
 
-func (lhw *LHWell) CalculateMaxVolume() (vol wunit.Volume, err error) {
+func (lhw *LHWell) CalculateMaxVolume() wunit.Volume {
 
-	if lhw.Bottom == 0 { // flat
-		vol, err = lhw.Shape().Volume()
-	} /*else if lhw.Bottom == 1 { // round
-		vol, err = lhw.Shape().Volume()
-		// + additional calculation
-	} else if lhw.Bottom == 2 { // Pointed / v-shaped /pyramid
-		vol, err = lhw.Shape().Volume()
-		// + additional calculation
-	}
-	*/
-	return
+	return lhw.Shape().Volume()
 }
 
 // make a new well structure
@@ -404,9 +389,6 @@ func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape 
 	well.Vunit = vunit
 	well.WShape = shape.Dup()
 	well.Bottom = bott
-	well.Xdim = xdim
-	well.Ydim = ydim
-	well.Zdim = zdim
 	well.Bottomh = bottomh
 	well.Dunit = dunit
 	well.Extra = make(map[string]interface{})

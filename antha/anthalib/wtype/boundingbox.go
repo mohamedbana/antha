@@ -72,6 +72,7 @@ func NewZBox4f(pos_x, pos_y, size_x, size_y float64) *BBox {
 func (self BBox) GetPosition() Coordinates {
 	return self.position
 }
+
 func (self BBox) ZMax() float64 {
 	return self.position.Z + self.size.Z
 }
