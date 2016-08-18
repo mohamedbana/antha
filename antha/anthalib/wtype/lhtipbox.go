@@ -155,6 +155,9 @@ func (tb *LHTipbox) N_clean_tips() int {
 //##############################################
 
 func (self *LHTipbox) GetPosition() Coordinates {
+	if self.parent != nil {
+		return self.parent.GetPosition().Add(self.bounds.GetPosition())
+	}
 	return self.bounds.GetPosition()
 }
 
@@ -163,6 +166,8 @@ func (self *LHTipbox) GetSize() Coordinates {
 }
 
 func (self *LHTipbox) GetBoxIntersections(box BBox) []LHObject {
+	//relative box
+	box.SetPosition(box.GetPosition().Subtract(self.GetPosition()))
 	ret := []LHObject{}
 	if self.bounds.IntersectsBox(box) {
 		ret = append(ret, self)
@@ -172,6 +177,8 @@ func (self *LHTipbox) GetBoxIntersections(box BBox) []LHObject {
 }
 
 func (self *LHTipbox) GetPointIntersections(point Coordinates) []LHObject {
+	//relative point
+	point = point.Subtract(self.GetPosition())
 	ret := []LHObject{}
 	if self.bounds.IntersectsPoint(point) {
 		ret = append(ret, self)
@@ -181,9 +188,6 @@ func (self *LHTipbox) GetPointIntersections(point Coordinates) []LHObject {
 }
 
 func (self *LHTipbox) SetOffset(o Coordinates) error {
-	if self.parent != nil {
-		o = o.Add(self.parent.GetPosition())
-	}
 	self.bounds.SetPosition(o)
 	return nil
 }
