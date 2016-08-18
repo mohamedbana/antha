@@ -121,7 +121,7 @@ func (self *LHTipwaste) GetSize() Coordinates {
 
 func (self *LHTipwaste) GetBoxIntersections(box BBox) []LHObject {
 	//relative box
-	box.SetPosition(box.GetPosition().Subtract(self.GetPosition()))
+	box.SetPosition(box.GetPosition().Subtract(OriginOf(self)))
 
 	ret := []LHObject{}
 	//todo, test well
@@ -133,7 +133,7 @@ func (self *LHTipwaste) GetBoxIntersections(box BBox) []LHObject {
 
 func (self *LHTipwaste) GetPointIntersections(point Coordinates) []LHObject {
 	//relative point
-	point = point.Subtract(self.GetPosition())
+	point = point.Subtract(OriginOf(self))
 
 	ret := []LHObject{}
 	//Todo, test well

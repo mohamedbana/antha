@@ -463,7 +463,7 @@ func (self *LHPlate) GetSize() Coordinates {
 
 func (self *LHPlate) GetBoxIntersections(box BBox) []LHObject {
 	//relative to me
-	box.SetPosition(box.GetPosition().Subtract(self.GetPosition()))
+	box.SetPosition(box.GetPosition().Subtract(OriginOf(self)))
 	ret := []LHObject{}
 	if self.bounds.IntersectsBox(box) {
 		ret = append(ret, self)
@@ -474,7 +474,7 @@ func (self *LHPlate) GetBoxIntersections(box BBox) []LHObject {
 
 func (self *LHPlate) GetPointIntersections(point Coordinates) []LHObject {
 	//relative
-	point = point.Subtract(self.GetPosition())
+	point = point.Subtract(OriginOf(self))
 	ret := []LHObject{}
 	//todo, scan through wells
 	if self.bounds.IntersectsPoint(point) {
