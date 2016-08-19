@@ -525,8 +525,7 @@ func (self *LHPlate) GetChildByAddress(c WellCoords) LHObject {
 		return nil
 	}
 	//LHWells aren't LHObjects yet
-	//return self.Cols[c.X][c.Y]
-	return nil
+	return self.Cols[c.X][c.Y]
 }
 
 func (self *LHPlate) CoordsToWellCoords(r Coordinates) (WellCoords, Coordinates) {

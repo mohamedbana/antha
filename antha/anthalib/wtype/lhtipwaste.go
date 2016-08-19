@@ -184,8 +184,7 @@ func (self *LHTipwaste) GetChildByAddress(c WellCoords) LHObject {
 		return nil
 	}
 	//LHWells arent LHObjects yet
-	//return self.AsWell
-	return nil
+	return self.AsWell
 }
 
 func (self *LHTipwaste) CoordsToWellCoords(r Coordinates) (WellCoords, Coordinates) {
