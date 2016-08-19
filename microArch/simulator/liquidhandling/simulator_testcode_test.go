@@ -171,7 +171,7 @@ type LHWellParams struct {
 	vol       float64
 	rvol      float64
 	shape     ShapeParams
-	bott      int
+	bott      wtype.WellBottomType
 	xdim      float64
 	ydim      float64
 	zdim      float64
@@ -380,12 +380,12 @@ func default_lhplate_props() *LHPlateParams {
 				5.5,          // w               float64
 				20.4,         // d               float64
 			},
-			wtype.LHWBV, // bott            int
-			5.5,         // xdim            float64
-			5.5,         // ydim            float64
-			20.4,        // zdim            float64
-			1.4,         // bottomh         float64
-			"mm",        // dunit           string
+			wtype.VWellBottom, // bott            int
+			5.5,               // xdim            float64
+			5.5,               // ydim            float64
+			20.4,              // zdim            float64
+			1.4,               // bottomh         float64
+			"mm",              // dunit           string
 		},
 		9.,   // wellXOffset     float64
 		9.,   // wellYOffset     float64
@@ -437,12 +437,12 @@ func default_lhtipbox(name string) *wtype.LHTipbox {
 				7.3,          // w               float64
 				51.2,         // d               float64
 			},
-			wtype.LHWBV, // bott            int
-			7.3,         // xdim            float64
-			7.3,         // ydim            float64
-			51.2,        // zdim            float64
-			0.0,         // bottomh         float64
-			"mm",        // dunit           string
+			wtype.VWellBottom, // bott            int
+			7.3,               // xdim            float64
+			7.3,               // ydim            float64
+			51.2,              // zdim            float64
+			0.0,               // bottomh         float64
+			"mm",              // dunit           string
 		},
 		9., //tipxoffset      float64
 		9., //tipyoffset      float64
@@ -474,12 +474,12 @@ func default_lhtipwaste(name string) *wtype.LHTipwaste {
 				80.0,          // w               float64
 				92.0,          // d               float64
 			},
-			wtype.LHWBV, // bott            int
-			123.0,       // xdim            float64
-			80.0,        // ydim            float64
-			92.0,        // zdim            float64
-			0.0,         // bottomh         float64
-			"mm",        // dunit           string
+			wtype.VWellBottom, // bott            int
+			123.0,             // xdim            float64
+			80.0,              // ydim            float64
+			92.0,              // zdim            float64
+			0.0,               // bottomh         float64
+			"mm",              // dunit           string
 		},
 		85.5, //wellxstart      float64
 		45.5, //wellystart      float64

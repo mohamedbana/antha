@@ -30,11 +30,15 @@ import (
 	"github.com/antha-lang/antha/microArch/logger"
 )
 
+type WellBottomType int
+
 const (
-	LHWBFLAT = iota
-	LHWBU
-	LHWBV
+	FlatWellBottom WellBottomType = iota
+	UWellBottom
+	VWellBottom
 )
+
+var WellBottomNames []string = []string{"flat", "U", "V"}
 
 // structure representing a well on a microplate - description of a destination
 type LHWell struct {
@@ -48,7 +52,7 @@ type LHWell struct {
 	WContents *LHComponent
 	Rvol      float64
 	WShape    *Shape
-	Bottom    int
+	Bottom    WellBottomType
 	bounds    BBox
 	Bottomh   float64
 	Extra     map[string]interface{}
@@ -137,7 +141,7 @@ MaxVol    : %g ul,
 WContents : %v,
 Rvol      : %g ul,
 WShape    : %v,
-Bottom    : %d,
+Bottom    : %s,
 size      : [%v x %v x %v]mm,
 Bottomh   : %g,
 Extra     : %v,
@@ -153,7 +157,7 @@ Plate     : %v,
 		w.WContents,
 		w.Rvol,
 		w.WShape,
-		w.Bottom,
+		WellBottomNames[w.Bottom],
 		w.GetSize().X,
 		w.GetSize().Y,
 		w.GetSize().Z,
@@ -337,12 +341,12 @@ func (lhw *LHWell) CalculateMaxCrossSectionArea() (ca wunit.Area, err error) {
 
 func (lhw *LHWell) CalculateMaxVolume() (vol wunit.Volume, err error) {
 
-	if lhw.Bottom == 0 { // flat
+	if lhw.Bottom == FlatWellBottom { // flat
 		vol, err = lhw.Shape().Volume()
-	} /*else if lhw.Bottom == 1 { // round
+	} /*else if lhw.Bottom == UWellBottom { // round
 		vol, err = lhw.Shape().Volume()
 		// + additional calculation
-	} else if lhw.Bottom == 2 { // Pointed / v-shaped /pyramid
+	} else if lhw.Bottom == VWellBottom { // Pointed / v-shaped /pyramid
 		vol, err = lhw.Shape().Volume()
 		// + additional calculation
 	}
@@ -351,7 +355,7 @@ func (lhw *LHWell) CalculateMaxVolume() (vol wunit.Volume, err error) {
 }
 
 // make a new well structure
-func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott int, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
+func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott WellBottomType, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
 	var well LHWell
 
 	well.WContents = NewLHComponent()

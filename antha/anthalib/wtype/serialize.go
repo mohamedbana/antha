@@ -72,7 +72,7 @@ type LHWellType struct {
 	Vunit     string
 	Rvol      float64
 	ShapeName string
-	Bottom    int
+	Bottom    WellBottomType
 	Xdim      float64
 	Ydim      float64
 	Zdim      float64
