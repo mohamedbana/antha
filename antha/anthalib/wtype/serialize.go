@@ -24,6 +24,7 @@ package wtype
 
 import (
 	"encoding/json"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 )
 
 // serializable, stripped-down version of the LHPlate
@@ -37,8 +38,8 @@ type SLHPlate struct {
 	WellsX         int
 	WellsY         int
 	Nwells         int
-    Width          float64
-    Length         float64
+	Width          float64
+	Length         float64
 	Height         float64
 	Hunit          string
 	Welltype       *LHWell
@@ -56,10 +57,10 @@ func (slhp SLHPlate) FillPlate(plate *LHPlate) {
 	plate.WlsX = slhp.WellsX
 	plate.WlsY = slhp.WellsY
 	plate.Nwells = slhp.Nwells
-//	plate.Width = slhp.Width
-//	plate.Length = slhp.Length
-//	plate.Height = slhp.Height
-//  plate.Hunit = slhp.Hunit
+	//	plate.Width = slhp.Width
+	//	plate.Length = slhp.Length
+	//	plate.Height = slhp.Height
+	//  plate.Hunit = slhp.Hunit
 	plate.Welltype = slhp.Welltype
 	plate.Wellcoords = slhp.Wellcoords
 }
@@ -80,21 +81,19 @@ type LHWellType struct {
 }
 
 func (w *LHWell) AddDimensions(lhwt *LHWellType) {
-	w.MaxVol = lhwt.Vol
-	w.Vunit = lhwt.Vunit
-	w.Rvol = lhwt.Rvol
+	w.MaxVol = wunit.NewVolume(lhwt.Vol, lhwt.Vunit).ConvertToString("ul")
+	w.Rvol = wunit.NewVolume(lhwt.Rvol, lhwt.Vunit).ConvertToString("ul")
 	w.WShape = NewShape(lhwt.ShapeName, lhwt.Dunit, lhwt.Xdim, lhwt.Ydim, lhwt.Zdim)
 	w.Bottom = lhwt.Bottom
-	w.Xdim = lhwt.Xdim
-	w.Ydim = lhwt.Ydim
-	w.Zdim = lhwt.Zdim
-	w.Bottomh = lhwt.Bottomh
-	w.Dunit = lhwt.Dunit
+	w.Xdim = wunit.NewLength(lhwt.Xdim, lhwt.Dunit).ConvertToString("mm")
+	w.Ydim = wunit.NewLength(lhwt.Ydim, lhwt.Dunit).ConvertToString("mm")
+	w.Zdim = wunit.NewLength(lhwt.Zdim, lhwt.Dunit).ConvertToString("mm")
+	w.Bottomh = wunit.NewLength(lhwt.Bottomh, lhwt.Dunit).ConvertToString("mm")
 }
 
 func (plate *LHPlate) Welldimensions() *LHWellType {
 	t := plate.Welltype
-	lhwt := LHWellType{t.MaxVol, t.Vunit, t.Rvol, t.WShape.ShapeName, t.Bottom, t.Xdim, t.Ydim, t.Zdim, t.Bottomh, t.Dunit}
+	lhwt := LHWellType{t.MaxVol, "ul", t.Rvol, t.WShape.ShapeName, t.Bottom, t.Xdim, t.Ydim, t.Zdim, t.Bottomh, "mm"}
 	return &lhwt
 }
 

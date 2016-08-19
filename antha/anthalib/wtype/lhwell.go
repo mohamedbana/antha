@@ -45,7 +45,6 @@ type LHWell struct {
 	Platetype string
 	Crds      string
 	MaxVol    float64
-	Vunit     string
 	WContents *LHComponent
 	Rvol      float64
 	WShape    *Shape
@@ -54,7 +53,6 @@ type LHWell struct {
 	Ydim      float64
 	Zdim      float64
 	Bottomh   float64
-	Dunit     string
 	Extra     map[string]interface{}
 	Plate     *LHPlate `gotopb:"-" json:"-"`
 }
@@ -68,17 +66,15 @@ Plateinst : %s,
 Plateid   : %s,
 Platetype : %s,
 Crds      : %s,
-MaxVol    : %g,
-Vunit     : %s,
+MaxVol    : %g ul,
 WContents : %v,
-Rvol      : %g,
+Rvol      : %g ul,
 WShape    : %v,
 Bottom    : %d,
 Xdim      : %g,
 Ydim      : %g,
 Zdim      : %g,
 Bottomh   : %g,
-Dunit     : %s,
 Extra     : %v,
 Plate     : %v,
 }`,
@@ -89,7 +85,6 @@ Plate     : %v,
 		w.Platetype,
 		w.Crds,
 		w.MaxVol,
-		w.Vunit,
 		w.WContents,
 		w.Rvol,
 		w.WShape,
@@ -98,7 +93,6 @@ Plate     : %v,
 		w.Ydim,
 		w.Zdim,
 		w.Bottomh,
-		w.Dunit,
 		w.Extra,
 		w.Plate,
 	)
@@ -155,12 +149,12 @@ func (w *LHWell) CurrVolume() wunit.Volume {
 }
 
 func (w *LHWell) MaxVolume() wunit.Volume {
-	return wunit.NewVolume(w.MaxVol, w.Vunit)
+	return wunit.NewVolume(w.MaxVol, "ul")
 }
 func (w *LHWell) Add(c *LHComponent) {
 	//wasEmpty := w.Empty()
-	mv := wunit.NewVolume(w.MaxVol, w.Vunit)
-	cv := wunit.NewVolume(c.Vol, c.Vunit)
+	mv := wunit.NewVolume(w.MaxVol, "ul")
+	cv := wunit.NewVolume(c.Vol, "ul")
 	wv := w.CurrentVolume()
 	cv.Add(wv)
 	if cv.GreaterThan(mv) {
@@ -187,21 +181,21 @@ func (w *LHWell) Remove(v wunit.Volume) *LHComponent {
 	}
 
 	ret := w.Contents().Dup()
-	ret.Vol = v.ConvertToString(w.Vunit)
+	ret.Vol = v.ConvertToString("ul")
 
 	w.Contents().Remove(v)
 	return ret
 }
 
 func (w *LHWell) WorkingVolume() wunit.Volume {
-	v := wunit.NewVolume(w.Currvol(), w.Vunit)
-	v2 := wunit.NewVolume(w.Rvol, w.Vunit)
+	v := wunit.NewVolume(w.Currvol(), "ul")
+	v2 := wunit.NewVolume(w.Rvol, "ul")
 	v.Subtract(v2)
 	return v
 }
 
 func (w *LHWell) ResidualVolume() wunit.Volume {
-	v := wunit.NewVolume(w.Rvol, w.Vunit)
+	v := wunit.NewVolume(w.Rvol, "ul")
 	return v
 }
 
@@ -248,7 +242,7 @@ func (w *LHWell) Empty() bool {
 
 // copy of instance
 func (lhw *LHWell) Dup() *LHWell {
-	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, lhw.Dunit)
+	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, "ul", lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, "mm")
 
 	for k, v := range lhw.Extra {
 		cp.Extra[k] = v
@@ -261,7 +255,7 @@ func (lhw *LHWell) Dup() *LHWell {
 
 // copy of type
 func (lhw *LHWell) CDup() *LHWell {
-	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, lhw.Dunit)
+	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, "ul", lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, "mm")
 	for k, v := range lhw.Extra {
 		cp.Extra[k] = v
 	}
@@ -300,16 +294,14 @@ func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape 
 	well.Platetype = platetype
 	well.Plateid = plateid
 	well.Crds = crds
-	well.MaxVol = vol
-	well.Rvol = rvol
-	well.Vunit = vunit
+	well.MaxVol = wunit.NewVolume(vol, vunit).ConvertToString("ul")
+	well.Rvol = wunit.NewVolume(rvol, vunit).ConvertToString("ul")
 	well.WShape = shape.Dup()
 	well.Bottom = bott
-	well.Xdim = xdim
-	well.Ydim = ydim
-	well.Zdim = zdim
-	well.Bottomh = bottomh
-	well.Dunit = dunit
+	well.Xdim = wunit.NewLength(xdim, dunit).ConvertToString("mm")
+	well.Ydim = wunit.NewLength(ydim, dunit).ConvertToString("mm")
+	well.Zdim = wunit.NewLength(zdim, dunit).ConvertToString("mm")
+	well.Bottomh = wunit.NewLength(bottomh, dunit).ConvertToString("mm")
 	well.Extra = make(map[string]interface{})
 	return &well
 }
