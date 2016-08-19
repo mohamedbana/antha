@@ -85,15 +85,17 @@ func (w *LHWell) AddDimensions(lhwt *LHWellType) {
 	w.Rvol = wunit.NewVolume(lhwt.Rvol, lhwt.Vunit).ConvertToString("ul")
 	w.WShape = NewShape(lhwt.ShapeName, lhwt.Dunit, lhwt.Xdim, lhwt.Ydim, lhwt.Zdim)
 	w.Bottom = lhwt.Bottom
-	w.Xdim = wunit.NewLength(lhwt.Xdim, lhwt.Dunit).ConvertToString("mm")
-	w.Ydim = wunit.NewLength(lhwt.Ydim, lhwt.Dunit).ConvertToString("mm")
-	w.Zdim = wunit.NewLength(lhwt.Zdim, lhwt.Dunit).ConvertToString("mm")
+	w.bounds.SetSize(Coordinates{
+		wunit.NewLength(lhwt.Xdim, lhwt.Dunit).ConvertToString("mm"),
+		wunit.NewLength(lhwt.Ydim, lhwt.Dunit).ConvertToString("mm"),
+		wunit.NewLength(lhwt.Zdim, lhwt.Dunit).ConvertToString("mm"),
+	})
 	w.Bottomh = wunit.NewLength(lhwt.Bottomh, lhwt.Dunit).ConvertToString("mm")
 }
 
 func (plate *LHPlate) Welldimensions() *LHWellType {
 	t := plate.Welltype
-	lhwt := LHWellType{t.MaxVol, "ul", t.Rvol, t.WShape.ShapeName, t.Bottom, t.Xdim, t.Ydim, t.Zdim, t.Bottomh, "mm"}
+	lhwt := LHWellType{t.MaxVol, "ul", t.Rvol, t.WShape.ShapeName, t.Bottom, t.GetSize().X, t.GetSize().Y, t.GetSize().Z, t.Bottomh, "mm"}
 	return &lhwt
 }
 

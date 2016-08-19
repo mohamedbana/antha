@@ -205,7 +205,7 @@ func (self *LHTipwaste) WellCoordsToCoords(wc WellCoords, r WellReference) (Coor
 	}
 
 	return Coordinates{
-		self.WellXStart + 0.5*self.AsWell.Xdim,
-		self.WellYStart + 0.5*self.AsWell.Ydim,
+		self.WellXStart + 0.5*self.AsWell.GetSize().X,
+		self.WellYStart + 0.5*self.AsWell.GetSize().Y,
 		z}, true
 }

@@ -49,12 +49,79 @@ type LHWell struct {
 	Rvol      float64
 	WShape    *Shape
 	Bottom    int
-	Xdim      float64
-	Ydim      float64
-	Zdim      float64
+	bounds    BBox
 	Bottomh   float64
 	Extra     map[string]interface{}
 	Plate     *LHPlate `gotopb:"-" json:"-"`
+}
+
+//@implement Named
+func (self *LHWell) GetName() string {
+	return fmt.Sprintf("well_%s@%s", self.Crds, self.Plate.GetName())
+}
+
+//@implement Typed
+func (self *LHWell) GetType() string {
+	return fmt.Sprintf("well_in_%s", self.Plate.GetType())
+}
+
+//@implement Classy
+func (self *LHWell) GetClass() string {
+	return "well"
+}
+
+//@implement LHObject
+func (self *LHWell) GetPosition() Coordinates {
+	return OriginOf(self).Add(self.bounds.GetPosition())
+}
+
+//@implement LHObject
+func (self *LHWell) GetSize() Coordinates {
+	return self.bounds.GetSize()
+}
+
+//@implement LHObject
+func (self *LHWell) GetBoxIntersections(box BBox) []LHObject {
+	//relative box
+	box.SetPosition(box.GetPosition().Subtract(OriginOf(self)))
+	if self.bounds.IntersectsBox(box) {
+		return []LHObject{self}
+	}
+	return nil
+}
+
+//@implement LHObject
+func (self *LHWell) GetPointIntersections(point Coordinates) []LHObject {
+	//relative point
+	point = point.Subtract(OriginOf(self))
+	//At some point this should be called self.shape for a more accurate intersection test
+	//see branch shape-changes
+	if self.bounds.IntersectsPoint(point) {
+		return []LHObject{self}
+	}
+	return nil
+}
+
+//@implement LHObject
+func (self *LHWell) SetOffset(point Coordinates) error {
+	self.bounds.SetPosition(point)
+	return nil
+}
+
+//@implement LHObject
+func (self *LHWell) SetParent(p LHObject) error {
+	//Seems unlikely, but I suppose wells that you can take from one plate and insert
+	//into another could be feasible with some funky labware
+	if plate, ok := p.(*LHPlate); ok {
+		self.Plate = plate
+		return nil
+	}
+	return fmt.Errorf("Cannot set well parent to %s \"%s\", only plates allowed", ClassOf(p), NameOf(p))
+}
+
+//@implement LHObject
+func (self *LHWell) GetParent() LHObject {
+	return self.Plate
 }
 
 func (w LHWell) String() string {
@@ -71,9 +138,7 @@ WContents : %v,
 Rvol      : %g ul,
 WShape    : %v,
 Bottom    : %d,
-Xdim      : %g,
-Ydim      : %g,
-Zdim      : %g,
+size      : [%v x %v x %v]mm,
 Bottomh   : %g,
 Extra     : %v,
 Plate     : %v,
@@ -89,9 +154,9 @@ Plate     : %v,
 		w.Rvol,
 		w.WShape,
 		w.Bottom,
-		w.Xdim,
-		w.Ydim,
-		w.Zdim,
+		w.GetSize().X,
+		w.GetSize().Y,
+		w.GetSize().Z,
 		w.Bottomh,
 		w.Extra,
 		w.Plate,
@@ -242,7 +307,7 @@ func (w *LHWell) Empty() bool {
 
 // copy of instance
 func (lhw *LHWell) Dup() *LHWell {
-	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, "ul", lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, "mm")
+	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, "ul", lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.GetSize().X, lhw.GetSize().Y, lhw.GetSize().Z, lhw.Bottomh, "mm")
 
 	for k, v := range lhw.Extra {
 		cp.Extra[k] = v
@@ -255,7 +320,7 @@ func (lhw *LHWell) Dup() *LHWell {
 
 // copy of type
 func (lhw *LHWell) CDup() *LHWell {
-	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, "ul", lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, "mm")
+	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, "ul", lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.GetSize().X, lhw.GetSize().Y, lhw.GetSize().Z, lhw.Bottomh, "mm")
 	for k, v := range lhw.Extra {
 		cp.Extra[k] = v
 	}
@@ -298,9 +363,11 @@ func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape 
 	well.Rvol = wunit.NewVolume(rvol, vunit).ConvertToString("ul")
 	well.WShape = shape.Dup()
 	well.Bottom = bott
-	well.Xdim = wunit.NewLength(xdim, dunit).ConvertToString("mm")
-	well.Ydim = wunit.NewLength(ydim, dunit).ConvertToString("mm")
-	well.Zdim = wunit.NewLength(zdim, dunit).ConvertToString("mm")
+	well.bounds = BBox{Coordinates{}, Coordinates{
+		wunit.NewLength(xdim, dunit).ConvertToString("mm"),
+		wunit.NewLength(ydim, dunit).ConvertToString("mm"),
+		wunit.NewLength(zdim, dunit).ConvertToString("mm"),
+	}}
 	well.Bottomh = wunit.NewLength(bottomh, dunit).ConvertToString("mm")
 	well.Extra = make(map[string]interface{})
 	return &well
