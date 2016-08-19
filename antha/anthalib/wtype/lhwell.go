@@ -44,10 +44,7 @@ var WellBottomNames []string = []string{"flat", "U", "V"}
 type LHWell struct {
 	ID        string
 	Inst      string
-	Plateinst string
-	Plateid   string
-	Platetype string
-	Crds      string
+	Crds      WellCoords
 	MaxVol    float64
 	WContents *LHComponent
 	Rvol      float64
@@ -149,10 +146,10 @@ Plate     : %v,
 }`,
 		w.ID,
 		w.Inst,
-		w.Plateinst,
-		w.Plateid,
-		w.Platetype,
-		w.Crds,
+		w.Plate.Inst,
+		w.Plate.ID,
+		w.Plate.GetType(),
+		w.Crds.FormatA1(),
 		w.MaxVol,
 		w.WContents,
 		w.Rvol,
@@ -229,7 +226,7 @@ func (w *LHWell) Add(c *LHComponent) {
 	if cv.GreaterThan(mv) {
 		// could make this fatal but we don't track state well enough
 		// for that to be worthwhile
-		logger.Debug("WARNING: OVERFULL WELL AT ", w.Crds)
+		logger.Debug("WARNING: OVERFULL WELL AT ", w.Crds.FormatA1())
 	}
 
 	w.Contents().Mix(c)
@@ -245,7 +242,7 @@ func (w *LHWell) Remove(v wunit.Volume) *LHComponent {
 	// if the volume is too high we complain
 
 	if v.GreaterThan(w.CurrentVolume()) {
-		logger.Debug("You ask too much: ", w.Crds, " ", v.ToString(), " I only have: ", w.CurrentVolume().ToString(), " PLATEID: ", w.Plateid)
+		logger.Debug("You ask too much: ", w.Crds.FormatA1(), " ", v.ToString(), " I only have: ", w.CurrentVolume().ToString(), " PLATEID: ", w.Plate.ID)
 		return nil
 	}
 
@@ -279,7 +276,7 @@ func (lhw *LHWell) Location_ID() string {
 }
 
 func (lhw *LHWell) Location_Name() string {
-	return lhw.Platetype
+	return lhw.Plate.GetType()
 }
 
 func (lhw *LHWell) Shape() *Shape {
@@ -294,7 +291,7 @@ func (lhw *LHWell) Shape() *Shape {
 // @deprecate Well
 
 func (w *LHWell) ContainerType() string {
-	return w.Platetype
+	return w.Plate.GetType()
 }
 
 func (w *LHWell) Clear() {
@@ -311,7 +308,7 @@ func (w *LHWell) Empty() bool {
 
 // copy of instance
 func (lhw *LHWell) Dup() *LHWell {
-	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, "ul", lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.GetSize().X, lhw.GetSize().Y, lhw.GetSize().Z, lhw.Bottomh, "mm")
+	cp := NewLHWell(lhw.Plate, lhw.Crds, "ul", lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.GetSize().X, lhw.GetSize().Y, lhw.GetSize().Z, lhw.Bottomh, "mm")
 
 	for k, v := range lhw.Extra {
 		cp.Extra[k] = v
@@ -324,7 +321,7 @@ func (lhw *LHWell) Dup() *LHWell {
 
 // copy of type
 func (lhw *LHWell) CDup() *LHWell {
-	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, "ul", lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.GetSize().X, lhw.GetSize().Y, lhw.GetSize().Z, lhw.Bottomh, "mm")
+	cp := NewLHWell(lhw.Plate, lhw.Crds, "ul", lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.GetSize().X, lhw.GetSize().Y, lhw.GetSize().Z, lhw.Bottomh, "mm")
 	for k, v := range lhw.Extra {
 		cp.Extra[k] = v
 	}
@@ -355,13 +352,12 @@ func (lhw *LHWell) CalculateMaxVolume() (vol wunit.Volume, err error) {
 }
 
 // make a new well structure
-func NewLHWell(platetype, plateid, crds, vunit string, vol, rvol float64, shape *Shape, bott WellBottomType, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
+func NewLHWell(plate *LHPlate, crds WellCoords, vunit string, vol, rvol float64, shape *Shape, bott WellBottomType, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
 	var well LHWell
 
+	well.Plate = plate
 	well.WContents = NewLHComponent()
 	well.ID = GetUUID()
-	well.Platetype = platetype
-	well.Plateid = plateid
 	well.Crds = crds
 	well.MaxVol = wunit.NewVolume(vol, vunit).ConvertToString("ul")
 	well.Rvol = wunit.NewVolume(rvol, vunit).ConvertToString("ul")
@@ -393,7 +389,7 @@ func Get_Next_Well(plate *LHPlate, component *LHComponent, curwell *LHWell) (*LH
 			return curwell, true
 		}
 
-		startcoords := MakeWellCoords(curwell.Crds)
+		startcoords := curwell.Crds
 		it.SetStartTo(startcoords)
 		it.Rewind()
 		it.Next()

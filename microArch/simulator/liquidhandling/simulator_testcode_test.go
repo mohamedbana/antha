@@ -164,24 +164,21 @@ func makeShape(p *ShapeParams) *wtype.Shape {
 }
 
 type LHWellParams struct {
-	platetype string
-	plateid   string
-	crds      string
-	vunit     string
-	vol       float64
-	rvol      float64
-	shape     ShapeParams
-	bott      wtype.WellBottomType
-	xdim      float64
-	ydim      float64
-	zdim      float64
-	bottomh   float64
-	dunit     string
+	crds    wtype.WellCoords
+	vunit   string
+	vol     float64
+	rvol    float64
+	shape   ShapeParams
+	bott    wtype.WellBottomType
+	xdim    float64
+	ydim    float64
+	zdim    float64
+	bottomh float64
+	dunit   string
 }
 
 func makeLHWell(p *LHWellParams) *wtype.LHWell {
-	return wtype.NewLHWell(p.platetype,
-		p.plateid,
+	return wtype.NewLHWell(nil,
 		p.crds,
 		p.vunit,
 		p.vol,
@@ -367,12 +364,10 @@ func default_lhplate_props() *LHPlateParams {
 		12,               // ncols           int
 		wtype.Coordinates{127.76, 85.48, 25.7}, // size          float64
 		LHWellParams{ // welltype
-			"test_welltype", // platetype       string
-			"test_wellid",   // plateid         string
-			"",              // crds            string
-			"ul",            // vunit           string
-			200,             // vol             float64
-			5,               // rvol            float64
+			wtype.ZeroWellCoords(), // crds            string
+			"ul", // vunit           string
+			200,  // vol             float64
+			5,    // rvol            float64
 			ShapeParams{ // shape           ShapeParams struct {
 				"test_shape", // name            string
 				"mm",         // lengthunit      string
@@ -424,12 +419,10 @@ func default_lhtipbox(name string) *wtype.LHTipbox {
 			"ul",            //volunit     string
 		},
 		LHWellParams{ // well
-			"test_welltype", // platetype       string
-			"test_wellid",   // plateid         string
-			"",              // crds            string
-			"ul",            // vunit           string
-			1000,            // vol             float64
-			50,              // rvol            float64
+			wtype.ZeroWellCoords(), // crds            string
+			"ul", // vunit           string
+			1000, // vol             float64
+			50,   // rvol            float64
 			ShapeParams{ // shape           ShapeParams struct {
 				"test_shape", // name            string
 				"mm",         // lengthunit      string
@@ -461,12 +454,10 @@ func default_lhtipwaste(name string) *wtype.LHTipwaste {
 		"testTipwaste mfr",                     //mfr             string
 		wtype.Coordinates{127.76, 85.48, 92.0}, //height          float64
 		LHWellParams{ // w               LHWellParams
-			"test_tipwaste_well", // platetype       string
-			"test_wellid",        // plateid         string
-			"",                   // crds            string
-			"ul",                 // vunit           string
-			800000.0,             // vol             float64
-			800000.0,             // rvol            float64
+			wtype.ZeroWellCoords(), // crds            string
+			"ul",     // vunit           string
+			800000.0, // vol             float64
+			800000.0, // rvol            float64
 			ShapeParams{ // shape           ShapeParams struct {
 				"test_tipbox", // name            string
 				"mm",          // lengthunit      string

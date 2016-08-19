@@ -236,6 +236,7 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, size Coordinates, wellt
 	lhp.WlsX = ncols
 	lhp.WlsY = nrows
 	lhp.Nwells = ncols * nrows
+	welltype.Plate = &lhp
 	lhp.Welltype = welltype
 	lhp.WellXOffset = wellXOffset
 	lhp.WellYOffset = wellYOffset
@@ -262,18 +263,14 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, size Coordinates, wellt
 			arr[i][j] = welltype.CDup()
 
 			//crds := wutil.NumToAlpha(i+1) + ":" + strconv.Itoa(j+1)
-			crds := WellCoords{j, i}.FormatA1()
-			wellcoords[crds] = arr[i][j]
-			arr[i][j].Crds = crds
+			crds := WellCoords{j, i}
+			wellcoords[crds.FormatA1()] = arr[i][j]
 			colarr[j][i] = arr[i][j]
 			rowarr[i][j] = arr[i][j]
 			wellmap[arr[i][j].ID] = arr[i][j]
 			arr[i][j].Plate = &lhp
-			arr[i][j].Plateinst = lhp.Inst
-			arr[i][j].Plateid = lhp.ID
-			arr[i][j].Platetype = lhp.Type
 			arr[i][j].Crds = crds
-			arr[i][j].WContents.Loc = lhp.ID + ":" + crds
+			arr[i][j].WContents.Loc = lhp.ID + ":" + crds.FormatA1()
 		}
 	}
 
@@ -297,12 +294,10 @@ func (lhp *LHPlate) Dup() *LHPlate {
 			d := well.Dup()
 			ret.Rows[i][j] = d
 			ret.Cols[j][i] = d
-			ret.Wellcoords[d.Crds] = d
+			ret.Wellcoords[d.Crds.FormatA1()] = d
 			ret.HWells[d.ID] = d
-			d.WContents.Loc = ret.ID + ":" + d.Crds
+			d.WContents.Loc = ret.ID + ":" + d.Crds.FormatA1()
 			d.Plate = ret
-			d.Plateinst = ret.Inst
-			d.Plateid = ret.ID
 		}
 	}
 
@@ -322,15 +317,13 @@ func (p *LHPlate) UnProtectAllWells() {
 }
 
 func Initialize_Wells(plate *LHPlate) {
-	id := (*plate).ID
 	wells := (*plate).HWells
 	newwells := make(map[string]*LHWell, len(wells))
 	wellcrds := (*plate).Wellcoords
 	for _, well := range wells {
 		well.ID = GetUUID()
-		well.Plateid = id
 		newwells[well.ID] = well
-		wellcrds[well.Crds] = well
+		wellcrds[well.Crds.FormatA1()] = well
 	}
 	(*plate).HWells = newwells
 	(*plate).Wellcoords = wellcrds

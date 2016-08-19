@@ -100,19 +100,15 @@ func (plate *LHPlate) Welldimensions() *LHWellType {
 }
 
 type SLHWell struct {
-	ID        string
-	Inst      string
-	Plateinst string
-	Plateid   string
-	Coords    string
-	Contents  *LHComponent
+	ID       string
+	Inst     string
+	Coords   WellCoords
+	Contents *LHComponent
 }
 
 func (slw SLHWell) FillWell(lw *LHWell) {
 	lw.ID = slw.ID
 	lw.Inst = slw.Inst
-	lw.Plateinst = slw.Plateinst
-	lw.Plateid = slw.Plateid
 	lw.Crds = slw.Coords
 	lw.WContents = slw.Contents
 }
