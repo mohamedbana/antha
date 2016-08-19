@@ -230,9 +230,7 @@ func (tb *LHTipbox) GetChildByAddress(c WellCoords) LHObject {
 	if !tb.AddressExists(c) {
 		return nil
 	}
-	//Tips aren't yet an LHObject...
-	//return tb.Tips[c.X][c.Y]
-	return nil
+	return tb.Tips[c.X][c.Y]
 }
 
 func (tb *LHTipbox) CoordsToWellCoords(r Coordinates) (WellCoords, Coordinates) {
@@ -373,6 +371,12 @@ func initialize_tips(tipbox *LHTipbox, tiptype *LHTip) *LHTipbox {
 	for i := 0; i < nc; i++ {
 		for j := 0; j < nr; j++ {
 			tipbox.Tips[i][j] = CopyTip(*tiptype)
+			tipbox.Tips[i][j].SetOffset(Coordinates{
+				tipbox.TipXStart + float64(i)*tipbox.TipXOffset,
+				tipbox.TipYStart + float64(j)*tipbox.TipYOffset,
+				tipbox.TipZStart,
+			})
+			tipbox.Tips[i][j].SetParent(tipbox)
 		}
 	}
 	tipbox.NTips = tipbox.Nrows * tipbox.Ncols

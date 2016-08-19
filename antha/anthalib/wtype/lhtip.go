@@ -23,9 +23,13 @@
 // defines types for dealing with liquid handling requests
 package wtype
 
-import "github.com/antha-lang/antha/antha/anthalib/wunit"
+import (
+	"fmt"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
+)
 
 //TODO add extra properties, i.e. filter
+//     remove BBox once shape implements LHObject
 type LHTip struct {
 	ID     string
 	Type   string
@@ -33,6 +37,9 @@ type LHTip struct {
 	Dirty  bool
 	MaxVol wunit.Volume
 	MinVol wunit.Volume
+	shape  *Shape
+	bounds BBox
+	parent LHObject
 }
 
 /*
@@ -47,6 +54,56 @@ type LHTip struct {
 	Orientation int
 	Head        int
 */
+
+//@implement LHObject
+func (self *LHTip) GetPosition() Coordinates {
+	return OriginOf(self).Add(self.bounds.GetPosition())
+}
+
+//@implement LHObject
+func (self *LHTip) GetSize() Coordinates {
+	return self.bounds.GetSize()
+}
+
+//@implement LHObject
+func (self *LHTip) GetBoxIntersections(box BBox) []LHObject {
+	box.SetPosition(box.GetPosition().Subtract(OriginOf(self)))
+	if self.bounds.IntersectsBox(box) {
+		return []LHObject{self}
+	}
+	return nil
+}
+
+//@implement LHObject
+func (self *LHTip) GetPointIntersections(point Coordinates) []LHObject {
+	point = point.Subtract(point)
+	//TODO more accurate intersection detection with Shape
+	if self.bounds.IntersectsPoint(point) {
+		return []LHObject{self}
+	}
+	return nil
+}
+
+//@implement LHObject
+func (self *LHTip) SetOffset(point Coordinates) error {
+	self.bounds.SetPosition(point)
+	return nil
+}
+
+//@implement LHObject
+func (self *LHTip) SetParent(o LHObject) error {
+	//parent should be LHTipbox (should accept LHAdaptor, but it doesn't implement LHObject yet)
+	if _, ok := o.(*LHTipbox); ok {
+		self.parent = o
+		return nil
+	}
+	return fmt.Errorf("Cannot set %s \"%s\" as parent of tip", ClassOf(o), NameOf(o))
+}
+
+//@implement LHObject
+func (self *LHTip) GetParent() LHObject {
+	return self.parent
+}
 
 func (tip *LHTip) GetParams() *LHChannelParameter {
 	// be safe
@@ -66,18 +123,27 @@ func (tip *LHTip) IsNil() bool {
 }
 
 func (tip *LHTip) Dup() *LHTip {
-	t := NewLHTip(tip.Mnfr, tip.Type, tip.MinVol.RawValue(), tip.MaxVol.RawValue(), tip.MinVol.Unit().PrefixedSymbol())
+	t := NewLHTip(tip.Mnfr, tip.Type, tip.MinVol.RawValue(), tip.MaxVol.RawValue(), tip.MinVol.Unit().PrefixedSymbol(), tip.shape)
 	t.Dirty = tip.Dirty
 	return t
 }
 
-func NewLHTip(mfr, ttype string, minvol, maxvol float64, volunit string) *LHTip {
-	var lht LHTip
-	lht.ID = GetUUID()
-	lht.Mnfr = mfr
-	lht.Type = ttype
-	lht.MaxVol = wunit.NewVolume(maxvol, volunit)
-	lht.MinVol = wunit.NewVolume(minvol, volunit)
+func NewLHTip(mfr, ttype string, minvol, maxvol float64, volunit string, shape *Shape) *LHTip {
+	lht := LHTip{
+		GetUUID(),
+		ttype,
+		mfr,
+		false, //dirty
+		wunit.NewVolume(maxvol, volunit),
+		wunit.NewVolume(minvol, volunit),
+		shape,
+		BBox{Coordinates{}, Coordinates{
+			shape.Height().ConvertToString("mm"), //not a mistake, Shape currently has height&width as
+			shape.Width().ConvertToString("mm"),  // XY coordinates and Depth as Z
+			shape.Depth().ConvertToString("mm"),
+		}},
+		nil,
+	}
 	return &lht
 }
 

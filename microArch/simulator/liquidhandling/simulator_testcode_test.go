@@ -228,6 +228,7 @@ type LHTipParams struct {
 	minvol  float64
 	maxvol  float64
 	volunit string
+	shape   ShapeParams
 }
 
 func makeLHTip(p *LHTipParams) *wtype.LHTip {
@@ -235,7 +236,8 @@ func makeLHTip(p *LHTipParams) *wtype.LHTip {
 		p.ttype,
 		p.minvol,
 		p.maxvol,
-		p.volunit)
+		p.volunit,
+		makeShape(&p.shape))
 }
 
 type LHTipboxParams struct {
@@ -417,6 +419,13 @@ func default_lhtipbox(name string) *wtype.LHTipbox {
 			50,              //minvol      float64
 			1000,            //maxvol      float64
 			"ul",            //volunit     string
+			ShapeParams{ // shape           ShapeParams struct {
+				"test_shape", // name            string
+				"mm",         // lengthunit      string
+				7.3,          // h               float64
+				7.3,          // w               float64
+				51.2,         // d               float64
+			},
 		},
 		LHWellParams{ // well
 			wtype.ZeroWellCoords(), // crds            string
