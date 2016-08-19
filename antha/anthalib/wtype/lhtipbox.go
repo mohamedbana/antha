@@ -127,10 +127,16 @@ func (tb *LHTipbox) Dup() *LHTipbox {
 // @implement named
 
 func (tb *LHTipbox) GetName() string {
+	if tb == nil {
+		return "<nil>"
+	}
 	return tb.Boxname
 }
 
 func (tb *LHTipbox) GetType() string {
+	if tb == nil {
+		return "<nil>"
+	}
 	return tb.Type
 }
 

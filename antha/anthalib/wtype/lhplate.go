@@ -180,11 +180,17 @@ func (lhp *LHPlate) AllWellPositions() (wellpositionarray []string) {
 // @implement named
 
 func (lhp *LHPlate) GetName() string {
+	if lhp == nil {
+		return "<nil>"
+	}
 	return lhp.PlateName
 }
 
 // @implement Typed
 func (lhp *LHPlate) GetType() string {
+	if lhp == nil {
+		return "<nil>"
+	}
 	return lhp.Type
 }
 

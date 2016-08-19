@@ -64,10 +64,16 @@ func (tw *LHTipwaste) Dup() *LHTipwaste {
 }
 
 func (tw *LHTipwaste) GetName() string {
+	if tw == nil {
+		return "<nil>"
+	}
 	return tw.Name
 }
 
 func (tw *LHTipwaste) GetType() string {
+	if tw == nil {
+		return "<nil>"
+	}
 	return tw.Type
 }
 
