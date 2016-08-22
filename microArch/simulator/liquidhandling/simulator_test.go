@@ -582,7 +582,6 @@ func Test_Move(t *testing.T) {
 // ########################################################################################################################
 // ########################################################## Tip Loading/Unloading
 // ########################################################################################################################
-/*
 
 func TestLoadTips(t *testing.T) {
 
@@ -685,7 +684,7 @@ func TestLoadTips(t *testing.T) {
 			},
 		},
 		SimulatorTest{
-			"OK - single tip above space (alt)",
+			"OK - single tip below space (alt)",
 			nil,
 			[]*SetupFn{
 				testLayout(),
@@ -711,7 +710,7 @@ func TestLoadTips(t *testing.T) {
 			},
 		},
 		SimulatorTest{
-			"OK - 3 tips",
+			"OK - 3 tips at once",
 			nil,
 			[]*SetupFn{
 				testLayout(),
@@ -736,7 +735,7 @@ func TestLoadTips(t *testing.T) {
 			},
 		},
 		SimulatorTest{
-			"OK - 3 tips (alt)",
+			"OK - 3 tips at once (alt)",
 			nil,
 			[]*SetupFn{
 				testLayout(),
@@ -786,7 +785,7 @@ func TestLoadTips(t *testing.T) {
 			},
 		},
 		SimulatorTest{
-			"OK - 8 tips",
+			"OK - 8 tips at once",
 			nil,
 			[]*SetupFn{
 				testLayout(),
@@ -811,7 +810,7 @@ func TestLoadTips(t *testing.T) {
 			},
 		},
 		SimulatorTest{
-			"invalid channel 8",
+			"unknown channel 8",
 			nil,
 			[]*SetupFn{
 				testLayout(),
@@ -833,7 +832,7 @@ func TestLoadTips(t *testing.T) {
 			nil, //assertions
 		},
 		SimulatorTest{
-			"invalid channel -1",
+			"unknown channel -1",
 			nil,
 			[]*SetupFn{
 				testLayout(),

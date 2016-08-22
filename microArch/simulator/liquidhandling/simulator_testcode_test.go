@@ -738,6 +738,8 @@ type moveToParams struct {
 	Rows         int
 }
 
+//moveTo Simplify generating Move commands when running tests by avoiding
+//repeating stuff that doesn't change
 func moveTo(row, col int, p moveToParams) *SetupFn {
 	s_dp := make([]string, p.Multi)
 	s_wc := make([]string, p.Multi)
