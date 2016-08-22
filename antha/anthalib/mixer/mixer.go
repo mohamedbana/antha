@@ -154,7 +154,6 @@ func SampleForTotalVolume(l *wtype.LHComponent, v wunit.Volume) *wtype.LHCompone
 	ret.Visc = l.GetVisc()
 	//logger.Track(fmt.Sprintf("SAMPLE T %s %s %s", l.ID, ret.ID, v.ToString()))
 	ret.SetSample(true)
-
 	return ret
 }
 

@@ -62,7 +62,7 @@ func mix(ctx context.Context, inst *mixInst) *wtype.LHComponent {
 		v := c.Volume().SIValue()
 		inst.Node.Reqs = append(inst.Node.Reqs, ast.Request{MixVol: ast.NewPoint(v)})
 		c.Order = i
-		inst.Comp.Mix(c)
+		inst.Comp.MixPreserveTvol(c)
 		//inst.Comp.AddParent(c.ID)
 		//c.AddDaughter(inst.Comp.ID)
 		if c.Generation() > mx {
