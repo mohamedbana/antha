@@ -1224,7 +1224,7 @@ func Test_UnloadTips(t *testing.T) {
 					8, //multi
 					[]string{"tipbox", "tipbox", "tipbox", "tipbox", "tipbox", "tipbox", "tipbox", "tipbox"},                 //tipbox
 					[]string{"tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1"}, //location
-					[]string{"A1", "A1", "A1", "A1", "A1", "A1", "A1", "A1"},                                                 //well
+					[]string{"A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"},                                         //well
 				},
 			},
 			nil, //errors

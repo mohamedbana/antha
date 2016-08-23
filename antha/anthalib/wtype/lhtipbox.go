@@ -325,6 +325,18 @@ func (tb *LHTipbox) RemoveTip(c WellCoords) *LHTip {
 	return tip
 }
 
+//PutTip
+func (tb *LHTipbox) PutTip(c WellCoords, tip *LHTip) bool {
+	if !tb.AddressExists(c) {
+		return false
+	}
+	if tb.HasTipAt(c) {
+		return false
+	}
+	tb.Tips[c.X][c.Y] = tip
+	return true
+}
+
 // actually useful functions
 // TODO implement Mirror
 

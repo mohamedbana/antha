@@ -683,11 +683,95 @@ func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
 		return ret
 	}
 
-	//if err := self.state.GetAdaptor(head).UnloadTips(platetype, position, well); err != nil {
-	//    self.AddError("UnloadTips", err.Error())
-	//}
+	adaptor := self.state.GetAdaptor(head)
+	deck := self.state.GetDeck()
 
-	//TODO: check that specified channels have no tips, any other tips remain
+	//Check that there are tips everywhere we want to eject
+	missing := []string{}
+	for _, ch := range channels {
+		if !adaptor.GetChannel(ch).HasTip() {
+			missing = append(missing, fmt.Sprintf("%d", ch))
+		}
+	}
+	if len(missing) == 1 {
+		self.AddWarningf("UnloadTips", "No tip present at Head%d channel%s to eject", head, missing[0])
+	} else if len(missing) > 0 {
+		self.AddWarningf("UnloadTips", "No tips present on Head%d channels %s to eject", head, strings.Join(missing, ","))
+	}
+
+	for _, ch := range channels {
+		//get the target
+		if target, ok := deck.GetChild(position[ch]); !ok {
+			self.AddErrorf("UnloadTips", "Unknown deck position \"%s\"", position[ch])
+			break
+		} else if target == nil {
+			self.AddErrorf("UnloadTips", "Cannot unload to empty deck location \"%s\"", position[ch])
+			break
+		} else if addr, ok := target.(wtype.Addressable); !ok {
+			self.AddErrorf("UnloadTips", "Cannot unload tips to %s \"%s\" at location %s",
+				wtype.ClassOf(target), wtype.NameOf(target), position[ch])
+		} else {
+			//get the location of the channel
+			ch_pos := adaptor.GetChannel(ch).GetAbsolutePosition()
+			//parse the wellcoords
+			wc := wtype.MakeWellCoords(well[ch])
+			if wc.IsZero() {
+				self.AddErrorf("UnloadTips", "Cannot parse well coordinates \"%s\"", well[ch])
+				break
+			}
+			if !addr.AddressExists(wc) {
+				self.AddErrorf("UnloadTips", "Cannot unload to address %s in %s \"%s\" [%dx%d]",
+					wc.FormatA1(), wtype.ClassOf(target), wtype.NameOf(target), addr.NRows(), addr.NCols())
+				break
+			}
+			//get the child - *LHTip or *LHWell
+			child := addr.GetChildByAddress(wc)
+			well_p, _ := addr.WellCoordsToCoords(wc, wtype.TopReference)
+			delta := ch_pos.Subtract(well_p)
+
+			switch target := target.(type) {
+			case *wtype.LHTipbox:
+				//put the tip in the tipbox
+				if child.(*wtype.LHTip) != nil {
+					self.AddErrorf("UnloadTips", "Cannot unload to tipbox \"%s\" %s, tip already present there",
+						target.GetName(), wc.FormatA1())
+				} else if delta.AbsXY() > 0.25 {
+					self.AddErrorf("UnloadTips", "Head%d channel%d misaligned from tipbox \"%s\" %s by %.2fmm",
+						head, ch, target.GetName(), wc.FormatA1(), delta.AbsXY())
+				} else if delta.Z > target.GetSize().Z/2. {
+					self.AddWarningf("UnloadTips", "Ejecting tip from Head%d channel%d to tipbox \"%s\" %s from height of %.2fmm",
+						head, ch, target.GetName(), wc.FormatA1(), delta.Z)
+				} else {
+					target.PutTip(wc, adaptor.GetChannel(ch).UnloadTip())
+				}
+
+			case *wtype.LHTipwaste:
+				//put the tip in the tipwaste
+				if child == nil {
+					//I don't think this should happen, but it would be embarressing to segfault...
+					self.AddWarningf("UnloadTips", "Tipwaste \"%s\" well %s was nil, cannot check head alignment",
+						target.GetName(), wc.FormatA1())
+					adaptor.GetChannel(ch).UnloadTip()
+				} else if max_delta := child.GetSize(); delta.X > max_delta.X || delta.Y > max_delta.Y {
+					self.AddErrorf("UnloadTips", "Cannot unload, head%d channel%d is not above tipwaste \"%s\"",
+						head, ch, target.GetName())
+				} else if target.SpaceLeft() <= 0 {
+					self.AddErrorf("UnloadTips", "Cannot unload tip to overfull tipwaste \"%s\", contains %d tips",
+						target.GetName(), target.Contents)
+				} else {
+					target.Dispose(1)
+					adaptor.GetChannel(ch).UnloadTip()
+				}
+			default:
+				self.AddErrorf("UnloadTips", "Cannot unload tips to %s \"%s\" at location %s",
+					wtype.ClassOf(target), wtype.NameOf(target), position[ch])
+				break
+			}
+		}
+		if self.HasError() {
+			break
+		}
+	}
 
 	return ret
 }

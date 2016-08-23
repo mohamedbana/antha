@@ -701,7 +701,7 @@ func removeTipboxTips(tipbox_loc string, wells []string) *SetupFn {
 		tipbox := vlh.GetObjectAt(tipbox_loc).(*wtype.LHTipbox)
 		for _, well := range wells {
 			wc := wtype.MakeWellCoords(well)
-			tipbox.Tips[wc.X][wc.Y] = nil
+			tipbox.RemoveTip(wc)
 		}
 	}
 	return &ret

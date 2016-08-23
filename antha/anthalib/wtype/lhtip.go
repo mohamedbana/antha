@@ -57,6 +57,9 @@ type LHTip struct {
 
 //@implement Named
 func (self *LHTip) GetName() string {
+	if self == nil {
+		return "<nil>"
+	}
 	if addr, ok := self.parent.(Addressable); ok {
 		pos := self.GetPosition().Add(self.GetSize().Multiply(0.5))
 		wc, _ := addr.CoordsToWellCoords(pos)
@@ -67,6 +70,9 @@ func (self *LHTip) GetName() string {
 
 //@implement Typed
 func (self *LHTip) GetType() string {
+	if self == nil {
+		return "<nil>"
+	}
 	return self.Type
 }
 
