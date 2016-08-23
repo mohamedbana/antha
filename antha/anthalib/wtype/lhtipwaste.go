@@ -22,7 +22,7 @@ type LHTipwaste struct {
 }
 
 func (tw LHTipwaste) SpaceLeft() int {
-	return tw.Contents - tw.Capacity
+	return tw.Capacity - tw.Contents
 }
 
 func (te LHTipwaste) String() string {
