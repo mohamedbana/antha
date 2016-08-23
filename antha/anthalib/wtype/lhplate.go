@@ -529,9 +529,10 @@ func (self *LHPlate) GetChildByAddress(c WellCoords) LHObject {
 }
 
 func (self *LHPlate) CoordsToWellCoords(r Coordinates) (WellCoords, Coordinates) {
+	rel := r.Subtract(self.GetPosition())
 	wc := WellCoords{
-		int(math.Floor(((r.X - self.WellXStart) / self.WellXOffset))), // + 0.5), Don't need to add .5 because
-		int(math.Floor(((r.Y - self.WellYStart) / self.WellYOffset))), // + 0.5), WellXStart is to edge, not center
+		int(math.Floor(((rel.X - self.WellXStart) / self.WellXOffset))), // + 0.5), Don't need to add .5 because
+		int(math.Floor(((rel.Y - self.WellYStart) / self.WellYOffset))), // + 0.5), WellXStart is to edge, not center
 	}
 	if wc.X < 0 {
 		wc.X = 0
@@ -558,7 +559,7 @@ func (self *LHPlate) WellCoordsToCoords(wc WellCoords, r WellReference) (Coordin
 	if r == BottomReference {
 		z = self.WellZStart
 	} else if r == TopReference {
-		z = self.bounds.ZMax()
+		z = self.WellZStart + self.Welltype.GetSize().Z
 	} else if r == LiquidReference {
 		panic("Haven't implemented liquid level yet")
 	}

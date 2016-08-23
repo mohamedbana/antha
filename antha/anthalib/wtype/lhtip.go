@@ -55,6 +55,26 @@ type LHTip struct {
 	Head        int
 */
 
+//@implement Named
+func (self *LHTip) GetName() string {
+	if addr, ok := self.parent.(Addressable); ok {
+		pos := self.GetPosition().Add(self.GetSize().Multiply(0.5))
+		wc, _ := addr.CoordsToWellCoords(pos)
+		return fmt.Sprintf("%s@%s", wc.FormatA1(), NameOf(self.parent))
+	}
+	return fmt.Sprintf("%s_%s", self.Mnfr, self.Type)
+}
+
+//@implement Typed
+func (self *LHTip) GetType() string {
+	return self.Type
+}
+
+//@implement Classy
+func (self *LHTip) GetClass() string {
+	return "tip"
+}
+
 //@implement LHObject
 func (self *LHTip) GetPosition() Coordinates {
 	return OriginOf(self).Add(self.bounds.GetPosition())

@@ -982,8 +982,7 @@ func TestLoadTips(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(warn) LoadTips: Cannot load tip to channel 0 as no tip at H12 in tipbox_1",
-				"(err) LoadTips: Failed to load tip to channel 0",
+				"(err) LoadTips: Cannot load to channel 0 as no tip at H12 in tipbox \"tipbox1\"",
 			},
 			nil, //assertions
 		},
@@ -1006,7 +1005,29 @@ func TestLoadTips(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) LoadTips: Tip already loaded on channel 0",
+				"(err) LoadTips: Cannot load tips to Head0 when channel 0 already has a tip loaded",
+			},
+			nil, //assertions
+		},
+		SimulatorTest{
+			"extra tip in the way",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				moveTo(6, 11, mtp),
+			},
+			[]TestRobotInstruction{
+				&LoadTips{
+					[]int{0}, //channels
+					0,        //head
+					8,        //multi
+					[]string{"tipbox", "", "", "", "", "", "", ""},   //tipbox
+					[]string{"tipbox_1", "", "", "", "", "", "", ""}, //location
+					[]string{"G12", "", "", "", "", "", "", ""},      //well
+				},
+			},
+			[]string{ //errors
+				"(err) LoadTips: Cannot load G12->channel0, channel 1 collides with tip \"H12@tipbox1\" (Head0 not independent)",
 			},
 			nil, //assertions
 		},
@@ -1028,7 +1049,7 @@ func TestLoadTips(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) LoadTips: Channel0 is above F12, not E12 as requested",
+				"(err) LoadTips: Channel 0 is misaligned with tip at E12 by 9mm",
 			},
 			nil, //assertions
 		},
@@ -1050,7 +1071,7 @@ func TestLoadTips(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) LoadTips: Channels 0,1 are above F12,G12, not G12,F12 as requested",
+				"(err) LoadTips: Channels 0,1 are misaligned with tips at G12,F12 by 9,9 mm respectively",
 			},
 			nil, //assertions
 		},
@@ -1059,20 +1080,20 @@ func TestLoadTips(t *testing.T) {
 			nil,
 			[]*SetupFn{
 				testLayout(),
-				moveTo(5, 11, misaligned_mtp),
+				moveTo(7, 11, misaligned_mtp),
 			},
 			[]TestRobotInstruction{
 				&LoadTips{
-					[]int{0, 1, 2}, //channels
-					0,              //head
-					8,              //multi
+					[]int{0}, //channels
+					0,        //head
+					8,        //multi
 					[]string{"tipbox", "", "", "", "", "", "", ""},   //tipbox
 					[]string{"tipbox_1", "", "", "", "", "", "", ""}, //location
 					[]string{"H12", "", "", "", "", "", "", ""},      //well
 				},
 			},
 			[]string{ //errors
-				"(err) LoadTips: Channel 0 is misaligned with tip H12 by 2mm",
+				"(err) LoadTips: Channel 0 is misaligned with tip at H12 by 2mm",
 			},
 			nil, //assertions
 		},
@@ -1094,7 +1115,7 @@ func TestLoadTips(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) LoadTips: Channels {0,1,2} are misaligned with tips {F12,G12,H12} by {2,2,2}mm",
+				"(err) LoadTips: Channels 0,1,2 are misaligned with tips at F12,G12,H12 by 2,2,2 mm respectively",
 			},
 			nil, //assertions
 		},

@@ -446,11 +446,11 @@ func default_lhtipbox(name string) *wtype.LHTipbox {
 			0.0,               // bottomh         float64
 			"mm",              // dunit           string
 		},
-		9., //tipxoffset      float64
-		9., //tipyoffset      float64
-		0., //tipxstart       float64
-		0., //tipystart       float64
-		0., //tipzstart       float64
+		9.,  //tipxoffset      float64
+		9.,  //tipyoffset      float64
+		0.,  //tipxstart       float64
+		0.,  //tipystart       float64
+		10., //tipzstart       float64
 	}
 
 	return makeLHTipbox(&params, name)

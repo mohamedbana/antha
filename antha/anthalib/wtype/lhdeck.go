@@ -211,14 +211,13 @@ func (self *LHDeck) SetSlotAccepts(name string, class string) {
 //will return the plate
 func (self *LHDeck) GetChildBelow(point Coordinates) LHObject {
 	//get all children in the same vertical plane
-	box := NewBBox6f(point.X, point.Y, math.MaxFloat64, 0, 0, math.MaxFloat64)
+	box := NewBBox6f(point.X, point.Y, -math.MaxFloat64/2, 0, 0, math.MaxFloat64)
 	candidates := self.GetBoxIntersections(*box)
-
 	//find the closest that's below
 	z_off_min := math.MaxFloat64
 	z_off_i := -1
 	for i, c := range candidates {
-		if z_off := point.Z - c.GetPosition().Z; z_off > 0 && z_off < z_off_min {
+		if z_off := (point.Z - (c.GetPosition().Z + c.GetSize().Z)); (point.Z-c.GetPosition().Z) > 0 && z_off < z_off_min {
 			z_off_min = z_off
 			z_off_i = i
 		}

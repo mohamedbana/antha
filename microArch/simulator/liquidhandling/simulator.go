@@ -28,27 +28,71 @@ import (
 	"github.com/antha-lang/antha/microArch/driver"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/simulator"
+	"math"
 	"sort"
 	"strings"
 )
 
 func summariseWell2Channel(well []string, channels []int) string {
-	ret := make([]string, len(well))
-	for i := range well {
-		ret[i] = fmt.Sprintf("%s->channel%v", well[i], channels[i])
+	ret := make([]string, 0, len(channels))
+	for ch := range channels {
+		ret = append(ret, fmt.Sprintf("%s->channel%v", well[ch], ch))
 	}
 	return strings.Join(ret, ", ")
+}
+
+type adaptorCollision struct {
+	channel int
+	objects []wtype.LHObject
+}
+
+type adaptorCollisions []adaptorCollision
+
+func (self adaptorCollisions) String() string {
+	channels := make([]string, 0, len(self))
+	objects := []wtype.LHObject{}
+
+	seen := func(o wtype.LHObject) bool {
+		for _, O := range objects {
+			if o == O {
+				return true
+			}
+		}
+		return false
+	}
+
+	for _, ac := range self {
+		channels = append(channels, fmt.Sprintf("%d", ac.channel))
+		for _, obj := range ac.objects {
+			if !seen(obj) {
+				objects = append(objects, obj)
+			}
+		}
+	}
+
+	s_obj := make([]string, 0, len(objects))
+	for _, o := range objects {
+		s_obj = append(s_obj, fmt.Sprintf("%s \"%s\"", wtype.ClassOf(o), wtype.NameOf(o)))
+	}
+
+	if len(self) == 1 {
+		return fmt.Sprintf("channel %s collides with %s", channels[0], strings.Join(s_obj, " and "))
+	}
+	return fmt.Sprintf("channels %s collide with %s", strings.Join(channels, ","), strings.Join(s_obj, " and "))
 }
 
 // Simulate a liquid handler Driver
 type VirtualLiquidHandler struct {
 	simulator.ErrorReporter
-	state *RobotState
+	state             *RobotState
+	tipbox_collisions bool
 }
 
 //Create a new VirtualLiquidHandler which mimics an LHDriver
 func NewVirtualLiquidHandler(props *liquidhandling.LHProperties) *VirtualLiquidHandler {
 	var vlh VirtualLiquidHandler
+
+	vlh.tipbox_collisions = true
 
 	vlh.validateProperties(props)
 	//if the properties are that bad, don't bother building RobotState
@@ -155,6 +199,15 @@ func (self *VirtualLiquidHandler) testSliceLength(f_name string, slice_lengths m
 	return true
 }
 
+func contains(v int, s []int) bool {
+	for _, val := range s {
+		if v == val {
+			return true
+		}
+	}
+	return false
+}
+
 //getAdaptorState
 func (self *VirtualLiquidHandler) getAdaptorState(f_name string, h int) *AdaptorState {
 	if h < 0 || h >= self.state.GetNumberOfAdaptors() {
@@ -224,6 +277,21 @@ func (self *VirtualLiquidHandler) testTipArgs(f_name string, channels []int, hea
 		"position":  len(position),
 		"well":      len(well)},
 		n_channels)
+
+	if ret {
+		for i := range platetype {
+			if contains(i, channels) {
+				if platetype[i] == "" && well[i] == "" && position[i] == "" {
+					self.AddErrorf(f_name, "Command given for channel %d, but no platetype, well or position given", i)
+					return false
+				}
+			} else {
+				if !(platetype[i] == "" && well[i] == "" && position[i] == "") {
+					self.AddWarningf(f_name, "No command for channel %d, but platetype, well or position given", i)
+				}
+			}
+		}
+	}
 	return ret
 }
 
@@ -455,40 +523,151 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 	platetype, position, well []string) driver.CommandStatus {
 	ret := driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
 
-	//check that RobotState won't crash
+	//check that the command is valid
 	if !self.testTipArgs("LoadTips", channels, head, multi, platetype, position, well) {
 		return ret
 	}
 
-	adaptor := self.state.GetAdaptor(head)
-	//if err := adaptor.LoadTips(platetype, position, well); err != nil {
-	//    err.SetFunctionName("LoadTips")
-	//    self.AddSimulationError(err)
-	//}
-
-	//Check that tips were loaded onto the specified channels
-	mchannels := map[int]bool{}
-	for _, ch := range channels {
-		mchannels[ch] = true
+	//make well coords
+	wc := make([]wtype.WellCoords, multi)
+	for i := range well {
+		wc[i] = wtype.MakeWellCoords(well[i])
 	}
-	extra := []string{}
-	missing := []string{}
-	for ch := 0; ch < adaptor.GetChannelCount(); ch++ {
-		if ht, et := adaptor.GetChannel(ch).HasTip(), mchannels[ch]; ht && !et {
-			extra = append(extra, fmt.Sprintf("%v", ch))
-		} else if !ht && et {
-			missing = append(missing, fmt.Sprintf("%v", ch))
+
+	//check that all channels are empty
+	adaptor := self.state.GetAdaptor(head)
+	if tc := adaptor.GetTipCount(); tc > 0 {
+		//get a slice of channels with tips on
+		loaded := make([]string, 0, tc)
+		for i := 0; i < adaptor.GetChannelCount(); i++ {
+			if adaptor.GetChannel(i).HasTip() {
+				loaded = append(loaded, fmt.Sprintf("%d", i))
+			}
+		}
+		if tc > 1 {
+			self.AddErrorf("LoadTips", "Cannot load tips to Head%d when channels %s already have tips loaded",
+				head, strings.Join(loaded, ","))
+		} else {
+			self.AddErrorf("LoadTips", "Cannot load tips to Head%d when channel %s already has a tip loaded",
+				head, loaded[0])
+		}
+		return ret
+	}
+
+	//get the deck
+	deck := self.state.GetDeck()
+
+	//Get the tip at each requested location
+	tips := make([]*wtype.LHTip, multi)
+	for _, i := range channels {
+		if o, ok := deck.GetChild(position[i]); !ok {
+			self.AddErrorf("LoadTips", "No known location \"%s\"", position[i])
+			return ret
+		} else if o == nil {
+			self.AddErrorf("LoadTips", "No tipbox found at position %s, empty deck position", position[i])
+			return ret
+		} else if tipbox, ok := o.(*wtype.LHTipbox); !ok {
+			self.AddErrorf("LoadTips", "No tipbox found at position %s, instead found %s \"%s\"",
+				position[i], wtype.ClassOf(o), wtype.NameOf(o))
+			return ret
+		} else if !tipbox.AddressExists(wc[i]) {
+			self.AddErrorf("LoadTips", "Request for tip at %s in tipbox of size [%dx%d]",
+				wc[i].FormatA1(), tipbox.NCols(), tipbox.NRows())
+			return ret
+		} else {
+			tips[i] = tipbox.GetChildByAddress(wc[i]).(*wtype.LHTip)
+			if tips[i] == nil {
+				self.AddErrorf("LoadTips", "Cannot load to channel %d as no tip at %s in tipbox \"%s\"",
+					i, wc[i].FormatA1(), tipbox.GetName())
+				return ret
+			}
 		}
 	}
-	if len(extra) == 1 {
-		self.AddErrorf("LoadTips", "Unexpected tip loaded to channel %s", extra[0])
-	} else if len(extra) > 1 {
-		self.AddErrorf("LoadTips", "Unexpected tips loaded to channels {%s}", strings.Join(extra, ","))
+
+	//check alignment
+	z_off := make([]float64, multi)
+	misaligned := []string{}
+	target := []string{}
+	amount := []string{}
+	for _, ch := range channels {
+		tip_s := tips[ch].GetSize()
+		tip_p := tips[ch].GetPosition().Add(wtype.Coordinates{0.5 * tip_s.X, 0.5 * tip_s.Y, tip_s.Z})
+		ch_p := adaptor.GetChannel(ch).GetAbsolutePosition()
+		delta := ch_p.Subtract(tip_p)
+		if xy := delta.AbsXY(); xy > 0.5 {
+			misaligned = append(misaligned, fmt.Sprintf("%d", ch))
+			target = append(target, wc[ch].FormatA1())
+			amount = append(amount, fmt.Sprintf("%v", xy))
+		}
+		z_off[ch] = delta.Z
+		if delta.Z < 0. {
+			self.AddError("LoadTips", "Request to load tip which is above adaptor - CRASH")
+			return ret
+		}
 	}
-	if len(missing) == 1 {
-		self.AddErrorf("LoadTips", "Failed to load tip to channel %s", missing[0])
-	} else if len(missing) > 1 {
-		self.AddErrorf("LoadTips", "Failed to load tips to channels {%s}", strings.Join(missing, ","))
+	if len(misaligned) == 1 {
+		self.AddErrorf("LoadTips", "Channel %s is misaligned with tip at %s by %smm",
+			misaligned[0], target[0], amount[0])
+		return ret
+	} else if len(misaligned) > 1 {
+		self.AddErrorf("LoadTips", "Channels %s are misaligned with tips at %s by %s mm respectively",
+			strings.Join(misaligned, ","), strings.Join(target, ","), strings.Join(amount, ","))
+		return ret
+	}
+
+	//if not independent, check there are no other tips in the way
+	if !adaptor.IsIndependent() {
+		collisions := adaptorCollisions{}
+		zo_max := 0.
+		zo_min := math.MaxFloat64
+		for _, ch := range channels {
+			if z_off[ch] > zo_max {
+				zo_max = z_off[ch]
+			}
+			if z_off[ch] < zo_min {
+				zo_min = z_off[ch]
+			}
+		}
+		if zo_max != zo_min {
+			self.AddErrorf("LoadTips", "Distance between channels and tips varies from %v to %v mm in non-independent head",
+				zo_min, zo_max)
+			return ret
+		}
+		for i := 0; i < adaptor.GetChannelCount(); i++ {
+			if contains(i, channels) {
+				continue
+			}
+			ch_pos := adaptor.GetChannel(i).GetAbsolutePosition()
+			size := wtype.Coordinates{0., 0., zo_max + 0.5}
+			box := wtype.NewBBox(ch_pos.Subtract(size), size)
+			objects := deck.GetBoxIntersections(*box)
+			//filter out tipboxes if we're meant to be ignoring them
+			//(hack to prevent dubious tipbox geometry messing this up)
+			if !self.tipbox_collisions {
+				no_tipboxes := objects[:0]
+				for _, o := range objects {
+					if _, ok := o.(*wtype.LHTipbox); !ok {
+						no_tipboxes = append(no_tipboxes, o)
+					}
+				}
+				objects = no_tipboxes
+			}
+			if len(objects) > 0 {
+				collisions = append(collisions, adaptorCollision{i, objects})
+			}
+		}
+
+		if len(collisions) > 0 {
+			self.AddErrorf("LoadTips", "Cannot load %s, %v (Head%d not independent)",
+				summariseWell2Channel(well, channels), collisions, head)
+		}
+	}
+
+	//move the tips to the adaptors
+	for _, ch := range channels {
+		tips[ch].GetParent().(*wtype.LHTipbox).RemoveTip(wc[ch])
+		adaptor.GetChannel(ch).LoadTip(tips[ch])
+		tips[ch].SetParent(nil)
 	}
 
 	return ret
@@ -589,6 +768,17 @@ func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{},
 
 		if err := self.state.GetDeck().SetChild(position, obj); err != nil {
 			self.AddError("AddPlateTo", err.Error())
+			return ret
+		}
+
+		if tb, ok := obj.(*wtype.LHTipbox); ok {
+			//check that the height of the tips is greater than the height of the tipbox
+			if tb.GetSize().Z >= (tb.TipZStart+tb.Tiptype.GetSize().Z) && self.tipbox_collisions {
+				self.AddWarningf("AddPlateTo",
+					"Tipbox \"%s\" is taller than the tips it holds (%.2fmm > %.2fmm), disabling tipbox collision detection",
+					tb.GetName(), tb.GetSize().Z, tb.TipZStart+tb.Tiptype.GetSize().Z)
+				self.tipbox_collisions = false
+			}
 		}
 
 	} else {

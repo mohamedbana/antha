@@ -171,6 +171,13 @@ func (self *LHTipbox) GetSize() Coordinates {
 	return self.bounds.GetSize()
 }
 
+func (self *LHTipbox) GetTipBounds() BBox {
+	return BBox{
+		Coordinates{self.GetPosition().X, self.GetPosition().Y, self.TipZStart},
+		Coordinates{self.GetSize().X, self.GetSize().Y, self.Tiptype.GetSize().Z},
+	}
+}
+
 func (self *LHTipbox) GetBoxIntersections(box BBox) []LHObject {
 	//relative box
 	box.SetPosition(box.GetPosition().Subtract(OriginOf(self)))
@@ -178,7 +185,21 @@ func (self *LHTipbox) GetBoxIntersections(box BBox) []LHObject {
 	if self.bounds.IntersectsBox(box) {
 		ret = append(ret, self)
 	}
-	//todo, scan tips
+
+	//if it's possible the this box might intersect with some tips
+	if self.GetTipBounds().IntersectsBox(box) {
+		for _, tiprow := range self.Tips {
+			for _, tip := range tiprow {
+				if tip != nil {
+					c := tip.GetBoxIntersections(box)
+					if c != nil {
+						ret = append(ret, c...)
+					}
+				}
+			}
+		}
+	}
+
 	return ret
 }
 
@@ -189,7 +210,20 @@ func (self *LHTipbox) GetPointIntersections(point Coordinates) []LHObject {
 	if self.bounds.IntersectsPoint(point) {
 		ret = append(ret, self)
 	}
-	//todo, scan tips
+
+	//if it's possible the this point might intersect with some tips
+	if self.GetTipBounds().IntersectsPoint(point) {
+		for _, tiprow := range self.Tips {
+			for _, tip := range tiprow {
+				if tip != nil {
+					c := tip.GetPointIntersections(point)
+					if c != nil {
+						ret = append(ret, c...)
+					}
+				}
+			}
+		}
+	}
 	return ret
 }
 
@@ -234,9 +268,11 @@ func (tb *LHTipbox) GetChildByAddress(c WellCoords) LHObject {
 }
 
 func (tb *LHTipbox) CoordsToWellCoords(r Coordinates) (WellCoords, Coordinates) {
+	//get relative Coordinates
+	rel := r.Subtract(tb.GetPosition())
 	wc := WellCoords{
-		int(math.Floor(((r.X - tb.TipXStart) / tb.TipXOffset))), // + 0.5)), Don't have to add .5 because
-		int(math.Floor(((r.Y - tb.TipYStart) / tb.TipYOffset))), // + 0.5)), TipX/YStart is to TL corner, not center
+		int(math.Floor(((rel.X - tb.TipXStart) / tb.TipXOffset))), // + 0.5)), Don't have to add .5 because
+		int(math.Floor(((rel.Y - tb.TipYStart) / tb.TipYOffset))), // + 0.5)), TipX/YStart is to TL corner, not center
 	}
 	if wc.X < 0 {
 		wc.X = 0
@@ -263,7 +299,7 @@ func (tb *LHTipbox) WellCoordsToCoords(wc WellCoords, r WellReference) (Coordina
 	if r == BottomReference {
 		z = tb.TipZStart
 	} else if r == TopReference {
-		z = tb.Height
+		z = tb.TipZStart + tb.Tiptype.GetSize().Z
 	} else {
 		return Coordinates{}, false
 	}
@@ -368,12 +404,15 @@ func (tb *LHTipbox) GetTips(mirror bool, multi, orient int) []string {
 func initialize_tips(tipbox *LHTipbox, tiptype *LHTip) *LHTipbox {
 	nr := tipbox.Nrows
 	nc := tipbox.Ncols
+	//make sure tips are in the center of the address
+	x_off := (tipbox.TipXOffset - tiptype.GetSize().X) / 2.
+	y_off := (tipbox.TipYOffset - tiptype.GetSize().Y) / 2.
 	for i := 0; i < nc; i++ {
 		for j := 0; j < nr; j++ {
 			tipbox.Tips[i][j] = CopyTip(*tiptype)
 			tipbox.Tips[i][j].SetOffset(Coordinates{
-				tipbox.TipXStart + float64(i)*tipbox.TipXOffset,
-				tipbox.TipYStart + float64(j)*tipbox.TipYOffset,
+				tipbox.TipXStart + float64(i)*tipbox.TipXOffset + x_off,
+				tipbox.TipYStart + float64(j)*tipbox.TipYOffset + y_off,
 				tipbox.TipZStart,
 			})
 			tipbox.Tips[i][j].SetParent(tipbox)
