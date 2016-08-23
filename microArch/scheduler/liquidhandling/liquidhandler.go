@@ -168,7 +168,7 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 			lastPos := ins.GetParameter("POSTO").([]string)
 
 			for i, p := range lastPos {
-				lastPlate[i] = this.FinalProperties.PosLookup[p]
+				lastPlate[i] = this.Properties.PosLookup[p]
 			}
 
 			lastWell = ins.GetParameter("WELLTO").([]string)
@@ -212,7 +212,6 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 		if !ok {
 			//err := wtype.LHError(wtype.LH_ERR_DIRE, fmt.Sprint("NO SUCH PLATE: ", plateID))
 			//return err
-
 			continue
 		}
 
@@ -223,8 +222,8 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 	// now go through and set the plates up appropriately
 
 	for plateID, wellmap := range vols {
-		plate, ok := this.FinalProperties.Plates[this.FinalProperties.PlateIDLookup[plateID]]
-		plate2, _ := this.Properties.Plates[this.FinalProperties.PlateIDLookup[plateID]]
+		plate, ok := this.FinalProperties.Plates[this.Properties.PlateIDLookup[plateID]]
+		plate2, _ := this.Properties.Plates[this.Properties.PlateIDLookup[plateID]]
 
 		if !ok {
 			err := wtype.LHError(wtype.LH_ERR_DIRE, fmt.Sprint("NO SUCH PLATE: ", plateID))

@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"math/rand"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
@@ -108,6 +109,12 @@ func TestPlateReuse(t *testing.T) {
 		if !ok {
 			continue
 		}
+
+		if strings.Contains(plate.Name(), "Output_plate") {
+			// leave it out
+			continue
+		}
+
 		rq.Input_plates[plateid] = plate
 	}
 	rq.Input_platetypes = append(rq.Input_platetypes, GetPlateForTest())
@@ -142,6 +149,10 @@ func TestPlateReuse(t *testing.T) {
 
 		plate, ok := thing.(*wtype.LHPlate)
 		if !ok {
+			continue
+		}
+		if strings.Contains(plate.Name(), "Output_plate") {
+			// leave it out
 			continue
 		}
 		for _, v := range plate.Wellcoords {
@@ -248,7 +259,6 @@ func TestBeforeVsAfter(t *testing.T) {
 			tw1 := p1.(*wtype.LHTipwaste)
 			tw2 := p2.(*wtype.LHTipwaste)
 
-			fmt.Println(tw1.Contents, " ", tw2.Contents)
 			if tw1.Type != tw2.Type {
 				t.Fatal(fmt.Sprintf("Tipwaste at position %s changed type: %s %s", tw1.Type, tw2.Type))
 			}

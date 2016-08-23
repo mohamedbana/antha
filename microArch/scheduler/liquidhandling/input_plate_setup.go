@@ -92,10 +92,6 @@ func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 	// we assume that input_plates is set if any locs are set
 	input_plates := (*request).Input_plates
 
-	for k, _ := range input_plates {
-		fmt.Println("INPUT PLATE HERE: ", k)
-	}
-
 	if len(input_plates) == 0 {
 		input_plates = make(map[string]*wtype.LHPlate, 3)
 	}
