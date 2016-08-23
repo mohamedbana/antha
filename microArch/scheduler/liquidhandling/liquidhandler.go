@@ -311,6 +311,7 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 						if ok && w2.Empty() {
 							w2.Add(w.WContents)
 							//w2.WContents.SetVolume(wunit.NewVolume(0.000002, "ul"))
+							w.Clear()
 						}
 					}
 				}

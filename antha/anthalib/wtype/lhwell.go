@@ -239,6 +239,7 @@ func (w *LHWell) ContainerType() string {
 
 func (w *LHWell) Clear() {
 	w.WContents = NewLHComponent()
+	w.WContents.Loc = w.Plateid + ":" + w.Crds
 }
 
 func (w *LHWell) Empty() bool {
