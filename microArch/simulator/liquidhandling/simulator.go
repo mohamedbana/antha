@@ -41,6 +41,17 @@ func summariseWell2Channel(well []string, channels []int) string {
 	return strings.Join(ret, ", ")
 }
 
+func summariseChannels(channels []int) string {
+	if len(channels) == 1 {
+		return fmt.Sprintf("channel %d", channels[0])
+	}
+	sch := make([]string, 0, len(channels))
+	for _, ch := range channels {
+		sch = append(sch, fmt.Sprintf("%d", ch))
+	}
+	return fmt.Sprintf("channels %s", strings.Join(sch, ","))
+}
+
 type adaptorCollision struct {
 	channel int
 	objects []wtype.LHObject
@@ -686,7 +697,7 @@ func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
 	adaptor := self.state.GetAdaptor(head)
 	deck := self.state.GetDeck()
 
-	//Check that there are tips everywhere we want to eject
+	//Raise a warning if we're trying to eject tips that aren't there
 	missing := []string{}
 	for _, ch := range channels {
 		if !adaptor.GetChannel(ch).HasTip() {
@@ -697,6 +708,28 @@ func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
 		self.AddWarningf("UnloadTips", "No tip present at Head%d channel%s to eject", head, missing[0])
 	} else if len(missing) > 0 {
 		self.AddWarningf("UnloadTips", "No tips present on Head%d channels %s to eject", head, strings.Join(missing, ","))
+	}
+
+	//Check that this is possible
+	if !adaptor.IsIndependent() {
+		extra := []int{}
+		for ch := 0; ch < multi; ch++ {
+			if contains(ch, channels) {
+				continue
+			}
+			if adaptor.GetChannel(ch).HasTip() {
+				extra = append(extra, ch)
+			}
+		}
+		if len(extra) == 1 {
+			self.AddErrorf("UnloadTips", "Cannot unload tips from head%d %s without unloading tip from channel %s (head isn't independent)",
+				head, summariseChannels(channels), extra[0])
+			return ret
+		} else if len(extra) > 1 {
+			self.AddErrorf("UnloadTips", "Cannot unload tips from head%d %s without unloading tips from %s (head isn't independent)",
+				head, summariseChannels(channels), summariseChannels(extra))
+			return ret
+		}
 	}
 
 	for _, ch := range channels {
@@ -720,7 +753,7 @@ func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
 				break
 			}
 			if !addr.AddressExists(wc) {
-				self.AddErrorf("UnloadTips", "Cannot unload to address %s in %s \"%s\" [%dx%d]",
+				self.AddErrorf("UnloadTips", "Cannot unload to address %s in %s \"%s\" size [%dx%d]",
 					wc.FormatA1(), wtype.ClassOf(target), wtype.NameOf(target), addr.NRows(), addr.NCols())
 				break
 			}
