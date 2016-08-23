@@ -303,14 +303,12 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 		if ok1 && ok2 {
 			for _, wa := range p1.Cols {
 				for _, w := range wa {
-					// the initial state needs to look like the final one... pro tem
-					/// XXX don't like it
+					// copy the outputs to the correct side
+					// and remove the outputs from the initial state
 					if !w.Empty() {
-						//		fmt.Println("BBB: ", w.Crds, " ", w.WContents.CName)
 						w2, ok := p2.Wellcoords[w.Crds]
 						if ok && w2.Empty() {
 							w2.Add(w.WContents)
-							//w2.WContents.SetVolume(wunit.NewVolume(0.000002, "ul"))
 							w.Clear()
 						}
 					}
