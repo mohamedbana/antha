@@ -442,7 +442,7 @@ func (this *Liquidhandler) Plan(request *LHRequest) error {
 		}
 	*/
 
-	this.Refresh_tipboxes(request)
+	this.Refresh_tipboxes_tipwastes(request)
 
 	// revise the volumes
 	err = this.revise_volumes(request)

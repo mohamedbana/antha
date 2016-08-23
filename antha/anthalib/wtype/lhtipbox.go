@@ -109,8 +109,22 @@ TipZStart : %f,
 	)
 }
 
+//lazy sunuva
 func (tb *LHTipbox) Dup() *LHTipbox {
-	return NewLHTipbox(tb.Nrows, tb.Ncols, tb.Height, tb.Mnfr, tb.Type, tb.Tiptype, tb.AsWell, tb.TipXOffset, tb.TipYOffset, tb.TipXStart, tb.TipYStart, tb.TipZStart)
+	tb2 := NewLHTipbox(tb.Nrows, tb.Ncols, tb.Height, tb.Mnfr, tb.Type, tb.Tiptype, tb.AsWell, tb.TipXOffset, tb.TipYOffset, tb.TipXStart, tb.TipYStart, tb.TipZStart)
+
+	for i := 0; i < len(tb.Tips); i++ {
+		for j := 0; j < len(tb.Tips[i]); j++ {
+			t := tb.Tips[i][j]
+			if t == nil {
+				tb2.Tips[i][j] = nil
+			} else {
+				tb2.Tips[i][j] = t.Dup()
+			}
+		}
+	}
+
+	return tb2
 }
 
 // @implement named
