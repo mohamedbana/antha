@@ -1126,247 +1126,300 @@ func TestLoadTips(t *testing.T) {
 	}
 }
 
-/*
-
 func Test_UnloadTips(t *testing.T) {
 
-    tests := []SimulatorTest{
-        SimulatorTest{
-            "OK - single tip",
-            nil,
-            []*SetupFn{
-                testLayout(),
-                preloadAdaptorTips(0, "tipbox_1", []int{0}),
-            },
-            []TestRobotInstruction{
-                &UnloadTips{
-                    []int{0},               //channels
-                    0,                      //head
-                    1,                      //multi
-                    []string{"tipwaste"},     //tipbox
-                    []string{"tipwaste"},   //location
-                    []string{"A1"},        //well
-                },
-            },
-            nil,            //errors
-            []*AssertionFn{ //assertions
-                tipboxAssertion("tipbox_1", []string{}),
-                tipboxAssertion("tipbox_2", []string{}),
-                adaptorAssertion(0, []int{}),
-                tipwasteAssertion("tipwaste", 1),
-            },
-        },
-        SimulatorTest{
-            "OK - 8 tips",
-            nil,
-            []*SetupFn{
-                testLayout(),
-                preloadAdaptorTips(0, "tipbox_1", []int{0,1,2,3,4,5,6,7}),
-            },
-            []TestRobotInstruction{
-                &UnloadTips{
-                    []int{0,1,2,3,4,5,6,7},               //channels
-                    0,                      //head
-                    8,                      //multi
-                    []string{"tipwaste","tipwaste","tipwaste","tipwaste","tipwaste","tipwaste","tipwaste","tipwaste"},     //tipbox
-                    []string{"tipwaste","tipwaste","tipwaste","tipwaste","tipwaste","tipwaste","tipwaste","tipwaste"},   //location
-                    []string{"A1","A1","A1","A1","A1","A1","A1","A1"},        //well
-                },
-            },
-            nil,            //errors
-            []*AssertionFn{ //assertions
-                tipboxAssertion("tipbox_1", []string{}),
-                tipboxAssertion("tipbox_2", []string{}),
-                adaptorAssertion(0, []int{}),
-                tipwasteAssertion("tipwaste", 8),
-            },
-        },
-        SimulatorTest{
-            "OK - independent tips",
-            independent_lhproperties(),
-            []*SetupFn{
-                testLayout(),
-                preloadAdaptorTips(0, "tipbox_1", []int{0,1,2,3,4,5,6,7}),
-            },
-            []TestRobotInstruction{
-                &UnloadTips{
-                    []int{0,2,4,6},               //channels
-                    0,                      //head
-                    4,                      //multi
-                    []string{"tipwaste","tipwaste","tipwaste","tipwaste"},     //tipbox
-                    []string{"tipwaste","tipwaste","tipwaste","tipwaste"},   //location
-                    []string{"A1","A1","A1","A1"},        //well
-                },
-            },
-            nil,            //errors
-            []*AssertionFn{ //assertions
-                tipboxAssertion("tipbox_1", []string{}),
-                tipboxAssertion("tipbox_2", []string{}),
-                adaptorAssertion(0, []int{1,3,5,7}),
-                tipwasteAssertion("tipwaste", 4),
-            },
-        },
-        SimulatorTest{
-            "can only unload all tips",
-            nil,
-            []*SetupFn{
-                testLayout(),
-                preloadAdaptorTips(0, "tipbox_1", []int{0,1,2,3,4,5,6,7}),
-            },
-            []TestRobotInstruction{
-                &UnloadTips{
-                    []int{0,2,4,6},               //channels
-                    0,                      //head
-                    4,                      //multi
-                    []string{"tipwaste","tipwaste","tipwaste","tipwaste"},     //tipbox
-                    []string{"tipwaste","tipwaste","tipwaste","tipwaste"},   //location
-                    []string{"A1","A1","A1","A1"},        //well
-                },
-            },
-            []string{            //errors
-                "(err) UnloadTips: Cannot unload tips from Head0(channels 0,2,4,6) due to other tips on the adaptor (independent is false)",
-            },
-            nil,            //assertions
-        },
-        SimulatorTest{
-            "wrong multi",
-            nil,
-            []*SetupFn{
-                testLayout(),
-                preloadAdaptorTips(0, "tipbox_1", []int{0}),
-            },
-            []TestRobotInstruction{
-                &UnloadTips{
-                    []int{0},               //channels
-                    0,                      //head
-                    2,                      //multi
-                    []string{"tipwaste"},     //tipbox
-                    []string{"tipwaste"},   //location
-                    []string{"A1"},        //well
-                },
-            },
-            []string{            //errors
-                "(err) UnloadTips: channels, platetype, position, well should be of length multi=2",
-            },
-            nil,
-        },
-        SimulatorTest{
-            "wrong location",
-            nil,
-            []*SetupFn{
-                testLayout(),
-                preloadAdaptorTips(0, "tipbox_1", []int{0}),
-            },
-            []TestRobotInstruction{
-                &UnloadTips{
-                    []int{0},               //channels
-                    0,                      //head
-                    1,                      //multi
-                    []string{"tipbox"},     //tipbox
-                    []string{"tipbox_1"},   //location
-                    []string{"A1"},        //well
-                },
-            },
-            []string{            //errors
-                "(err) UnloadTips: No tipwaste found at location \"tipbox_1\"",
-            },
-            nil,
-        },
-        SimulatorTest{
-            "wrong well",
-            nil,
-            []*SetupFn{
-                testLayout(),
-                preloadAdaptorTips(0, "tipbox_1", []int{0}),
-            },
-            []TestRobotInstruction{
-                &UnloadTips{
-                    []int{0},               //channels
-                    0,                      //head
-                    1,                      //multi
-                    []string{"tipwaste"},     //tipbox
-                    []string{"tipwaste"},   //location
-                    []string{"B1"},        //well
-                },
-            },
-            []string{            //errors
-                "(err) UnloadTips: Tipwaste at \"tipwaste\" has no well B1",
-            },
-            nil,
-        },
-        SimulatorTest{
-            "multiple locations",
-            nil,
-            []*SetupFn{
-                testLayout(),
-                preloadAdaptorTips(0, "tipbox_1", []int{0,1}),
-            },
-            []TestRobotInstruction{
-                &UnloadTips{
-                    []int{0,1},               //channels
-                    0,                      //head
-                    2,                      //multi
-                    []string{"tipwaste","tipwaste"},     //tipbox
-                    []string{"tipwaste","tipwaste2"},   //location
-                    []string{"A1","A1"},        //well
-                },
-            },
-            []string{            //errors
-                "(err) UnloadTips: Cannot unload tips to multiple locations",
-            },
-            nil,
-        },
-        SimulatorTest{
-            "multiple locations",
-            nil,
-            []*SetupFn{
-                testLayout(),
-                preloadAdaptorTips(0, "tipbox_1", []int{0}),
-            },
-            []TestRobotInstruction{
-                &UnloadTips{
-                    []int{0,7},               //channels
-                    0,                      //head
-                    2,                      //multi
-                    []string{"tipwaste","tipwaste"},     //tipbox
-                    []string{"tipwaste","tipwaste"},   //location
-                    []string{"A1","A1"},        //well
-                },
-            },
-            []string{            //errors
-                "(err) UnloadTips: Cannot unload tip from channel 7 as no tip is loaded there",
-            },
-            nil,
-        },
-        SimulatorTest{
-            "multiple locations",
-            nil,
-            []*SetupFn{
-                testLayout(),
-                preloadAdaptorTips(0, "tipbox_1", []int{0}),
-                fillTipwaste("tipwaste", 700),
-            },
-            []TestRobotInstruction{
-                &UnloadTips{
-                    []int{0},               //channels
-                    0,                      //head
-                    1,                      //multi
-                    []string{"tipwaste"},   //tipbox
-                    []string{"tipwaste"},   //location
-                    []string{"A1"},        //well
-                },
-            },
-            []string{            //errors
-                "(err) UnloadTips: Tipwaste at \"tipwaste\" is overfull",
-            },
-            nil,
-        },
+	tests := []SimulatorTest{
+		SimulatorTest{
+			"OK - single tip",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				preloadAdaptorTips(0, "tipbox_1", []int{0}),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"tipwaste", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},       //wellcoords
+					[]int{1, 1, 1, 1, 1, 1, 1, 1},                    //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},        //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},        //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},        //offsetZ
+					[]string{"tipwaste", "", "", "", "", "", "", ""}, //plate_type
+					0, //head
+				},
+				&UnloadTips{
+					[]int{0}, //channels
+					0,        //head
+					8,        //multi
+					[]string{"tipwaste", "", "", "", "", "", "", ""}, //tipbox
+					[]string{"tipwaste", "", "", "", "", "", "", ""}, //location
+					[]string{"A1", "", "", "", "", "", "", ""},       //well
+				},
+			},
+			nil, //errors
+			[]*AssertionFn{ //assertions
+				tipboxAssertion("tipbox_1", []string{}),
+				tipboxAssertion("tipbox_2", []string{}),
+				adaptorAssertion(0, []int{}),
+				tipwasteAssertion("tipwaste", 1),
+			},
+		},
+		SimulatorTest{
+			"OK - 8 tips",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				preloadAdaptorTips(0, "tipbox_1", []int{0, 1, 2, 3, 4, 5, 6, 7}),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste"}, //deckposition
+					[]string{"A1", "A1", "A1", "A1", "A1", "A1", "A1", "A1"},                                                 //wellcoords
+					[]int{1, 1, 1, 1, 1, 1, 1, 1},                                                                            //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                                //offsetX
+					[]float64{-31.5, -22.5, -13.5, -4.5, 4.5, 13.5, 22.5, 31.5},                                              //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},                                                                //offsetZ
+					[]string{"tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste"}, //plate_type
+					0, //head
+				},
+				&UnloadTips{
+					[]int{0, 1, 2, 3, 4, 5, 6, 7}, //channels
+					0, //head
+					8, //multi
+					[]string{"tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste"}, //tipbox
+					[]string{"tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste"}, //location
+					[]string{"A1", "A1", "A1", "A1", "A1", "A1", "A1", "A1"},                                                 //well
+				},
+			},
+			nil, //errors
+			[]*AssertionFn{ //assertions
+				tipboxAssertion("tipbox_1", []string{}),
+				tipboxAssertion("tipbox_2", []string{}),
+				adaptorAssertion(0, []int{}),
+				tipwasteAssertion("tipwaste", 8),
+			},
+		},
+		SimulatorTest{
+			"OK - 8 tips back to a tipbox",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				removeTipboxTips("tipbox_1", []string{"A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"}),
+				preloadAdaptorTips(0, "tipbox_1", []int{0, 1, 2, 3, 4, 5, 6, 7}),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1"}, //deckposition
+					[]string{"A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"},                                         //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                                                                            //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                                //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                                //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},                                                                //offsetZ
+					[]string{"tipbox", "tipbox", "tipbox", "tipbox", "tipbox", "tipbox", "tipbox", "tipbox"},                 //plate_type
+					0, //head
+				},
+				&UnloadTips{
+					[]int{0, 1, 2, 3, 4, 5, 6, 7}, //channels
+					0, //head
+					8, //multi
+					[]string{"tipbox", "tipbox", "tipbox", "tipbox", "tipbox", "tipbox", "tipbox", "tipbox"},                 //tipbox
+					[]string{"tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1"}, //location
+					[]string{"A1", "A1", "A1", "A1", "A1", "A1", "A1", "A1"},                                                 //well
+				},
+			},
+			nil, //errors
+			[]*AssertionFn{ //assertions
+				tipboxAssertion("tipbox_1", []string{}),
+				tipboxAssertion("tipbox_2", []string{}),
+				adaptorAssertion(0, []int{}),
+				tipwasteAssertion("tipwaste", 0),
+			},
+		},
+		SimulatorTest{
+			"OK - independent tips",
+			independent_lhproperties(),
+			[]*SetupFn{
+				testLayout(),
+				preloadAdaptorTips(0, "tipbox_1", []int{0, 1, 2, 3, 4, 5, 6, 7}),
+			},
+			[]TestRobotInstruction{
+				&UnloadTips{
+					[]int{0, 2, 4, 6}, //channels
+					0,                 //head
+					8,                 //multi
+					[]string{"tipwaste", "", "tipwaste", "", "tipwaste", "", "tipwaste", ""}, //tipbox
+					[]string{"tipwaste", "", "tipwaste", "", "tipwaste", "", "tipwaste", ""}, //location
+					[]string{"A1", "", "A1", "", "A1", "", "A1", ""},                         //well
+				},
+			},
+			nil, //errors
+			[]*AssertionFn{ //assertions
+				tipboxAssertion("tipbox_1", []string{}),
+				tipboxAssertion("tipbox_2", []string{}),
+				adaptorAssertion(0, []int{1, 3, 5, 7}),
+				tipwasteAssertion("tipwaste", 4),
+			},
+		},
+		/*
+			SimulatorTest{
+				"can only unload all tips",
+				nil,
+				[]*SetupFn{
+					testLayout(),
+					preloadAdaptorTips(0, "tipbox_1", []int{0, 1, 2, 3, 4, 5, 6, 7}),
+				},
+				[]TestRobotInstruction{
+					&UnloadTips{
+						[]int{0, 2, 4, 6}, //channels
+						0,                 //head
+						4,                 //multi
+						[]string{"tipwaste", "tipwaste", "tipwaste", "tipwaste"}, //tipbox
+						[]string{"tipwaste", "tipwaste", "tipwaste", "tipwaste"}, //location
+						[]string{"A1", "A1", "A1", "A1"},                         //well
+					},
+				},
+				[]string{ //errors
+					"(err) UnloadTips: Cannot unload tips from Head0(channels 0,2,4,6) due to other tips on the adaptor (independent is false)",
+				},
+				nil, //assertions
+			},
+			SimulatorTest{
+				"wrong multi",
+				nil,
+				[]*SetupFn{
+					testLayout(),
+					preloadAdaptorTips(0, "tipbox_1", []int{0}),
+				},
+				[]TestRobotInstruction{
+					&UnloadTips{
+						[]int{0},             //channels
+						0,                    //head
+						2,                    //multi
+						[]string{"tipwaste"}, //tipbox
+						[]string{"tipwaste"}, //location
+						[]string{"A1"},       //well
+					},
+				},
+				[]string{ //errors
+					"(err) UnloadTips: channels, platetype, position, well should be of length multi=2",
+				},
+				nil,
+			},
+			SimulatorTest{
+				"wrong location",
+				nil,
+				[]*SetupFn{
+					testLayout(),
+					preloadAdaptorTips(0, "tipbox_1", []int{0}),
+				},
+				[]TestRobotInstruction{
+					&UnloadTips{
+						[]int{0},             //channels
+						0,                    //head
+						1,                    //multi
+						[]string{"tipbox"},   //tipbox
+						[]string{"tipbox_1"}, //location
+						[]string{"A1"},       //well
+					},
+				},
+				[]string{ //errors
+					"(err) UnloadTips: No tipwaste found at location \"tipbox_1\"",
+				},
+				nil,
+			},
+			SimulatorTest{
+				"wrong well",
+				nil,
+				[]*SetupFn{
+					testLayout(),
+					preloadAdaptorTips(0, "tipbox_1", []int{0}),
+				},
+				[]TestRobotInstruction{
+					&UnloadTips{
+						[]int{0},             //channels
+						0,                    //head
+						1,                    //multi
+						[]string{"tipwaste"}, //tipbox
+						[]string{"tipwaste"}, //location
+						[]string{"B1"},       //well
+					},
+				},
+				[]string{ //errors
+					"(err) UnloadTips: Tipwaste at \"tipwaste\" has no well B1",
+				},
+				nil,
+			},
+			SimulatorTest{
+				"multiple locations",
+				nil,
+				[]*SetupFn{
+					testLayout(),
+					preloadAdaptorTips(0, "tipbox_1", []int{0, 1}),
+				},
+				[]TestRobotInstruction{
+					&UnloadTips{
+						[]int{0, 1}, //channels
+						0,           //head
+						2,           //multi
+						[]string{"tipwaste", "tipwaste"},  //tipbox
+						[]string{"tipwaste", "tipwaste2"}, //location
+						[]string{"A1", "A1"},              //well
+					},
+				},
+				[]string{ //errors
+					"(err) UnloadTips: Cannot unload tips to multiple locations",
+				},
+				nil,
+			},
+			SimulatorTest{
+				"multiple locations",
+				nil,
+				[]*SetupFn{
+					testLayout(),
+					preloadAdaptorTips(0, "tipbox_1", []int{0}),
+				},
+				[]TestRobotInstruction{
+					&UnloadTips{
+						[]int{0, 7}, //channels
+						0,           //head
+						2,           //multi
+						[]string{"tipwaste", "tipwaste"}, //tipbox
+						[]string{"tipwaste", "tipwaste"}, //location
+						[]string{"A1", "A1"},             //well
+					},
+				},
+				[]string{ //errors
+					"(err) UnloadTips: Cannot unload tip from channel 7 as no tip is loaded there",
+				},
+				nil,
+			},
+			SimulatorTest{
+				"multiple locations",
+				nil,
+				[]*SetupFn{
+					testLayout(),
+					preloadAdaptorTips(0, "tipbox_1", []int{0}),
+					fillTipwaste("tipwaste", 700),
+				},
+				[]TestRobotInstruction{
+					&UnloadTips{
+						[]int{0},             //channels
+						0,                    //head
+						1,                    //multi
+						[]string{"tipwaste"}, //tipbox
+						[]string{"tipwaste"}, //location
+						[]string{"A1"},       //well
+					},
+				},
+				[]string{ //errors
+					"(err) UnloadTips: Tipwaste at \"tipwaste\" is overfull",
+				},
+				nil,
+			},
+		*/
+	}
 
-    }
-
-    for _,test := range tests {
-        test.run(t)
-    }
+	for _, test := range tests {
+		test.run(t)
+	}
 }
-
-*/
