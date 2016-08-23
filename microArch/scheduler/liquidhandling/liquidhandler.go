@@ -289,9 +289,12 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 		pidm[p2.ID] = p1.ID
 	}
 
-	for _, inst := range rq.LHInstructions {
-		inst.SetPlateID(pidm[inst.PlateID()])
-	}
+	// questionable
+	/*
+		for _, inst := range rq.LHInstructions {
+			inst.SetPlateID(pidm[inst.PlateID()])
+		}
+	*/
 
 	// this is many shades of wrong but likely to save us a lot of time
 	for _, pos := range this.Properties.Output_preferences {
@@ -299,16 +302,16 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 		p2, ok2 := this.FinalProperties.Plates[pos]
 
 		if ok1 && ok2 {
-			for _, wa := range p2.Cols {
+			for _, wa := range p1.Cols {
 				for _, w := range wa {
 					// the initial state needs to look like the final one... pro tem
 					/// XXX don't like it
 					if !w.Empty() {
 						//		fmt.Println("BBB: ", w.Crds, " ", w.WContents.CName)
-						w2, ok := p1.Wellcoords[w.Crds]
+						w2, ok := p2.Wellcoords[w.Crds]
 						if ok && w2.Empty() {
 							w2.Add(w.WContents)
-							w2.WContents.SetVolume(wunit.NewVolume(0.000002, "ul"))
+							//w2.WContents.SetVolume(wunit.NewVolume(0.000002, "ul"))
 						}
 					}
 				}
@@ -431,10 +434,15 @@ func (this *Liquidhandler) Plan(request *LHRequest) error {
 		return err
 	}
 	// fix the deck setup
-	request, err = this.Tip_box_setup(request)
-	if err != nil {
-		return err
-	}
+	// don't think you need this
+	/*
+		request, err = this.Tip_box_setup(request)
+		if err != nil {
+			return err
+		}
+	*/
+
+	this.Refresh_tipboxes(request)
 
 	// revise the volumes
 	err = this.revise_volumes(request)
@@ -695,9 +703,10 @@ func (this *Liquidhandler) ExecutionPlan(request *LHRequest) (*LHRequest, error)
 	rq, err := this.ExecutionPlanner(request, this.Properties)
 
 	// switcherooo
+	//	this.FinalProperties = this.Properties
+	//	this.Properties = temprobot
 
-	this.FinalProperties = this.Properties
-	this.Properties = temprobot
+	this.FinalProperties = temprobot
 
 	return rq, err
 }
