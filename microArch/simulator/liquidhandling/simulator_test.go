@@ -23,6 +23,7 @@
 package liquidhandling_test
 
 import (
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	lh "github.com/antha-lang/antha/microArch/simulator/liquidhandling"
 	"testing"
 )
@@ -242,7 +243,7 @@ func Test_Move(t *testing.T) {
 			},
 			[]TestRobotInstruction{
 				&Move{
-					[]string{"tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1"}, //deckposition
+					[]string{"tipbox_2", "tipbox_2", "tipbox_2", "tipbox_2", "tipbox_2", "tipbox_2", "tipbox_2", "tipbox_2"}, //deckposition
 					[]string{"A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"},                                                 //wellcoords
 					[]int{1, 1, 1, 1, 1, 1, 1, 1},                                                                            //reference
 					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                                //offsetX
@@ -253,7 +254,9 @@ func Test_Move(t *testing.T) {
 				},
 			},
 			nil, //errors
-			nil, //assertions
+			[]*AssertionFn{ //assertions
+				positionAssertion(0, wtype.Coordinates{204.5, 4.5, 62.2}),
+			},
 		},
 		SimulatorTest{
 			"OK_2",
@@ -274,7 +277,9 @@ func Test_Move(t *testing.T) {
 				},
 			},
 			nil, //errors
-			nil, //assertions
+			[]*AssertionFn{ //assertions
+				positionAssertion(0, wtype.Coordinates{147, 454, 93}),
+			},
 		},
 		SimulatorTest{
 			"OK_2.5",
@@ -295,7 +300,9 @@ func Test_Move(t *testing.T) {
 				},
 			},
 			nil, //errors
-			nil, //assertions
+			[]*AssertionFn{ //assertions
+				positionAssertion(0, wtype.Coordinates{147, 454, 93}),
+			},
 		},
 		SimulatorTest{
 			"OK_3",
@@ -316,7 +323,9 @@ func Test_Move(t *testing.T) {
 				},
 			},
 			nil, //errors
-			nil, //assertions
+			[]*AssertionFn{ //assertions
+				positionAssertion(0, wtype.Coordinates{4.5, -22.5, 62.2}),
+			},
 		},
 		SimulatorTest{
 			"OK_4",
@@ -337,7 +346,9 @@ func Test_Move(t *testing.T) {
 				},
 			},
 			nil, //errors
-			nil, //assertions
+			[]*AssertionFn{ //assertions
+				positionAssertion(0, wtype.Coordinates{404.5, 67.5, 38.9}),
+			},
 		},
 		SimulatorTest{
 			"OK_5",
@@ -358,7 +369,9 @@ func Test_Move(t *testing.T) {
 				},
 			},
 			nil, //errors
-			nil, //assertions
+			[]*AssertionFn{ //assertions
+				positionAssertion(0, wtype.Coordinates{404.5, 31.5, 38.9}),
+			},
 		},
 		SimulatorTest{
 			"unknown location",
@@ -522,7 +535,7 @@ func Test_Move(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Move: Non-independent head '0' can't move adaptors to \"plate\" positions [A-H]0, layout mismatch",
+				"(err) Move: Non-independent head '0' can't move adaptors to \"plate\" positions A1,B1,C1,D1,E1,F1,G1,H1, layout mismatch",
 			},
 			nil, //assertions
 		},
@@ -545,7 +558,7 @@ func Test_Move(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Move: Non-independent head '0' can't move adaptors to \"tipbox\" positions [A-H]0, layout mismatch",
+				"(err) Move: Non-independent head '0' can't move adaptors to \"tipbox\" positions A1,B1,C1,D1,E1,F1,G1,H1, layout mismatch",
 			},
 			nil, //assertions
 		},
@@ -1327,13 +1340,13 @@ func Test_UnloadTips(t *testing.T) {
 			},
 			[]TestRobotInstruction{
 				&Move{
-					[]string{"input_1", "input_1", "input_1", "input_1", "input_1", "input_1", "input_1", "input_1"}, //deckposition
-					[]string{"A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"},                                 //wellcoords
-					[]int{0, 0, 0, 0, 0, 0, 0, 0},                                                                    //reference
-					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                        //offsetX
-					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                        //offsetY
-					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},                                                        //offsetZ
-					[]string{"plate", "plate", "plate", "plate", "plate", "plate", "plate", "plate"},                 //plate_type
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A12", "", "", "", "", "", "", ""},     //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
 					0, //head
 				},
 				&UnloadTips{
@@ -1359,13 +1372,13 @@ func Test_UnloadTips(t *testing.T) {
 			},
 			[]TestRobotInstruction{
 				&Move{
-					[]string{"tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste"}, //deckposition
-					[]string{"A1", "A1", "A1", "A1", "A1", "A1", "A1", "A1"},                                                 //wellcoords
-					[]int{1, 1, 1, 1, 1, 1, 1, 1},                                                                            //reference
-					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                                //offsetX
-					[]float64{-31.5, -22.5, -13.5, -4.5, 4.5, 13.5, 22.5, 31.5},                                              //offsetY
-					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},                                                                //offsetZ
-					[]string{"tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste", "tipwaste"}, //plate_type
+					[]string{"tipwaste", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},       //wellcoords
+					[]int{1, 1, 1, 1, 1, 1, 1, 1},                    //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},        //offsetX
+					[]float64{-31.5, 0., 0., 0., 0., 0., 0., 0.},     //offsetY
+					[]float64{1., 0., 0., 0., 0., 0., 0., 0.},        //offsetZ
+					[]string{"tipwaste", "", "", "", "", "", "", ""}, //plate_type
 					0, //head
 				},
 				&UnloadTips{
@@ -1490,7 +1503,7 @@ func Test_Aspirate(t *testing.T) {
 					[]int{0, 0, 0, 0, 0, 0, 0, 0},                          //reference
 					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},              //offsetX
 					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},              //offsetY
-					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},              //offsetZ
+					[]float64{1., 52.2, 1., 1., 1., 1., 1., 1.},            //offsetZ
 					[]string{"plate", "plate", "", "", "", "", "", ""},     //plate_type
 					0, //head
 				},
@@ -1736,7 +1749,7 @@ func Test_Aspirate(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Aspirate: Head 0 Channel 0 not in requested location well A1 of plate \"input1\"",
+				"(err) Aspirate: Cannot aspirate 100 ul of water to Head 0 Channel 0, tip not in a well",
 			},
 			nil, //assertions
 		},

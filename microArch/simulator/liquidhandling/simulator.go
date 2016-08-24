@@ -25,6 +25,7 @@ package liquidhandling
 import (
 	"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/microArch/driver"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/simulator"
@@ -390,7 +391,7 @@ func getUnique(ss []string) []string {
 	}
 
 	for _, s := range ss {
-		if !is_in(s) {
+		if !is_in(s) && s != "" {
 			r = append(r, s)
 		}
 	}
@@ -445,6 +446,10 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
 				return ret
 			}
 			coords[i] = coords[i].Add(offsets[i])
+			//if there's a tip, take account of it
+			if tip := adaptor.GetChannel(i).GetTip(); tip != nil {
+				coords[i] = coords[i].Add(wtype.Coordinates{0., 0., tip.GetSize().Z})
+			}
 			explicit[i] = true
 			exp_count++
 		}
@@ -518,8 +523,75 @@ func (self *VirtualLiquidHandler) MoveRaw(head int, x, y, z float64) driver.Comm
 //Aspirate - used
 func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, head int, multi int,
 	platetype []string, what []string, llf []bool) driver.CommandStatus {
-	self.AddWarning("Aspirate", "Not yet implemented")
-	return driver.CommandStatus{true, driver.OK, "ASPIRATE ACK"}
+
+	ret := driver.CommandStatus{true, driver.OK, "ASPIRATE ACK"}
+
+	//Verify arguments
+	if head < 0 || head >= self.state.GetNumberOfAdaptors() {
+		self.AddErrorf("Aspirate", "Unknown head %d", head)
+		return ret
+	}
+	adaptor := self.state.GetAdaptor(head)
+	if multi != adaptor.GetChannelCount() {
+		self.AddErrorf("Aspirate", "Multi[=%d] doesn't match number of channels on head %d [=%d]", multi, head, adaptor.GetChannelCount())
+		return ret
+	}
+	if !self.testSliceLength("Aspirate", map[string]int{
+		"volume":     len(volume),
+		"overstroke": len(overstroke),
+		"platetype":  len(platetype),
+		"what":       len(what),
+		"llf":        len(llf),
+	}, multi) {
+		return ret
+	}
+
+	//which channels are specified
+	channels := make([]bool, multi)
+	for i := range channels {
+		channels[i] = !(platetype[i] == "" && what[i] == "")
+	}
+
+	deck := self.state.GetDeck()
+
+	//get the position of tips
+	tip_pos := make([]wtype.Coordinates, multi)
+	wells := make([]*wtype.LHWell, multi)
+	for i := range channels {
+		ch := adaptor.GetChannel(i)
+		tip_pos[i] = ch.GetAbsolutePosition()
+		if ch.HasTip() {
+			tip_pos[i] = tip_pos[i].Subtract(wtype.Coordinates{0., 0., ch.GetTip().GetSize().Z})
+		} else if channels[i] {
+			self.AddErrorf("Aspirate", "Missing tip on %d", i)
+			return ret
+		}
+
+		objs := deck.GetPointIntersections(tip_pos[i])
+		for _, o := range objs {
+			if well, ok := o.(*wtype.LHWell); ok {
+				wells[i] = well
+			}
+		}
+	}
+
+	//move liquid
+	for i := range channels {
+		if !channels[i] {
+			continue
+		}
+		v := wunit.NewVolume(volume[i], "ul")
+
+		if wells[i] == nil {
+			self.AddErrorf("Aspirate", "not in a well %s", tip_pos[i])
+		} else if c, err := wells[i].Remove(v); err != nil {
+			self.AddErrorf("Aspirate", err.Error())
+		} else if err := adaptor.GetChannel(i).GetTip().Add(c); err != nil {
+			self.AddErrorf("Aspirate", err.Error())
+		}
+	}
+
+	return ret
 }
 
 //Dispense - used

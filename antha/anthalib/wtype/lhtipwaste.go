@@ -204,13 +204,13 @@ func (self *LHTipwaste) WellCoordsToCoords(wc WellCoords, r WellReference) (Coor
 	if r == BottomReference {
 		z = self.WellZStart
 	} else if r == TopReference {
-		z = self.Height
+		z = self.WellZStart + self.AsWell.GetSize().Z
 	} else {
 		return Coordinates{}, false
 	}
 
-	return Coordinates{
+	return self.GetPosition().Add(Coordinates{
 		self.WellXStart + 0.5*self.AsWell.GetSize().X,
 		self.WellYStart + 0.5*self.AsWell.GetSize().Y,
-		z}, true
+		z}), true
 }

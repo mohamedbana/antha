@@ -880,6 +880,18 @@ func adaptorAssertion(head int, tips []tipDesc) *AssertionFn {
 	return &ret
 }
 
+//adaptorPositionAssertion assert that the adaptor has tips in the given positions
+func positionAssertion(head int, origin wtype.Coordinates) *AssertionFn {
+	var ret AssertionFn = func(name string, t *testing.T, vlh *lh.VirtualLiquidHandler) {
+		adaptor := vlh.GetAdaptorState(head)
+		or := adaptor.GetChannel(0).GetAbsolutePosition()
+		if or.X != origin.X || or.Y != origin.Y || or.Z != origin.Z {
+			t.Errorf("PositionAssertion failed in \"%s\", adaptor should be at %s, was actually at %s", name, origin, or)
+		}
+	}
+	return &ret
+}
+
 //tipwasteAssertion assert the number of tips which should be in the tipwaste
 func tipwasteAssertion(tipwaste_loc string, expected_contents int) *AssertionFn {
 	var ret AssertionFn = func(name string, t *testing.T, vlh *lh.VirtualLiquidHandler) {

@@ -304,10 +304,10 @@ func (tb *LHTipbox) WellCoordsToCoords(wc WellCoords, r WellReference) (Coordina
 		return Coordinates{}, false
 	}
 
-	return Coordinates{
+	return tb.GetPosition().Add(Coordinates{
 		tb.TipXStart + (float64(wc.X)+0.5)*tb.TipXOffset,
 		tb.TipYStart + (float64(wc.Y)+0.5)*tb.TipYOffset,
-		z}, true
+		z}), true
 }
 
 //HasTipAt

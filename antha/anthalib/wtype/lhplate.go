@@ -465,12 +465,27 @@ func (self *LHPlate) GetSize() Coordinates {
 	return self.bounds.GetSize()
 }
 
+func (self *LHPlate) GetWellBounds() BBox {
+	return BBox{
+		self.bounds.GetPosition().Add(Coordinates{self.WellXStart, self.WellYStart, self.WellZStart}),
+		Coordinates{self.WellXOffset * float64(self.NCols()), self.WellYOffset * float64(self.NRows()), self.Welltype.GetSize().Z},
+	}
+}
+
 func (self *LHPlate) GetBoxIntersections(box BBox) []LHObject {
 	//relative to me
 	box.SetPosition(box.GetPosition().Subtract(OriginOf(self)))
 	ret := []LHObject{}
 	if self.bounds.IntersectsBox(box) {
 		ret = append(ret, self)
+	}
+
+	if self.GetWellBounds().IntersectsBox(box) {
+		for _, row := range self.Rows {
+			for _, well := range row {
+				ret = append(ret, well.GetBoxIntersections(box)...)
+			}
+		}
 	}
 	//todo, scan through wells
 	return ret
@@ -480,8 +495,16 @@ func (self *LHPlate) GetPointIntersections(point Coordinates) []LHObject {
 	//relative
 	point = point.Subtract(OriginOf(self))
 	ret := []LHObject{}
-	//todo, scan through wells
-	if self.bounds.IntersectsPoint(point) {
+
+	if self.GetWellBounds().IntersectsPoint(point) {
+		for _, row := range self.Rows {
+			for _, well := range row {
+				ret = append(ret, well.GetPointIntersections(point)...)
+			}
+		}
+	}
+
+	if len(ret) == 0 && self.bounds.IntersectsPoint(point) {
 		ret = append(ret, self)
 	}
 	return ret
@@ -564,8 +587,8 @@ func (self *LHPlate) WellCoordsToCoords(wc WellCoords, r WellReference) (Coordin
 		panic("Haven't implemented liquid level yet")
 	}
 
-	return Coordinates{
+	return self.GetPosition().Add(Coordinates{
 		self.WellXStart + (float64(wc.X)+0.5)*self.WellXOffset,
 		self.WellYStart + (float64(wc.Y)+0.5)*self.WellYOffset,
-		z}, true
+		z}), true
 }

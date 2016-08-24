@@ -58,7 +58,7 @@ type LHWell struct {
 
 //@implement Named
 func (self *LHWell) GetName() string {
-	return fmt.Sprintf("well_%s@%s", self.Crds, self.Plate.GetName())
+	return fmt.Sprintf("well_%s@%s", self.Crds.FormatA1(), self.Plate.GetName())
 }
 
 //@implement Typed
@@ -248,7 +248,7 @@ func (w *LHWell) Remove(v wunit.Volume) (*LHComponent, error) {
 	if v.GreaterThan(w.CurrentVolume()) {
 		logger.Debug("You ask too much: ", w.Crds.FormatA1(), " ", v.ToString(), " I only have: ", w.CurrentVolume().ToString(), " PLATEID: ", w.Plate.ID)
 		//maybe we should instead return as much as we can and an error?
-		return nil, fmt.Errorf("Requested %s from well \"%s\" which only contains %s", v, w, w.CurrentVolume())
+		return nil, fmt.Errorf("Requested %s from well \"%s\" which only contains %s", v, w.GetName(), w.CurrentVolume())
 	}
 
 	ret := w.Contents().Dup()
