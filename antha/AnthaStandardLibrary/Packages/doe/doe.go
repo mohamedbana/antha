@@ -85,6 +85,21 @@ func (run Run) AllResponses() (headers []string, values []interface{}) {
 	return
 }
 
+func (run Run) AllFactors() (headers []string, values []interface{}) {
+	headers = make([]string, 0)
+	values = make([]interface{}, 0)
+
+	for _, header := range run.Factordescriptors {
+		fmt.Println(header)
+		headers = append(headers, header)
+	}
+	for _, value := range run.Setpoints {
+		values = append(values, value)
+	}
+	fmt.Println(headers, values)
+	return
+}
+
 func (run Run) GetResponseValue(responsedescriptor string) (responsevalue interface{}, err error) {
 
 	var tempresponsevalue interface{}
@@ -112,6 +127,36 @@ func (run Run) GetResponseValue(responsedescriptor string) (responsevalue interf
 	}
 
 	responsevalue = tempresponsevalue
+	return
+}
+
+func (run Run) GetFactorValue(factordescriptor string) (factorvalue interface{}, err error) {
+
+	var tempresponsevalue interface{}
+	headers, values := run.AllFactors()
+
+	errstr := fmt.Sprint("factor descriptor ", factordescriptor, " not found in ", headers, values)
+	err = fmt.Errorf(errstr)
+	for i, descriptor := range run.Factordescriptors {
+		if strings.TrimSpace(strings.ToUpper(descriptor)) == strings.TrimSpace(strings.ToUpper(factordescriptor)) {
+			factorvalue = run.Setpoints[i]
+			return factorvalue, nil
+		} else if strings.Contains(strings.TrimSpace(strings.ToUpper(descriptor)), strings.TrimSpace(strings.ToUpper(factordescriptor))) {
+
+			errstr := fmt.Sprint("factor descriptor", factordescriptor, "found within ", descriptor, "but no exact match")
+			err = fmt.Errorf(errstr)
+			tempresponsevalue = run.Setpoints[i]
+			return tempresponsevalue, err
+		} else if strings.Contains(strings.TrimSpace(strings.ToUpper(factordescriptor)), strings.TrimSpace(strings.ToUpper(descriptor))) {
+
+			errstr := fmt.Sprint("factor descriptors of ", descriptor, "found within ", factordescriptor, "but not exact match")
+			err = fmt.Errorf(errstr)
+			tempresponsevalue = run.Setpoints[i]
+			return tempresponsevalue, err
+		}
+	}
+
+	factorvalue = tempresponsevalue
 	return
 }
 

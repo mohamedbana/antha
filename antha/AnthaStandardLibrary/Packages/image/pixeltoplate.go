@@ -275,7 +275,7 @@ var UVProteinPaintboxmap = map[color.Color]string{
 	color.RGBA{R: uint8(179), G: uint8(119), B: uint8(57), A: uint8(255)}:  "TannenGFP",
 
 	// conventional E.coli colour is black under UV ??
-	//color.RGBA{R: uint8(0), G: uint8(0), B: uint8(0), A: uint8(255)}:       "E.coli",
+	color.RGBA{R: uint8(0), G: uint8(0), B: uint8(0), A: uint8(255)}: "E.coli",
 	//color.RGBA{R: uint8(242), G: uint8(243), B: uint8(242), A: uint8(255)}: "verywhite",
 }
 

@@ -2,7 +2,7 @@ package lib
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	// "github.com/montanaflynn/stats"
+	"github.com/montanaflynn/stats"
 	// "github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
@@ -50,6 +50,8 @@ import (
 // of target molecule at wavelength
 //= 20330
 //= 0.0002878191305957933
+
+// validation requirements
 
 // Data which is returned from this protocol, and data types
 
@@ -517,56 +519,69 @@ func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateRead
 	plot.Export(runordercorrectnessgraph, filenameandextension[0]+"_runorder_correctnessfactor"+".png")
 
 	// 5. workout CV for each volume
+	replicateactualconcmap := make(map[string][]float64)
+	_output.VolumeToActualConc = make(map[string]Dataset)
+	replicatevalues := make([]float64, 0)
 
-	/*
-		replicateactualconcmap := make(map[string][]float64)
+	//counter := 0
 
-		replicatevalues := make([]float64,0)
+	// make map of replicate values for Actual Conc
+	for _, runwithresponses := range _output.Runs {
 
-		for i,runwithresponses := range Runs {
+		volstr, err := runwithresponses.GetAdditionalInfo("Volume")
 
-		//if _,found := replicateactualconcmap[runwithresponses.Get];
-		//get all replicates
-
-		// get response value and check if it's a float64 type
-		runorder, err := runwithresponses.GetResponseValue("Runorder")
-
-		if err != nil{
-			Errors = append(Errors,err.Error())
+		if err != nil {
+			execute.Errorf(_ctx, err.Error())
 		}
 
-		runorderint,inttrue := runorder.(int)
-		// if int is true
-		if inttrue {
-			xvalues = append(xvalues, float64(runorderint))
-		}else {
-			Errorf("Run"+fmt.Sprint(i,runwithresponses)+" Run Order:"+fmt.Sprint(runorderint), " not an int")
+		/*
+			repstr, err := runwithresponses.GetAdditionalInfo("Replicate")
+
+			if err != nil {
+				Errorf(err.Error())
+			}
+		*/
+		actualconc, err := runwithresponses.GetResponseValue("AbsorbanceActualConc")
+
+		if err != nil {
+			execute.Errorf(_ctx, err.Error())
 		}
 
-		// get response value and check if it's a float64 type
-		correctness, err := runwithresponses.GetResponseValue("Absorbance CorrectnessFactor "+strconv.Itoa(Wavelength))
+		/*rep, err := strconv.Atoi(repstr.(string))
 
-		if err != nil{
-			fmt.Println(err.Error())
-			Errors = append(Errors,err.Error())
+		if err != nil {
+			Errorf(err.Error())
 		}
-
-		correctnessfloat,floattrue := correctness.(float64)
-
-		if floattrue {
-			yvalues = append(yvalues,correctnessfloat )
-		}else {
-			fmt.Println(err.Error())
-			Errorf(" Absorbance CorrectnessFactor:"+fmt.Sprint(correctnessfloat))
+		*/
+		if _, found := replicateactualconcmap[volstr.(string)]; found /*&& rep == counter*/ {
+			replicatevalues = replicateactualconcmap[volstr.(string)]
+			replicatevalues = append(replicatevalues, actualconc.(float64))
+			replicateactualconcmap[volstr.(string)] = replicatevalues
+			replicatevalues = make([]float64, 0)
+			//counter++
+		} else if _, found := replicateactualconcmap[volstr.(string)]; !found {
+			replicatevalues = append(replicatevalues, actualconc.(float64))
+			replicateactualconcmap[volstr.(string)] = replicatevalues
+			replicatevalues = make([]float64, 0)
+			//counter++
 		}
+	}
 
-		}
+	// process into datasets
+	for key, values := range replicateactualconcmap {
 
-		runordercorrectnessgraph := plot.Plot(xvalues, [][]float64{yvalues})
+		var dataset Dataset
+		// process replicates into mean and cv
+		dataset.Name = key + "_AbsorbanceActualConc"
+		dataset.Mean, _ = stats.Mean(values)
+		dataset.StdDev, _ = stats.StdDevS(values)
+		dataset.Values = values
 
-		plot.Export(runordercorrectnessgraph, filenameandextension[0]+"_runorder_correctnessfactor"+".png")
+		dataset.CV = dataset.StdDev / dataset.Mean * float64(100)
+		_output.VolumeToActualConc[key] = dataset
 
-	*/
+	}
+
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
@@ -574,11 +589,31 @@ func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateRead
 // dipstick basis
 func _AddPlateReaderresults_2Validation(_ctx context.Context, _input *AddPlateReaderresults_2Input, _output *AddPlateReaderresults_2Output) {
 
-	if _output.R2 > 0.9 {
+	_output.CVpass = true
+
+	if _output.R2 < _input.R2threshold {
 		_output.R2Pass = true
+		_output.Errors = append(_output.Errors, fmt.Sprint("R2 threshold of ", _input.R2threshold, " not met; R2 value = ", _output.R2))
+	}
+
+	for key, dataset := range _output.VolumeToActualConc {
+
+		if dataset.CV > _input.CVthreshold {
+			_output.CVpass = false
+			_output.Errors = append(_output.Errors, fmt.Sprint(key, " coefficient of variance above ", _input.CVthreshold, " percent threshold; CV value = ", dataset.CV))
+		}
 	}
 
 }
+
+type Dataset struct {
+	Name   string
+	Values []float64
+	Mean   float64
+	StdDev float64
+	CV     float64
+}
+
 func _AddPlateReaderresults_2Run(_ctx context.Context, input *AddPlateReaderresults_2Input) *AddPlateReaderresults_2Output {
 	output := &AddPlateReaderresults_2Output{}
 	_AddPlateReaderresults_2Setup(_ctx, input)
@@ -628,6 +663,7 @@ type AddPlateReaderresults_2Element struct {
 
 type AddPlateReaderresults_2Input struct {
 	Blanks                []string
+	CVthreshold           float64
 	DesignFile            string
 	DesignFiletype        string
 	Diluent               *wtype.LHComponent
@@ -638,6 +674,7 @@ type AddPlateReaderresults_2Input struct {
 	Molecule              *wtype.LHComponent
 	OutputFilename        string
 	PlateType             *wtype.LHPlate
+	R2threshold           float64
 	ReadingTypeinMarsFile string
 	Responsecolumnstofill []string
 	Sheet                 int
@@ -661,6 +698,7 @@ type AddPlateReaderresults_2Output struct {
 	ResponsetoManualValuesmap map[string][]float64
 	Runs                      []doe.Run
 	Variance                  float64
+	VolumeToActualConc        map[string]Dataset
 }
 
 type AddPlateReaderresults_2SOutput struct {
@@ -677,6 +715,7 @@ type AddPlateReaderresults_2SOutput struct {
 		ResponsetoManualValuesmap map[string][]float64
 		Runs                      []doe.Run
 		Variance                  float64
+		VolumeToActualConc        map[string]Dataset
 	}
 	Outputs struct {
 	}
@@ -690,6 +729,7 @@ func init() {
 			Path: "antha/component/an/Utility/AddPlateReaderResults_2.an",
 			Params: []component.ParamDesc{
 				{Name: "Blanks", Desc: "= []string{\"P24\"}\n", Kind: "Parameters"},
+				{Name: "CVthreshold", Desc: "", Kind: "Parameters"},
 				{Name: "DesignFile", Desc: "= \"250516CCFbubbles/240516DXCFFDoeoutputgilsonright_TEST.xlsx\"\n", Kind: "Parameters"},
 				{Name: "DesignFiletype", Desc: "= \"JMP\"\n", Kind: "Parameters"},
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
@@ -700,6 +740,7 @@ func init() {
 				{Name: "Molecule", Desc: "", Kind: "Inputs"},
 				{Name: "OutputFilename", Desc: "= \"250516CCFbubbles/2501516bubblesresults.xlsx\"\n", Kind: "Parameters"},
 				{Name: "PlateType", Desc: "", Kind: "Inputs"},
+				{Name: "R2threshold", Desc: "validation requirements\n", Kind: "Parameters"},
 				{Name: "ReadingTypeinMarsFile", Desc: "= \"Abs Spectrum\"\n", Kind: "Parameters"},
 				{Name: "Responsecolumnstofill", Desc: "= []string{\"AbsVLV\"}\n", Kind: "Parameters"},
 				{Name: "Sheet", Desc: "= 0                                        //PRESHAKEPRESPIN\n", Kind: "Parameters"},
@@ -720,6 +761,7 @@ func init() {
 				{Name: "ResponsetoManualValuesmap", Desc: "", Kind: "Data"},
 				{Name: "Runs", Desc: "", Kind: "Data"},
 				{Name: "Variance", Desc: "", Kind: "Data"},
+				{Name: "VolumeToActualConc", Desc: "", Kind: "Data"},
 			},
 		},
 	}); err != nil {

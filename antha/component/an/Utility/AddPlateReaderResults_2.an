@@ -2,7 +2,7 @@ protocol AddPlateReaderresults_2
 
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
-	// "github.com/montanaflynn/stats"
+	 "github.com/montanaflynn/stats"
 	// "github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
@@ -47,6 +47,11 @@ Parameters (
 	// of target molecule at wavelength
 	Extinctioncoefficient float64 //= 20330
 	StockconcinMperL wunit.Concentration //= 0.0002878191305957933
+	
+	
+	// validation requirements
+	R2threshold float64
+	CVthreshold float64
 )
 
 // Data which is returned from this protocol, and data types
@@ -63,6 +68,7 @@ Data (
 	CV float64
 	CVpass bool
 	Errors []string
+	VolumeToActualConc map[string]Dataset
 )
 
 
@@ -555,56 +561,72 @@ Analysis {
 	plot.Export(runordercorrectnessgraph, filenameandextension[0]+"_runorder_correctnessfactor"+".png")
 	
 	// 5. workout CV for each volume
-	
-	/*
 	replicateactualconcmap := make(map[string][]float64)
-	
+	VolumeToActualConc = make(map[string]Dataset) 
 	replicatevalues := make([]float64,0)
 	
-	for i,runwithresponses := range Runs {
+	//counter := 0
 	
-	//if _,found := replicateactualconcmap[runwithresponses.Get]; 	
-	//get all replicates
+	// make map of replicate values for Actual Conc
+	for _,runwithresponses := range Runs {
 	
-	// get response value and check if it's a float64 type
-	runorder, err := runwithresponses.GetResponseValue("Runorder")
-	
-	if err != nil{
-		Errors = append(Errors,err.Error())
+	volstr, err := runwithresponses.GetAdditionalInfo("Volume")
+
+	if err != nil {
+		Errorf(err.Error())
 	}
 	
-	runorderint,inttrue := runorder.(int)
-	// if int is true 
-	if inttrue {
-		xvalues = append(xvalues, float64(runorderint))
-	}else {
-		Errorf("Run"+fmt.Sprint(i,runwithresponses)+" Run Order:"+fmt.Sprint(runorderint), " not an int")
+	/*
+	repstr, err := runwithresponses.GetAdditionalInfo("Replicate")
+	
+	if err != nil {
+		Errorf(err.Error())
+	}
+	*/
+	actualconc, err := runwithresponses.GetResponseValue("AbsorbanceActualConc")
+	
+	if err != nil {
+		Errorf(err.Error())
+	}
+	
+	/*rep, err := strconv.Atoi(repstr.(string))
+	
+	if err != nil {
+		Errorf(err.Error())
+	}
+	*/
+	if _,found := replicateactualconcmap[volstr.(string)];found /*&& rep == counter*/{
+		replicatevalues =replicateactualconcmap[volstr.(string)] 
+		replicatevalues = append(replicatevalues,actualconc.(float64))
+		replicateactualconcmap[volstr.(string)]= replicatevalues 
+		replicatevalues = make([]float64,0)
+		//counter++
+	} else if _,found := replicateactualconcmap[volstr.(string)];!found{
+		replicatevalues =append(replicatevalues,actualconc.(float64))
+		replicateactualconcmap[volstr.(string)]=replicatevalues 
+		replicatevalues = make([]float64,0)
+		//counter++
+	} 
+	}
+	
+	// process into datasets
+	for key,values := range replicateactualconcmap {
+	
+	
+	var dataset Dataset
+		// process replicates into mean and cv
+	dataset.Name = key + "_AbsorbanceActualConc"
+	dataset.Mean,_ = stats.Mean(values)
+	dataset.StdDev,_ = stats.StdDevS(values)
+	dataset.Values = values
+
+	dataset.CV = dataset.StdDev / dataset.Mean * float64(100)
+	VolumeToActualConc[key] = dataset
+	
+	
 	}
 
-	// get response value and check if it's a float64 type
-	correctness, err := runwithresponses.GetResponseValue("Absorbance CorrectnessFactor "+strconv.Itoa(Wavelength))
 	
-	if err != nil{
-		fmt.Println(err.Error())
-		Errors = append(Errors,err.Error())
-	}
-	
-	correctnessfloat,floattrue := correctness.(float64)
-	
-	if floattrue {
-		yvalues = append(yvalues,correctnessfloat )
-	}else {
-		fmt.Println(err.Error())
-		Errorf(" Absorbance CorrectnessFactor:"+fmt.Sprint(correctnessfloat))
-	}
-		
-	}
-		
-	runordercorrectnessgraph := plot.Plot(xvalues, [][]float64{yvalues})
-	
-	plot.Export(runordercorrectnessgraph, filenameandextension[0]+"_runorder_correctnessfactor"+".png")
-	
-	*/
 }
 
 
@@ -613,8 +635,27 @@ Analysis {
 // dipstick basis
 Validation {
 	
-	if R2 > 0.9 {
+	CVpass = true
+	
+	if R2 < R2threshold {
 		R2Pass = true
+		Errors = append(Errors, fmt.Sprint("R2 threshold of ", R2threshold ," not met; R2 value = ",R2))
 	}
 	
+	for key,dataset := range VolumeToActualConc {
+	
+	if dataset.CV > CVthreshold {
+		CVpass = false
+		Errors = append(Errors, fmt.Sprint(key," coefficient of variance above ", CVthreshold ," percent threshold; CV value = ",dataset.CV))
+	}
+	}
+	
+}
+
+type Dataset struct {
+	Name string
+	Values []float64
+	Mean float64
+	StdDev float64
+	CV float64
 }
