@@ -690,6 +690,22 @@ func (self *Move) Apply(vlh *lh.VirtualLiquidHandler) {
 	vlh.Move(self.deckposition, self.wellcoords, self.reference, self.offsetX, self.offsetY, self.offsetZ, self.plate_type, self.head)
 }
 
+//Aspirate
+type Aspirate struct {
+	volume     []float64
+	overstroke []bool
+	head       int
+	multi      int
+	platetype  []string
+	what       []string
+	llf        []bool
+}
+
+func (self *Aspirate) Apply(vlh *lh.VirtualLiquidHandler) {
+	vlh.Aspirate(self.volume, self.overstroke, self.head, self.multi,
+		self.platetype, self.what, self.llf)
+}
+
 /*
  * ######################################## Setup
  */
@@ -853,8 +869,8 @@ func adaptorAssertion(head int, tips []tipDesc) *AssertionFn {
 			tip := adaptor.GetChannel(td.channel).GetTip()
 			c := tip.Contents()
 			if c.Volume().ConvertToString("ul") != td.volume || c.GetType() != td.liquid_type {
-				errors = append(errors, fmt.Sprintf("Expected tip with %.2f ul of \"%s\", got tip with %s of \"%s\"",
-					td.volume, td.liquid_type, c.Volume(), c.GetType()))
+				errors = append(errors, fmt.Sprintf("Channel %d: Expected tip with %.2f ul of \"%s\", got tip with %s of \"%s\"",
+					td.channel, td.volume, td.liquid_type, c.Volume(), c.GetType()))
 			}
 		}
 		if len(errors) > 0 {

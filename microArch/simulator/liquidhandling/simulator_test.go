@@ -1393,7 +1393,7 @@ func Test_Aspirate(t *testing.T) {
 
 	tests := []SimulatorTest{
 		SimulatorTest{
-			"OK - single tip",
+			"OK - single channel",
 			nil,
 			[]*SetupFn{
 				testLayout(),
@@ -1408,17 +1408,405 @@ func Test_Aspirate(t *testing.T) {
 					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
 					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
 					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
-					[]string{"plate1", "", "", "", "", "", "", ""},  //plate_type
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
 					0, //head
+				},
+				&Aspirate{
+					[]float64{100., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
+					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
+					0, //head       int
+					8, //multi      int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
 				},
 			},
 			nil, //errors
 			[]*AssertionFn{ //assertions
 				tipboxAssertion("tipbox_1", []string{}),
 				tipboxAssertion("tipbox_2", []string{}),
-				adaptorAssertion(0, []tipDesc{}),
-				tipwasteAssertion("tipwaste", 1),
+				adaptorAssertion(0, []tipDesc{tipDesc{0, "water", 100}}),
+				tipwasteAssertion("tipwaste", 0),
 			},
+		},
+		SimulatorTest{
+			"OK - 8 channel",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				prefillWells("input_1", []string{"A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"}, "water", 200.),
+				preloadAdaptorTips(0, "tipbox_1", []int{0, 1, 2, 3, 4, 5, 6, 7}),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "input_1", "input_1", "input_1", "input_1", "input_1", "input_1", "input_1"}, //deckposition
+					[]string{"A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"},                                         //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                                                                    //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                        //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                        //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},                                                        //offsetZ
+					[]string{"plate", "plate", "plate", "plate", "plate", "plate", "plate", "plate"},                 //plate_type
+					0, //head
+				},
+				&Aspirate{
+					[]float64{100., 100., 100., 100., 100., 100., 100., 100.},      //volume     []float64
+					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
+					0, //head       int
+					8, //multi      int
+					[]string{"plate", "plate", "plate", "plate", "plate", "plate", "plate", "plate"}, //platetype  []string
+					[]string{"water", "water", "water", "water", "water", "water", "water", "water"}, //what       []string
+					[]bool{false, false, false, false, false, false, false, false},                   //llf        []bool
+				},
+			},
+			nil, //errors
+			[]*AssertionFn{ //assertions
+				tipboxAssertion("tipbox_1", []string{}),
+				tipboxAssertion("tipbox_2", []string{}),
+				adaptorAssertion(0, []tipDesc{
+					tipDesc{0, "water", 100},
+					tipDesc{1, "water", 100},
+					tipDesc{2, "water", 100},
+					tipDesc{3, "water", 100},
+					tipDesc{4, "water", 100},
+					tipDesc{5, "water", 100},
+					tipDesc{6, "water", 100},
+					tipDesc{7, "water", 100},
+				}),
+				tipwasteAssertion("tipwaste", 0),
+			},
+		},
+		SimulatorTest{
+			"Fail - Aspirate with no tip",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				prefillWells("input_1", []string{"A1", "B1"}, "water", 200.),
+				preloadAdaptorTips(0, "tipbox_1", []int{0}),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "input_1", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "B1", "", "", "", "", "", ""},           //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                          //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},              //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},              //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},              //offsetZ
+					[]string{"plate", "plate", "", "", "", "", "", ""},     //plate_type
+					0, //head
+				},
+				&Aspirate{
+					[]float64{100., 100., 0., 0., 0., 0., 0., 0.},                  //volume     []float64
+					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
+					0, //head       int
+					8, //multi      int
+					[]string{"plate", "plate", "", "", "", "", "", ""},             //platetype  []string
+					[]string{"water", "water", "", "", "", "", "", ""},             //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+			},
+			[]string{ //errors
+				"(err) Aspirate: Request to aspirate 100.00 ul to channel 1 but no tip loaded",
+			},
+			nil, //assertions
+		},
+		SimulatorTest{
+			"Fail - Underfull tip",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				prefillWells("input_1", []string{"A1"}, "water", 200.),
+				preloadAdaptorTips(0, "tipbox_1", []int{0}),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Aspirate{
+					[]float64{20., 0., 0., 0., 0., 0., 0., 0.},                     //volume     []float64
+					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
+					0, //head       int
+					8, //multi      int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+			},
+			[]string{ //errors
+				"(warn) Aspirate: Aspirating 20.00 ul to channel 0 but tip minimum volume is 50.00 ul",
+			},
+			nil, //assertions
+		},
+		SimulatorTest{
+			"Fail - Overfull tip",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				prefillWells("input_1", []string{"A1", "B1", "C1", "D1", "E1", "F1"}, "water", 200.),
+				preloadAdaptorTips(0, "tipbox_1", []int{0}),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Aspirate{
+					[]float64{200., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
+					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
+					0, //head       int
+					8, //multi      int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"B1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Aspirate{
+					[]float64{200., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
+					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
+					0, //head       int
+					8, //multi      int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"C1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Aspirate{
+					[]float64{200., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
+					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
+					0, //head       int
+					8, //multi      int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"D1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Aspirate{
+					[]float64{200., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
+					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
+					0, //head       int
+					8, //multi      int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"E1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Aspirate{
+					[]float64{200., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
+					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
+					0, //head       int
+					8, //multi      int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"F1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Aspirate{
+					[]float64{200., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
+					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
+					0, //head       int
+					8, //multi      int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+			},
+			[]string{ //errors
+				"(error) Aspirate: Overful tip on head 0 channel 0. contains 1000.00 ul, aspirating 200.00 ul more would exceed maximum volume of 1000.00 ul",
+			},
+			nil, //assertions
+		},
+		SimulatorTest{
+			"Fail - non-independent head can only aspirate equal volumes",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				prefillWells("input_1", []string{"A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"}, "water", 200.),
+				preloadAdaptorTips(0, "tipbox_1", []int{0, 1, 2, 3, 4, 5, 6, 7}),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "input_1", "input_1", "input_1", "input_1", "input_1", "input_1", "input_1"}, //deckposition
+					[]string{"A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"},                                         //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                                                                    //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                        //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                        //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},                                                        //offsetZ
+					[]string{"plate", "plate", "plate", "plate", "plate", "plate", "plate", "plate"},                 //plate_type
+					0, //head
+				},
+				&Aspirate{
+					[]float64{50., 60., 70., 80., 90., 100., 110., 120.},           //volume     []float64
+					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
+					0, //head       int
+					8, //multi      int
+					[]string{"plate", "plate", "plate", "plate", "plate", "plate", "plate", "plate"}, //platetype  []string
+					[]string{"water", "water", "water", "water", "water", "water", "water", "water"}, //what       []string
+					[]bool{false, false, false, false, false, false, false, false},                   //llf        []bool
+				},
+			},
+			[]string{ //errors
+				"(err) Aspirate: Requested aspirate volume cannot vary between channels in non-independent head",
+			},
+			nil, //assertions
+		},
+		SimulatorTest{
+			"Fail - tip not in well",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				prefillWells("input_1", []string{"A1"}, "water", 200.),
+				preloadAdaptorTips(0, "tipbox_1", []int{0}),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{50., 1., 1., 1., 1., 1., 1., 1.},      //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Aspirate{
+					[]float64{100., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
+					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
+					0, //head       int
+					8, //multi      int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+			},
+			[]string{ //errors
+				"(err) Aspirate: Head 0 Channel 0 not in requested location well A1 of plate \"input1\"",
+			},
+			nil, //assertions
+		},
+		SimulatorTest{
+			"Fail - Well doesn't contain enough",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				prefillWells("input_1", []string{"A1"}, "water", 200.),
+				preloadAdaptorTips(0, "tipbox_1", []int{0}),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Aspirate{
+					[]float64{500., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
+					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
+					0, //head       int
+					8, //multi      int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+			},
+			[]string{ //errors
+				"(err) Aspirate: Cannot aspirate 500 ul water from plate \"input1\" well A1 to Head 0 Channel 0, well contains only 200 ul water",
+			},
+			nil, //assertions
+		},
+		SimulatorTest{
+			"Fail - wrong liquid type",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				prefillWells("input_1", []string{"A1"}, "water", 200.),
+				preloadAdaptorTips(0, "tipbox_1", []int{0}),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Aspirate{
+					[]float64{100., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
+					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
+					0, //head       int
+					8, //multi      int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
+					[]string{"ethanol", "", "", "", "", "", "", ""},                //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+			},
+			[]string{ //errors
+				"(err) Aspirate: Cannot aspirate 100 ul of ethanol from plate \"input1\" well A1, well contains water",
+			},
+			nil, //assertions
 		},
 	}
 
