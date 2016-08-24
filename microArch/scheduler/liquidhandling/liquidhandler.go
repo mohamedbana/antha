@@ -239,6 +239,7 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 				vol.Add(well.ResidualVolume())
 				well2.WContents.SetVolume(vol)
 				well.WContents.SetVolume(well.ResidualVolume())
+				well.WContents.ID = wtype.GetUUID()
 				well.DeclareNotTemporary()
 				well2.DeclareNotTemporary()
 			}
