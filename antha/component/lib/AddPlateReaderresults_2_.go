@@ -523,6 +523,10 @@ func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateRead
 	_output.VolumeToActualConc = make(map[string]Dataset)
 	replicatevalues := make([]float64, 0)
 
+	replicatecorrectnessmap := make(map[string][]float64)
+	correctnessvalues := make([]float64, 0)
+	_output.VolumeToCorrectnessFactor = make(map[string]Dataset)
+
 	//counter := 0
 
 	// make map of replicate values for Actual Conc
@@ -553,6 +557,8 @@ func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateRead
 			Errorf(err.Error())
 		}
 		*/
+
+		// Actual Conc map
 		if _, found := replicateactualconcmap[volstr.(string)]; found /*&& rep == counter*/ {
 			replicatevalues = replicateactualconcmap[volstr.(string)]
 			replicatevalues = append(replicatevalues, actualconc.(float64))
@@ -565,6 +571,36 @@ func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateRead
 			replicatevalues = make([]float64, 0)
 			//counter++
 		}
+
+		// get response value and check if it's a float64 type
+		correctness, err := runwithresponses.GetResponseValue("Absorbance CorrectnessFactor " + strconv.Itoa(_input.Wavelength))
+
+		if err != nil {
+			fmt.Println(err.Error())
+			_output.Errors = append(_output.Errors, err.Error())
+		}
+
+		correctnessfloat, floattrue := correctness.(float64)
+
+		if !floattrue {
+			fmt.Println(err.Error())
+			execute.Errorf(_ctx, " Correctnessfloat not float but:"+fmt.Sprint(correctnessfloat))
+		}
+
+		// correctness factor map
+		if _, found := replicatecorrectnessmap[volstr.(string)]; found /*&& rep == counter*/ {
+			correctnessvalues = replicatecorrectnessmap[volstr.(string)]
+			correctnessvalues = append(correctnessvalues, correctnessfloat)
+			replicatecorrectnessmap[volstr.(string)] = correctnessvalues
+			correctnessvalues = make([]float64, 0)
+			//counter++
+		} else if _, found := replicatecorrectnessmap[volstr.(string)]; !found {
+			correctnessvalues = append(correctnessvalues, correctnessfloat)
+			replicatecorrectnessmap[volstr.(string)] = correctnessvalues
+			correctnessvalues = make([]float64, 0)
+			//counter++
+		}
+
 	}
 
 	// process into datasets
@@ -579,6 +615,21 @@ func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateRead
 
 		dataset.CV = dataset.StdDev / dataset.Mean * float64(100)
 		_output.VolumeToActualConc[key] = dataset
+
+	}
+
+	// process into datasets
+	for key, values := range replicatecorrectnessmap {
+
+		var dataset Dataset
+		// process replicates into mean and cv
+		dataset.Name = key + "_CorrectnessFactor"
+		dataset.Mean, _ = stats.Mean(values)
+		dataset.StdDev, _ = stats.StdDevS(values)
+		dataset.Values = values
+
+		dataset.CV = dataset.StdDev / dataset.Mean * float64(100)
+		_output.VolumeToCorrectnessFactor[key] = dataset
 
 	}
 
@@ -699,6 +750,7 @@ type AddPlateReaderresults_2Output struct {
 	Runs                      []doe.Run
 	Variance                  float64
 	VolumeToActualConc        map[string]Dataset
+	VolumeToCorrectnessFactor map[string]Dataset
 }
 
 type AddPlateReaderresults_2SOutput struct {
@@ -716,6 +768,7 @@ type AddPlateReaderresults_2SOutput struct {
 		Runs                      []doe.Run
 		Variance                  float64
 		VolumeToActualConc        map[string]Dataset
+		VolumeToCorrectnessFactor map[string]Dataset
 	}
 	Outputs struct {
 	}
@@ -762,6 +815,7 @@ func init() {
 				{Name: "Runs", Desc: "", Kind: "Data"},
 				{Name: "Variance", Desc: "", Kind: "Data"},
 				{Name: "VolumeToActualConc", Desc: "", Kind: "Data"},
+				{Name: "VolumeToCorrectnessFactor", Desc: "", Kind: "Data"},
 			},
 		},
 	}); err != nil {

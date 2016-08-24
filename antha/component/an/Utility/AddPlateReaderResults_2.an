@@ -69,6 +69,7 @@ Data (
 	CVpass bool
 	Errors []string
 	VolumeToActualConc map[string]Dataset
+	VolumeToCorrectnessFactor map[string]Dataset
 )
 
 
@@ -565,6 +566,10 @@ Analysis {
 	VolumeToActualConc = make(map[string]Dataset) 
 	replicatevalues := make([]float64,0)
 	
+	replicatecorrectnessmap := make(map[string][]float64)
+	correctnessvalues := make([]float64,0)
+	VolumeToCorrectnessFactor = make(map[string]Dataset) 
+	
 	//counter := 0
 	
 	// make map of replicate values for Actual Conc
@@ -595,6 +600,8 @@ Analysis {
 		Errorf(err.Error())
 	}
 	*/
+	
+	// Actual Conc map
 	if _,found := replicateactualconcmap[volstr.(string)];found /*&& rep == counter*/{
 		replicatevalues =replicateactualconcmap[volstr.(string)] 
 		replicatevalues = append(replicatevalues,actualconc.(float64))
@@ -607,6 +614,41 @@ Analysis {
 		replicatevalues = make([]float64,0)
 		//counter++
 	} 
+	
+	
+	// get response value and check if it's a float64 type
+	correctness, err := runwithresponses.GetResponseValue("Absorbance CorrectnessFactor "+strconv.Itoa(Wavelength))
+	
+	if err != nil{
+		fmt.Println(err.Error())
+		Errors = append(Errors,err.Error())
+	}
+	
+	correctnessfloat,floattrue := correctness.(float64)
+	
+	if !floattrue {
+		fmt.Println(err.Error())
+		Errorf(" Correctnessfloat not float but:"+fmt.Sprint(correctnessfloat))
+	}
+	
+	// correctness factor map
+	if _,found := replicatecorrectnessmap[volstr.(string)];found /*&& rep == counter*/{
+		correctnessvalues =replicatecorrectnessmap[volstr.(string)] 
+		correctnessvalues = append(correctnessvalues,correctnessfloat)
+		replicatecorrectnessmap[volstr.(string)]= correctnessvalues 
+		correctnessvalues = make([]float64,0)
+		//counter++
+	} else if _,found := replicatecorrectnessmap[volstr.(string)];!found{
+		correctnessvalues =append(correctnessvalues,correctnessfloat)
+		replicatecorrectnessmap[volstr.(string)]=correctnessvalues 
+		correctnessvalues = make([]float64,0)
+		//counter++
+	} 
+	
+	
+	
+	
+	
 	}
 	
 	// process into datasets
@@ -622,6 +664,23 @@ Analysis {
 
 	dataset.CV = dataset.StdDev / dataset.Mean * float64(100)
 	VolumeToActualConc[key] = dataset
+	
+	
+	}
+
+	// process into datasets
+	for key,values := range replicatecorrectnessmap {
+	
+	
+	var dataset Dataset
+		// process replicates into mean and cv
+	dataset.Name = key + "_CorrectnessFactor"
+	dataset.Mean,_ = stats.Mean(values)
+	dataset.StdDev,_ = stats.StdDevS(values)
+	dataset.Values = values
+
+	dataset.CV = dataset.StdDev / dataset.Mean * float64(100)
+	VolumeToCorrectnessFactor[key] = dataset
 	
 	
 	}
