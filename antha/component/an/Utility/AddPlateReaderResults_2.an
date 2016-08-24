@@ -696,8 +696,9 @@ Validation {
 	
 	CVpass = true
 	
-	if R2 < R2threshold {
+	if R2 > R2threshold {
 		R2Pass = true
+	} else {
 		Errors = append(Errors, fmt.Sprint("R2 threshold of ", R2threshold ," not met; R2 value = ",R2))
 	}
 	
