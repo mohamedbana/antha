@@ -31,15 +31,16 @@ import (
 //TODO add extra properties, i.e. filter
 //     remove BBox once shape implements LHObject
 type LHTip struct {
-	ID     string
-	Type   string
-	Mnfr   string
-	Dirty  bool
-	MaxVol wunit.Volume
-	MinVol wunit.Volume
-	shape  *Shape
-	bounds BBox
-	parent LHObject
+	ID       string
+	Type     string
+	Mnfr     string
+	Dirty    bool
+	MaxVol   wunit.Volume
+	MinVol   wunit.Volume
+	shape    *Shape
+	bounds   BBox
+	parent   LHObject
+	contents *LHComponent
 }
 
 /*
@@ -169,10 +170,59 @@ func NewLHTip(mfr, ttype string, minvol, maxvol float64, volunit string, shape *
 			shape.Depth().ConvertToString("mm"),
 		}},
 		nil,
+		NewLHComponent(),
 	}
 	return &lht
 }
 
 func CopyTip(tt LHTip) *LHTip {
 	return &tt
+}
+
+//@implement LHContainer
+func (self *LHTip) Contents() *LHComponent {
+	return self.contents
+}
+
+//@implement LHContainer
+func (self *LHTip) CurrentVolume() wunit.Volume {
+	return self.contents.Volume()
+}
+
+//@implement LHContainer
+func (self *LHTip) ResidualVolume() wunit.Volume {
+	//currently not really supported
+	return wunit.NewVolume(0, "ul")
+}
+
+//@implement LHContainer
+func (self *LHTip) WorkingVolume() wunit.Volume {
+	return self.contents.Volume()
+}
+
+//@implement LHContainer
+func (self *LHTip) Add(v *LHComponent) error {
+	fv := self.CurrentVolume()
+	fv.Add(v.Volume())
+
+	self.contents.Mix(v)
+
+	if fv.GreaterThan(self.MaxVol) {
+		return fmt.Errorf("Tip %s overfull, contains %v and maximum is %v", self.GetName(), fv, self.MaxVol)
+	}
+	if fv.LessThan(self.MinVol) {
+		return fmt.Errorf("Added less than minimum volume to %s, contains %v and minimum working volume is %v", self.GetName(), fv, self.MinVol)
+	}
+	return nil
+}
+
+//@implement LHContainer
+func (self *LHTip) Remove(v wunit.Volume) (*LHComponent, error) {
+	if v.GreaterThan(self.WorkingVolume()) {
+		return nil, fmt.Errorf("Requested removal of %v from tip %s which only has %v working volume", v, self.GetName(), self.WorkingVolume())
+	}
+	ret := self.contents.Dup()
+	ret.Vol = v.ConvertToString("ul")
+	self.contents.Remove(v)
+	return ret, nil
 }

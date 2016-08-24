@@ -348,9 +348,9 @@ func (p *LHPlate) RemoveComponent(well string, vol wunit.Volume) *LHComponent {
 		return nil
 	}
 
-	err := w.Remove(vol)
+	c, _ := w.Remove(vol)
 
-	return err
+	return c
 }
 
 func (p *LHPlate) DeclareTemporary() {

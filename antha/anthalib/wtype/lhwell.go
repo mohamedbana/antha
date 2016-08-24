@@ -217,7 +217,7 @@ func (w *LHWell) CurrVolume() wunit.Volume {
 func (w *LHWell) MaxVolume() wunit.Volume {
 	return wunit.NewVolume(w.MaxVol, "ul")
 }
-func (w *LHWell) Add(c *LHComponent) {
+func (w *LHWell) Add(c *LHComponent) error {
 	//wasEmpty := w.Empty()
 	mv := wunit.NewVolume(w.MaxVol, "ul")
 	cv := wunit.NewVolume(c.Vol, "ul")
@@ -236,21 +236,26 @@ func (w *LHWell) Add(c *LHComponent) {
 	//	logger.Track(fmt.Sprintf("MIX REPLACED WELL CONTENTS ID WAS %s NOW %s", w.WContents.ID, c.ID))
 	//w.WContents.ID = c.ID
 	//}
+	if cv.GreaterThan(mv) {
+		return fmt.Errorf("Overfull well \"%s\", contains %s but maximum volume is only %s", w, cv, mv)
+	}
+	return nil
 }
 
-func (w *LHWell) Remove(v wunit.Volume) *LHComponent {
+func (w *LHWell) Remove(v wunit.Volume) (*LHComponent, error) {
 	// if the volume is too high we complain
 
 	if v.GreaterThan(w.CurrentVolume()) {
 		logger.Debug("You ask too much: ", w.Crds.FormatA1(), " ", v.ToString(), " I only have: ", w.CurrentVolume().ToString(), " PLATEID: ", w.Plate.ID)
-		return nil
+		//maybe we should instead return as much as we can and an error?
+		return nil, fmt.Errorf("Requested %s from well \"%s\" which only contains %s", v, w, w.CurrentVolume())
 	}
 
 	ret := w.Contents().Dup()
 	ret.Vol = v.ConvertToString("ul")
 
 	w.Contents().Remove(v)
-	return ret
+	return ret, nil
 }
 
 func (w *LHWell) WorkingVolume() wunit.Volume {

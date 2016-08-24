@@ -23,6 +23,8 @@
 // defines types for dealing with liquid handling requests
 package wtype
 
+import "github.com/antha-lang/antha/antha/anthalib/wunit"
+
 type Named interface {
 	GetName() string
 }
@@ -152,4 +154,17 @@ type Addressable interface {
 	//WellReference is the position within a well.
 	//Requesting LiquidReference on a LHTipbox will return false
 	WellCoordsToCoords(WellCoords, WellReference) (Coordinates, bool)
+}
+
+//LHContainer a tip or a well or something that holds liquids
+type LHContainer interface {
+	Contents() *LHComponent
+	CurrentVolume() wunit.Volume
+	ResidualVolume() wunit.Volume
+	//WorkingVolume = CurrentVolume - ResidualVolume
+	WorkingVolume() wunit.Volume
+	//Add to the container
+	Add(*LHComponent) error
+	//Remove from the container
+	Remove(wunit.Volume) (LHComponent, error)
 }
