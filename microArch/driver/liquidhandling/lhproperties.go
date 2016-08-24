@@ -539,16 +539,22 @@ func (lhp *LHProperties) AddWashTo(pos string, wash *wtype.LHPlate) bool {
 // GetComponents takes requests for components at particular volumes
 // + a measure of carry volume
 // returns lists of plate IDs + wells from which to get components or error
-func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent, carryvol wunit.Volume) ([]string, []string, error) {
-	r1 := make([]string, len(cmps))
-	r2 := make([]string, len(cmps))
+func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent, carryvol wunit.Volume) ([][]string, [][]string, [][]wunit.Volume, error) {
+	r1 := make([][]string, len(cmps))
+	r2 := make([][]string, len(cmps))
+	r3 := make([][]wunit.Volume, len(cmps))
 
 	for i, v := range cmps {
+		r1[i] = make([]string, 0, 1)
+		r2[i] = make([]string, 0, 1)
+		r3[i] = make([]wunit.Volume, 0, 1)
 		foundIt := false
 
 		vdup := v.Dup()
-		vdup.Vol += carryvol.ConvertTo(wunit.ParsePrefixedUnit(vdup.Vunit))
-
+		/*
+			vdup := v.Dup()
+			vdup.Vol += carryvol.ConvertTo(wunit.ParsePrefixedUnit(vdup.Vunit))
+		*/
 		if v.HasAnyParent() {
 			//fmt.Println("Trying to get component ", v.CName, v.ParentID)
 			// this means it was already made with a previous call
@@ -562,8 +568,8 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent, carryvol wunit
 				tx = strings.Split(loc, ":")
 			}
 
-			r1[i] = tx[0]
-			r2[i] = tx[1]
+			r1[i][0] = tx[0]
+			r2[i][0] = tx[1]
 
 			vol := v.Volume().Dup()
 			vol.Add(carryvol)
@@ -583,21 +589,22 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent, carryvol wunit
 				if ok {
 					// whaddya got?
 					// nb this won't work if we need to split a volume across several plates
-					wcarr, ok := p.GetComponent(vdup, false)
+					wcarr, varr, ok := p.GetComponent(vdup, false)
 
 					if ok {
 						foundIt = true
-						// update r1 and r2
-						r1[i] = p.ID
-						// XXX XXX XXX FFS this should aggregate
-						// TODO -- fix this
-						r2[i] = wcarr[0].FormatA1()
-
-						vol := v.Volume().Dup()
-						vol.Add(carryvol)
-
-						lhp.RemoveComponent(r1[i], r2[i], vol)
-
+						for ix, _ := range wcarr {
+							wc := wcarr[ix].FormatA1()
+							vl := varr[ix].Dup()
+							r1[i] = append(r1[i], p.ID)
+							r2[i] = append(r2[i], wc)
+							r3[i] = append(r3[i], vl)
+							/*
+								vl = vl.Dup()
+								vl.Add(carryvol)
+							*/
+							lhp.RemoveComponent(p.ID, wc, vl)
+						}
 						break
 					}
 				}
@@ -605,13 +612,13 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent, carryvol wunit
 
 			if !foundIt {
 				err := wtype.LHError(wtype.LH_ERR_DIRE, fmt.Sprint("NO SOURCE FOR ", v.CName, " at volume ", v.Volume().ToString()))
-				return r1, r2, err
+				return r1, r2, r3, err
 			}
 
 		}
 	}
 
-	return r1, r2, nil
+	return r1, r2, r3, nil
 }
 
 func (lhp *LHProperties) GetCleanTips(tiptype string, channel *wtype.LHChannelParameter, mirror bool, multi int) (wells, positions, boxtypes []string, err error) {

@@ -114,13 +114,14 @@ func (lhp LHPlate) String() string {
 
 // convenience method
 
-func (lhp *LHPlate) GetComponent(cmp *LHComponent, exact bool) ([]WellCoords, bool) {
+func (lhp *LHPlate) GetComponent(cmp *LHComponent, exact bool) ([]WellCoords, []wunit.Volume, bool) {
 	ret := make([]WellCoords, 0, 1)
-
+	vols := make([]wunit.Volume, 0, 1)
 	it := NewOneTimeColumnWiseIterator(lhp)
 
 	var volGot wunit.Volume
 	volGot = wunit.NewVolume(0.0, "ul")
+	volWant := cmp.Volume().Dup()
 
 	x := 0
 
@@ -139,11 +140,21 @@ func (lhp *LHPlate) GetComponent(cmp *LHComponent, exact bool) ([]WellCoords, bo
 			x += 1
 
 			v := w.WorkingVolume()
-			if v.LessThan(cmp.Volume()) {
-				continue
-			}
+			/*
+				if v.LessThan(cmp.Volume()) {
+					continue
+				}
+			*/
 			volGot.Add(v)
 			ret = append(ret, wc)
+
+			if volWant.GreaterThan(v) {
+				vols = append(vols, v)
+			} else {
+				vols = append(vols, volWant.Dup())
+			}
+
+			volWant.Subtract(v)
 
 			if volGot.GreaterThan(cmp.Volume()) || volGot.EqualTo(cmp.Volume()) {
 				break
@@ -154,10 +165,10 @@ func (lhp *LHPlate) GetComponent(cmp *LHComponent, exact bool) ([]WellCoords, bo
 	//	fmt.Println("FOUND: ", cmp.CName, " WANT ", cmp.Volume().ToString(), " GOT ", volGot.ToString(), "  ", ret)
 
 	if !(volGot.GreaterThan(cmp.Volume()) || volGot.EqualTo(cmp.Volume())) {
-		return ret, false
+		return ret, vols, false
 	}
 
-	return ret, true
+	return ret, vols, true
 }
 
 func (lhp *LHPlate) Wells() [][]*LHWell {
