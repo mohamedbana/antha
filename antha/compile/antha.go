@@ -83,6 +83,7 @@ func (p *compiler) anthaInit() {
 		"Centrifuge":   "execute.Centrifuge",
 		"Electroshock": "execute.Electroshock",
 		"ReadEM":       "execute.ReadEM",
+		"MixNamed":     "execute.MixNamed",
 		"MixTo":        "execute.MixTo",
 		"MixInto":      "execute.MixInto",
 		"Mix":          "execute.Mix",
