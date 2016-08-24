@@ -628,7 +628,7 @@ func TestLoadTips(t *testing.T) {
 			[]*AssertionFn{ //assertions
 				tipboxAssertion("tipbox_1", []string{"H12"}),
 				tipboxAssertion("tipbox_2", []string{}),
-				adaptorAssertion(0, []int{0}),
+				adaptorAssertion(0, []tipDesc{tipDesc{0, "nil", 0}}),
 				tipwasteAssertion("tipwaste", 0),
 			},
 		},
@@ -653,7 +653,7 @@ func TestLoadTips(t *testing.T) {
 			[]*AssertionFn{ //assertions
 				tipboxAssertion("tipbox_1", []string{"A1"}),
 				tipboxAssertion("tipbox_2", []string{}),
-				adaptorAssertion(0, []int{7}),
+				adaptorAssertion(0, []tipDesc{tipDesc{7, "nil", 0}}),
 				tipwasteAssertion("tipwaste", 0),
 			},
 		},
@@ -679,7 +679,7 @@ func TestLoadTips(t *testing.T) {
 			[]*AssertionFn{ //assertions
 				tipboxAssertion("tipbox_1", []string{"H12", "G12"}),
 				tipboxAssertion("tipbox_2", []string{}),
-				adaptorAssertion(0, []int{0}),
+				adaptorAssertion(0, []tipDesc{tipDesc{0, "nil", 0}}),
 				tipwasteAssertion("tipwaste", 0),
 			},
 		},
@@ -705,7 +705,7 @@ func TestLoadTips(t *testing.T) {
 			[]*AssertionFn{ //assertions
 				tipboxAssertion("tipbox_1", []string{"A1", "B1"}),
 				tipboxAssertion("tipbox_2", []string{}),
-				adaptorAssertion(0, []int{7}),
+				adaptorAssertion(0, []tipDesc{tipDesc{7, "nil", 0}}),
 				tipwasteAssertion("tipwaste", 0),
 			},
 		},
@@ -730,7 +730,11 @@ func TestLoadTips(t *testing.T) {
 			[]*AssertionFn{ //assertions
 				tipboxAssertion("tipbox_1", []string{"F12", "G12", "H12"}),
 				tipboxAssertion("tipbox_2", []string{}),
-				adaptorAssertion(0, []int{0, 1, 2}),
+				adaptorAssertion(0, []tipDesc{
+					tipDesc{0, "nil", 0},
+					tipDesc{1, "nil", 0},
+					tipDesc{2, "nil", 0},
+				}),
 				tipwasteAssertion("tipwaste", 0),
 			},
 		},
@@ -755,7 +759,11 @@ func TestLoadTips(t *testing.T) {
 			[]*AssertionFn{ //assertions
 				tipboxAssertion("tipbox_1", []string{"A1", "B1", "C1"}),
 				tipboxAssertion("tipbox_2", []string{}),
-				adaptorAssertion(0, []int{5, 6, 7}),
+				adaptorAssertion(0, []tipDesc{
+					tipDesc{5, "nil", 0},
+					tipDesc{6, "nil", 0},
+					tipDesc{7, "nil", 0},
+				}),
 				tipwasteAssertion("tipwaste", 0),
 			},
 		},
@@ -780,7 +788,11 @@ func TestLoadTips(t *testing.T) {
 			[]*AssertionFn{ //assertions
 				tipboxAssertion("tipbox_1", []string{"A1", "E1", "H1"}),
 				tipboxAssertion("tipbox_2", []string{}),
-				adaptorAssertion(0, []int{0, 4, 7}),
+				adaptorAssertion(0, []tipDesc{
+					tipDesc{0, "nil", 0},
+					tipDesc{4, "nil", 0},
+					tipDesc{7, "nil", 0},
+				}),
 				tipwasteAssertion("tipwaste", 0),
 			},
 		},
@@ -805,7 +817,16 @@ func TestLoadTips(t *testing.T) {
 			[]*AssertionFn{ //assertions
 				tipboxAssertion("tipbox_1", []string{"A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"}),
 				tipboxAssertion("tipbox_2", []string{}),
-				adaptorAssertion(0, []int{0, 1, 2, 3, 4, 5, 6, 7}),
+				adaptorAssertion(0, []tipDesc{
+					tipDesc{0, "nil", 0},
+					tipDesc{1, "nil", 0},
+					tipDesc{2, "nil", 0},
+					tipDesc{3, "nil", 0},
+					tipDesc{4, "nil", 0},
+					tipDesc{5, "nil", 0},
+					tipDesc{6, "nil", 0},
+					tipDesc{7, "nil", 0},
+				}),
 				tipwasteAssertion("tipwaste", 0),
 			},
 		},
@@ -1160,7 +1181,7 @@ func Test_UnloadTips(t *testing.T) {
 			[]*AssertionFn{ //assertions
 				tipboxAssertion("tipbox_1", []string{}),
 				tipboxAssertion("tipbox_2", []string{}),
-				adaptorAssertion(0, []int{}),
+				adaptorAssertion(0, []tipDesc{}),
 				tipwasteAssertion("tipwaste", 1),
 			},
 		},
@@ -1195,7 +1216,7 @@ func Test_UnloadTips(t *testing.T) {
 			[]*AssertionFn{ //assertions
 				tipboxAssertion("tipbox_1", []string{}),
 				tipboxAssertion("tipbox_2", []string{}),
-				adaptorAssertion(0, []int{}),
+				adaptorAssertion(0, []tipDesc{}),
 				tipwasteAssertion("tipwaste", 8),
 			},
 		},
@@ -1231,7 +1252,7 @@ func Test_UnloadTips(t *testing.T) {
 			[]*AssertionFn{ //assertions
 				tipboxAssertion("tipbox_1", []string{}),
 				tipboxAssertion("tipbox_2", []string{}),
-				adaptorAssertion(0, []int{}),
+				adaptorAssertion(0, []tipDesc{}),
 				tipwasteAssertion("tipwaste", 0),
 			},
 		},
@@ -1256,7 +1277,12 @@ func Test_UnloadTips(t *testing.T) {
 			[]*AssertionFn{ //assertions
 				tipboxAssertion("tipbox_1", []string{}),
 				tipboxAssertion("tipbox_2", []string{}),
-				adaptorAssertion(0, []int{1, 3, 5, 7}),
+				adaptorAssertion(0, []tipDesc{
+					tipDesc{1, "nil", 0},
+					tipDesc{3, "nil", 0},
+					tipDesc{5, "nil", 0},
+					tipDesc{7, "nil", 0},
+				}),
 				tipwasteAssertion("tipwaste", 4),
 			},
 		},
@@ -1355,6 +1381,44 @@ func Test_UnloadTips(t *testing.T) {
 				"(err) UnloadTips: Cannot unload to address B1 in tipwaste \"tipwaste\" size [1x1]",
 			},
 			nil,
+		},
+	}
+
+	for _, test := range tests {
+		test.run(t)
+	}
+}
+
+func Test_Aspirate(t *testing.T) {
+
+	tests := []SimulatorTest{
+		SimulatorTest{
+			"OK - single tip",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				prefillWells("input_1", []string{"A1"}, "water", 200.),
+				preloadAdaptorTips(0, "tipbox_1", []int{0}),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate1", "", "", "", "", "", "", ""},  //plate_type
+					0, //head
+				},
+			},
+			nil, //errors
+			[]*AssertionFn{ //assertions
+				tipboxAssertion("tipbox_1", []string{}),
+				tipboxAssertion("tipbox_2", []string{}),
+				adaptorAssertion(0, []tipDesc{}),
+				tipwasteAssertion("tipwaste", 1),
+			},
 		},
 	}
 

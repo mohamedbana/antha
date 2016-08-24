@@ -727,6 +727,22 @@ func fillTipwaste(tipwaste_loc string, count int) *SetupFn {
 	return &ret
 }
 
+func prefillWells(plate_loc string, wells_to_fill []string, liquid_name string, volume float64) *SetupFn {
+	var ret SetupFn = func(vlh *lh.VirtualLiquidHandler) {
+		plate := vlh.GetObjectAt(plate_loc).(*wtype.LHPlate)
+		for _, well_name := range wells_to_fill {
+			wc := wtype.MakeWellCoords(well_name)
+			well := plate.GetChildByAddress(wc).(*wtype.LHWell)
+			comp := factory.GetComponentByType(liquid_name)
+			//feels dirty
+			comp.Vol = volume
+			comp.Vunit = "ul"
+			well.Add(comp)
+		}
+	}
+	return &ret
+}
+
 type moveToParams struct {
 	Multi        int
 	Head         int
@@ -806,12 +822,18 @@ func tipboxAssertion(tipbox_loc string, missing_tips []string) *AssertionFn {
 	return &ret
 }
 
+type tipDesc struct {
+	channel     int
+	liquid_type string
+	volume      float64
+}
+
 //adaptorAssertion assert that the adaptor has tips in the given positions
-func adaptorAssertion(head int, tip_channels []int) *AssertionFn {
+func adaptorAssertion(head int, tips []tipDesc) *AssertionFn {
 	var ret AssertionFn = func(name string, t *testing.T, vlh *lh.VirtualLiquidHandler) {
 		mtips := make(map[int]bool)
-		for _, tl := range tip_channels {
-			mtips[tl] = true
+		for _, td := range tips {
+			mtips[td.channel] = true
 		}
 
 		adaptor := vlh.GetAdaptorState(head)
@@ -821,6 +843,18 @@ func adaptorAssertion(head int, tip_channels []int) *AssertionFn {
 				errors = append(errors, fmt.Sprintf("Unexpected tip on channel %v", ch))
 			} else if !itl && et {
 				errors = append(errors, fmt.Sprintf("Expected tip on channel %v", ch))
+			}
+		}
+		//now check volumes
+		for _, td := range tips {
+			if !adaptor.GetChannel(td.channel).HasTip() {
+				continue //already reported this error
+			}
+			tip := adaptor.GetChannel(td.channel).GetTip()
+			c := tip.Contents()
+			if c.Volume().ConvertToString("ul") != td.volume || c.GetType() != td.liquid_type {
+				errors = append(errors, fmt.Sprintf("Expected tip with %.2f ul of \"%s\", got tip with %s of \"%s\"",
+					td.volume, td.liquid_type, c.Volume(), c.GetType()))
 			}
 		}
 		if len(errors) > 0 {
@@ -840,6 +874,32 @@ func tipwasteAssertion(tipwaste_loc string, expected_contents int) *AssertionFn 
 				t.Errorf("TipwasteAssertion failed in test \"%s\" at location %s: expected %v tips, got %v",
 					name, tipwaste_loc, expected_contents, tipwaste.Contents)
 			}
+		}
+	}
+	return &ret
+}
+
+type WellDesc struct {
+	position    string
+	liquid_type string
+	volume      float64
+}
+
+func plateAssertion(plate_loc string, wells []WellDesc) *AssertionFn {
+	var ret AssertionFn = func(name string, t *testing.T, vlh *lh.VirtualLiquidHandler) {
+		plate := vlh.GetObjectAt(plate_loc).(*wtype.LHPlate)
+		errs := []string{}
+		for _, wd := range wells {
+			wc := wtype.MakeWellCoords(wd.position)
+			well := plate.GetChildByAddress(wc).(*wtype.LHWell)
+			c := well.Contents()
+			if c.Vol != wd.volume || wd.liquid_type != c.GetType() {
+				errs = append(errs, fmt.Sprintf("Expected %.2ful of %s in well %s, found %.2ful of %s",
+					wd.volume, wd.liquid_type, c.Vol, c.GetType()))
+			}
+		}
+		if len(errs) > 0 {
+			t.Errorf("plateAssertion failed in test \"%s\", errors were:\n%s", name, strings.Join(errs, "\n"))
 		}
 	}
 	return &ret
