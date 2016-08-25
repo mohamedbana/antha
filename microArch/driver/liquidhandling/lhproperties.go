@@ -566,9 +566,8 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent, carryvol wunit
 				st := sampletracker.GetSampleTracker()
 				loc, _ := st.GetLocationOf(v.ID)
 				tx = strings.Split(loc, ":")
+				fmt.Println("LOOKING IT UP", " where IT = ", v.ID, " loc: ", loc)
 			}
-
-			fmt.Println("GOT tx: ", tx)
 
 			r1[i] = append(r1[i], tx[0])
 			r2[i] = append(r2[i], tx[1])
