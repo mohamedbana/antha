@@ -1,0 +1,21 @@
+{
+    "Parameters": {
+        "Protoplast_movement_overlay1": {
+            "OutPlatetype":"pcrplate_skirted_riser",
+			"OutPlatetype2":"Nuncon12well_incubator",
+			"AgarPlate":"falcon6wellAgar",
+            "Cells":"protoplasts",
+			"DNA":"dna_part",
+			"PEG":"PEG",
+			"Partname":"thepart",
+			"CellVol":"10ul",
+			"DNAVol":"2ul",
+			"PEGVol":"100ul",
+			"Plateoutvolume":"100ul",
+			"TransformedCellsVol":"100ul",
+			"OutWell":"A1",
+			"OutWell2":"A1",
+      "OutWell3":"A1"
+        }
+}
+}

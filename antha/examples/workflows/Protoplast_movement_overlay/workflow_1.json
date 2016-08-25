@@ -1,0 +1,8 @@
+{
+    "connections": [],
+    "processes": {
+        "Protoplast_movement_overlay1": {
+            "component": "Protoplast_movement_overlay"
+        }
+    }
+}
