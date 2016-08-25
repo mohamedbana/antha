@@ -78,7 +78,7 @@ func summariseVolumes(vols []float64) string {
 		s_vols[i] = wunit.NewVolume(v, "ul").String()
 		s_vols[i] = s_vols[i][:len(s_vols[i])-2]
 	}
-	return fmt.Sprintf("{%s} ul", strings.Join(s_vols, ","))
+	return fmt.Sprintf("{%s}ul", strings.Join(s_vols, ","))
 }
 
 func summariseStrings(s []string) string {
@@ -589,17 +589,24 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 	channels := make([]bool, multi)
 	s_chan := make([]int, 0)
 	s_vols := make([]float64, 0)
+	negative := false
 	for i := range channels {
 		channels[i] = !(platetype[i] == "" && what[i] == "")
 		if channels[i] {
 			s_chan = append(s_chan, i)
 			s_vols = append(s_vols, volume[i])
+			negative = negative || volume[i] < 0.
 		}
 	}
 
 	describe := func() string {
 		return fmt.Sprintf("aspirating %s of %s to head %d %s",
 			summariseVolumes(s_vols), summariseStrings(what), head, summariseChannels(s_chan))
+	}
+
+	if negative {
+		self.AddErrorf("Aspirate", "Error %s - cannot aspirate negative volume")
+		return ret
 	}
 
 	//Verify arguments
@@ -638,6 +645,36 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 	if len(tip_missing) > 0 {
 		self.AddErrorf("Aspirate", "While %s - missing %s on %s", describe(), pTips(len(tip_missing)), summariseChannels(tip_missing))
 		return ret
+	}
+
+	//independence constraints
+	if !adaptor.IsIndependent() {
+		different := false
+		v := -1.
+		for ch, b := range channels {
+			if b {
+				if v >= 0 {
+					different = different || v != volume[ch]
+				} else {
+					v = volume[ch]
+				}
+			}
+		}
+		if different {
+			self.AddErrorf("Aspirate", "While %s - channels cannot aspirate different volumes in non-independent head", describe())
+			return ret
+		}
+	}
+
+	//check liquid type
+	for i := range channels {
+		if !channels[i] || wells[i] == nil {
+			continue
+		}
+		if wells[i].Contents().GetType() != what[i] {
+			self.AddWarningf("Aspirate", "While %s - well %s contains %s, not %s",
+				describe(), wells[i].GetName(), wells[i].Contents().GetType(), what[i])
+		}
 	}
 
 	//move liquid
