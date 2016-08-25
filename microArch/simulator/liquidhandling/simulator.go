@@ -724,8 +724,75 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 //Dispense - used
 func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, head int, multi int,
 	platetype []string, what []string, llf []bool) driver.CommandStatus {
-	self.AddWarning("Dispense", "Not yet implemented")
-	return driver.CommandStatus{true, driver.OK, "DISPENSE ACK"}
+
+	ret := driver.CommandStatus{true, driver.OK, "DISPENSE ACK"}
+
+	//check that arguments are valid
+	if head < 0 || head >= self.state.GetNumberOfAdaptors() {
+		self.AddErrorf("Dispense", "Cannot dispense from unknown head %d", head)
+		return ret
+	}
+	adaptor := self.state.GetAdaptor(head)
+	deck := self.state.GetDeck()
+
+	if multi != adaptor.GetChannelCount() {
+		self.AddErrorf("Dispense", "Multi[=%d] doesn't match number of channels on head %d[=%d]",
+			multi, head, adaptor.GetChannelCount())
+		return ret
+	}
+
+	if !self.testSliceLength("Dispense", map[string]int{
+		"volume":    len(volume),
+		"blowout":   len(blowout),
+		"platetype": len(platetype),
+		"what":      len(what),
+		"llf":       len(llf),
+	}, multi) {
+		return ret
+	}
+
+	//find which channels are explicitly commanded
+	channels := make([]bool, multi)
+	for i := range channels {
+		channels[i] = !(platetype[i] == "" && what[i] == "")
+	}
+
+	//find the position of each tip
+	tip_pos := make([]wtype.Coordinates, multi)
+	wells := make([]*wtype.LHWell, multi)
+	for i := range channels {
+		if ch := adaptor.GetChannel(i); ch.HasTip() {
+			tip_pos[i] = ch.GetAbsolutePosition().Subtract(wtype.Coordinates{0., 0., ch.GetTip().GetSize().Z})
+
+			for _, o := range deck.GetPointIntersections(tip_pos[i]) {
+				if w, ok := o.(*wtype.LHWell); ok {
+					wells[i] = w
+					break
+				}
+			}
+		}
+	}
+
+	//independence contraints
+
+	//dispense
+	for i, explicit := range channels {
+		if !explicit {
+			continue
+		}
+		v := wunit.NewVolume(volume[i], "ul")
+		tip := adaptor.GetChannel(i).GetTip()
+
+		if wells[i] == nil {
+			self.AddErrorf("Dispense", "tip not in well")
+		} else if c, err := tip.Remove(v); err != nil {
+			self.AddErrorf("Dispense", "Unexpected tip error \"%s\"", err.Error())
+		} else if err := wells[i].Add(c); err != nil {
+			self.AddErrorf("Dispense", "Unexpected well error \"%s\"", err.Error())
+		}
+	}
+
+	return ret
 }
 
 //LoadTips - used

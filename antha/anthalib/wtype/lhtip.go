@@ -152,6 +152,7 @@ func (tip *LHTip) IsNil() bool {
 func (tip *LHTip) Dup() *LHTip {
 	t := NewLHTip(tip.Mnfr, tip.Type, tip.MinVol.RawValue(), tip.MaxVol.RawValue(), tip.MinVol.Unit().PrefixedSymbol(), tip.shape)
 	t.Dirty = tip.Dirty
+	t.contents = tip.Contents().Dup()
 	return t
 }
 

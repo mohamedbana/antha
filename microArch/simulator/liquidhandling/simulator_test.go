@@ -1861,3 +1861,105 @@ func Test_Aspirate(t *testing.T) {
 		test.run(t)
 	}
 }
+
+func Test_Dispense(t *testing.T) {
+
+	tests := []SimulatorTest{
+		SimulatorTest{
+			"OK - single channel",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				preloadFilledTips(0, "tipbox_1", []int{0}, "water", 100.),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Dispense{
+					[]float64{50., 0., 0., 0., 0., 0., 0., 0.},                     //volume    []float64
+					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
+					0, //head      int
+					8, //multi     int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+			},
+			nil, //errors
+			[]*AssertionFn{ //assertions
+				tipboxAssertion("tipbox_1", []string{}),
+				tipboxAssertion("tipbox_2", []string{}),
+				plateAssertion("input_1", []wellDesc{wellDesc{"A1", "water", 50.}}),
+				adaptorAssertion(0, []tipDesc{tipDesc{0, "water", 50.}}),
+				tipwasteAssertion("tipwaste", 0),
+			},
+		},
+		SimulatorTest{
+			"OK - 8 channel",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				preloadFilledTips(0, "tipbox_1", []int{0, 1, 2, 3, 4, 5, 6, 7}, "water", 100.),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "input_1", "input_1", "input_1", "input_1", "input_1", "input_1", "input_1"}, //deckposition
+					[]string{"A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"},                                         //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                                                                    //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                        //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                        //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},                                                        //offsetZ
+					[]string{"plate", "plate", "plate", "plate", "plate", "plate", "plate", "plate"},                 //plate_type
+					0, //head
+				},
+				&Dispense{
+					[]float64{50., 50., 50., 50., 50., 50., 50., 50.},              //volume    []float64
+					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
+					0, //head      int
+					8, //multi     int
+					[]string{"plate", "plate", "plate", "plate", "plate", "plate", "plate", "plate"}, //platetype []string
+					[]string{"water", "water", "water", "water", "water", "water", "water", "water"}, //what       []string
+					[]bool{false, false, false, false, false, false, false, false},                   //llf        []bool
+				},
+			},
+			nil, //errors
+			[]*AssertionFn{ //assertions
+				tipboxAssertion("tipbox_1", []string{}),
+				tipboxAssertion("tipbox_2", []string{}),
+				adaptorAssertion(0, []tipDesc{
+					tipDesc{0, "water", 50.},
+					tipDesc{1, "water", 50.},
+					tipDesc{2, "water", 50.},
+					tipDesc{3, "water", 50.},
+					tipDesc{4, "water", 50.},
+					tipDesc{5, "water", 50.},
+					tipDesc{6, "water", 50.},
+					tipDesc{7, "water", 50.},
+				}),
+				plateAssertion("input_1", []wellDesc{
+					wellDesc{"A1", "water", 50.},
+					wellDesc{"B1", "water", 50.},
+					wellDesc{"C1", "water", 50.},
+					wellDesc{"D1", "water", 50.},
+					wellDesc{"E1", "water", 50.},
+					wellDesc{"F1", "water", 50.},
+					wellDesc{"G1", "water", 50.},
+					wellDesc{"H1", "water", 50.},
+				}),
+				tipwasteAssertion("tipwaste", 0),
+			},
+		},
+	}
+
+	for _, test := range tests {
+		test.run(t)
+	}
+}

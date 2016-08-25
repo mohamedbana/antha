@@ -706,6 +706,22 @@ func (self *Aspirate) Apply(vlh *lh.VirtualLiquidHandler) {
 		self.platetype, self.what, self.llf)
 }
 
+//Dispense
+type Dispense struct {
+	volume    []float64
+	blowout   []bool
+	head      int
+	multi     int
+	platetype []string
+	what      []string
+	llf       []bool
+}
+
+func (self *Dispense) Apply(vlh *lh.VirtualLiquidHandler) {
+	vlh.Dispense(self.volume, self.blowout, self.head, self.multi,
+		self.platetype, self.what, self.llf)
+}
+
 /*
  * ######################################## Setup
  */
@@ -730,6 +746,23 @@ func preloadAdaptorTips(head int, tipbox_loc string, channels []int) *SetupFn {
 
 		for _, ch := range channels {
 			adaptor.GetChannel(ch).LoadTip(tipbox.Tiptype.Dup())
+		}
+	}
+	return &ret
+}
+
+func preloadFilledTips(head int, tipbox_loc string, channels []int, what string, volume float64) *SetupFn {
+	var ret SetupFn = func(vlh *lh.VirtualLiquidHandler) {
+		adaptor := vlh.GetAdaptorState(head)
+		tipbox := vlh.GetObjectAt(tipbox_loc).(*wtype.LHTipbox)
+		tip := tipbox.Tiptype.Dup()
+		c := factory.GetComponentByType(what)
+		c.Vol = volume
+		c.Vunit = "ul"
+		tip.Add(c)
+
+		for _, ch := range channels {
+			adaptor.GetChannel(ch).LoadTip(tip.Dup())
 		}
 	}
 	return &ret
@@ -907,25 +940,37 @@ func tipwasteAssertion(tipwaste_loc string, expected_contents int) *AssertionFn 
 	return &ret
 }
 
-type WellDesc struct {
+type wellDesc struct {
 	position    string
 	liquid_type string
 	volume      float64
 }
 
-func plateAssertion(plate_loc string, wells []WellDesc) *AssertionFn {
+func plateAssertion(plate_loc string, wells []wellDesc) *AssertionFn {
 	var ret AssertionFn = func(name string, t *testing.T, vlh *lh.VirtualLiquidHandler) {
+		m := map[string]bool{}
 		plate := vlh.GetObjectAt(plate_loc).(*wtype.LHPlate)
 		errs := []string{}
 		for _, wd := range wells {
+			m[wd.position] = true
 			wc := wtype.MakeWellCoords(wd.position)
 			well := plate.GetChildByAddress(wc).(*wtype.LHWell)
 			c := well.Contents()
 			if c.Vol != wd.volume || wd.liquid_type != c.GetType() {
 				errs = append(errs, fmt.Sprintf("Expected %.2ful of %s in well %s, found %.2ful of %s",
-					wd.volume, wd.liquid_type, c.Vol, c.GetType()))
+					wd.volume, wd.liquid_type, wd.position, c.Vol, c.GetType()))
 			}
 		}
+		//now check that all the other wells are empty
+		for _, row := range plate.Rows {
+			for _, well := range row {
+				if c := well.Contents(); !m[well.Crds.FormatA1()] && !c.IsZero() {
+					errs = append(errs, fmt.Sprintf("Expected empty well at %s, instead %s of %s",
+						well.Crds.FormatA1(), c.Volume(), c.GetType()))
+				}
+			}
+		}
+
 		if len(errs) > 0 {
 			t.Errorf("plateAssertion failed in test \"%s\", errors were:\n%s", name, strings.Join(errs, "\n"))
 		}
