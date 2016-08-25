@@ -1,0 +1,77 @@
+{
+    "Parameters": {
+        "Protoplast_movement_overlay_day2_1": {
+			"AgarPlate":"falcon6wellAgar",
+			"OverlayAgar":"protoplasts",
+			"Plateoutvolume":"190ul",
+      "Platenumber":1,
+			"OutWell":"A1"
+        },"Protoplast_movement_overlay_day2_2": {
+			"AgarPlate":"falcon6wellAgar",
+			"OverlayAgar":"protoplasts",
+			"Plateoutvolume":"190ul",
+      "Platenumber":1,
+			"OutWell":"A2"
+        },"Protoplast_movement_overlay_day2_3": {
+			"AgarPlate":"falcon6wellAgar",
+			"OverlayAgar":"protoplasts",
+			"Plateoutvolume":"190ul",
+      "Platenumber":1,
+			"OutWell":"A3"
+        },"Protoplast_movement_overlay_day2_4": {
+			"AgarPlate":"falcon6wellAgar",
+			"OverlayAgar":"protoplasts",
+			"Plateoutvolume":"190ul",
+      "Platenumber":1,
+			"OutWell":"B1"
+        },"Protoplast_movement_overlay_day2_5": {
+			"AgarPlate":"falcon6wellAgar",
+			"OverlayAgar":"protoplasts",
+			"Plateoutvolume":"190ul",
+      "Platenumber":1,
+			"OutWell":"B2"
+        },"Protoplast_movement_overlay_day2_6": {
+			"AgarPlate":"falcon6wellAgar",
+			"OverlayAgar":"protoplasts",
+			"Plateoutvolume":"190ul",
+      "Platenumber":1,
+			"OutWell":"B3"
+        },"Protoplast_movement_overlay_day2_7": {
+			"AgarPlate":"falcon6wellAgar",
+			"OverlayAgar":"protoplasts",
+			"Plateoutvolume":"190ul",
+      "Platenumber":2,
+			"OutWell":"A1"
+        },"Protoplast_movement_overlay_day2_8": {
+			"AgarPlate":"falcon6wellAgar",
+			"OverlayAgar":"protoplasts",
+			"Plateoutvolume":"190ul",
+      "Platenumber":2,
+			"OutWell":"A2"
+        },"Protoplast_movement_overlay_day2_9": {
+			"AgarPlate":"falcon6wellAgar",
+			"OverlayAgar":"protoplasts",
+			"Plateoutvolume":"190ul",
+      "Platenumber":2,
+			"OutWell":"A3"
+        },"Protoplast_movement_overlay_day2_10": {
+			"AgarPlate":"falcon6wellAgar",
+			"OverlayAgar":"protoplasts",
+			"Plateoutvolume":"190ul",
+      "Platenumber":2,
+			"OutWell":"B1"
+        },"Protoplast_movement_overlay_day2_11": {
+			"AgarPlate":"falcon6wellAgar",
+			"OverlayAgar":"protoplasts",
+			"Plateoutvolume":"190ul",
+      "Platenumber":2,
+			"OutWell":"B2"
+        },"Protoplast_movement_overlay_day2_12": {
+			"AgarPlate":"falcon6wellAgar",
+			"OverlayAgar":"protoplasts",
+			"Plateoutvolume":"190ul",
+      "Platenumber":2,
+			"OutWell":"B3"
+        }
+}
+}

@@ -1,0 +1,10 @@
+{
+    "Parameters": {
+        "Protoplast_movement_overlay_day2_1": {
+			"AgarPlate":"falcon6wellAgar",
+			"OverlayAgar":"protoplasts",
+			"Plateoutvolume":"200ul",
+			"OutWell":"A1"
+        }
+}
+}
