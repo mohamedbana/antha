@@ -1821,6 +1821,40 @@ func Test_Aspirate(t *testing.T) {
 			},
 			nil, //assertions
 		},
+		SimulatorTest{
+			"Fail - inadvertant aspiration",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				prefillWells("input_1", []string{"A1", "A2"}, "water", 200.),
+				preloadAdaptorTips(0, "tipbox_1", []int{0, 1}),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Aspirate{
+					[]float64{98.6, 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
+					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
+					0, //head       int
+					8, //multi      int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+			},
+			[]string{ //errors
+				"(err) Aspirate: While aspirating 98.6ul of water to head 0 channel 0 - channel 1 will inadvertantly aspirate 98.6ul of water from well B1@plate1 as head is not independent",
+			},
+			nil, //assertions
+		},
 	}
 
 	for _, test := range tests {
