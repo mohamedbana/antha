@@ -626,20 +626,19 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 	tip_pos := make([]wtype.Coordinates, multi)
 	wells := make([]*wtype.LHWell, multi)
 	tip_missing := []int{}
-	for i := range channels {
+	for i, explicit := range channels {
 		ch := adaptor.GetChannel(i)
-		tip_pos[i] = ch.GetAbsolutePosition()
 		if ch.HasTip() {
-			tip_pos[i] = tip_pos[i].Subtract(wtype.Coordinates{0., 0., ch.GetTip().GetSize().Z})
-		} else if channels[i] {
-			tip_missing = append(tip_missing, i)
-		}
+			tip_pos[i] = ch.GetAbsolutePosition().Subtract(wtype.Coordinates{0., 0., ch.GetTip().GetSize().Z})
 
-		objs := deck.GetPointIntersections(tip_pos[i])
-		for _, o := range objs {
-			if well, ok := o.(*wtype.LHWell); ok {
-				wells[i] = well
+			objs := deck.GetPointIntersections(tip_pos[i])
+			for _, o := range objs {
+				if well, ok := o.(*wtype.LHWell); ok {
+					wells[i] = well
+				}
 			}
+		} else if explicit {
+			tip_missing = append(tip_missing, i)
 		}
 	}
 	if len(tip_missing) > 0 {
@@ -657,6 +656,13 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 					different = different || v != volume[ch]
 				} else {
 					v = volume[ch]
+				}
+			} else if wells[ch] != nil {
+				//a non-explicitly requested tip is in a well. If the well has stuff in it, it'll get aspirated
+				if c := wells[ch].Contents(); !c.IsZero() {
+					self.AddErrorf("Aspirate",
+						"While %s - channel %d will inadvertantly aspirate %s from well %s as head is not independent",
+						describe(), ch, c.GetType(), wells[ch].GetName())
 				}
 			}
 		}

@@ -1826,7 +1826,7 @@ func Test_Aspirate(t *testing.T) {
 			nil,
 			[]*SetupFn{
 				testLayout(),
-				prefillWells("input_1", []string{"A1", "A2"}, "water", 200.),
+				prefillWells("input_1", []string{"A1", "B1"}, "water", 200.),
 				preloadAdaptorTips(0, "tipbox_1", []int{0, 1}),
 			},
 			[]TestRobotInstruction{
@@ -1851,7 +1851,7 @@ func Test_Aspirate(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Aspirate: While aspirating 98.6ul of water to head 0 channel 0 - channel 1 will inadvertantly aspirate 98.6ul of water from well B1@plate1 as head is not independent",
+				"(err) Aspirate: While aspirating 98.6ul of water to head 0 channel 0 - channel 1 will inadvertantly aspirate water from well B1@plate1 as head is not independent",
 			},
 			nil, //assertions
 		},
