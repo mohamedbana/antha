@@ -1518,7 +1518,7 @@ func Test_Aspirate(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Aspirate: Request to aspirate 100.00 ul to channel 1 but no tip loaded",
+				"(err) Aspirate: While aspirating 100 ul of water to head 0 channels 0,1 - missing tip on channel 1",
 			},
 			nil, //assertions
 		},
@@ -1552,7 +1552,7 @@ func Test_Aspirate(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(warn) Aspirate: Aspirating 20.00 ul to channel 0 but tip minimum volume is 50.00 ul",
+				"(warn) Aspirate: While aspirating 20 ul of water to head 0 channel 0 - minimum tip volume is 50 ul",
 			},
 			nil, //assertions
 		},
@@ -1576,7 +1576,7 @@ func Test_Aspirate(t *testing.T) {
 					0, //head
 				},
 				&Aspirate{
-					[]float64{200., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
+					[]float64{175., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
 					8, //multi      int
@@ -1595,7 +1595,7 @@ func Test_Aspirate(t *testing.T) {
 					0, //head
 				},
 				&Aspirate{
-					[]float64{200., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
+					[]float64{175., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
 					8, //multi      int
@@ -1614,7 +1614,7 @@ func Test_Aspirate(t *testing.T) {
 					0, //head
 				},
 				&Aspirate{
-					[]float64{200., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
+					[]float64{175., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
 					8, //multi      int
@@ -1633,7 +1633,7 @@ func Test_Aspirate(t *testing.T) {
 					0, //head
 				},
 				&Aspirate{
-					[]float64{200., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
+					[]float64{175., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
 					8, //multi      int
@@ -1652,7 +1652,7 @@ func Test_Aspirate(t *testing.T) {
 					0, //head
 				},
 				&Aspirate{
-					[]float64{200., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
+					[]float64{175., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
 					8, //multi      int
@@ -1671,7 +1671,7 @@ func Test_Aspirate(t *testing.T) {
 					0, //head
 				},
 				&Aspirate{
-					[]float64{200., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
+					[]float64{175., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
 					8, //multi      int
@@ -1681,7 +1681,7 @@ func Test_Aspirate(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(error) Aspirate: Overful tip on head 0 channel 0. contains 1000.00 ul, aspirating 200.00 ul more would exceed maximum volume of 1000.00 ul",
+				"(err) Aspirate: While aspirating 175 ul of water to head 0 channel 0 - channel 0 contains 875 ul, command exceeds maximum volume of 1000 ul",
 			},
 			nil, //assertions
 		},
@@ -1715,7 +1715,7 @@ func Test_Aspirate(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Aspirate: Requested aspirate volume cannot vary between channels in non-independent head",
+				"(err) Aspirate: While aspirating {60,70,80,90,100,110,120} ul of water to head 0 channels 0,1,2,3,4,5,6,7 - channels cannot aspirate different volumes in non-independent head",
 			},
 			nil, //assertions
 		},
@@ -1749,7 +1749,7 @@ func Test_Aspirate(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Aspirate: Cannot aspirate 100 ul of water to Head 0 Channel 0, tip not in a well",
+				"(err) Aspirate: While aspirating 100 ul of water to head 0 channel 0 - tip on channel 0 not in a well",
 			},
 			nil, //assertions
 		},
@@ -1773,7 +1773,7 @@ func Test_Aspirate(t *testing.T) {
 					0, //head
 				},
 				&Aspirate{
-					[]float64{500., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
+					[]float64{535.12135, 0., 0., 0., 0., 0., 0., 0.},               //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
 					8, //multi      int
@@ -1783,7 +1783,7 @@ func Test_Aspirate(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Aspirate: Cannot aspirate 500 ul water from plate \"input1\" well A1 to Head 0 Channel 0, well contains only 200 ul water",
+				"(err) Aspirate: While aspirating 535.12 ul of water to head 0 channel 0 - well A1@plate1 only contains 195 ul working volume",
 			},
 			nil, //assertions
 		},
@@ -1807,7 +1807,7 @@ func Test_Aspirate(t *testing.T) {
 					0, //head
 				},
 				&Aspirate{
-					[]float64{100., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
+					[]float64{102.1, 0., 0., 0., 0., 0., 0., 0.},                   //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
 					8, //multi      int
@@ -1817,7 +1817,7 @@ func Test_Aspirate(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Aspirate: Cannot aspirate 100 ul of ethanol from plate \"input1\" well A1, well contains water",
+				"(err) Aspirate: While aspirating 102.1 ul of ethanol to head 0 channel 0 - well contains water",
 			},
 			nil, //assertions
 		},

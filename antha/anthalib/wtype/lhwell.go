@@ -58,7 +58,7 @@ type LHWell struct {
 
 //@implement Named
 func (self *LHWell) GetName() string {
-	return fmt.Sprintf("well_%s@%s", self.Crds.FormatA1(), self.Plate.GetName())
+	return fmt.Sprintf("%s@%s", self.Crds.FormatA1(), self.Plate.GetName())
 }
 
 //@implement Typed

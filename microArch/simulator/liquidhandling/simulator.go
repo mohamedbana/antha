@@ -34,6 +34,13 @@ import (
 	"strings"
 )
 
+func pTips(N int) string {
+	if N == 1 {
+		return "tip"
+	}
+	return "tips"
+}
+
 func summariseWell2Channel(well []string, channels []int) string {
 	ret := make([]string, 0, len(channels))
 	for ch := range channels {
@@ -51,6 +58,47 @@ func summariseChannels(channels []int) string {
 		sch = append(sch, fmt.Sprintf("%d", ch))
 	}
 	return fmt.Sprintf("channels %s", strings.Join(sch, ","))
+}
+
+func summariseVolumes(vols []float64) string {
+	equal := true
+	for _, v := range vols {
+		if v != vols[0] {
+			equal = false
+			break
+		}
+	}
+
+	if equal {
+		return fmt.Sprintf("%.2f ul", vols[0])
+	}
+
+	s_vols := make([]string, len(vols))
+	for i, v := range vols {
+		s_vols[i] = fmt.Sprintf("%.2f", v)
+	}
+	return fmt.Sprintf("{%s} ul", strings.Join(s_vols, ","))
+}
+
+func summariseStrings(s []string) string {
+	m := map[string]bool{}
+	for _, v := range s {
+		if v != "" {
+			m[v] = true
+		}
+	}
+	s2 := make([]string, 0, len(m))
+	for k, _ := range m {
+		s2 = append(s2, k)
+	}
+
+	if len(s2) == 0 {
+		return "nil"
+	}
+	if len(s2) == 1 {
+		return s2[0]
+	}
+	return fmt.Sprintf("{%s}", strings.Join(s2, ","))
 }
 
 type adaptorCollision struct {
@@ -526,16 +574,6 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 
 	ret := driver.CommandStatus{true, driver.OK, "ASPIRATE ACK"}
 
-	//Verify arguments
-	if head < 0 || head >= self.state.GetNumberOfAdaptors() {
-		self.AddErrorf("Aspirate", "Unknown head %d", head)
-		return ret
-	}
-	adaptor := self.state.GetAdaptor(head)
-	if multi != adaptor.GetChannelCount() {
-		self.AddErrorf("Aspirate", "Multi[=%d] doesn't match number of channels on head %d [=%d]", multi, head, adaptor.GetChannelCount())
-		return ret
-	}
 	if !self.testSliceLength("Aspirate", map[string]int{
 		"volume":     len(volume),
 		"overstroke": len(overstroke),
@@ -548,8 +586,30 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 
 	//which channels are specified
 	channels := make([]bool, multi)
+	s_chan := make([]int, 0)
+	s_vols := make([]float64, 0)
 	for i := range channels {
 		channels[i] = !(platetype[i] == "" && what[i] == "")
+		if channels[i] {
+			s_chan = append(s_chan, i)
+			s_vols = append(s_vols, volume[i])
+		}
+	}
+
+	describe := func() string {
+		return fmt.Sprintf("aspirating %s of %s to head %d %s",
+			summariseVolumes(s_vols), summariseStrings(what), head, summariseChannels(s_chan))
+	}
+
+	//Verify arguments
+	if head < 0 || head >= self.state.GetNumberOfAdaptors() {
+		self.AddErrorf("Aspirate", "While %s - unknown head %d", describe(), head)
+		return ret
+	}
+	adaptor := self.state.GetAdaptor(head)
+	if multi != adaptor.GetChannelCount() {
+		self.AddErrorf("Aspirate", "Invalid arguments - multi[=%d] must equal number of channels on head %d [=%d]", multi, head, adaptor.GetChannelCount())
+		return ret
 	}
 
 	deck := self.state.GetDeck()
@@ -557,14 +617,14 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 	//get the position of tips
 	tip_pos := make([]wtype.Coordinates, multi)
 	wells := make([]*wtype.LHWell, multi)
+	tip_missing := []int{}
 	for i := range channels {
 		ch := adaptor.GetChannel(i)
 		tip_pos[i] = ch.GetAbsolutePosition()
 		if ch.HasTip() {
 			tip_pos[i] = tip_pos[i].Subtract(wtype.Coordinates{0., 0., ch.GetTip().GetSize().Z})
 		} else if channels[i] {
-			self.AddErrorf("Aspirate", "Missing tip on %d", i)
-			return ret
+			tip_missing = append(tip_missing, i)
 		}
 
 		objs := deck.GetPointIntersections(tip_pos[i])
@@ -574,21 +634,44 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 			}
 		}
 	}
+	if len(tip_missing) > 0 {
+		self.AddErrorf("Aspirate", "While %s - missing %s on %s", describe(), pTips(len(tip_missing)), summariseChannels(tip_missing))
+		return ret
+	}
 
 	//move liquid
+	no_well := []int{}
 	for i := range channels {
 		if !channels[i] {
 			continue
 		}
 		v := wunit.NewVolume(volume[i], "ul")
+		tip := adaptor.GetChannel(i).GetTip()
+		fv := tip.CurrentVolume()
+		fv.Add(v)
 
 		if wells[i] == nil {
-			self.AddErrorf("Aspirate", "not in a well %s", tip_pos[i])
+			no_well = append(no_well, i)
+		} else if wells[i].WorkingVolume().LessThan(v) {
+			self.AddErrorf("Aspirate", "While %s - well %s only contains %s working volume",
+				describe(), wells[i].GetName(), wells[i].WorkingVolume())
+		} else if fv.GreaterThan(tip.MaxVol) {
+			self.AddErrorf("Aspirate", "While %s - channel %d contains %s command exceeds maximum volume %s",
+				describe(), i, tip.CurrentVolume(), tip.MaxVol)
 		} else if c, err := wells[i].Remove(v); err != nil {
-			self.AddErrorf("Aspirate", err.Error())
-		} else if err := adaptor.GetChannel(i).GetTip().Add(c); err != nil {
-			self.AddErrorf("Aspirate", err.Error())
+			self.AddErrorf("Aspirate", "While %s - unexpected well error \"%s\"", describe(), err.Error())
+		} else if fv.LessThan(tip.MinVol) {
+			self.AddWarningf("Aspirate", "While %s - minimum is volume is %s",
+				describe(), tip.MinVol)
+			//will get an error here, but ignore it since we're already raising a warning
+			tip.Add(c)
+		} else if err := tip.Add(c); err != nil {
+			self.AddErrorf("Aspirate", "While %s - unexpected tip error \"%s\"", describe(), err.Error())
 		}
+	}
+
+	if len(no_well) > 0 {
+		self.AddErrorf("Aspirate", "While %s - %s on %s not in a well", describe(), pTips(len(no_well)), summariseChannels(no_well))
 	}
 
 	return ret
