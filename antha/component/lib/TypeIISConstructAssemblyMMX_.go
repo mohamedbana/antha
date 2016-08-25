@@ -32,7 +32,7 @@ func _TypeIISConstructAssemblyMMXSteps(_ctx context.Context, _input *TypeIISCons
 	//waterSample:=mixer.SampleForTotalVolume(Water,ReactionVolume)
 	//	samples = append(samples, waterSample)
 
-	mmxSample := mixer.Sample(_input.MasterMix, _input.ReactionVolume)
+	mmxSample := mixer.SampleForTotalVolume(_input.MasterMix, _input.ReactionVolume)
 	samples = append(samples, mmxSample)
 
 	for k, part := range _input.Parts {
