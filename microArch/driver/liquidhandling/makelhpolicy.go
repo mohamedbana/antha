@@ -549,7 +549,12 @@ func MakeDNAPolicy() LHPolicy {
 	dnapolicy["DSPREFERENCE"] = 0
 	dnapolicy["DSPZOFFSET"] = 0.5
 	dnapolicy["TIP_REUSE_LIMIT"] = 0
-	dnapolicy["NO_AIR_DISPENSE"] = true
+	//dnapolicy["NO_AIR_DISPENSE"] = true
+	dnapolicy["RESET_OVERRIDE "] = true
+	dnapolicy["POST_MIX_VOLUME"] = 5
+	dnapolicy["POST_MIX"] = 1
+	dnapolicy["POST_MIX_Z"] = 0.5
+	dnapolicy["POST_MIX_RATE"] = 3.0
 	return dnapolicy
 }
 
@@ -734,6 +739,7 @@ func MakeDefaultPolicy() LHPolicy {
 	//defaultpolicy["DSP_WAIT"] = 1.0
 	defaultpolicy["PRE_MIX_VOLUME"] = 10
 	defaultpolicy["POST_MIX_VOLUME"] = 10
+	defaultpolicy["RESET_OVERRIDE"] = true
 
 	return defaultpolicy
 }
