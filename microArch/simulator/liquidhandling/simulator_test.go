@@ -1518,7 +1518,7 @@ func Test_Aspirate(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Aspirate: While aspirating 100 ul of water to head 0 channels 0,1 - missing tip on channel 1",
+				"(err) Aspirate: While aspirating 100ul of water to head 0 channels 0,1 - missing tip on channel 1",
 			},
 			nil, //assertions
 		},
@@ -1552,7 +1552,7 @@ func Test_Aspirate(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(warn) Aspirate: While aspirating 20 ul of water to head 0 channel 0 - minimum tip volume is 50 ul",
+				"(warn) Aspirate: While aspirating 20ul of water to head 0 channel 0 - minimum tip volume is 50ul",
 			},
 			nil, //assertions
 		},
@@ -1681,7 +1681,7 @@ func Test_Aspirate(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Aspirate: While aspirating 175 ul of water to head 0 channel 0 - channel 0 contains 875 ul, command exceeds maximum volume of 1000 ul",
+				"(err) Aspirate: While aspirating 175ul of water to head 0 channel 0 - channel 0 contains 875ul, command exceeds maximum volume 1000ul",
 			},
 			nil, //assertions
 		},
@@ -1715,7 +1715,7 @@ func Test_Aspirate(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Aspirate: While aspirating {60,70,80,90,100,110,120} ul of water to head 0 channels 0,1,2,3,4,5,6,7 - channels cannot aspirate different volumes in non-independent head",
+				"(err) Aspirate: While aspirating {60,70,80,90,100,110,120}ul of water to head 0 channels 0,1,2,3,4,5,6,7 - channels cannot aspirate different volumes in non-independent head",
 			},
 			nil, //assertions
 		},
@@ -1749,7 +1749,7 @@ func Test_Aspirate(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Aspirate: While aspirating 100 ul of water to head 0 channel 0 - tip on channel 0 not in a well",
+				"(err) Aspirate: While aspirating 100ul of water to head 0 channel 0 - tip on channel 0 not in a well",
 			},
 			nil, //assertions
 		},
@@ -1783,7 +1783,7 @@ func Test_Aspirate(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Aspirate: While aspirating 535.12 ul of water to head 0 channel 0 - well A1@plate1 only contains 195 ul working volume",
+				"(err) Aspirate: While aspirating 535.121ul of water to head 0 channel 0 - well A1@plate1 only contains 195ul working volume",
 			},
 			nil, //assertions
 		},
@@ -1817,7 +1817,7 @@ func Test_Aspirate(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Aspirate: While aspirating 102.1 ul of ethanol to head 0 channel 0 - well contains water",
+				"(err) Aspirate: While aspirating 102.1ul of ethanol to head 0 channel 0 - well contains water",
 			},
 			nil, //assertions
 		},

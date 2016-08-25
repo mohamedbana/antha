@@ -70,12 +70,13 @@ func summariseVolumes(vols []float64) string {
 	}
 
 	if equal {
-		return fmt.Sprintf("%.2f ul", vols[0])
+		return wunit.NewVolume(vols[0], "ul").String()
 	}
 
 	s_vols := make([]string, len(vols))
 	for i, v := range vols {
-		s_vols[i] = fmt.Sprintf("%.2f", v)
+		s_vols[i] = wunit.NewVolume(v, "ul").String()
+		s_vols[i] = s_vols[i][:len(s_vols[i])-2]
 	}
 	return fmt.Sprintf("{%s} ul", strings.Join(s_vols, ","))
 }
@@ -656,12 +657,12 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 			self.AddErrorf("Aspirate", "While %s - well %s only contains %s working volume",
 				describe(), wells[i].GetName(), wells[i].WorkingVolume())
 		} else if fv.GreaterThan(tip.MaxVol) {
-			self.AddErrorf("Aspirate", "While %s - channel %d contains %s command exceeds maximum volume %s",
+			self.AddErrorf("Aspirate", "While %s - channel %d contains %s, command exceeds maximum volume %s",
 				describe(), i, tip.CurrentVolume(), tip.MaxVol)
 		} else if c, err := wells[i].Remove(v); err != nil {
 			self.AddErrorf("Aspirate", "While %s - unexpected well error \"%s\"", describe(), err.Error())
 		} else if fv.LessThan(tip.MinVol) {
-			self.AddWarningf("Aspirate", "While %s - minimum is volume is %s",
+			self.AddWarningf("Aspirate", "While %s - minimum tip volume is %s",
 				describe(), tip.MinVol)
 			//will get an error here, but ignore it since we're already raising a warning
 			tip.Add(c)

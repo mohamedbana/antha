@@ -310,8 +310,17 @@ func (cm *ConcreteMeasurement) EqualToFloat(f float64) bool {
 	return false
 }
 
+//Human readable string
 func (cm *ConcreteMeasurement) ToString() string {
-	return fmt.Sprintf("%-6.3f%s", cm.RawValue(), cm.Unit().PrefixedSymbol())
+	v := fmt.Sprintf("%.3f", cm.RawValue())
+	//prettyfy by removing trailing zeros after the point
+	for v[len(v)-1] == '0' {
+		v = v[:len(v)-1]
+	}
+	if v[len(v)-1] == '.' {
+		v = v[:len(v)-1]
+	}
+	return fmt.Sprintf("%s%s", v, cm.Unit().PrefixedSymbol())
 }
 
 /**********/
