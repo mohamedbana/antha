@@ -13,6 +13,7 @@ var (
 		InputPlateType:       []string{"pcrplate_skirted_riser40"},
 		OutputPlateType:      []string{"pcrplate_skirted_riser40"},
 		InputPlates:          []*wtype.LHPlate{},
+		OutputPlates:         []*wtype.LHPlate{},
 	}
 )
 
@@ -29,6 +30,9 @@ type Opt struct {
 	InputPlateFiles []string         // From filenames
 	InputPlateData  [][]byte         // From contents of files
 	InputPlates     []*wtype.LHPlate // Directly
+
+	// Direct specification of Output plates
+	OutputPlates []*wtype.LHPlate
 
 	// Driver specific position names (e.g., position_1 or A2) will be revised when multi-device is available
 	DriverSpecificTipPreferences []string
@@ -66,6 +70,9 @@ func (a Opt) Merge(x *Opt) Opt {
 	}
 	if len(x.InputPlates) != 0 {
 		a.InputPlates = x.InputPlates
+	}
+	if len(x.OutputPlates) != 0 {
+		a.OutputPlates = x.OutputPlates
 	}
 	if len(x.DriverSpecificTipPreferences) != 0 {
 		a.DriverSpecificTipPreferences = x.DriverSpecificTipPreferences

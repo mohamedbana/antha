@@ -568,8 +568,11 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent, carryvol wunit
 				tx = strings.Split(loc, ":")
 			}
 
-			r1[i][0] = tx[0]
-			r2[i][0] = tx[1]
+			fmt.Println("GOT tx: ", tx)
+
+			r1[i] = append(r1[i], tx[0])
+			r2[i] = append(r2[i], tx[1])
+			r3[i] = append(r3[i], v.Volume().Dup())
 
 			vol := v.Volume().Dup()
 			vol.Add(carryvol)

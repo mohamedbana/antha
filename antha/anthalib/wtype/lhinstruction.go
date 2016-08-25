@@ -25,6 +25,7 @@ type LHInstruction struct {
 	Result           *LHComponent
 	gen              int
 	PlateName        string
+	OutPlate         *LHPlate
 }
 
 func NewLHInstruction() *LHInstruction {

@@ -98,7 +98,8 @@ func MixInto(ctx context.Context, outplate *wtype.LHPlate, address string, compo
 				Components:  components,
 				Destination: outplate,
 				Address:     address,
-			})},
+			}),
+		},
 	})
 }
 

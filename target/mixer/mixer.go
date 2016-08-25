@@ -224,6 +224,17 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	for _, m := range mixes {
+		if m.OutPlate != nil {
+			p, ok := r.LHRequest.Output_plates[m.OutPlate.ID]
+			if ok && p != m.OutPlate {
+				return nil, fmt.Errorf("Mix setup error: Plate %s already requested in different state", p.ID)
+			}
+			r.LHRequest.Output_plates[m.OutPlate.ID] = m.OutPlate
+		}
+	}
+
 	r.LHRequest.BlockID = getId(mixes)
 
 	for _, mix := range mixes {

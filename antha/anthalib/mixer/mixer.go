@@ -204,6 +204,7 @@ func GenericMix(opt MixOptions) *wtype.LHInstruction {
 		r.ContainerType = opt.Destination.Type
 		r.Platetype = opt.Destination.Type
 		r.SetPlateID(opt.Destination.ID)
+		r.OutPlate = opt.Destination
 	}
 
 	if opt.PlateType != "" {
