@@ -42,6 +42,10 @@ func (a *Mixer) CanCompile(req ast.Request) bool {
 	if req.Move != nil {
 		return false
 	}
+	if req.Manual {
+		return false
+	}
+
 	// TODO: Add specific volume constraints
 	return req.MixVol != nil
 }
