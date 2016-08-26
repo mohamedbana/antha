@@ -237,7 +237,7 @@ func (w *LHWell) Add(c *LHComponent) error {
 	//w.WContents.ID = c.ID
 	//}
 	if cv.GreaterThan(mv) {
-		return fmt.Errorf("Overfull well \"%s\", contains %s but maximum volume is only %s", w, cv, mv)
+		return fmt.Errorf("Overfull well \"%s\", contains %s but maximum volume is only %s", w.GetName(), cv, mv)
 	}
 	return nil
 }

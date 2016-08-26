@@ -1903,6 +1903,43 @@ func Test_Dispense(t *testing.T) {
 			},
 		},
 		SimulatorTest{
+			"OK - single channel slightly above well",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				preloadFilledTips(0, "tipbox_1", []int{0}, "water", 100.),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{1, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{3., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Dispense{
+					[]float64{50., 0., 0., 0., 0., 0., 0., 0.},                     //volume    []float64
+					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
+					0, //head      int
+					8, //multi     int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+			},
+			nil, //errors
+			[]*AssertionFn{ //assertions
+				tipboxAssertion("tipbox_1", []string{}),
+				tipboxAssertion("tipbox_2", []string{}),
+				plateAssertion("input_1", []wellDesc{wellDesc{"A1", "water", 50.}}),
+				adaptorAssertion(0, []tipDesc{tipDesc{0, "water", 50.}}),
+				tipwasteAssertion("tipwaste", 0),
+			},
+		},
+		SimulatorTest{
 			"OK - 8 channel",
 			nil,
 			[]*SetupFn{
@@ -1956,6 +1993,171 @@ func Test_Dispense(t *testing.T) {
 				}),
 				tipwasteAssertion("tipwaste", 0),
 			},
+		},
+		SimulatorTest{
+			"Fail - no tips",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				//preloadFilledTips(0, "tipbox_1", []int{0}, "water", 100.),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Dispense{
+					[]float64{50., 0., 0., 0., 0., 0., 0., 0.},                     //volume    []float64
+					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
+					0, //head      int
+					8, //multi     int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+			},
+			[]string{ //errors
+				"(err) Dispense:",
+			},
+			nil, //assertionsi
+		},
+		SimulatorTest{
+			"Fail - not enough in tip",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				preloadFilledTips(0, "tipbox_1", []int{0}, "water", 100.),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Dispense{
+					[]float64{150., 0., 0., 0., 0., 0., 0., 0.},                    //volume    []float64
+					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
+					0, //head      int
+					8, //multi     int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+			},
+			[]string{ //errors
+				"(err) Dispense:",
+			},
+			nil, //assertionsi
+		},
+		SimulatorTest{
+			"Fail - well over-full",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				preloadFilledTips(0, "tipbox_1", []int{0}, "water", 1000.),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Dispense{
+					[]float64{500., 0., 0., 0., 0., 0., 0., 0.},                    //volume    []float64
+					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
+					0, //head      int
+					8, //multi     int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+			},
+			[]string{ //errors
+				"(err) Dispense:",
+			},
+			nil, //assertionsi
+		},
+		SimulatorTest{
+			"Fail - not in a well",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				preloadFilledTips(0, "tipbox_1", []int{0}, "water", 100.),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{200., 1., 1., 1., 1., 1., 1., 1.},     //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Dispense{
+					[]float64{50., 0., 0., 0., 0., 0., 0., 0.},                     //volume    []float64
+					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
+					0, //head      int
+					8, //multi     int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+			},
+			[]string{ //errors
+				"(err) Dispense:",
+			},
+			nil, //assertionsi
+		},
+		SimulatorTest{
+			"Fail - dispensing to tipwaste",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				preloadFilledTips(0, "tipbox_1", []int{0}, "water", 100.),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"tipwaste", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},       //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                    //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},        //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},        //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},        //offsetZ
+					[]string{"tipwaste", "", "", "", "", "", "", ""}, //plate_type
+					0, //head
+				},
+				&Dispense{
+					[]float64{50., 0., 0., 0., 0., 0., 0., 0.},                     //volume    []float64
+					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
+					0, //head      int
+					8, //multi     int
+					[]string{"tipwaste", "", "", "", "", "", "", ""},               //platetype []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+			},
+			[]string{ //errors
+				"(err) Dispense:",
+			},
+			nil, //assertionsi
 		},
 	}
 

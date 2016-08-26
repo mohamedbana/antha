@@ -145,8 +145,9 @@ func (self adaptorCollisions) String() string {
 // Simulate a liquid handler Driver
 type VirtualLiquidHandler struct {
 	simulator.ErrorReporter
-	state             *RobotState
-	tipbox_collisions bool
+	state               *RobotState
+	tipbox_collisions   bool
+	max_dispense_height float64
 }
 
 //Create a new VirtualLiquidHandler which mimics an LHDriver
@@ -154,6 +155,7 @@ func NewVirtualLiquidHandler(props *liquidhandling.LHProperties) *VirtualLiquidH
 	var vlh VirtualLiquidHandler
 
 	vlh.tipbox_collisions = true
+	vlh.max_dispense_height = 5.
 
 	vlh.validateProperties(props)
 	//if the properties are that bad, don't bother building RobotState
@@ -760,11 +762,12 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 	//find the position of each tip
 	tip_pos := make([]wtype.Coordinates, multi)
 	wells := make([]*wtype.LHWell, multi)
+	size := wtype.Coordinates{0, 0, self.max_dispense_height}
 	for i := range channels {
 		if ch := adaptor.GetChannel(i); ch.HasTip() {
 			tip_pos[i] = ch.GetAbsolutePosition().Subtract(wtype.Coordinates{0., 0., ch.GetTip().GetSize().Z})
 
-			for _, o := range deck.GetPointIntersections(tip_pos[i]) {
+			for _, o := range deck.GetBoxIntersections(*wtype.NewBBox(tip_pos[i].Subtract(size), size)) {
 				if w, ok := o.(*wtype.LHWell); ok {
 					wells[i] = w
 					break
@@ -784,7 +787,7 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 		tip := adaptor.GetChannel(i).GetTip()
 
 		if wells[i] == nil {
-			self.AddErrorf("Dispense", "tip not in well")
+			self.AddErrorf("Dispense", "tip not above well")
 		} else if c, err := tip.Remove(v); err != nil {
 			self.AddErrorf("Dispense", "Unexpected tip error \"%s\"", err.Error())
 		} else if err := wells[i].Add(c); err != nil {
