@@ -642,8 +642,9 @@ func _AddPlateReaderresults_2Validation(_ctx context.Context, _input *AddPlateRe
 
 	_output.CVpass = true
 
-	if _output.R2 < _input.R2threshold {
+	if _output.R2 > _input.R2threshold {
 		_output.R2Pass = true
+	} else {
 		_output.Errors = append(_output.Errors, fmt.Sprint("R2 threshold of ", _input.R2threshold, " not met; R2 value = ", _output.R2))
 	}
 
