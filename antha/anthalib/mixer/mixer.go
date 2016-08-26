@@ -26,6 +26,7 @@ package mixer
 import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/twinj/uuid"
 )
 
 // mix needs to define the interface with liquid handling
@@ -43,6 +44,7 @@ func SampleAll(l *wtype.LHComponent) *wtype.LHComponent {
 func Sample(l *wtype.LHComponent, v wunit.Volume) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
 	ret.ID = l.ID
+	l.ID = uuid.NewV4().String()
 
 	l.AddDaughterComponent(ret)
 	if l.HasAnyParent() {
@@ -70,6 +72,8 @@ func MultiSample(l []*wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent 
 		ret := wtype.NewLHComponent()
 		vi := v[i]
 		ret.ID = j.ID
+		j.ID = uuid.NewV4().String()
+
 		j.AddDaughterComponent(ret)
 		if j.HasAnyParent() {
 			ret.ParentID = j.ParentID
@@ -93,6 +97,7 @@ func MultiSample(l []*wtype.LHComponent, v []wunit.Volume) []*wtype.LHComponent 
 func SampleForConcentration(l *wtype.LHComponent, c wunit.Concentration) *wtype.LHComponent {
 	ret := wtype.NewLHComponent()
 	ret.ID = l.ID
+	l.ID = uuid.NewV4().String()
 	l.AddDaughterComponent(ret)
 	if l.HasAnyParent() {
 		ret.ParentID = l.ParentID
@@ -117,6 +122,7 @@ func SampleMass(s *wtype.LHComponent, m wunit.Mass, d wunit.Density) *wtype.LHCo
 
 	ret := wtype.NewLHComponent()
 	ret.ID = s.ID
+	s.ID = uuid.NewV4().String()
 	s.AddDaughterComponent(ret)
 	if s.HasAnyParent() {
 		ret.ParentID = s.ParentID
@@ -140,6 +146,7 @@ func SampleForTotalVolume(l *wtype.LHComponent, v wunit.Volume) *wtype.LHCompone
 	ret := wtype.NewLHComponent()
 
 	ret.ID = l.ID
+	l.ID = uuid.NewV4().String()
 	l.AddDaughterComponent(ret)
 	if l.HasAnyParent() {
 		ret.ParentID = l.ParentID
