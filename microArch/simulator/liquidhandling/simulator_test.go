@@ -278,7 +278,7 @@ func Test_Move(t *testing.T) {
 			},
 			nil, //errors
 			[]*AssertionFn{ //assertions
-				positionAssertion(0, wtype.Coordinates{147, 454, 93}),
+				positionAssertion(0, wtype.Coordinates{111., 440., 93.}),
 			},
 		},
 		SimulatorTest{
@@ -301,7 +301,7 @@ func Test_Move(t *testing.T) {
 			},
 			nil, //errors
 			[]*AssertionFn{ //assertions
-				positionAssertion(0, wtype.Coordinates{147, 454, 93}),
+				positionAssertion(0, wtype.Coordinates{111., 440., 93}),
 			},
 		},
 		SimulatorTest{
@@ -2023,7 +2023,7 @@ func Test_Dispense(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Dispense:",
+				"(err) Dispense: While dispensing 50ul from head 0 channel 0 - no tip loaded on channel 0",
 			},
 			nil, //assertionsi
 		},
@@ -2056,7 +2056,7 @@ func Test_Dispense(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Dispense:",
+				"(err) Dispense: While dispensing 150ul from head 0 channel 0 - tip on channel 0 contains only 100ul working volume",
 			},
 			nil, //assertionsi
 		},
@@ -2089,7 +2089,7 @@ func Test_Dispense(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Dispense:",
+				"(err) Dispense: While dispensing 500ul from head 0 channel 0 - well A1@plate1 under channel 0 contains 0ul, command would exceed maximum volume 200ul",
 			},
 			nil, //assertionsi
 		},
@@ -2122,7 +2122,7 @@ func Test_Dispense(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Dispense:",
+				"(err) Dispense: While dispensing 50ul from head 0 channel 0 - no well within 5mm below tip on channel 0",
 			},
 			nil, //assertionsi
 		},
@@ -2137,7 +2137,7 @@ func Test_Dispense(t *testing.T) {
 				&Move{
 					[]string{"tipwaste", "", "", "", "", "", "", ""}, //deckposition
 					[]string{"A1", "", "", "", "", "", "", ""},       //wellcoords
-					[]int{0, 0, 0, 0, 0, 0, 0, 0},                    //reference
+					[]int{1, 0, 0, 0, 0, 0, 0, 0},                    //reference
 					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},        //offsetX
 					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},        //offsetY
 					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},        //offsetZ
@@ -2155,9 +2155,42 @@ func Test_Dispense(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Dispense:",
+				"(warn) Dispense: While dispensing 50ul from head 0 channel 0 - dispensing to tipwaste",
 			},
 			nil, //assertionsi
+		},
+		SimulatorTest{
+			"fail - independence",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				preloadFilledTips(0, "tipbox_1", []int{0, 1, 2, 3, 4, 5, 6, 7}, "water", 100.),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Dispense{
+					[]float64{50., 0, 0, 0, 0, 0, 0, 0},                            //volume    []float64
+					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
+					0, //head      int
+					8, //multi     int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+			},
+			[]string{ //errors
+				"(err) Dispense: While dispensing 50ul from head 0 channel 0 - must also dispense 50ul from channels 1,2,3,4,5,6,7 as head is not independent",
+			},
+			nil, //assertions
 		},
 	}
 

@@ -755,8 +755,18 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 
 	//find which channels are explicitly commanded
 	channels := make([]bool, multi)
+	s_chan := make([]int, 0, len(channels))
+	s_vols := make([]float64, 0, len(channels))
 	for i := range channels {
 		channels[i] = !(platetype[i] == "" && what[i] == "")
+		if channels[i] {
+			s_chan = append(s_chan, i)
+			s_vols = append(s_vols, volume[i])
+		}
+	}
+
+	describe := func() string {
+		return fmt.Sprintf("dispensing %s from head %d %s", summariseVolumes(s_vols), head, summariseChannels(s_chan))
 	}
 
 	//find the position of each tip
@@ -777,22 +787,73 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 	}
 
 	//independence contraints
+	if !adaptor.IsIndependent() {
+		extra := []int{}
+		different := false
+		v := -1.
+		for ch, b := range channels {
+			if b {
+				if v >= 0 {
+					different = different || v != volume[ch]
+				} else {
+					v = volume[ch]
+				}
+			} else if wells[ch] != nil {
+				//a non-explicitly requested tip is in a well. If the well has stuff in it, it'll get aspirated
+				if c := adaptor.GetChannel(ch).GetTip().Contents(); !c.IsZero() {
+					extra = append(extra, ch)
+				}
+			}
+		}
+		if different {
+			self.AddErrorf("Dispense", "While %s - channels cannot dispense different volumes in non-independent head", describe())
+			return ret
+		} else if len(extra) > 0 {
+			self.AddErrorf("Dispense",
+				"While %s - must also dispense %s from %s as head is not independent",
+				describe(), summariseVolumes(s_vols), summariseChannels(extra))
+			return ret
+		}
+	}
 
 	//dispense
-	for i, explicit := range channels {
-		if !explicit {
-			continue
-		}
+	no_well := []int{}
+	no_tip := []int{}
+	for _, i := range s_chan {
 		v := wunit.NewVolume(volume[i], "ul")
 		tip := adaptor.GetChannel(i).GetTip()
+		fv := wunit.NewVolume(volume[i], "ul")
 
-		if wells[i] == nil {
-			self.AddErrorf("Dispense", "tip not above well")
+		if wells[i] != nil {
+			if _, tw := wells[i].Plate.(*wtype.LHTipwaste); tw {
+				self.AddWarningf("Dispense", "While %s - dispensing to tipwaste", describe())
+			}
+		}
+
+		if tip == nil {
+			no_tip = append(no_tip, i)
+		} else if wells[i] == nil {
+			no_well = append(no_well, i)
+		} else if fv.Add(wells[i].CurrentVolume()); fv.GreaterThan(wells[i].MaxVolume()) {
+			self.AddErrorf("Dispense", "While %s - well %s under channel %d contains %s, command would exceed maximum volume %s",
+				describe(), wells[i].GetName(), i, wells[i].CurrentVolume(), wells[i].MaxVolume())
+		} else if v.GreaterThan(tip.WorkingVolume()) {
+			self.AddErrorf("Dispense", "While %s - tip on channel %d contains only %s working volume",
+				describe(), i, tip.WorkingVolume())
 		} else if c, err := tip.Remove(v); err != nil {
 			self.AddErrorf("Dispense", "Unexpected tip error \"%s\"", err.Error())
 		} else if err := wells[i].Add(c); err != nil {
 			self.AddErrorf("Dispense", "Unexpected well error \"%s\"", err.Error())
 		}
+	}
+
+	if len(no_well) > 0 {
+		self.AddErrorf("Dispense", "While %s - no well within %s below %s on %s",
+			describe(), wunit.NewLength(self.max_dispense_height, "mm"), pTips(len(no_well)), summariseChannels(no_well))
+	}
+	if len(no_tip) > 0 {
+		self.AddErrorf("Dispense", "While %s - no %s loaded on %s",
+			describe(), pTips(len(no_tip)), summariseChannels(no_tip))
 	}
 
 	return ret

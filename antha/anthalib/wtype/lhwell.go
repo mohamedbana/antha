@@ -53,17 +53,17 @@ type LHWell struct {
 	bounds    BBox
 	Bottomh   float64
 	Extra     map[string]interface{}
-	Plate     *LHPlate `gotopb:"-" json:"-"`
+	Plate     LHObject `gotopb:"-" json:"-"`
 }
 
 //@implement Named
 func (self *LHWell) GetName() string {
-	return fmt.Sprintf("%s@%s", self.Crds.FormatA1(), self.Plate.GetName())
+	return fmt.Sprintf("%s@%s", self.Crds.FormatA1(), NameOf(self.Plate))
 }
 
 //@implement Typed
 func (self *LHWell) GetType() string {
-	return fmt.Sprintf("well_in_%s", self.Plate.GetType())
+	return fmt.Sprintf("well_in_%s", TypeOf(self.Plate))
 }
 
 //@implement Classy
@@ -117,6 +117,10 @@ func (self *LHWell) SetParent(p LHObject) error {
 		self.Plate = plate
 		return nil
 	}
+	if tb, ok := p.(*LHTipwaste); ok {
+		self.Plate = tb
+		return nil
+	}
 	return fmt.Errorf("Cannot set well parent to %s \"%s\", only plates allowed", ClassOf(p), NameOf(p))
 }
 
@@ -126,6 +130,7 @@ func (self *LHWell) GetParent() LHObject {
 }
 
 func (w LHWell) String() string {
+	plate := w.Plate.(*LHPlate)
 	return fmt.Sprintf(
 		`LHWELL{
 ID        : %s,
@@ -146,9 +151,9 @@ Plate     : %v,
 }`,
 		w.ID,
 		w.Inst,
-		w.Plate.Inst,
-		w.Plate.ID,
-		w.Plate.GetType(),
+		plate.Inst,
+		plate.ID,
+		plate.GetType(),
 		w.Crds.FormatA1(),
 		w.MaxVol,
 		w.WContents,
@@ -246,7 +251,11 @@ func (w *LHWell) Remove(v wunit.Volume) (*LHComponent, error) {
 	// if the volume is too high we complain
 
 	if v.GreaterThan(w.CurrentVolume()) {
-		logger.Debug("You ask too much: ", w.Crds.FormatA1(), " ", v.ToString(), " I only have: ", w.CurrentVolume().ToString(), " PLATEID: ", w.Plate.ID)
+		pid := "nil"
+		if p, ok := w.Plate.(*LHPlate); ok {
+			pid = p.ID
+		}
+		logger.Debug("You ask too much: ", w.Crds.FormatA1(), " ", v.ToString(), " I only have: ", w.CurrentVolume().ToString(), " PLATEID: ", pid)
 		//maybe we should instead return as much as we can and an error?
 		return nil, fmt.Errorf("Requested %s from well \"%s\" which only contains %s", v, w.GetName(), w.CurrentVolume())
 	}
@@ -281,7 +290,7 @@ func (lhw *LHWell) Location_ID() string {
 }
 
 func (lhw *LHWell) Location_Name() string {
-	return lhw.Plate.GetType()
+	return NameOf(lhw.Plate)
 }
 
 func (lhw *LHWell) Shape() *Shape {
@@ -296,7 +305,7 @@ func (lhw *LHWell) Shape() *Shape {
 // @deprecate Well
 
 func (w *LHWell) ContainerType() string {
-	return w.Plate.GetType()
+	return TypeOf(w.Plate)
 }
 
 func (w *LHWell) Clear() {
@@ -357,7 +366,7 @@ func (lhw *LHWell) CalculateMaxVolume() (vol wunit.Volume, err error) {
 }
 
 // make a new well structure
-func NewLHWell(plate *LHPlate, crds WellCoords, vunit string, vol, rvol float64, shape *Shape, bott WellBottomType, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
+func NewLHWell(plate LHObject, crds WellCoords, vunit string, vol, rvol float64, shape *Shape, bott WellBottomType, xdim, ydim, zdim, bottomh float64, dunit string) *LHWell {
 	var well LHWell
 
 	well.Plate = plate

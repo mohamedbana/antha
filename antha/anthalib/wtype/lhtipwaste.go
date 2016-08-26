@@ -94,6 +94,8 @@ func NewLHTipwaste(capacity int, typ, mfr string, size Coordinates, w *LHWell, w
 	lht.WellYStart = wellystart
 	lht.WellZStart = wellzstart
 
+	w.SetParent(&lht)
+
 	return &lht
 }
 
@@ -126,11 +128,13 @@ func (self *LHTipwaste) GetSize() Coordinates {
 }
 
 func (self *LHTipwaste) GetBoxIntersections(box BBox) []LHObject {
-	//relative box
-	box.SetPosition(box.GetPosition().Subtract(OriginOf(self)))
+	if r := self.AsWell.GetBoxIntersections(box); len(r) > 0 {
+		return r
+	}
 
 	ret := []LHObject{}
-	//todo, test well
+	//relative box
+	box.SetPosition(box.GetPosition().Subtract(OriginOf(self)))
 	if self.bounds.IntersectsBox(box) {
 		ret = append(ret, self)
 	}
@@ -138,6 +142,10 @@ func (self *LHTipwaste) GetBoxIntersections(box BBox) []LHObject {
 }
 
 func (self *LHTipwaste) GetPointIntersections(point Coordinates) []LHObject {
+	if r := self.AsWell.GetPointIntersections(point); len(r) > 0 {
+		return r
+	}
+
 	//relative point
 	point = point.Subtract(OriginOf(self))
 

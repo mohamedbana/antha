@@ -481,8 +481,8 @@ func default_lhtipwaste(name string) *wtype.LHTipwaste {
 			0.0,               // bottomh         float64
 			"mm",              // dunit           string
 		},
-		85.5, //wellxstart      float64
-		45.5, //wellystart      float64
+		49.5, //wellxstart      float64
+		31.5, //wellystart      float64
 		0.0,  //wellzstart      float64
 	}
 	return makeLHTipWaste(&params, name)
