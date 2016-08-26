@@ -12,22 +12,22 @@ import (
 
 // Converts execute instructions to their ast equivalents
 type resolver struct {
-	insts []target.Inst
-	nodes []ast.Node
-	comp  map[*wtype.LHComponent]*ast.UseComp
+	insts   []target.Inst
+	nodes   []ast.Node
+	useComp map[string]*ast.UseComp
 }
 
 func (a *resolver) makeComp(c *wtype.LHComponent) *ast.UseComp {
-	if a.comp == nil {
-		a.comp = make(map[*wtype.LHComponent]*ast.UseComp)
+	if a.useComp == nil {
+		a.useComp = make(map[string]*ast.UseComp)
 	}
 
-	n, ok := a.comp[c]
+	n, ok := a.useComp[c.ID]
 	if !ok {
 		n = &ast.UseComp{
 			Value: c,
 		}
-		a.comp[c] = n
+		a.useComp[c.ID] = n
 	}
 	return n
 }

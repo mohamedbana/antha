@@ -16,14 +16,14 @@ type commandInst struct {
 	Command *ast.Command
 }
 
-func Incubate(ctx context.Context, in *wtype.LHComponent, temp wunit.Temperature, time wunit.Time, shaking bool) *wtype.LHComponent {
+func incubate(ctx context.Context, in *wtype.LHComponent, temp wunit.Temperature, time wunit.Time, shaking bool) *commandInst {
 	st := sampletracker.GetSampleTracker()
 	comp := in.Dup()
 	comp.ID = wtype.GetUUID()
 	comp.BlockID = wtype.NewBlockID(getId(ctx))
 	st.UpdateIDOf(in.ID, comp.ID)
 
-	trace.Issue(ctx, &commandInst{
+	return &commandInst{
 		Args: []*wtype.LHComponent{in},
 		Comp: comp,
 		Command: &ast.Command{
@@ -38,18 +38,23 @@ func Incubate(ctx context.Context, in *wtype.LHComponent, temp wunit.Temperature
 				},
 			},
 		},
-	})
-	return comp
+	}
 }
 
-func Handle(ctx context.Context, by string, in *wtype.LHComponent) *wtype.LHComponent {
+func Incubate(ctx context.Context, in *wtype.LHComponent, temp wunit.Temperature, time wunit.Time, shaking bool) *wtype.LHComponent {
+	inst := incubate(ctx, in, temp, time, shaking)
+	trace.Issue(ctx, inst)
+	return inst.Comp
+}
+
+func handle(ctx context.Context, by string, in *wtype.LHComponent) *commandInst {
 	st := sampletracker.GetSampleTracker()
 	comp := in.Dup()
 	comp.ID = wtype.GetUUID()
 	comp.BlockID = wtype.NewBlockID(getId(ctx))
 	st.UpdateIDOf(in.ID, comp.ID)
 
-	trace.Issue(ctx, &commandInst{
+	return &commandInst{
 		Args: []*wtype.LHComponent{in},
 		Comp: comp,
 		Command: &ast.Command{
@@ -58,14 +63,19 @@ func Handle(ctx context.Context, by string, in *wtype.LHComponent) *wtype.LHComp
 			},
 			Requests: []ast.Request{ast.Request{Manual: true}},
 		},
-	})
-	return comp
+	}
+}
+
+func Handle(ctx context.Context, by string, in *wtype.LHComponent) *wtype.LHComponent {
+	inst := handle(ctx, by, in)
+	trace.Issue(ctx, inst)
+	return inst.Comp
 }
 
 // TODO -- LOC etc. will be passed through OK but what about
 //         the actual plate info?
 //        - two choices here: 1) we upgrade the sample tracker; 2) we pass the plate in somehow
-func mix(ctx context.Context, inst *wtype.LHInstruction) *wtype.LHComponent {
+func mix(ctx context.Context, inst *wtype.LHInstruction) *commandInst {
 	inst.BlockID = wtype.NewBlockID(getId(ctx))
 	inst.Result.BlockID = inst.BlockID
 
@@ -91,7 +101,7 @@ func mix(ctx context.Context, inst *wtype.LHInstruction) *wtype.LHComponent {
 
 	inst.ProductID = result.ID
 
-	i := &commandInst{
+	return &commandInst{
 		Args: inst.Components,
 		Command: &ast.Command{
 			Requests: reqs,
@@ -99,19 +109,22 @@ func mix(ctx context.Context, inst *wtype.LHInstruction) *wtype.LHComponent {
 		},
 		Comp: result,
 	}
-	trace.Issue(ctx, i)
+}
 
-	return result
+func genericMix(ctx context.Context, generic *wtype.LHInstruction) *wtype.LHComponent {
+	inst := mix(ctx, generic)
+	trace.Issue(ctx, inst)
+	return inst.Comp
 }
 
 func Mix(ctx context.Context, components ...*wtype.LHComponent) *wtype.LHComponent {
-	return mix(ctx, mixer.GenericMix(mixer.MixOptions{
+	return genericMix(ctx, mixer.GenericMix(mixer.MixOptions{
 		Components: components,
 	}))
 }
 
 func MixInto(ctx context.Context, outplate *wtype.LHPlate, address string, components ...*wtype.LHComponent) *wtype.LHComponent {
-	return mix(ctx, mixer.GenericMix(mixer.MixOptions{
+	return genericMix(ctx, mixer.GenericMix(mixer.MixOptions{
 		Components:  components,
 		Destination: outplate,
 		Address:     address,
@@ -119,15 +132,16 @@ func MixInto(ctx context.Context, outplate *wtype.LHPlate, address string, compo
 }
 
 func MixNamed(ctx context.Context, outplatetype, address string, platename string, components ...*wtype.LHComponent) *wtype.LHComponent {
-	return mix(ctx, mixer.GenericMix(mixer.MixOptions{
+	return genericMix(ctx, mixer.GenericMix(mixer.MixOptions{
 		Components: components,
 		PlateType:  outplatetype,
 		Address:    address,
 		PlateName:  platename,
 	}))
 }
+
 func MixTo(ctx context.Context, outplatetype, address string, platenum int, components ...*wtype.LHComponent) *wtype.LHComponent {
-	return mix(ctx, mixer.GenericMix(mixer.MixOptions{
+	return genericMix(ctx, mixer.GenericMix(mixer.MixOptions{
 		Components: components,
 		PlateType:  outplatetype,
 		Address:    address,
