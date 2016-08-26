@@ -49,6 +49,21 @@ func (a *Human) String() string {
 	return "Human"
 }
 
+// Return key for node for grouping
+func getKey(n ast.Node) (r interface{}) {
+	// Group by value for HandleInst and Incubate and type otherwise
+	if c, ok := n.(*ast.Command); !ok {
+		r = reflect.TypeOf(n)
+	} else if h, ok := c.Inst.(*ast.HandleInst); ok {
+		r = h.Group
+	} else if i, ok := c.Inst.(*ast.IncubateInst); ok {
+		r = *i
+	} else {
+		r = reflect.TypeOf(c.Inst)
+	}
+	return
+}
+
 func (a *Human) Compile(nodes []ast.Node) ([]target.Inst, error) {
 	addDep := func(in, dep target.Inst) {
 		in.SetDependsOn(append(in.DependsOn(), dep))
@@ -68,12 +83,11 @@ func (a *Human) Compile(nodes []ast.Node) ([]target.Inst, error) {
 	for len(dag.Roots) > 0 {
 		var next []graph.Node
 		// Gather
-		same := make(map[reflect.Type][]graph.Node)
+		same := make(map[interface{}][]graph.Node)
 		for _, r := range dag.Roots {
-			// XXX: not from type
 			n := r.(ast.Node)
-			tn := reflect.TypeOf(n)
-			same[tn] = append(same[tn], n)
+			key := getKey(n)
+			same[key] = append(same[key], n)
 			next = append(next, dag.Visit(r)...)
 		}
 		// Apply
@@ -86,11 +100,11 @@ func (a *Human) Compile(nodes []ast.Node) ([]target.Inst, error) {
 				}
 				ins = append(ins, in)
 			}
-			min := a.makeFromManual(ins)
-			insts = append(insts, min)
+			in := a.coalesce(ins)
+			insts = append(insts, in)
 
 			for _, n := range nodes {
-				inst[n.(ast.Node)] = min
+				inst[n.(ast.Node)] = in
 			}
 		}
 

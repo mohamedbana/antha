@@ -2,6 +2,7 @@ package human
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
@@ -45,6 +46,13 @@ func (a *Human) makeFromMove(c *ast.Move) (*target.Manual, error) {
 	}, nil
 }
 
+func prettyMixDetails(from string, inst *wtype.LHInstruction) string {
+	if len(inst.PlateName) != 0 || len(inst.Welladdress) != 0 {
+		return fmt.Sprintf("Mix %q on %q[%q]", from, inst.PlateName, inst.Welladdress)
+	}
+	return fmt.Sprintf("Mix %q", from)
+}
+
 func (a *Human) makeFromCommand(c *ast.Command) (*target.Manual, error) {
 	from := extractFromNodes(c.From...)
 	switch inst := c.Inst.(type) {
@@ -52,7 +60,7 @@ func (a *Human) makeFromCommand(c *ast.Command) (*target.Manual, error) {
 		return &target.Manual{
 			Dev:     a,
 			Label:   "Mix",
-			Details: fmt.Sprintf("Mix %q", from),
+			Details: prettyMixDetails(from, inst),
 		}, nil
 	case *ast.IncubateInst:
 		return &target.Manual{
@@ -72,25 +80,35 @@ func (a *Human) makeFromCommand(c *ast.Command) (*target.Manual, error) {
 	}
 }
 
-func (a *Human) makeFromManual(ms []*target.Manual) target.Inst {
-	m := ms[0]
-	if len(ms) == 1 {
-		return m
+func sortAndJoin(xs map[string]bool, sep string) string {
+	var rs []string
+	for x := range xs {
+		rs = append(rs, x)
 	}
-	var details []string
-	var maxSec float64
+	sort.Strings(rs)
+	return strings.Join(rs, sep)
+}
 
+func (a *Human) coalesce(ms []*target.Manual) target.Inst {
+	if len(ms) == 1 {
+		return ms[0]
+	}
+
+	var maxSec float64
+	labels := make(map[string]bool)
+	details := make(map[string]bool)
 	for _, m := range ms {
 		if t := m.GetTimeEstimate(); maxSec < t {
 			maxSec = t
 		}
-		details = append(details, m.Details)
+		labels[m.Label] = true
+		details[m.Details] = true
 	}
 
 	return &target.Manual{
-		Dev:     m.Dev,
-		Label:   m.Label,
-		Details: strings.Join(details, "\n"),
+		Dev:     ms[0].Dev,
+		Label:   sortAndJoin(labels, ";"),
+		Details: sortAndJoin(details, "\n"),
 		Time:    maxSec,
 	}
 }

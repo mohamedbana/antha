@@ -39,10 +39,10 @@ type Command struct {
 func (a *Command) NodeString() string {
 	return fmt.Sprintf("%+v", struct {
 		Requests interface{}
-		Inst     interface{}
+		Inst     string
 	}{
 		Requests: a.Requests,
-		Inst:     a.Inst,
+		Inst:     fmt.Sprintf("%T", a.Inst),
 	})
 }
 
