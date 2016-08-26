@@ -78,8 +78,8 @@ func build(root ast.Node) (*ir, error) {
 	ct := graph.Eliminate(graph.EliminateOpt{
 		Graph: g,
 		In: func(n graph.Node) bool {
-			c, ok := n.(ast.Command)
-			return (ok && c.Output() == nil) || n == root
+			c, ok := n.(*ast.Command)
+			return (ok && c.Output == nil) || n == root
 		},
 	})
 	if err := graph.IsTree(ct, root); err != nil {

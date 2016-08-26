@@ -55,8 +55,8 @@ func (a *ir) assignDevices(t *target.Target) error {
 	bundleReqs := func(n *ast.Bundle) (reqs []ast.Request) {
 		for i, inum := 0, a.CommandTree.NumOuts(n); i < inum; i += 1 {
 			kid := a.CommandTree.Out(n, i)
-			if c, ok := kid.(ast.Command); ok {
-				reqs = append(reqs, c.Requests()...)
+			if c, ok := kid.(*ast.Command); ok {
+				reqs = append(reqs, c.Requests...)
 			}
 		}
 		return
@@ -67,8 +67,8 @@ func (a *ir) assignDevices(t *target.Target) error {
 		n := a.CommandTree.Node(i).(ast.Node)
 		var reqs []ast.Request
 		isBundle := false
-		if c, ok := n.(ast.Command); ok {
-			reqs = c.Requests()
+		if c, ok := n.(*ast.Command); ok {
+			reqs = c.Requests
 		} else if b, ok := n.(*ast.Bundle); ok {
 			// Try to find device that can do everything
 			reqs = bundleReqs(b)
@@ -196,9 +196,9 @@ func (a *ir) tryPlan() error {
 	// TODO: When splitting a mix sequence, adjust LHInstructions to place
 	// output samples on the same plate
 
-	cmds := make(map[*drun][]ast.Command)
+	cmds := make(map[*drun][]ast.Node)
 	for n, d := range a.assignment {
-		if c, ok := n.(ast.Command); !ok {
+		if c, ok := n.(*ast.Command); !ok {
 			continue
 		} else {
 			cmds[d] = append(cmds[d], c)
@@ -313,7 +313,7 @@ func (a *ir) addMove(t *target.Target, dnode graph.Node, run *drun) error {
 		return r
 	}
 
-	moves := make(map[target.Device][]ast.Command)
+	moves := make(map[target.Device][]ast.Node)
 	for i, inum := 0, a.DeviceDeps.NumOrigs(dnode); i < inum; i += 1 {
 		n := a.DeviceDeps.Orig(dnode, i).(ast.Node)
 		for j, jnum := 0, a.CommandTree.NumOuts(n); j < jnum; j += 1 {
@@ -460,12 +460,12 @@ func (a *ir) genInsts() ([]target.Inst, error) {
 // Mark nodes as compiled
 func (a *ir) setOutputs() error {
 	for _, n := range a.Graph.Nodes {
-		if c, ok := n.(ast.Command); !ok {
+		if c, ok := n.(*ast.Command); !ok {
 			continue
-		} else if c.Output() != nil {
+		} else if c.Output != nil {
 			continue
 		} else if run := a.assignment[c]; run != nil {
-			c.SetOutput(run)
+			c.Output = run
 		}
 	}
 	return nil

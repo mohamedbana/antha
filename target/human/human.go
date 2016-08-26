@@ -49,15 +49,11 @@ func (a *Human) String() string {
 	return "Human"
 }
 
-func (a *Human) Compile(cmds []ast.Command) ([]target.Inst, error) {
+func (a *Human) Compile(nodes []ast.Node) ([]target.Inst, error) {
 	addDep := func(in, dep target.Inst) {
 		in.SetDependsOn(append(in.DependsOn(), dep))
 	}
 
-	var nodes []ast.Node
-	for _, c := range cmds {
-		nodes = append(nodes, c)
-	}
 	g := ast.Deps(nodes)
 
 	entry := &target.Wait{}
@@ -74,6 +70,7 @@ func (a *Human) Compile(cmds []ast.Command) ([]target.Inst, error) {
 		// Gather
 		same := make(map[reflect.Type][]graph.Node)
 		for _, r := range dag.Roots {
+			// XXX: not from type
 			n := r.(ast.Node)
 			tn := reflect.TypeOf(n)
 			same[tn] = append(same[tn], n)
@@ -83,7 +80,7 @@ func (a *Human) Compile(cmds []ast.Command) ([]target.Inst, error) {
 		for _, nodes := range same {
 			var ins []*target.Manual
 			for _, n := range nodes {
-				in, err := a.makeInst(n.(ast.Command))
+				in, err := a.makeInst(n.(ast.Node))
 				if err != nil {
 					return nil, err
 				}

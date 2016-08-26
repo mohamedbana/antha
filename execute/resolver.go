@@ -32,22 +32,13 @@ func (a *resolver) makeComp(c *wtype.LHComponent) *ast.UseComp {
 	return n
 }
 
-func (a *resolver) addIncubate(in *incubateInst) {
-	in.Node.From = append(in.Node.From, a.makeComp(in.Arg))
-
-	out := a.makeComp(in.Comp)
-	out.From = append(out.From, in.Node)
-
-	a.nodes = append(a.nodes, out)
-}
-
-func (a *resolver) addMix(in *mixInst) {
+func (a *resolver) addCommand(in *commandInst) {
 	for _, arg := range in.Args {
-		in.Node.From = append(in.Node.From, a.makeComp(arg))
+		in.Command.From = append(in.Command.From, a.makeComp(arg))
 	}
 
 	out := a.makeComp(in.Comp)
-	out.From = append(out.From, in.Node)
+	out.From = append(out.From, in.Command)
 
 	a.nodes = append(a.nodes, out)
 }
@@ -58,10 +49,8 @@ func (a *resolver) resolve(ctx context.Context, insts []interface{}) (map[int]in
 	for idx, in := range insts {
 		switch inst := in.(type) {
 		case nil:
-		case *incubateInst:
-			a.addIncubate(inst)
-		case *mixInst:
-			a.addMix(inst)
+		case *commandInst:
+			a.addCommand(inst)
 		default:
 			return nil, fmt.Errorf("invalid instruction: %T", inst)
 		}

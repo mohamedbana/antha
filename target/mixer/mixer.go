@@ -151,13 +151,15 @@ func (a *Mixer) makeLhreq() (*lhreq, error) {
 	}, nil
 }
 
-func (a *Mixer) Compile(cmds []ast.Command) ([]target.Inst, error) {
+func (a *Mixer) Compile(nodes []ast.Node) ([]target.Inst, error) {
 	var mixes []*wtype.LHInstruction
-	for _, c := range cmds {
-		if m, ok := c.(*ast.Mix); !ok {
-			return nil, fmt.Errorf("cannot compile %T", c)
+	for _, node := range nodes {
+		if c, ok := node.(*ast.Command); !ok {
+			return nil, fmt.Errorf("cannot compile %T", node)
+		} else if m, ok := c.Inst.(*wtype.LHInstruction); !ok {
+			return nil, fmt.Errorf("cannot compile %T", c.Inst)
 		} else {
-			mixes = append(mixes, m.Inst)
+			mixes = append(mixes, m)
 		}
 	}
 	if inst, err := a.makeMix(mixes); err != nil {

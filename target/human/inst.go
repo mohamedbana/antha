@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/ast"
 	"github.com/antha-lang/antha/target"
 )
@@ -35,31 +36,39 @@ func extractFromNodes(nodes ...ast.Node) string {
 	return strings.Join(vs, ",")
 }
 
-func (a *Human) makeFromMove(c *ast.Move) *target.Manual {
+func (a *Human) makeFromMove(c *ast.Move) (*target.Manual, error) {
 	from := extractFromUseNodes(c.From...)
 	return &target.Manual{
 		Dev:     a,
 		Label:   "Move",
 		Details: fmt.Sprintf("Move %q to %s", from, c.ToLoc),
-	}
+	}, nil
 }
 
-func (a *Human) makeFromMix(c *ast.Mix) *target.Manual {
+func (a *Human) makeFromCommand(c *ast.Command) (*target.Manual, error) {
 	from := extractFromNodes(c.From...)
-	return &target.Manual{
-		Dev:     a,
-		Label:   "Mix",
-		Details: fmt.Sprintf("Mix %q", from),
-	}
-}
-
-func (a *Human) makeFromIncubate(c *ast.Incubate) *target.Manual {
-	from := extractFromNodes(c.From...)
-	return &target.Manual{
-		Dev:     a,
-		Label:   "Incubate",
-		Details: fmt.Sprintf("Incubate %q at %s for %s", from, c.Temp.ToString(), c.Time.ToString()),
-		Time:    c.Time.Seconds(),
+	switch inst := c.Inst.(type) {
+	case *wtype.LHInstruction:
+		return &target.Manual{
+			Dev:     a,
+			Label:   "Mix",
+			Details: fmt.Sprintf("Mix %q", from),
+		}, nil
+	case *ast.IncubateInst:
+		return &target.Manual{
+			Dev:     a,
+			Label:   "Incubate",
+			Details: fmt.Sprintf("Incubate %q at %s for %s", from, inst.Temp.ToString(), inst.Time.ToString()),
+			Time:    inst.Time.Seconds(),
+		}, nil
+	case *ast.GroupInst:
+		return &target.Manual{
+			Dev:     a,
+			Label:   "Do",
+			Details: inst.GroupBy,
+		}, nil
+	default:
+		return nil, fmt.Errorf("unknown inst %T", inst)
 	}
 }
 
@@ -86,15 +95,13 @@ func (a *Human) makeFromManual(ms []*target.Manual) target.Inst {
 	}
 }
 
-func (a *Human) makeInst(cmd ast.Command) (*target.Manual, error) {
-	switch cmd := cmd.(type) {
+func (a *Human) makeInst(n ast.Node) (*target.Manual, error) {
+	switch n := n.(type) {
 	case *ast.Move:
-		return a.makeFromMove(cmd), nil
-	case *ast.Mix:
-		return a.makeFromMix(cmd), nil
-	case *ast.Incubate:
-		return a.makeFromIncubate(cmd), nil
+		return a.makeFromMove(n)
+	case *ast.Command:
+		return a.makeFromCommand(n)
 	default:
-		return nil, fmt.Errorf("unknown command %T", cmd)
+		return nil, fmt.Errorf("unknown node %T", n)
 	}
 }
