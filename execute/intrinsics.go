@@ -42,6 +42,24 @@ func Incubate(ctx context.Context, in *wtype.LHComponent, temp wunit.Temperature
 	return comp
 }
 
+func Handle(ctx context.Context, by string, in *wtype.LHComponent) *wtype.LHComponent {
+	st := sampletracker.GetSampleTracker()
+	comp := in.Dup()
+	comp.ID = wtype.GetUUID()
+	comp.BlockID = wtype.NewBlockID(getId(ctx))
+	st.UpdateIDOf(in.ID, comp.ID)
+
+	trace.Issue(ctx, &commandInst{
+		Args: []*wtype.LHComponent{in},
+		Comp: comp,
+		Command: &ast.Command{
+			Inst: &ast.HandleInst{
+				Group: by,
+			},
+			Requests: []ast.Request{ast.Request{Manual: true}},
+		},
+	})
+	return comp
 }
 
 // TODO -- LOC etc. will be passed through OK but what about

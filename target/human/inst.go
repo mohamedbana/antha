@@ -61,11 +61,11 @@ func (a *Human) makeFromCommand(c *ast.Command) (*target.Manual, error) {
 			Details: fmt.Sprintf("Incubate %q at %s for %s", from, inst.Temp.ToString(), inst.Time.ToString()),
 			Time:    inst.Time.Seconds(),
 		}, nil
-	case *ast.GroupInst:
+	case *ast.HandleInst:
 		return &target.Manual{
 			Dev:     a,
-			Label:   "Do",
-			Details: inst.GroupBy,
+			Label:   "Handle",
+			Details: inst.Group,
 		}, nil
 	default:
 		return nil, fmt.Errorf("unknown inst %T", inst)
