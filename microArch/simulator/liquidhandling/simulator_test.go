@@ -971,7 +971,7 @@ func TestLoadTips(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) LoadTips: Slices platetype,position,well are not of expected length 8",
+				"(err) LoadTips: Slices platetype(1), position(1), well(1) are not of expected length 8",
 			},
 			nil, //assertions
 		},

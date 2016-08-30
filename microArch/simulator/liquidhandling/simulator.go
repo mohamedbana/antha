@@ -241,25 +241,23 @@ func elements_equal(slice []string) bool {
 }
 
 //testSliceLength test that a bunch of slices are the correct length
-func (self *VirtualLiquidHandler) testSliceLength(f_name string, slice_lengths map[string]int, exp_length int) bool {
+func (self *VirtualLiquidHandler) testSliceLength(slice_lengths map[string]int, exp_length int) error {
 
 	wrong := []string{}
 	for name, actual_length := range slice_lengths {
 		if actual_length != exp_length {
-			wrong = append(wrong, name)
+			wrong = append(wrong, fmt.Sprintf("%s(%d)", name, actual_length))
 		}
 	}
 
 	if len(wrong) == 1 {
-		self.AddErrorf(f_name, "Slice %s is not of expected length %v", wrong[0], exp_length)
-		return false
+		return fmt.Errorf("Slice %s is not of expected length %v", wrong[0], exp_length)
 	} else if len(wrong) > 1 {
 		//for unit testing, names need to always be in the same order
 		sort.Strings(wrong)
-		self.AddErrorf(f_name, "Slices %s are not of expected length %v", strings.Join(wrong, ","), exp_length)
-		return false
+		return fmt.Errorf("Slices %s are not of expected length %v", strings.Join(wrong, ", "), exp_length)
 	}
-	return true
+	return nil
 }
 
 func contains(v int, s []int) bool {
@@ -335,11 +333,15 @@ func (self *VirtualLiquidHandler) testTipArgs(f_name string, channels []int, hea
 		ret = false
 	}
 
-	ret = ret && self.testSliceLength(f_name, map[string]int{
+	if err := self.testSliceLength(map[string]int{
 		"platetype": len(platetype),
 		"position":  len(position),
 		"well":      len(well)},
-		n_channels)
+		multi); err != nil {
+
+		self.AddError(f_name, err.Error())
+		ret = false
+	}
 
 	if ret {
 		for i := range platetype {
@@ -356,6 +358,69 @@ func (self *VirtualLiquidHandler) testTipArgs(f_name string, channels []int, hea
 		}
 	}
 	return ret
+}
+
+type lhRet struct {
+	channels    []int
+	volumes     []float64
+	is_explicit []bool
+	adaptor     *AdaptorState
+}
+
+//Validate args to LH commands - aspirate, dispense, mix
+func (self *VirtualLiquidHandler) validateLHArgs(head, multi int, platetype, what []string, volume []float64,
+	flags map[string][]bool, cycles []int) (*lhRet, error) {
+
+	if err := self.testSliceLength(map[string]int{
+		"volume":    len(volume),
+		"platetype": len(platetype),
+		"what":      len(what),
+	}, multi); err != nil {
+		return nil, err
+	}
+
+	sla := map[string]int{}
+	for k, v := range flags {
+		sla[k] = len(v)
+	}
+	if cycles != nil {
+		sla["cycles"] = len(cycles)
+	}
+	if err := self.testSliceLength(sla, multi); err != nil {
+		return nil, err
+	}
+
+	ret := lhRet{
+		make([]int, 0),
+		make([]float64, 0),
+		make([]bool, multi),
+		nil,
+	}
+	negative := false
+	for i := range ret.is_explicit {
+		ret.is_explicit[i] = !(platetype[i] == "" && what[i] == "")
+		if ret.is_explicit[i] {
+			ret.channels = append(ret.channels, i)
+			ret.volumes = append(ret.volumes, volume[i])
+			negative = negative || volume[i] < 0.
+		}
+	}
+
+	if negative {
+		return &ret, fmt.Errorf("Cannot aspirate negative volume")
+	}
+
+	//Verify arguments
+	if head < 0 || head >= self.state.GetNumberOfAdaptors() {
+		return &ret, fmt.Errorf("unknown head %d", head)
+	}
+	ret.adaptor = self.state.GetAdaptor(head)
+
+	if multi != ret.adaptor.GetChannelCount() {
+		return &ret, fmt.Errorf("multi[=%d] must equal number of channels on head %d [=%d]", multi, head, ret.adaptor.GetChannelCount())
+	}
+
+	return &ret, nil
 }
 
 //getAbsolutePosition get a position within the liquidhandler, adding any errors as neccessary
@@ -464,7 +529,7 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
 	}
 
 	//check slice length
-	ok := self.testSliceLength("Move", map[string]int{
+	if err := self.testSliceLength(map[string]int{
 		"deckposition": len(deckposition),
 		"wellcoords":   len(wellcoords),
 		"reference":    len(reference),
@@ -472,8 +537,9 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
 		"offsetY":      len(offsetY),
 		"offsetZ":      len(offsetZ),
 		"plate_type":   len(platetype)},
-		adaptor.GetChannelCount())
-	if !ok {
+		adaptor.GetChannelCount()); err != nil {
+
+		self.AddError("Move", err.Error())
 		return ret
 	}
 
@@ -492,10 +558,11 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
 			}
 			explicit[i] = false
 		} else {
-			coords[i], ok = self.getAbsolutePosition("Move", deckposition[i], wellcoords[i], reference[i], platetype[i])
+			c, ok := self.getAbsolutePosition("Move", deckposition[i], wellcoords[i], reference[i], platetype[i])
 			if !ok {
 				return ret
 			}
+			coords[i] = c
 			coords[i] = coords[i].Add(offsets[i])
 			//if there's a tip, take account of it
 			if tip := adaptor.GetChannel(i).GetTip(); tip != nil {
@@ -577,49 +644,19 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 
 	ret := driver.CommandStatus{true, driver.OK, "ASPIRATE ACK"}
 
-	if !self.testSliceLength("Aspirate", map[string]int{
-		"volume":     len(volume),
-		"overstroke": len(overstroke),
-		"platetype":  len(platetype),
-		"what":       len(what),
-		"llf":        len(llf),
-	}, multi) {
+	arg, err := self.validateLHArgs(head, multi, platetype, what, volume,
+		map[string][]bool{
+			"overstroke": overstroke,
+			"llf":        llf,
+		}, nil)
+	if err != nil {
+		self.AddErrorf("Aspirate", "Invalid Arguments - %s", err.Error())
 		return ret
-	}
-
-	//which channels are specified
-	channels := make([]bool, multi)
-	s_chan := make([]int, 0)
-	s_vols := make([]float64, 0)
-	negative := false
-	for i := range channels {
-		channels[i] = !(platetype[i] == "" && what[i] == "")
-		if channels[i] {
-			s_chan = append(s_chan, i)
-			s_vols = append(s_vols, volume[i])
-			negative = negative || volume[i] < 0.
-		}
 	}
 
 	describe := func() string {
 		return fmt.Sprintf("aspirating %s of %s to head %d %s",
-			summariseVolumes(s_vols), summariseStrings(what), head, summariseChannels(s_chan))
-	}
-
-	if negative {
-		self.AddErrorf("Aspirate", "Error %s - cannot aspirate negative volume")
-		return ret
-	}
-
-	//Verify arguments
-	if head < 0 || head >= self.state.GetNumberOfAdaptors() {
-		self.AddErrorf("Aspirate", "While %s - unknown head %d", describe(), head)
-		return ret
-	}
-	adaptor := self.state.GetAdaptor(head)
-	if multi != adaptor.GetChannelCount() {
-		self.AddErrorf("Aspirate", "Invalid arguments - multi[=%d] must equal number of channels on head %d [=%d]", multi, head, adaptor.GetChannelCount())
-		return ret
+			summariseVolumes(arg.volumes), summariseStrings(what), head, summariseChannels(arg.channels))
 	}
 
 	deck := self.state.GetDeck()
@@ -628,8 +665,8 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 	tip_pos := make([]wtype.Coordinates, multi)
 	wells := make([]*wtype.LHWell, multi)
 	tip_missing := []int{}
-	for i, explicit := range channels {
-		ch := adaptor.GetChannel(i)
+	for i, explicit := range arg.is_explicit {
+		ch := arg.adaptor.GetChannel(i)
 		if ch.HasTip() {
 			tip_pos[i] = ch.GetAbsolutePosition().Subtract(wtype.Coordinates{0., 0., ch.GetTip().GetSize().Z})
 
@@ -649,10 +686,10 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 	}
 
 	//independence constraints
-	if !adaptor.IsIndependent() {
+	if !arg.adaptor.IsIndependent() {
 		different := false
 		v := -1.
-		for ch, b := range channels {
+		for ch, b := range arg.is_explicit {
 			if b {
 				if v >= 0 {
 					different = different || v != volume[ch]
@@ -675,8 +712,8 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 	}
 
 	//check liquid type
-	for i := range channels {
-		if !channels[i] || wells[i] == nil {
+	for i := range arg.channels {
+		if wells[i] == nil { //we'll catch this later
 			continue
 		}
 		if wells[i].Contents().GetType() != what[i] {
@@ -687,12 +724,9 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 
 	//move liquid
 	no_well := []int{}
-	for i := range channels {
-		if !channels[i] {
-			continue
-		}
+	for _, i := range arg.channels {
 		v := wunit.NewVolume(volume[i], "ul")
-		tip := adaptor.GetChannel(i).GetTip()
+		tip := arg.adaptor.GetChannel(i).GetTip()
 		fv := tip.CurrentVolume()
 		fv.Add(v)
 
@@ -729,52 +763,27 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 
 	ret := driver.CommandStatus{true, driver.OK, "DISPENSE ACK"}
 
-	//check that arguments are valid
-	if head < 0 || head >= self.state.GetNumberOfAdaptors() {
-		self.AddErrorf("Dispense", "Cannot dispense from unknown head %d", head)
-		return ret
-	}
-	adaptor := self.state.GetAdaptor(head)
 	deck := self.state.GetDeck()
 
-	if multi != adaptor.GetChannelCount() {
-		self.AddErrorf("Dispense", "Multi[=%d] doesn't match number of channels on head %d[=%d]",
-			multi, head, adaptor.GetChannelCount())
+	arg, err := self.validateLHArgs(head, multi, platetype, what, volume, map[string][]bool{
+		"blowout": blowout,
+		"llf":     llf,
+	}, nil)
+	if err != nil {
+		self.AddErrorf("Dispense", "Invalid arguments - %s", err.Error())
 		return ret
-	}
-
-	if !self.testSliceLength("Dispense", map[string]int{
-		"volume":    len(volume),
-		"blowout":   len(blowout),
-		"platetype": len(platetype),
-		"what":      len(what),
-		"llf":       len(llf),
-	}, multi) {
-		return ret
-	}
-
-	//find which channels are explicitly commanded
-	channels := make([]bool, multi)
-	s_chan := make([]int, 0, len(channels))
-	s_vols := make([]float64, 0, len(channels))
-	for i := range channels {
-		channels[i] = !(platetype[i] == "" && what[i] == "")
-		if channels[i] {
-			s_chan = append(s_chan, i)
-			s_vols = append(s_vols, volume[i])
-		}
 	}
 
 	describe := func() string {
-		return fmt.Sprintf("dispensing %s from head %d %s", summariseVolumes(s_vols), head, summariseChannels(s_chan))
+		return fmt.Sprintf("dispensing %s from head %d %s", summariseVolumes(arg.volumes), head, summariseChannels(arg.channels))
 	}
 
 	//find the position of each tip
 	tip_pos := make([]wtype.Coordinates, multi)
 	wells := make([]*wtype.LHWell, multi)
 	size := wtype.Coordinates{0, 0, self.max_dispense_height}
-	for i := range channels {
-		if ch := adaptor.GetChannel(i); ch.HasTip() {
+	for i := 0; i < multi; i++ {
+		if ch := arg.adaptor.GetChannel(i); ch.HasTip() {
 			tip_pos[i] = ch.GetAbsolutePosition().Subtract(wtype.Coordinates{0., 0., ch.GetTip().GetSize().Z})
 
 			for _, o := range deck.GetBoxIntersections(*wtype.NewBBox(tip_pos[i].Subtract(size), size)) {
@@ -787,11 +796,11 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 	}
 
 	//independence contraints
-	if !adaptor.IsIndependent() {
+	if !arg.adaptor.IsIndependent() {
 		extra := []int{}
 		different := false
 		v := -1.
-		for ch, b := range channels {
+		for ch, b := range arg.is_explicit {
 			if b {
 				if v >= 0 {
 					different = different || v != volume[ch]
@@ -800,7 +809,7 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 				}
 			} else if wells[ch] != nil {
 				//a non-explicitly requested tip is in a well. If the well has stuff in it, it'll get aspirated
-				if c := adaptor.GetChannel(ch).GetTip().Contents(); !c.IsZero() {
+				if c := arg.adaptor.GetChannel(ch).GetTip().Contents(); !c.IsZero() {
 					extra = append(extra, ch)
 				}
 			}
@@ -811,7 +820,7 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 		} else if len(extra) > 0 {
 			self.AddErrorf("Dispense",
 				"While %s - must also dispense %s from %s as head is not independent",
-				describe(), summariseVolumes(s_vols), summariseChannels(extra))
+				describe(), summariseVolumes(arg.volumes), summariseChannels(extra))
 			return ret
 		}
 	}
@@ -819,9 +828,9 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 	//dispense
 	no_well := []int{}
 	no_tip := []int{}
-	for _, i := range s_chan {
+	for _, i := range arg.channels {
 		v := wunit.NewVolume(volume[i], "ul")
-		tip := adaptor.GetChannel(i).GetTip()
+		tip := arg.adaptor.GetChannel(i).GetTip()
 		fv := wunit.NewVolume(volume[i], "ul")
 
 		if wells[i] != nil {
