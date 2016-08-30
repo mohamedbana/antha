@@ -98,12 +98,8 @@ func TestLHWellSerialize(t *testing.T) {
 	lhwell := LHWell{
 		"15cf94b7-ae06-443d-bc9a-9aadc30790fd",
 		"",
-		"",
-		"",
-		"Gilson20Tipbox",
-		"A1",
+		MakeWellCoords("A1"),
 		20,
-		"ul",
 		NewLHComponent(),
 		1.0,
 		&Shape{
@@ -113,12 +109,9 @@ func TestLHWellSerialize(t *testing.T) {
 			7.3,
 			51.2,
 		},
-		0,
-		7.3,
-		7.3,
+		FlatWellBottom,
+		BBox{Coordinates{}, Coordinates{7.3, 7.3, 51.2}},
 		46,
-		0,
-		"mm",
 		wellExtra,
 		nil,
 	}
@@ -143,8 +136,8 @@ func TestLHWellSerialize(t *testing.T) {
 func TestSerializeLHPlate_1(t *testing.T) {
 	//from make_plate_library
 	swshp := NewShape("box", "mm", 8.2, 8.2, 41.3)
-	welltype := NewLHWell("DSW96", "", "", "ul", 2000, 25, swshp, 3, 8.2, 8.2, 41.3, 4.7, "mm")
-	plate := NewLHPlate("DSW96", "Unknown", 8, 12, 44.1, "mm", welltype, 9, 9, 0.0, 0.0, 0.0)
+	welltype := NewLHWell(nil, ZeroWellCoords(), "ul", 2000, 25, swshp, VWellBottom, 8.2, 8.2, 41.3, 4.7, "mm")
+	plate := NewLHPlate("DSW96", "Unknown", 8, 12, Coordinates{127.76, 85.48, 44.1}, welltype, 9, 9, 0.0, 0.0, 0.0)
 
 	enc, err := json.Marshal(plate)
 	if err != nil {

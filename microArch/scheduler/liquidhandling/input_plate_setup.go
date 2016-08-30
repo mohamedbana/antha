@@ -193,7 +193,7 @@ func input_plate_setup(request *LHRequest) (*LHRequest, error) {
 
 				// now put it there
 
-				location := curr_plate.ID + ":" + curr_well.Crds
+				location := curr_plate.ID + ":" + curr_well.Crds.FormatA1()
 				ass = append(ass, location)
 
 				newcomponent := component.Dup()

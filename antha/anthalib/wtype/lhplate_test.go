@@ -10,8 +10,8 @@ import (
 
 func makeplatefortest() *LHPlate {
 	swshp := NewShape("box", "mm", 8.2, 8.2, 41.3)
-	welltype := NewLHWell("DSW96", "", "", "ul", 1000, 100, swshp, LHWBV, 8.2, 8.2, 41.3, 4.7, "mm")
-	p := NewLHPlate("testplate", "none", 8, 12, 44.1, "mm", welltype, 0.5, 0.5, 0.5, 0.5, 0.5)
+	welltype := NewLHWell(nil, ZeroWellCoords(), "ul", 1000, 100, swshp, VWellBottom, 8.2, 8.2, 41.3, 4.7, "mm")
+	p := NewLHPlate("testplate", "none", 8, 12, Coordinates{127.76, 85.48, 43.1}, welltype, 0.5, 0.5, 0.5, 0.5, 0.5)
 	return p
 }
 
@@ -50,8 +50,8 @@ func validatePlate(t *testing.T, plate *LHPlate) {
 	for crds, w := range plate.Wellcoords {
 		ws2 = append(ws2, w)
 
-		if w.Crds != crds {
-			t.Fatal(fmt.Sprintf("ERROR: Well coords not consistent -- %s != %s", w.Crds, crds))
+		if w.Crds.FormatA1() != crds {
+			t.Fatal(fmt.Sprintf("ERROR: Well coords not consistent -- %s != %s", w.Crds.FormatA1(), crds))
 		}
 
 		if w.WContents.Loc == "" {
