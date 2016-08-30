@@ -2192,6 +2192,39 @@ func Test_Dispense(t *testing.T) {
 			},
 			nil, //assertions
 		},
+		SimulatorTest{
+			"Fail - independence, different volumes",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				preloadFilledTips(0, "tipbox_1", []int{0, 1, 2, 3, 4, 5, 6, 7}, "water", 100.),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "input_1", "input_1", "input_1", "input_1", "input_1", "input_1", "input_1"}, //deckposition
+					[]string{"A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"},                                         //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                                                                    //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                        //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                        //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},                                                        //offsetZ
+					[]string{"plate", "plate", "plate", "plate", "plate", "plate", "plate", "plate"},                 //plate_type
+					0, //head
+				},
+				&Dispense{
+					[]float64{50., 60., 50., 50., 50., 50., 50., 50.},              //volume    []float64
+					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
+					0, //head      int
+					8, //multi     int
+					[]string{"plate", "plate", "plate", "plate", "plate", "plate", "plate", "plate"}, //platetype []string
+					[]string{"water", "water", "water", "water", "water", "water", "water", "water"}, //what       []string
+					[]bool{false, false, false, false, false, false, false, false},                   //llf        []bool
+				},
+			},
+			[]string{ //errors
+				"(err) Dispense: While dispensing {50,60,50,50,50,50,50,50}ul from head 0 channels 0,1,2,3,4,5,6,7 - channels cannot dispense different volumes in non-independent head",
+			},
+			nil, //assertions
+		},
 	}
 
 	for _, test := range tests {
