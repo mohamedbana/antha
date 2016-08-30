@@ -41,6 +41,13 @@ func pTips(N int) string {
 	return "tips"
 }
 
+func pWells(N int) string {
+	if N == 1 {
+		return "well"
+	}
+	return "wells"
+}
+
 func summariseWell2Channel(well []string, channels []int) string {
 	ret := make([]string, 0, len(channels))
 	for ch := range channels {
@@ -100,6 +107,74 @@ func summariseStrings(s []string) string {
 		return s2[0]
 	}
 	return fmt.Sprintf("{%s}", strings.Join(s2, ","))
+}
+func summariseCycles(cycles []int, elems []int) string {
+	if iElemsEqual(cycles, elems) {
+		if cycles[0] == 1 {
+			return "once"
+		} else {
+			return fmt.Sprintf("%d times", cycles[0])
+		}
+	}
+	sc := make([]string, 0, len(elems))
+	for _, i := range elems {
+		sc = append(sc, fmt.Sprintf("%d", cycles[i]))
+	}
+	return fmt.Sprintf("{%s} times", strings.Join(sc, ","))
+}
+
+func summariseWells(wells []*wtype.LHWell, elems []int) string {
+	w := make([]string, 0, len(elems))
+	for _, i := range elems {
+		w = append(w, wells[i].Crds.FormatA1())
+	}
+	uw := getUnique(w)
+
+	if len(uw) == 1 {
+		return fmt.Sprintf("well %s", uw[0])
+	}
+	return fmt.Sprintf("wells %s", strings.Join(uw, ","))
+}
+
+func summarisePlates(wells []*wtype.LHWell, elems []int) string {
+	p := make([]string, 0, len(elems))
+	for _, i := range elems {
+		p = append(p, wtype.NameOf(wells[i].Plate))
+	}
+	up := getUnique(p)
+
+	if len(up) == 1 {
+		return fmt.Sprintf("plate \"%s\"", up[0])
+	}
+	return fmt.Sprintf("plates \"%s\"", strings.Join(up, "\",\""))
+
+}
+
+func sElemsEqual(sl []string, elems []int) bool {
+	for _, i := range elems {
+		if sl[i] != sl[elems[0]] {
+			return false
+		}
+	}
+	return true
+}
+
+func iElemsEqual(sl []int, elems []int) bool {
+	for _, i := range elems {
+		if sl[i] != sl[elems[0]] {
+			return false
+		}
+	}
+	return true
+}
+
+func fElemsEqual(sl []float64, elems []int) bool {
+	for _, i := range elems {
+		if sl[i] != sl[elems[0]] {
+			return false
+		}
+	}
+	return true
 }
 
 type adaptorCollision struct {
@@ -484,6 +559,27 @@ func (self *VirtualLiquidHandler) getAbsolutePosition(fname, deckposition, well 
 	return ret, true
 }
 
+func (self *VirtualLiquidHandler) getWellsBelow(height float64, adaptor *AdaptorState) []*wtype.LHWell {
+	tip_pos := make([]wtype.Coordinates, adaptor.GetChannelCount())
+	wells := make([]*wtype.LHWell, adaptor.GetChannelCount())
+	size := wtype.Coordinates{0, 0, height}
+	deck := self.state.GetDeck()
+	for i := 0; i < adaptor.GetChannelCount(); i++ {
+		if ch := adaptor.GetChannel(i); ch.HasTip() {
+			tip_pos[i] = ch.GetAbsolutePosition().Subtract(wtype.Coordinates{0., 0., ch.GetTip().GetSize().Z})
+
+			for _, o := range deck.GetBoxIntersections(*wtype.NewBBox(tip_pos[i].Subtract(size), size)) {
+				if w, ok := o.(*wtype.LHWell); ok {
+					wells[i] = w
+					break
+				}
+			}
+		}
+	}
+
+	return wells
+}
+
 func makeOffsets(Xs, Ys, Zs []float64) []wtype.Coordinates {
 	ret := make([]wtype.Coordinates, len(Xs))
 	for i := range Xs {
@@ -659,24 +755,13 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 			summariseVolumes(arg.volumes), summariseStrings(what), head, summariseChannels(arg.channels))
 	}
 
-	deck := self.state.GetDeck()
-
 	//get the position of tips
-	tip_pos := make([]wtype.Coordinates, multi)
-	wells := make([]*wtype.LHWell, multi)
-	tip_missing := []int{}
-	for i, explicit := range arg.is_explicit {
-		ch := arg.adaptor.GetChannel(i)
-		if ch.HasTip() {
-			tip_pos[i] = ch.GetAbsolutePosition().Subtract(wtype.Coordinates{0., 0., ch.GetTip().GetSize().Z})
+	wells := self.getWellsBelow(0., arg.adaptor)
 
-			objs := deck.GetPointIntersections(tip_pos[i])
-			for _, o := range objs {
-				if well, ok := o.(*wtype.LHWell); ok {
-					wells[i] = well
-				}
-			}
-		} else if explicit {
+	//check if any explicitly requested channels are missing tips
+	tip_missing := []int{}
+	for _, i := range arg.channels {
+		if !arg.adaptor.GetChannel(i).HasTip() {
 			tip_missing = append(tip_missing, i)
 		}
 	}
@@ -763,8 +848,6 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 
 	ret := driver.CommandStatus{true, driver.OK, "DISPENSE ACK"}
 
-	deck := self.state.GetDeck()
-
 	arg, err := self.validateLHArgs(head, multi, platetype, what, volume, map[string][]bool{
 		"blowout": blowout,
 		"llf":     llf,
@@ -779,21 +862,7 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 	}
 
 	//find the position of each tip
-	tip_pos := make([]wtype.Coordinates, multi)
-	wells := make([]*wtype.LHWell, multi)
-	size := wtype.Coordinates{0, 0, self.max_dispense_height}
-	for i := 0; i < multi; i++ {
-		if ch := arg.adaptor.GetChannel(i); ch.HasTip() {
-			tip_pos[i] = ch.GetAbsolutePosition().Subtract(wtype.Coordinates{0., 0., ch.GetTip().GetSize().Z})
-
-			for _, o := range deck.GetBoxIntersections(*wtype.NewBBox(tip_pos[i].Subtract(size), size)) {
-				if w, ok := o.(*wtype.LHWell); ok {
-					wells[i] = w
-					break
-				}
-			}
-		}
-	}
+	wells := self.getWellsBelow(self.max_dispense_height, arg.adaptor)
 
 	//independence contraints
 	if !arg.adaptor.IsIndependent() {
@@ -1202,8 +1271,107 @@ func (self *VirtualLiquidHandler) Wait(time float64) driver.CommandStatus {
 //Mix - used
 func (self *VirtualLiquidHandler) Mix(head int, volume []float64, platetype []string, cycles []int,
 	multi int, what []string, blowout []bool) driver.CommandStatus {
-	self.AddWarning("Mix", "Not yet implemented")
-	return driver.CommandStatus{true, driver.OK, "MIX ACK"}
+
+	ret := driver.CommandStatus{true, driver.OK, "MIX ACK"}
+
+	arg, err := self.validateLHArgs(head, multi, platetype, what, volume, map[string][]bool{
+		"blowout": blowout,
+	}, cycles)
+	if err != nil {
+		self.AddErrorf("Mix", "Invalid arguments - %s", err.Error())
+		return ret
+	}
+
+	wells := self.getWellsBelow(0., arg.adaptor)
+
+	describe := func() string {
+		return fmt.Sprintf("mixing %s %s in %s of %s",
+			summariseVolumes(arg.volumes),
+			summariseCycles(cycles, arg.channels),
+			summariseWells(wells, arg.channels),
+			summarisePlates(wells, arg.channels))
+	}
+
+	//check tips exist
+	no_tip := []int{}
+	for _, i := range arg.channels {
+		if !arg.adaptor.GetChannel(i).HasTip() {
+			no_tip = append(no_tip, i)
+		}
+	}
+	if len(no_tip) > 0 {
+		self.AddErrorf("Mix", "While %s - no tip on %s", describe(), summariseChannels(no_tip))
+		return ret
+	}
+
+	//check wells exist and their contents is ok
+	no_well := []int{}
+	for _, i := range arg.channels {
+		v := wunit.NewVolume(volume[i], "ul")
+
+		if wells[i] == nil {
+			no_well = append(no_well, i)
+		} else {
+			if wells[i].Contents().GetType() != what[i] {
+				self.AddWarningf("Mix", "While %s - well %s contains %s not %s", describe(), wells[i].GetName(), wells[i].Contents().GetType(), what[i])
+			}
+			if wells[i].CurrVolume().LessThan(v) {
+				self.AddErrorf("Mix", "While %s - well %s only contains %s", describe(), wells[i].GetName(), wells[i].CurrVolume())
+			}
+			if wtype.TypeOf(wells[i].Plate) != platetype[i] {
+				self.AddWarningf("Mix", "While %s - plate \"%s\" is of type \"%s\", not \"%s\"",
+					describe(), wtype.NameOf(wells[i].Plate), wtype.TypeOf(wells[i].Plate), platetype[i])
+			}
+		}
+	}
+	if len(no_well) > 0 {
+		self.AddErrorf("Mix", "While %s - %s not in %s", describe(), summariseChannels(no_well), pWells(len(no_well)))
+		return ret
+	}
+
+	//independece
+	if !arg.adaptor.IsIndependent() {
+		if !fElemsEqual(volume, arg.channels) {
+			self.AddErrorf("Mix", "While %s - cannot manipulate different volumes with non-independent head", describe())
+		}
+
+		if !iElemsEqual(cycles, arg.channels) {
+			self.AddErrorf("Mix", "While %s - cannot vary number of mix cycles with non-independent head", describe())
+		}
+	}
+
+	//do the mixing
+	for _, ch := range arg.channels {
+		v := wunit.NewVolume(volume[ch], "ul")
+		tip := arg.adaptor.GetChannel(ch).GetTip()
+
+		//this is pretty pointless unless the tip already contained something
+		//it also makes sure the tip.Contents().GetType() is set properly
+		for c := 0; c < cycles[ch]; c++ {
+			com, err := wells[ch].Remove(v)
+			if err != nil {
+				self.AddErrorf("Mix", "Unexpected well error - %s", err.Error())
+				continue
+			}
+			err = tip.Add(com)
+			if err != nil {
+				self.AddErrorf("Mix", "Unexpected well error - %s", err.Error())
+				continue
+			}
+			com, err = tip.Remove(v)
+			if err != nil {
+				self.AddErrorf("Mix", "Unexpected tip error - %s", err.Error())
+				continue
+			}
+			err = wells[ch].Add(com)
+			if err != nil {
+				self.AddErrorf("Mix", "Unexpected well error - %s", err.Error())
+				continue
+			}
+		}
+	}
+
+	return ret
 }
 
 //ResetPistons - used

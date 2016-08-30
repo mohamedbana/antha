@@ -2231,3 +2231,182 @@ func Test_Dispense(t *testing.T) {
 		test.run(t)
 	}
 }
+
+func Test_Mix(t *testing.T) {
+
+	tests := []SimulatorTest{
+		SimulatorTest{
+			"OK - single channel",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				preloadAdaptorTips(0, "tipbox_1", []int{0}),
+				prefillWells("input_1", []string{"A1"}, "water", 200.),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Mix{
+					0, //head      int
+					[]float64{50., 0., 0., 0., 0., 0., 0., 0.},    //volume    []float64
+					[]string{"plate", "", "", "", "", "", "", ""}, //platetype []string
+					[]int{5, 0, 0, 0, 0, 0, 0, 0},                 //cycles []int
+					8, //multi     int
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
+				},
+			},
+			nil, //errors
+			[]*AssertionFn{ //assertions
+				tipboxAssertion("tipbox_1", []string{}),
+				tipboxAssertion("tipbox_2", []string{}),
+				plateAssertion("input_1", []wellDesc{wellDesc{"A1", "water", 200.}}),
+				adaptorAssertion(0, []tipDesc{tipDesc{0, "water", 0.}}),
+				tipwasteAssertion("tipwaste", 0),
+			},
+		},
+		SimulatorTest{
+			"OK - 8 channel",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				preloadAdaptorTips(0, "tipbox_1", []int{0, 1, 2, 3, 4, 5, 6, 7}),
+				prefillWells("input_1", []string{"A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"}, "water", 200.),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "input_1", "input_1", "input_1", "input_1", "input_1", "input_1", "input_1"}, //deckposition
+					[]string{"A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"},                                         //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                                                                    //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                        //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                        //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},                                                        //offsetZ
+					[]string{"plate", "plate", "plate", "plate", "plate", "plate", "plate", "plate"},                 //plate_type
+					0, //head
+				},
+				&Mix{
+					0, //head      int
+					[]float64{50., 50., 50., 50., 50., 50., 50., 50.},                                //volume    []float64
+					[]string{"plate", "plate", "plate", "plate", "plate", "plate", "plate", "plate"}, //platetype []string
+					[]int{5, 5, 5, 5, 5, 5, 5, 5},                                                    //cycles []int
+					8, //multi     int
+					[]string{"water", "water", "water", "water", "water", "water", "water", "water"}, //what       []string
+					[]bool{false, false, false, false, false, false, false, false},                   //blowout   []bool
+				},
+			},
+			nil, //errors
+			[]*AssertionFn{ //assertions
+				tipboxAssertion("tipbox_1", []string{}),
+				tipboxAssertion("tipbox_2", []string{}),
+				plateAssertion("input_1", []wellDesc{
+					wellDesc{"A1", "water", 200.},
+					wellDesc{"B1", "water", 200.},
+					wellDesc{"C1", "water", 200.},
+					wellDesc{"D1", "water", 200.},
+					wellDesc{"E1", "water", 200.},
+					wellDesc{"F1", "water", 200.},
+					wellDesc{"G1", "water", 200.},
+					wellDesc{"H1", "water", 200.},
+				}),
+				adaptorAssertion(0, []tipDesc{
+					tipDesc{0, "water", 0.},
+					tipDesc{1, "water", 0.},
+					tipDesc{2, "water", 0.},
+					tipDesc{3, "water", 0.},
+					tipDesc{4, "water", 0.},
+					tipDesc{5, "water", 0.},
+					tipDesc{6, "water", 0.},
+					tipDesc{7, "water", 0.},
+				}),
+				tipwasteAssertion("tipwaste", 0),
+			},
+		},
+		SimulatorTest{
+			"Fail - independece problems",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				preloadAdaptorTips(0, "tipbox_1", []int{0, 1, 2, 3, 4, 5, 6, 7}),
+				prefillWells("input_1", []string{"A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"}, "water", 200.),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "input_1", "input_1", "input_1", "input_1", "input_1", "input_1", "input_1"}, //deckposition
+					[]string{"A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"},                                         //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                                                                    //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                        //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},                                                        //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},                                                        //offsetZ
+					[]string{"plate", "plate", "plate", "plate", "plate", "plate", "plate", "plate"},                 //plate_type
+					0, //head
+				},
+				&Mix{
+					0, //head      int
+					[]float64{50., 60., 50., 50., 50., 50., 50., 50.},                                //volume    []float64
+					[]string{"plate", "plate", "plate", "plate", "plate", "plate", "plate", "plate"}, //platetype []string
+					[]int{5, 5, 5, 5, 5, 2, 2, 2},                                                    //cycles []int
+					8, //multi     int
+					[]string{"water", "water", "water", "water", "water", "water", "water", "water"}, //what       []string
+					[]bool{false, false, false, false, false, false, false, false},                   //blowout   []bool
+				},
+			},
+			[]string{ //errors
+				"(err) Mix: While mixing {50,60,50,50,50,50,50,50}ul {5,5,5,5,5,2,2,2} times in wells A1,B1,C1,D1,E1,F1,G1,H1 of plate \"plate1\" - cannot manipulate different volumes with non-independent head",
+				"(err) Mix: While mixing {50,60,50,50,50,50,50,50}ul {5,5,5,5,5,2,2,2} times in wells A1,B1,C1,D1,E1,F1,G1,H1 of plate \"plate1\" - cannot vary number of mix cycles with non-independent head",
+			},
+			nil, //assertions
+		},
+		SimulatorTest{
+			"Fail - wrong platetype",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				preloadAdaptorTips(0, "tipbox_1", []int{0}),
+				prefillWells("input_1", []string{"A1"}, "water", 200.),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Mix{
+					0, //head      int
+					[]float64{50., 0., 0., 0., 0., 0., 0., 0.},        //volume    []float64
+					[]string{"notaplate", "", "", "", "", "", "", ""}, //platetype []string
+					[]int{5, 0, 0, 0, 0, 0, 0, 0},                     //cycles []int
+					8, //multi     int
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
+				},
+			},
+			[]string{ //errors
+				"(warn) Mix: While mixing 50ul 5 times in well A1 of plate \"plate1\" - plate \"plate1\" is of type \"plate\", not \"notaplate\"",
+			},
+			[]*AssertionFn{ //assertions
+				tipboxAssertion("tipbox_1", []string{}),
+				tipboxAssertion("tipbox_2", []string{}),
+				plateAssertion("input_1", []wellDesc{wellDesc{"A1", "water", 200.}}),
+				adaptorAssertion(0, []tipDesc{tipDesc{0, "water", 0.}}),
+				tipwasteAssertion("tipwaste", 0),
+			},
+		},
+	}
+
+	for _, test := range tests {
+		test.run(t)
+	}
+}

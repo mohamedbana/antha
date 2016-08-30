@@ -722,6 +722,22 @@ func (self *Dispense) Apply(vlh *lh.VirtualLiquidHandler) {
 		self.platetype, self.what, self.llf)
 }
 
+//Mix
+type Mix struct {
+	head      int
+	volume    []float64
+	platetype []string
+	cycles    []int
+	multi     int
+	what      []string
+	blowout   []bool
+}
+
+func (self *Mix) Apply(vlh *lh.VirtualLiquidHandler) {
+	vlh.Mix(self.head, self.volume, self.platetype, self.cycles,
+		self.multi, self.what, self.blowout)
+}
+
 /*
  * ######################################## Setup
  */
