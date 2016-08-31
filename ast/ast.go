@@ -143,7 +143,6 @@ func numOuts(n Node, deps int) int {
 	switch n := n.(type) {
 	case *UseComp:
 		return len(n.From)
-		return 1
 	case *Bundle:
 		return len(n.From)
 	case *Command:
