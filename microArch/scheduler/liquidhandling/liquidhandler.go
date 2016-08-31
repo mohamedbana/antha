@@ -708,17 +708,11 @@ func (this *Liquidhandler) Layout(request *LHRequest) (*LHRequest, error) {
 
 // make the instructions for executing this request
 func (this *Liquidhandler) ExecutionPlan(request *LHRequest) (*LHRequest, error) {
-	//rbtcpy := this.Properties.Dup()
+	// necessary??
 	this.FinalProperties = this.Properties.Dup()
 	temprobot := this.Properties.Dup()
-	rq, err := this.ExecutionPlanner(request, this.Properties)
-
 	saved_plates := this.Properties.SaveUserPlates()
-
-	// switcherooo
-	//	this.FinalProperties = this.Properties
-	//	this.Properties = temprobot
-
+	rq, err := this.ExecutionPlanner(request, this.Properties)
 	this.FinalProperties = temprobot
 
 	this.Properties.RestoreUserPlates(saved_plates)
