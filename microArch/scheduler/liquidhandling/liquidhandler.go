@@ -185,9 +185,6 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 
 				lwl := ppp.Wellcoords[lw]
 
-				// might need this or might not
-				fmt.Println("IS AUTO? ", ppp.Name(), " ", lwl.Crds, " ", lwl.WContents.CName, " ", lwl.WContents.Volume().ToString(), " ", lwl.IsAutoallocated())
-
 				if !lwl.IsAutoallocated() {
 					continue
 				}
