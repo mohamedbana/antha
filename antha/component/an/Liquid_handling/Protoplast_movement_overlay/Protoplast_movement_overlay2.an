@@ -1,0 +1,97 @@
+protocol Protoplast_movement_overlay_day2
+
+import (
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
+	"github.com/antha-lang/antha/antha/anthalib/mixer"
+	"github.com/antha-lang/antha/microArch/factory"
+)
+
+
+// Input parameters for this protocol (data)
+Parameters (
+	/*CellVol wunit.Volume
+	DNAVol wunit.Volume
+	PEGVol wunit.Volume 
+	TransformedCellsVol wunit.Volume*/
+	Plateoutvolume wunit.Volume
+	/*OutPlatetype string
+	OutPlatetype2 string*/
+	AgarPlate string
+	OutWell string
+	Platenumber int
+	OverlayAgar string
+	/*OutWell2 string
+	OutWell3 string
+	Partname string*/
+)
+
+// Data which is returned from this protocol, and data types
+Data (
+	
+)
+
+
+// Physical Inputs to this protocol with types
+Inputs (
+	//OverlayAgar *wtype.LHComponent
+	/*DNA *wtype.LHComponent
+	PEG *wtype.LHComponent*/
+)
+
+// Physical outputs from this protocol with types
+Outputs (
+	/*TransformedCells *wtype.LHComponent
+	CellsAgarinWellFinal *wtype.LHComponent*/
+	Platedculture *wtype.LHComponent
+)
+
+Requirements {
+	
+	
+	
+}
+
+// Conditions to run on startup
+Setup {
+	
+}
+
+// The core process for this protocol, with the steps to be performed
+// for every input
+Steps {
+	/*cellsample:=mixer.Sample(Cells,CellVol)
+	cellsinwell:=MixTo(OutPlatetype, OutWell,1, cellsample)
+	
+	DNASample:=mixer.Sample(DNA, DNAVol)
+	cellsplusdna:=Mix(cellsinwell, DNASample)
+	
+	PEGSample:=mixer.Sample(PEG, PEGVol)
+	TransformedCells=Mix(cellsplusdna, PEGSample)*/
+	
+	/*CellsAgar:=mixer.Sample(TransformedCells,TransformedCellsVol)
+	CellsAgarinWell:=MixTo(OutPlatetype2, OutWell2, 1, CellsAgar)*/
+	
+	//CellsAgarinWellFinal=CellsAgarinWell
+	
+	overlayAgar := factory.GetComponentByType("protoplasts")
+	
+	overlayAgar.CName = OverlayAgar
+	
+	plateout := mixer.Sample(overlayAgar, Plateoutvolume)
+	platedculture := MixTo(AgarPlate, OutWell, Platenumber, plateout)
+	
+	Platedculture = platedculture
+	
+	
+}
+// Run after controls and a steps block are completed to
+// post process any data and provide downstream results
+Analysis {
+}
+
+// A block of tests to perform to validate that the sample was processed 
+//correctly. Optionally, destructive tests can be performed to validate 
+//results on a dipstick basis
+Validation {
+	 
+}
