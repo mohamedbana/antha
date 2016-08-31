@@ -319,6 +319,36 @@ func (lhp *LHPlate) Dup() *LHPlate {
 
 	return ret
 }
+func (lhp *LHPlate) DupKeepIDs() *LHPlate {
+	// protect yourself fgs
+	if lhp == nil {
+		logger.Fatal(fmt.Sprintln("Can't dup nonexistent plate"))
+	}
+	ret := NewLHPlate(lhp.Type, lhp.Mnfr, lhp.WlsY, lhp.WlsX, lhp.Height, lhp.Hunit, lhp.Welltype, lhp.WellXOffset, lhp.WellYOffset, lhp.WellXStart, lhp.WellYStart, lhp.WellZStart)
+	ret.ID = lhp.ID
+
+	ret.PlateName = lhp.PlateName
+
+	ret.HWells = make(map[string]*LHWell, len(ret.HWells))
+
+	for i, row := range lhp.Rows {
+		for j, well := range row {
+			d := well.Dup()
+			d.ID = well.ID
+			ret.Rows[i][j] = d
+			ret.Cols[j][i] = d
+			ret.Wellcoords[d.Crds] = d
+			ret.HWells[d.ID] = d
+			d.WContents.ID = well.WContents.ID
+			d.WContents.Loc = ret.ID + ":" + d.Crds
+			d.Plate = ret
+			d.Plateinst = ret.Inst
+			d.Plateid = ret.ID
+		}
+	}
+
+	return ret
+}
 
 func (p *LHPlate) ProtectAllWells() {
 	for _, v := range p.Wellcoords {
@@ -479,4 +509,43 @@ func (p *LHPlate) ResetID(newID string) {
 		w.ResetPlateID(newID)
 	}
 	p.ID = newID
+}
+
+func (p *LHPlate) IsUserAllocated() bool {
+	// true if any wells are user allocated
+
+	for _, w := range p.Wellcoords {
+		if w.IsUserAllocated() {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (p *LHPlate) MergeWith(p2 *LHPlate) {
+	// do nothing if these are not same type
+
+	if p.Type != p2.Type {
+		return
+	}
+
+	// transfer any non-User-Allocated wells in here
+
+	it := NewOneTimeColumnWiseIterator(p)
+
+	for ; it.Valid(); it.Next() {
+		wc := it.Curr()
+
+		if !it.Valid() {
+			break
+		}
+
+		w1 := p.Wellcoords[wc.FormatA1()]
+		w2 := p2.Wellcoords[wc.FormatA1()]
+
+		if !w1.IsUserAllocated() {
+			w1.WContents = w2.WContents
+		}
+	}
 }

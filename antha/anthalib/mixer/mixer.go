@@ -198,6 +198,14 @@ func GenericMix(opt MixOptions) *wtype.LHInstruction {
 		r.Result = opt.Result
 	} else {
 		r.Result = wtype.NewLHComponent()
+		mx := 0
+		for _, c := range opt.Components {
+			r.Result.MixPreserveTvol(c)
+			if c.Generation() > mx {
+				mx = c.Generation()
+			}
+		}
+		r.Result.SetGeneration(mx)
 	}
 
 	if opt.Destination != nil {
@@ -223,6 +231,15 @@ func GenericMix(opt MixOptions) *wtype.LHInstruction {
 	if opt.PlateName != "" {
 		r.PlateName = opt.PlateName
 	}
+
+	// oh yus oh yus oh yus
+
+	s := ""
+	for _, v := range r.Components {
+		s += v.CName + "-" + v.ID + " "
+	}
+
+	//fmt.Println("GENERATION: ", r.Result.Generation(), "MIXING : ", s, " RESULT: ", r.Result.CName+"-"+r.Result.ID)
 
 	return r
 }

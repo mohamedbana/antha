@@ -60,6 +60,7 @@ type lhreq struct {
 }
 
 func (a *Mixer) makeLhreq() (*lhreq, error) {
+	// MIS -- this might be a hole. We probably need to invoke the sample tracker here
 	addPlate := func(req *planner.LHRequest, ip *wtype.LHPlate) error {
 		if _, seen := req.Input_plates[ip.ID]; seen {
 			return fmt.Errorf("plate %q already added", ip.ID)

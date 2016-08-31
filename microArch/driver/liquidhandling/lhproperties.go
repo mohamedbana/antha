@@ -841,3 +841,31 @@ func (lhp *LHProperties) CheckTipPrefCompatibility(prefs []string) bool {
 
 	return true
 }
+
+type UserPlate struct {
+	Plate    *wtype.LHPlate
+	Position string
+}
+type UserPlates []UserPlate
+
+func (p *LHProperties) SaveUserPlates() UserPlates {
+	up := make(UserPlates, 0, len(p.Positions))
+
+	for pos, plate := range p.Plates {
+		if plate.IsUserAllocated() {
+			up = append(up, UserPlate{Plate: plate.DupKeepIDs(), Position: pos})
+		}
+	}
+
+	return up
+}
+
+func (p *LHProperties) RestoreUserPlates(up UserPlates) {
+	for _, plate := range up {
+		oldPlate := p.Plates[plate.Position]
+		p.RemovePlateAtPosition(plate.Position)
+		// merge these
+		plate.Plate.MergeWith(oldPlate)
+		p.AddPlate(plate.Position, plate.Plate)
+	}
+}

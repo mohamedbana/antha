@@ -10,6 +10,11 @@ import (
 	"github.com/antha-lang/antha/trace"
 )
 
+func SetInputPlate(ctx context.Context, plate *wtype.LHPlate) {
+	st := sampletracker.GetSampleTracker()
+	st.SetInputPlate(plate)
+}
+
 type incubateInst struct {
 	Arg  *wtype.LHComponent
 	Comp *wtype.LHComponent
@@ -46,9 +51,6 @@ type mixInst struct {
 	Node *ast.Mix
 }
 
-// TODO -- LOC etc. will be passed through OK but what about
-//         the actual plate info?
-//        - two choices here: 1) we upgrade the sample tracker; 2) we pass the plate in somehow
 func mix(ctx context.Context, inst *mixInst) *wtype.LHComponent {
 	// from the protocol POV components need to be passed by value
 	cmps := wtype.CopyComponentArray(inst.Args)
@@ -62,9 +64,9 @@ func mix(ctx context.Context, inst *mixInst) *wtype.LHComponent {
 		v := c.Volume().SIValue()
 		inst.Node.Reqs = append(inst.Node.Reqs, ast.Request{MixVol: ast.NewPoint(v)})
 		c.Order = i
-		inst.Comp.MixPreserveTvol(c)
-		//inst.Comp.AddParent(c.ID)
-		//c.AddDaughter(inst.Comp.ID)
+		/*
+			inst.Comp.MixPreserveTvol(c)
+		*/
 		if c.Generation() > mx {
 			mx = c.Generation()
 		}

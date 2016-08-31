@@ -143,7 +143,7 @@ func set_output_order(rq *LHRequest) error {
 	it := NewIChain(nil)
 
 	for _, v := range sorted {
-		//fmt.Println("V: ", v.Result.CName, " PARENTS: ", v.ParentString(), " RESULT : ", v.Result.ID, " GENERATION: ", v.Generation())
+		//	fmt.Println("V: ", v.Result.CName, " ID: ", v.Result.ID, " PARENTS: ", v.ParentString(), " GENERATION: ", v.Generation())
 
 		it.Add(v)
 	}
@@ -236,10 +236,12 @@ func ConvertInstruction(insIn *wtype.LHInstruction, robot *driver.LHProperties, 
 	vt := make([]wunit.Volume, 0, lenToMake) // volume in well to
 	ptf := make([]string, 0, lenToMake)      // plate types
 
-	for i, v := range insIn.Components {
-		if insIn.IsMixInPlace() && i == 0 {
-			continue
-		}
+	for i, v := range cmps {
+		/*
+			if insIn.IsMixInPlace() && i == 0 {
+				continue
+			}
+		*/
 
 		for xx, _ := range fromPlateIDs[i] {
 			// get dem big ole plates out
