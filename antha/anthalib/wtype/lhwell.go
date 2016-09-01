@@ -53,7 +53,7 @@ type LHWell struct {
 	Rvol      float64
 	WShape    *Shape
 	Bottom    WellBottomType
-	bounds    BBox
+	Bounds    BBox
 	Bottomh   float64
 	Extra     map[string]interface{}
 	Plate     LHObject `gotopb:"-" json:"-"`
@@ -76,19 +76,19 @@ func (self *LHWell) GetClass() string {
 
 //@implement LHObject
 func (self *LHWell) GetPosition() Coordinates {
-	return OriginOf(self).Add(self.bounds.GetPosition())
+	return OriginOf(self).Add(self.Bounds.GetPosition())
 }
 
 //@implement LHObject
 func (self *LHWell) GetSize() Coordinates {
-	return self.bounds.GetSize()
+	return self.Bounds.GetSize()
 }
 
 //@implement LHObject
 func (self *LHWell) GetBoxIntersections(box BBox) []LHObject {
 	//relative box
 	box.SetPosition(box.GetPosition().Subtract(OriginOf(self)))
-	if self.bounds.IntersectsBox(box) {
+	if self.Bounds.IntersectsBox(box) {
 		return []LHObject{self}
 	}
 	return nil
@@ -100,7 +100,7 @@ func (self *LHWell) GetPointIntersections(point Coordinates) []LHObject {
 	point = point.Subtract(OriginOf(self))
 	//At some point this should be called self.shape for a more accurate intersection test
 	//see branch shape-changes
-	if self.bounds.IntersectsPoint(point) {
+	if self.Bounds.IntersectsPoint(point) {
 		return []LHObject{self}
 	}
 	return nil
@@ -108,7 +108,7 @@ func (self *LHWell) GetPointIntersections(point Coordinates) []LHObject {
 
 //@implement LHObject
 func (self *LHWell) SetOffset(point Coordinates) error {
-	self.bounds.SetPosition(point)
+	self.Bounds.SetPosition(point)
 	return nil
 }
 
@@ -426,7 +426,7 @@ func NewLHWell(plate LHObject, crds WellCoords, vunit string, vol, rvol float64,
 	well.Rvol = wunit.NewVolume(rvol, vunit).ConvertToString("ul")
 	well.WShape = shape.Dup()
 	well.Bottom = bott
-	well.bounds = BBox{Coordinates{}, Coordinates{
+	well.Bounds = BBox{Coordinates{}, Coordinates{
 		wunit.NewLength(xdim, dunit).ConvertToString("mm"),
 		wunit.NewLength(ydim, dunit).ConvertToString("mm"),
 		wunit.NewLength(zdim, dunit).ConvertToString("mm"),
@@ -615,4 +615,15 @@ func (w *LHWell) ResetPlateID(newID string) {
 	ltx := strings.Split(w.WContents.Loc, ":")
 	w.WContents.Loc = newID + ":" + ltx[1]
 	//w.Plateid = newID
+}
+
+func (w *LHWell) XDim() float64 {
+	return w.Bounds.GetSize().X
+}
+
+func (w *LHWell) YDim() float64 {
+	return w.Bounds.GetSize().Y
+}
+func (w *LHWell) ZDim() float64 {
+	return w.Bounds.GetSize().Z
 }

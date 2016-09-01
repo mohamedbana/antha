@@ -85,7 +85,7 @@ func (w *LHWell) AddDimensions(lhwt *LHWellType) {
 	w.Rvol = wunit.NewVolume(lhwt.Rvol, lhwt.Vunit).ConvertToString("ul")
 	w.WShape = NewShape(lhwt.ShapeName, lhwt.Dunit, lhwt.Xdim, lhwt.Ydim, lhwt.Zdim)
 	w.Bottom = lhwt.Bottom
-	w.bounds.SetSize(Coordinates{
+	w.Bounds.SetSize(Coordinates{
 		wunit.NewLength(lhwt.Xdim, lhwt.Dunit).ConvertToString("mm"),
 		wunit.NewLength(lhwt.Ydim, lhwt.Dunit).ConvertToString("mm"),
 		wunit.NewLength(lhwt.Zdim, lhwt.Dunit).ConvertToString("mm"),

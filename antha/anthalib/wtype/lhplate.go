@@ -56,8 +56,8 @@ type LHPlate struct {
 	WellXStart  float64            // offset (mm) to first well in X direction
 	WellYStart  float64            // offset (mm) to first well in Y direction
 	WellZStart  float64            // offset (mm) to bottom of well in Z direction
-	bounds      BBox               // (relative) position of the plate (mm), set by parent
-	parent      LHObject
+	Bounds      BBox               // (relative) position of the plate (mm), set by parent
+	parent      LHObject           `gotopb:"-"`
 }
 
 func (lhp LHPlate) String() string {
@@ -103,9 +103,9 @@ func (lhp LHPlate) String() string {
 		lhp.WellXStart,
 		lhp.WellYStart,
 		lhp.WellZStart,
-		lhp.bounds.GetSize().X,
-		lhp.bounds.GetSize().Y,
-		lhp.bounds.GetSize().Z,
+		lhp.Bounds.GetSize().X,
+		lhp.Bounds.GetSize().Y,
+		lhp.Bounds.GetSize().Z,
 	)
 }
 
@@ -251,7 +251,7 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, size Coordinates, wellt
 	lhp.WellXStart = wellXStart
 	lhp.WellYStart = wellYStart
 	lhp.WellZStart = wellZStart
-	lhp.bounds.SetSize(size)
+	lhp.Bounds.SetSize(size)
 
 	wellcoords := make(map[string]*LHWell, ncols*nrows)
 
@@ -456,18 +456,18 @@ func (p *LHPlate) IsConstrainedOn(platform string) ([]string, bool) {
 
 func (self *LHPlate) GetPosition() Coordinates {
 	if self.parent != nil {
-		return self.parent.GetPosition().Add(self.bounds.GetPosition())
+		return self.parent.GetPosition().Add(self.Bounds.GetPosition())
 	}
-	return self.bounds.GetPosition()
+	return self.Bounds.GetPosition()
 }
 
 func (self *LHPlate) GetSize() Coordinates {
-	return self.bounds.GetSize()
+	return self.Bounds.GetSize()
 }
 
 func (self *LHPlate) GetWellBounds() BBox {
 	return BBox{
-		self.bounds.GetPosition().Add(Coordinates{self.WellXStart, self.WellYStart, self.WellZStart}),
+		self.Bounds.GetPosition().Add(Coordinates{self.WellXStart, self.WellYStart, self.WellZStart}),
 		Coordinates{self.WellXOffset * float64(self.NCols()), self.WellYOffset * float64(self.NRows()), self.Welltype.GetSize().Z},
 	}
 }
@@ -476,7 +476,7 @@ func (self *LHPlate) GetBoxIntersections(box BBox) []LHObject {
 	//relative to me
 	box.SetPosition(box.GetPosition().Subtract(OriginOf(self)))
 	ret := []LHObject{}
-	if self.bounds.IntersectsBox(box) {
+	if self.Bounds.IntersectsBox(box) {
 		ret = append(ret, self)
 	}
 
@@ -504,7 +504,7 @@ func (self *LHPlate) GetPointIntersections(point Coordinates) []LHObject {
 		}
 	}
 
-	if len(ret) == 0 && self.bounds.IntersectsPoint(point) {
+	if len(ret) == 0 && self.Bounds.IntersectsPoint(point) {
 		ret = append(ret, self)
 	}
 	return ret
@@ -527,7 +527,7 @@ func (p *LHPlate) Evaporate(time time.Duration, env Environment) []VolumeCorrect
 }
 
 func (self *LHPlate) SetOffset(o Coordinates) error {
-	self.bounds.SetPosition(o)
+	self.Bounds.SetPosition(o)
 	return nil
 }
 
@@ -614,4 +614,8 @@ func (p *LHPlate) ResetID(newID string) {
 		w.ResetPlateID(newID)
 	}
 	p.ID = newID
+}
+
+func (p *LHPlate) Height() float64 {
+	return p.Bounds.GetSize().Z
 }

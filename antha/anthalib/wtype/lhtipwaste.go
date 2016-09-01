@@ -17,8 +17,8 @@ type LHTipwaste struct {
 	WellYStart float64
 	WellZStart float64
 	AsWell     *LHWell
-	bounds     BBox
-	parent     LHObject
+	Bounds     BBox
+	parent     LHObject `gotopb:"-"`
 }
 
 func (tw LHTipwaste) SpaceLeft() int {
@@ -49,9 +49,9 @@ func (te LHTipwaste) String() string {
 		te.Mnfr,
 		te.Capacity,
 		te.Contents,
-		te.bounds.GetSize().X,
-		te.bounds.GetSize().Y,
-		te.bounds.GetSize().Z,
+		te.Bounds.GetSize().X,
+		te.Bounds.GetSize().Y,
+		te.Bounds.GetSize().Z,
 		te.WellXStart,
 		te.WellYStart,
 		te.WellZStart,
@@ -60,7 +60,7 @@ func (te LHTipwaste) String() string {
 }
 
 func (tw *LHTipwaste) Dup() *LHTipwaste {
-	tw2 := NewLHTipwaste(tw.Capacity, tw.Type, tw.Mnfr, tw.bounds.GetSize(), tw.AsWell, tw.WellXStart, tw.WellYStart, tw.WellZStart)
+	tw2 := NewLHTipwaste(tw.Capacity, tw.Type, tw.Mnfr, tw.Bounds.GetSize(), tw.AsWell, tw.WellXStart, tw.WellYStart, tw.WellZStart)
 
 	tw2.Contents = tw.Contents
 
@@ -93,7 +93,7 @@ func NewLHTipwaste(capacity int, typ, mfr string, size Coordinates, w *LHWell, w
 	lht.Name = fmt.Sprintf("%s_%s", typ, lht.ID[1:len(lht.ID)-2])
 	lht.Mnfr = mfr
 	lht.Capacity = capacity
-	lht.bounds.SetSize(size)
+	lht.Bounds.SetSize(size)
 	lht.AsWell = w
 	lht.WellXStart = wellxstart
 	lht.WellYStart = wellystart
@@ -123,13 +123,13 @@ func (lht *LHTipwaste) Dispose(n int) bool {
 
 func (self *LHTipwaste) GetPosition() Coordinates {
 	if self.parent != nil {
-		return self.parent.GetPosition().Add(self.bounds.GetPosition())
+		return self.parent.GetPosition().Add(self.Bounds.GetPosition())
 	}
-	return self.bounds.GetPosition()
+	return self.Bounds.GetPosition()
 }
 
 func (self *LHTipwaste) GetSize() Coordinates {
-	return self.bounds.GetSize()
+	return self.Bounds.GetSize()
 }
 
 func (self *LHTipwaste) GetBoxIntersections(box BBox) []LHObject {
@@ -140,7 +140,7 @@ func (self *LHTipwaste) GetBoxIntersections(box BBox) []LHObject {
 	ret := []LHObject{}
 	//relative box
 	box.SetPosition(box.GetPosition().Subtract(OriginOf(self)))
-	if self.bounds.IntersectsBox(box) {
+	if self.Bounds.IntersectsBox(box) {
 		ret = append(ret, self)
 	}
 	return ret
@@ -156,14 +156,14 @@ func (self *LHTipwaste) GetPointIntersections(point Coordinates) []LHObject {
 
 	ret := []LHObject{}
 	//Todo, test well
-	if self.bounds.IntersectsPoint(point) {
+	if self.Bounds.IntersectsPoint(point) {
 		ret = append(ret, self)
 	}
 	return ret
 }
 
 func (self *LHTipwaste) SetOffset(o Coordinates) error {
-	self.bounds.SetPosition(o)
+	self.Bounds.SetPosition(o)
 	return nil
 }
 
@@ -227,3 +227,11 @@ func (self *LHTipwaste) WellCoordsToCoords(wc WellCoords, r WellReference) (Coor
 		self.WellYStart + 0.5*self.AsWell.GetSize().Y,
 		z}), true
 }
+
+/*
+// once we complete the sweep we might need this
+func (tw *LHTipwaste) Height() float64 {
+	return tw.Bounds.GetSize().Z
+}
+
+*/

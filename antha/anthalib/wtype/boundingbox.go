@@ -28,92 +28,92 @@ import "math"
 //BBox is a simple LHObject representing a bounding box,
 //useful for checking if there's stuff in the way
 type BBox struct {
-	position Coordinates
-	size     Coordinates
+	Position Coordinates
+	Size     Coordinates
 }
 
-func NewBBox(pos, size Coordinates) *BBox {
-	if size.X < 0. {
-		pos.X = pos.X + size.X
-		size.X = -size.X
+func NewBBox(pos, Size Coordinates) *BBox {
+	if Size.X < 0. {
+		pos.X = pos.X + Size.X
+		Size.X = -Size.X
 	}
-	if size.Y < 0. {
-		pos.Y = pos.Y + size.Y
-		size.Y = -size.Y
+	if Size.Y < 0. {
+		pos.Y = pos.Y + Size.Y
+		Size.Y = -Size.Y
 	}
-	if size.Z < 0. {
-		pos.Z = pos.Z + size.Z
-		size.Z = -size.Z
+	if Size.Z < 0. {
+		pos.Z = pos.Z + Size.Z
+		Size.Z = -Size.Z
 	}
-	r := BBox{pos, size}
+	r := BBox{pos, Size}
 	return &r
 }
 
-func NewBBox6f(pos_x, pos_y, pos_z, size_x, size_y, size_z float64) *BBox {
+func NewBBox6f(pos_x, pos_y, pos_z, Size_x, Size_y, Size_z float64) *BBox {
 	return NewBBox(Coordinates{pos_x, pos_y, pos_z},
-		Coordinates{size_x, size_y, size_z})
+		Coordinates{Size_x, Size_y, Size_z})
 }
 
-func NewXBox4f(pos_y, pos_z, size_y, size_z float64) *BBox {
+func NewXBox4f(pos_y, pos_z, Size_y, Size_z float64) *BBox {
 	return NewBBox(Coordinates{-math.MaxFloat64 / 2., pos_y, pos_z},
-		Coordinates{math.MaxFloat64, size_y, size_z})
+		Coordinates{math.MaxFloat64, Size_y, Size_z})
 }
 
-func NewYBox4f(pos_x, pos_z, size_x, size_z float64) *BBox {
+func NewYBox4f(pos_x, pos_z, Size_x, Size_z float64) *BBox {
 	return NewBBox(Coordinates{pos_x, -math.MaxFloat64 / 2., pos_z},
-		Coordinates{size_x, math.MaxFloat64, size_z})
+		Coordinates{Size_x, math.MaxFloat64, Size_z})
 }
 
-func NewZBox4f(pos_x, pos_y, size_x, size_y float64) *BBox {
+func NewZBox4f(pos_x, pos_y, Size_x, Size_y float64) *BBox {
 	return NewBBox(Coordinates{pos_x, pos_y, -math.MaxFloat64 / 2.},
-		Coordinates{size_x, size_y, math.MaxFloat64})
+		Coordinates{Size_x, Size_y, math.MaxFloat64})
 }
 
 func (self BBox) GetPosition() Coordinates {
-	return self.position
+	return self.Position
 }
 func (self BBox) ZMax() float64 {
-	return self.position.Z + self.size.Z
+	return self.Position.Z + self.Size.Z
 }
 
 func (self BBox) GetSize() Coordinates {
-	return self.size
+	return self.Size
 }
 
 func (self *BBox) SetPosition(c Coordinates) {
-	self.position = c
+	self.Position = c
 }
 
 func (self *BBox) SetSize(c Coordinates) {
-	self.size = c
+	self.Size = c
 }
 
 func (self BBox) Contains(rhs Coordinates) bool {
-	return (rhs.X >= self.position.X && rhs.X < self.position.X+self.size.X &&
-		rhs.Y >= self.position.Y && rhs.Y < self.position.Y+self.size.Y &&
-		rhs.Z >= self.position.Z && rhs.Z < self.position.Z+self.size.Z)
+	return (rhs.X >= self.Position.X && rhs.X < self.Position.X+self.Size.X &&
+		rhs.Y >= self.Position.Y && rhs.Y < self.Position.Y+self.Size.Y &&
+		rhs.Z >= self.Position.Z && rhs.Z < self.Position.Z+self.Size.Z)
 }
 
 //IntersectsBox checks for bounding box intersection
 func (self BBox) IntersectsBox(rhs BBox) bool {
 	//test a single dimension.
-	//(a,b) are the start and end of the first position
+	//(a,b) are the start and end of the first Position
 	//(c,d) are the start and end of the second pos
 	// assert(a > b  and  d > c)
 	f := func(a, b, c, d float64) bool {
 		return !(c >= b || d <= a)
 	}
 
-	s := self.position.Add(self.size)
+	s := self.Position.Add(self.Size)
 	r := rhs.GetPosition().Add(rhs.GetSize())
-	return (f(self.position.X, s.X, rhs.GetPosition().X, r.X) &&
-		f(self.position.Y, s.Y, rhs.GetPosition().Y, r.Y) &&
-		f(self.position.Z, s.Z, rhs.GetPosition().Z, r.Z))
+	return (f(self.Position.X, s.X, rhs.GetPosition().X, r.X) &&
+		f(self.Position.Y, s.Y, rhs.GetPosition().Y, r.Y) &&
+		f(self.Position.Z, s.Z, rhs.GetPosition().Z, r.Z))
 }
 
 //IntersectsPoint
 func (self BBox) IntersectsPoint(rhs Coordinates) bool {
-	return (rhs.X >= self.position.X && rhs.X < self.position.X+self.size.X &&
-		rhs.Y >= self.position.Y && rhs.Y < self.position.Y+self.size.Y &&
-		rhs.Z >= self.position.Z && rhs.Z < self.position.Z+self.size.Z)
+	return (rhs.X >= self.Position.X && rhs.X < self.Position.X+self.Size.X &&
+		rhs.Y >= self.Position.Y && rhs.Y < self.Position.Y+self.Size.Y &&
+		rhs.Z >= self.Position.Z && rhs.Z < self.Position.Z+self.Size.Z)
 }

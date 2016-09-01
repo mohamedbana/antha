@@ -47,8 +47,8 @@ type LHTipbox struct {
 	TipYStart  float64
 	TipZStart  float64
 
-	bounds BBox
-	parent LHObject
+	Bounds BBox
+	parent LHObject `gotopb:"-"`
 }
 
 func NewLHTipbox(nrows, ncols int, size Coordinates, manufacturer, boxtype string, tiptype *LHTip, well *LHWell, tipxoffset, tipyoffset, tipxstart, tipystart, tipzstart float64) *LHTipbox {
@@ -62,7 +62,7 @@ func NewLHTipbox(nrows, ncols int, size Coordinates, manufacturer, boxtype strin
 	tipbox.Ncols = ncols
 	tipbox.Tips = make([][]*LHTip, ncols)
 	tipbox.NTips = tipbox.Nrows * tipbox.Ncols
-	tipbox.bounds.SetSize(size)
+	tipbox.Bounds.SetSize(size)
 	tipbox.Tiptype = tiptype
 	tipbox.AsWell = well
 	for i := 0; i < ncols; i++ {
@@ -105,9 +105,9 @@ TipZStart : %f,
 		tb.Mnfr,
 		tb.Nrows,
 		tb.Ncols,
-		tb.bounds.GetSize().X,
-		tb.bounds.GetSize().Y,
-		tb.bounds.GetSize().Z,
+		tb.Bounds.GetSize().X,
+		tb.Bounds.GetSize().Y,
+		tb.Bounds.GetSize().Z,
 		tb.Tiptype,
 		tb.AsWell,
 		tb.NTips,
@@ -122,7 +122,7 @@ TipZStart : %f,
 
 //lazy sunuva
 func (tb *LHTipbox) Dup() *LHTipbox {
-	tb2 := NewLHTipbox(tb.Nrows, tb.Ncols, tb.bounds.GetSize(), tb.Mnfr, tb.Type, tb.Tiptype, tb.AsWell, tb.TipXOffset, tb.TipYOffset, tb.TipXStart, tb.TipYStart, tb.TipZStart)
+	tb2 := NewLHTipbox(tb.Nrows, tb.Ncols, tb.Bounds.GetSize(), tb.Mnfr, tb.Type, tb.Tiptype, tb.AsWell, tb.TipXOffset, tb.TipYOffset, tb.TipXStart, tb.TipYStart, tb.TipZStart)
 
 	for i := 0; i < len(tb.Tips); i++ {
 		for j := 0; j < len(tb.Tips[i]); j++ {
@@ -176,13 +176,13 @@ func (tb *LHTipbox) N_clean_tips() int {
 
 func (self *LHTipbox) GetPosition() Coordinates {
 	if self.parent != nil {
-		return self.parent.GetPosition().Add(self.bounds.GetPosition())
+		return self.parent.GetPosition().Add(self.Bounds.GetPosition())
 	}
-	return self.bounds.GetPosition()
+	return self.Bounds.GetPosition()
 }
 
 func (self *LHTipbox) GetSize() Coordinates {
-	return self.bounds.GetSize()
+	return self.Bounds.GetSize()
 }
 
 func (self *LHTipbox) GetTipBounds() BBox {
@@ -196,7 +196,7 @@ func (self *LHTipbox) GetBoxIntersections(box BBox) []LHObject {
 	//relative box
 	box.SetPosition(box.GetPosition().Subtract(OriginOf(self)))
 	ret := []LHObject{}
-	if self.bounds.IntersectsBox(box) {
+	if self.Bounds.IntersectsBox(box) {
 		ret = append(ret, self)
 	}
 
@@ -221,7 +221,7 @@ func (self *LHTipbox) GetPointIntersections(point Coordinates) []LHObject {
 	//relative point
 	point = point.Subtract(OriginOf(self))
 	ret := []LHObject{}
-	if self.bounds.IntersectsPoint(point) {
+	if self.Bounds.IntersectsPoint(point) {
 		ret = append(ret, self)
 	}
 
@@ -242,7 +242,7 @@ func (self *LHTipbox) GetPointIntersections(point Coordinates) []LHObject {
 }
 
 func (self *LHTipbox) SetOffset(o Coordinates) error {
-	self.bounds.SetPosition(o)
+	self.Bounds.SetPosition(o)
 	return nil
 }
 
@@ -451,3 +451,10 @@ func initialize_tips(tipbox *LHTipbox, tiptype *LHTip) *LHTipbox {
 	tipbox.NTips = tipbox.Nrows * tipbox.Ncols
 	return tipbox
 }
+
+/*
+
+func (tb *LHTipbox) Height() float64 {
+	return tb.Bounds.GetSize().Z
+}
+*/

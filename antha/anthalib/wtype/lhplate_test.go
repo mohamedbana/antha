@@ -64,8 +64,8 @@ func validatePlate(t *testing.T, plate *LHPlate) {
 			t.Fatal(fmt.Sprintf("ERROR: Plate ID for component not consistent -- %s != %s", ltx[0], plate.ID))
 		}
 
-		if ltx[0] != w.Plate.(*wtype.LHPlate).ID {
-			t.Fatal(fmt.Sprintf("ERROR: Plate ID for component not consistent with well -- %s != %s", ltx[0], w.Plate.(*wtype.LHPlate).ID))
+		if ltx[0] != w.Plate.(*LHPlate).ID {
+			t.Fatal(fmt.Sprintf("ERROR: Plate ID for component not consistent with well -- %s != %s", ltx[0], w.Plate.(*LHPlate).ID))
 		}
 
 		if ltx[1] != crds {

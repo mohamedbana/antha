@@ -39,7 +39,7 @@ type LHTip struct {
 	MinVol   wunit.Volume
 	shape    *Shape
 	bounds   BBox
-	parent   LHObject
+	parent   LHObject `gotopb:"-"`
 	contents *LHComponent
 }
 
