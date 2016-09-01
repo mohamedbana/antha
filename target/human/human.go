@@ -57,7 +57,7 @@ func getKey(n ast.Node) (r interface{}) {
 	} else if h, ok := c.Inst.(*ast.HandleInst); ok {
 		r = h.Group
 	} else if i, ok := c.Inst.(*ast.IncubateInst); ok {
-		r = *i
+		r = i.Temp.ToString() + " " + i.Time.ToString()
 	} else {
 		r = reflect.TypeOf(c.Inst)
 	}
