@@ -40,7 +40,18 @@ func (a *maker) addMissingDeps() {
 	for _, uses := range a.byId {
 		// HACK: assume that samples are used in sequentially; remove when
 		// dependencies are tracked individually
-		for idx, u := range uses {
+
+		// Make sure we don't introduce any loops
+		seen := make(map[*ast.UseComp]bool)
+		var us []*ast.UseComp
+		for _, u := range uses {
+			if seen[u] {
+				continue
+			}
+			seen[u] = true
+			us = append(us, u)
+		}
+		for idx, u := range us {
 			if idx == 0 {
 				continue
 			}
