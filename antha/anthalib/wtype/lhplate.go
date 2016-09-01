@@ -549,3 +549,11 @@ func (p *LHPlate) MergeWith(p2 *LHPlate) {
 		}
 	}
 }
+
+func (p *LHPlate) MarkNonEmptyWellsUserAllocated() {
+	for _, w := range p.Wellcoords {
+		if !w.Empty() {
+			w.SetUserAllocated()
+		}
+	}
+}

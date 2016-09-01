@@ -103,7 +103,6 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) error {
 
 	//f := func() {
 	err := this.Plan(request)
-
 	if err != nil {
 		return err
 	}
@@ -123,7 +122,6 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) error {
 // run the request via the driver
 func (this *Liquidhandler) Execute(request *LHRequest) error {
 	// set up the robot
-
 	err := this.do_setup(request)
 
 	if err != nil {
@@ -284,13 +282,6 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 		pidm[p2.ID] = p1.ID
 	}
 
-	// questionable
-	/*
-		for _, inst := range rq.LHInstructions {
-			inst.SetPlateID(pidm[inst.PlateID()])
-		}
-	*/
-
 	// this is many shades of wrong but likely to save us a lot of time
 	for _, pos := range this.Properties.Output_preferences {
 		p1, ok1 := this.Properties.Plates[pos]
@@ -303,9 +294,12 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 					// and remove the outputs from the initial state
 					if !w.Empty() {
 						w2, ok := p2.Wellcoords[w.Crds]
-						// originally we checked if w2 was empty.. now we make it so
-						// not sure which is right TBH
 						if ok {
+							// there's no strict separation between outputs and
+							// inputs here
+							if w.IsAutoallocated() || w.IsUserAllocated() {
+								continue
+							}
 							w2.Clear()
 							w2.Add(w.WContents)
 							w.Clear()

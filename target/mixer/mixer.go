@@ -65,7 +65,8 @@ func (a *Mixer) makeLhreq() (*lhreq, error) {
 		if _, seen := req.Input_plates[ip.ID]; seen {
 			return fmt.Errorf("plate %q already added", ip.ID)
 		} else {
-			req.Input_plates[ip.ID] = ip
+			//req.Input_plates[ip.ID] = ip
+			req.AddUserPlate(ip)
 			return nil
 		}
 	}
