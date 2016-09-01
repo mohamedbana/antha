@@ -32,6 +32,7 @@ import (
 	"math"
 	"os"
 	"strconv"
+	"time"
 )
 
 // structure describing a microplate
@@ -236,6 +237,7 @@ func (lhp *LHPlate) NextEmptyWell(it PlateIterator) WellCoords {
 func NewLHPlate(platetype, mfr string, nrows, ncols int, size Coordinates, welltype *LHWell, wellXOffset, wellYOffset, wellXStart, wellYStart, wellZStart float64) *LHPlate {
 	var lhp LHPlate
 	lhp.Type = platetype
+	//lhp.ID = "plate-" + GetUUID()
 	lhp.ID = GetUUID()
 	lhp.PlateName = fmt.Sprintf("%s_%s", platetype, lhp.ID[1:len(lhp.ID)-2])
 	lhp.Mnfr = mfr
@@ -294,7 +296,11 @@ func NewLHPlate(platetype, mfr string, nrows, ncols int, size Coordinates, wellt
 }
 
 func (lhp *LHPlate) Dup() *LHPlate {
-	ret := NewLHPlate(lhp.Type, lhp.Mnfr, lhp.WlsY, lhp.WlsX, lhp.bounds.GetSize(), lhp.Welltype, lhp.WellXOffset, lhp.WellYOffset, lhp.WellXStart, lhp.WellYStart, lhp.WellZStart)
+	ret := NewLHPlate(lhp.Type, lhp.Mnfr, lhp.WlsY, lhp.WlsX, lhp.GetSize(), lhp.Welltype, lhp.WellXOffset, lhp.WellYOffset, lhp.WellXStart, lhp.WellYStart, lhp.WellZStart)
+	// protect yourself fgs
+	if lhp == nil {
+		logger.Fatal(fmt.Sprintln("Can't dup nonexistent plate"))
+	}
 
 	ret.PlateName = lhp.PlateName
 
@@ -408,12 +414,6 @@ func ExportPlateCSV(outputpilename string, plate *LHPlate, platename string, wel
 
 		volstr := strconv.FormatFloat(volfloat, 'G', -1, 64)
 
-		/*
-			fmt.Println("len(wells)", len(wells))
-			fmt.Println("len(liquids)", len(liquids))
-			fmt.Println("len(Volumes)", len(Volumes))
-		*/
-
 		record := []string{well, liquids[i].CName, liquids[i].TypeName(), volstr, Volumes[i].Unit().PrefixedSymbol()}
 		records = append(records, record)
 	}
@@ -510,6 +510,22 @@ func (self *LHPlate) GetPointIntersections(point Coordinates) []LHObject {
 	return ret
 }
 
+func (p *LHPlate) Evaporate(time time.Duration, env Environment) []VolumeCorrection {
+	ret := make([]VolumeCorrection, 0, 10)
+	if p == nil {
+		return ret
+	}
+	for _, w := range p.Wellcoords {
+		if !w.Empty() {
+			vc := w.Evaporate(time, env)
+			if vc.Type != "" {
+				ret = append(ret, vc)
+			}
+		}
+	}
+	return ret
+}
+
 func (self *LHPlate) SetOffset(o Coordinates) error {
 	self.bounds.SetPosition(o)
 	return nil
@@ -591,4 +607,11 @@ func (self *LHPlate) WellCoordsToCoords(wc WellCoords, r WellReference) (Coordin
 		self.WellXStart + (float64(wc.X)+0.5)*self.WellXOffset,
 		self.WellYStart + (float64(wc.Y)+0.5)*self.WellYOffset,
 		z}), true
+}
+
+func (p *LHPlate) ResetID(newID string) {
+	for _, w := range p.Wellcoords {
+		w.ResetPlateID(newID)
+	}
+	p.ID = newID
 }

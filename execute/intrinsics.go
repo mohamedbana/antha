@@ -62,7 +62,7 @@ func mix(ctx context.Context, inst *mixInst) *wtype.LHComponent {
 		v := c.Volume().SIValue()
 		inst.Node.Reqs = append(inst.Node.Reqs, ast.Request{MixVol: ast.NewPoint(v)})
 		c.Order = i
-		inst.Comp.Mix(c)
+		inst.Comp.MixPreserveTvol(c)
 		//inst.Comp.AddParent(c.ID)
 		//c.AddDaughter(inst.Comp.ID)
 		if c.Generation() > mx {
@@ -102,6 +102,18 @@ func MixInto(ctx context.Context, outplate *wtype.LHPlate, address string, compo
 	})
 }
 
+func MixNamed(ctx context.Context, outplatetype, address string, platename string, components ...*wtype.LHComponent) *wtype.LHComponent {
+	return mix(ctx, &mixInst{
+		Args: components,
+		Node: &ast.Mix{
+			Inst: mixer.GenericMix(mixer.MixOptions{
+				Components: components,
+				PlateType:  outplatetype,
+				Address:    address,
+				PlateName:  platename,
+			})},
+	})
+}
 func MixTo(ctx context.Context, outplatetype, address string, platenum int, components ...*wtype.LHComponent) *wtype.LHComponent {
 	return mix(ctx, &mixInst{
 		Args: components,

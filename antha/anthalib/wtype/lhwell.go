@@ -25,9 +25,12 @@ package wtype
 
 import (
 	"fmt"
-
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/eng"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
+	"github.com/antha-lang/antha/antha/anthalib/wutil"
 	"github.com/antha-lang/antha/microArch/logger"
+	"strings"
+	"time"
 )
 
 type WellBottomType int
@@ -310,6 +313,8 @@ func (w *LHWell) ContainerType() string {
 
 func (w *LHWell) Clear() {
 	w.WContents = NewLHComponent()
+	//death if this well is actually in a tipwaste
+	w.WContents.Loc = w.Plate.(*LHPlate).ID + ":" + w.Crds.FormatA1()
 }
 
 func (w *LHWell) Empty() bool {
@@ -350,6 +355,49 @@ func (lhw *LHWell) CalculateMaxCrossSectionArea() (ca wunit.Area, err error) {
 	return
 }
 
+func (lhw *LHWell) AreaForVolume() wunit.Area {
+
+	ret := wunit.NewArea(0.0, "m^2")
+
+	vf := lhw.GetAfVFunc()
+
+	if vf == nil {
+		ret, _ := lhw.CalculateMaxCrossSectionArea()
+		return ret
+	} else {
+		vol := lhw.WContents.Volume()
+		r := vf.F(vol.ConvertToString("ul"))
+		ret = wunit.NewArea(r, "mm^2")
+	}
+
+	return ret
+}
+
+func (lhw *LHWell) HeightForVolume() wunit.Length {
+	ret := wunit.NewLength(0.0, "m")
+
+	return ret
+}
+
+func (lhw *LHWell) SetAfVFunc(f string) {
+	lhw.Extra["afvfunc"] = f
+}
+
+func (lhw *LHWell) GetAfVFunc() wutil.Func1Prm {
+	f, ok := lhw.Extra["afvfunc"]
+
+	if !ok {
+		return nil
+	} else {
+		x, err := wutil.UnmarshalFunc([]byte(f.(string)))
+		if err != nil {
+			logger.Fatal(fmt.Sprintf("Can't unmarshal function, error: %s", err.Error))
+		}
+		return x
+	}
+	return nil
+}
+
 func (lhw *LHWell) CalculateMaxVolume() (vol wunit.Volume, err error) {
 
 	if lhw.Bottom == FlatWellBottom { // flat
@@ -371,6 +419,7 @@ func NewLHWell(plate LHObject, crds WellCoords, vunit string, vol, rvol float64,
 
 	well.Plate = plate
 	well.WContents = NewLHComponent()
+	//well.ID = "well-" + GetUUID()
 	well.ID = GetUUID()
 	well.Crds = crds
 	well.MaxVol = wunit.NewVolume(vol, vunit).ConvertToString("ul")
@@ -537,4 +586,33 @@ func (well *LHWell) IsAutoallocated() bool {
 		logger.Debug("Warning: Attempt to access nil well in IsAutoallocated()")
 	}
 	return false
+}
+
+func (well *LHWell) Evaporate(time time.Duration, env Environment) VolumeCorrection {
+	var ret VolumeCorrection
+
+	// don't let this happen
+	if well == nil {
+		return ret
+	}
+
+	// we need to use the evaporation calculator
+	// we should likely decorate wells since we have different capabilities
+	// for different well types
+
+	vol := eng.EvaporationVolume(env.Temperature, "water", env.Humidity, time.Seconds(), env.MeanAirFlowVelocity, well.AreaForVolume(), env.Pressure)
+
+	well.Remove(vol)
+
+	ret.Type = "Evaporation"
+	ret.Volume = vol.Dup()
+	ret.Location = well.WContents.Loc
+
+	return ret
+}
+
+func (w *LHWell) ResetPlateID(newID string) {
+	ltx := strings.Split(w.WContents.Loc, ":")
+	w.WContents.Loc = newID + ":" + ltx[1]
+	//w.Plateid = newID
 }

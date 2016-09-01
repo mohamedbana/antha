@@ -173,6 +173,7 @@ func NewLHTip(mfr, ttype string, minvol, maxvol float64, volunit string, shape *
 		nil,
 		NewLHComponent(),
 	}
+
 	return &lht
 }
 

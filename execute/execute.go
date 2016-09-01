@@ -68,9 +68,9 @@ func Run(parent context.Context, opt Opt) (*Result, error) {
 		}, nil
 	}
 
-	// Unwrap error
+	// Unwrap execute.Error
 	if terr, ok := err.(*trace.Error); ok {
-		if eerr, ok := terr.BaseError.(error); ok {
+		if eerr, ok := terr.BaseError.(*Error); ok {
 			err = eerr
 		}
 	}

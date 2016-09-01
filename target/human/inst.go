@@ -69,13 +69,20 @@ func (a *Human) makeFromManual(ms []*target.Manual) target.Inst {
 		return m
 	}
 	var details []string
+	var maxSec float64
+
 	for _, m := range ms {
+		if t := m.GetTimeEstimate(); maxSec < t {
+			maxSec = t
+		}
 		details = append(details, m.Details)
 	}
+
 	return &target.Manual{
 		Dev:     m.Dev,
 		Label:   m.Label,
 		Details: strings.Join(details, "\n"),
+		Time:    maxSec,
 	}
 }
 

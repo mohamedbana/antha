@@ -355,7 +355,7 @@ func MakePEGPolicy() LHPolicy {
 	policy["DSPZOFFSET"] = 2.5
 	policy["POST_MIX"] = 3
 	policy["POST_MIX_Z"] = 3.5
-	policy["BLOWOUTVOLUME"] = 0.0
+	policy["BLOWOUTVOLUME"] = 50.0
 	policy["BLOWOUTVOLUMEUNIT"] = "ul"
 	policy["TOUCHOFF"] = true
 	policy["CAN_MULTI"] = false
@@ -403,7 +403,7 @@ func MakeDispenseAboveLiquidPolicy() LHPolicy {
 	policy["DSP_SPEED"] = 3.0
 	//policy["ASP_WAIT"] = 1.0
 	//policy["DSP_WAIT"] = 1.0
-	policy["BLOWOUTVOLUME"] = 0.0
+	policy["BLOWOUTVOLUME"] = 50.0
 	policy["BLOWOUTVOLUMEUNIT"] = "ul"
 	policy["TOUCHOFF"] = false
 	policy["CAN_MULTI"] = false
@@ -436,7 +436,7 @@ func MakeWaterPolicy() LHPolicy {
 	waterpolicy["CAN_MSA"] = true
 	waterpolicy["CAN_SDD"] = true
 	waterpolicy["DSPZOFFSET"] = 1.0
-	waterpolicy["BLOWOUTVOLUME"] = 0.0
+	waterpolicy["BLOWOUTVOLUME"] = 50.0
 	return waterpolicy
 }
 func MakeFoamyPolicy() LHPolicy {
@@ -716,7 +716,7 @@ func MakeDefaultPolicy() LHPolicy {
 	defaultpolicy["TIP_REUSE_LIMIT"] = 100
 	defaultpolicy["BLOWOUTREFERENCE"] = 1
 	defaultpolicy["BLOWOUTOFFSET"] = -5.0
-	defaultpolicy["BLOWOUTVOLUME"] = 0.0
+	defaultpolicy["BLOWOUTVOLUME"] = 50.0
 	defaultpolicy["BLOWOUTVOLUMEUNIT"] = "ul"
 	defaultpolicy["PTZREFERENCE"] = 1
 	defaultpolicy["PTZOFFSET"] = -0.5
@@ -852,13 +852,13 @@ func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
 	*/
 
 	// remove blowout from gilson
+	/* reinstate blowout for gilson
 	rule = NewLHPolicyRule("NoBlowoutForGilson")
 	rule.AddCategoryConditionOn("PLATFORM", "GilsonPipetmax")
-
 	policy := make(LHPolicy, 6)
 	policy["RESET_OVERRIDE"] = true
-
 	lhpr.AddRule(rule, policy)
+	*/
 
 	return lhpr, nil
 

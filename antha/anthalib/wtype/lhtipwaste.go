@@ -60,7 +60,11 @@ func (te LHTipwaste) String() string {
 }
 
 func (tw *LHTipwaste) Dup() *LHTipwaste {
-	return NewLHTipwaste(tw.Capacity, tw.Type, tw.Mnfr, tw.bounds.GetSize(), tw.AsWell, tw.WellXStart, tw.WellYStart, tw.WellZStart)
+	tw2 := NewLHTipwaste(tw.Capacity, tw.Type, tw.Mnfr, tw.bounds.GetSize(), tw.AsWell, tw.WellXStart, tw.WellYStart, tw.WellZStart)
+
+	tw2.Contents = tw.Contents
+
+	return tw2
 }
 
 func (tw *LHTipwaste) GetName() string {
@@ -83,6 +87,7 @@ func (self *LHTipwaste) GetClass() string {
 
 func NewLHTipwaste(capacity int, typ, mfr string, size Coordinates, w *LHWell, wellxstart, wellystart, wellzstart float64) *LHTipwaste {
 	var lht LHTipwaste
+	//	lht.ID = "tipwaste-" + GetUUID()
 	lht.ID = GetUUID()
 	lht.Type = typ
 	lht.Name = fmt.Sprintf("%s_%s", typ, lht.ID[1:len(lht.ID)-2])
