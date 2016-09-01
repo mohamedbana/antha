@@ -23,6 +23,7 @@
 package liquidhandling_test
 
 import (
+	//"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	lh "github.com/antha-lang/antha/microArch/simulator/liquidhandling"
 	"testing"
@@ -2410,3 +2411,360 @@ func Test_Mix(t *testing.T) {
 		test.run(t)
 	}
 }
+
+/*
+func component(name string) *wtype.LHComponent {
+	A := wtype.NewLHComponent()
+	A.CName = name
+	A.Type = wtype.LTWater
+	A.Smax = 9999
+	return A
+}
+
+func Test_Workflow(t *testing.T) {
+
+	get8tips := func(column int) []TestRobotInstruction {
+		wc := make([]string, 8)
+		for i := range wc {
+			c := wtype.WellCoords{column, i}
+			wc[i] = c.FormatA1()
+		}
+		return []TestRobotInstruction{
+			&Move{
+				[]string{"tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1"},
+				wc,
+				[]int{1, 1, 1, 1, 1, 1, 1, 1},
+				[]float64{0, 0, 0, 0, 0, 0, 0, 0},
+				[]float64{0, 0, 0, 0, 0, 0, 0, 0},
+				[]float64{5, 5, 5, 5, 5, 5, 5, 5},
+				[]string{"tipbox", "tipbox", "tipbox", "tipbox", "tipbox", "tipbox", "tipbox", "tipbox"},
+				0,
+			},
+			&LoadTips{
+				[]int{0, 1, 2, 3, 4, 5, 6, 7},
+				0,
+				8,
+				[]string{"tipbox", "tipbox", "tipbox", "tipbox", "tipbox", "tipbox", "tipbox", "tipbox"},
+				[]string{"tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1", "tipbox_1"},
+				wc,
+			},
+		}
+	}
+
+	get1tip := func(wc string) []TestRobotInstruction {
+		return []TestRobotInstruction{
+			&Move{
+				[]string{"tipbox_1", "", "", "", "", "", "", ""},
+				[]string{wc, "", "", "", "", "", "", ""},
+				[]int{1, 1, 1, 1, 1, 1, 1, 1},
+				[]float64{0, 0, 0, 0, 0, 0, 0, 0},
+				[]float64{0, 0, 0, 0, 0, 0, 0, 0},
+				[]float64{5, 5, 5, 5, 5, 5, 5, 5},
+				[]string{"tipbox", "", "", "", "", "", "", ""},
+				0,
+			},
+			&LoadTips{
+				[]int{0},
+				0,
+				8,
+				[]string{"tipbox", "", "", "", "", "", "", ""},
+				[]string{"tipbox_1", "", "", "", "", "", "", ""},
+				[]string{wc, "", "", "", "", "", "", ""},
+			},
+		}
+	}
+
+	dropTips := func(channels []int) []TestRobotInstruction {
+		pl := make([]string, 8)
+		pt := make([]string, 8)
+		wl := make([]string, 8)
+		for _, ch := range channels {
+			pl[ch] = "tipwaste"
+			pt[ch] = "tipwaste"
+			wl[ch] = "A1"
+		}
+		return []TestRobotInstruction{
+			&Move{
+				pl,
+				wl,
+				[]int{1, 1, 1, 1, 1, 1, 1, 1},
+				[]float64{0, 0, 0, 0, 0, 0, 0, 0},
+				[]float64{-31.5, -22.5, -13.5, -4.5, 4.5, 13.5, 22.5, 31.5},
+				[]float64{5, 5, 5, 5, 5, 5, 5, 5},
+				pt,
+				0,
+			},
+			&UnloadTips{channels, 0, 8, pl, pt, wl},
+		}
+	}
+
+	suck := func(plateloc string, wells []string, what []string, volume float64) []TestRobotInstruction {
+		pl := make([]string, 8)
+		pt := make([]string, 8)
+		v := make([]float64, 8)
+		for i, w := range wells {
+			if w != "" {
+				pl[i] = plateloc
+				pt[i] = "plate"
+				v[i] = volume
+			}
+		}
+		return []TestRobotInstruction{
+			&Move{
+				pl,
+				wells,
+				[]int{0, 0, 0, 0, 0, 0, 0, 0},
+				[]float64{0, 0, 0, 0, 0, 0, 0, 0},
+				[]float64{0, 0, 0, 0, 0, 0, 0, 0},
+				[]float64{0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5},
+				pt,
+				0,
+			},
+			&Aspirate{
+				v,
+				[]bool{false, false, false, false, false, false, false, false},
+				0,
+				8,
+				pt,
+				what,
+				[]bool{false, false, false, false, false, false, false, false},
+			},
+		}
+	}
+	blow := func(plateloc string, wells []string, what []string, volume float64) []TestRobotInstruction {
+		pl := make([]string, 8)
+		pt := make([]string, 8)
+		v := make([]float64, 8)
+		for i, w := range wells {
+			if w != "" {
+				pl[i] = plateloc
+				pt[i] = "plate"
+				v[i] = volume
+			}
+		}
+		return []TestRobotInstruction{
+			&Move{
+				pl,
+				wells,
+				[]int{1, 1, 1, 1, 1, 1, 1, 1},
+				[]float64{0, 0, 0, 0, 0, 0, 0, 0},
+				[]float64{0, 0, 0, 0, 0, 0, 0, 0},
+				[]float64{1, 1, 1, 1, 1, 1, 1, 1},
+				pt,
+				0,
+			},
+			&Dispense{
+				v,
+				[]bool{false, false, false, false, false, false, false, false},
+				0,
+				8,
+				pt,
+				what,
+				[]bool{false, false, false, false, false, false, false, false},
+			},
+		}
+	}
+
+	//plates
+	input_plate := default_lhplate("input")
+	output_plate := default_lhplate("output")
+
+	//tips - using small tipbox so I don't have to worry about using different tips
+	tipbox := small_lhtipbox("tipbox")
+
+	//tipwaste
+	tipwaste := default_lhtipwaste("tipwaste")
+
+	//setup the input plate
+	wc := wtype.MakeWellCoords("A1")
+	comp := []*wtype.LHComponent{
+		component("water"),
+		component("red"),
+		component("green"),
+		component("water"),
+	}
+	for x := 0; x < len(comp); x++ {
+		wc.X = x
+		comp[x].Vol = 200.
+		for y := 0; y < 8; y++ {
+			wc.Y = y
+			well := input_plate.GetChildByAddress(wc).(*wtype.LHWell)
+			well.Add(comp[x].Dup())
+		}
+	}
+
+	//add all the plates to the robot
+	inst := []TestRobotInstruction{
+		&Initialize{},
+		&AddPlateTo{"input_1", input_plate, "input"},
+		&AddPlateTo{"output_1", output_plate, "output"},
+		&AddPlateTo{"tipbox_1", tipbox, "tipbox"},
+		&AddPlateTo{"tipwaste", tipwaste, "tipwaste"},
+	}
+
+	//make the green gradient
+	green := make([]float64, 8)
+	for i := range green {
+		green[i] = float64(7-i) / 7
+	}
+	inst = append(inst, get1tip("H12")...)
+	for y := 0; y < 8; y++ {
+		if green[y] == 0. {
+			continue
+		}
+		wc.X = 2
+		wc.Y = y
+		inst = append(inst, suck("input_1",
+			[]string{wc.FormatA1(), "", "", "", "", "", "", ""},
+			[]string{"green", "", "", "", "", "", "", ""},
+			195.*green[y])...)
+		wc.X = 4
+		fmt.Printf("green to %s\n", wc.FormatA1())
+		inst = append(inst, blow("input_1",
+			[]string{wc.FormatA1(), "", "", "", "", "", "", ""},
+			[]string{"green", "", "", "", "", "", "", ""},
+			195.*green[y])...)
+	}
+	inst = append(inst, dropTips([]int{0})...)
+	inst = append(inst, get1tip("G12")...)
+	for y := 0; y < 8; y++ {
+		if (1 - green[y]) == 0. {
+			fmt.Printf("PONG y = %d\n", y)
+			continue
+		}
+		wc.X = 3
+		wc.Y = y
+		inst = append(inst, suck("input_1",
+			[]string{wc.FormatA1(), "", "", "", "", "", "", ""},
+			[]string{"water", "", "", "", "", "", "", ""},
+			195.*(1-green[y]))...)
+		wc.X = 4
+		fmt.Printf("water to %s\n", wc.FormatA1())
+		inst = append(inst, blow("input_1",
+			[]string{wc.FormatA1(), "", "", "", "", "", "", ""},
+			[]string{"water", "", "", "", "", "", "", ""},
+			195.*(1-green[y]))...)
+
+		well := input_plate.GetChildByAddress(wc).(*wtype.LHWell)
+		fmt.Printf("well %s contains %s\n", well.GetName(), well.Contents().Name())
+	}
+	inst = append(inst, dropTips([]int{0})...)
+
+	//make the red gradient
+	red := make([]float64, 12)
+	for i := range red {
+		red[i] = float64(11-i) / 11
+	}
+	inst = append(inst, get8tips(10)...)
+
+	from_wells := make([]string, 8)
+	for i := range from_wells {
+		wc.X = 1
+		wc.Y = i
+		from_wells[i] = wc.FormatA1()
+	}
+	for x := 0; x < 12; x++ {
+		if red[x] == 0. {
+			continue
+		}
+		to_wells := make([]string, 8)
+		for i := range to_wells {
+			wc.X = x
+			wc.Y = i
+			to_wells[i] = wc.FormatA1()
+		}
+
+		inst = append(inst, suck("input_1",
+			from_wells,
+			[]string{"red", "red", "red", "red", "red", "red", "red", "red"},
+			5.*red[x])...)
+		inst = append(inst, blow("output_1",
+			to_wells,
+			[]string{"red", "red", "red", "red", "red", "red", "red", "red"},
+			5.*red[x])...)
+	}
+	inst = append(inst, dropTips([]int{0, 1, 2, 3, 4, 5, 6, 7})...)
+
+	//transfer the green gradient
+	inst = append(inst, get8tips(9)...)
+	from_wells = make([]string, 8)
+	for i := range from_wells {
+		wc.X = 4
+		wc.Y = i
+		from_wells[i] = wc.FormatA1()
+	}
+	for x := 0; x < 12; x++ {
+		to_wells := make([]string, 8)
+		for i := range to_wells {
+			wc.X = x
+			wc.Y = i
+			to_wells[i] = wc.FormatA1()
+		}
+
+		for _, w := range from_wells {
+			wc := wtype.MakeWellCoords(w)
+			well := input_plate.GetChildByAddress(wc).(*wtype.LHWell)
+			fmt.Printf("From %s : %s\n", well.GetName(), well.Contents().GetType())
+		}
+		fmt.Println()
+
+		inst = append(inst, suck("input_1",
+			from_wells,
+			[]string{"green", "green+water", "green+water", "green+water", "green+water", "green+water", "green+water", "water"},
+			5.)...)
+		inst = append(inst, blow("output_1",
+			to_wells,
+			[]string{"green", "green+water", "green+water", "green+water", "green+water", "green+water", "green+water", "water"},
+			5.)...)
+	}
+	inst = append(inst, dropTips([]int{0, 1, 2, 3, 4, 5, 6, 7})...)
+
+	//make up to 20ul
+	inst = append(inst, get8tips(8)...)
+	from_wells = make([]string, 8)
+	for i := range from_wells {
+		wc.X = 0
+		wc.Y = i
+		from_wells[i] = wc.FormatA1()
+	}
+	for x := 0; x < 12; x++ {
+		to_wells := make([]string, 8)
+		for i := range to_wells {
+			wc.X = x
+			wc.Y = i
+			to_wells[i] = wc.FormatA1()
+		}
+
+		inst = append(inst, suck("input_1",
+			from_wells,
+			[]string{"water", "water", "water", "water", "water", "water", "water", "water"},
+			10.+5.*(1.-red[x]))...)
+		inst = append(inst, blow("output_1",
+			to_wells,
+			[]string{"water", "water", "water", "water", "water", "water", "water", "water"},
+			10.+5.*(1.-red[x]))...)
+	}
+	inst = append(inst, dropTips([]int{0, 1, 2, 3, 4, 5, 6, 7})...)
+
+	//and finally
+	inst = append(inst, &Finalize{})
+
+	st := SimulatorTest{
+		"Run Workflow",
+		nil,
+		[]*SetupFn{},
+		inst,
+		nil, //errors
+		[]*AssertionFn{ //assertions
+			tipboxAssertion("tipbox_1", []string{}),
+			tipboxAssertion("tipbox_2", []string{}),
+			plateAssertion("input_1", []wellDesc{wellDesc{"A1", "water", 200.}}),
+			adaptorAssertion(0, []tipDesc{tipDesc{0, "water", 0.}}),
+			tipwasteAssertion("tipwaste", 0),
+		},
+	}
+
+	st.run(t)
+
+}
+*/

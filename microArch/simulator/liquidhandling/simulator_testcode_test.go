@@ -456,6 +456,56 @@ func default_lhtipbox(name string) *wtype.LHTipbox {
 	return makeLHTipbox(&params, name)
 }
 
+func small_lhtipbox(name string) *wtype.LHTipbox {
+	params := LHTipboxParams{
+		8,  //nrows           int
+		12, //ncols           int
+		wtype.Coordinates{127.76, 85.48, 60.13}, //size         float64
+		"test Tipbox mfg",                       //manufacturer    string
+		"tipbox",                                //boxtype         string
+		LHTipParams{ //tiptype
+			"test_tip mfg",  //mfr         string
+			"test_tip type", //ttype       string
+			0,               //minvol      float64
+			200,             //maxvol      float64
+			"ul",            //volunit     string
+			ShapeParams{ // shape           ShapeParams struct {
+				"test_shape", // name            string
+				"mm",         // lengthunit      string
+				7.3,          // h               float64
+				7.3,          // w               float64
+				51.2,         // d               float64
+			},
+		},
+		LHWellParams{ // well
+			wtype.ZeroWellCoords(), // crds            string
+			"ul", // vunit           string
+			1000, // vol             float64
+			50,   // rvol            float64
+			ShapeParams{ // shape           ShapeParams struct {
+				"test_shape", // name            string
+				"mm",         // lengthunit      string
+				7.3,          // h               float64
+				7.3,          // w               float64
+				51.2,         // d               float64
+			},
+			wtype.VWellBottom, // bott            int
+			7.3,               // xdim            float64
+			7.3,               // ydim            float64
+			51.2,              // zdim            float64
+			0.0,               // bottomh         float64
+			"mm",              // dunit           string
+		},
+		9.,  //tipxoffset      float64
+		9.,  //tipyoffset      float64
+		0.,  //tipxstart       float64
+		0.,  //tipystart       float64
+		10., //tipzstart       float64
+	}
+
+	return makeLHTipbox(&params, name)
+}
+
 func default_lhtipwaste(name string) *wtype.LHTipwaste {
 	params := LHTipwasteParams{
 		700,                                    //capacity        int

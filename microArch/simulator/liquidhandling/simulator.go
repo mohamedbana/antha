@@ -786,7 +786,7 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 				if c := wells[ch].Contents(); !c.IsZero() {
 					self.AddErrorf("Aspirate",
 						"While %s - channel %d will inadvertantly aspirate %s from well %s as head is not independent",
-						describe(), ch, c.GetType(), wells[ch].GetName())
+						describe(), ch, c.Name(), wells[ch].GetName())
 				}
 			}
 		}
@@ -801,9 +801,9 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 		if wells[i] == nil { //we'll catch this later
 			continue
 		}
-		if wells[i].Contents().GetType() != what[i] {
+		if wells[i].Contents().Name() != what[i] {
 			self.AddWarningf("Aspirate", "While %s - well %s contains %s, not %s",
-				describe(), wells[i].GetName(), wells[i].Contents().GetType(), what[i])
+				describe(), wells[i].GetName(), wells[i].Contents().Name(), what[i])
 		}
 	}
 
@@ -1312,8 +1312,8 @@ func (self *VirtualLiquidHandler) Mix(head int, volume []float64, platetype []st
 		if wells[i] == nil {
 			no_well = append(no_well, i)
 		} else {
-			if wells[i].Contents().GetType() != what[i] {
-				self.AddWarningf("Mix", "While %s - well %s contains %s not %s", describe(), wells[i].GetName(), wells[i].Contents().GetType(), what[i])
+			if wells[i].Contents().Name() != what[i] {
+				self.AddWarningf("Mix", "While %s - well %s contains %s not %s", describe(), wells[i].GetName(), wells[i].Contents().Name(), what[i])
 			}
 			if wells[i].CurrVolume().LessThan(v) {
 				self.AddErrorf("Mix", "While %s - well %s only contains %s", describe(), wells[i].GetName(), wells[i].CurrVolume())
@@ -1346,7 +1346,7 @@ func (self *VirtualLiquidHandler) Mix(head int, volume []float64, platetype []st
 		tip := arg.adaptor.GetChannel(ch).GetTip()
 
 		//this is pretty pointless unless the tip already contained something
-		//it also makes sure the tip.Contents().GetType() is set properly
+		//it also makes sure the tip.Contents().Name() is set properly
 		for c := 0; c < cycles[ch]; c++ {
 			com, err := wells[ch].Remove(v)
 			if err != nil {
