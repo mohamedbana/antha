@@ -158,6 +158,11 @@ func (lhr *LHRequest) NewComponentsAdded() bool {
 	return len(lhr.Input_vols_wanting) != 0
 }
 
+func (lhr *LHRequest) AddUserPlate(p *wtype.LHPlate) {
+	p.MarkNonEmptyWellsUserAllocated()
+	lhr.Input_plates[p.ID] = p
+}
+
 type LHPolicyManager struct {
 	SystemPolicies *liquidhandling.LHPolicyRuleSet
 	UserPolicies   *liquidhandling.LHPolicyRuleSet

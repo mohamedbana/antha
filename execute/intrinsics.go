@@ -16,6 +16,11 @@ type commandInst struct {
 	Command *ast.Command
 }
 
+func SetInputPlate(ctx context.Context, plate *wtype.LHPlate) {
+	st := sampletracker.GetSampleTracker()
+	st.SetInputPlate(plate)
+}
+
 func incubate(ctx context.Context, in *wtype.LHComponent, temp wunit.Temperature, time wunit.Time, shaking bool) *commandInst {
 	st := sampletracker.GetSampleTracker()
 	comp := in.Dup()
@@ -89,8 +94,6 @@ func mix(ctx context.Context, inst *wtype.LHInstruction) *commandInst {
 		reqs = append(reqs, ast.Request{MixVol: ast.NewPoint(c.Volume().SIValue())})
 		c.Order = i
 		result.MixPreserveTvol(c)
-		//inst.Comp.AddParent(c.ID)
-		//c.AddDaughter(inst.Comp.ID)
 		if c.Generation() > mx {
 			mx = c.Generation()
 		}

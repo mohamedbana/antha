@@ -272,6 +272,20 @@ func (lhw *LHWell) CDup() *LHWell {
 
 	return cp
 }
+func (lhw *LHWell) DupKeepIDs() *LHWell {
+	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, lhw.Dunit)
+
+	for k, v := range lhw.Extra {
+		cp.Extra[k] = v
+	}
+
+	// Dup here doesn't change ID
+	cp.WContents = lhw.Contents().Dup()
+
+	cp.ID = lhw.ID
+
+	return cp
+}
 
 func (lhw *LHWell) CalculateMaxCrossSectionArea() (ca wunit.Area, err error) {
 
@@ -541,4 +555,32 @@ func (w *LHWell) ResetPlateID(newID string) {
 	ltx := strings.Split(w.WContents.Loc, ":")
 	w.WContents.Loc = newID + ":" + ltx[1]
 	w.Plateid = newID
+}
+
+func (w *LHWell) IsUserAllocated() bool {
+	if w.Extra == nil {
+		return false
+	}
+
+	ua, ok := w.Extra["UserAllocated"].(bool)
+
+	if !ok {
+		return false
+	}
+
+	return ua
+}
+
+func (w *LHWell) SetUserAllocated() {
+	if w.Extra == nil {
+		w.Extra = make(map[string]interface{})
+	}
+	w.Extra["UserAllocated"] = true
+}
+
+func (w *LHWell) ClearUserAllocated() {
+	if w.Extra == nil {
+		w.Extra = make(map[string]interface{})
+	}
+	w.Extra["UserAllocated"] = false
 }

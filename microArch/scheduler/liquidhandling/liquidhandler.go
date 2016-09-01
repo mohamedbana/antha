@@ -34,6 +34,7 @@ import (
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
+	"github.com/antha-lang/antha/microArch/sampletracker"
 )
 
 // the liquid handler structure defines the interface to a particular liquid handling
@@ -102,7 +103,6 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) error {
 
 	//f := func() {
 	err := this.Plan(request)
-
 	if err != nil {
 		return err
 	}
@@ -122,7 +122,6 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) error {
 // run the request via the driver
 func (this *Liquidhandler) Execute(request *LHRequest) error {
 	// set up the robot
-
 	err := this.do_setup(request)
 
 	if err != nil {
@@ -180,6 +179,14 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 				lp := lastPlate[i]
 				lw := lastWell[i]
 
+				ppp := this.Properties.PlateLookup[lp].(*wtype.LHPlate)
+
+				lwl := ppp.Wellcoords[lw]
+
+				if !lwl.IsAutoallocated() {
+					continue
+				}
+
 				_, ok := vols[lp]
 
 				if !ok {
@@ -196,6 +203,7 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 
 				insvols := ins.GetParameter("VOLUME").([]wunit.Volume)
 				v.Add(insvols[i])
+				// double add of carry volume here?
 				v.Add(rq.CarryVolume)
 			}
 		}
@@ -210,8 +218,6 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 		wellmap, ok := vols[plateID]
 
 		if !ok {
-			//err := wtype.LHError(wtype.LH_ERR_DIRE, fmt.Sprint("NO SUCH PLATE: ", plateID))
-			//return err
 			continue
 		}
 
@@ -250,35 +256,22 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 
 	this.Properties.RemoveTemporaryComponents()
 	this.FinalProperties.RemoveTemporaryComponents()
-
-	// now ensure the mapping, excluding any temp plates added above, is recorded
-
-	/*
-		for plateID, _ := range vols {
-			plate, ok := this.FinalProperties.Plates[this.FinalProperties.PlateIDLookup[plateID]]
-
-			if !ok {
-				// plate deleted
-				continue
-			}
-
-			pos := this.FinalProperties.PlateIDLookup[plateID]
-
-			plate2 := this.Properties.Plates[pos]
-
-			fmt.Println("Plate ID Map: ", plate2.ID, " --> ", plate.ID)
-
-			this.plateIDMap[plate2.ID] = plate.ID
-		}
-
-	*/
 	pidm := make(map[string]string, len(this.Properties.Plates))
 	for pos, _ := range this.Properties.Plates {
 		p1, ok1 := this.Properties.Plates[pos]
 		p2, ok2 := this.FinalProperties.Plates[pos]
 
 		if (!ok1 && ok2) || (ok1 && !ok2) {
-			return (wtype.LHError(6, fmt.Sprintf("Plate disappeared from position %s", pos)))
+
+			if ok1 {
+				fmt.Println("BEFORE HAS: ", p1)
+			}
+
+			if ok2 {
+				fmt.Println("AFTER  HAS: ", p2)
+			}
+
+			return (wtype.LHError(8, fmt.Sprintf("Plate disappeared from position %s", pos)))
 		}
 
 		if !(ok1 && ok2) {
@@ -288,13 +281,6 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 		this.plateIDMap[p1.ID] = p2.ID
 		pidm[p2.ID] = p1.ID
 	}
-
-	// questionable
-	/*
-		for _, inst := range rq.LHInstructions {
-			inst.SetPlateID(pidm[inst.PlateID()])
-		}
-	*/
 
 	// this is many shades of wrong but likely to save us a lot of time
 	for _, pos := range this.Properties.Output_preferences {
@@ -308,7 +294,13 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 					// and remove the outputs from the initial state
 					if !w.Empty() {
 						w2, ok := p2.Wellcoords[w.Crds]
-						if ok && w2.Empty() {
+						if ok {
+							// there's no strict separation between outputs and
+							// inputs here
+							if w.IsAutoallocated() || w.IsUserAllocated() {
+								continue
+							}
+							w2.Clear()
 							w2.Add(w.WContents)
 							w.Clear()
 						}
@@ -456,6 +448,17 @@ func (this *Liquidhandler) Plan(request *LHRequest) error {
 // sort out inputs
 func (this *Liquidhandler) GetInputs(request *LHRequest) (*LHRequest, error) {
 	instructions := (*request).LHInstructions
+
+	// ensure input plates is sorted out correctly
+
+	st := sampletracker.GetSampleTracker()
+
+	parr := st.GetInputPlates()
+
+	for _, p := range parr {
+		request.Input_plates[p.ID] = p
+	}
+
 	inputs := make(map[string][]*wtype.LHComponent, 3)
 	order := make(map[string]map[string]int, 3)
 	vmap := make(map[string]wunit.Volume)
@@ -696,16 +699,14 @@ func (this *Liquidhandler) Layout(request *LHRequest) (*LHRequest, error) {
 
 // make the instructions for executing this request
 func (this *Liquidhandler) ExecutionPlan(request *LHRequest) (*LHRequest, error) {
-	//rbtcpy := this.Properties.Dup()
+	// necessary??
 	this.FinalProperties = this.Properties.Dup()
 	temprobot := this.Properties.Dup()
+	saved_plates := this.Properties.SaveUserPlates()
 	rq, err := this.ExecutionPlanner(request, this.Properties)
-
-	// switcherooo
-	//	this.FinalProperties = this.Properties
-	//	this.Properties = temprobot
-
 	this.FinalProperties = temprobot
+
+	this.Properties.RestoreUserPlates(saved_plates)
 
 	return rq, err
 }
