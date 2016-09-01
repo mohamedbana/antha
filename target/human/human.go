@@ -78,8 +78,9 @@ func (a *Human) Compile(nodes []ast.Node) ([]target.Inst, error) {
 
 	insts = append(insts, entry)
 
-	// Maximally coalesce repeated commands
-	dag := graph.Schedule(g)
+	// Maximally coalesce repeated commands according to when they are first
+	// available to be executed (graph.Reverse)
+	dag := graph.Schedule(graph.Reverse(g))
 	for len(dag.Roots) > 0 {
 		var next []graph.Node
 		// Gather
