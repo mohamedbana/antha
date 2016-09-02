@@ -3,15 +3,18 @@
 package image
 
 import (
+	"encoding/json"
 	"fmt"
 	goimage "image"
 	"image/color"
 	"image/color/palette"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 
+	anthapath "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
@@ -21,30 +24,71 @@ import (
 
 // Colour palette to use // this would relate to a map of components of these available colours in factor
 
-var AvailablePalettes = map[string]color.Palette{
-	"Palette1":               palettefromMap(Colourcomponentmap), //Chosencolourpalette,
-	"Neon":                   palettefromMap(Neon),
-	"WebSafe":                palette.WebSafe, //websafe,
-	"Plan9":                  palette.Plan9,
-	"ProteinPaintboxVisible": palettefromMap(ProteinPaintboxmap),
-	"ProteinPaintboxUV":      palettefromMap(UVProteinPaintboxmap),
-	"ProteinPaintboxSubset":  palettefromMap(ProteinPaintboxSubsetmap),
-	"Gray":                   MakeGreyScalePalette(),
-	"None":                   Emptycolourarray,
+func AvailablePalettes() (availablepalettes map[string]color.Palette) {
+
+	availablepalettes = make(map[string]color.Palette)
+
+	availablepalettes["Palette1"] = palettefromMap(Colourcomponentmap) //Chosencolourpalette,
+	availablepalettes["Neon"] = palettefromMap(Neon)
+	availablepalettes["WebSafe"] = palette.WebSafe //websafe,
+	availablepalettes["Plan9"] = palette.Plan9
+	availablepalettes["ProteinPaintboxVisible"] = palettefromMap(ProteinPaintboxmap)
+	availablepalettes["ProteinPaintboxUV"] = palettefromMap(UVProteinPaintboxmap)
+	availablepalettes["ProteinPaintboxSubset"] = palettefromMap(ProteinPaintboxSubsetmap)
+	availablepalettes["Gray"] = MakeGreyScalePalette()
+	availablepalettes["None"] = Emptycolourarray
+
+	invmap, err := MakelatestcolourMap(filepath.Join(anthapath.Path(), "testcolours.json"))
+	if err != nil {
+		panic(err.Error())
+	}
+	availablepalettes["inventory"] = palettefromMap(invmap)
+
+	uvinvmap, err := MakelatestcolourMap(filepath.Join(anthapath.Path(), "UVtestcolours.json"))
+	if err != nil {
+		panic(err.Error())
+	}
+	availablepalettes["UVinventory"] = palettefromMap(uvinvmap)
+	return
 }
 
 var Emptycolourarray color.Palette
 
-var AvailableComponentmaps = map[string]map[color.Color]string{
-	"Palette1": Colourcomponentmap,
-	"Neon":     Neon,
-	"ProteinPaintboxVisible": ProteinPaintboxmap,
-	"ProteinPaintboxUV":      UVProteinPaintboxmap,
-	"ProteinPaintboxSubset":  ProteinPaintboxSubsetmap,
+func AvailableComponentmaps() (componentmaps map[string]map[color.Color]string) {
+	componentmaps = make(map[string]map[color.Color]string)
+	componentmaps["Palette1"] = Colourcomponentmap
+	componentmaps["Neon"] = Neon
+	componentmaps["ProteinPaintboxVisible"] = ProteinPaintboxmap
+	componentmaps["ProteinPaintboxUV"] = UVProteinPaintboxmap
+	componentmaps["ProteinPaintboxSubset"] = ProteinPaintboxSubsetmap
+
+	invmap, err := MakelatestcolourMap(filepath.Join(anthapath.Path(), "testcolours.json"))
+	if err != nil {
+		panic(err.Error())
+	}
+
+	componentmaps["inventory"] = invmap
+
+	uvinvmap, err := MakelatestcolourMap(filepath.Join(anthapath.Path(), "UVtestcolours.json"))
+	if err != nil {
+		panic(err.Error())
+	}
+
+	componentmaps["UVinventory"] = uvinvmap
+
+	return
 }
 
-var Visibleequivalentmaps = map[string]map[color.Color]string{
-	"ProteinPaintboxUV": ProteinPaintboxmap,
+func Visibleequivalentmaps() map[string]map[color.Color]string {
+	visibleequivalentmaps := make(map[string]map[color.Color]string)
+	visibleequivalentmaps["ProteinPaintboxUV"] = ProteinPaintboxmap
+	invmap, err := MakelatestcolourMap(filepath.Join(anthapath.Path(), "testcolours.json"))
+	if err != nil {
+		panic(err.Error())
+	}
+	visibleequivalentmaps["UVinventory"] = invmap
+
+	return visibleequivalentmaps
 }
 
 func ColourtoCMYK(colour color.Color) (cmyk color.CMYK) {
@@ -58,6 +102,30 @@ func ColourtoGrayscale(colour color.Color) (gray color.Gray) {
 	r, g, b, _ := colour.RGBA()
 	gray.Y = uint8((0.2126 * float64(r)) + (0.7152 * float64(g)) + (0.0722 * float64(b)))
 	return
+}
+
+func MakelatestcolourMap(jsonmapfilename string) (colourtostringmap map[color.Color]string, err error) {
+	var stringtonrgbamap *map[string]color.NRGBA = &map[string]color.NRGBA{}
+
+	data, err := ioutil.ReadFile(jsonmapfilename)
+
+	if err != nil {
+		return colourtostringmap, err
+	}
+
+	err = json.Unmarshal(data, stringtonrgbamap)
+	if err != nil {
+		return colourtostringmap, err
+	}
+
+	stringtocolourmap := make(map[string]color.Color)
+	for key, value := range *stringtonrgbamap {
+		stringtocolourmap[key] = value
+	}
+
+	colourtostringmap, err = reversestringtopalettemap(stringtocolourmap)
+
+	return colourtostringmap, err
 }
 
 func MakeGreyScalePalette() (graypalette []color.Color) {
@@ -157,6 +225,25 @@ func reversepalettemap(colourmap map[color.Color]string) (stringmap map[string]c
 	return
 }
 
+func reversestringtopalettemap(stringmap map[string]color.Color) (colourmap map[color.Color]string, err error) {
+
+	colourmap = make(map[color.Color]string, len(stringmap))
+
+	for key, value := range stringmap {
+
+		_, ok := colourmap[value]
+		if ok == true {
+			alreadyinthere := colourmap[value]
+
+			err = fmt.Errorf("attempt to add value", key, "for key", value, "to colourmap", colourmap, "failed due to duplicate entry", alreadyinthere)
+		} else {
+			colourmap[value] = key
+		}
+		// fmt.Println("key:", key, "value", value)
+	}
+	return
+}
+
 func MakeSubMapfromMap(existingmap map[color.Color]string, colournames []string) (newmap map[color.Color]string) {
 
 	newmap = make(map[color.Color]string, 0)
@@ -176,7 +263,7 @@ func MakeSubMapfromMap(existingmap map[color.Color]string, colournames []string)
 }
 
 func MakeSubPallette(palettename string, colournames []string) (subpalette color.Palette) {
-	palettemap := AvailableComponentmaps[palettename]
+	palettemap := AvailableComponentmaps()[palettename]
 
 	submap := MakeSubMapfromMap(palettemap, colournames)
 
@@ -588,7 +675,7 @@ func MakeSmallPalleteFromImage(imagefilename string, plate *wtype.LHPlate, rotat
 
 	// use Plan9 as pallette for first round to keep number of colours down to a manageable level
 
-	chosencolourpalette := AvailablePalettes["Plan9"]
+	chosencolourpalette := AvailablePalettes()["Plan9"]
 
 	colourmap := make(map[color.Color]bool, 0)
 

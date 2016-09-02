@@ -216,6 +216,13 @@ func makeComponentLibrary() map[string]*wtype.LHComponent {
 
 	A = wtype.NewLHComponent()
 	//A.GenericMatter = matter[wtype.LTWater]
+	A.CName = "Paint"
+	A.Type = wtype.LTPostMix
+	A.Smax = 9999
+	cmap[A.CName] = A
+
+	A = wtype.NewLHComponent()
+	//A.GenericMatter = matter[wtype.LTWater]
 	A.CName = "yellow"
 	A.Type = wtype.LTWater
 	A.Smax = 9999
