@@ -11,9 +11,10 @@ import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 //"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/sequences"
@@ -51,7 +52,7 @@ func _PrimerDesign_ColonyPCR_wtypeSteps(_ctx context.Context, _input *PrimerDesi
 	if err != nil {
 		fmt.Println("FindPositioninoligoFail")
 		_output.Warnings = err
-		Errorf(_output.Warnings.Error())
+		execute.Errorf(_ctx, _output.Warnings.Error())
 	}
 
 	// if true then the start oint ot design primers is moved back 150bp to ensure full region is covered
@@ -69,7 +70,7 @@ func _PrimerDesign_ColonyPCR_wtypeSteps(_ctx context.Context, _input *PrimerDesi
 
 	if _output.Warnings != nil {
 		fmt.Println("FWDOligoSeqFail")
-		Errorf(_output.Warnings.Error())
+		execute.Errorf(_ctx, _output.Warnings.Error())
 	}
 
 	fmt.Println(text.Print("FWDPrimer:", _output.FWDPrimer))
@@ -86,7 +87,7 @@ func _PrimerDesign_ColonyPCR_wtypeSteps(_ctx context.Context, _input *PrimerDesi
 
 	if _output.Warnings != nil {
 		fmt.Println("REVOligoSeqFail")
-		Errorf(_output.Warnings.Error())
+		execute.Errorf(_ctx, _output.Warnings.Error())
 	}
 
 	fmt.Println(text.Print("REVPrimer:", _output.REVPrimer))
@@ -178,12 +179,12 @@ type PrimerDesign_ColonyPCR_wtypeSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PrimerDesign_ColonyPCR_wtype",
+	if err := addComponent(component.Component{Name: "PrimerDesign_ColonyPCR_wtype",
 		Constructor: PrimerDesign_ColonyPCR_wtypeNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "This element will design a pair of primers to cover a specified region of a sequence for colonyPCR.\nBut it's not finished yet!, please finish it off by designing the reverse primer\ngo to cd $GOPATH/src/github.com/antha-lang/antha/antha/examples/workflows/AnthaAcademy/Exercises/PrimerDesignExercise\nmake antharun return correct primerpairs for the three cases shown\nDesign criteria such as maximum gc content, acceptable ranges of melting temperatures and primer length may be specified by the user.\n",
 			Path: "antha/component/an/Data/DNA/PrimerDesign/PrimerDesign_ColonyPCR_wtype.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "FlankTargetSequence", Desc: "", Kind: "Parameters"},
 				{Name: "FullDNASeq", Desc: "", Kind: "Parameters"},
 				{Name: "Maxgc", Desc: "as a proportion of 1, i.e. 1 == 100%\n", Kind: "Parameters"},
@@ -199,5 +200,7 @@ func init() {
 				{Name: "Warnings", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

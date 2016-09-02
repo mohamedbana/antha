@@ -12,9 +12,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 	"strconv"
 )
 
@@ -200,12 +201,12 @@ type CombinatorialLibraryDesign_AntibodySOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "CombinatorialLibraryDesign_Antibody",
+	if err := addComponent(component.Component{Name: "CombinatorialLibraryDesign_Antibody",
 		Constructor: CombinatorialLibraryDesign_AntibodyNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Data/DNA/TypeIISAssembly_design/CombinatorialLibraryDesign_Antibody.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "BlastSearchSeqs", Desc: "", Kind: "Parameters"},
 				{Name: "Part1s", Desc: "", Kind: "Parameters"},
 				{Name: "Part2s", Desc: "", Kind: "Parameters"},
@@ -223,5 +224,7 @@ func init() {
 				{Name: "StatusMap", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }

@@ -9,9 +9,10 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
+	"golang.org/x/net/context"
 )
 
 /*type Polymerase struct {
@@ -81,7 +82,7 @@ func _PCR_vol_mmx_primerbindSteps(_ctx context.Context, _input *PCR_vol_mmx_prim
 			text.Print("RevPrimerSitesfound:", fmt.Sprint(_output.RevPrimerSites)),
 		)
 
-		Errorf(errordescription)
+		execute.Errorf(_ctx, errordescription)
 	}
 	// Make a mastermix
 
@@ -260,12 +261,12 @@ type PCR_vol_mmx_primerbindSOutput struct {
 }
 
 func init() {
-	addComponent(Component{Name: "PCR_vol_mmx_primerbind",
+	if err := addComponent(component.Component{Name: "PCR_vol_mmx_primerbind",
 		Constructor: PCR_vol_mmx_primerbindNew,
-		Desc: ComponentDesc{
+		Desc: component.ComponentDesc{
 			Desc: "",
 			Path: "antha/component/an/Liquid_handling/PCR/pcr_vol_mmx_primerbind.an",
-			Params: []ParamDesc{
+			Params: []component.ParamDesc{
 				{Name: "AnnealingTemp", Desc: "Should be calculated from primer and template binding\n", Kind: "Parameters"},
 				{Name: "Annealingtime", Desc: "Denaturationtemp Temperature\n", Kind: "Parameters"},
 				{Name: "Denaturationtime", Desc: "", Kind: "Parameters"},
@@ -299,5 +300,7 @@ func init() {
 				{Name: "RevPrimerSites", Desc: "", Kind: "Data"},
 			},
 		},
-	})
+	}); err != nil {
+		panic(err)
+	}
 }
