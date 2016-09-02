@@ -1022,7 +1022,7 @@ func plateAssertion(plate_loc string, wells []wellDesc) *AssertionFn {
 			wc := wtype.MakeWellCoords(wd.position)
 			well := plate.GetChildByAddress(wc).(*wtype.LHWell)
 			c := well.Contents()
-			if c.Vol != wd.volume || wd.liquid_type != c.Name() {
+			if fmt.Sprintf("%.2f", c.Vol) != fmt.Sprintf("%.2f", wd.volume) || wd.liquid_type != c.Name() {
 				errs = append(errs, fmt.Sprintf("Expected %.2ful of %s in well %s, found %.2ful of %s",
 					wd.volume, wd.liquid_type, wd.position, c.Vol, c.Name()))
 			}
