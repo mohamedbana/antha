@@ -222,6 +222,9 @@ func EncodeLHTip(arg wtype.LHTip) *pb.LHTipMessage {
 	return &ret
 }
 func DecodeLHTip(arg *pb.LHTipMessage) wtype.LHTip {
+	if arg == nil {
+		return wtype.LHTip{}
+	}
 	ret := wtype.LHTip{ID: (string)(arg.Arg_1), Type: (string)(arg.Arg_2), Mnfr: (string)(arg.Arg_3), Dirty: (bool)(arg.Arg_4), MaxVol: (wunit.Volume)(DecodeVolume(arg.Arg_5)), MinVol: (wunit.Volume)(DecodeVolume(arg.Arg_6))}
 	return ret
 }
@@ -486,6 +489,9 @@ func EncodeLHChannelParameter(arg wtype.LHChannelParameter) *pb.LHChannelParamet
 	return &ret
 }
 func DecodeLHChannelParameter(arg *pb.LHChannelParameterMessage) wtype.LHChannelParameter {
+	if arg == nil {
+		return wtype.LHChannelParameter{}
+	}
 	ret := wtype.LHChannelParameter{ID: (string)(arg.Arg_1), Platform: (string)(arg.Arg_2), Name: (string)(arg.Arg_3), Minvol: (wunit.Volume)(DecodeVolume(arg.Arg_4)), Maxvol: (wunit.Volume)(DecodeVolume(arg.Arg_5)), Minspd: (wunit.FlowRate)(DecodeFlowRate(arg.Arg_6)), Maxspd: (wunit.FlowRate)(DecodeFlowRate(arg.Arg_7)), Multi: (int)(arg.Arg_8), Independent: (bool)(arg.Arg_9), Orientation: (int)(arg.Arg_10), Head: (int)(arg.Arg_11)}
 	return ret
 }

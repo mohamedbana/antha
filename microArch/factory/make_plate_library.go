@@ -173,6 +173,9 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	plate = wtype.NewLHPlate("pcrplate_skirted_riser40", "Unknown", 8, 12, wtype.Coordinates{127.76, 85.48, 25.7}, welltype, 9, 9, 0.0, 0.0, riserheightinmm-1.25)
 	plates[plate.Type] = plate
 
+	plate = wtype.NewLHPlate("pcrplate_skirted_riser", "Unknown", 8, 12, wtype.Coordinates{127.76, 85.48, 25.7}, welltype, 9, 9, 0.0, 0.0, riserheightinmm-1.25)
+	plates[plate.Type] = plate
+
 	// pcr plate skirted (on riser)
 	cone = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
 	welltype = wtype.NewLHWell(nil, wtype.ZeroWellCoords(), "ul", 200, 5, cone, wtype.UWellBottom, 5.5, 5.5, 20.4, 1.4, "mm")
@@ -593,6 +596,7 @@ func MakeGreinerVBottomPlateWithRiser() *wtype.LHPlate {
 func GetPlateByType(typ string) *wtype.LHPlate {
 	plates := makePlateLibrary()
 	p := plates[typ]
+
 	return p.Dup()
 }
 
