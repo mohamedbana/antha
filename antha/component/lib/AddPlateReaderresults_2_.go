@@ -633,6 +633,63 @@ func _AddPlateReaderresults_2Analysis(_ctx context.Context, _input *AddPlateRead
 
 	}
 
+	if _input.ManualComparison {
+
+		// reset
+		xvalues = make([]float64, 0)
+		yvalues = make([]float64, 0)
+
+		// add origin
+		xvalues = append(xvalues, 0.0)
+		yvalues = append(yvalues, 0.0)
+
+		// 2. now plot correctnessfactor
+		for i, runwithresponses := range _output.Runs {
+			// values for r2 to reset each run
+
+			// get response value and check if it's a float64 type
+			expectedconc, err := runwithresponses.GetResponseValue("Absorbance ExpectedConc " + strconv.Itoa(_input.Wavelength))
+
+			if err != nil {
+				_output.Errors = append(_output.Errors, err.Error())
+			}
+
+			expectedconcfloat, floattrue := expectedconc.(float64)
+			// if float64 is true
+			if floattrue {
+				xvalues = append(xvalues, expectedconcfloat)
+			} else {
+				execute.Errorf(_ctx, "Run"+fmt.Sprint(i, runwithresponses)+" ExpectedConc:"+fmt.Sprint(expectedconcfloat))
+			}
+
+			// get response value and check if it's a float64 type
+			correctness, err := runwithresponses.GetResponseValue("Absorbance ManualCorrectnessFactor " + strconv.Itoa(_input.Wavelength))
+
+			if err != nil {
+				fmt.Println(err.Error())
+				_output.Errors = append(_output.Errors, err.Error())
+			}
+
+			correctnessfloat, floattrue := correctness.(float64)
+
+			if floattrue {
+				yvalues = append(yvalues, correctnessfloat)
+			} else {
+				fmt.Println(err.Error())
+				execute.Errorf(_ctx, "Manual Absorbance CorrectnessFactor:"+fmt.Sprint(correctnessfloat))
+			}
+
+		}
+
+		_output.R2_CorrectnessFactor, _, _ = plot.Rsquared("Expected Conc", xvalues, "Manual Correctness Factor", yvalues)
+		//run.AddResponseValue("R2", rsquared)
+
+		correctnessgraph := plot.Plot(xvalues, [][]float64{yvalues})
+
+		plot.Export(correctnessgraph, filenameandextension[0]+"_Manualcorrectnessfactor"+".png")
+
+	}
+
 }
 
 // A block of tests to perform to validate that the sample was processed correctly
