@@ -1070,10 +1070,10 @@ func (d *Driver) GetPositionState(arg_1 string) (string, driver.CommandStatus) {
 	ret, _ := d.C.GetPositionState(context.Background(), &req)
 	return (string)(ret.Ret_1), (driver.CommandStatus)(DecodeCommandStatus(ret.Ret_2))
 }
-func (d *Driver) GetStatus() (map[string]interface{}, driver.CommandStatus) {
+func (d *Driver) GetStatus() (driver.Status, driver.CommandStatus) {
 	req := pb.GetStatusRequest{}
 	ret, _ := d.C.GetStatus(context.Background(), &req)
-	return (map[string]interface{})(DecodeMapstringinterfaceMessage(ret.Ret_1)), (driver.CommandStatus)(DecodeCommandStatus(ret.Ret_2))
+	return (driver.Status)(DecodeMapstringinterfaceMessage(ret.Ret_1)), (driver.CommandStatus)(DecodeCommandStatus(ret.Ret_2))
 }
 func (d *Driver) Go() driver.CommandStatus {
 	req := pb.GoRequest{}
@@ -1210,7 +1210,7 @@ func (d *Driver) SetPipetteSpeed(arg_1 int, arg_2 int, arg_3 float64) driver.Com
 	ret, _ := d.C.SetPipetteSpeed(context.Background(), &req)
 	return (driver.CommandStatus)(DecodeCommandStatus(ret.Ret_1))
 }
-func (d *Driver) SetPositionState(arg_1 string, arg_2 map[string]interface{}) driver.CommandStatus {
+func (d *Driver) SetPositionState(arg_1 string, arg_2 driver.PositionState) driver.CommandStatus {
 	req := pb.SetPositionStateRequest{
 		(string)(arg_1),
 		EncodeMapstringinterfaceMessage(arg_2),
