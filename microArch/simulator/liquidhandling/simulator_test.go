@@ -23,7 +23,6 @@
 package liquidhandling_test
 
 import (
-	//"fmt"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	lh "github.com/antha-lang/antha/microArch/simulator/liquidhandling"
 	"testing"
@@ -1904,6 +1903,44 @@ func Test_Dispense(t *testing.T) {
 			},
 		},
 		SimulatorTest{
+			"OK - mixing",
+			nil,
+			[]*SetupFn{
+				testLayout(),
+				preloadFilledTips(0, "tipbox_1", []int{0}, "water", 100.),
+				prefillWells("input_1", []string{"A1"}, "green", 50.),
+			},
+			[]TestRobotInstruction{
+				&Move{
+					[]string{"input_1", "", "", "", "", "", "", ""}, //deckposition
+					[]string{"A1", "", "", "", "", "", "", ""},      //wellcoords
+					[]int{0, 0, 0, 0, 0, 0, 0, 0},                   //reference
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetX
+					[]float64{0., 0., 0., 0., 0., 0., 0., 0.},       //offsetY
+					[]float64{1., 1., 1., 1., 1., 1., 1., 1.},       //offsetZ
+					[]string{"plate", "", "", "", "", "", "", ""},   //plate_type
+					0, //head
+				},
+				&Dispense{
+					[]float64{50., 0., 0., 0., 0., 0., 0., 0.},                     //volume    []float64
+					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
+					0, //head      int
+					8, //multi     int
+					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype []string
+					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
+					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
+				},
+			},
+			nil, //errors
+			[]*AssertionFn{ //assertions
+				tipboxAssertion("tipbox_1", []string{}),
+				tipboxAssertion("tipbox_2", []string{}),
+				plateAssertion("input_1", []wellDesc{wellDesc{"A1", "green+water", 100.}}),
+				adaptorAssertion(0, []tipDesc{tipDesc{0, "water", 50.}}),
+				tipwasteAssertion("tipwaste", 0),
+			},
+		},
+		SimulatorTest{
 			"OK - single channel slightly above well",
 			nil,
 			[]*SetupFn{
@@ -2412,7 +2449,6 @@ func Test_Mix(t *testing.T) {
 	}
 }
 
-/*
 func component(name string) *wtype.LHComponent {
 	A := wtype.NewLHComponent()
 	A.CName = name
@@ -2619,7 +2655,6 @@ func Test_Workflow(t *testing.T) {
 			[]string{"green", "", "", "", "", "", "", ""},
 			195.*green[y])...)
 		wc.X = 4
-		fmt.Printf("green to %s\n", wc.FormatA1())
 		inst = append(inst, blow("input_1",
 			[]string{wc.FormatA1(), "", "", "", "", "", "", ""},
 			[]string{"green", "", "", "", "", "", "", ""},
@@ -2629,7 +2664,6 @@ func Test_Workflow(t *testing.T) {
 	inst = append(inst, get1tip("G12")...)
 	for y := 0; y < 8; y++ {
 		if (1 - green[y]) == 0. {
-			fmt.Printf("PONG y = %d\n", y)
 			continue
 		}
 		wc.X = 3
@@ -2639,14 +2673,10 @@ func Test_Workflow(t *testing.T) {
 			[]string{"water", "", "", "", "", "", "", ""},
 			195.*(1-green[y]))...)
 		wc.X = 4
-		fmt.Printf("water to %s\n", wc.FormatA1())
 		inst = append(inst, blow("input_1",
 			[]string{wc.FormatA1(), "", "", "", "", "", "", ""},
 			[]string{"water", "", "", "", "", "", "", ""},
 			195.*(1-green[y]))...)
-
-		well := input_plate.GetChildByAddress(wc).(*wtype.LHWell)
-		fmt.Printf("well %s contains %s\n", well.GetName(), well.Contents().Name())
 	}
 	inst = append(inst, dropTips([]int{0})...)
 
@@ -2700,13 +2730,6 @@ func Test_Workflow(t *testing.T) {
 			wc.Y = i
 			to_wells[i] = wc.FormatA1()
 		}
-
-		for _, w := range from_wells {
-			wc := wtype.MakeWellCoords(w)
-			well := input_plate.GetChildByAddress(wc).(*wtype.LHWell)
-			fmt.Printf("From %s : %s\n", well.GetName(), well.Contents().GetType())
-		}
-		fmt.Println()
 
 		inst = append(inst, suck("input_1",
 			from_wells,
@@ -2767,4 +2790,3 @@ func Test_Workflow(t *testing.T) {
 	st.run(t)
 
 }
-*/

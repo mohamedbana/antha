@@ -439,7 +439,7 @@ func initialize_tips(tipbox *LHTipbox, tiptype *LHTip) *LHTipbox {
 	y_off := (tipbox.TipYOffset - tiptype.GetSize().Y) / 2.
 	for i := 0; i < nc; i++ {
 		for j := 0; j < nr; j++ {
-			tipbox.Tips[i][j] = CopyTip(*tiptype)
+			tipbox.Tips[i][j] = tiptype.Dup()
 			tipbox.Tips[i][j].SetOffset(Coordinates{
 				tipbox.TipXStart + float64(i)*tipbox.TipXOffset + x_off,
 				tipbox.TipYStart + float64(j)*tipbox.TipYOffset + y_off,

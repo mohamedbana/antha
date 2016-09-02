@@ -967,9 +967,9 @@ func adaptorAssertion(head int, tips []tipDesc) *AssertionFn {
 			}
 			tip := adaptor.GetChannel(td.channel).GetTip()
 			c := tip.Contents()
-			if c.Volume().ConvertToString("ul") != td.volume || c.GetType() != td.liquid_type {
+			if c.Volume().ConvertToString("ul") != td.volume || c.Name() != td.liquid_type {
 				errors = append(errors, fmt.Sprintf("Channel %d: Expected tip with %.2f ul of \"%s\", got tip with %s of \"%s\"",
-					td.channel, td.volume, td.liquid_type, c.Volume(), c.GetType()))
+					td.channel, td.volume, td.liquid_type, c.Volume(), c.Name()))
 			}
 		}
 		if len(errors) > 0 {
@@ -1022,9 +1022,9 @@ func plateAssertion(plate_loc string, wells []wellDesc) *AssertionFn {
 			wc := wtype.MakeWellCoords(wd.position)
 			well := plate.GetChildByAddress(wc).(*wtype.LHWell)
 			c := well.Contents()
-			if c.Vol != wd.volume || wd.liquid_type != c.GetType() {
+			if c.Vol != wd.volume || wd.liquid_type != c.Name() {
 				errs = append(errs, fmt.Sprintf("Expected %.2ful of %s in well %s, found %.2ful of %s",
-					wd.volume, wd.liquid_type, wd.position, c.Vol, c.GetType()))
+					wd.volume, wd.liquid_type, wd.position, c.Vol, c.Name()))
 			}
 		}
 		//now check that all the other wells are empty
@@ -1032,7 +1032,7 @@ func plateAssertion(plate_loc string, wells []wellDesc) *AssertionFn {
 			for _, well := range row {
 				if c := well.Contents(); !m[well.Crds.FormatA1()] && !c.IsZero() {
 					errs = append(errs, fmt.Sprintf("Expected empty well at %s, instead %s of %s",
-						well.Crds.FormatA1(), c.Volume(), c.GetType()))
+						well.Crds.FormatA1(), c.Volume(), c.Name()))
 				}
 			}
 		}
