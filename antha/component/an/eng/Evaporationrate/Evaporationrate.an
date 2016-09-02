@@ -81,7 +81,7 @@ Analysis {
 			panic(err.Error())
 		}
 		fmt.Println("wellarea", wellarea.ToString())
-		fmt.Println(Platetype.Welltype.Xdim, Platetype.Welltype.Ydim, Platetype.Welltype.Zdim, Platetype.Welltype.Shape())
+		fmt.Println(Platetype.Welltype.GetSize(), Platetype.Welltype.Shape())
 	surfacearea = wellarea
 	}else {
 		Warnings = fmt.Errorf("plate "+ Platetype.String() +" Wellshape "+ Platetype.Welltype.String() +" surface area not yet calculated due to bottom type")
