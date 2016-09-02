@@ -34,6 +34,13 @@ func (a *ir) Print(g graph.Graph, out io.Writer) error {
 		Graph: g,
 		NodeLabelers: []graph.Labeler{
 			func(x interface{}) string {
+				if c, ok := x.(*ast.Command); ok {
+					return fmt.Sprintf("%T", c.Inst)
+				} else {
+					return ""
+				}
+			},
+			func(x interface{}) string {
 				n := x.(ast.Node)
 				drun := a.assignment[n]
 				if drun != nil {

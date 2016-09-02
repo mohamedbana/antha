@@ -57,7 +57,7 @@ func getKey(n ast.Node) (r interface{}) {
 	} else if h, ok := c.Inst.(*ast.HandleInst); ok {
 		r = h.Group
 	} else if i, ok := c.Inst.(*ast.IncubateInst); ok {
-		r = *i
+		r = i.Temp.ToString() + " " + i.Time.ToString()
 	} else {
 		r = reflect.TypeOf(c.Inst)
 	}
@@ -78,8 +78,9 @@ func (a *Human) Compile(nodes []ast.Node) ([]target.Inst, error) {
 
 	insts = append(insts, entry)
 
-	// Maximally coalesce repeated commands
-	dag := graph.Schedule(g)
+	// Maximally coalesce repeated commands according to when they are first
+	// available to be executed (graph.Reverse)
+	dag := graph.Schedule(graph.Reverse(g))
 	for len(dag.Roots) > 0 {
 		var next []graph.Node
 		// Gather
