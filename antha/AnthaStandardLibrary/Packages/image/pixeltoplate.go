@@ -38,17 +38,21 @@ func AvailablePalettes() (availablepalettes map[string]color.Palette) {
 	availablepalettes["Gray"] = MakeGreyScalePalette()
 	availablepalettes["None"] = Emptycolourarray
 
-	invmap, err := MakelatestcolourMap(filepath.Join(anthapath.Path(), "testcolours.json"))
-	if err != nil {
-		panic(err.Error())
+	if _, err := os.Stat(filepath.Join(anthapath.Path(), "testcolours.json")); err == nil {
+		invmap, err := MakelatestcolourMap(filepath.Join(anthapath.Path(), "testcolours.json"))
+		if err != nil {
+			panic(err.Error())
+		}
+		availablepalettes["inventory"] = palettefromMap(invmap)
 	}
-	availablepalettes["inventory"] = palettefromMap(invmap)
 
-	uvinvmap, err := MakelatestcolourMap(filepath.Join(anthapath.Path(), "UVtestcolours.json"))
-	if err != nil {
-		panic(err.Error())
+	if _, err := os.Stat(filepath.Join(anthapath.Path(), "UVtestcolours.json")); err == nil {
+		uvinvmap, err := MakelatestcolourMap(filepath.Join(anthapath.Path(), "UVtestcolours.json"))
+		if err != nil {
+			panic(err.Error())
+		}
+		availablepalettes["UVinventory"] = palettefromMap(uvinvmap)
 	}
-	availablepalettes["UVinventory"] = palettefromMap(uvinvmap)
 	return
 }
 
@@ -62,32 +66,36 @@ func AvailableComponentmaps() (componentmaps map[string]map[color.Color]string) 
 	componentmaps["ProteinPaintboxUV"] = UVProteinPaintboxmap
 	componentmaps["ProteinPaintboxSubset"] = ProteinPaintboxSubsetmap
 
-	invmap, err := MakelatestcolourMap(filepath.Join(anthapath.Path(), "testcolours.json"))
-	if err != nil {
-		panic(err.Error())
+	if _, err := os.Stat(filepath.Join(anthapath.Path(), "testcolours.json")); err == nil {
+		invmap, err := MakelatestcolourMap(filepath.Join(anthapath.Path(), "testcolours.json"))
+		if err != nil {
+			panic(err.Error())
+		}
+
+		componentmaps["inventory"] = invmap
 	}
+	if _, err := os.Stat(filepath.Join(anthapath.Path(), "UVtestcolours.json")); err == nil {
+		uvinvmap, err := MakelatestcolourMap(filepath.Join(anthapath.Path(), "UVtestcolours.json"))
+		if err != nil {
+			panic(err.Error())
+		}
 
-	componentmaps["inventory"] = invmap
-
-	uvinvmap, err := MakelatestcolourMap(filepath.Join(anthapath.Path(), "UVtestcolours.json"))
-	if err != nil {
-		panic(err.Error())
+		componentmaps["UVinventory"] = uvinvmap
 	}
-
-	componentmaps["UVinventory"] = uvinvmap
-
 	return
 }
 
 func Visibleequivalentmaps() map[string]map[color.Color]string {
 	visibleequivalentmaps := make(map[string]map[color.Color]string)
 	visibleequivalentmaps["ProteinPaintboxUV"] = ProteinPaintboxmap
-	invmap, err := MakelatestcolourMap(filepath.Join(anthapath.Path(), "testcolours.json"))
-	if err != nil {
-		panic(err.Error())
-	}
-	visibleequivalentmaps["UVinventory"] = invmap
 
+	if _, err := os.Stat(filepath.Join(anthapath.Path(), "testcolours.json")); err == nil {
+		invmap, err := MakelatestcolourMap(filepath.Join(anthapath.Path(), "testcolours.json"))
+		if err != nil {
+			panic(err.Error())
+		}
+		visibleequivalentmaps["UVinventory"] = invmap
+	}
 	return visibleequivalentmaps
 }
 
