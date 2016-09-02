@@ -70,6 +70,8 @@ var AvailablePolicyfiles []PolicyFile = []PolicyFile{
 	MakePolicyFile("newdesign2factorsonly.xlsx", "JMP", &[]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}, 2000),
 	MakePolicyFile("190516OnePolicy.xlsx", "JMP", &[]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}, 3000),
 	MakePolicyFile("AssemblycategoricScreen.xlsx", "JMP", &[]int{1, 2, 3, 4, 5}, 4000),
+	MakePolicyFile("090816dispenseerrordiagnosis.xlsx", "JMP", &[]int{2}, 5000),
+	MakePolicyFile("090816combineddesign.xlsx", "JMP", &[]int{1}, 6000),
 }
 
 // change to range through several files
@@ -603,6 +605,10 @@ func MakeLoadPolicy() LHPolicy {
 	loadpolicy["TIP_REUSE_LIMIT"] = 0
 	loadpolicy["NO_AIR_DISPENSE"] = true
 	loadpolicy["TOUCHOFF"] = false
+	loadpolicy["BLOWOUTREFERENCE"] = 1
+	loadpolicy["BLOWOUTOFFSET"] = 0.0
+	loadpolicy["BLOWOUTVOLUME"] = 0.0
+	loadpolicy["BLOWOUTVOLUMEUNIT"] = "ul"
 	return loadpolicy
 }
 
@@ -613,11 +619,15 @@ func MakeLoadWaterPolicy() LHPolicy {
 	loadpolicy["DSPSPEED"] = 0.1
 	loadpolicy["CAN_MULTI"] = false
 	loadpolicy["CAN_MSA"] = false
-	loadpolicy["CAN_SDD"] = false
+	//loadpolicy["CAN_SDD"] = false
 	loadpolicy["TOUCHOFF"] = false
 	loadpolicy["NO_AIR_DISPENSE"] = true
 	loadpolicy["TOUCHOFF"] = false
 	loadpolicy["TIP_REUSE_LIMIT"] = 100
+	loadpolicy["BLOWOUTREFERENCE"] = 1
+	loadpolicy["BLOWOUTOFFSET"] = 0.0
+	loadpolicy["BLOWOUTVOLUME"] = 0.0
+	loadpolicy["BLOWOUTVOLUMEUNIT"] = "ul"
 	return loadpolicy
 }
 
@@ -634,6 +644,10 @@ func MakeLoadlowPolicy() LHPolicy {
 	loadpolicy["DSPZOFFSET"] = 0.5
 	loadpolicy["NO_AIR_DISPENSE"] = true
 	loadpolicy["TOUCHOFF"] = false
+	loadpolicy["BLOWOUTREFERENCE"] = 1
+	loadpolicy["BLOWOUTOFFSET"] = 0.0
+	loadpolicy["BLOWOUTVOLUME"] = 0.0
+	loadpolicy["BLOWOUTVOLUMEUNIT"] = "ul"
 	return loadpolicy
 }
 
@@ -710,13 +724,16 @@ func MakeDefaultPolicy() LHPolicy {
 	defaultpolicy["ASPZOFFSET"] = 0.5
 	defaultpolicy["DSPREFERENCE"] = 0
 	defaultpolicy["DSPZOFFSET"] = 0.5
-	defaultpolicy["CAN_MULTI"] = false
+	defaultpolicy["CAN_MULTI"] = true
 	defaultpolicy["CAN_MSA"] = false
 	defaultpolicy["CAN_SDD"] = true
 	defaultpolicy["TIP_REUSE_LIMIT"] = 100
 	defaultpolicy["BLOWOUTREFERENCE"] = 1
-	defaultpolicy["BLOWOUTOFFSET"] = -5.0
+
 	defaultpolicy["BLOWOUTVOLUME"] = 50.0
+
+	defaultpolicy["BLOWOUTOFFSET"] = 0.0 //-5.0
+
 	defaultpolicy["BLOWOUTVOLUMEUNIT"] = "ul"
 	defaultpolicy["PTZREFERENCE"] = 1
 	defaultpolicy["PTZOFFSET"] = -0.5
@@ -851,15 +868,18 @@ func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
 
 	*/
 
-	// remove blowout from gilson
-	/* reinstate blowout for gilson
-	rule = NewLHPolicyRule("NoBlowoutForGilson")
-	rule.AddCategoryConditionOn("PLATFORM", "GilsonPipetmax")
-	policy := make(LHPolicy, 6)
-	policy["RESET_OVERRIDE"] = true
-	lhpr.AddRule(rule, policy)
-	*/
+	// this is commented out to diagnose the dispense error
+	/*
+			// remove blowout from gilson
+			rule = NewLHPolicyRule("NoBlowoutForGilson")
+			rule.AddCategoryConditionOn("PLATFORM", "GilsonPipetmax")
 
+			policy := make(LHPolicy, 6)
+			policy["RESET_OVERRIDE"] = true
+
+
+		lhpr.AddRule(rule, policy)
+	*/
 	return lhpr, nil
 
 }

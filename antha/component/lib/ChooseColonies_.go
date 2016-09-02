@@ -2,6 +2,7 @@ package lib
 
 import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image/pick"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
@@ -30,7 +31,7 @@ func _ChooseColoniesSetup(_ctx context.Context, _input *ChooseColoniesInput) {
 // for every input
 func _ChooseColoniesSteps(_ctx context.Context, _input *ChooseColoniesInput, _output *ChooseColoniesOutput) {
 
-	_output.Wellstopick = pick.Pick(_input.Imagefile, _input.NumbertoPick, _input.Setplateperimeterfirst, _input.Rotate)
+	_output.Wellstopick, _output.Error = pick.PickAndExportCSV(_input.Imagefile, _input.ExportFileName, _input.PlateForCoordinates, _input.NumbertoPick, _input.Setplateperimeterfirst, _input.Rotate)
 
 }
 
@@ -93,18 +94,22 @@ type ChooseColoniesElement struct {
 }
 
 type ChooseColoniesInput struct {
+	ExportFileName         string
 	Imagefile              string
 	NumbertoPick           int
+	PlateForCoordinates    *wtype.LHPlate
 	Rotate                 bool
 	Setplateperimeterfirst bool
 }
 
 type ChooseColoniesOutput struct {
+	Error       error
 	Wellstopick []string
 }
 
 type ChooseColoniesSOutput struct {
 	Data struct {
+		Error       error
 		Wellstopick []string
 	}
 	Outputs struct {
@@ -118,10 +123,13 @@ func init() {
 			Desc: "",
 			Path: "antha/component/an/Data/choosecolonies/ChooseColonies.an",
 			Params: []component.ParamDesc{
+				{Name: "ExportFileName", Desc: "", Kind: "Parameters"},
 				{Name: "Imagefile", Desc: "", Kind: "Parameters"},
 				{Name: "NumbertoPick", Desc: "", Kind: "Parameters"},
+				{Name: "PlateForCoordinates", Desc: "", Kind: "Inputs"},
 				{Name: "Rotate", Desc: "", Kind: "Parameters"},
 				{Name: "Setplateperimeterfirst", Desc: "", Kind: "Parameters"},
+				{Name: "Error", Desc: "", Kind: "Data"},
 				{Name: "Wellstopick", Desc: "", Kind: "Data"},
 			},
 		},
