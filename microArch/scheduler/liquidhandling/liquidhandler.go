@@ -215,7 +215,7 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 
 		// ignore anything where the location isn't properly set
 
-		if len(loctox < 2) {
+		if len(loctox) < 2 {
 			continue
 		}
 
