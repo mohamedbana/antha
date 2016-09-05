@@ -590,7 +590,7 @@ func (lhp *LHProperties) GetComponents(cmps []*wtype.LHComponent, carryvol wunit
 				if ok {
 					// whaddya got?
 					// nb this won't work if we need to split a volume across several plates
-					wcarr, varr, ok := p.GetComponent(vdup, false)
+					wcarr, varr, ok := p.GetComponent(vdup, false, lhp.MinPossibleVolume())
 
 					if ok {
 						foundIt = true
@@ -866,4 +866,23 @@ func (p *LHProperties) RestoreUserPlates(up UserPlates) {
 		plate.Plate.MergeWith(oldPlate)
 		p.AddPlate(plate.Position, plate.Plate)
 	}
+}
+
+func (p *LHProperties) MinPossibleVolume() wunit.Volume {
+	if len(p.HeadsLoaded) == 0 {
+		return wunit.ZeroVolume()
+	}
+	minvol := p.HeadsLoaded[0].GetParams().Minvol
+	for _, head := range p.HeadsLoaded {
+		for _, tip := range p.Tips {
+			lhcp := head.Params.MergeWithTip(tip)
+			v := lhcp.Minvol
+			if v.LessThan(minvol) {
+				minvol = v
+			}
+		}
+
+	}
+
+	return minvol
 }
