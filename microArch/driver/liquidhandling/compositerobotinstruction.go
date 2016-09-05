@@ -819,6 +819,7 @@ func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms
 	tipdrp, err := DropTips(tiptype, prms, channel, 1)
 
 	if err != nil {
+		fmt.Println("ERROR NOT NIL: ", err)
 		return ret, err
 	}
 	ret = append(ret, tipdrp)
@@ -844,7 +845,6 @@ type MultiChannelBlockInstruction struct {
 
 func NewMultiChannelBlockInstruction() *MultiChannelBlockInstruction {
 	var v MultiChannelBlockInstruction
-	v.Type = MCB
 	v.What = make([][]string, 0)
 	v.PltFrom = make([][]string, 0)
 	v.PltTo = make([][]string, 0)

@@ -666,7 +666,6 @@ func (lhp *LHProperties) GetCleanTips(tiptype string, channel *wtype.LHChannelPa
 	// surely
 
 	if !foundit {
-
 		// try adding a new tip box
 		bx := factory.GetTipboxByType(tiptype)
 
