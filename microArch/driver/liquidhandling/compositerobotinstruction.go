@@ -819,7 +819,6 @@ func (ins *SingleChannelBlockInstruction) Generate(policy *LHPolicyRuleSet, prms
 	tipdrp, err := DropTips(tiptype, prms, channel, 1)
 
 	if err != nil {
-		fmt.Println("ERROR NOT NIL: ", err)
 		return ret, err
 	}
 	ret = append(ret, tipdrp)
@@ -2145,7 +2144,6 @@ func (ins *SuckInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 		_, ok := pol["PRE_MIX_VOLUME"]
 		mix.Volume = ins.Volume
 		mixvol := SafeGetF64(pol, "PRE_MIX_VOLUME")
-
 		if ok {
 			v := make([]wunit.Volume, ins.Multi)
 			for i := 0; i < ins.Multi; i++ {
@@ -2611,7 +2609,6 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 		_, ok := pol["POST_MIX_VOLUME"]
 		mix.Volume = ins.Volume
 		mixvol := SafeGetF64(pol, "POST_MIX_VOLUME")
-
 		if ok {
 			v := make([]wunit.Volume, ins.Multi)
 			for i := 0; i < ins.Multi; i++ {
