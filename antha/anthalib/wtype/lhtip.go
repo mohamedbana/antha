@@ -84,18 +84,18 @@ func (self *LHTip) GetClass() string {
 
 //@implement LHObject
 func (self *LHTip) GetPosition() Coordinates {
-	return OriginOf(self).Add(self.bounds.GetPosition())
+	return OriginOf(self).Add(self.Bounds.GetPosition())
 }
 
 //@implement LHObject
 func (self *LHTip) GetSize() Coordinates {
-	return self.bounds.GetSize()
+	return self.Bounds.GetSize()
 }
 
 //@implement LHObject
 func (self *LHTip) GetBoxIntersections(box BBox) []LHObject {
 	box.SetPosition(box.GetPosition().Subtract(OriginOf(self)))
-	if self.bounds.IntersectsBox(box) {
+	if self.Bounds.IntersectsBox(box) {
 		return []LHObject{self}
 	}
 	return nil
@@ -105,7 +105,7 @@ func (self *LHTip) GetBoxIntersections(box BBox) []LHObject {
 func (self *LHTip) GetPointIntersections(point Coordinates) []LHObject {
 	point = point.Subtract(point)
 	//TODO more accurate intersection detection with Shape
-	if self.bounds.IntersectsPoint(point) {
+	if self.Bounds.IntersectsPoint(point) {
 		return []LHObject{self}
 	}
 	return nil
@@ -113,7 +113,7 @@ func (self *LHTip) GetPointIntersections(point Coordinates) []LHObject {
 
 //@implement LHObject
 func (self *LHTip) SetOffset(point Coordinates) error {
-	self.bounds.SetPosition(point)
+	self.Bounds.SetPosition(point)
 	return nil
 }
 
@@ -150,7 +150,7 @@ func (tip *LHTip) IsNil() bool {
 }
 
 func (tip *LHTip) Dup() *LHTip {
-	t := NewLHTip(tip.Mnfr, tip.Type, tip.MinVol.RawValue(), tip.MaxVol.RawValue(), tip.MinVol.Unit().PrefixedSymbol(), tip.shape.Dup())
+	t := NewLHTip(tip.Mnfr, tip.Type, tip.MinVol.RawValue(), tip.MaxVol.RawValue(), tip.MinVol.Unit().PrefixedSymbol(), tip.Shape.Dup())
 	t.Dirty = tip.Dirty
 	t.contents = tip.Contents().Dup()
 	return t

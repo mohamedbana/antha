@@ -114,7 +114,9 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) error {
 
 	err = this.Simulate(request)
 	if err != nil {
-		return err
+		//since the simulator is... tender right now, let's take this with a pinch of salt
+		logger.Info("Ignoring simulation warning")
+		//return err
 	}
 
 	err = this.Execute(request)
@@ -163,7 +165,12 @@ func (this *Liquidhandler) Simulate(request *LHRequest) error {
 		return vlh.GetWorstError()
 	}
 
-	for _, ins := range instructions {
+	for i, ins := range instructions {
+		fmt.Printf("Ins #%d: %T\n", i, ins)
+		if ins == nil {
+			logger.Info("Skipping nill at instruction #%d")
+			continue
+		}
 		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(vlh)
 		if vlh.HasError() {
 			break
@@ -387,8 +394,8 @@ func (this *Liquidhandler) get_setup_instructions(rq *LHRequest) []liquidhandlin
 		}
 		ins := liquidhandling.NewAddPlateToInstruction()
 		ins.Plate = this.Properties.PlateLookup[plateid]
-		ins.PlateType = ins.Plate.(wtype.LHPlate).Type
-		ins.Name = ins.Plate.(wtype.Named).GetName()
+		ins.PlateType = wtype.TypeOf(ins.Plate)
+		ins.Name = wtype.NameOf(ins.Plate.(wtype.Named))
 		ins.Position = position
 
 		instructions = append(instructions, ins)

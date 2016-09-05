@@ -112,25 +112,27 @@ func (lhc *LHComponent) Remove(v wunit.Volume) {
 
 func (lhc *LHComponent) Dup() *LHComponent {
 	c := NewLHComponent()
-	c.ID = lhc.ID
-	c.Order = lhc.Order
-	c.CName = lhc.CName
-	c.Type = lhc.Type
-	c.Vol = lhc.Vol
-	c.Conc = lhc.Conc
-	c.Vunit = lhc.Vunit
-	c.Tvol = lhc.Tvol
-	c.Smax = lhc.Smax
-	c.Visc = lhc.Visc
-	c.StockConcentration = lhc.StockConcentration
-	c.Extra = make(map[string]interface{}, len(lhc.Extra))
-	for k, v := range lhc.Extra {
-		c.Extra[k] = v
+	if lhc != nil {
+		c.ID = lhc.ID
+		c.Order = lhc.Order
+		c.CName = lhc.CName
+		c.Type = lhc.Type
+		c.Vol = lhc.Vol
+		c.Conc = lhc.Conc
+		c.Vunit = lhc.Vunit
+		c.Tvol = lhc.Tvol
+		c.Smax = lhc.Smax
+		c.Visc = lhc.Visc
+		c.StockConcentration = lhc.StockConcentration
+		c.Extra = make(map[string]interface{}, len(lhc.Extra))
+		for k, v := range lhc.Extra {
+			c.Extra[k] = v
+		}
+		c.Loc = lhc.Loc
+		c.Destination = lhc.Destination
+		c.ParentID = lhc.ParentID
+		c.DaughterID = lhc.DaughterID
 	}
-	c.Loc = lhc.Loc
-	c.Destination = lhc.Destination
-	c.ParentID = lhc.ParentID
-	c.DaughterID = lhc.DaughterID
 	return c
 }
 
