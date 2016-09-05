@@ -114,17 +114,6 @@ type LHPropertiesParams struct {
 	Waste_preferences    []string
 }
 
-func AddAllTips(lhp *liquidhandling.LHProperties) *liquidhandling.LHProperties {
-	tips := factory.GetTipList()
-	for _, tt := range tips {
-		tb := factory.GetTipByType(tt)
-		if tb.Mnfr == lhp.Mnfr || lhp.Mnfr == "MotherNature" {
-			lhp.Tips = append(lhp.Tips, tb.Tips[0][0])
-		}
-	}
-	return lhp
-}
-
 func makeLHProperties(p *LHPropertiesParams) *liquidhandling.LHProperties {
 
 	layout := make(map[string]wtype.Coordinates)
@@ -133,8 +122,6 @@ func makeLHProperties(p *LHPropertiesParams) *liquidhandling.LHProperties {
 	}
 
 	lhp := liquidhandling.NewLHProperties(len(layout), p.Name, p.Mfg, "discrete", "disposable", layout)
-
-	AddAllTips(lhp)
 
 	lhp.Heads = make([]*wtype.LHHead, 0)
 	for _, hp := range p.Heads {

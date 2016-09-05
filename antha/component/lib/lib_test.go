@@ -155,6 +155,7 @@ func runElements(t *testing.T, ctx context.Context, inputs []*TInput) {
 					return
 				}
 			}
+			fmt.Printf("execute.Run(workflow %s / param %s)\n", input.WorkflowPath, input.ParamPath)
 			_, err := execute.Run(ctx, execute.Opt{
 				WorkflowData: input.WorkflowData,
 				ParamData:    input.ParamData,
@@ -297,8 +298,8 @@ func TestElementsWithExampleInputs4(t *testing.T) {
 
 var (
 	defaultShape = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
-	defaultWell  = wtype.NewLHWell("dummy", "", "", "ul", 250, 5, defaultShape, wtype.LHWBU, 5.5, 5.5, 20.4, 1.4, "mm")
-	defaultPlate = wtype.NewLHPlate("pcrplate_with_cooler", "Unknown", 8, 12, 25.7, "mm", defaultWell, 9, 9, 0.0, 0.0, 15.5)
+	defaultWell  = wtype.NewLHWell(nil, wtype.ZeroWellCoords(), "ul", 250, 5, defaultShape, wtype.UWellBottom, 5.5, 5.5, 20.4, 1.4, "mm")
+	defaultPlate = wtype.NewLHPlate("pcrplate_with_cooler", "Unknown", 8, 12, wtype.Coordinates{127.76, 85.48, 25.7}, defaultWell, 9, 9, 0.0, 0.0, 15.5)
 )
 
 func TestElementsWithDefaultInputs(t *testing.T) {
