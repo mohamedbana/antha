@@ -185,7 +185,7 @@ func (w *LHWell) Remove(v wunit.Volume) *LHComponent {
 	// if the volume is too high we complain
 
 	if v.GreaterThan(w.CurrentVolume()) {
-		logger.Debug("You ask too much: ", w.Crds, " ", v.ToString(), " I only have: ", w.CurrentVolume().ToString(), " PLATEID: ", w.Plateid)
+		//logger.Debug("You ask too much: ", w.Crds, " ", v.ToString(), " I only have: ", w.CurrentVolume().ToString(), " PLATEID: ", w.Plateid)
 		return nil
 	}
 
@@ -536,13 +536,21 @@ func (well *LHWell) Evaporate(time time.Duration, env Environment) VolumeCorrect
 		return ret
 	}
 
+	if well.Empty() {
+		return ret
+	}
+
 	// we need to use the evaporation calculator
 	// we should likely decorate wells since we have different capabilities
 	// for different well types
 
 	vol := eng.EvaporationVolume(env.Temperature, "water", env.Humidity, time.Seconds(), env.MeanAirFlowVelocity, well.AreaForVolume(), env.Pressure)
 
-	well.Remove(vol)
+	r := well.Remove(vol)
+
+	if r == nil {
+		well.WContents.Vol = 0.0
+	}
 
 	ret.Type = "Evaporation"
 	ret.Volume = vol.Dup()
