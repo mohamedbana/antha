@@ -218,14 +218,14 @@ func DecodeLHAdaptor(arg *pb.LHAdaptorMessage) wtype.LHAdaptor {
 	return ret
 }
 func EncodeLHTip(arg wtype.LHTip) *pb.LHTipMessage {
-	ret := pb.LHTipMessage{(string)(arg.ID), (string)(arg.Type), (string)(arg.Mnfr), (bool)(arg.Dirty), EncodeVolume(arg.MaxVol), EncodeVolume(arg.MinVol)}
+	ret := pb.LHTipMessage{(string)(arg.ID), (string)(arg.Type), (string)(arg.Mnfr), (bool)(arg.Dirty), EncodeVolume(arg.MaxVol), EncodeVolume(arg.MinVol), EncodePtrToShape(arg.Shape), EncodeBBox(arg.Bounds)}
 	return &ret
 }
 func DecodeLHTip(arg *pb.LHTipMessage) wtype.LHTip {
 	if arg == nil {
 		return wtype.LHTip{}
 	}
-	ret := wtype.LHTip{ID: (string)(arg.Arg_1), Type: (string)(arg.Arg_2), Mnfr: (string)(arg.Arg_3), Dirty: (bool)(arg.Arg_4), MaxVol: (wunit.Volume)(DecodeVolume(arg.Arg_5)), MinVol: (wunit.Volume)(DecodeVolume(arg.Arg_6))}
+	ret := wtype.LHTip{ID: (string)(arg.Arg_1), Type: (string)(arg.Arg_2), Mnfr: (string)(arg.Arg_3), Dirty: (bool)(arg.Arg_4), MaxVol: (wunit.Volume)(DecodeVolume(arg.Arg_5)), MinVol: (wunit.Volume)(DecodeVolume(arg.Arg_6)), Shape: (*wtype.Shape)(DecodePtrToShape(arg.Arg_7)), Bounds: (wtype.BBox)(DecodeBBox(arg.Arg_8))}
 	return ret
 }
 func EncodeMapstringPtrToLHPositionMessage(arg map[string]*wtype.LHPosition) *pb.MapstringPtrToLHPositionMessageMessage {

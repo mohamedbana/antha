@@ -2028,12 +2028,14 @@ func (m *LHAdaptorMessage) GetArg_5() *ArrayOfPtrToLHTipMessage {
 }
 
 type LHTipMessage struct {
-	Arg_1 string         `protobuf:"bytes,1,opt,name=Arg_1" json:"Arg_1,omitempty"`
-	Arg_2 string         `protobuf:"bytes,2,opt,name=Arg_2" json:"Arg_2,omitempty"`
-	Arg_3 string         `protobuf:"bytes,3,opt,name=Arg_3" json:"Arg_3,omitempty"`
-	Arg_4 bool           `protobuf:"varint,4,opt,name=Arg_4" json:"Arg_4,omitempty"`
-	Arg_5 *VolumeMessage `protobuf:"bytes,5,opt,name=Arg_5" json:"Arg_5,omitempty"`
-	Arg_6 *VolumeMessage `protobuf:"bytes,6,opt,name=Arg_6" json:"Arg_6,omitempty"`
+	Arg_1 string             `protobuf:"bytes,1,opt,name=Arg_1" json:"Arg_1,omitempty"`
+	Arg_2 string             `protobuf:"bytes,2,opt,name=Arg_2" json:"Arg_2,omitempty"`
+	Arg_3 string             `protobuf:"bytes,3,opt,name=Arg_3" json:"Arg_3,omitempty"`
+	Arg_4 bool               `protobuf:"varint,4,opt,name=Arg_4" json:"Arg_4,omitempty"`
+	Arg_5 *VolumeMessage     `protobuf:"bytes,5,opt,name=Arg_5" json:"Arg_5,omitempty"`
+	Arg_6 *VolumeMessage     `protobuf:"bytes,6,opt,name=Arg_6" json:"Arg_6,omitempty"`
+	Arg_7 *PtrToShapeMessage `protobuf:"bytes,7,opt,name=Arg_7" json:"Arg_7,omitempty"`
+	Arg_8 *BBoxMessage       `protobuf:"bytes,8,opt,name=Arg_8" json:"Arg_8,omitempty"`
 }
 
 func (m *LHTipMessage) Reset()                    { *m = LHTipMessage{} }
@@ -2051,6 +2053,20 @@ func (m *LHTipMessage) GetArg_5() *VolumeMessage {
 func (m *LHTipMessage) GetArg_6() *VolumeMessage {
 	if m != nil {
 		return m.Arg_6
+	}
+	return nil
+}
+
+func (m *LHTipMessage) GetArg_7() *PtrToShapeMessage {
+	if m != nil {
+		return m.Arg_7
+	}
+	return nil
+}
+
+func (m *LHTipMessage) GetArg_8() *BBoxMessage {
+	if m != nil {
+		return m.Arg_8
 	}
 	return nil
 }

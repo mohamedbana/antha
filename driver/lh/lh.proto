@@ -443,6 +443,8 @@ message LHTipMessage {
 	bool Arg_4 = 4;
 	VolumeMessage Arg_5 = 5;
 	VolumeMessage Arg_6 = 6;
+    PtrToShapeMessage Arg_7 = 7;
+    BBoxMessage Arg_8 = 8;
 }
 message MapstringCoordinatesMessageMessageFieldEntry{
 string key = 1;
