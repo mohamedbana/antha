@@ -347,7 +347,7 @@ func (lhw *LHWell) CDup() *LHWell {
 	return cp
 }
 func (lhw *LHWell) DupKeepIDs() *LHWell {
-	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, lhw.Dunit)
+	cp := NewLHWell(lhw.Plate, lhw.Crds, "ul", lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.GetSize().X, lhw.GetSize().Y, lhw.GetSize().Z, lhw.Bottomh, "mm")
 
 	for k, v := range lhw.Extra {
 		cp.Extra[k] = v
@@ -619,7 +619,7 @@ func (well *LHWell) Evaporate(time time.Duration, env Environment) VolumeCorrect
 
 	vol := eng.EvaporationVolume(env.Temperature, "water", env.Humidity, time.Seconds(), env.MeanAirFlowVelocity, well.AreaForVolume(), env.Pressure)
 
-	r := well.Remove(vol)
+	r, _ := well.Remove(vol)
 
 	if r == nil {
 		well.WContents.Vol = 0.0

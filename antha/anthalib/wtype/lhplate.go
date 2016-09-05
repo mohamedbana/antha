@@ -336,7 +336,7 @@ func (lhp *LHPlate) DupKeepIDs() *LHPlate {
 	if lhp == nil {
 		logger.Fatal(fmt.Sprintln("Can't dup nonexistent plate"))
 	}
-	ret := NewLHPlate(lhp.Type, lhp.Mnfr, lhp.WlsY, lhp.WlsX, lhp.Height, lhp.Hunit, lhp.Welltype, lhp.WellXOffset, lhp.WellYOffset, lhp.WellXStart, lhp.WellYStart, lhp.WellZStart)
+	ret := NewLHPlate(lhp.Type, lhp.Mnfr, lhp.WlsY, lhp.WlsX, lhp.GetSize(), lhp.Welltype, lhp.WellXOffset, lhp.WellYOffset, lhp.WellXStart, lhp.WellYStart, lhp.WellZStart)
 	ret.ID = lhp.ID
 
 	ret.PlateName = lhp.PlateName
@@ -349,13 +349,11 @@ func (lhp *LHPlate) DupKeepIDs() *LHPlate {
 			d.ID = well.ID
 			ret.Rows[i][j] = d
 			ret.Cols[j][i] = d
-			ret.Wellcoords[d.Crds] = d
+			ret.Wellcoords[d.Crds.FormatA1()] = d
 			ret.HWells[d.ID] = d
 			d.WContents.ID = well.WContents.ID
-			d.WContents.Loc = ret.ID + ":" + d.Crds
+			d.WContents.Loc = ret.ID + ":" + d.Crds.FormatA1()
 			d.Plate = ret
-			d.Plateinst = ret.Inst
-			d.Plateid = ret.ID
 		}
 	}
 
