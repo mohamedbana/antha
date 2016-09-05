@@ -25,145 +25,156 @@
 package simulator
 
 import (
-    "fmt"
+	"fmt"
+	"github.com/antha-lang/antha/microArch/logger"
 )
 
 //SimulationErrorSeverity how serious is the error
 type ErrorSeverity int
+
 const (
-    SeverityNone ErrorSeverity = iota
-    SeverityInfo
-    SeverityWarning
-    SeverityError
+	SeverityNone ErrorSeverity = iota
+	SeverityInfo
+	SeverityWarning
+	SeverityError
 )
 
-var severityNames = map[ErrorSeverity]string {
-    SeverityInfo: "info",
-    SeverityWarning: "warn",
-    SeverityError: "err",
+var severityNames = map[ErrorSeverity]string{
+	SeverityInfo:    "info",
+	SeverityWarning: "warn",
+	SeverityError:   "err",
 }
 
 type SimulationError struct {
-    severity        ErrorSeverity
-    fname           string
-    message         string
+	severity ErrorSeverity
+	fname    string
+	message  string
 }
 
 func NewError(function_name, message string) *SimulationError {
-    err := SimulationError{SeverityError, function_name, message}
-    return &err
+	err := SimulationError{SeverityError, function_name, message}
+	return &err
 }
 
 func NewErrorf(function_name, message string, args ...interface{}) *SimulationError {
-    err := SimulationError{SeverityError, function_name, fmt.Sprintf(message, args...)}
-    return &err
+	err := SimulationError{SeverityError, function_name, fmt.Sprintf(message, args...)}
+	return &err
 }
 
 func NewWarning(function_name, message string) *SimulationError {
-    err := SimulationError{SeverityWarning, function_name, message}
-    return &err
+	err := SimulationError{SeverityWarning, function_name, message}
+	return &err
 }
 
 func NewWarningf(function_name, message string, args ...interface{}) *SimulationError {
-    err := SimulationError{SeverityWarning, function_name, fmt.Sprintf(message, args...)}
-    return &err
+	err := SimulationError{SeverityWarning, function_name, fmt.Sprintf(message, args...)}
+	return &err
 }
 
 func NewInfo(function_name, message string) *SimulationError {
-    err := SimulationError{SeverityInfo, function_name, message}
-    return &err
+	err := SimulationError{SeverityInfo, function_name, message}
+	return &err
 }
 
 func NewInfof(function_name, message string, args ...interface{}) *SimulationError {
-    err := SimulationError{SeverityInfo, function_name, fmt.Sprintf(message, args...)}
-    return &err
+	err := SimulationError{SeverityInfo, function_name, fmt.Sprintf(message, args...)}
+	return &err
 }
 
 func (self *SimulationError) Error() string {
-    return fmt.Sprintf("(%s) %s: %s",
-                severityNames[self.Severity()],
-                self.fname,
-                self.message)
+	return fmt.Sprintf("(%s) %s: %s",
+		severityNames[self.Severity()],
+		self.fname,
+		self.message)
 }
 
 func (self *SimulationError) Severity() ErrorSeverity {
-    return self.severity
+	return self.severity
 }
 
 func (self *SimulationError) FunctionName() string {
-    return self.fname
+	return self.fname
 }
 
 func (self *SimulationError) SetFunctionName(fname string) {
-    self.fname = fname
+	self.fname = fname
 }
 
-//ErrorReporter 
+func (self *SimulationError) WriteToLog() {
+	switch self.severity {
+	case SeverityInfo:
+		logger.Info(self.Error())
+	case SeverityWarning:
+		logger.Warning(self.Error())
+	case SeverityError:
+		logger.Error(self.Error())
+	}
+}
+
+//ErrorReporter
 type ErrorReporter struct {
-    errors []*SimulationError
-    worst_error *SimulationError
+	errors      []*SimulationError
+	worst_error *SimulationError
 }
 
 func NewErrorReporter() *ErrorReporter {
-    er := ErrorReporter{}
-    er.errors = make([]*SimulationError, 0)
-    er.worst_error = nil
+	er := ErrorReporter{}
+	er.errors = make([]*SimulationError, 0)
+	er.worst_error = nil
 
-    return &er
+	return &er
 }
 
 func (self *ErrorReporter) GetErrors() []*SimulationError {
-    return self.errors
+	return self.errors
 }
 
 func (self *ErrorReporter) GetWorstError() *SimulationError {
-    return self.worst_error
+	return self.worst_error
 }
 
 func (self *ErrorReporter) GetErrorSeverity() ErrorSeverity {
-    if self.worst_error != nil {
-        return self.worst_error.Severity()
-    }
-    return SeverityNone
+	if self.worst_error != nil {
+		return self.worst_error.Severity()
+	}
+	return SeverityNone
 }
 
 func (self *ErrorReporter) HasError() bool {
-    return self.GetErrorSeverity() == SeverityError
+	return self.GetErrorSeverity() == SeverityError
 }
 
 func (self *ErrorReporter) HasWarning() bool {
-    return self.GetErrorSeverity() >= SeverityWarning
+	return self.GetErrorSeverity() >= SeverityWarning
 }
 
 func (self *ErrorReporter) AddSimulationError(se *SimulationError) {
-    self.errors = append(self.errors, se)
-    if se.Severity() > self.GetErrorSeverity() {
-        self.worst_error = se
-    }
+	self.errors = append(self.errors, se)
+	if se.Severity() > self.GetErrorSeverity() {
+		self.worst_error = se
+	}
 }
 
 func (self *ErrorReporter) AddError(fname, msg string) {
-    self.AddSimulationError(NewError(fname, msg))
+	self.AddSimulationError(NewError(fname, msg))
 }
 
 func (self *ErrorReporter) AddWarning(fname, msg string) {
-    self.AddSimulationError(NewWarning(fname, msg))
+	self.AddSimulationError(NewWarning(fname, msg))
 }
 
 func (self *ErrorReporter) AddInfo(fname, msg string) {
-    self.AddSimulationError(NewInfo(fname, msg))
+	self.AddSimulationError(NewInfo(fname, msg))
 }
 
 func (self *ErrorReporter) AddErrorf(fname, msg string, args ...interface{}) {
-    self.AddSimulationError(NewErrorf(fname, msg, args...))
+	self.AddSimulationError(NewErrorf(fname, msg, args...))
 }
 
 func (self *ErrorReporter) AddWarningf(fname, msg string, args ...interface{}) {
-    self.AddSimulationError(NewWarningf(fname, msg, args...))
+	self.AddSimulationError(NewWarningf(fname, msg, args...))
 }
 
 func (self *ErrorReporter) AddInfof(fname, msg string, args ...interface{}) {
-    self.AddSimulationError(NewInfof(fname, msg, args...))
+	self.AddSimulationError(NewInfof(fname, msg, args...))
 }
-
-

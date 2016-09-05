@@ -34,6 +34,7 @@ import (
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
 	"github.com/antha-lang/antha/microArch/sampletracker"
+	simulator_lh "github.com/antha-lang/antha/microArch/simulator/liquidhandling"
 )
 
 // the liquid handler structure defines the interface to a particular liquid handling
@@ -151,19 +152,32 @@ func (this *Liquidhandler) Simulate(request *LHRequest) error {
 		return wtype.LHError(wtype.LH_ERR_OTHER, "Cannot execute request: no instructions")
 	}
 
-	//Simulator disabled for now - HJK 10/08/16
-
 	// set up the simulator
-	//vlh := simulator_lh.NewVirtualLiquidHandler(this.Properties)
+	vlh := simulator_lh.NewVirtualLiquidHandler(this.Properties)
+	for _, err := range vlh.GetErrors() {
+		err.WriteToLog()
+	}
+
 	//check we didn't hit a catastrophic error
-	//if vlh.GetErrorSeverity() == simulator.SeverityError {
-	//	return vlh.GetWorstError()
-	//}
+	if vlh.HasError() {
+		return vlh.GetWorstError()
+	}
 
-	//for _, ins := range instructions {
-	//	ins.(liquidhandling.TerminalRobotInstruction).OutputTo(vlh)
-	//}
+	for _, ins := range instructions {
+		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(vlh)
+		if vlh.HasError() {
+			break
+		}
+	}
 
+	for _, err := range vlh.GetErrors() {
+		err.WriteToLog()
+	}
+
+	//return the worst error if it's actually an error
+	if vlh.HasError() {
+		return vlh.GetWorstError()
+	}
 	return nil
 }
 
