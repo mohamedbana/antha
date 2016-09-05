@@ -74,6 +74,6 @@ func (a *Runner) MoveCost(Device) int {
 	return 0
 }
 
-func (a *Runner) Compile([]ast.Command) ([]Inst, error) {
+func (a *Runner) Compile([]ast.Node) ([]Inst, error) {
 	return nil, nil
 }

@@ -254,12 +254,11 @@ func (w *LHWell) Remove(v wunit.Volume) (*LHComponent, error) {
 	// if the volume is too high we complain
 
 	if v.GreaterThan(w.CurrentVolume()) {
-		pid := "nil"
-		if p, ok := w.Plate.(*LHPlate); ok {
-			pid = p.ID
-		}
-		logger.Debug("You ask too much: ", w.Crds.FormatA1(), " ", v.ToString(), " I only have: ", w.CurrentVolume().ToString(), " PLATEID: ", pid)
-		//maybe we should instead return as much as we can and an error?
+		//pid := "nil"
+		//if p, ok := w.Plate.(*LHPlate); ok {
+		//	pid = p.ID
+		//}
+		//logger.Debug("You ask too much: ", w.Crds.FormatA1(), " ", v.ToString(), " I only have: ", w.CurrentVolume().ToString(), " PLATEID: ", pid)
 		return nil, fmt.Errorf("Requested %s from well \"%s\" which only contains %s", v, w.GetName(), w.CurrentVolume())
 	}
 
@@ -344,6 +343,20 @@ func (lhw *LHWell) CDup() *LHWell {
 	for k, v := range lhw.Extra {
 		cp.Extra[k] = v
 	}
+
+	return cp
+}
+func (lhw *LHWell) DupKeepIDs() *LHWell {
+	cp := NewLHWell(lhw.Platetype, lhw.Plateid, lhw.Crds, lhw.Vunit, lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.Xdim, lhw.Ydim, lhw.Zdim, lhw.Bottomh, lhw.Dunit)
+
+	for k, v := range lhw.Extra {
+		cp.Extra[k] = v
+	}
+
+	// Dup here doesn't change ID
+	cp.WContents = lhw.Contents().Dup()
+
+	cp.ID = lhw.ID
 
 	return cp
 }
@@ -596,13 +609,21 @@ func (well *LHWell) Evaporate(time time.Duration, env Environment) VolumeCorrect
 		return ret
 	}
 
+	if well.Empty() {
+		return ret
+	}
+
 	// we need to use the evaporation calculator
 	// we should likely decorate wells since we have different capabilities
 	// for different well types
 
 	vol := eng.EvaporationVolume(env.Temperature, "water", env.Humidity, time.Seconds(), env.MeanAirFlowVelocity, well.AreaForVolume(), env.Pressure)
 
-	well.Remove(vol)
+	r := well.Remove(vol)
+
+	if r == nil {
+		well.WContents.Vol = 0.0
+	}
 
 	ret.Type = "Evaporation"
 	ret.Volume = vol.Dup()
@@ -626,4 +647,32 @@ func (w *LHWell) YDim() float64 {
 }
 func (w *LHWell) ZDim() float64 {
 	return w.Bounds.GetSize().Z
+}
+
+func (w *LHWell) IsUserAllocated() bool {
+	if w.Extra == nil {
+		return false
+	}
+
+	ua, ok := w.Extra["UserAllocated"].(bool)
+
+	if !ok {
+		return false
+	}
+
+	return ua
+}
+
+func (w *LHWell) SetUserAllocated() {
+	if w.Extra == nil {
+		w.Extra = make(map[string]interface{})
+	}
+	w.Extra["UserAllocated"] = true
+}
+
+func (w *LHWell) ClearUserAllocated() {
+	if w.Extra == nil {
+		w.Extra = make(map[string]interface{})
+	}
+	w.Extra["UserAllocated"] = false
 }

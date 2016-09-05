@@ -157,18 +157,6 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) (*
 		}
 		//fmt.Println("PLAATE: ", position)
 		setup[position] = p
-		/*
-			fmt.Println("ADDING PLATE ", p, "\n\nTO POSITION: ", position)
-
-			for _, w := range p.Wellcoords {
-				if w.Empty() {
-					continue
-				}
-
-				fmt.Println("WEL: ", w.WContents.CName, " ", w.WContents.Vol)
-			}
-		*/
-
 		plate_lookup[p.ID] = position
 		params.AddPlate(position, p)
 		logger.Info(fmt.Sprintf("Input plate of type %s in position %s", p.Type, position))
