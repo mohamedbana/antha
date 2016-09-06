@@ -29,15 +29,53 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
-	antha "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
+	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/AnthaPath"
 	. "github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/doe"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
-	"github.com/antha-lang/antha/internal/github.com/ghodss/yaml"
+	"github.com/ghodss/yaml"
 )
 
-var DOEliquidhandlingFile = "8run4cpFactorial.xlsx" //"FullFactorial.xlsx" // "ScreenLHPolicyDOE2.xlsx"
-var DXORJMP = "JMP"                                 //"DX"
+type PolicyFile struct {
+	Filename                string
+	DXORJMP                 string
+	FactorColumns           *[]int
+	LiquidTypeStarterNumber int
+}
+
+func (polfile PolicyFile) Prepend() (prepend string) {
+	nameparts := strings.Split(polfile.Filename, ".")
+	prepend = nameparts[0]
+	return
+}
+
+func (polfile PolicyFile) StarterNumber() (starternumber int) {
+	starternumber = polfile.LiquidTypeStarterNumber
+	return
+}
+
+func MakePolicyFile(filename string, dxorjmp string, factorcolumns *[]int, liquidtypestartnumber int) (policyfile PolicyFile) {
+	policyfile.Filename = filename
+	policyfile.DXORJMP = dxorjmp
+	policyfile.FactorColumns = factorcolumns
+	policyfile.LiquidTypeStarterNumber = liquidtypestartnumber
+	return
+}
+
+// policy files to put in ./antha
+var AvailablePolicyfiles []PolicyFile = []PolicyFile{
+	MakePolicyFile("170516CCFDesign_noTouchoff_noBlowout.xlsx", "DX", nil, 100),
+	MakePolicyFile("2700516AssemblyCCF.xlsx", "DX", nil, 1000),
+	MakePolicyFile("newdesign2factorsonly.xlsx", "JMP", &[]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}, 2000),
+	MakePolicyFile("190516OnePolicy.xlsx", "JMP", &[]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}, 3000),
+	MakePolicyFile("AssemblycategoricScreen.xlsx", "JMP", &[]int{1, 2, 3, 4, 5}, 4000),
+}
+
+// change to range through several files
+//var DOEliquidhandlingFile = "170516CCFDesign_noTouchoff_noBlowout.xlsx" // "2700516AssemblyCCF.xlsx" //"newdesign2factorsonly.xlsx" // "170516CCFDesign_noTouchoff_noBlowout.xlsx" // "170516CFF.xlsx" //"newdesign2factorsonly.xlsx" "170516CCFDesign_noTouchoff_noBlowout.xlsx" // //"newdesign2factorsonly.xlsx" //"8run4cpFactorial.xlsx" //"FullFactorial.xlsx" // "ScreenLHPolicyDOE2.xlsx"
+//var DXORJMP = "DX"                                                      //"JMP"
+var BASEPolicy = "default" //"dna"
 
 func MakePolicies() map[string]LHPolicy {
 	pols := make(map[string]LHPolicy)
@@ -53,6 +91,8 @@ func MakePolicies() map[string]LHPolicy {
 	pols["dna"] = MakeDNAPolicy()
 	pols["DoNotMix"] = MakeDefaultPolicy()
 	pols["NeedToMix"] = MakeNeedToMixPolicy()
+	pols["PreMix"] = PreMixPolicy()
+	pols["PostMix"] = PostMixPolicy()
 	pols["viscous"] = MakeViscousPolicy()
 	pols["Paint"] = MakePaintPolicy()
 
@@ -66,6 +106,8 @@ func MakePolicies() map[string]LHPolicy {
 	pols["PEG"] = MakePEGPolicy()
 	pols["Protoplasts"] = MakeProtoplastPolicy()
 	pols["dna_mix"] = MakeDNAMixPolicy()
+	pols["plateout"] = MakePlateOutPolicy()
+	pols["colony"] = MakeColonyPolicy()
 	//      pols["lysate"] = MakeLysatePolicy()
 
 	/*policies, names := PolicyMaker(Allpairs, "DOE_run", false)
@@ -74,68 +116,135 @@ func MakePolicies() map[string]LHPolicy {
 	}
 	*/
 
-	if antha.Anthafileexists(DOEliquidhandlingFile) {
-		fmt.Println("found lhpolicy doe file", DOEliquidhandlingFile)
-		policies, names, _, err := PolicyMakerfromDesign(DXORJMP, DOEliquidhandlingFile, "DOE_run")
+	// TODO: Remove this hack
+	for _, DOEliquidhandlingFile := range AvailablePolicyfiles {
+		if _, err := os.Stat(filepath.Join(anthapath.Path(), DOEliquidhandlingFile.Filename)); err == nil {
+			//if antha.Anthafileexists(DOEliquidhandlingFile) {
+			//fmt.Println("found lhpolicy doe file", DOEliquidhandlingFile)
 
-		for i, policy := range policies {
-			pols[names[i]] = policy
+			filenameparts := strings.Split(DOEliquidhandlingFile.Filename, ".")
+
+			policies, names, _, err := PolicyMakerfromDesign(BASEPolicy, DOEliquidhandlingFile.DXORJMP, DOEliquidhandlingFile.Filename, filenameparts[0])
+			//policies, names, _, err := PolicyMakerfromDesign(BASEPolicy, DXORJMP, DOEliquidhandlingFile, "DOE_run")
+			for i, policy := range policies {
+				pols[names[i]] = policy
+			}
+			if err != nil {
+				panic(err)
+			}
+		} else {
+			//	fmt.Println("no lhpolicy doe file found named: ", DOEliquidhandlingFile)
 		}
-		if err != nil {
-			panic(err)
-		}
-	} else {
-		fmt.Println("no lhpolicy doe file found named: ", DOEliquidhandlingFile)
 	}
 	return pols
 
 }
 
-func PolicyMakerfromDesign(DXORJMP string, dxdesignfilename string, prepend string) (policies []LHPolicy, names []string, runs []Run, err error) {
+func PolicyFilefromName(filename string) (pol PolicyFile, found bool) {
+	for _, policy := range AvailablePolicyfiles {
+		if policy.Filename == filename {
+			pol = policy
+			found = true
+			return
+		}
+	}
+	return
+}
 
+func PolicyMakerfromFilename(filename string) (policies []LHPolicy, names []string, runs []Run, err error) {
+
+	doeliquidhandlingFile, found := PolicyFilefromName(filename)
+	if found == false {
+		panic("policyfilename" + filename + "not found")
+	}
+	filenameparts := strings.Split(doeliquidhandlingFile.Filename, ".")
+
+	policies, names, runs, err = PolicyMakerfromDesign(BASEPolicy, doeliquidhandlingFile.DXORJMP, doeliquidhandlingFile.Filename, filenameparts[0])
+	return
+}
+
+func PolicyMakerfromDesign(basepolicy string, DXORJMP string, dxdesignfilename string, prepend string) (policies []LHPolicy, names []string, runs []Run, err error) {
+
+	policyitemmap := MakePolicyItems()
+	intfactors := make([]string, 0)
+
+	for key, val := range policyitemmap {
+
+		if val.Type.Name() == "int" {
+			intfactors = append(intfactors, key)
+
+		}
+
+	}
 	if DXORJMP == "DX" {
 
-		runs, err = RunsFromDXDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), []string{"Pre_MIX", "POST_MIX"})
+		runs, err = RunsFromDXDesign(filepath.Join(anthapath.Path(), dxdesignfilename), intfactors)
 		if err != nil {
 			return policies, names, runs, err
 		}
 
 	} else if DXORJMP == "JMP" {
 
-		patterncolumn := 0
-		factorcolumns := []int{1, 2, 3, 4, 5}
-		responsecolumns := []int{6, 7, 8, 9}
+		factorcolumns := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}
+		responsecolumns := []int{14, 15, 16, 17}
 
-		runs, err = RunsFromJMPDesign(filepath.Join(antha.Dirpath(), dxdesignfilename), patterncolumn, factorcolumns, responsecolumns, []string{"PRE_MIX", "POST_MIX"})
+		runs, err = RunsFromJMPDesign(filepath.Join(anthapath.Path(), dxdesignfilename), factorcolumns, responsecolumns, intfactors)
 		if err != nil {
 			return policies, names, runs, err
 		}
 	} else {
 		return policies, names, runs, fmt.Errorf("only JMP or DX allowed as valid inputs for DXORJMP variable")
 	}
-	policies, names = PolicyMakerfromRuns(runs, prepend, false)
+	policies, names = PolicyMakerfromRuns(basepolicy, runs, prepend, false)
 	return policies, names, runs, err
 }
 
-func PolicyMaker(factors []DOEPair, nameprepend string, concatfactorlevelsinname bool) (policies []LHPolicy, names []string) {
+func PolicyMaker(basepolicy string, factors []DOEPair, nameprepend string, concatfactorlevelsinname bool) (policies []LHPolicy, names []string) {
 
 	runs := AllCombinations(factors)
 
-	policies, names = PolicyMakerfromRuns(runs, nameprepend, concatfactorlevelsinname)
+	policies, names = PolicyMakerfromRuns(basepolicy, runs, nameprepend, concatfactorlevelsinname)
 
 	return
 }
 
-func PolicyMakerfromRuns(runs []Run, nameprepend string, concatfactorlevelsinname bool) (policies []LHPolicy, names []string) {
+func PolicyMakerfromRuns(basepolicy string, runs []Run, nameprepend string, concatfactorlevelsinname bool) (policies []LHPolicy, names []string) {
+
+	policyitemmap := MakePolicyItems()
 
 	names = make([]string, 0)
 	policies = make([]LHPolicy, 0)
 
-	//policy := make(LHPolicy, 0)
 	policy := MakeDefaultPolicy()
+	policy["CAN_MULTI"] = false
+
+	/*base, _ := GetPolicyByName(basepolicy)
+
+	for key, value := range base {
+		policy[key] = value
+	}
+	*/
+	//fmt.Println("basepolicy:", basepolicy)
 	for _, run := range runs {
 		for j, desc := range run.Factordescriptors {
-			policy[desc] = run.Setpoints[j]
+
+			_, ok := policyitemmap[desc]
+			if ok {
+
+				/*if val.Type.Name() == "int" {
+					aInt, found := run.Setpoints[j].(int)
+
+					var bInt int
+
+					bInt = int(aInt)
+					if found {
+						run.Setpoints[j] = interface{}(bInt)
+					}
+				}*/
+				policy[desc] = run.Setpoints[j]
+			} /* else {
+				panic("policyitem " + desc + " " + "not present! " + "These are present: " + policyitemmap.TypeList())
+			}*/
 		}
 
 		// raising runtime error when using concat == true
@@ -145,12 +254,13 @@ func PolicyMakerfromRuns(runs []Run, nameprepend string, concatfactorlevelsinnam
 				name = fmt.Sprint(name, "_", key, ":", value)
 
 			}
-			//	fmt.Println(name)
+
 		} else {
 			names = append(names, nameprepend+strconv.Itoa(run.RunNumber))
 		}
 		policies = append(policies, policy)
-		//fmt.Println("len policy = ", len(policy))
+
+		//policy := GetPolicyByName(basepolicy)
 		policy = MakeDefaultPolicy()
 	}
 
@@ -181,6 +291,17 @@ func GetPolicyByName(policyname string) (lhpolicy LHPolicy, policypresent bool) 
 	policymap := MakePolicies()
 
 	lhpolicy, policypresent = policymap[policyname]
+	return
+}
+
+func AvailablePolicies() (policies []string) {
+
+	policies = make([]string, 0)
+	policymap := MakePolicies()
+
+	for key, _ := range policymap {
+		policies = append(policies, key)
+	}
 	return
 }
 
@@ -234,9 +355,10 @@ func MakePEGPolicy() LHPolicy {
 	policy["DSPZOFFSET"] = 2.5
 	policy["POST_MIX"] = 3
 	policy["POST_MIX_Z"] = 3.5
-	policy["BLOWOUTVOLUME"] = 0.0
+	policy["BLOWOUTVOLUME"] = 50.0
+	policy["POST_MIX_VOLUME"] = 190.0
 	policy["BLOWOUTVOLUMEUNIT"] = "ul"
-	policy["TOUCHOFF"] = true
+	policy["TOUCHOFF"] = false
 	policy["CAN_MULTI"] = false
 	return policy
 }
@@ -282,7 +404,7 @@ func MakeDispenseAboveLiquidPolicy() LHPolicy {
 	policy["DSP_SPEED"] = 3.0
 	//policy["ASP_WAIT"] = 1.0
 	//policy["DSP_WAIT"] = 1.0
-	policy["BLOWOUTVOLUME"] = 0.0
+	policy["BLOWOUTVOLUME"] = 50.0
 	policy["BLOWOUTVOLUMEUNIT"] = "ul"
 	policy["TOUCHOFF"] = false
 	policy["CAN_MULTI"] = false
@@ -314,7 +436,8 @@ func MakeWaterPolicy() LHPolicy {
 	waterpolicy["CAN_MULTI"] = false
 	waterpolicy["CAN_MSA"] = true
 	waterpolicy["CAN_SDD"] = true
-	waterpolicy["DSPZOFFSET"] = 0.5
+	waterpolicy["DSPZOFFSET"] = 1.0
+	waterpolicy["BLOWOUTVOLUME"] = 50.0
 	return waterpolicy
 }
 func MakeFoamyPolicy() LHPolicy {
@@ -427,19 +550,14 @@ func MakeDNAPolicy() LHPolicy {
 	dnapolicy["DSPREFERENCE"] = 0
 	dnapolicy["DSPZOFFSET"] = 0.5
 	dnapolicy["TIP_REUSE_LIMIT"] = 0
-	//dnapolicy["NO_AIR_DISPENSE"] = true
-	dnapolicy["RESET_OVERRIDE "] = true
-	dnapolicy["POST_MIX_VOLUME"] = 5
-	dnapolicy["POST_MIX"] = 1
-	dnapolicy["POST_MIX_Z"] = 0.5
-	dnapolicy["POST_MIX_RATE"] = 3.0
+	dnapolicy["NO_AIR_DISPENSE"] = true
 	return dnapolicy
 }
 
 func MakeDNAMixPolicy() LHPolicy {
 	dnapolicy := MakeDNAPolicy()
-	dnapolicy["POST_MIX_VOLUME"] = 50
-	dnapolicy["POST_MIX"] = 3
+	dnapolicy["POST_MIX_VOLUME"] = 10.0
+	dnapolicy["POST_MIX"] = 5
 	dnapolicy["POST_MIX_Z"] = 0.5
 	dnapolicy["POST_MIX_RATE"] = 3.0
 	return dnapolicy
@@ -521,19 +639,12 @@ func MakeLoadlowPolicy() LHPolicy {
 }
 
 func MakeNeedToMixPolicy() LHPolicy {
-<<<<<<< HEAD
-	dnapolicy := make(LHPolicy, 10)
-	dnapolicy["POST_MIX"] = 4
-	dnapolicy["POST_MIX_VOLUME"] = 75.0
-	dnapolicy["ASPSPEED"] = 4.0
-	dnapolicy["DSPSPEED"] = 4.0
-=======
 	dnapolicy := make(LHPolicy, 15)
 	dnapolicy["POST_MIX"] = 3
 	dnapolicy["POST_MIX_VOLUME"] = 10.0
 	dnapolicy["POST_MIX_RATE"] = 3.74
 	dnapolicy["PRE_MIX"] = 3
-	dnapolicy["PRE_MIX_VOLUME"] = 10.0
+	dnapolicy["PRE_MIX_VOLUME"] = 10
 	dnapolicy["PRE_MIX_RATE"] = 3.74
 	dnapolicy["ASPSPEED"] = 3.74
 	dnapolicy["DSPSPEED"] = 3.74
@@ -578,7 +689,6 @@ func PostMixPolicy() LHPolicy {
 	//dnapolicy["PRE_MIX_RATE"] = 3.74
 	dnapolicy["ASPSPEED"] = 3.74
 	dnapolicy["DSPSPEED"] = 3.74
->>>>>>> df08af02a66978058843fe8bae2d50c6cf952d22
 	dnapolicy["CAN_MULTI"] = false
 	dnapolicy["CAN_MSA"] = false
 	dnapolicy["CAN_SDD"] = false
@@ -591,7 +701,7 @@ func PostMixPolicy() LHPolicy {
 }
 
 func MakeDefaultPolicy() LHPolicy {
-	defaultpolicy := make(LHPolicy, 21)
+	defaultpolicy := make(LHPolicy, 27)
 	// don't set this here -- use defaultpipette speed or there will be inconsistencies
 	// defaultpolicy["ASP_SPEED"] = 3.0
 	// defaultpolicy["DSP_SPEED"] = 3.0
@@ -606,18 +716,16 @@ func MakeDefaultPolicy() LHPolicy {
 	defaultpolicy["CAN_SDD"] = true
 	defaultpolicy["TIP_REUSE_LIMIT"] = 100
 	defaultpolicy["BLOWOUTREFERENCE"] = 1
-	defaultpolicy["BLOWOUTOFFSET"] = -0.5
-	defaultpolicy["BLOWOUTVOLUME"] = 200.0
+	defaultpolicy["BLOWOUTOFFSET"] = -5.0
+	defaultpolicy["BLOWOUTVOLUME"] = 50.0
 	defaultpolicy["BLOWOUTVOLUMEUNIT"] = "ul"
 	defaultpolicy["PTZREFERENCE"] = 1
 	defaultpolicy["PTZOFFSET"] = -0.5
-	defaultpolicy["NO_AIR_DISPENSE"] = false
+	defaultpolicy["NO_AIR_DISPENSE"] = true
 	defaultpolicy["DEFAULTPIPETTESPEED"] = 3.0
 	defaultpolicy["MANUALPTZ"] = false
 	defaultpolicy["JUSTBLOWOUT"] = false
 	defaultpolicy["DONT_BE_DIRTY"] = true
-<<<<<<< HEAD
-=======
 	// added to diagnose bubble cause
 	defaultpolicy["ASPZOFFSET"] = 0.5
 	defaultpolicy["DSPZOFFSET"] = 0.5
@@ -628,7 +736,6 @@ func MakeDefaultPolicy() LHPolicy {
 	defaultpolicy["PRE_MIX_VOLUME"] = 10.0
 	defaultpolicy["POST_MIX_VOLUME"] = 10.0
 
->>>>>>> df08af02a66978058843fe8bae2d50c6cf952d22
 	return defaultpolicy
 }
 
@@ -652,15 +759,24 @@ func MakeLVExtraPolicy() LHPolicy {
 	return lvep
 }
 
-func MakeLVOffsetPolicy() LHPolicy {
-	lvop := make(LHPolicy, 2)
-	lvop["ASPZOFFSET"] = 0.0
-	lvop["DSPZOFFSET"] = 0.0
-	lvop["POST_MIX_Z"] = 0.0
-	lvop["PRE_MIX_Z"] = 0.0
+func MakeHVOffsetPolicy() LHPolicy {
+	lvop := make(LHPolicy, 6)
+	lvop["ASPZOFFSET"] = 1.00
+	lvop["DSPZOFFSET"] = 1.00
+	lvop["POST_MIX_Z"] = 1.00
+	lvop["PRE_MIX_Z"] = 1.00
 	lvop["DSPREFERENCE"] = 0
 	lvop["ASPREFERENCE"] = 0
 	return lvop
+}
+
+func MakeHVFlowRatePolicy() LHPolicy {
+	policy := make(LHPolicy, 4)
+	policy["POST_MIX_RATE"] = 37
+	policy["PRE_MIX_RATE"] = 37
+	policy["ASPSPEED"] = 37
+	policy["DSPSPEED"] = 37
+	return policy
 }
 
 func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
@@ -687,6 +803,7 @@ func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
 	// nb for this to really work I think we still need to make sure well volumes
 	// are being properly kept in sync
 
+	/* hide this for now as a suspect for causing bubbles
 	rule := NewLHPolicyRule("BlowOutToEmptyWells")
 	err := rule.AddNumericConditionOn("WELLTOVOLUME", 0.0, 1.0)
 
@@ -700,9 +817,11 @@ func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
 	}
 	pol := MakeJBPolicy()
 	lhpr.AddRule(rule, pol)
+	*/
 
 	// a further refinement: for low volumes we need to add extra volume
 	// for aspirate and dispense
+
 	/*
 		rule = NewLHPolicyRule("ExtraVolumeForLV")
 		rule.AddNumericConditionOn("VOLUME", 0.0, 20.0)
@@ -711,20 +830,39 @@ func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
 	*/
 
 	// hack to fix plate type problems
-	rule = NewLHPolicyRule("LVOffsetFix")
-	rule.AddNumericConditionOn("VOLUME", 0.0, 20.0)
-	rule.AddCategoryConditionOn("FROMPLATETYPE", "pcrplate_skirted_riser")
-	pol = MakeLVOffsetPolicy()
+	rule := NewLHPolicyRule("HVOffsetFix")
+	rule.AddNumericConditionOn("VOLUME", 20.1, 300.0) // what about higher? // set specifically for openPlant configuration
+	//rule.AddCategoryConditionOn("FROMPLATETYPE", "pcrplate_skirted_riser")
+	pol := MakeHVOffsetPolicy()
 	lhpr.AddRule(rule, pol)
 
-	rule = NewLHPolicyRule("LVOffsetFix2")
+	// hack to fix plate type problems
+	rule = NewLHPolicyRule("HVFlowRate")
+	rule.AddNumericConditionOn("VOLUME", 20.1, 300.0) // what about higher? // set specifically for openPlant configuration
+	//rule.AddCategoryConditionOn("FROMPLATETYPE", "pcrplate_skirted_riser")
+	pol = MakeHVFlowRatePolicy()
+	lhpr.AddRule(rule, pol)
+
+	/*rule = NewLHPolicyRule("LVOffsetFix2")
 	rule.AddNumericConditionOn("VOLUME", 0.0, 20.0)
 	rule.AddCategoryConditionOn("TOPLATETYPE", "pcrplate_skirted_riser")
 	pol = MakeLVOffsetPolicy()
 
 	lhpr.AddRule(rule, pol)
 
+	*/
+
+	// remove blowout from gilson
+	/* reinstate blowout for gilson
+	rule = NewLHPolicyRule("NoBlowoutForGilson")
+	rule.AddCategoryConditionOn("PLATFORM", "GilsonPipetmax")
+	policy := make(LHPolicy, 6)
+	policy["RESET_OVERRIDE"] = true
+	lhpr.AddRule(rule, policy)
+	*/
+
 	return lhpr, nil
+
 }
 
 func LoadLHPoliciesFromFile() (*LHPolicyRuleSet, error) {
