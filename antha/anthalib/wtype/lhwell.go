@@ -326,15 +326,26 @@ func (w *LHWell) Empty() bool {
 
 // copy of instance
 func (lhw *LHWell) Dup() *LHWell {
-	cp := NewLHWell(lhw.Plate, lhw.Crds, "ul", lhw.MaxVol, lhw.Rvol, lhw.Shape().Dup(), lhw.Bottom, lhw.GetSize().X, lhw.GetSize().Y, lhw.GetSize().Z, lhw.Bottomh, "mm")
-
-	for k, v := range lhw.Extra {
-		cp.Extra[k] = v
+	ret := LHWell{
+		GetUUID(),                //ID        string
+		lhw.Inst,                 //Inst      string
+		lhw.Crds,                 //Crds      WellCoords
+		lhw.MaxVol,               //MaxVol    float64
+		lhw.WContents.Dup(),      //WContents *LHComponent
+		lhw.Rvol,                 //Rvol      float64
+		lhw.WShape.Dup(),         //WShape    *Shape
+		lhw.Bottom,               //Bottom    WellBottomType
+		lhw.Bounds,               //Bounds    BBox
+		lhw.Bottomh,              //Bottomh   float64
+		map[string]interface{}{}, //Extra     map[string]interface{}
+		lhw.Plate,                //Plate     LHObject `gotopb:"-" json:"-"`
 	}
 
-	cp.WContents = lhw.Contents().Dup()
+	for k, v := range lhw.Extra {
+		ret.Extra[k] = v
+	}
 
-	return cp
+	return &ret
 }
 
 // copy of type
