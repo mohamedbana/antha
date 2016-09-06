@@ -177,6 +177,50 @@ func fElemsEqual(sl []float64, elems []int) bool {
 	return true
 }
 
+func extend_ints(l int, sl []int) []int {
+	if len(sl) < l {
+		r := make([]int, l)
+		for i, v := range sl {
+			r[i] = v
+		}
+		return r
+	}
+	return sl
+}
+
+func extend_floats(l int, sl []float64) []float64 {
+	if len(sl) < l {
+		r := make([]float64, l)
+		for i, v := range sl {
+			r[i] = v
+		}
+		return r
+	}
+	return sl
+}
+
+func extend_strings(l int, sl []string) []string {
+	if len(sl) < l {
+		r := make([]string, l)
+		for i, v := range sl {
+			r[i] = v
+		}
+		return r
+	}
+	return sl
+}
+
+func extend_bools(l int, sl []bool) []bool {
+	if len(sl) < l {
+		r := make([]bool, l)
+		for i, v := range sl {
+			r[i] = v
+		}
+		return r
+	}
+	return sl
+}
+
 type adaptorCollision struct {
 	channel int
 	objects []wtype.LHObject
@@ -624,6 +668,15 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
 		return ret
 	}
 
+	//extend args
+	deckposition = extend_strings(adaptor.GetChannelCount(), deckposition)
+	wellcoords = extend_strings(adaptor.GetChannelCount(), wellcoords)
+	reference = extend_ints(adaptor.GetChannelCount(), reference)
+	offsetX = extend_floats(adaptor.GetChannelCount(), offsetX)
+	offsetY = extend_floats(adaptor.GetChannelCount(), offsetY)
+	offsetZ = extend_floats(adaptor.GetChannelCount(), offsetZ)
+	platetype = extend_strings(adaptor.GetChannelCount(), platetype)
+
 	//check slice length
 	if err := self.testSliceLength(map[string]int{
 		"deckposition": len(deckposition),
@@ -740,6 +793,13 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 
 	ret := driver.CommandStatus{true, driver.OK, "ASPIRATE ACK"}
 
+	//extend arguments
+	volume = extend_floats(multi, volume)
+	overstroke = extend_bools(multi, overstroke)
+	platetype = extend_strings(multi, platetype)
+	what = extend_strings(multi, what)
+	llf = extend_bools(multi, llf)
+
 	arg, err := self.validateLHArgs(head, multi, platetype, what, volume,
 		map[string][]bool{
 			"overstroke": overstroke,
@@ -848,6 +908,13 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 
 	ret := driver.CommandStatus{true, driver.OK, "DISPENSE ACK"}
 
+	//extend arguments
+	volume = extend_floats(multi, volume)
+	blowout = extend_bools(multi, blowout)
+	platetype = extend_strings(multi, platetype)
+	what = extend_strings(multi, what)
+	llf = extend_bools(multi, llf)
+
 	arg, err := self.validateLHArgs(head, multi, platetype, what, volume, map[string][]bool{
 		"blowout": blowout,
 		"llf":     llf,
@@ -941,6 +1008,11 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 	platetype, position, well []string) driver.CommandStatus {
 	ret := driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
+
+	//extend arg slices
+	platetype = extend_strings(multi, platetype)
+	position = extend_strings(multi, position)
+	well = extend_strings(multi, well)
 
 	//check that the command is valid
 	if !self.testTipArgs("LoadTips", channels, head, multi, platetype, position, well) {
@@ -1096,6 +1168,11 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
 	platetype, position, well []string) driver.CommandStatus {
 	ret := driver.CommandStatus{true, driver.OK, "UNLOADTIPS ACK"}
+
+	//extend arg slices
+	platetype = extend_strings(multi, platetype)
+	position = extend_strings(multi, position)
+	well = extend_strings(multi, well)
 
 	//check that RobotState won't crash
 	if !self.testTipArgs("UnloadTips", channels, head, multi, platetype, position, well) {
@@ -1273,6 +1350,13 @@ func (self *VirtualLiquidHandler) Mix(head int, volume []float64, platetype []st
 	multi int, what []string, blowout []bool) driver.CommandStatus {
 
 	ret := driver.CommandStatus{true, driver.OK, "MIX ACK"}
+
+	//extend arguments
+	volume = extend_floats(multi, volume)
+	platetype = extend_strings(multi, platetype)
+	cycles = extend_ints(multi, cycles)
+	what = extend_strings(multi, what)
+	blowout = extend_bools(multi, blowout)
 
 	arg, err := self.validateLHArgs(head, multi, platetype, what, volume, map[string][]bool{
 		"blowout": blowout,
