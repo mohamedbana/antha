@@ -137,6 +137,7 @@ func (this *Liquidhandler) AddSetupInstructions(request *LHRequest) error {
 	if request.Instructions == nil {
 		return wtype.LHError(wtype.LH_ERR_OTHER, "Cannot execute request: no instructions")
 	}
+
 	setup_insts := this.get_setup_instructions(request)
 	if request.Instructions[0].InstructionType() == liquidhandling.INI {
 		request.Instructions = append(request.Instructions[:1], append(setup_insts, request.Instructions[1:]...)...)
@@ -167,10 +168,6 @@ func (this *Liquidhandler) Simulate(request *LHRequest) error {
 
 	for i, ins := range instructions {
 		fmt.Printf("Ins #%d: %T\n", i, ins)
-		if ins == nil {
-			logger.Info("Skipping nill at instruction #%d")
-			continue
-		}
 		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(vlh)
 		if vlh.HasError() {
 			break
@@ -383,7 +380,7 @@ func (this *Liquidhandler) revise_volumes(rq *LHRequest) error {
 }
 
 func (this *Liquidhandler) get_setup_instructions(rq *LHRequest) []liquidhandling.TerminalRobotInstruction {
-	instructions := make([]liquidhandling.TerminalRobotInstruction, 1+len(this.Properties.PosLookup))
+	instructions := make([]liquidhandling.TerminalRobotInstruction, 0, 1+len(this.Properties.PosLookup))
 
 	//first instruction is always to remove all plates
 	instructions = append(instructions, liquidhandling.NewRemoveAllPlatesInstruction())
