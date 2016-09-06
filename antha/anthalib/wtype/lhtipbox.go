@@ -217,7 +217,7 @@ func (tb *LHTipbox) GetTips(mirror bool, multi, orient int) []string {
 
 	}
 
-	tb.NTips -= multi
+	tb.NTips -= len(ret)
 	return ret
 }
 

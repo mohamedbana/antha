@@ -462,7 +462,7 @@ func MakeDetergentPolicy() LHPolicy {
 func MakeProteinPolicy() LHPolicy {
 	proteinpolicy := make(LHPolicy, 10)
 	proteinpolicy["POST_MIX"] = 5
-	proteinpolicy["POST_MIX_VOLUME"] = 50
+	proteinpolicy["POST_MIX_VOLUME"] = 50.0
 	proteinpolicy["ASPSPEED"] = 2.0
 	proteinpolicy["DSPSPEED"] = 2.0
 	proteinpolicy["CAN_MULTI"] = false
@@ -521,11 +521,64 @@ func MakeLoadlowPolicy() LHPolicy {
 }
 
 func MakeNeedToMixPolicy() LHPolicy {
+<<<<<<< HEAD
 	dnapolicy := make(LHPolicy, 10)
 	dnapolicy["POST_MIX"] = 4
-	dnapolicy["POST_MIX_VOLUME"] = 75
+	dnapolicy["POST_MIX_VOLUME"] = 75.0
 	dnapolicy["ASPSPEED"] = 4.0
 	dnapolicy["DSPSPEED"] = 4.0
+=======
+	dnapolicy := make(LHPolicy, 15)
+	dnapolicy["POST_MIX"] = 3
+	dnapolicy["POST_MIX_VOLUME"] = 10.0
+	dnapolicy["POST_MIX_RATE"] = 3.74
+	dnapolicy["PRE_MIX"] = 3
+	dnapolicy["PRE_MIX_VOLUME"] = 10.0
+	dnapolicy["PRE_MIX_RATE"] = 3.74
+	dnapolicy["ASPSPEED"] = 3.74
+	dnapolicy["DSPSPEED"] = 3.74
+	dnapolicy["CAN_MULTI"] = false
+	dnapolicy["CAN_MSA"] = false
+	dnapolicy["CAN_SDD"] = false
+	dnapolicy["DSPREFERENCE"] = 0
+	dnapolicy["DSPZOFFSET"] = 0.5
+	dnapolicy["TIP_REUSE_LIMIT"] = 0
+	dnapolicy["NO_AIR_DISPENSE"] = true
+	return dnapolicy
+}
+
+func PreMixPolicy() LHPolicy {
+	dnapolicy := make(LHPolicy, 12)
+	//dnapolicy["POST_MIX"] = 3
+	//dnapolicy["POST_MIX_VOLUME"] = 10.0
+	//dnapolicy["POST_MIX_RATE"] = 3.74
+	dnapolicy["PRE_MIX"] = 3
+	dnapolicy["PRE_MIX_VOLUME"] = 10.0
+	dnapolicy["PRE_MIX_RATE"] = 3.74
+	dnapolicy["ASPSPEED"] = 3.74
+	dnapolicy["DSPSPEED"] = 3.74
+	dnapolicy["CAN_MULTI"] = false
+	dnapolicy["CAN_MSA"] = false
+	dnapolicy["CAN_SDD"] = false
+	dnapolicy["DSPREFERENCE"] = 0
+	dnapolicy["DSPZOFFSET"] = 0.5
+	dnapolicy["TIP_REUSE_LIMIT"] = 0
+	dnapolicy["NO_AIR_DISPENSE"] = true
+	return dnapolicy
+
+}
+
+func PostMixPolicy() LHPolicy {
+	dnapolicy := make(LHPolicy, 12)
+	dnapolicy["POST_MIX"] = 3
+	dnapolicy["POST_MIX_VOLUME"] = 10.0
+	dnapolicy["POST_MIX_RATE"] = 3.74
+	//dnapolicy["PRE_MIX"] = 3
+	//dnapolicy["PRE_MIX_VOLUME"] = 10
+	//dnapolicy["PRE_MIX_RATE"] = 3.74
+	dnapolicy["ASPSPEED"] = 3.74
+	dnapolicy["DSPSPEED"] = 3.74
+>>>>>>> df08af02a66978058843fe8bae2d50c6cf952d22
 	dnapolicy["CAN_MULTI"] = false
 	dnapolicy["CAN_MSA"] = false
 	dnapolicy["CAN_SDD"] = false
@@ -563,6 +616,19 @@ func MakeDefaultPolicy() LHPolicy {
 	defaultpolicy["MANUALPTZ"] = false
 	defaultpolicy["JUSTBLOWOUT"] = false
 	defaultpolicy["DONT_BE_DIRTY"] = true
+<<<<<<< HEAD
+=======
+	// added to diagnose bubble cause
+	defaultpolicy["ASPZOFFSET"] = 0.5
+	defaultpolicy["DSPZOFFSET"] = 0.5
+	defaultpolicy["POST_MIX_Z"] = 0.5
+	defaultpolicy["PRE_MIX_Z"] = 0.5
+	//defaultpolicy["ASP_WAIT"] = 1.0
+	//defaultpolicy["DSP_WAIT"] = 1.0
+	defaultpolicy["PRE_MIX_VOLUME"] = 10.0
+	defaultpolicy["POST_MIX_VOLUME"] = 10.0
+
+>>>>>>> df08af02a66978058843fe8bae2d50c6cf952d22
 	return defaultpolicy
 }
 
