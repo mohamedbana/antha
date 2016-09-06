@@ -954,7 +954,7 @@ func TestLoadTips(t *testing.T) {
 			nil, //assertions
 		},
 		SimulatorTest{
-			"mismatching multi",
+			"OK - argument expansion",
 			nil,
 			[]*SetupFn{
 				testLayout(),
@@ -970,10 +970,13 @@ func TestLoadTips(t *testing.T) {
 					[]string{"H12"},      //well
 				},
 			},
-			[]string{ //errors
-				"(err) LoadTips: Slices platetype(1), position(1), well(1) are not of expected length 8",
+			nil, //errors
+			[]*AssertionFn{ //assertions
+				tipboxAssertion("tipbox_1", []string{"H12"}),
+				tipboxAssertion("tipbox_2", []string{}),
+				adaptorAssertion(0, []tipDesc{tipDesc{0, "", 0}}),
+				tipwasteAssertion("tipwaste", 0),
 			},
-			nil, //assertions
 		},
 		SimulatorTest{
 			"mismatching multi",
