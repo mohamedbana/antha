@@ -47,7 +47,7 @@ type LiquidhandlingDriver interface {
 	//volume: amount to aspirate in ul
 	//overstroke:
 	//head: which head to use
-	//multi: equal to the number of channel in the adaptor
+	//multi: the number of channels given an instruction
 	//platetype: the type of plate which should be present below the adaptor
 	//what: liquid class name
 	//llf: liquidlevelfollow attempt to follow liquid surface
@@ -57,7 +57,7 @@ type LiquidhandlingDriver interface {
 	//volume: amount to dispense in ul
 	//blowout: dispense extra to attempt to remove droplets
 	//head: which head to use
-	//platetype: the type of plate which should be present
+	//multi: the number of channels given an instruction
 	//platetype: the type of plate which should be present below the adaptor
 	//what: liquid class name
 	//llf: liquidlevelfollow attempt to follow liquid surface
@@ -66,19 +66,19 @@ type LiquidhandlingDriver interface {
 	//channels: list of which channels should end up with tips on them. values of platetype, position, well that aren't given
 	//in channels can be left as ""
 	//head: the head to use
-	//multi: the number of channels on the adaptor
-	//platetype: the type of plate below each channel, len = multi
-	//position: the name of the deck position below the channel, len = multi
-	//well: the well below the adaptor channel, len = multi
+	//multi: the number of channels given an instruction
+	//platetype: the type of plate below each channel
+	//position: the name of the deck position below the channel
+	//well: the well below the adaptor channel
 	LoadTips(channels []int, head, multi int, platetype, position, well []string) driver.CommandStatus
 	//UnloadTips remove tips from the given channels
 	//channels: list of which channels should have tips removed from them. values of platetype, position, well that aren't given
 	//in channels can be left as ""
 	//head: the head to use
-	//multi: the number of channels on the adaptor
-	//platetype: the type of plate below each channel, len = multi
-	//position: the name of the deck position below the channel, len = multi
-	//well: the well below the adaptor channel, len = multi
+	//multi: the number of channels given an instruction
+	//platetype: the type of plate below each channel
+	//position: the name of the deck position below the channel
+	//well: the well below the adaptor channel
 	UnloadTips(channels []int, head, multi int, platetype, position, well []string) driver.CommandStatus
 	//SetPipetteSpeed set the rate of aspirate and dispense commands
 	//non-independent heads can only have the same rate for each channel

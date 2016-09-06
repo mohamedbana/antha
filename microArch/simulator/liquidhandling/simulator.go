@@ -407,8 +407,7 @@ func (self *VirtualLiquidHandler) GetObjectAt(slot string) wtype.LHObject {
 }
 
 //testTipArgs check that load/unload tip arguments are valid insofar as they won't crash in RobotState
-func (self *VirtualLiquidHandler) testTipArgs(f_name string, channels []int, head, multi int,
-	platetype, position, well []string) bool {
+func (self *VirtualLiquidHandler) testTipArgs(f_name string, channels []int, head int, platetype, position, well []string) bool {
 	//head should exist
 	adaptor := self.getAdaptorState(f_name, head)
 	if adaptor == nil {
@@ -417,11 +416,6 @@ func (self *VirtualLiquidHandler) testTipArgs(f_name string, channels []int, hea
 
 	n_channels := adaptor.GetChannelCount()
 	ret := true
-
-	if multi != n_channels {
-		self.AddErrorf(f_name, "Multi(=%v) doesn't match number of channels on Head%v(=%v)", multi, head, n_channels)
-		ret = false
-	}
 
 	bad_channels := []string{}
 	mchannels := map[int]bool{}
@@ -456,7 +450,7 @@ func (self *VirtualLiquidHandler) testTipArgs(f_name string, channels []int, hea
 		"platetype": len(platetype),
 		"position":  len(position),
 		"well":      len(well)},
-		multi); err != nil {
+		n_channels); err != nil {
 
 		self.AddError(f_name, err.Error())
 		ret = false
@@ -754,7 +748,9 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
 		//i.e. the channels can't move relative to each other or the head, so relative locations must remain the same
 		moved := []string{}
 		for i, rc := range rel_coords {
-			if rc != adaptor.GetChannel(i).GetRelativePosition() {
+			//check that adaptor relative position remains the same
+			//arbitrary 0.01mm to avoid numerical instability
+			if rc.Subtract(adaptor.GetChannel(i).GetRelativePosition()).Abs() > 0.01 {
 				moved = append(moved, fmt.Sprintf("%d", i))
 			}
 		}
@@ -1008,40 +1004,55 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 	platetype, position, well []string) driver.CommandStatus {
 	ret := driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
+	if len(channels) == 0 {
+		self.AddWarning("loadtips", "command specifies no channels to load tips onto, ignoring")
+		return ret
+	}
+
+	//get the adaptor
+	adaptor := self.getAdaptorState("LoadTips", head)
+	if adaptor == nil {
+		return ret
+	}
+	n_channels := adaptor.GetChannelCount()
 
 	//extend arg slices
-	platetype = extend_strings(multi, platetype)
-	position = extend_strings(multi, position)
-	well = extend_strings(multi, well)
+	platetype = extend_strings(n_channels, platetype)
+	position = extend_strings(n_channels, position)
+	well = extend_strings(n_channels, well)
 
 	//check that the command is valid
-	if !self.testTipArgs("LoadTips", channels, head, multi, platetype, position, well) {
+	if !self.testTipArgs("LoadTips", channels, head, platetype, position, well) {
+		return ret
+	}
+
+	if multi != len(channels) {
+		self.AddErrorf("LoadTips", "While loading %s to %s, multi should equal %d, not %d",
+			pTips(len(channels)), summariseChannels(channels), len(channels), multi)
 		return ret
 	}
 
 	//make well coords
-	wc := make([]wtype.WellCoords, multi)
+	wc := make([]wtype.WellCoords, n_channels)
 	for i := range well {
 		wc[i] = wtype.MakeWellCoords(well[i])
 	}
 
 	//check that all channels are empty
-	adaptor := self.state.GetAdaptor(head)
 	if tc := adaptor.GetTipCount(); tc > 0 {
 		//get a slice of channels with tips on
-		loaded := make([]string, 0, tc)
+		loaded := make([]int, 0, tc)
 		for i := 0; i < adaptor.GetChannelCount(); i++ {
 			if adaptor.GetChannel(i).HasTip() {
-				loaded = append(loaded, fmt.Sprintf("%d", i))
+				loaded = append(loaded, i)
 			}
 		}
+		has := "has a"
 		if tc > 1 {
-			self.AddErrorf("LoadTips", "Cannot load tips to Head%d when channels %s already have tips loaded",
-				head, strings.Join(loaded, ","))
-		} else {
-			self.AddErrorf("LoadTips", "Cannot load tips to Head%d when channel %s already has a tip loaded",
-				head, loaded[0])
+			has = "have"
 		}
+		self.AddErrorf("LoadTips", "Cannot load tips to Head%d when %s already %s %s loaded",
+			head, summariseChannels(loaded), has, pTips(tc))
 		return ret
 	}
 
@@ -1049,7 +1060,7 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 	deck := self.state.GetDeck()
 
 	//Get the tip at each requested location
-	tips := make([]*wtype.LHTip, multi)
+	tips := make([]*wtype.LHTip, n_channels)
 	for _, i := range channels {
 		if o, ok := deck.GetChild(position[i]); !ok {
 			self.AddErrorf("LoadTips", "No known location \"%s\"", position[i])
@@ -1076,7 +1087,7 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 	}
 
 	//check alignment
-	z_off := make([]float64, multi)
+	z_off := make([]float64, n_channels)
 	misaligned := []string{}
 	target := []string{}
 	amount := []string{}
@@ -1168,18 +1179,34 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
 	platetype, position, well []string) driver.CommandStatus {
 	ret := driver.CommandStatus{true, driver.OK, "UNLOADTIPS ACK"}
-
-	//extend arg slices
-	platetype = extend_strings(multi, platetype)
-	position = extend_strings(multi, position)
-	well = extend_strings(multi, well)
-
-	//check that RobotState won't crash
-	if !self.testTipArgs("UnloadTips", channels, head, multi, platetype, position, well) {
+	if len(channels) == 0 {
+		self.AddWarning("UnloadTips", "Command doesn't specify any channels to unload tips from, ignoring")
 		return ret
 	}
 
-	adaptor := self.state.GetAdaptor(head)
+	//get the adaptor
+	adaptor := self.getAdaptorState("UnloadTips", head)
+	if adaptor == nil {
+		return ret
+	}
+	n_channels := adaptor.GetChannelCount()
+
+	//extend arg slices
+	platetype = extend_strings(n_channels, platetype)
+	position = extend_strings(n_channels, position)
+	well = extend_strings(n_channels, well)
+
+	//check that RobotState won't crash
+	if !self.testTipArgs("UnloadTips", channels, head, platetype, position, well) {
+		return ret
+	}
+
+	if multi != len(channels) {
+		self.AddErrorf("UnloadTips", "While unloading %s from %s, multi should equal %d, not %d",
+			pTips(len(channels)), summariseChannels(channels), len(channels), multi)
+		return ret
+	}
+
 	deck := self.state.GetDeck()
 
 	//Raise a warning if we're trying to eject tips that aren't there
@@ -1198,7 +1225,7 @@ func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
 	//Check that this is possible
 	if !adaptor.IsIndependent() {
 		extra := []int{}
-		for ch := 0; ch < multi; ch++ {
+		for ch := 0; ch < n_channels; ch++ {
 			if contains(ch, channels) {
 				continue
 			}
@@ -1206,13 +1233,9 @@ func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
 				extra = append(extra, ch)
 			}
 		}
-		if len(extra) == 1 {
-			self.AddErrorf("UnloadTips", "Cannot unload tips from head%d %s without unloading tip from channel %s (head isn't independent)",
-				head, summariseChannels(channels), extra[0])
-			return ret
-		} else if len(extra) > 1 {
-			self.AddErrorf("UnloadTips", "Cannot unload tips from head%d %s without unloading tips from %s (head isn't independent)",
-				head, summariseChannels(channels), summariseChannels(extra))
+		if len(extra) > 0 {
+			self.AddErrorf("UnloadTips", "Cannot unload tips from head%d %s without unloading %s from %s (head isn't independent)",
+				head, summariseChannels(channels), pTips(len(extra)), summariseChannels(extra))
 			return ret
 		}
 	}

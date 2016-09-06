@@ -631,7 +631,7 @@ func TestLoadTips(t *testing.T) {
 				&LoadTips{
 					[]int{0}, //channels
 					0,        //head
-					8,        //multi
+					1,        //multi
 					[]string{"tipbox", "", "", "", "", "", "", ""},   //tipbox
 					[]string{"tipbox_1", "", "", "", "", "", "", ""}, //location
 					[]string{"H12", "", "", "", "", "", "", ""},      //well
@@ -656,7 +656,7 @@ func TestLoadTips(t *testing.T) {
 				&LoadTips{
 					[]int{7}, //channels
 					0,        //head
-					8,        //multi
+					1,        //multi
 					[]string{"", "", "", "", "", "", "", "tipbox"},   //tipbox
 					[]string{"", "", "", "", "", "", "", "tipbox_1"}, //location
 					[]string{"", "", "", "", "", "", "", "A1"},       //well
@@ -682,7 +682,7 @@ func TestLoadTips(t *testing.T) {
 				&LoadTips{
 					[]int{0}, //channels
 					0,        //head
-					8,        //multi
+					1,        //multi
 					[]string{"tipbox", "", "", "", "", "", "", ""},   //tipbox
 					[]string{"tipbox_1", "", "", "", "", "", "", ""}, //location
 					[]string{"G12", "", "", "", "", "", "", ""},      //well
@@ -708,7 +708,7 @@ func TestLoadTips(t *testing.T) {
 				&LoadTips{
 					[]int{7}, //channels
 					0,        //head
-					8,        //multi
+					1,        //multi
 					[]string{"", "", "", "", "", "", "", "tipbox"},   //tipbox
 					[]string{"", "", "", "", "", "", "", "tipbox_1"}, //location
 					[]string{"", "", "", "", "", "", "", "B1"},       //well
@@ -733,7 +733,7 @@ func TestLoadTips(t *testing.T) {
 				&LoadTips{
 					[]int{0, 1, 2}, //channels
 					0,              //head
-					8,              //multi
+					3,              //multi
 					[]string{"tipbox", "tipbox", "tipbox", "", "", "", "", ""},       //tipbox
 					[]string{"tipbox_1", "tipbox_1", "tipbox_1", "", "", "", "", ""}, //location
 					[]string{"F12", "G12", "H12", "", "", "", "", ""},                //well
@@ -762,7 +762,7 @@ func TestLoadTips(t *testing.T) {
 				&LoadTips{
 					[]int{5, 6, 7}, //channels
 					0,              //head
-					8,              //multi
+					3,              //multi
 					[]string{"", "", "", "", "", "tipbox", "tipbox", "tipbox"},       //tipbox
 					[]string{"", "", "", "", "", "tipbox_1", "tipbox_1", "tipbox_1"}, //location
 					[]string{"", "", "", "", "", "A1", "B1", "C1"},                   //well
@@ -791,7 +791,7 @@ func TestLoadTips(t *testing.T) {
 				&LoadTips{
 					[]int{0, 4, 7}, //channels
 					0,              //head
-					8,              //multi
+					3,              //multi
 					[]string{"tipbox", "", "", "", "tipbox", "", "", "tipbox"},       //tipbox
 					[]string{"tipbox_1", "", "", "", "tipbox_1", "", "", "tipbox_1"}, //location
 					[]string{"A1", "", "", "", "E1", "", "", "H1"},                   //well
@@ -854,7 +854,7 @@ func TestLoadTips(t *testing.T) {
 				&LoadTips{
 					[]int{8}, //channels
 					0,        //head
-					8,        //multi
+					1,        //multi
 					[]string{"", "", "", "", "", "", "", "tipbox"},   //tipbox
 					[]string{"", "", "", "", "", "", "", "tipbox_1"}, //location
 					[]string{"", "", "", "", "", "", "", "H12"},      //well
@@ -876,7 +876,7 @@ func TestLoadTips(t *testing.T) {
 				&LoadTips{
 					[]int{-1}, //channels
 					0,         //head
-					8,         //multi
+					1,         //multi
 					[]string{"", "", "", "", "", "", "", "tipbox"},   //tipbox
 					[]string{"", "", "", "", "", "", "", "tipbox_1"}, //location
 					[]string{"", "", "", "", "", "", "", "H12"},      //well
@@ -920,7 +920,7 @@ func TestLoadTips(t *testing.T) {
 				&LoadTips{
 					[]int{0}, //channels
 					1,        //head
-					8,        //multi
+					1,        //multi
 					[]string{"tipbox", "", "", "", "", "", "", ""},   //tipbox
 					[]string{"tipbox_1", "", "", "", "", "", "", ""}, //location
 					[]string{"H12", "", "", "", "", "", "", ""},      //well
@@ -964,7 +964,7 @@ func TestLoadTips(t *testing.T) {
 				&LoadTips{
 					[]int{0},             //channels
 					0,                    //head
-					8,                    //multi
+					1,                    //multi
 					[]string{"tipbox"},   //tipbox
 					[]string{"tipbox_1"}, //location
 					[]string{"H12"},      //well
@@ -996,7 +996,7 @@ func TestLoadTips(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) LoadTips: Multi(=4) doesn't match number of channels on Head0(=8)",
+				"(err) LoadTips: While loading tip to channel 0, multi should equal 1, not 4",
 			},
 			nil, //assertions
 		},
@@ -1012,7 +1012,7 @@ func TestLoadTips(t *testing.T) {
 				&LoadTips{
 					[]int{0}, //channels
 					0,        //head
-					8,        //multi
+					1,        //multi
 					[]string{"tipbox", "", "", "", "", "", "", ""},   //tipbox
 					[]string{"tipbox_1", "", "", "", "", "", "", ""}, //location
 					[]string{"H12", "", "", "", "", "", "", ""},      //well
@@ -1035,7 +1035,7 @@ func TestLoadTips(t *testing.T) {
 				&LoadTips{
 					[]int{0}, //channels
 					0,        //head
-					8,        //multi
+					1,        //multi
 					[]string{"tipbox", "", "", "", "", "", "", ""},   //tipbox
 					[]string{"tipbox_1", "", "", "", "", "", "", ""}, //location
 					[]string{"H12", "", "", "", "", "", "", ""},      //well
@@ -1057,7 +1057,7 @@ func TestLoadTips(t *testing.T) {
 				&LoadTips{
 					[]int{0}, //channels
 					0,        //head
-					8,        //multi
+					1,        //multi
 					[]string{"tipbox", "", "", "", "", "", "", ""},   //tipbox
 					[]string{"tipbox_1", "", "", "", "", "", "", ""}, //location
 					[]string{"G12", "", "", "", "", "", "", ""},      //well
@@ -1079,7 +1079,7 @@ func TestLoadTips(t *testing.T) {
 				&LoadTips{
 					[]int{0, 1, 2}, //channels
 					0,              //head
-					8,              //multi
+					3,              //multi
 					[]string{"tipbox", "tipbox", "tipbox", "", "", "", "", ""},       //tipbox
 					[]string{"tipbox_1", "tipbox_1", "tipbox_1", "", "", "", "", ""}, //location
 					[]string{"E12", "G12", "H12", "", "", "", "", ""},                //well
@@ -1101,7 +1101,7 @@ func TestLoadTips(t *testing.T) {
 				&LoadTips{
 					[]int{0, 1, 2}, //channels
 					0,              //head
-					8,              //multi
+					3,              //multi
 					[]string{"tipbox", "tipbox", "tipbox", "", "", "", "", ""},       //tipbox
 					[]string{"tipbox_1", "tipbox_1", "tipbox_1", "", "", "", "", ""}, //location
 					[]string{"G12", "F12", "H12", "", "", "", "", ""},                //well
@@ -1123,7 +1123,7 @@ func TestLoadTips(t *testing.T) {
 				&LoadTips{
 					[]int{0}, //channels
 					0,        //head
-					8,        //multi
+					1,        //multi
 					[]string{"tipbox", "", "", "", "", "", "", ""},   //tipbox
 					[]string{"tipbox_1", "", "", "", "", "", "", ""}, //location
 					[]string{"H12", "", "", "", "", "", "", ""},      //well
@@ -1145,7 +1145,7 @@ func TestLoadTips(t *testing.T) {
 				&LoadTips{
 					[]int{0, 1, 2}, //channels
 					0,              //head
-					8,              //multi
+					3,              //multi
 					[]string{"tipbox", "tipbox", "tipbox", "", "", "", "", ""},       //tipbox
 					[]string{"tipbox_1", "tipbox_1", "tipbox_1", "", "", "", "", ""}, //location
 					[]string{"F12", "G12", "H12", "", "", "", "", ""},                //well
@@ -1187,7 +1187,7 @@ func Test_UnloadTips(t *testing.T) {
 				&UnloadTips{
 					[]int{0}, //channels
 					0,        //head
-					8,        //multi
+					1,        //multi
 					[]string{"tipwaste", "", "", "", "", "", "", ""}, //tipbox
 					[]string{"tipwaste", "", "", "", "", "", "", ""}, //location
 					[]string{"A1", "", "", "", "", "", "", ""},       //well
@@ -1283,7 +1283,7 @@ func Test_UnloadTips(t *testing.T) {
 				&UnloadTips{
 					[]int{0, 2, 4, 6}, //channels
 					0,                 //head
-					8,                 //multi
+					4,                 //multi
 					[]string{"tipwaste", "", "tipwaste", "", "tipwaste", "", "tipwaste", ""}, //tipbox
 					[]string{"tipwaste", "", "tipwaste", "", "tipwaste", "", "tipwaste", ""}, //location
 					[]string{"A1", "", "A1", "", "A1", "", "A1", ""},                         //well
@@ -1323,7 +1323,7 @@ func Test_UnloadTips(t *testing.T) {
 				&UnloadTips{
 					[]int{0, 2, 4, 6}, //channels
 					0,                 //head
-					8,                 //multi
+					4,                 //multi
 					[]string{"tipwaste", "", "tipwaste", "", "tipwaste", "", "tipwaste", ""}, //tipbox
 					[]string{"tipwaste", "", "tipwaste", "", "tipwaste", "", "tipwaste", ""}, //location
 					[]string{"A1", "", "A1", "", "A1", "", "A1", ""},                         //well
@@ -1355,7 +1355,7 @@ func Test_UnloadTips(t *testing.T) {
 				&UnloadTips{
 					[]int{0}, //channels
 					0,        //head
-					8,        //multi
+					1,        //multi
 					[]string{"plate", "", "", "", "", "", "", ""},   //tipbox
 					[]string{"input_1", "", "", "", "", "", "", ""}, //location
 					[]string{"A1", "", "", "", "", "", "", ""},      //well
@@ -1387,7 +1387,7 @@ func Test_UnloadTips(t *testing.T) {
 				&UnloadTips{
 					[]int{0}, //channels
 					0,        //head
-					8,        //multi
+					1,        //multi
 					[]string{"tipwaste", "", "", "", "", "", "", ""}, //tipbox
 					[]string{"tipwaste", "", "", "", "", "", "", ""}, //location
 					[]string{"B1", "", "", "", "", "", "", ""},       //well
@@ -2505,7 +2505,7 @@ func Test_Workflow(t *testing.T) {
 			&LoadTips{
 				[]int{0},
 				0,
-				8,
+				1,
 				[]string{"tipbox", "", "", "", "", "", "", ""},
 				[]string{"tipbox_1", "", "", "", "", "", "", ""},
 				[]string{wc, "", "", "", "", "", "", ""},
@@ -2533,7 +2533,7 @@ func Test_Workflow(t *testing.T) {
 				pt,
 				0,
 			},
-			&UnloadTips{channels, 0, 8, pl, pt, wl},
+			&UnloadTips{channels, 0, len(channels), pl, pt, wl},
 		}
 	}
 
