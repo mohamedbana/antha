@@ -1,4 +1,4 @@
-package liquidhandler
+package liquidhandling
 
 type LHOptions struct {
 	ModelEvap bool
