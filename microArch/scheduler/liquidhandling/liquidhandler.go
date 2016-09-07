@@ -141,10 +141,7 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 
 	for _, ins := range instructions {
 		//logger.Debug(fmt.Sprintln(liquidhandling.InsToString(ins)))
-<<<<<<< HEAD
-=======
-		fmt.Println(liquidhandling.InsToString(ins))
->>>>>>> accuracytest2
+
 		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(this.Properties.Driver)
 
 		if timer != nil {
