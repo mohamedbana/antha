@@ -111,7 +111,7 @@ func (lhp LHPlate) String() string {
 
 // convenience method
 
-func (lhp *LHPlate) GetComponent(cmp *LHComponent, exact bool) ([]WellCoords, []wunit.Volume, bool) {
+func (lhp *LHPlate) GetComponent(cmp *LHComponent, exact bool, mpv wunit.Volume) ([]WellCoords, []wunit.Volume, bool) {
 	ret := make([]WellCoords, 0, 1)
 	vols := make([]wunit.Volume, 0, 1)
 	it := NewOneTimeColumnWiseIterator(lhp)
@@ -137,11 +137,9 @@ func (lhp *LHPlate) GetComponent(cmp *LHComponent, exact bool) ([]WellCoords, []
 			x += 1
 
 			v := w.WorkingVolume()
-			/*
-				if v.LessThan(cmp.Volume()) {
-					continue
-				}
-			*/
+			if v.LessThan(mpv) {
+				continue
+			}
 			volGot.Add(v)
 			ret = append(ret, wc)
 
