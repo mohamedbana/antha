@@ -214,6 +214,19 @@ func TransferVolumes(Vol, Min, Max wunit.Volume) ([]wunit.Volume, error) {
 		return ret, err
 	}
 
+	if max <= 0. {
+		err := wtype.LHError(wtype.LH_ERR_VOL, fmt.Sprintf("Liquid Handler channel maximum volume cannot be %s", Max))
+		return nil, err
+	}
+	if min < 0. {
+		err := wtype.LHError(wtype.LH_ERR_VOL, fmt.Sprintf("Liquid Handler channel minimum volume cannot be %s", Min))
+		return nil, err
+	}
+	if min > max {
+		err := wtype.LHError(wtype.LH_ERR_VOL, fmt.Sprintf("Liquid Handler channel minimum volume (%s) can't be greater than maximum volume (%s)", Min, Max))
+		return nil, err
+	}
+
 	if vol <= max {
 		ret = append(ret, Vol)
 		return ret, nil
@@ -3437,7 +3450,7 @@ func (mi *MixInstruction) OutputTo(driver LiquidhandlingDriver) {
 //RemoveAllPlatesInstruction remove all plates from the machine, returning
 //it to an unconfigured state
 type RemoveAllPlatesInstruction struct {
-	Type      int
+	Type int
 }
 
 func NewRemoveAllPlatesInstruction() *RemoveAllPlatesInstruction {
@@ -3464,20 +3477,20 @@ func (self *RemoveAllPlatesInstruction) GetParameter(name string) interface{} {
 }
 
 func (self *RemoveAllPlatesInstruction) OutputTo(driver LiquidhandlingDriver) {
-    driver.RemoveAllPlates()
+	driver.RemoveAllPlates()
 }
 
 //RemovePlateAt remove the plate at the given location
 type RemovePlateAtInstruction struct {
-	Type      int
-    Location string
+	Type     int
+	Location string
 }
 
 func NewRemovePlateAtInstruction() *RemovePlateAtInstruction {
 	var ins RemovePlateAtInstruction
 
 	ins.Type = RPA
-    ins.Location = ""
+	ins.Location = ""
 	return &ins
 }
 
@@ -3493,23 +3506,23 @@ func (self *RemovePlateAtInstruction) GetParameter(name string) interface{} {
 	switch name {
 	case "INSTRUCTIONTYPE":
 		return self.InstructionType()
-    case "POSFROM":
-        return self.Location
+	case "POSFROM":
+		return self.Location
 	}
 	return nil
 }
 
 func (self *RemovePlateAtInstruction) OutputTo(driver LiquidhandlingDriver) {
-    driver.RemovePlateAt(self.Location)
+	driver.RemovePlateAt(self.Location)
 }
 
 //AddPlateToInstruction remove the plate at the given location
 type AddPlateToInstruction struct {
 	Type      int
-    Position  string
-    Plate     interface{}
-    PlateType string
-    Name      string
+	Position  string
+	Plate     interface{}
+	PlateType string
+	Name      string
 }
 
 func NewAddPlateToInstruction() *AddPlateToInstruction {
@@ -3520,7 +3533,7 @@ func NewAddPlateToInstruction() *AddPlateToInstruction {
 }
 
 func (self *AddPlateToInstruction) InstructionType() int {
-    return self.Type
+	return self.Type
 }
 
 func (self *AddPlateToInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
@@ -3531,16 +3544,16 @@ func (self *AddPlateToInstruction) GetParameter(name string) interface{} {
 	switch name {
 	case "INSTRUCTIONTYPE":
 		return self.InstructionType()
-    case "POSTO":
-        return self.Position
-    case "TOPLATETYPE":
-        return self.PlateType
+	case "POSTO":
+		return self.Position
+	case "TOPLATETYPE":
+		return self.PlateType
 	}
 	return nil
 }
 
 func (self *AddPlateToInstruction) OutputTo(driver LiquidhandlingDriver) {
-    driver.AddPlateTo(self.Position, self.Plate, self.Name)
+	driver.AddPlateTo(self.Position, self.Plate, self.Name)
 }
 
 // TODO -- implement MESSAGE
