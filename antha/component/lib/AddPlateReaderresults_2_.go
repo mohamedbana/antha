@@ -156,11 +156,19 @@ func _AddPlateReaderresults_2Steps(_ctx context.Context, _input *AddPlateReaderr
 
 			experimentalvolumestr := experimentalvolumeinterface.(string)
 
-			volandunit := strings.Split(experimentalvolumestr, " ")
+			//experimentalvolumestr = strings.TrimSpace(experimentalvolumestr)
 
-			vol, err := strconv.ParseFloat(volandunit[0], 64)
+			var volandunit []string
 
-			experimentalvolume := wunit.NewVolume(vol, volandunit[1])
+			if strings.Count(experimentalvolumestr, " ") == 1 {
+				volandunit = strings.Split(experimentalvolumestr, " ")
+			} else if strings.Count(experimentalvolumestr, "ul") == 1 && strings.HasSuffix(experimentalvolumestr, "ul") {
+				volandunit = []string{strings.Trim(experimentalvolumestr, "ul"), "ul"}
+			}
+
+			vol, err := strconv.ParseFloat(strings.TrimSpace(volandunit[0]), 64)
+
+			experimentalvolume := wunit.NewVolume(vol, strings.TrimSpace(volandunit[1]))
 
 			actualconcentrations[experimentalvolume.ToString()] = buffers.DiluteBasedonMolecularWeight(Molecularweight, _input.StockconcinMperL, experimentalvolume, _input.Diluent.CName, wunit.NewVolume(_input.Stockvol.RawValue()-experimentalvolume.RawValue(), "ul"))
 
