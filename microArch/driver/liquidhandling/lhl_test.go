@@ -92,13 +92,10 @@ func makeTestGilson() *LHProperties {
 	return params
 }
 
-func TestBlow(t *testing.T) {
-	robot := makeTestGilson()
-	pol, _ := GetLHPolicyForTest()
-	bi := NewBlowInstruction()
+func getTestBlowout(robot *LHProperties) RobotInstruction {
 	v := wunit.NewVolume(10.0, "ul")
 	ch, _ := ChooseChannel(v, robot)
-
+	bi := NewBlowInstruction()
 	bi.Multi = 1
 	bi.What = append(bi.What, "soup")
 	bi.PltTo = append(bi.PltTo, "position_4")
@@ -107,6 +104,14 @@ func TestBlow(t *testing.T) {
 	bi.TPlateType = append(bi.TPlateType, "pcrplate_skirted_riser40")
 	bi.TVolume = append(bi.TVolume, wunit.ZeroVolume())
 	bi.Prms = ch
+	bi.Head = ch.Head
+	return bi
+}
+
+func TestBlowWithTipChange(t *testing.T) {
+	robot := makeTestGilson()
+	bi := getTestBlowout(robot)
+	pol, _ := GetLHPolicyForTest()
 
 	rule := NewLHPolicyRule("TESTRULE1")
 	rule.AddCategoryConditionOn("LIQUIDCLASS", "soup")
@@ -114,7 +119,6 @@ func TestBlow(t *testing.T) {
 	pols["POST_MIX"] = 5
 	pols["POST_MIX_VOLUME"] = 100.0
 	pol.AddRule(rule, pols)
-	bi.Head = ch.Head
 
 	set := NewRobotInstructionSet(bi)
 
@@ -124,16 +128,47 @@ func TestBlow(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(ris) != 10 {
-		t.Fatal(fmt.Sprintf("Error: Expected %d instructions, got %d", 10, len(ris)))
-	}
-
 	expectedIns := []int{MOV, DSP, MOV, ULD, MOV, LOD, MOV, MMX, MOV, BLO}
+
+	if len(ris) != len(expectedIns) {
+		t.Fatal(fmt.Sprintf("Error: Expected %d instructions, got %d", len(expectedIns), len(ris)))
+	}
 
 	for i, ins := range ris {
 		if ins.InstructionType() != expectedIns[i] {
 			t.Fatal(fmt.Sprintf("Error generating high mix volume blow: expected %s got %s", Robotinstructionnames[expectedIns[i]], Robotinstructionnames[ins.InstructionType()]))
 		}
 	}
+}
 
+func TestBlowNoTipChange(t *testing.T) {
+	robot := makeTestGilson()
+	bi := getTestBlowout(robot)
+	pol, _ := GetLHPolicyForTest()
+
+	rule := NewLHPolicyRule("TESTRULE1")
+	rule.AddCategoryConditionOn("LIQUIDCLASS", "soup")
+	pols := make(LHPolicy, 2)
+	pols["POST_MIX"] = 5
+	pols["POST_MIX_VOLUME"] = 10.0
+	pol.AddRule(rule, pols)
+
+	set := NewRobotInstructionSet(bi)
+
+	ris, err := set.Generate(pol, robot)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	expectedIns := []int{MOV, DSP, MOV, MMX, MOV, BLO}
+
+	if len(ris) != len(expectedIns) {
+		t.Fatal(fmt.Sprintf("Error: Expected %d instructions, got %d", len(expectedIns), len(ris)))
+	}
+
+	for i, ins := range ris {
+		if ins.InstructionType() != expectedIns[i] {
+			t.Fatal(fmt.Sprintf("Error generating low mix volume blow: expected %s got %s", Robotinstructionnames[expectedIns[i]], Robotinstructionnames[ins.InstructionType()]))
+		}
+	}
 }
