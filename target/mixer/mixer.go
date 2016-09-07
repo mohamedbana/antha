@@ -274,7 +274,8 @@ func (a *Mixer) makeMix(mixes []*wtype.LHInstruction) (target.Inst, error) {
 	// TODO: Desired filename not exposed in current driver interface, so pick
 	// a name. So far, at least Gilson software cares what the filename is, so
 	// use .sqlite for compatibility
-	tarball, err := a.saveFile("input.sqlite")
+	name := strings.Replace(fmt.Sprintf("%s.sqlite", time.Now().Format(time.RFC3339)), ":", "_", -1)
+	tarball, err := a.saveFile(name)
 	if err != nil {
 		return nil, err
 	}
@@ -301,9 +302,23 @@ func New(opt Opt, d driver.ExtendedLiquidhandlingDriver) (*Mixer, error) {
 	if !status.OK {
 		return nil, fmt.Errorf("cannot get capabilities: %s", status.Msg)
 	}
-	if len(opt.DriverSpecificTipPreferences) != 0 && p.CheckTipPrefCompatibility(opt.DriverSpecificTipPreferences) {
-		p.Tip_preferences = opt.DriverSpecificTipPreferences
+
+	update := func(addr *[]string, v []string) {
+		if len(v) != 0 {
+			*addr = v
+		}
 	}
+
+	update(&p.Input_preferences, opt.DriverSpecificInputPreferences)
+	update(&p.Output_preferences, opt.DriverSpecificOutputPreferences)
+
+	if len(opt.DriverSpecificTipPreferences) != 0 && p.CheckTipPrefCompatibility(opt.DriverSpecificTipPreferences) {
+		update(&p.Tip_preferences, opt.DriverSpecificTipPreferences)
+	}
+
+	update(&p.Tipwaste_preferences, opt.DriverSpecificTipWastePreferences)
+	update(&p.Wash_preferences, opt.DriverSpecificWashPreferences)
+
 	p.Driver = d
 	return &Mixer{driver: d, properties: &p, opt: opt}, nil
 }
