@@ -2628,7 +2628,7 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 			tipchg, err := ChangeTips("", vmixvol, prms, ins.Prms, ins.Multi, true)
 
 			if err != nil {
-				return ret, wtype.LHError(wtype.LH_ERR_POLICY, fmt.Sprintf("Setting POST_MIX_VOLUME: %s", err.Error))
+				return ret, wtype.LHError(wtype.LH_ERR_POLICY, fmt.Sprintf("Setting POST_MIX_VOLUME: %s", err.Error()))
 			}
 			ret = append(ret, tipchg...)
 		}
