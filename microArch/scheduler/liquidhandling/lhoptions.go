@@ -1,7 +1,7 @@
 package liquidhandling
 
 type LHOptions struct {
-	ModelEvap bool
+	ModelEvaporation bool
 }
 
 func NewLHOptions() LHOptions {

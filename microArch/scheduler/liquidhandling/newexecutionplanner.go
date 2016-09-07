@@ -78,7 +78,7 @@ func ImprovedExecutionPlanner(request *LHRequest, robot *liquidhandling.LHProper
 
 			// evaporate stuff
 
-			if request.Options.ModelEvap {
+			if request.Options.ModelEvaporation {
 				myevap := robot.Evaporate(totaltime)
 				evaps = append(evaps, myevap...)
 			}
