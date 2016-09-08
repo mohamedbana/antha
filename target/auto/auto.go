@@ -37,7 +37,7 @@ func tryRunner(conn *grpc.ClientConn, opts []interface{}) (target.Device, error)
 	if err != nil {
 		return nil, err
 	}
-	if reply.Type != "antha.runner.v1" {
+	if reply.Type != "antha.runner.v1.Runner" {
 		return nil, noMatch
 	}
 
