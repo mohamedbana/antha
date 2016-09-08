@@ -115,8 +115,10 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) error {
 	err = this.Simulate(request)
 	if err != nil {
 		//since the simulator is... tender right now, let's take this with a pinch of salt
-		logger.Info("Ignoring simulation warning")
+		logger.Info("Ignoring simulation error")
 		//return err
+	} else {
+		logger.Info("Simulation completed successfully")
 	}
 
 	err = this.Execute(request)
@@ -167,8 +169,7 @@ func (this *Liquidhandler) Simulate(request *LHRequest) error {
 	}
 
 	fmt.Printf("Simulating %d instructions...\n", len(instructions))
-	for i, ins := range instructions {
-		fmt.Printf("Ins #%d: %T\n", i, ins)
+	for _, ins := range instructions {
 		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(vlh)
 		if vlh.HasError() {
 			break
