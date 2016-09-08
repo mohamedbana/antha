@@ -1431,7 +1431,7 @@ func Test_Aspirate(t *testing.T) {
 					[]float64{100., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
-					8, //multi      int
+					1, //multi      int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -1514,7 +1514,7 @@ func Test_Aspirate(t *testing.T) {
 					[]float64{100., 100., 0., 0., 0., 0., 0., 0.},                  //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
-					8, //multi      int
+					2, //multi      int
 					[]string{"plate", "plate", "", "", "", "", "", ""},             //platetype  []string
 					[]string{"water", "water", "", "", "", "", "", ""},             //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -1548,7 +1548,7 @@ func Test_Aspirate(t *testing.T) {
 					[]float64{20., 0., 0., 0., 0., 0., 0., 0.},                     //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
-					8, //multi      int
+					1, //multi      int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -1582,7 +1582,7 @@ func Test_Aspirate(t *testing.T) {
 					[]float64{175., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
-					8, //multi      int
+					1, //multi      int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -1601,7 +1601,7 @@ func Test_Aspirate(t *testing.T) {
 					[]float64{175., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
-					8, //multi      int
+					1, //multi      int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -1620,7 +1620,7 @@ func Test_Aspirate(t *testing.T) {
 					[]float64{175., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
-					8, //multi      int
+					1, //multi      int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -1639,7 +1639,7 @@ func Test_Aspirate(t *testing.T) {
 					[]float64{175., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
-					8, //multi      int
+					1, //multi      int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -1658,7 +1658,7 @@ func Test_Aspirate(t *testing.T) {
 					[]float64{175., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
-					8, //multi      int
+					1, //multi      int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -1677,7 +1677,7 @@ func Test_Aspirate(t *testing.T) {
 					[]float64{175., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
-					8, //multi      int
+					1, //multi      int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -1745,7 +1745,7 @@ func Test_Aspirate(t *testing.T) {
 					[]float64{100., 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
-					8, //multi      int
+					1, //multi      int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -1779,7 +1779,7 @@ func Test_Aspirate(t *testing.T) {
 					[]float64{535.12135, 0., 0., 0., 0., 0., 0., 0.},               //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
-					8, //multi      int
+					1, //multi      int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -1813,7 +1813,7 @@ func Test_Aspirate(t *testing.T) {
 					[]float64{102.1, 0., 0., 0., 0., 0., 0., 0.},                   //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
-					8, //multi      int
+					1, //multi      int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
 					[]string{"ethanol", "", "", "", "", "", "", ""},                //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -1847,7 +1847,7 @@ func Test_Aspirate(t *testing.T) {
 					[]float64{98.6, 0., 0., 0., 0., 0., 0., 0.},                    //volume     []float64
 					[]bool{false, false, false, false, false, false, false, false}, //overstroke []bool
 					0, //head       int
-					8, //multi      int
+					1, //multi      int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype  []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -1890,7 +1890,7 @@ func Test_Dispense(t *testing.T) {
 					[]float64{50., 0., 0., 0., 0., 0., 0., 0.},                     //volume    []float64
 					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
 					0, //head      int
-					8, //multi     int
+					1, //multi     int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -1928,7 +1928,7 @@ func Test_Dispense(t *testing.T) {
 					[]float64{50., 0., 0., 0., 0., 0., 0., 0.},                     //volume    []float64
 					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
 					0, //head      int
-					8, //multi     int
+					1, //multi     int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -1965,7 +1965,7 @@ func Test_Dispense(t *testing.T) {
 					[]float64{50., 0., 0., 0., 0., 0., 0., 0.},                     //volume    []float64
 					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
 					0, //head      int
-					8, //multi     int
+					1, //multi     int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -2057,7 +2057,7 @@ func Test_Dispense(t *testing.T) {
 					[]float64{50., 0., 0., 0., 0., 0., 0., 0.},                     //volume    []float64
 					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
 					0, //head      int
-					8, //multi     int
+					1, //multi     int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -2090,7 +2090,7 @@ func Test_Dispense(t *testing.T) {
 					[]float64{150., 0., 0., 0., 0., 0., 0., 0.},                    //volume    []float64
 					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
 					0, //head      int
-					8, //multi     int
+					1, //multi     int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -2123,7 +2123,7 @@ func Test_Dispense(t *testing.T) {
 					[]float64{500., 0., 0., 0., 0., 0., 0., 0.},                    //volume    []float64
 					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
 					0, //head      int
-					8, //multi     int
+					1, //multi     int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -2156,7 +2156,7 @@ func Test_Dispense(t *testing.T) {
 					[]float64{50., 0., 0., 0., 0., 0., 0., 0.},                     //volume    []float64
 					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
 					0, //head      int
-					8, //multi     int
+					1, //multi     int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -2189,7 +2189,7 @@ func Test_Dispense(t *testing.T) {
 					[]float64{50., 0., 0., 0., 0., 0., 0., 0.},                     //volume    []float64
 					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
 					0, //head      int
-					8, //multi     int
+					1, //multi     int
 					[]string{"tipwaste", "", "", "", "", "", "", ""},               //platetype []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -2222,7 +2222,7 @@ func Test_Dispense(t *testing.T) {
 					[]float64{50., 0, 0, 0, 0, 0, 0, 0},                            //volume    []float64
 					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
 					0, //head      int
-					8, //multi     int
+					1, //multi     int
 					[]string{"plate", "", "", "", "", "", "", ""},                  //platetype []string
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //llf        []bool
@@ -2300,7 +2300,7 @@ func Test_Mix(t *testing.T) {
 					[]float64{50., 0., 0., 0., 0., 0., 0., 0.},    //volume    []float64
 					[]string{"plate", "", "", "", "", "", "", ""}, //platetype []string
 					[]int{5, 0, 0, 0, 0, 0, 0, 0},                 //cycles []int
-					8, //multi     int
+					1, //multi     int
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
 				},
@@ -2429,7 +2429,7 @@ func Test_Mix(t *testing.T) {
 					[]float64{50., 0., 0., 0., 0., 0., 0., 0.},        //volume    []float64
 					[]string{"notaplate", "", "", "", "", "", "", ""}, //platetype []string
 					[]int{5, 0, 0, 0, 0, 0, 0, 0},                     //cycles []int
-					8, //multi     int
+					1, //multi     int
 					[]string{"water", "", "", "", "", "", "", ""},                  //what       []string
 					[]bool{false, false, false, false, false, false, false, false}, //blowout   []bool
 				},
@@ -2538,6 +2538,12 @@ func Test_Workflow(t *testing.T) {
 	}
 
 	suck := func(plateloc string, wells []string, what []string, volume float64) []TestRobotInstruction {
+		multi := 0
+		for i := range wells {
+			if wells[i] != "" || what[i] != "" {
+				multi += 1
+			}
+		}
 		pl := make([]string, 8)
 		pt := make([]string, 8)
 		v := make([]float64, 8)
@@ -2563,7 +2569,7 @@ func Test_Workflow(t *testing.T) {
 				v,
 				[]bool{false, false, false, false, false, false, false, false},
 				0,
-				8,
+				multi,
 				pt,
 				what,
 				[]bool{false, false, false, false, false, false, false, false},
@@ -2571,6 +2577,12 @@ func Test_Workflow(t *testing.T) {
 		}
 	}
 	blow := func(plateloc string, wells []string, what []string, volume float64) []TestRobotInstruction {
+		multi := 0
+		for i := range wells {
+			if wells[i] != "" || what[i] != "" {
+				multi += 1
+			}
+		}
 		pl := make([]string, 8)
 		pt := make([]string, 8)
 		v := make([]float64, 8)
@@ -2596,7 +2608,7 @@ func Test_Workflow(t *testing.T) {
 				v,
 				[]bool{false, false, false, false, false, false, false, false},
 				0,
-				8,
+				multi,
 				pt,
 				what,
 				[]bool{false, false, false, false, false, false, false, false},

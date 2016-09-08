@@ -389,12 +389,11 @@ func contains(v int, s []int) bool {
 }
 
 //getAdaptorState
-func (self *VirtualLiquidHandler) getAdaptorState(f_name string, h int) *AdaptorState {
+func (self *VirtualLiquidHandler) getAdaptorState(h int) (*AdaptorState, error) {
 	if h < 0 || h >= self.state.GetNumberOfAdaptors() {
-		self.AddErrorf(f_name, "Unknown head %v", h)
-		return nil
+		return nil, fmt.Errorf("Unknown head %d", h)
 	}
-	return self.state.GetAdaptor(h)
+	return self.state.GetAdaptor(h), nil
 }
 
 func (self *VirtualLiquidHandler) GetAdaptorState(head int) *AdaptorState {
@@ -409,8 +408,9 @@ func (self *VirtualLiquidHandler) GetObjectAt(slot string) wtype.LHObject {
 //testTipArgs check that load/unload tip arguments are valid insofar as they won't crash in RobotState
 func (self *VirtualLiquidHandler) testTipArgs(f_name string, channels []int, head int, platetype, position, well []string) bool {
 	//head should exist
-	adaptor := self.getAdaptorState(f_name, head)
-	if adaptor == nil {
+	adaptor, err := self.getAdaptorState(head)
+	if err != nil {
+		self.AddError(f_name, err.Error())
 		return false
 	}
 
@@ -484,11 +484,25 @@ type lhRet struct {
 func (self *VirtualLiquidHandler) validateLHArgs(head, multi int, platetype, what []string, volume []float64,
 	flags map[string][]bool, cycles []int) (*lhRet, error) {
 
+	var err error
+
+	ret := lhRet{
+		make([]int, 0),
+		make([]float64, 0),
+		nil,
+		nil,
+	}
+
+	ret.adaptor, err = self.getAdaptorState(head)
+	if err != nil {
+		return nil, err
+	}
+
 	if err := self.testSliceLength(map[string]int{
 		"volume":    len(volume),
 		"platetype": len(platetype),
 		"what":      len(what),
-	}, multi); err != nil {
+	}, ret.adaptor.GetChannelCount()); err != nil {
 		return nil, err
 	}
 
@@ -499,38 +513,31 @@ func (self *VirtualLiquidHandler) validateLHArgs(head, multi int, platetype, wha
 	if cycles != nil {
 		sla["cycles"] = len(cycles)
 	}
-	if err := self.testSliceLength(sla, multi); err != nil {
+	if err := self.testSliceLength(sla, ret.adaptor.GetChannelCount()); err != nil {
 		return nil, err
 	}
 
-	ret := lhRet{
-		make([]int, 0),
-		make([]float64, 0),
-		make([]bool, multi),
-		nil,
-	}
-	negative := false
+	negative := []float64{}
+	ret.is_explicit = make([]bool, ret.adaptor.GetChannelCount())
 	for i := range ret.is_explicit {
 		ret.is_explicit[i] = !(platetype[i] == "" && what[i] == "")
 		if ret.is_explicit[i] {
 			ret.channels = append(ret.channels, i)
 			ret.volumes = append(ret.volumes, volume[i])
-			negative = negative || volume[i] < 0.
+			if volume[i] < 0. {
+				negative = append(negative, volume[i])
+			}
 		}
 	}
 
-	if negative {
-		return &ret, fmt.Errorf("Cannot aspirate negative volume")
+	if len(negative) == 1 {
+		return &ret, fmt.Errorf("Cannot manipulate negative volume %s", summariseVolumes(negative))
+	} else if len(negative) > 1 {
+		return &ret, fmt.Errorf("Cannot manipulate negative volumes %s", summariseVolumes(negative))
 	}
 
-	//Verify arguments
-	if head < 0 || head >= self.state.GetNumberOfAdaptors() {
-		return &ret, fmt.Errorf("unknown head %d", head)
-	}
-	ret.adaptor = self.state.GetAdaptor(head)
-
-	if multi != ret.adaptor.GetChannelCount() {
-		return &ret, fmt.Errorf("multi[=%d] must equal number of channels on head %d [=%d]", multi, head, ret.adaptor.GetChannelCount())
+	if multi != len(ret.channels) {
+		return &ret, fmt.Errorf("Multi was %d, but instructions given for %d channels (%s)", multi, len(ret.channels), summariseChannels(ret.channels))
 	}
 
 	return &ret, nil
@@ -657,8 +664,9 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
 	ret := driver.CommandStatus{true, driver.OK, "MOVE ACK"}
 
 	//get the adaptor
-	adaptor := self.getAdaptorState("Move", head)
-	if adaptor == nil {
+	adaptor, err := self.getAdaptorState(head)
+	if err != nil {
+		self.AddError("Move", err.Error())
 		return ret
 	}
 
@@ -789,12 +797,15 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 
 	ret := driver.CommandStatus{true, driver.OK, "ASPIRATE ACK"}
 
-	//extend arguments
-	volume = extend_floats(multi, volume)
-	overstroke = extend_bools(multi, overstroke)
-	platetype = extend_strings(multi, platetype)
-	what = extend_strings(multi, what)
-	llf = extend_bools(multi, llf)
+	//extend arguments - at some point shortform slices might become illegal
+	if adaptor, err := self.getAdaptorState(head); err == nil {
+		nc := adaptor.GetChannelCount()
+		volume = extend_floats(nc, volume)
+		overstroke = extend_bools(nc, overstroke)
+		platetype = extend_strings(nc, platetype)
+		what = extend_strings(nc, what)
+		llf = extend_bools(nc, llf)
+	}
 
 	arg, err := self.validateLHArgs(head, multi, platetype, what, volume,
 		map[string][]bool{
@@ -904,12 +915,14 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 
 	ret := driver.CommandStatus{true, driver.OK, "DISPENSE ACK"}
 
-	//extend arguments
-	volume = extend_floats(multi, volume)
-	blowout = extend_bools(multi, blowout)
-	platetype = extend_strings(multi, platetype)
-	what = extend_strings(multi, what)
-	llf = extend_bools(multi, llf)
+	//extend arguments - at some point shortform slices might become illegal
+	if adaptor, err := self.getAdaptorState(head); err == nil {
+		volume = extend_floats(adaptor.GetChannelCount(), volume)
+		blowout = extend_bools(adaptor.GetChannelCount(), blowout)
+		platetype = extend_strings(adaptor.GetChannelCount(), platetype)
+		what = extend_strings(adaptor.GetChannelCount(), what)
+		llf = extend_bools(adaptor.GetChannelCount(), llf)
+	}
 
 	arg, err := self.validateLHArgs(head, multi, platetype, what, volume, map[string][]bool{
 		"blowout": blowout,
@@ -1010,8 +1023,9 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 	}
 
 	//get the adaptor
-	adaptor := self.getAdaptorState("LoadTips", head)
-	if adaptor == nil {
+	adaptor, err := self.getAdaptorState(head)
+	if err != nil {
+		self.AddError("LoadTips", err.Error())
 		return ret
 	}
 	n_channels := adaptor.GetChannelCount()
@@ -1185,8 +1199,9 @@ func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
 	}
 
 	//get the adaptor
-	adaptor := self.getAdaptorState("UnloadTips", head)
-	if adaptor == nil {
+	adaptor, err := self.getAdaptorState(head)
+	if err != nil {
+		self.AddError("UnloadTips", err.Error())
 		return ret
 	}
 	n_channels := adaptor.GetChannelCount()
@@ -1374,12 +1389,14 @@ func (self *VirtualLiquidHandler) Mix(head int, volume []float64, platetype []st
 
 	ret := driver.CommandStatus{true, driver.OK, "MIX ACK"}
 
-	//extend arguments
-	volume = extend_floats(multi, volume)
-	platetype = extend_strings(multi, platetype)
-	cycles = extend_ints(multi, cycles)
-	what = extend_strings(multi, what)
-	blowout = extend_bools(multi, blowout)
+	//extend arguments - at some point shortform slices might become illegal
+	if adaptor, err := self.getAdaptorState(head); err == nil {
+		volume = extend_floats(adaptor.GetChannelCount(), volume)
+		platetype = extend_strings(adaptor.GetChannelCount(), platetype)
+		cycles = extend_ints(adaptor.GetChannelCount(), cycles)
+		what = extend_strings(adaptor.GetChannelCount(), what)
+		blowout = extend_bools(adaptor.GetChannelCount(), blowout)
+	}
 
 	arg, err := self.validateLHArgs(head, multi, platetype, what, volume, map[string][]bool{
 		"blowout": blowout,
