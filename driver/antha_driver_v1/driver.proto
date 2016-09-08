@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package antha.driver.v1;
+
+message TypeRequest {}
+
+message TypeReply {
+  string type = 1;
+}
+
+message HttpHeader {
+  string Name = 1;
+  string Value = 2;
+}
+
+// Remote Http call
+message HttpCall {
+  string url = 1;
+  string method = 2;
+  bytes body = 3;
+  repeated HttpHeader headers = 4;
+}
+
