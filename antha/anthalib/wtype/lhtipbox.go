@@ -187,8 +187,8 @@ func (self *LHTipbox) GetSize() Coordinates {
 
 func (self *LHTipbox) GetTipBounds() BBox {
 	return BBox{
-		Coordinates{self.GetPosition().X, self.GetPosition().Y, self.TipZStart},
-		Coordinates{self.GetSize().X, self.GetSize().Y, self.Tiptype.GetSize().Z},
+		self.Bounds.GetPosition().Add(Coordinates{self.TipXStart, self.TipYStart, self.TipZStart}),
+		Coordinates{self.TipXOffset * float64(self.NCols()), self.TipYOffset * float64(self.NRows()), self.Tiptype.GetSize().Z},
 	}
 }
 
