@@ -2097,7 +2097,7 @@ func Test_Dispense(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(err) Dispense: While dispensing 150ul from head 0 channel 0 - tip on channel 0 contains only 100ul working volume",
+				"(warn) Dispense: While dispensing 150ul from head 0 channel 0 - tip on channel 0 contains only 100ul, possible inadvertant blowout",
 			},
 			nil, //assertionsi
 		},

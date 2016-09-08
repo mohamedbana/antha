@@ -463,7 +463,7 @@ func (self *VirtualLiquidHandler) testTipArgs(f_name string, channels []int, hea
 					self.AddErrorf(f_name, "Command given for channel %d, but no platetype, well or position given", i)
 					return false
 				}
-			} else {
+			} else if len(channels) > 0 { //if channels are empty we'll infer it later
 				if !(platetype[i] == "" && well[i] == "" && position[i] == "") {
 					self.AddWarningf(f_name, "No command for channel %d, but platetype, well or position given", i)
 				}
@@ -1007,14 +1007,22 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 
 		if tip == nil {
 			no_tip = append(no_tip, i)
-		} else if wells[i] == nil {
+			continue
+		}
+		if v.GreaterThan(tip.WorkingVolume()) {
+			v = tip.WorkingVolume()
+			//there's nothing in the tip, then this is probably blowout
+			if !tip.WorkingVolume().IsZero() {
+				//a bit strange
+				self.AddWarningf("Dispense", "While %s - tip on channel %d contains only %s, possible inadvertant blowout",
+					describe(), i, tip.WorkingVolume())
+			}
+		}
+		if wells[i] == nil {
 			no_well = append(no_well, i)
 		} else if fv.Add(wells[i].CurrentVolume()); fv.GreaterThan(wells[i].MaxVolume()) {
 			self.AddErrorf("Dispense", "While %s - well %s under channel %d contains %s, command would exceed maximum volume %s",
 				describe(), wells[i].GetName(), i, wells[i].CurrentVolume(), wells[i].MaxVolume())
-		} else if v.GreaterThan(tip.WorkingVolume()) {
-			self.AddErrorf("Dispense", "While %s - tip on channel %d contains only %s working volume",
-				describe(), i, tip.WorkingVolume())
 		} else if c, err := tip.Remove(v); err != nil {
 			self.AddErrorf("Dispense", "Unexpected tip error \"%s\"", err.Error())
 		} else if err := wells[i].Add(c); err != nil {
@@ -1088,7 +1096,7 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 		above_tip := map[int]bool{}
 		for ch := 0; ch < n_channels; ch++ {
 			pos := adaptor.GetChannel(ch).GetAbsolutePosition()
-			size := wtype.Coordinates{0., 0., pos.Z}
+			size := wtype.Coordinates{0., 0., 100.}
 			bb := wtype.NewBBox(pos.Subtract(size), size)
 
 			found := deck.GetBoxIntersections(*bb)
@@ -1104,10 +1112,10 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 		}
 
 		if len(channels) == 0 {
-			self.AddWarning("LoadTips", "Command doesn't specify which channels to load to, and no tips below adaptor, ignoring")
+			self.AddWarning("LoadTips", "'channel' argument empty and no tips below adaptor, ignoring")
 			return ret
 		} else {
-			self.AddWarningf("LoadTips", "Command doesn't specify which channels to load to, assuming %s", summariseChannels(channels))
+			self.AddWarningf("LoadTips", "'channel' argument empty, assuming all channels above tips (%s)", summariseChannels(channels))
 		}
 	}
 	if multi != len(channels) {
@@ -1236,10 +1244,6 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
 	platetype, position, well []string) driver.CommandStatus {
 	ret := driver.CommandStatus{true, driver.OK, "UNLOADTIPS ACK"}
-	if len(channels) == 0 {
-		self.AddWarning("UnloadTips", "Command doesn't specify any channels to unload tips from, ignoring")
-		return ret
-	}
 
 	//get the adaptor
 	adaptor, err := self.getAdaptorState(head)
@@ -1253,6 +1257,19 @@ func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
 	platetype = extend_strings(n_channels, platetype)
 	position = extend_strings(n_channels, position)
 	well = extend_strings(n_channels, well)
+
+	if len(channels) == 0 {
+		for ch := 0; ch < n_channels; ch++ {
+			if adaptor.GetChannel(ch).HasTip() {
+				channels = append(channels, ch)
+			}
+		}
+		if len(channels) == 0 {
+			self.AddWarning("UnloadTips", "'channel' argument empty and no tips are loaded, ignoring")
+		} else {
+			self.AddWarningf("UnloadTips", "'channel' argument empty, unloading all tips (%s)", summariseChannels(channels))
+		}
+	}
 
 	//check that RobotState won't crash
 	if !self.testTipArgs("UnloadTips", channels, head, platetype, position, well) {
@@ -1480,10 +1497,11 @@ func (self *VirtualLiquidHandler) Mix(head int, volume []float64, platetype []st
 			no_well = append(no_well, i)
 		} else {
 			if wells[i].Contents().Name() != what[i] {
-				self.AddWarningf("Mix", "While %s - well %s contains %s not %s", describe(), wells[i].GetName(), wells[i].Contents().Name(), what[i])
+				self.AddWarningf("Mix", "While %s - well contains %s not %s", describe(), wells[i].Contents().Name(), what[i])
 			}
 			if wells[i].CurrVolume().LessThan(v) {
-				self.AddErrorf("Mix", "While %s - well %s only contains %s", describe(), wells[i].GetName(), wells[i].CurrVolume())
+				self.AddWarningf("Mix", "While %s - well only contains %s", describe(), wells[i].CurrVolume())
+				v = wells[i].CurrVolume()
 			}
 			if wtype.TypeOf(wells[i].Plate) != platetype[i] {
 				self.AddWarningf("Mix", "While %s - plate \"%s\" is of type \"%s\", not \"%s\"",
