@@ -545,21 +545,8 @@ func (self *VirtualLiquidHandler) validateLHArgs(head, multi int, platetype, wha
 
 //getAbsolutePosition get a position within the liquidhandler, adding any errors as neccessary
 //bool is false if the instruction shouldn't continue (e.g. missing deckposition e.t.c)
-func (self *VirtualLiquidHandler) getAbsolutePosition(fname, deckposition, well string, reference int, platetype string) (wtype.Coordinates, bool) {
+func (self *VirtualLiquidHandler) getAbsolutePosition(fname, deckposition, well string, ref wtype.WellReference, platetype string) (wtype.Coordinates, bool) {
 	ret := wtype.Coordinates{}
-
-	var ref wtype.WellReference
-	switch reference {
-	case 0:
-		ref = wtype.BottomReference
-	case 1:
-		ref = wtype.TopReference
-	case 2:
-		ref = wtype.LiquidReference
-	default:
-		self.AddErrorf(fname, "Invalid reference %d", reference)
-		return ret, false
-	}
 
 	target, ok := self.state.GetDeck().GetChild(deckposition)
 	if !ok {
@@ -598,7 +585,7 @@ func (self *VirtualLiquidHandler) getAbsolutePosition(fname, deckposition, well 
 	if !ok {
 		//since we already checked that the address exists, this must be a bad reference
 		self.AddErrorf(fname, "Object type %s at %s doesn't support reference \"%s\"",
-			wtype.TypeOf(target), deckposition, wtype.WellReferenceNames[ref])
+			wtype.TypeOf(target), deckposition, ref)
 		return ret, false
 	}
 	return ret, true
@@ -694,6 +681,21 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
 		return ret
 	}
 
+	refs := make([]wtype.WellReference, adaptor.GetChannelCount())
+	for i, r := range reference {
+		switch r {
+		case 0:
+			refs[i] = wtype.BottomReference
+		case 1:
+			refs[i] = wtype.TopReference
+		case 2:
+			refs[i] = wtype.LiquidReference
+		default:
+			self.AddErrorf("Move", "Invalid reference %d", r)
+			return ret
+		}
+	}
+
 	//find the coordinates of each explicitly requested position
 	coords := make([]wtype.Coordinates, adaptor.GetChannelCount())
 	offsets := makeOffsets(offsetX, offsetY, offsetZ)
@@ -709,7 +711,7 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
 			}
 			explicit[i] = false
 		} else {
-			c, ok := self.getAbsolutePosition("Move", deckposition[i], wellcoords[i], reference[i], platetype[i])
+			c, ok := self.getAbsolutePosition("Move", deckposition[i], wellcoords[i], refs[i], platetype[i])
 			if !ok {
 				return ret
 			}
@@ -775,6 +777,25 @@ func (self *VirtualLiquidHandler) Move(deckposition []string, wellcoords []strin
 	}
 
 	//check for collisions in the new location
+	for ch, rc := range rel_coords {
+		pos := origin.Add(rc)
+		obj := self.state.GetDeck().GetPointIntersections(pos)
+		in_well := false
+		for _, o := range obj {
+			if _, ok := o.(*wtype.LHWell); ok {
+				in_well = true
+			}
+		}
+		if !in_well && len(obj) > 0 {
+			o_str := make([]string, len(obj))
+			for i, o := range obj {
+				o_str[i] = wtype.NameOf(o)
+			}
+			self.AddErrorf("Move", "Cannot move channel %d to (\"%s\", %s, %s) + (%.1f,%.1f,%.1f)mm as this collides with %s\n",
+				ch, deckposition[ch], wellcoords[ch], refs[ch], offsetX[ch], offsetY[ch], offsetZ[ch], strings.Join(o_str, " and "))
+			return ret
+		}
+	}
 
 	//update the head position accordingly
 	adaptor.SetPosition(origin)
@@ -1017,10 +1038,6 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 	platetype, position, well []string) driver.CommandStatus {
 	ret := driver.CommandStatus{true, driver.OK, "LOADTIPS ACK"}
-	if len(channels) == 0 {
-		self.AddWarning("loadtips", "command specifies no channels to load tips onto, ignoring")
-		return ret
-	}
 
 	//get the adaptor
 	adaptor, err := self.getAdaptorState(head)
@@ -1037,12 +1054,6 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 
 	//check that the command is valid
 	if !self.testTipArgs("LoadTips", channels, head, platetype, position, well) {
-		return ret
-	}
-
-	if multi != len(channels) {
-		self.AddErrorf("LoadTips", "While loading %s to %s, multi should equal %d, not %d",
-			pTips(len(channels)), summariseChannels(channels), len(channels), multi)
 		return ret
 	}
 
@@ -1072,6 +1083,38 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 
 	//get the deck
 	deck := self.state.GetDeck()
+
+	if len(channels) == 0 {
+		above_tip := map[int]bool{}
+		for ch := 0; ch < n_channels; ch++ {
+			pos := adaptor.GetChannel(ch).GetAbsolutePosition()
+			size := wtype.Coordinates{0., 0., pos.Z}
+			bb := wtype.NewBBox(pos.Subtract(size), size)
+
+			found := deck.GetBoxIntersections(*bb)
+			for _, obj := range found {
+				if _, ok := obj.(*wtype.LHTip); ok {
+					above_tip[ch] = true
+				}
+			}
+		}
+
+		for ch := range above_tip {
+			channels = append(channels, ch)
+		}
+
+		if len(channels) == 0 {
+			self.AddWarning("LoadTips", "Command doesn't specify which channels to load to, and no tips below adaptor, ignoring")
+			return ret
+		} else {
+			self.AddWarningf("LoadTips", "Command doesn't specify which channels to load to, assuming %s", summariseChannels(channels))
+		}
+	}
+	if multi != len(channels) {
+		self.AddErrorf("LoadTips", "While loading %s to %s, multi should equal %d, not %d",
+			pTips(len(channels)), summariseChannels(channels), len(channels), multi)
+		return ret
+	}
 
 	//Get the tip at each requested location
 	tips := make([]*wtype.LHTip, n_channels)
@@ -1117,7 +1160,7 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 		}
 		z_off[ch] = delta.Z
 		if delta.Z < 0. {
-			self.AddError("LoadTips", "Request to load tip which is above adaptor - CRASH")
+			self.AddErrorf("LoadTips", "Request to load tip at location %s to channel %d at %s, channel is %.1f below tip", tip_p, ch, ch_p, -delta.Z)
 			return ret
 		}
 	}
