@@ -1,6 +1,7 @@
 package target
 
 import (
+	"github.com/antha-lang/antha/driver"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	lh "github.com/antha-lang/antha/microArch/scheduler/liquidhandling"
 )
@@ -120,6 +121,31 @@ func (a *Manual) SetDependsOn(x []Inst) {
 
 func (a *Manual) GetTimeEstimate() float64 {
 	return a.Time
+}
+
+// Run calls on device
+type Run struct {
+	Dev     Device
+	Label   string
+	Details string
+	Depends []Inst
+	Calls   []driver.Call
+}
+
+func (a *Run) DependsOn() []Inst {
+	return a.Depends
+}
+
+func (a *Run) Device() Device {
+	return a.Dev
+}
+
+func (a *Run) SetDependsOn(x []Inst) {
+	a.Depends = x
+}
+
+func (a *Run) GetTimeEstimate() float64 {
+	return 0.0
 }
 
 // Virtual instruction to hang dependencies on
