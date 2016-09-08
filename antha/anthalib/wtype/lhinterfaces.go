@@ -124,6 +124,10 @@ const (
 	LiquidReference                      //2
 )
 
+func (self WellReference) String() string {
+	return []string{"BottomReference", "TopReference", "LiquidReference"}[self]
+}
+
 var WellReferenceNames []string = []string{"bottom", "top", "liquid"}
 
 //Addressable unifies the interface to objects which have
