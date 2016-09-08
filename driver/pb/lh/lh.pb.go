@@ -1785,17 +1785,17 @@ func (m *PtrToLHTipMessage) GetArg_1() *LHTipMessage {
 }
 
 type LHChannelParameterMessage struct {
-	Arg_1  string           `protobuf:"bytes,1,opt,name=Arg_1" json:"Arg_1,omitempty"`
-	Arg_2  string           `protobuf:"bytes,2,opt,name=Arg_2" json:"Arg_2,omitempty"`
-	Arg_3  string           `protobuf:"bytes,3,opt,name=Arg_3" json:"Arg_3,omitempty"`
-	Arg_4  *VolumeMessage   `protobuf:"bytes,4,opt,name=Arg_4" json:"Arg_4,omitempty"`
-	Arg_5  *VolumeMessage   `protobuf:"bytes,5,opt,name=Arg_5" json:"Arg_5,omitempty"`
-	Arg_6  *FlowRateMessage `protobuf:"bytes,6,opt,name=Arg_6" json:"Arg_6,omitempty"`
-	Arg_7  *FlowRateMessage `protobuf:"bytes,7,opt,name=Arg_7" json:"Arg_7,omitempty"`
-	Arg_8  int64            `protobuf:"varint,8,opt,name=Arg_8" json:"Arg_8,omitempty"`
-	Arg_9  bool             `protobuf:"varint,9,opt,name=Arg_9" json:"Arg_9,omitempty"`
-	Arg_10 int64            `protobuf:"varint,10,opt,name=Arg_10" json:"Arg_10,omitempty"`
-	Arg_11 int64            `protobuf:"varint,11,opt,name=Arg_11" json:"Arg_11,omitempty"`
+	Arg_1  string           `protobuf:"bytes,1,opt,name=Arg_1,json=arg1" json:"Arg_1,omitempty"`
+	Arg_2  string           `protobuf:"bytes,2,opt,name=Arg_2,json=arg2" json:"Arg_2,omitempty"`
+	Arg_3  string           `protobuf:"bytes,3,opt,name=Arg_3,json=arg3" json:"Arg_3,omitempty"`
+	Arg_4  *VolumeMessage   `protobuf:"bytes,4,opt,name=Arg_4,json=arg4" json:"Arg_4,omitempty"`
+	Arg_5  *VolumeMessage   `protobuf:"bytes,5,opt,name=Arg_5,json=arg5" json:"Arg_5,omitempty"`
+	Arg_6  *FlowRateMessage `protobuf:"bytes,6,opt,name=Arg_6,json=arg6" json:"Arg_6,omitempty"`
+	Arg_7  *FlowRateMessage `protobuf:"bytes,7,opt,name=Arg_7,json=arg7" json:"Arg_7,omitempty"`
+	Arg_8  int64            `protobuf:"varint,8,opt,name=Arg_8,json=arg8" json:"Arg_8,omitempty"`
+	Arg_9  bool             `protobuf:"varint,9,opt,name=Arg_9,json=arg9" json:"Arg_9,omitempty"`
+	Arg_10 int64            `protobuf:"varint,10,opt,name=Arg_10,json=arg10" json:"Arg_10,omitempty"`
+	Arg_11 int64            `protobuf:"varint,11,opt,name=Arg_11,json=arg11" json:"Arg_11,omitempty"`
 }
 
 func (m *LHChannelParameterMessage) Reset()                    { *m = LHChannelParameterMessage{} }
@@ -2434,20 +2434,6 @@ func (m *VolumeMessage) GetArg_1() *PtrToConcreteMeasurementMessage {
 
 type FlowRateMessage struct {
 	Arg_1 *PtrToConcreteMeasurementMessage `protobuf:"bytes,1,opt,name=Arg_1" json:"Arg_1,omitempty"`
-}
-
-type LHChannelParameterMessage struct {
-	Arg_1  string           `protobuf:"bytes,1,opt,name=Arg_1,json=arg1" json:"Arg_1,omitempty"`
-	Arg_2  string           `protobuf:"bytes,2,opt,name=Arg_2,json=arg2" json:"Arg_2,omitempty"`
-	Arg_3  string           `protobuf:"bytes,3,opt,name=Arg_3,json=arg3" json:"Arg_3,omitempty"`
-	Arg_4  *VolumeMessage   `protobuf:"bytes,4,opt,name=Arg_4,json=arg4" json:"Arg_4,omitempty"`
-	Arg_5  *VolumeMessage   `protobuf:"bytes,5,opt,name=Arg_5,json=arg5" json:"Arg_5,omitempty"`
-	Arg_6  *FlowRateMessage `protobuf:"bytes,6,opt,name=Arg_6,json=arg6" json:"Arg_6,omitempty"`
-	Arg_7  *FlowRateMessage `protobuf:"bytes,7,opt,name=Arg_7,json=arg7" json:"Arg_7,omitempty"`
-	Arg_8  int64            `protobuf:"varint,8,opt,name=Arg_8,json=arg8" json:"Arg_8,omitempty"`
-	Arg_9  bool             `protobuf:"varint,9,opt,name=Arg_9,json=arg9" json:"Arg_9,omitempty"`
-	Arg_10 int64            `protobuf:"varint,10,opt,name=Arg_10,json=arg10" json:"Arg_10,omitempty"`
-	Arg_11 int64            `protobuf:"varint,11,opt,name=Arg_11,json=arg11" json:"Arg_11,omitempty"`
 }
 
 func (m *FlowRateMessage) Reset()                    { *m = FlowRateMessage{} }
