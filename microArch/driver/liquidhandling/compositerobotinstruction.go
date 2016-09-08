@@ -1402,17 +1402,17 @@ func (ins *LoadTipsMoveInstruction) GetParameter(name string) interface{} {
 func (ins *LoadTipsMoveInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties) ([]RobotInstruction, error) {
 	ret := make([]RobotInstruction, 2)
 
-	// move
+	// move to just above the tip
 
 	mov := NewMoveInstruction()
 	mov.Head = ins.Head
 	mov.Pos = ins.FPosition
 	mov.Well = ins.Well
 	mov.Plt = ins.FPlateType
-	mov.Reference = append(mov.Reference, 0)
+	mov.Reference = append(mov.Reference, 1)
 	mov.OffsetX = append(mov.OffsetX, 0.0)
 	mov.OffsetY = append(mov.OffsetY, 0.0)
-	mov.OffsetZ = append(mov.OffsetZ, 0.0)
+	mov.OffsetZ = append(mov.OffsetZ, 5.0)
 	mov.Platform = ins.Platform
 	ret[0] = mov
 
@@ -1484,7 +1484,7 @@ func (ins *UnloadTipsMoveInstruction) Generate(policy *LHPolicyRuleSet, prms *LH
 	mov.Pos = ins.PltTo
 	mov.Well = ins.WellTo
 	mov.Plt = ins.TPlateType
-	mov.Reference = append(mov.Reference, 0)
+	mov.Reference = append(mov.Reference, 1)
 	mov.OffsetX = append(mov.OffsetX, 0.0)
 	mov.OffsetY = append(mov.OffsetY, 0.0)
 	mov.OffsetZ = append(mov.OffsetZ, 0.0)

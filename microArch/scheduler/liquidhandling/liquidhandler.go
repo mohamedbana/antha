@@ -166,6 +166,7 @@ func (this *Liquidhandler) Simulate(request *LHRequest) error {
 		return vlh.GetWorstError()
 	}
 
+	fmt.Printf("Simulating %d instructions...\n", len(instructions))
 	for i, ins := range instructions {
 		fmt.Printf("Ins #%d: %T\n", i, ins)
 		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(vlh)
