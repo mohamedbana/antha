@@ -183,6 +183,10 @@ func CopyTip(tt LHTip) *LHTip {
 
 //@implement LHContainer
 func (self *LHTip) Contents() *LHComponent {
+	//Only happens with dodgy tip initialization
+	if self.contents == nil {
+		self.contents = NewLHComponent()
+	}
 	return self.contents
 }
 
