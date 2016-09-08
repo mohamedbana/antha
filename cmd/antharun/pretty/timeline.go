@@ -17,7 +17,7 @@ func prettyInst(inst *target.Manual) string {
 
 func summarize(inst target.Inst) (string, error) {
 	switch inst := inst.(type) {
-	case target.RunInst:
+	case runInst:
 		return fmt.Sprintf("Run file (size: %d)", len(inst.Data().Tarball)), nil
 	case *target.Manual:
 		return prettyInst(inst), nil

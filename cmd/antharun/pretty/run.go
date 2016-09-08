@@ -8,6 +8,11 @@ import (
 	"github.com/antha-lang/antha/target"
 )
 
+type runInst interface {
+	target.Inst
+	Data() target.Files
+}
+
 func Run(out io.Writer, result *execute.Result, t *target.Target) error {
 	if len(t.Runners()) == 0 {
 		return nil
@@ -16,7 +21,7 @@ func Run(out io.Writer, result *execute.Result, t *target.Target) error {
 		return err
 	}
 	for _, inst := range result.Insts {
-		rinst, ok := inst.(target.RunInst)
+		rinst, ok := inst.(runInst)
 		if !ok {
 			continue
 		}

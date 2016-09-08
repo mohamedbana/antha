@@ -5,25 +5,11 @@ import (
 	lh "github.com/antha-lang/antha/microArch/scheduler/liquidhandling"
 )
 
-var (
-	_ RunInst = &Mix{}
-)
-
 type Inst interface {
 	Device() Device
 	DependsOn() []Inst
 	SetDependsOn([]Inst)
 	GetTimeEstimate() float64
-}
-
-type Files struct {
-	Type    string // Pseudo MIME-type describing contents of tarball
-	Tarball []byte // Tar'ed and gzip'ed files
-}
-
-type RunInst interface {
-	Inst
-	Data() Files // Blob of data that is runnable
 }
 
 type CmpError struct {
