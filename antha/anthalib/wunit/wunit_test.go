@@ -210,3 +210,22 @@ func TestNewVolume(t *testing.T) {
 	}
 
 }
+
+func TestFlowRateComparison(t *testing.T) {
+	a := NewFlowRate(1., "ml/min")
+	b := NewFlowRate(2., "ml/min")
+
+	if !b.GreaterThan(a) {
+		t.Errorf("Got b > a (%s > %s) wrong", b, a)
+	}
+	if a.GreaterThan(b) {
+		t.Errorf("Got a > b (%s > %s) wrong", a, b)
+	}
+
+	if b.LessThan(a) {
+		t.Errorf("Got b < a (%s < %s) wrong", b, a)
+	}
+	if !a.LessThan(b) {
+		t.Errorf("Got a < b (%s < %s) wrong", a, b)
+	}
+}
