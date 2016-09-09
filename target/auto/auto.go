@@ -32,7 +32,7 @@ type Opt struct {
 }
 
 func tryRunner(conn *grpc.ClientConn, opts []interface{}) (target.Device, error) {
-	c := runner.NewRunnerClient(conn)
+	c := driver.NewDriverClient(conn)
 	reply, err := c.DriverType(context.Background(), &driver.TypeRequest{})
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func tryRunner(conn *grpc.ClientConn, opts []interface{}) (target.Device, error)
 		return nil, noMatch
 	}
 
-	return target.NewRunner(c), nil
+	return target.NewRunner(runner.NewRunnerClient(conn)), nil
 }
 
 func getMixerOpt(opt []interface{}) (ret mixer.Opt) {
