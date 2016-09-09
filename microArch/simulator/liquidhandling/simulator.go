@@ -1421,7 +1421,7 @@ func (self *VirtualLiquidHandler) SetPipetteSpeed(head, channel int, rate float6
 			t_rate := wunit.NewFlowRate(rate, "ml/min")
 			if t_rate.GreaterThan(p.Maxspd) || t_rate.LessThan(p.Minspd) {
 				self.AddErrorf("SetPipetteSpeed", "Setting Head %d channel %d speed to %s, outside allowable range [%s:%s]",
-					t_rate, p.Minspd, p.Maxspd)
+					head, ch, t_rate, p.Minspd, p.Maxspd)
 			}
 		}
 	}
