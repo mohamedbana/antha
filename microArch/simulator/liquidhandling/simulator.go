@@ -889,9 +889,9 @@ func (self *VirtualLiquidHandler) Aspirate(volume []float64, overstroke []bool, 
 		if wells[i] == nil { //we'll catch this later
 			continue
 		}
-		if wells[i].Contents().Name() != what[i] {
+		if wells[i].Contents().GetType() != what[i] {
 			self.AddWarningf("Aspirate", "While %s - well %s contains %s, not %s",
-				describe(), wells[i].GetName(), wells[i].Contents().Name(), what[i])
+				describe(), wells[i].GetName(), wells[i].Contents().GetType(), what[i])
 		}
 	}
 
@@ -988,6 +988,16 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 				"While %s - must also dispense %s from %s as head is not independent",
 				describe(), summariseVolumes(arg.volumes), summariseChannels(extra))
 			return ret
+		}
+	}
+
+	//check liquid type
+	for i := range arg.channels {
+		if tip := arg.adaptor.GetChannel(i).GetTip(); tip != nil {
+			if tip.Contents().GetType() != what[i] {
+				self.AddWarningf("Dispense", "While %s - channel %d contains %s, not %s",
+					describe(), i, tip.Contents().GetType(), what[i])
+			}
 		}
 	}
 
@@ -1496,8 +1506,8 @@ func (self *VirtualLiquidHandler) Mix(head int, volume []float64, platetype []st
 		if wells[i] == nil {
 			no_well = append(no_well, i)
 		} else {
-			if wells[i].Contents().Name() != what[i] {
-				self.AddWarningf("Mix", "While %s - well contains %s not %s", describe(), wells[i].Contents().Name(), what[i])
+			if wells[i].Contents().GetType() != what[i] {
+				self.AddWarningf("Mix", "While %s - well contains %s not %s", describe(), wells[i].Contents().GetType(), what[i])
 			}
 			if wells[i].CurrVolume().LessThan(v) {
 				self.AddWarningf("Mix", "While %s - well only contains %s", describe(), wells[i].CurrVolume())

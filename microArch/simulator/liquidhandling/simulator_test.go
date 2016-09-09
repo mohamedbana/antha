@@ -2667,12 +2667,12 @@ func Test_Workflow(t *testing.T) {
 		wc.Y = y
 		inst = append(inst, suck("input_1",
 			[]string{wc.FormatA1(), "", "", "", "", "", "", ""},
-			[]string{"green", "", "", "", "", "", "", ""},
+			[]string{"water", "", "", "", "", "", "", ""},
 			195.*green[y])...)
 		wc.X = 4
 		inst = append(inst, blow("input_1",
 			[]string{wc.FormatA1(), "", "", "", "", "", "", ""},
-			[]string{"green", "", "", "", "", "", "", ""},
+			[]string{"water", "", "", "", "", "", "", ""},
 			195.*green[y])...)
 	}
 	inst = append(inst, dropTips([]int{0})...)
@@ -2721,11 +2721,11 @@ func Test_Workflow(t *testing.T) {
 
 		inst = append(inst, suck("input_1",
 			from_wells,
-			[]string{"red", "red", "red", "red", "red", "red", "red", "red"},
+			[]string{"water", "water", "water", "water", "water", "water", "water", "water"},
 			5.*red[x])...)
 		inst = append(inst, blow("output_1",
 			to_wells,
-			[]string{"red", "red", "red", "red", "red", "red", "red", "red"},
+			[]string{"water", "water", "water", "water", "water", "water", "water", "water"},
 			5.*red[x])...)
 	}
 	inst = append(inst, dropTips([]int{0, 1, 2, 3, 4, 5, 6, 7})...)
@@ -2748,11 +2748,11 @@ func Test_Workflow(t *testing.T) {
 
 		inst = append(inst, suck("input_1",
 			from_wells,
-			[]string{"green", "green+water", "green+water", "green+water", "green+water", "green+water", "green+water", "water"},
+			[]string{"water", "water", "water", "water", "water", "water", "water", "water"},
 			5.)...)
 		inst = append(inst, blow("output_1",
 			to_wells,
-			[]string{"green", "green+water", "green+water", "green+water", "green+water", "green+water", "green+water", "water"},
+			[]string{"water", "water", "water", "water", "water", "water", "water", "water"},
 			5.)...)
 	}
 	inst = append(inst, dropTips([]int{0, 1, 2, 3, 4, 5, 6, 7})...)
