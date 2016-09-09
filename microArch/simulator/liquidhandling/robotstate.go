@@ -128,16 +128,19 @@ type AdaptorState struct {
 	channels    []*ChannelState
 	position    wtype.Coordinates
 	independent bool
+	params      *wtype.LHChannelParameter
 	robot       *RobotState
 }
 
 func NewAdaptorState(independent bool,
 	channels int,
-	channel_offset wtype.Coordinates) *AdaptorState {
+	channel_offset wtype.Coordinates,
+	params *wtype.LHChannelParameter) *AdaptorState {
 	as := AdaptorState{
 		make([]*ChannelState, 0, channels),
 		wtype.Coordinates{},
 		independent,
+		params.Dup(),
 		nil,
 	}
 
@@ -164,6 +167,14 @@ func (self *AdaptorState) GetChannelCount() int {
 //GetChannel
 func (self *AdaptorState) GetChannel(ch int) *ChannelState {
 	return self.channels[ch]
+}
+
+//GetParamsForChannel
+func (self *AdaptorState) GetParamsForChannel(ch int) *wtype.LHChannelParameter {
+	if tip := self.GetChannel(ch).GetTip(); tip != nil {
+		return self.params.MergeWithTip(tip)
+	}
+	return self.params
 }
 
 //GetTipCount

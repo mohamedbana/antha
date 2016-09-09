@@ -295,7 +295,7 @@ func NewVirtualLiquidHandler(props *liquidhandling.LHProperties) *VirtualLiquidH
 		} else if p.Orientation == wtype.LHVChannel {
 			spacing.X = 9.
 		}
-		vlh.state.AddAdaptor(NewAdaptorState(p.Independent, p.Multi, spacing))
+		vlh.state.AddAdaptor(NewAdaptorState(p.Independent, p.Multi, spacing, p))
 	}
 
 	//Make the deck
@@ -1403,13 +1403,35 @@ func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
 
 //SetPipetteSpeed - used
 func (self *VirtualLiquidHandler) SetPipetteSpeed(head, channel int, rate float64) driver.CommandStatus {
-	self.AddWarning("SetPipetteSpeed", "Not yet implemented")
+
+	if adaptor, err := self.getAdaptorState(head); err != nil {
+		self.AddError("SetPipetteSpeed", err.Error())
+	} else {
+		channels := make([]int, 0, adaptor.GetChannelCount())
+		if channel < 0 {
+			for ch := 0; ch < adaptor.GetChannelCount(); ch++ {
+				channels = append(channels, ch)
+			}
+		} else {
+			channels = append(channels, channel)
+		}
+
+		for ch := range channels {
+			p := adaptor.GetParamsForChannel(ch)
+			t_rate := wunit.NewFlowRate(rate, "ml/min")
+			if t_rate.GreaterThan(p.Maxspd) || t_rate.LessThan(p.Minspd) {
+				self.AddErrorf("SetPipetteSpeed", "Setting Head %d channel %d speed to %s, outside allowable range [%s:%s]",
+					t_rate, p.Minspd, p.Maxspd)
+			}
+		}
+	}
+
 	return driver.CommandStatus{true, driver.OK, "SETPIPETTESPEED ACK"}
 }
 
 //SetDriveSpeed - used
 func (self *VirtualLiquidHandler) SetDriveSpeed(drive string, rate float64) driver.CommandStatus {
-	self.AddWarning("SetDriveSpeed", "Not yet implemented")
+	self.AddWarningf("SetDriveSpeed", "Not yet implemented: SetDriveSpeed(%s, %f)", drive, rate)
 	return driver.CommandStatus{true, driver.OK, "SETDRIVESPEED ACK"}
 }
 
