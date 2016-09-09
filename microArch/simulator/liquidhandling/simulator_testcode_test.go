@@ -672,6 +672,17 @@ func (self *Finalize) Apply(vlh *lh.VirtualLiquidHandler) {
 	vlh.Finalize()
 }
 
+//SetPipetteSpeed
+type SetPipetteSpeed struct {
+	head    int
+	channel int
+	speed   float64
+}
+
+func (self *SetPipetteSpeed) Apply(vlh *lh.VirtualLiquidHandler) {
+	vlh.SetPipetteSpeed(self.head, self.channel, self.speed)
+}
+
 //AddPlateTo
 type AddPlateTo struct {
 	position string

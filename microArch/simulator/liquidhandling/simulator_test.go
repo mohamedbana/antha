@@ -216,6 +216,79 @@ func TestVLH_AddPlateTo(t *testing.T) {
 	}
 }
 
+func Test_SetPippetteSpeed(t *testing.T) {
+	tests := []SimulatorTest{
+		SimulatorTest{
+			"OK", //name
+			nil,  //default params
+			nil,  //no setup
+			[]TestRobotInstruction{
+				&Initialize{},
+				&SetPipetteSpeed{0, -1, 5.},
+			},
+			nil, //no errors
+			nil, //no assertions
+		},
+		SimulatorTest{
+			"too low", //name
+			nil,       //default params
+			nil,       //no setup
+			[]TestRobotInstruction{
+				&Initialize{},
+				&SetPipetteSpeed{0, -1, 0.001},
+			},
+			[]string{
+				"(err) SetPipetteSpeed: Setting Head 0 channel 0 to 0.001ml/min outside allowable range [0.1ml/min:10ml/min]",
+				"(err) SetPipetteSpeed: Setting Head 0 channel 1 to 0.001ml/min outside allowable range [0.1ml/min:10ml/min]",
+				"(err) SetPipetteSpeed: Setting Head 0 channel 2 to 0.001ml/min outside allowable range [0.1ml/min:10ml/min]",
+				"(err) SetPipetteSpeed: Setting Head 0 channel 3 to 0.001ml/min outside allowable range [0.1ml/min:10ml/min]",
+				"(err) SetPipetteSpeed: Setting Head 0 channel 4 to 0.001ml/min outside allowable range [0.1ml/min:10ml/min]",
+				"(err) SetPipetteSpeed: Setting Head 0 channel 5 to 0.001ml/min outside allowable range [0.1ml/min:10ml/min]",
+				"(err) SetPipetteSpeed: Setting Head 0 channel 6 to 0.001ml/min outside allowable range [0.1ml/min:10ml/min]",
+				"(err) SetPipetteSpeed: Setting Head 0 channel 7 to 0.001ml/min outside allowable range [0.1ml/min:10ml/min]",
+			},
+			nil, //no assertions
+		},
+		SimulatorTest{
+			"too high", //name
+			nil,        //default params
+			nil,        //no setup
+			[]TestRobotInstruction{
+				&Initialize{},
+				&SetPipetteSpeed{0, -1, 15.},
+			},
+			[]string{
+				"(err) SetPipetteSpeed: Setting Head 0 channel 0 to 15ml/min outside allowable range [0.1ml/min:10ml/min]",
+				"(err) SetPipetteSpeed: Setting Head 0 channel 1 to 15ml/min outside allowable range [0.1ml/min:10ml/min]",
+				"(err) SetPipetteSpeed: Setting Head 0 channel 2 to 15ml/min outside allowable range [0.1ml/min:10ml/min]",
+				"(err) SetPipetteSpeed: Setting Head 0 channel 3 to 15ml/min outside allowable range [0.1ml/min:10ml/min]",
+				"(err) SetPipetteSpeed: Setting Head 0 channel 4 to 15ml/min outside allowable range [0.1ml/min:10ml/min]",
+				"(err) SetPipetteSpeed: Setting Head 0 channel 5 to 15ml/min outside allowable range [0.1ml/min:10ml/min]",
+				"(err) SetPipetteSpeed: Setting Head 0 channel 6 to 15ml/min outside allowable range [0.1ml/min:10ml/min]",
+				"(err) SetPipetteSpeed: Setting Head 0 channel 7 to 15ml/min outside allowable range [0.1ml/min:10ml/min]",
+			},
+			nil, //no assertions
+		},
+		SimulatorTest{
+			"Independent", //name
+			nil,           //default params
+			nil,           //no setup
+			[]TestRobotInstruction{
+				&Initialize{},
+				&SetPipetteSpeed{0, 3, 5.},
+			},
+			[]string{
+				"(warn) SetPipetteSpeed: Head 0 is not independent, setting pipette speed for channel 3 sets all other channels as well",
+			},
+			nil, //no assertions
+		},
+	}
+
+	for _, test := range tests {
+		test.run(t)
+	}
+}
+
 // ########################################################################################################################
 // ########################################################## Move
 // ########################################################################################################################
@@ -2097,7 +2170,7 @@ func Test_Dispense(t *testing.T) {
 				},
 			},
 			[]string{ //errors
-				"(warn) Dispense: While dispensing 150ul from head 0 channel 0 - tip on channel 0 contains only 100ul, possible inadvertant blowout",
+				"(warn) Dispense: While dispensing 150ul from head 0 channel 0 - tip on channel 0 contains only 100ul, but blowout flag is false",
 			},
 			nil, //assertionsi
 		},
