@@ -24,9 +24,11 @@ package factory
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/devices"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wutil"
+	"github.com/antha-lang/antha/microArch/logger"
 )
 
 //lhPlateParams
@@ -342,6 +344,8 @@ func makePlateLibrary() map[string]*lhPlateParams {
 
 	square = wtype.NewShape("box", "mm", 2, 2, 7)
 	welltype = wtype.NewLHWell(nil, wtype.ZeroWellCoords(), "ul", 13, 2, square, bottomtype, xdim, ydim, zdim, bottomh, "mm")
+	plate = &lhPlateParams{"nunc1536_riser", "Unknown", 32, 48, wtype.Coordinates{127.76, 85.48, 7}, welltype, wellxoffset, wellyoffset, xstart, ystart, zstart, nil}
+	plates[plate.Platetype] = plate
 	plate = &lhPlateParams{"nunc1536_riser40", "Unknown", 32, 48, wtype.Coordinates{127.76, 85.48, 7}, welltype, wellxoffset, wellyoffset, xstart, ystart, zstart, nil}
 	plates[plate.Platetype] = plate
 
@@ -625,9 +629,11 @@ func MakeGreinerVBottomPlateWithRiser() *lhPlateParams {
 
 func GetPlateByType(typ string) *wtype.LHPlate {
 	plates := makePlateLibrary()
-	p := plates[typ]
-
-	return p.Init()
+	if p, ok := plates[typ]; ok {
+		return p.Init()
+	}
+	logger.Fatal(fmt.Sprintf("Plate library has no plate of type \"%s\"", typ))
+	return nil //keep the compiler happy
 }
 
 func GetPlateList() []string {
