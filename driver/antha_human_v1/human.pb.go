@@ -12,13 +12,13 @@ It has these top-level messages:
 */
 package antha_human_v1
 
-import proto "github.com/antha-lang/antha/bvendor/github.com/antha-lang/antha/bvendor/github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto"
+import proto "github.com/antha-lang/antha/bvendor/github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
 
 import (
-	context "github.com/antha-lang/antha/bvendor/github.com/antha-lang/antha/bvendor/github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
-	grpc "github.com/antha-lang/antha/bvendor/github.com/antha-lang/antha/bvendor/github.com/antha-lang/antha/bvendor/google.golang.org/grpc"
+	context "github.com/antha-lang/antha/bvendor/golang.org/x/net/context"
+	grpc "github.com/antha-lang/antha/bvendor/google.golang.org/grpc"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
