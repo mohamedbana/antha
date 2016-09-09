@@ -13,8 +13,6 @@ service Runner {
   rpc Messages(MessagesRequest) returns (MessagesReply);
   // Types of files that can be run
   rpc SupportedRunTypes(SupportedRunTypesRequest) returns (SupportedRunTypesReply);
-  // What type of driver am I?
-  rpc DriverType(antha.driver.v1.TypeRequest) returns (antha.driver.v1.TypeReply);
 }
 
 message RunRequest {
