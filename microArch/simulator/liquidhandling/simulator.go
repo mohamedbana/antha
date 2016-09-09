@@ -1408,7 +1408,10 @@ func (self *VirtualLiquidHandler) SetPipetteSpeed(head, channel int, rate float6
 		self.AddError("SetPipetteSpeed", err.Error())
 	} else {
 		channels := make([]int, 0, adaptor.GetChannelCount())
-		if channel < 0 {
+		if channel < 0 || !adaptor.IsIndependent() {
+			if channel >= 0 {
+				self.AddWarningf("SetPipetteSpeed", "Head %d is not independent, setting pipette speed for channel %d sets all other channels as well", head, channel)
+			}
 			for ch := 0; ch < adaptor.GetChannelCount(); ch++ {
 				channels = append(channels, ch)
 			}
@@ -1420,7 +1423,7 @@ func (self *VirtualLiquidHandler) SetPipetteSpeed(head, channel int, rate float6
 			p := adaptor.GetParamsForChannel(ch)
 			t_rate := wunit.NewFlowRate(rate, "ml/min")
 			if t_rate.GreaterThan(p.Maxspd) || t_rate.LessThan(p.Minspd) {
-				self.AddErrorf("SetPipetteSpeed", "Setting Head %d channel %d speed to %s, outside allowable range [%s:%s]",
+				self.AddErrorf("SetPipetteSpeed", "Setting Head %d channel %d speed to %s outside allowable range [%s:%s]",
 					head, ch, t_rate, p.Minspd, p.Maxspd)
 			}
 		}
