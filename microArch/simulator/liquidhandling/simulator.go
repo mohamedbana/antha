@@ -1021,10 +1021,9 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 		}
 		if v.GreaterThan(tip.WorkingVolume()) {
 			v = tip.WorkingVolume()
-			//there's nothing in the tip, then this is probably blowout
-			if !tip.WorkingVolume().IsZero() {
+			if !blowout[i] {
 				//a bit strange
-				self.AddWarningf("Dispense", "While %s - tip on channel %d contains only %s, possible inadvertant blowout",
+				self.AddWarningf("Dispense", "While %s - tip on channel %d contains only %s, but blowout flag is false",
 					describe(), i, tip.WorkingVolume())
 			}
 		}
@@ -1609,7 +1608,10 @@ func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{},
 
 //RemoveAllPlates - used
 func (self *VirtualLiquidHandler) RemoveAllPlates() driver.CommandStatus {
-	self.AddWarning("RemoveAllPlates", "Not yet implemented")
+	deck := self.state.GetDeck()
+	for _, name := range deck.GetSlotNames() {
+		deck.Clear(name)
+	}
 	return driver.CommandStatus{true, driver.OK, "REMOVEALLPLATES ACK"}
 }
 

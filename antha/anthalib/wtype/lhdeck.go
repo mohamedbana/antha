@@ -183,6 +183,15 @@ func (self *LHDeck) SetChild(name string, child LHObject) error {
 	return nil
 }
 
+func (self *LHDeck) Clear(name string) error {
+	if ds, ok := self.slots[name]; !ok {
+		return fmt.Errorf("Cannot clear from unknown slot \"%s\"", name)
+	} else {
+		ds.contents = nil
+	}
+	return nil
+}
+
 func (self *LHDeck) Accepts(name string, child LHObject) bool {
 	if ds, ok := self.slots[name]; ok {
 		return ds.Fits(child.GetSize()) && ds.AcceptsClass(ClassOf(child))
