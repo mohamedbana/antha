@@ -44,6 +44,7 @@ type Opt struct {
 	DriverSpecificTipPreferences      []string // Driver specific position names (e.g., position_1 or A2)
 	DriverSpecificTipWastePreferences []string
 	DriverSpecificWashPreferences     []string
+	ModelEvaporation                  bool
 }
 
 // Merge two configs together and return the result. Values in the argument

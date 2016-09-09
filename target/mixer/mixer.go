@@ -145,6 +145,8 @@ func (a *Mixer) makeLhreq() (*lhreq, error) {
 		}
 	}
 
+	req.Options.ModelEvaporation = a.opt.ModelEvaporation
+
 	err := req.ConfigureYourself()
 	if err != nil {
 		return nil, err
