@@ -264,17 +264,19 @@ func (self adaptorCollisions) String() string {
 // Simulate a liquid handler Driver
 type VirtualLiquidHandler struct {
 	simulator.ErrorReporter
-	state               *RobotState
-	tipbox_collisions   bool
-	max_dispense_height float64
+	state    *RobotState
+	settings *SimulatorSettings
 }
 
 //Create a new VirtualLiquidHandler which mimics an LHDriver
-func NewVirtualLiquidHandler(props *liquidhandling.LHProperties) *VirtualLiquidHandler {
+func NewVirtualLiquidHandler(props *liquidhandling.LHProperties, settings *SimulatorSettings) *VirtualLiquidHandler {
 	var vlh VirtualLiquidHandler
 
-	vlh.tipbox_collisions = true
-	vlh.max_dispense_height = 5.
+	if settings == nil {
+		vlh.settings = DefaultSimulatorSettings()
+	} else {
+		vlh.settings = settings
+	}
 
 	vlh.validateProperties(props)
 	//if the properties are that bad, don't bother building RobotState
@@ -959,7 +961,7 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 	}
 
 	//find the position of each tip
-	wells := self.getWellsBelow(self.max_dispense_height, arg.adaptor)
+	wells := self.getWellsBelow(self.settings.MaxDispenseHeight(), arg.adaptor)
 
 	//independence contraints
 	if !arg.adaptor.IsIndependent() {
@@ -1041,7 +1043,7 @@ func (self *VirtualLiquidHandler) Dispense(volume []float64, blowout []bool, hea
 
 	if len(no_well) > 0 {
 		self.AddErrorf("Dispense", "While %s - no well within %s below %s on %s",
-			describe(), wunit.NewLength(self.max_dispense_height, "mm"), pTips(len(no_well)), summariseChannels(no_well))
+			describe(), wunit.NewLength(self.settings.MaxDispenseHeight(), "mm"), pTips(len(no_well)), summariseChannels(no_well))
 	}
 	if len(no_tip) > 0 {
 		self.AddErrorf("Dispense", "While %s - no %s loaded on %s",
@@ -1123,7 +1125,7 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 		if len(channels) == 0 {
 			self.AddWarning("LoadTips", "'channel' argument empty and no tips below adaptor, ignoring")
 			return ret
-		} else {
+		} else if self.settings.IsAutoChannelWarningEnabled() {
 			self.AddWarningf("LoadTips", "'channel' argument empty, assuming all channels above tips (%s)", summariseChannels(channels))
 		}
 	}
@@ -1219,7 +1221,7 @@ func (self *VirtualLiquidHandler) LoadTips(channels []int, head, multi int,
 			objects := deck.GetBoxIntersections(*box)
 			//filter out tipboxes if we're meant to be ignoring them
 			//(hack to prevent dubious tipbox geometry messing this up)
-			if !self.tipbox_collisions {
+			if !self.settings.IsTipboxCollisionEnabled() {
 				no_tipboxes := objects[:0]
 				for _, o := range objects {
 					if _, ok := o.(*wtype.LHTipbox); !ok {
@@ -1275,7 +1277,7 @@ func (self *VirtualLiquidHandler) UnloadTips(channels []int, head, multi int,
 		}
 		if len(channels) == 0 {
 			self.AddWarning("UnloadTips", "'channel' argument empty and no tips are loaded, ignoring")
-		} else {
+		} else if self.settings.IsAutoChannelWarningEnabled() {
 			self.AddWarningf("UnloadTips", "'channel' argument empty, unloading all tips (%s)", summariseChannels(channels))
 		}
 	}
@@ -1423,7 +1425,7 @@ func (self *VirtualLiquidHandler) SetPipetteSpeed(head, channel int, rate float6
 			p := adaptor.GetParamsForChannel(ch)
 			t_rate := wunit.NewFlowRate(rate, "ml/min")
 			if t_rate.GreaterThan(p.Maxspd) || t_rate.LessThan(p.Minspd) {
-				self.AddErrorf("SetPipetteSpeed", "Setting Head %d channel %d speed to %s outside allowable range [%s:%s]",
+				self.AddWarningf("SetPipetteSpeed", "Setting Head %d channel %d speed to %s outside allowable range [%s:%s]",
 					head, ch, t_rate, p.Minspd, p.Maxspd)
 			}
 		}
@@ -1616,11 +1618,11 @@ func (self *VirtualLiquidHandler) AddPlateTo(position string, plate interface{},
 
 		if tb, ok := obj.(*wtype.LHTipbox); ok {
 			//check that the height of the tips is greater than the height of the tipbox
-			if tb.GetSize().Z >= (tb.TipZStart+tb.Tiptype.GetSize().Z) && self.tipbox_collisions {
+			if tb.GetSize().Z >= (tb.TipZStart+tb.Tiptype.GetSize().Z) && self.settings.IsTipboxCheckEnabled() {
 				self.AddWarningf("AddPlateTo",
 					"Tipbox \"%s\" is taller than the tips it holds (%.2fmm > %.2fmm), disabling tipbox collision detection",
 					tb.GetName(), tb.GetSize().Z, tb.TipZStart+tb.Tiptype.GetSize().Z)
-				self.tipbox_collisions = false
+				self.settings.EnableTipboxCollision(false)
 			}
 		}
 

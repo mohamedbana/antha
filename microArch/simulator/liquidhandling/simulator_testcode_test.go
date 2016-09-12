@@ -646,7 +646,7 @@ func independent_lhproperties() *liquidhandling.LHProperties {
 }
 
 func default_vlh() *lh.VirtualLiquidHandler {
-	vlh := lh.NewVirtualLiquidHandler(default_lhproperties())
+	vlh := lh.NewVirtualLiquidHandler(default_lhproperties(), nil)
 	return vlh
 }
 
@@ -1060,7 +1060,7 @@ func (self *SimulatorTest) run(t *testing.T) {
 	if self.Props == nil {
 		self.Props = default_lhproperties()
 	}
-	vlh := lh.NewVirtualLiquidHandler(self.Props)
+	vlh := lh.NewVirtualLiquidHandler(self.Props, nil)
 
 	//do setup
 	if self.Setup != nil {

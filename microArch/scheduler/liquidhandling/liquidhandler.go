@@ -157,8 +157,8 @@ func (this *Liquidhandler) Simulate(request *LHRequest) error {
 		return wtype.LHError(wtype.LH_ERR_OTHER, "Cannot execute request: no instructions")
 	}
 
-	// set up the simulator
-	vlh := simulator_lh.NewVirtualLiquidHandler(this.Properties)
+	// set up the simulator with default settings
+	vlh := simulator_lh.NewVirtualLiquidHandler(this.Properties, nil)
 	for _, err := range vlh.GetErrors() {
 		err.WriteToLog()
 	}
