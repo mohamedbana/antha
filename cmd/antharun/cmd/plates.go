@@ -28,6 +28,7 @@ import (
 	"strings"
 
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/text"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -62,7 +63,7 @@ func lhPlates(cmd *cobra.Command, args []string) error {
 		prettystrings = append(prettystrings, text.Print("Plate Name", "Properties"))
 
 		for i := range cs {
-			prettystrings = append(prettystrings, text.Print(cs[i], factory.GetPlateByType(cs[i]).String()))
+			prettystrings = append(prettystrings, text.Print(cs[i], fmt.Sprint(factory.GetPlateByType(cs[i]).WellsX(), " by ", factory.GetPlateByType(cs[i]).WellsY(), " ", factory.GetPlateByType(cs[i]).Welltype.Shape().ShapeName, " ", wtype.BottomType(factory.GetPlateByType(cs[i]).Welltype), " shaped ", factory.GetPlateByType(cs[i]).Welltype.MaxVolume().ToString(), " wells")))
 		}
 		_, err := fmt.Println(strings.Join(prettystrings, ""))
 		return err
