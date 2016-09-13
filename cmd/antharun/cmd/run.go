@@ -201,6 +201,8 @@ func runWorkflow(cmd *cobra.Command, args []string) error {
 			} else {
 				drivers = append(drivers, uri)
 			}
+		case "tcp":
+			drivers = append(drivers, u.Host)
 		default:
 			drivers = append(drivers, u.String())
 		}
@@ -223,8 +225,8 @@ func init() {
 	//RootCmd.AddCommand(c)
 	flags.String("parameters", "parameters.yml", "Parameters to workflow")
 	flags.String("workflow", "workflow.json", "Workflow definition file")
-	flags.StringSlice("driver", nil, "Uris of remote drivers ({tcp,go}://...)")
-	flags.StringSlice("component", nil, "Uris of remote components ({tcp,go}://...)")
+	flags.StringSlice("driver", nil, "Uris of remote drivers ({tcp,go}://...); use multiple flags for multiple drivers")
+	flags.StringSlice("component", nil, "Uris of remote components ({tcp,go}://...); use multiple flags for multiple components")
 	flags.Int("maxPlates", 0, "Maximum number of plates")
 	flags.Int("maxWells", 0, "Maximum number of wells on a plate")
 	flags.Float64("residualVolumeWeight", 0.0, "Residual volume weight")
