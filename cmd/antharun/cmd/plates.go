@@ -44,9 +44,6 @@ func lhPlates(cmd *cobra.Command, args []string) error {
 	viper.BindPFlags(cmd.Flags())
 
 	cs := factory.GetPlateList()
-	/*if err != nil {
-		return err
-	}*/
 
 	switch viper.GetString("output") {
 	case jsonOutput:
@@ -58,7 +55,9 @@ func lhPlates(cmd *cobra.Command, args []string) error {
 		}
 	default:
 
-		prettystrings := make([]string, 0)
+		var prettystrings []string
+
+		prettystrings = make([]string, 0)
 
 		prettystrings = append(prettystrings, text.Print("Plate Name", "Properties"))
 

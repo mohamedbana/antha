@@ -43,9 +43,6 @@ func lhPolicies(cmd *cobra.Command, args []string) error {
 	viper.BindPFlags(cmd.Flags())
 
 	policymap := liquidhandling.MakePolicies()
-	/*if err != nil {
-		return err
-	}*/
 
 	switch viper.GetString("output") {
 	case jsonOutput:
