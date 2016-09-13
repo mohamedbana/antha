@@ -1,3 +1,3 @@
-# AnthaStandardLibrary - The standard library of Antha-based functions and commands
+# anthalib - A library of very basic functions and commands
 
-You can search the packages in this directory to find methods suitable for your Antha elements.
+You can search the packages in this directory to find very basic methods, like unit definitions and type assertions.
