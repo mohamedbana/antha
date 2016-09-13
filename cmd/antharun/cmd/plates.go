@@ -63,7 +63,10 @@ func lhPlates(cmd *cobra.Command, args []string) error {
 		prettystrings = append(prettystrings, text.Print("Plate Name", "Properties"))
 
 		for i := range cs {
-			prettystrings = append(prettystrings, text.Print(cs[i], fmt.Sprint(factory.GetPlateByType(cs[i]).WellsX(), " by ", factory.GetPlateByType(cs[i]).WellsY(), " ", factory.GetPlateByType(cs[i]).Welltype.Shape().ShapeName, " ", wtype.BottomType(factory.GetPlateByType(cs[i]).Welltype), " shaped ", factory.GetPlateByType(cs[i]).Welltype.MaxVolume().ToString(), " wells")))
+
+			platetype := factory.GetPlateByType(cs[i])
+
+			prettystrings = append(prettystrings, text.Print(cs[i], fmt.Sprint(platetype.WellsX(), " by ", platetype.WellsY(), " ", platetype.Welltype.Shape().ShapeName, " ", wtype.BottomType(platetype.Welltype), " shaped ", platetype.Welltype.MaxVolume().ToString(), " wells")))
 		}
 		_, err := fmt.Println(strings.Join(prettystrings, ""))
 		return err
