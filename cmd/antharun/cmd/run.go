@@ -36,9 +36,7 @@ import (
 	"github.com/antha-lang/antha/cmd/antharun/spawn"
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
-	"github.com/antha-lang/antha/target"
 	"github.com/antha-lang/antha/target/auto"
-	"github.com/antha-lang/antha/target/human"
 	"github.com/antha-lang/antha/target/mixer"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -98,30 +96,6 @@ type runOpt struct {
 	ParametersFile string
 }
 
-func (a *runOpt) makeTarget(mixerOpt mixer.Opt) (*target.Target, error) {
-	t := target.New()
-	if len(a.Drivers) == 0 {
-		if err := t.AddDevice(human.New(human.Opt{CanMix: true, CanIncubate: true})); err != nil {
-			return nil, err
-		}
-	} else {
-		if err := t.AddDevice(human.New(human.Opt{CanIncubate: true})); err != nil {
-			return nil, err
-		}
-	}
-	for _, uri := range a.Drivers {
-		if d, err := auto.New(auto.Opt{
-			Uri:  uri,
-			Opts: []interface{}{mixerOpt},
-		}); err != nil {
-			return nil, err
-		} else if err := t.AddDevice(d); err != nil {
-			return nil, err
-		}
-	}
-	return t, nil
-}
-
 func (a *runOpt) Run() error {
 	wdata, err := ioutil.ReadFile(a.WorkflowFile)
 	if err != nil {
@@ -139,7 +113,13 @@ func (a *runOpt) Run() error {
 	}
 
 	mixerOpt := mixer.DefaultOpt.Merge(params.Config).Merge(&a.MixerOpt)
-	t, err := a.makeTarget(mixerOpt)
+	opt := auto.Opt{
+		MaybeArgs: []interface{}{mixerOpt},
+	}
+	for _, uri := range a.Drivers {
+		opt.Endpoints = append(opt.Endpoints, auto.Endpoint{Uri: uri})
+	}
+	t, err := auto.New(opt)
 	if err != nil {
 		return err
 	}
@@ -156,7 +136,7 @@ func (a *runOpt) Run() error {
 	}
 
 	rout, err := execute.Run(ctx, execute.Opt{
-		Target:   t,
+		Target:   t.Target,
 		Workflow: wdesc,
 		Params:   params,
 	})
@@ -164,11 +144,11 @@ func (a *runOpt) Run() error {
 		return err
 	}
 
-	if err := pretty.Timeline(os.Stdout, rout); err != nil {
+	if err := pretty.Timeline(os.Stdout, t, rout); err != nil {
 		return err
 	}
 
-	if err := pretty.Run(os.Stdout, rout, t); err != nil {
+	if err := pretty.Run(os.Stdout, os.Stdin, t, rout); err != nil {
 		return err
 	}
 

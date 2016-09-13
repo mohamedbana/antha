@@ -42,10 +42,6 @@ type Incubate struct {
 	Time    float64
 }
 
-func (a *Incubate) Data() Files {
-	return a.Files
-}
-
 func (a *Incubate) Device() Device {
 	return a.Dev
 }
@@ -71,10 +67,6 @@ type Mix struct {
 	FinalProperties *liquidhandling.LHProperties
 	Final           map[string]string // Map from ids in Properties to FinalProperties
 	Files           Files
-}
-
-func (a *Mix) Data() Files {
-	return a.Files
 }
 
 func (a *Mix) Device() Device {
