@@ -59,7 +59,10 @@ func (a *Auto) executeMix(ctx context.Context, inst *target.Mix) error {
 
 	// Proof of concept
 	var errors []string
-	for range time.Tick(5 * time.Second) {
+	ticker := time.NewTicker(5 * time.Second)
+	defer ticker.Stop()
+
+	for range ticker.C {
 		msgs, err := r.Messages(ctx, &runner.MessagesRequest{
 			Id: reply.Id,
 		})
