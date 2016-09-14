@@ -833,8 +833,12 @@ func GetLHPolicyForTest() (*LHPolicyRuleSet, error) {
 	}
 
 	// hack to fix plate type problems
+	// this really should be removed asap
+	// make low priority so it doesn't clobber other
+	// policies
 	rule := NewLHPolicyRule("HVOffsetFix")
 	rule.AddNumericConditionOn("VOLUME", 20.1, 300.0) // what about higher? // set specifically for openPlant configuration
+	rule.Priority = 0
 	//rule.AddCategoryConditionOn("FROMPLATETYPE", "pcrplate_skirted_riser")
 	pol := MakeHVOffsetPolicy()
 	lhpr.AddRule(rule, pol)
