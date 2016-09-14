@@ -2,6 +2,7 @@ protocol ChooseColonies
 
 import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image/pick"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 
 )
 
@@ -21,7 +22,7 @@ Data (
 
 // Physical Inputs to this protocol with types
 Inputs (
-	
+	Plate *wtype.LHPlate
 )
 
 // Physical outputs from this protocol with types
@@ -42,7 +43,7 @@ Setup {
 // for every input
 Steps {
 	
-	Wellstopick = pick.Pick(Imagefile, NumbertoPick,Setplateperimeterfirst,Rotate)
+	Wellstopick = pick.Pick(Imagefile,Plate, NumbertoPick,Setplateperimeterfirst,Rotate)
 	
 }
 // Run after controls and a steps block are completed to

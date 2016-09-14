@@ -2,6 +2,7 @@ package lib
 
 import (
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/image/pick"
+	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/antha/anthalib/wunit"
 	"github.com/antha-lang/antha/component"
 	"github.com/antha-lang/antha/execute"
@@ -30,7 +31,7 @@ func _ChooseColoniesSetup(_ctx context.Context, _input *ChooseColoniesInput) {
 // for every input
 func _ChooseColoniesSteps(_ctx context.Context, _input *ChooseColoniesInput, _output *ChooseColoniesOutput) {
 
-	_output.Wellstopick = pick.Pick(_input.Imagefile, _input.NumbertoPick, _input.Setplateperimeterfirst, _input.Rotate)
+	_output.Wellstopick = pick.Pick(_input.Imagefile, _input.Plate, _input.NumbertoPick, _input.Setplateperimeterfirst, _input.Rotate)
 
 }
 
@@ -95,6 +96,7 @@ type ChooseColoniesElement struct {
 type ChooseColoniesInput struct {
 	Imagefile              string
 	NumbertoPick           int
+	Plate                  *wtype.LHPlate
 	Rotate                 bool
 	Setplateperimeterfirst bool
 }
@@ -120,6 +122,7 @@ func init() {
 			Params: []component.ParamDesc{
 				{Name: "Imagefile", Desc: "", Kind: "Parameters"},
 				{Name: "NumbertoPick", Desc: "", Kind: "Parameters"},
+				{Name: "Plate", Desc: "", Kind: "Inputs"},
 				{Name: "Rotate", Desc: "", Kind: "Parameters"},
 				{Name: "Setplateperimeterfirst", Desc: "", Kind: "Parameters"},
 				{Name: "Wellstopick", Desc: "", Kind: "Data"},
