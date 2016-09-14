@@ -80,7 +80,13 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) (*
 			}
 		}
 
-		if len(input_plate_order) != len(input_plates) {
+		if len(input_plate_order) < len(input_plates) {
+			for id, _ := range input_plates {
+				if !isInStrArr(id, input_plate_order) {
+					input_plate_order = append(input_plate_order, id)
+				}
+			}
+		} else if len(input_plate_order) > len(input_plates) {
 			return nil, wtype.LHError(wtype.LH_ERR_DIRE, fmt.Sprintf("Plate number inconsistency: %d != %d (here: %d)", len(input_plate_order), len(input_plates), 82))
 		}
 
