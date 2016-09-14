@@ -45,10 +45,7 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	inhecoincubatorinmm := devices.Shaker["InhecoStaticOnDeck"]["Height"] * 1000
 
 	valueformaxheadtonotintoDSWplatewithp20tips := 4.5
-<<<<<<< HEAD
-=======
 
->>>>>>> 94bd257... finalised nun8well plate defs
 	// deep square well 96
 	swshp := wtype.NewShape("box", "mm", 8.2, 8.2, 41.3)
 	welltype := wtype.NewLHWell("DSW96", "", "", "ul", 1000, 100, swshp, wtype.LHWBV, 8.2, 8.2, 41.3, 4.7, "mm")
@@ -571,7 +568,10 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	plate = wtype.NewLHPlate("nunc8well", "Unknown", wellspercolumn, wellsperrow, heightinmm, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
 	plates[plate.Type] = plate
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 94bd257... finalised nun8well plate defs
 	//	WellXOffset float64
 	//	WellYOffset float64
 	//	WellXStart  float64
