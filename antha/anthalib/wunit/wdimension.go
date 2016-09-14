@@ -24,9 +24,10 @@ package wunit
 
 import (
 	"fmt"
-	"github.com/antha-lang/antha/microArch/logger"
 	"strings"
 	"time"
+
+	"github.com/antha-lang/antha/microArch/logger"
 )
 
 // length
@@ -124,11 +125,13 @@ func SubtractVolumes(OriginalVol Volume, subtractvols []Volume) (newvolume Volum
 	// ideally should check these have the same Dimension
 	// need to improve this
 
-	tempvol := OriginalVol
+	tempvol := (CopyVolume(OriginalVol))
+
+	fmt.Println(tempvol)
 
 	for _, vol := range subtractvols {
-		newvolume = NewVolume(tempvol.SIValue()-vol.SIValue(), newvolume.Unit().BaseSISymbol())
-		tempvol = newvolume
+		newvolume = NewVolume(tempvol.RawValue()-vol.RawValue(), tempvol.Unit().PrefixedSymbol())
+		tempvol = (CopyVolume(newvolume))
 	}
 	return
 
