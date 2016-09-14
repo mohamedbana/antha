@@ -10,7 +10,40 @@ func getChannelForTest() *wtype.LHChannelParameter {
 	return wtype.NewLHChannelParameter("ch", "gilson", wunit.NewVolume(20.0, "ul"), wunit.NewVolume(200.0, "ul"), wunit.NewFlowRate(0.0, "ml/min"), wunit.NewFlowRate(100.0, "ml/min"), 8, false, wtype.LHVChannel, 1)
 }
 
-func TestPolicyMerger(t *testing.T) {
+func TestDNAPolicy(t *testing.T) {
+	pft, _ := GetLHPolicyForTest()
+
+	tp := TransferParams{
+		What:    "dna",
+		Volume:  wunit.NewVolume(2.0, "ul"),
+		Channel: getChannelForTest(),
+	}
+
+	ins1 := NewSuckInstruction()
+	ins1.AddTransferParams(tp)
+
+	p := pft.GetPolicyFor(ins1)
+
+	m, ok := p["POST_MIX"]
+
+	if ok && m.(int) > 0 {
+		t.Fatal("DNA must not post mix at volumes > 2 ul")
+	}
+
+	tp.Volume = wunit.NewVolume(1.99, "ul")
+
+	ins2 := NewSuckInstruction()
+	ins2.AddTransferParams(tp)
+	p = pft.GetPolicyFor(ins2)
+
+	m, ok = p["POST_MIX"]
+
+	if !ok || m.(int) != 1 {
+		t.Fatal("DNA must have exactly 1 post mix at volumes < 2 ul")
+	}
+}
+
+func TestPEGPolicy(t *testing.T) {
 	pft, _ := GetLHPolicyForTest()
 
 	tp := TransferParams{
