@@ -28,7 +28,6 @@ import (
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
 	"github.com/antha-lang/antha/microArch/logger"
-	"sort"
 	"strings"
 )
 
@@ -61,14 +60,30 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) (*
 	input_plate_order := request.Input_plate_order
 
 	if len(input_plate_order) < len(input_plates) {
-		input_plate_order = make([]string, len(input_plates))
-		x := 0
-		for k, _ := range input_plates {
-			input_plate_order[x] = k
-			x += 1
+		input_plate_order = make([]string, 0, len(input_plates))
+		/*
+			x := 0
+			for k, _ := range input_plates {
+				input_plate_order[x] = k
+				x += 1
+			}
+
+			sort.Strings(input_plate_order)
+		*/
+
+		for _, ass := range request.Input_assignments {
+			for _, a := range ass {
+				tx := strings.Split(a, ":")
+				if !isInStrArr(tx[0], input_plate_order) {
+					input_plate_order = append(input_plate_order, tx[0])
+				}
+			}
 		}
 
-		sort.Strings(input_plate_order)
+		if len(input_plate_order) != len(input_plates) {
+			return nil, wtype.LHError(wtype.LH_ERR_DIRE, fmt.Sprintf("Plate number inconsistency: %d != %d (here: %d)", len(input_plate_order), len(input_plates), 82))
+		}
+
 		request.Input_plate_order = input_plate_order
 	}
 
@@ -77,20 +92,18 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) (*
 	output_plate_order := request.Output_plate_order
 
 	if len(output_plate_order) < len(output_plates) {
-		output_plate_order = make([]string, len(output_plates))
+		output_plate_order = make([]string, 0, len(output_plates))
 		/*
-			x := 0
+				x := 0
 			for k, _ := range output_plates {
-				output_plate_order[x] = k
-				x += 1
+				fmt.Println("K: ", k)
 			}
-
-			sort.Strings(output_plate_order)
+				sort.Strings(output_plate_order)
 		*/
 		// order them according to when they are first used
 		for _, insID := range request.Output_order {
 			ins := request.LHInstructions[insID]
-			tx := strings.Split(":", ins.Result.Loc)
+			tx := strings.Split(ins.Result.Loc, ":")
 			pa := tx[0]
 
 			if !isInStrArr(pa, output_plate_order) {
