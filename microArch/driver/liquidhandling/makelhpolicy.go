@@ -360,8 +360,9 @@ func MakePEGPolicy() LHPolicy {
 	policy["POST_MIX_VOLUME"] = 190.0
 	policy["BLOWOUTVOLUME"] = 50.0
 	policy["BLOWOUTVOLUMEUNIT"] = "ul"
-	policy["TOUCHOFF"] = true
+	policy["TOUCHOFF"] = false
 	policy["CAN_MULTI"] = false
+	policy["RESET_OVERRIDE"] = true
 	return policy
 }
 
@@ -554,6 +555,7 @@ func MakeDNAPolicy() LHPolicy {
 	dnapolicy["TIP_REUSE_LIMIT"] = 0
 	dnapolicy["NO_AIR_DISPENSE"] = true
 	dnapolicy["RESET_OVERRIDE"] = true
+	dnapolicy["TOUCHOFF"] = false
 	return dnapolicy
 }
 
@@ -784,6 +786,7 @@ func MakeLVDNAMixPolicy() LHPolicy {
 	dnapolicy["POST_MIX"] = 1
 	dnapolicy["POST_MIX_Z"] = 0.5
 	dnapolicy["POST_MIX_RATE"] = 3.0
+	dnapolicy["TOUCHOFF"] = false
 	return dnapolicy
 }
 
