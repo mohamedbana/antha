@@ -141,7 +141,7 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 
 	for _, ins := range instructions {
 		//logger.Debug(fmt.Sprintln(liquidhandling.InsToString(ins)))
-
+		//fmt.Println(liquidhandling.InsToString(ins))
 		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(this.Properties.Driver)
 
 		if timer != nil {
@@ -446,6 +446,9 @@ func (this *Liquidhandler) Plan(request *LHRequest) error {
 	// revise the volumes
 	err = this.revise_volumes(request)
 
+	// ensure the after state is correct
+	this.fix_post_ids()
+
 	if err != nil {
 		return err
 	}
@@ -739,4 +742,15 @@ func OutputSetup(robot *liquidhandling.LHProperties) {
 		logger.Debug(fmt.Sprintf("%s %s: %s capacity %d", k, robot.PlateIDLookup[k], v.Type, v.Capacity))
 	}
 
+}
+
+//ugly
+func (lh *Liquidhandler) fix_post_ids() {
+	for _, p := range lh.FinalProperties.Plates {
+		for _, w := range p.Wellcoords {
+			if w.IsUserAllocated() {
+				w.WContents.ID = wtype.GetUUID()
+			}
+		}
+	}
 }

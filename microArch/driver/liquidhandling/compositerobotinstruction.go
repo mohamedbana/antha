@@ -2624,13 +2624,17 @@ func (ins *BlowInstruction) Generate(policy *LHPolicyRuleSet, prms *LHProperties
 		if mixvol < wtype.Globals.MIN_REASONABLE_VOLUME_UL {
 			return ret, wtype.LHError(wtype.LH_ERR_POLICY, fmt.Sprintf("POST_MIX_VOLUME set below minimum allowed: %f min %f", mixvol, wtype.Globals.MIN_REASONABLE_VOLUME_UL))
 		} else if !ins.Prms.CanMove(vmixvol, true) {
-			//func ChangeTips(tiptype string, vol wunit.Volume, prms *LHProperties, channel wtype.LHChannelParameter, multi int) ([]RobotInstruction, error) {
-			tipchg, err := ChangeTips("", vmixvol, prms, ins.Prms, ins.Multi, true)
+			// make this illegal for now
 
-			if err != nil {
-				return ret, wtype.LHError(wtype.LH_ERR_POLICY, fmt.Sprintf("Setting POST_MIX_VOLUME: %s", err.Error()))
-			}
-			ret = append(ret, tipchg...)
+			return ret, wtype.LHError(wtype.LH_ERR_POLICY, fmt.Sprintf("Setting POST_MIX_VOLME to %s cannot be achieved with current tip", vmixvol.ToString()))
+			/*
+				tipchg, err := ChangeTips("", vmixvol, prms, ins.Prms, ins.Multi, true)
+
+				if err != nil {
+					return ret, wtype.LHError(wtype.LH_ERR_POLICY, fmt.Sprintf("Setting POST_MIX_VOLUME: %s", err.Error()))
+				}
+				ret = append(ret, tipchg...)
+			*/
 		}
 
 		if ok {
