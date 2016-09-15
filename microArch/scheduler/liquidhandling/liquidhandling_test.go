@@ -227,27 +227,31 @@ func TestBeforeVsAfter(t *testing.T) {
 			if pp1.Type != pp2.Type {
 				t.Fatal(fmt.Sprintf("Plates at %s not same type: %s %s", pos, pp1.Type, pp2.Type))
 			}
-			/*
-				it := wtype.NewOneTimeColumnWiseIterator(pp1)
+			it := wtype.NewOneTimeColumnWiseIterator(pp1)
 
-				for {
-					if !it.Valid() {
-						break
-					}
-					wc := it.Curr()
-					w1 := pp1.Wellcoords[wc.FormatA1()]
-					w2 := pp2.Wellcoords[wc.FormatA1()]
+			for {
+				if !it.Valid() {
+					break
+				}
+				wc := it.Curr()
+				w1 := pp1.Wellcoords[wc.FormatA1()]
+				w2 := pp2.Wellcoords[wc.FormatA1()]
 
-					if w1.Empty() && w2.Empty() {
-						it.Next()
-						continue
-					}
+				if w1.Empty() && w2.Empty() {
+					it.Next()
+					continue
+				}
+				/*
 					fmt.Println(wc.FormatA1())
 					fmt.Println(w1.WContents.CName, " ", w1.WContents.Vol)
 					fmt.Println(w2.WContents.CName, " ", w2.WContents.Vol)
-					it.Next()
+				*/
+
+				if w1.WContents.ID == w2.WContents.ID {
+					t.Fatal(fmt.Sprintf("IDs before and after must differ"))
 				}
-			*/
+				it.Next()
+			}
 		case *wtype.LHTipbox:
 			tb1 := p1.(*wtype.LHTipbox)
 			tb2 := p2.(*wtype.LHTipbox)
