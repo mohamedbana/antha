@@ -171,7 +171,7 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) (*
 		plate_lookup[p.ID] = position
 
 		params.AddPlate(position, p)
-		//logger.Info(fmt.Sprintf("Output plate of type %s in position %s", p.Type, position))
+		logger.Info(fmt.Sprintf("Output plate of type %s in position %s", p.Type, position))
 	}
 
 	for _, pid := range input_plate_order {
