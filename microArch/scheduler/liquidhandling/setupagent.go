@@ -27,7 +27,6 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"github.com/antha-lang/antha/microArch/driver/liquidhandling"
 	"github.com/antha-lang/antha/microArch/factory"
-	"github.com/antha-lang/antha/microArch/logger"
 	"strings"
 )
 
@@ -171,7 +170,7 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) (*
 		plate_lookup[p.ID] = position
 
 		params.AddPlate(position, p)
-		logger.Info(fmt.Sprintf("Output plate of type %s in position %s", p.Type, position))
+		//logger.Info(fmt.Sprintf("Output plate of type %s in position %s", p.Type, position))
 	}
 
 	for _, pid := range input_plate_order {
@@ -197,7 +196,7 @@ func BasicSetupAgent(request *LHRequest, params *liquidhandling.LHProperties) (*
 		setup[position] = p
 		plate_lookup[p.ID] = position
 		params.AddPlate(position, p)
-		logger.Info(fmt.Sprintf("Input plate of type %s in position %s", p.Type, position))
+		//logger.Info(fmt.Sprintf("Input plate of type %s in position %s", p.Type, position))
 	}
 
 	// add the waste
