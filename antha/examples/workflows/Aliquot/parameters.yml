@@ -1,31 +1,10 @@
 {
     "Parameters": {
         "AliquotParams": {
-            "NumberofAliquots": 8,
-            "OutPlatetype": "pcrplate_with_cooler",
+            "NumberofAliquots": 4,
+            "OutPlatetype": "eppendorfrack425_1.5ml",
             "Solution": "water",
-            "SolutionVolume": "4000ul",
-            "VolumePerAliquot": "25ul"
-        },
-        "AliquotParams2": {
-            "NumberofAliquots": 8,
-            "OutPlatetype": "pcrplate_with_cooler",
-            "Solution": "water",
-            "SolutionVolume": "4000ul",
-            "VolumePerAliquot": "25ul"
-        },
-        "AliquotParams3": {
-            "NumberofAliquots": 8,
-            "OutPlatetype": "pcrplate_with_cooler",
-            "Solution": "fluorescein",
-            "SolutionVolume": "4000ul",
-            "VolumePerAliquot": "25ul"
-        },
-        "AliquotParams4": {
-            "NumberofAliquots": 8,
-            "OutPlatetype": "pcrplate_with_cooler",
-            "Solution": "fluorescein",
-            "SolutionVolume": "4000ul",
+            "SolutionVolume": "100ul",
             "VolumePerAliquot": "25ul"
         }
     }
