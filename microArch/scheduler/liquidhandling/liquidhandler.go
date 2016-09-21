@@ -107,6 +107,34 @@ func (this *Liquidhandler) MakeSolutions(request *LHRequest) error {
 	if err != nil {
 		return err
 	}
+
+	// now give me some answers
+
+	/*
+		for _, id := range this.FinalProperties.PosLookup {
+			p, ok := this.FinalProperties.PlateLookup[id]
+			if !ok {
+				continue
+			}
+			switch p.(type) {
+			case *wtype.LHPlate:
+				pl := p.(*wtype.LHPlate)
+				for _, c := range pl.Cols {
+					for _, w := range c {
+						if !w.Empty() {
+							fmt.Print(w.Crds, " ")
+							fmt.Print(pl.PlateName, " ")
+							fmt.Print(pl.Type, " ")
+							fmt.Print(w.WContents.CName, " ")
+							fmt.Print(w.WContents.Vol, " ")
+							fmt.Println()
+						}
+					}
+				}
+			}
+		}
+	*/
+
 	err = this.Execute(request)
 
 	if err != nil {
@@ -142,7 +170,7 @@ func (this *Liquidhandler) Execute(request *LHRequest) error {
 
 	for _, ins := range instructions {
 		//logger.Debug(fmt.Sprintln(liquidhandling.InsToString(ins)))
-		fmt.Println(liquidhandling.InsToString(ins))
+		//fmt.Println(liquidhandling.InsToString(ins))
 		ins.(liquidhandling.TerminalRobotInstruction).OutputTo(this.Properties.Driver)
 
 		if timer != nil {
