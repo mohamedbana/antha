@@ -45,6 +45,7 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	inhecoincubatorinmm := devices.Shaker["InhecoStaticOnDeck"]["Height"] * 1000
 
 	valueformaxheadtonotintoDSWplatewithp20tips := 4.5
+	valueforheadtogotobrottomofDSW96on20riser := 26 - offset
 
 	// deep square well 96
 	swshp := wtype.NewShape("box", "mm", 8.2, 8.2, 41.3)
@@ -55,7 +56,7 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	// deep square well 96 on riser
 	swshp = wtype.NewShape("box", "mm", 8.2, 8.2, 41.3)
 	welltype = wtype.NewLHWell("DSW96", "", "", "ul", 1000, 100, swshp, wtype.LHWBV, 8.2, 8.2, 41.3, 4.7, "mm")
-	plate = wtype.NewLHPlate("DSW96_riser", "Unknown", 8, 12, 44.1, "mm", welltype, 9, 9, 0.0, 0.0, riserheightinmm)
+	plate = wtype.NewLHPlate("DSW96_riser", "Unknown", 8, 12, 44.1, "mm", welltype, 9, 9, 0.0, 0.0, valueforheadtogotobrottomofDSW96on20riser)
 	plates[plate.Type] = plate
 	plate = wtype.NewLHPlate("DSW96_riser40", "Unknown", 8, 12, 44.1, "mm", welltype, 9, 9, 0.0, 0.0, riserheightinmm)
 	plates[plate.Type] = plate
@@ -177,6 +178,14 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 200, 5, cone, wtype.LHWBU, 5.5, 5.5, 20.4, 1.4, "mm")
 	welltype.SetAfVFunc(afs)
 	plate = wtype.NewLHPlate("pcrplate_skirted_riser", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, riserheightinmm-1.25)
+
+	plates[plate.Type] = plate
+
+	// pcr plate skirted (on riser)
+	cone = wtype.NewShape("cylinder", "mm", 5.5, 5.5, 20.4)
+	welltype = wtype.NewLHWell("pcrplate", "", "", "ul", 200, 5, cone, wtype.LHWBU, 5.5, 5.5, 20.4, 1.4, "mm")
+	welltype.SetAfVFunc(afs)
+	plate = wtype.NewLHPlate("pcrplate_skirted_riser_96forpicking", "Unknown", 8, 12, 25.7, "mm", welltype, 9, 9, 0.0, 0.0, riserheightinmm+3)
 
 	plates[plate.Type] = plate
 
