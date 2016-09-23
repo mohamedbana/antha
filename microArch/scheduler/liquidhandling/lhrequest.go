@@ -64,6 +64,7 @@ type LHRequest struct {
 	CarryVolume              wunit.Volume
 	Evaps                    []wtype.VolumeCorrection
 	Options                  LHOptions
+	NUserPlates              int
 }
 
 func (req *LHRequest) ConfigureYourself() error {
@@ -161,6 +162,13 @@ func (lhr *LHRequest) NewComponentsAdded() bool {
 }
 
 func (lhr *LHRequest) AddUserPlate(p *wtype.LHPlate) {
+	// impose sanity
+
+	if p.PlateName == "" {
+		p.PlateName = fmt.Sprintf("User_plate_%d", lhr.NUserPlates+1)
+		lhr.NUserPlates += 1
+	}
+
 	p.MarkNonEmptyWellsUserAllocated()
 	lhr.Input_plates[p.ID] = p
 }
