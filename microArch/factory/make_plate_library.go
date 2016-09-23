@@ -555,6 +555,13 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 
 	plates[plate.Type] = plate
 
+	welltype = wtype.NewLHWell("falcon12well", "", "", "ul", 100, 10, circle, bottomtype, xdim, ydim, zdim, bottomh, "mm")
+	plate = wtype.NewLHPlate("Nuncon12wellAgarD_incubator", "Unknown", wellspercolumn, wellsperrow, heightinmm, "mm", welltype, wellxoffset, wellyoffset, xstart, ystart, zstart)
+
+	consar = []string{"position_9"}
+	plate.SetConstrained("Pipetmax", consar)
+	plates[plate.Type] = plate
+
 	//Nunclon 8 well Plate 167064 DOW
 	bottomtype = wtype.LHWBFLAT
 	xdim = 30.0

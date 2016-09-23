@@ -242,9 +242,11 @@ func TestBeforeVsAfter(t *testing.T) {
 					continue
 				}
 				/*
+					fmt.Println(pp1.PlateName, " ", pp1.Type)
+					fmt.Println(pp2.PlateName, " ", pp2.Type)
 					fmt.Println(wc.FormatA1())
-					fmt.Println(w1.WContents.CName, " ", w1.WContents.Vol)
-					fmt.Println(w2.WContents.CName, " ", w2.WContents.Vol)
+					fmt.Println(w1.ID, " ", w1.WContents.ID, " ", w1.WContents.CName, " ", w1.WContents.Vol)
+					fmt.Println(w2.ID, " ", w2.WContents.ID, " ", w2.WContents.CName, " ", w2.WContents.Vol)
 				*/
 
 				if w1.WContents.ID == w2.WContents.ID {
