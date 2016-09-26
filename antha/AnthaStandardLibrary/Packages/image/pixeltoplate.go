@@ -558,7 +558,12 @@ func ResizeImagetoPlate(imagefilename string, plate *wtype.LHPlate, algorithm im
 		if rotate {
 			img = imaging.Rotate270(img)
 		}
-		plateimage = imaging.Resize(img, 0, plate.WlsY, algorithm)
+		var aspectratio float64 = float64(img.Bounds().Dx()) / float64(img.Bounds().Dy())
+		if aspectratio <= float64(plate.WellsX())/float64(plate.WellsY()) {
+			plateimage = imaging.Resize(img, 0, plate.WlsY, algorithm)
+		} else {
+			plateimage = imaging.Resize(img, plate.WlsX, 0, algorithm)
+		}
 		//plateimages = append(plateimages,plateimage)
 	} else {
 		// fmt.Println("i'm the same!!!")
@@ -591,7 +596,12 @@ func ResizeImagetoPlateAutoRotate(imagefilename string, plate *wtype.LHPlate, al
 			// fmt.Println("Auto Rotating image")
 			img = imaging.Rotate270(img)
 		}
-		plateimage = imaging.Resize(img, 0, plate.WlsY, algorithm)
+		var aspectratio float64 = float64(img.Bounds().Dx()) / float64(img.Bounds().Dy())
+		if aspectratio <= float64(plate.WellsX())/float64(plate.WellsY()) {
+			plateimage = imaging.Resize(img, 0, plate.WlsY, algorithm)
+		} else {
+			plateimage = imaging.Resize(img, plate.WlsX, 0, algorithm)
+		}
 		//plateimages = append(plateimages,plateimage)
 	} else {
 		// fmt.Println("i'm the same!!!")
@@ -627,7 +637,12 @@ func CheckAllResizealgorithms(imagefilename string, plate *wtype.LHPlate, rotate
 		if img.Bounds().Dy() != plate.WellsY() {
 			// fmt.Println("hey we're not so different", img.Bounds().Dy(), plate.WellsY())
 			// have the option of changing the resize algorithm here
-			plateimage = imaging.Resize(img, 0, plate.WlsY, algorithm)
+			var aspectratio float64 = float64(img.Bounds().Dx()) / float64(img.Bounds().Dy())
+			if aspectratio <= float64(plate.WellsX())/float64(plate.WellsY()) {
+				plateimage = imaging.Resize(img, 0, plate.WlsY, algorithm)
+			} else {
+				plateimage = imaging.Resize(img, plate.WlsX, 0, algorithm)
+			}
 			//plateimages = append(plateimages,plateimage)
 		} else {
 			// fmt.Println("i'm the same!!!")
