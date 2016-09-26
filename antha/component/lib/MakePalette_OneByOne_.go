@@ -89,8 +89,8 @@ func _MakePalette_OneByOneSteps(_ctx context.Context, _input *MakePalette_OneByO
 
 					cyanvol := wunit.NewVolume(((float64(cmyk.C) / float64(maxuint8)) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
 
-					if cyanvol.RawValue() < 10 && cyanvol.Unit().PrefixedSymbol() == "ul" {
-						cyanvol.SetValue(10)
+					if cyanvol.RawValue() < 0.5 && cyanvol.Unit().PrefixedSymbol() == "ul" {
+						cyanvol.SetValue(0.5)
 					}
 
 					_input.Cyan.Type = wtype.LTPAINT
@@ -102,8 +102,8 @@ func _MakePalette_OneByOneSteps(_ctx context.Context, _input *MakePalette_OneByO
 				if cmyk.Y > 0 {
 					yellowvol := wunit.NewVolume(((float64(cmyk.Y) / float64(maxuint8)) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
 
-					if yellowvol.RawValue() < 10 && yellowvol.Unit().PrefixedSymbol() == "ul" {
-						yellowvol.SetValue(10)
+					if yellowvol.RawValue() < 0.5 && yellowvol.Unit().PrefixedSymbol() == "ul" {
+						yellowvol.SetValue(0.5)
 					}
 
 					_input.Yellow.Type = wtype.LTPAINT
@@ -115,8 +115,8 @@ func _MakePalette_OneByOneSteps(_ctx context.Context, _input *MakePalette_OneByO
 				if cmyk.M > 0 {
 					magentavol := wunit.NewVolume(((float64(cmyk.M) / float64(maxuint8)) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
 
-					if magentavol.RawValue() < 10 && magentavol.Unit().PrefixedSymbol() == "ul" {
-						magentavol.SetValue(10)
+					if magentavol.RawValue() < 0.5 && magentavol.Unit().PrefixedSymbol() == "ul" {
+						magentavol.SetValue(0.5)
 					}
 
 					_input.Magenta.Type = wtype.LTPAINT
@@ -128,8 +128,8 @@ func _MakePalette_OneByOneSteps(_ctx context.Context, _input *MakePalette_OneByO
 				if cmyk.K > 0 {
 					blackvol := wunit.NewVolume(((float64(cmyk.K) / float64(maxuint8)) * _input.VolumeForFullcolour.RawValue()), _input.VolumeForFullcolour.Unit().PrefixedSymbol())
 
-					if blackvol.RawValue() < 10 && blackvol.Unit().PrefixedSymbol() == "ul" {
-						blackvol.SetValue(10)
+					if blackvol.RawValue() < 0.5 && blackvol.Unit().PrefixedSymbol() == "ul" {
+						blackvol.SetValue(0.5)
 					}
 
 					_input.Black.Type = wtype.LTPAINT
