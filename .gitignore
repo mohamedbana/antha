@@ -1,4 +1,4 @@
-# Compiled Object files, Static and Dynamic libs (Shared Objects)
+n# Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o
 *.a
 *.so
@@ -16,6 +16,8 @@ _test
 _cgo_defun.c
 _cgo_gotypes.go
 _cgo_export.*
+
+.DS_Store
 
 _testmain.go
 
