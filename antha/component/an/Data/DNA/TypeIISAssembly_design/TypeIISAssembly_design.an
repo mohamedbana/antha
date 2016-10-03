@@ -93,7 +93,7 @@ Steps {
 				
 		}
 		} else {
-		partDNA = Inventory.Partslist[part]
+		partDNA = Inventory.Partslist()[part]
 		
 		}
 		
@@ -122,7 +122,7 @@ Steps {
 	
 	
 	// lookup vector sequence
-	vectordata := Inventory.Partslist[Vector]
+	vectordata := Inventory.Partslist()[Vector]
 	
 	//lookup restriction enzyme
 	restrictionenzyme := enzymes.Enzymelookup[AssemblyStandard][Level]

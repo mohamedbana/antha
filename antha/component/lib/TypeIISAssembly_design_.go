@@ -77,7 +77,7 @@ func _TypeIISAssembly_designSteps(_ctx context.Context, _input *TypeIISAssembly_
 
 			}
 		} else {
-			partDNA = Inventory.Partslist[part]
+			partDNA = Inventory.Partslist()[part]
 
 		}
 
@@ -104,7 +104,7 @@ func _TypeIISAssembly_designSteps(_ctx context.Context, _input *TypeIISAssembly_
 	}
 
 	// lookup vector sequence
-	vectordata := Inventory.Partslist[_input.Vector]
+	vectordata := Inventory.Partslist()[_input.Vector]
 
 	//lookup restriction enzyme
 	restrictionenzyme := enzymes.Enzymelookup[_input.AssemblyStandard][_input.Level]
