@@ -113,11 +113,15 @@ func makePlateLibrary() map[string]*wtype.LHPlate {
 	plates[plate.Type] = plate
 
 	// shallow round well flat bottom 96 on riser
+	// are these well bottoms definitely correct?
 	rwshp = wtype.NewShape("cylinder", "mm", 8.2, 8.2, 11)
 	welltype = wtype.NewLHWell("SRWFB96", "", "", "ul", 500, 10, rwshp, 0, 8.2, 8.2, 11, 1.0, "mm")
 	plate = wtype.NewLHPlate("SRWFB96_riser", "Unknown", 8, 12, 15, "mm", welltype, 9, 9, 0.0, 0.0, 40.0)
 	plates[plate.Type] = plate
 	plate = wtype.NewLHPlate("SRWFB96_riser40", "Unknown", 8, 12, 15, "mm", welltype, 9, 9, 0.0, 0.0, 40.0)
+	plates[plate.Type] = plate
+	// incubator
+	plate = wtype.NewLHPlate("SRWFB96_incubator", "Unknown", 8, 12, 15, "mm", welltype, 9, 9, 0.0, 0.0, 44.0)
 	plates[plate.Type] = plate
 
 	// deep well strip trough 12
