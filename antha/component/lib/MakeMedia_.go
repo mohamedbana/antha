@@ -56,6 +56,10 @@ func _MakeMediaSteps(_ctx context.Context, _input *MakeMediaInput, _output *Make
 	step = text.Print("Recipe for: ", _input.Name)
 	recipestring = append(recipestring, step)
 
+	step = text.Print("Step"+strconv.Itoa(stepcounter)+": ", "Prepare clean "+_input.Vessel.Type)
+	recipestring = append(recipestring, step)
+	stepcounter++
+
 	for _, liq := range _input.LiqComponents {
 
 		volrequired, err := wunit.VolumeForTargetConcentration(_input.LiqComponentFinalConcentrations[liq.CName], _input.LiqComponentStockConcentrations[liq.CName], _input.TotalVolume)

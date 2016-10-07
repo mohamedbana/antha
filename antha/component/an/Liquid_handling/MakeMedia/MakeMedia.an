@@ -73,6 +73,10 @@ Steps {
 		step = text.Print("Recipe for: ",Name)
 		recipestring = append(recipestring,step)
 		
+		step = text.Print("Step" + strconv.Itoa(stepcounter) + ": ", "Prepare clean " + Vessel.Type)
+		recipestring = append(recipestring,step)
+		stepcounter++
+
 		for _, liq := range LiqComponents {
 			
 			volrequired, err := wunit.VolumeForTargetConcentration(LiqComponentFinalConcentrations[liq.CName], LiqComponentStockConcentrations[liq.CName],TotalVolume) 
