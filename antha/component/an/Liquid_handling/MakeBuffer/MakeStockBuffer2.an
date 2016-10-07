@@ -4,6 +4,7 @@ import (
 	"github.com/antha-lang/antha/antha/anthalib/mixer"
 	"github.com/antha-lang/antha/antha/anthalib/wtype"
 	"fmt"
+	"strings"
 	"github.com/antha-lang/antha/antha/AnthaStandardLibrary/Packages/Pubchem"
 )
 
@@ -12,6 +13,8 @@ Parameters (
 	TargetConc Concentration
 	TotalVolume Volume
 	MoleculeDensity Density
+	ExtraInstructions []string
+	StorageTemperature Temperature
 )
 
 // Physical Inputs to this protocol with types
@@ -75,7 +78,7 @@ Steps {
 	Status = fmt.Sprintln( "Stock added = ", MassToAddinG.ToString(), "of", Molecule.CName,
 	"was added up to ", TotalVolume.SIValue(), "L with ",Diluent.CName,
 	"to make ", TotalVolume.SIValue(), "L", "of", Buffer.CName,
-	"Buffer stock conc =",TargetConc.ToString())
+	"Buffer stock conc =",TargetConc.ToString(),". Extra instructions: ", strings.Join(ExtraInstructions,", "),". Store at ",StorageTemperature.ToString())
 		
 	//OriginalDiluentVolume = DiluentVolume
 	

@@ -10,6 +10,7 @@ import (
 	"github.com/antha-lang/antha/execute"
 	"github.com/antha-lang/antha/inject"
 	"golang.org/x/net/context"
+	"strings"
 )
 
 // Input parameters for this protocol (data)
@@ -60,7 +61,7 @@ func _MakeStockBuffer2Steps(_ctx context.Context, _input *MakeStockBuffer2Input,
 	_output.Status = fmt.Sprintln("Stock added = ", _output.MassToAddinG.ToString(), "of", _input.Molecule.CName,
 		"was added up to ", _input.TotalVolume.SIValue(), "L with ", _input.Diluent.CName,
 		"to make ", _input.TotalVolume.SIValue(), "L", "of", _output.Buffer.CName,
-		"Buffer stock conc =", _input.TargetConc.ToString())
+		"Buffer stock conc =", _input.TargetConc.ToString(), ". Extra instructions: ", strings.Join(_input.ExtraInstructions, ", "), ". Store at ", _input.StorageTemperature.ToString())
 
 	//OriginalDiluentVolume = DiluentVolume
 
@@ -126,12 +127,14 @@ type MakeStockBuffer2Element struct {
 }
 
 type MakeStockBuffer2Input struct {
-	Diluent         *wtype.LHComponent
-	Molecule        *wtype.LHComponent
-	MoleculeDensity wunit.Density
-	TargetConc      wunit.Concentration
-	TotalVolume     wunit.Volume
-	Vessel          *wtype.LHPlate
+	Diluent            *wtype.LHComponent
+	ExtraInstructions  []string
+	Molecule           *wtype.LHComponent
+	MoleculeDensity    wunit.Density
+	StorageTemperature wunit.Temperature
+	TargetConc         wunit.Concentration
+	TotalVolume        wunit.Volume
+	Vessel             *wtype.LHPlate
 }
 
 type MakeStockBuffer2Output struct {
@@ -164,8 +167,10 @@ func init() {
 			Path: "antha/component/an/Liquid_handling/MakeBuffer/MakeStockBuffer2.an",
 			Params: []component.ParamDesc{
 				{Name: "Diluent", Desc: "", Kind: "Inputs"},
+				{Name: "ExtraInstructions", Desc: "", Kind: "Parameters"},
 				{Name: "Molecule", Desc: "", Kind: "Inputs"},
 				{Name: "MoleculeDensity", Desc: "", Kind: "Parameters"},
+				{Name: "StorageTemperature", Desc: "", Kind: "Parameters"},
 				{Name: "TargetConc", Desc: "", Kind: "Parameters"},
 				{Name: "TotalVolume", Desc: "", Kind: "Parameters"},
 				{Name: "Vessel", Desc: "", Kind: "Inputs"},
