@@ -71,9 +71,12 @@ func VolumetoMass(v Volume, d Density) (m Mass) {
 
 func VolumeForTargetMass(targetmass Mass, startingconc Concentration) (v Volume, err error) {
 
-	if startingconc.Unit().PrefixedSymbol() == "g/l" && targetmass.Unit().PrefixedSymbol() == "g" {
+	if startingconc.Unit().BaseSISymbol() == "kg/l" && targetmass.Unit().BaseSISymbol() == "kg" {
+		v = NewVolume(float64((targetmass.SIValue()/startingconc.SIValue())*1000000), "ul")
+	} else if startingconc.Unit().BaseSISymbol() == "g/l" && targetmass.Unit().BaseSISymbol() == "g" {
 		v = NewVolume(float64((targetmass.SIValue()/startingconc.SIValue())*1000000), "ul")
 	} else {
+		fmt.Println("Base units ", startingconc.Unit().BaseSISymbol(), " and ", targetmass.Unit().BaseSISymbol(), " not compatible with this function")
 		err = fmt.Errorf("Convert ", targetmass.ToString(), " to g and ", startingconc.ToString(), " to g/l")
 	}
 
