@@ -419,6 +419,7 @@ func NewConcentration(v float64, unit string) (o Concentration) {
 		"ng/ul":  Unit{Base: "g/l", Prefix: "m", Multiplier: 1.0},
 		"Mol/L":  Unit{Base: "Mol/l", Prefix: "", Multiplier: 1.0},
 		"M":      Unit{Base: "Mol/l", Prefix: "", Multiplier: 1.0},
+		"M/l":    Unit{Base: "Mol/l", Prefix: "", Multiplier: 1.0},
 		"mM":     Unit{Base: "Mol/l", Prefix: "m", Multiplier: 1.0},
 		"mMol/L": Unit{Base: "Mol/l", Prefix: "m", Multiplier: 1.0},
 	}
@@ -433,7 +434,7 @@ func NewConcentration(v float64, unit string) (o Concentration) {
 	}
 
 	if !approved {
-		panic("Can't make Time with non approved unit of " + unit + ". Approved units are: " + fmt.Sprint(approvedunits))
+		panic("Can't make Concentration with non approved unit of " + unit + ". Approved units are: " + fmt.Sprint(approvedunits))
 	}
 	/*if unit == "g/L" {
 		o = Concentration{NewMeasurement(v, "", "g/l")}
@@ -482,16 +483,26 @@ func (conc *Concentration) GramPerL(molecularweight float64) (conc_g Concentrati
 	if conc.Munit.BaseSISymbol() == "g/l" {
 		conc_g = *conc
 	}
+
+	if conc.Munit.BaseSISymbol() == "kg/l" {
+		conc_g = *conc
+	}
+
 	if conc.Munit.BaseSISymbol() == "M/l" {
-		conc_g = NewConcentration((conc.SIValue() * molecularweight), "M/l")
+		conc_g = NewConcentration((conc.SIValue() * molecularweight), "g/l")
 	}
 	return conc_g
 }
 
 func (conc *Concentration) MolPerL(molecularweight float64) (conc_M Concentration) {
 	if conc.Munit.BaseSISymbol() == "g/l" {
-		conc_M = NewConcentration((conc.SIValue() / molecularweight), "g/l")
+		conc_M = NewConcentration((conc.SIValue() / molecularweight), "M/l")
 	}
+
+	if conc.Munit.BaseSISymbol() == "kg/l" {
+		conc_M = NewConcentration((conc.SIValue() / molecularweight), "M/l")
+	}
+
 	if conc.Munit.BaseSISymbol() == "M/l" {
 		conc_M = *conc
 	}
