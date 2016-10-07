@@ -682,8 +682,9 @@ func GetPlateByType(typ string) *wtype.LHPlate {
 	plates := makePlateLibrary()
 	p := plates[typ]
 
-	if p != nil {
+	if p == nil {
 		fmt.Println("can't dup plate nil, plate name", typ)
+		return nil
 	} else {
 		fmt.Println("plate type", typ, "found in factory")
 	}
