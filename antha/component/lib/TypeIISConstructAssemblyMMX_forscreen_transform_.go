@@ -84,7 +84,7 @@ func _TypeIISConstructAssemblyMMX_forscreen_transformSteps(_ctx context.Context,
 
 	transformationSample := mixer.Sample(transformation, _input.CompetentCellTransferVolume)
 
-	_output.Recovery = execute.MixTo(_ctx, _input.PlatewithRecoveryMedia.Type, _input.RecoveryPlateWell, 1, transformationSample)
+	_output.Recovery = execute.MixTo(_ctx, _input.PlatewithRecoveryMedia.Type, _input.RecoveryPlateWell, _input.RecoveryPlateNumber, transformationSample)
 
 	// incubate the reaction mixture
 	// commented out pending changes to incubate
@@ -174,6 +174,7 @@ type TypeIISConstructAssemblyMMX_forscreen_transformInput struct {
 	ReactionTemp                wunit.Temperature
 	ReactionTime                wunit.Time
 	ReactionVolume              wunit.Volume
+	RecoveryPlateNumber         int
 	RecoveryPlateWell           string
 	RecoveryTemp                wunit.Temperature
 	RecoveryTime                wunit.Time
@@ -231,6 +232,7 @@ func init() {
 				{Name: "ReactionTemp", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionTime", Desc: "", Kind: "Parameters"},
 				{Name: "ReactionVolume", Desc: "", Kind: "Parameters"},
+				{Name: "RecoveryPlateNumber", Desc: "", Kind: "Parameters"},
 				{Name: "RecoveryPlateWell", Desc: "", Kind: "Parameters"},
 				{Name: "RecoveryTemp", Desc: "", Kind: "Parameters"},
 				{Name: "RecoveryTime", Desc: "", Kind: "Parameters"},

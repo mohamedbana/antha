@@ -31,6 +31,7 @@ Parameters (
 	PostPlasmidTemp 			Temperature
 	PostPlasmidTime 			Time
 	CompetentCellTransferVolume Volume
+	RecoveryPlateNumber 		int
 )
 
 // Physical Inputs to this protocol with types
@@ -121,7 +122,7 @@ Steps {
 		
 		transformationSample := mixer.Sample(transformation,CompetentCellTransferVolume) 
 		
-		Recovery = MixTo(PlatewithRecoveryMedia.Type,RecoveryPlateWell,1,transformationSample)
+		Recovery = MixTo(PlatewithRecoveryMedia.Type,RecoveryPlateWell,RecoveryPlateNumber,transformationSample)
 		
 
 	// incubate the reaction mixture
