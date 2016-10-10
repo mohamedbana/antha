@@ -79,9 +79,7 @@ Steps {
 	"was added up to ", TotalVolume.SIValue(), "L with ",Diluent.CName,
 	"to make ", TotalVolume.SIValue(), "L", "of", Buffer.CName,
 	"Buffer stock conc =",TargetConc.ToString(),". Extra instructions: ", strings.Join(ExtraInstructions,", "),". Store at ",StorageTemperature.ToString())
-		
-	//OriginalDiluentVolume = DiluentVolume
-	
+			
 	MoleculeInfo = molecule
 
 }

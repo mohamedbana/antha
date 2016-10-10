@@ -63,8 +63,6 @@ func _MakeStockBuffer2Steps(_ctx context.Context, _input *MakeStockBuffer2Input,
 		"to make ", _input.TotalVolume.SIValue(), "L", "of", _output.Buffer.CName,
 		"Buffer stock conc =", _input.TargetConc.ToString(), ". Extra instructions: ", strings.Join(_input.ExtraInstructions, ", "), ". Store at ", _input.StorageTemperature.ToString())
 
-	//OriginalDiluentVolume = DiluentVolume
-
 	_output.MoleculeInfo = molecule
 
 }
