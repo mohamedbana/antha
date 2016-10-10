@@ -2,7 +2,7 @@
     "connections": [],
     "processes": {
         "Transformation_complete": {
-            "component": "Transformation_complete"
+            "component": "Transformation_complete_noIncubation"
         }
     }
 }
