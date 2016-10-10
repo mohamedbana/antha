@@ -90,7 +90,7 @@ var Rbs = wtype.DNASequence{"x", strings.ToUpper("C"), false, false, wtype.Overh
 var CDS = wtype.DNASequence{"y", strings.ToUpper("A"), false, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, "", features}
 var Term = wtype.DNASequence{"z", strings.ToUpper("T"), false, false, wtype.Overhang{0, 0, 0, "", false}, wtype.Overhang{0, 0, 0, "", false}, "", features}
 
-var partslist = map[string]wtype.DNASequence{
+var initialpartslist = map[string]wtype.DNASequence{
 	"Vector1":       Vector1,
 	"Part1":         Part1,
 	"Part2":         Part2,
@@ -116,11 +116,18 @@ func LookforParts() (partslist map[string]wtype.DNASequence, err error) {
 	partslist = make(map[string]wtype.DNASequence)
 
 	// first add PartsList above
-	for key, value := range partslist {
-		if _, alreadyinmap := partslist[key]; !alreadyinmap {
+	for key, value := range initialpartslist {
+
+		// initialise parts into map
+		partslist[key] = value
+		/*if _, alreadyinmap := initialpartslist[key]; !alreadyinmap {
 			partslist[key] = value
-		} else if _, alreadyinmap := partslist[value.Nm]; !alreadyinmap {
+			fmt.Println("adding ", key, " to inventory")
+		}*/
+		// add by name too
+		if _, alreadyinmap := initialpartslist[value.Nm]; !alreadyinmap {
 			partslist[value.Nm] = value
+			fmt.Println("adding ", value.Nm, " to inventory")
 		} else {
 			err = fmt.Errorf("cannot add " + key + " to inventory partslist as already found, change the name")
 			//return
