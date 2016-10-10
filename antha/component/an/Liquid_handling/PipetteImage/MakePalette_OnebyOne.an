@@ -115,8 +115,11 @@ Steps {
 				cyanvol.SetValue(0.5)
 			}
 		
-		
-		Cyan.Type = wtype.LTPAINT
+		if cmyk.K == 0 && cmyk.M == 0 && cmyk.Y == 0{
+		Cyan.Type  =	wtype.LTDoNotMix
+		}else {
+		Cyan.Type = wtype.LTPostMix
+		}
 		
 		cyanSample := mixer.Sample(Cyan, cyanvol)
 		components = append(components, cyanSample)
@@ -129,8 +132,11 @@ Steps {
 				yellowvol.SetValue(0.5)
 			}
 		
-		
-		Yellow.Type = wtype.LTPAINT
+		if cmyk.K == 0 && cmyk.M == 0{
+		Yellow.Type  =	wtype.LTDoNotMix
+		}else {
+		Yellow.Type = wtype.LTPostMix
+		}
 		
 		yellowSample := mixer.Sample(Yellow, yellowvol)
 		components = append(components, yellowSample)
@@ -143,7 +149,11 @@ Steps {
 				magentavol.SetValue(0.5)
 			}
 		
-		Magenta.Type = wtype.LTPAINT
+		if cmyk.K == 0 {
+		Magenta.Type  =	wtype.LTDoNotMix
+		}else {
+		Magenta.Type = wtype.LTPostMix
+		}
 		
 		magentaSample := mixer.Sample(Magenta, magentavol)
 		components = append(components, magentaSample)
@@ -156,7 +166,7 @@ Steps {
 				blackvol.SetValue(0.5)
 			}
 		
-		Black.Type = wtype.LTPAINT
+		Black.Type = wtype.LTPostMix
 		
 		blackSample := mixer.Sample(Black, blackvol)
 		components = append(components, blackSample)
