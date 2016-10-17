@@ -435,7 +435,11 @@ func (a *ir) genInsts() ([]target.Inst, error) {
 
 	// Remove synthetic nodes and redundant edges
 	sg, err := graph.TransitiveReduction(graph.Eliminate(graph.EliminateOpt{
-		Graph: ig,
+		Graph: graph.Simplify(graph.SimplifyOpt{
+			Graph:            ig,
+			RemoveSelfLoops:  true,
+			RemoveMultiEdges: true,
+		}),
 		In: func(n graph.Node) bool {
 			if _, isWait := n.(*target.Wait); isWait {
 				return false
